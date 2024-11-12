@@ -1,0 +1,259 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>huge</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>High-dimensional undirected graph estimation</h2>
+
+<h3>Description</h3>
+
+<p>The main function for high-dimensional undirected graph estimation. Three graph estimation methods, including (1) Meinshausen-Buhlmann graph estimation (<code>mb</code>) (2) graphical lasso (<code>glasso</code>) (3) correlation thresholding graph estimation (<code>ct</code>) and (4) tuning-insensitive graph estimation (<code>tiger</code>), are available for data analysis.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">huge(
+  x,
+  lambda = NULL,
+  nlambda = NULL,
+  lambda.min.ratio = NULL,
+  method = "mb",
+  scr = NULL,
+  scr.num = NULL,
+  cov.output = FALSE,
+  sym = "or",
+  verbose = TRUE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>There are 2 options: (1) <code>x</code> is an <code>n</code> by <code>d</code> data matrix (2) a <code>d</code> by <code>d</code> sample covariance matrix. The program automatically identifies the input matrix by checking the symmetry. (<code>n</code> is the sample size and <code>d</code> is the dimension).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lambda</code></td>
+<td>
+<p>A sequence of decreasing positive numbers to control the regularization when <code>method = "mb"</code>, <code>"glasso"</code> or <code>"tiger"</code>, or the thresholding in <code>method = "ct"</code>. Typical usage is to leave the input <code>lambda = NULL</code> and have the program compute its own <code>lambda</code> sequence based on <code>nlambda</code> and <code>lambda.min.ratio</code>. Users can also specify a sequence to override this. When <code>method = "mb"</code>, <code>"glasso"</code> or <code>"tiger"</code>, use with care - it is better to supply a decreasing sequence values than a single (small) value.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nlambda</code></td>
+<td>
+<p>The number of regularization/thresholding parameters. The default value is <code>30</code> for <code>method = "ct"</code> and <code>10</code> for <code>method = "mb"</code>, <code>"glasso"</code> or <code>"tiger"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lambda.min.ratio</code></td>
+<td>
+<p>If <code>method = "mb"</code>, <code>"glasso"</code> or <code>"tiger"</code>, it is the smallest value for <code>lambda</code>, as a fraction of the upperbound (<code>MAX</code>) of the regularization/thresholding parameter which makes all estimates equal to <code>0</code>. The program can automatically generate <code>lambda</code> as a sequence of length = <code>nlambda</code> starting from <code>MAX</code> to <code>lambda.min.ratio*MAX</code> in log scale. If <code>method = "ct"</code>, it is the largest sparsity level for estimated graphs. The program can automatically generate <code>lambda</code> as a sequence of length = <code>nlambda</code>, which makes the sparsity level of the graph path increases from <code>0</code> to <code>lambda.min.ratio</code> evenly.The default value is <code>0.1</code> when <code>method = "mb"</code>, <code>"glasso"</code> or <code>"tiger"</code>, and 0.05 <code>method = "ct"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+<p>Graph estimation methods with 4 options: <code>"mb"</code>, <code>"ct"</code>, <code>"glasso"</code> and <code>"tiger"</code>. The default value is <code>"mb"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>scr</code></td>
+<td>
+<p>If <code>scr = TRUE</code>, the lossy screening rule is applied to preselect the neighborhood before the graph estimation. The default value is  <code>FALSE</code>. NOT applicable when <code>method = "ct"</code>, "mb", or "tiger".</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>scr.num</code></td>
+<td>
+<p>The neighborhood size after the lossy screening rule (the number of remaining neighbors per node). ONLY applicable when <code>scr = TRUE</code>. The default value is <code>n-1</code>. An alternative value is <code>n/log(n)</code>. ONLY applicable when <code>scr = TRUE</code> and <code>method = "mb"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cov.output</code></td>
+<td>
+<p>If <code>cov.output = TRUE</code>, the output will include a path of estimated covariance matrices. ONLY applicable when <code>method = "glasso"</code>. Since the estimated covariance matrices are generally not sparse, please use it with care, or it may take much memory under high-dimensional setting. The default value is <code>FALSE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sym</code></td>
+<td>
+<p>Symmetrize the output graphs. If <code>sym = "and"</code>, the edge between node <code>i</code> and node <code>j</code> is selected ONLY when both node <code>i</code> and node <code>j</code> are selected as neighbors for each other. If <code>sym = "or"</code>, the edge is selected when either node <code>i</code> or node <code>j</code> is selected as the neighbor for each other. The default value is <code>"or"</code>. ONLY applicable when <code>method = "mb"</code> or "tiger".</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p>If <code>verbose = FALSE</code>, tracing information printing is disabled. The default value is <code>TRUE</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The graph structure is estimated by Meinshausen-Buhlmann graph estimation or the graphical lasso, and both methods can be further accelerated via the lossy screening rule by preselecting the neighborhood of each variable by correlation thresholding. We target on high-dimensional data analysis usually d &gt;&gt; n, and the computation is memory-optimized using the sparse matrix output. We also provide a highly computationally efficient approaches correlation thresholding graph estimation.
+</p>
+
+
+<h3>Value</h3>
+
+<p>An object with S3 class <code>"huge"</code> is returned:
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+
+<p>The <code>n</code> by <code>d</code> data matrix or <code>d</code> by <code>d</code> sample covariance matrix from the input
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cov.input</code></td>
+<td>
+
+<p>An indicator of the sample covariance.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ind.mat</code></td>
+<td>
+
+<p>The <code>scr.num</code> by <code>k</code> matrix with each column corresponding to a variable in <code>ind.group</code> and contains the indices of the remaining neighbors after the GSS. ONLY applicable when <code>scr = TRUE</code> and <code>approx = FALSE</code>
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lambda</code></td>
+<td>
+
+<p>The sequence of regularization parameters used in mb or thresholding parameters in ct.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sym</code></td>
+<td>
+
+<p>The <code>sym</code> from the input. ONLY applicable when <code>method = "mb"</code> or <code>"tiger"</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>scr</code></td>
+<td>
+
+<p>The <code>scr</code> from the input. ONLY applicable when <code>method = "mb"</code> or <code>"glasso"</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>path</code></td>
+<td>
+
+<p>A list of <code>k</code> by <code>k</code> adjacency matrices of estimated graphs as a graph path corresponding to <code>lambda</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sparsity</code></td>
+<td>
+
+<p>The sparsity levels of the graph path.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>icov</code></td>
+<td>
+
+<p>A list of <code>d</code> by <code>d</code> precision matrices as an alternative graph path (numerical path) corresponding to <code>lambda</code>. ONLY applicable when <code>method = "glasso"</code> or <code>"tiger"</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cov</code></td>
+<td>
+
+<p>A list of <code>d</code> by <code>d</code> estimated covariance matrices corresponding to <code>lambda</code>. ONLY applicable when <code>cov.output = TRUE</code> and <code>method = "glasso"</code>
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+
+<p>The method used in the graph estimation stage.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>df</code></td>
+<td>
+
+<p>If <code>method = "mb"</code> or <code>"tiger"</code>, it is a <code>k</code> by <code>nlambda</code> matrix. Each row contains the number of nonzero coefficients along the lasso solution path. If <code>method = "glasso"</code>, it is a <code>nlambda</code> dimensional vector containing the number of nonzero coefficients along the graph path <code>icov</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>loglik</code></td>
+<td>
+
+<p>A <code>nlambda</code> dimensional vector containing the likelihood scores along the graph path (<code>icov</code>). ONLY applicable when <code>method = "glasso"</code>. For an estimated inverse covariance Z, the program only calculates log(det(Z)) - trace(SZ) where S is the empirical covariance matrix. For the likelihood for n observations, please multiply by n/2.
+</p>
+</td>
+</tr>
+</table>
+<h3>Note</h3>
+
+<p>This function ONLY estimates the graph path. For more information about the optimal graph selection, please refer to <code>huge.select</code>.<br></p>
+
+
+<h3>See Also</h3>
+
+<p><code>huge.generator</code>, <code>huge.select</code>, <code>huge.plot</code>, <code>huge.roc</code>, and <code>huge-package</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">#generate data
+L = huge.generator(n = 50, d = 12, graph = "hub", g = 4)
+
+#graph path estimation using mb
+out1 = huge(L$data)
+out1
+plot(out1)         #Not aligned
+plot(out1, align = TRUE) #Aligned
+huge.plot(out1$path[[3]])
+
+#graph path estimation using the sample covariance matrix as the input.
+#out1 = huge(cor(L$data), method = "glasso")
+#out1
+#plot(out1)         #Not aligned
+#plot(out1, align = TRUE) #Aligned
+#huge.plot(out1$path[[3]])
+
+#graph path estimation using ct
+#out2 = huge(L$data,method = "ct")
+#out2
+#plot(out2)
+
+#graph path estimation using glasso
+#out3 = huge(L$data, method = "glasso")
+#out3
+#plot(out3)
+
+#graph path estimation using tiger
+#out4 = huge(L$data, method = "tiger")
+#out4
+#plot(out4)
+</code></pre>
+
+
+</div>

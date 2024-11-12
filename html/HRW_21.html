@@ -1,0 +1,167 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>summMCMC</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Summarizes Markov chain Monte Carlo (MCMC) samples both graphically and numerically</h2>
+
+<h3>Description</h3>
+
+<p>Given a set of MCMC for possibly several parameters the following summaries are produced: 1. a trace (time series) plot of each MCMC, 2. a plot of each MCMC sample against the 1-lagged sample, 3. estimated autocorrelatio function (acf), 4. Brooks-Gelman-Rubin (BGR) diagnostic plot in cases where multiple chains are inputted, 5. kernel ddensity estimate of the posterior density function based on the MCMC sample, 6. numerical summary consisting of the MCMC-based estimates of posterior means and credible sets for each parameter.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">summMCMC(xList,EPSfileName,PDFfileName,plotInd = 1,parNames,columnHeadings,
+         colourVersion = TRUE,credLevel = 0.95,columnHeadCex = NULL,paletteNum = 1,
+         numerSummCex = NULL,BGRsttPos = 10,BGRyRange = c(0.95,1.25),BGRtickPos = 1.2,
+         BGRlogTransf,BGRlogitTransf,KDExlim,KDEvertLine = TRUE,KDEvertLineCol = "black",
+         addTruthToKDE = NULL)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>xList</code></td>
+<td>
+<p>list of matrices, where each matrix corresponds to a different chain, and the columns of each matrix correspond to different parameters. The matrices each have dimension "numMCMC" by "numParms"; where "numMCMC" is the size of the MCMC sample and "numParms" is the number of parameters being summarized.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>EPSfileName</code></td>
+<td>
+<p>filename if the summary is to be saved as a (encapsulated) Postscript file. If this argument and 'PDFfileName' are both not specified then the summary is printed to the screen.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>PDFfileName</code></td>
+<td>
+<p>filename if the summary is to be saved as a PDF file. If this argument and 'EPSfileName' are both not specified then the summary is printed to the screen.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>plotInd</code></td>
+<td>
+<p>if "numChains" exceeds 1 then this indicates which chain is summarized in the non-BGR panels. The BGR panels are Brooks-Gelman-Rubin diagnostic plots are use all chains. The default value is 1.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>parNames</code></td>
+<td>
+<p>list containing a vector of character strings for the parameter names. The maximum length of the vector is 3.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>columnHeadings</code></td>
+<td>
+<p>vector containing column headings. The default is: c("parameter","trace","lag 1","acf","BGR","density","summary").</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>colourVersion</code></td>
+<td>
+<p>logical flag indicating if summary should be in colour. The default is TRUE.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>credLevel</code></td>
+<td>
+<p>number between 0 and 1 specifying the credible set level. The default is 0.95.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>columnHeadCex</code></td>
+<td>
+<p>positive number specifying character expansion factor for the column headings.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>paletteNum</code></td>
+<td>
+<p>either 1 or 2 to specify the colour palette to be used.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>numerSummCex</code></td>
+<td>
+<p>positive number specifying character expansion factor for the numerical summary (last column).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>BGRsttPos</code></td>
+<td>
+<p>starting position for the Brooks-Gelman-Rubin plots. The default value is 10.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>BGRyRange</code></td>
+<td>
+<p>vertical axis limits for the Brooks-Gelman-Rubin plots. The default value is  c(0.95,1.25).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>BGRtickPos</code></td>
+<td>
+<p>position of tick mark on vertical axis for the Brooks-Gelman-Rubin plots. The default value is 1.2.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>BGRlogTransf</code></td>
+<td>
+<p>vector containing indices of those parameters for which the Brooks-Gelman-Rubin plots should be done on a logarithmic scale.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>BGRlogitTransf</code></td>
+<td>
+<p>vector containing indices of those parameters for which the Brooks-Gelman-Rubin plots should be done on a logit scale.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>KDExlim</code></td>
+<td>
+<p>list of vectors of length 2 specifying the horizontal axis limits for the kernel density estimates.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>KDEvertLine</code></td>
+<td>
+<p>logical flag indicating if a vertical line at zero should be added to the kernel density estimates. The default value is TRUE.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>KDEvertLineCol</code></td>
+<td>
+<p>Colour of the vertical line at zero for kernel density estimates. The default value is "black".</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>addTruthToKDE</code></td>
+<td>
+<p>Vector indicating ‘true’ values of parameters. The default value is NULL. If 'addTruthToKDE' is non-NULL then dashed vertical lines corresponding to true values (if known from simulation) are added.</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>Matt Wand
+<a href="mailto:matt.wand@uts.edu.au">matt.wand@uts.edu.au</a> 
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">library(HRW)
+xListSingleChain &lt;- list(cbind(rnorm(100),rnorm(100),rnorm(100),rnorm(100)))
+summMCMC(xListSingleChain,parNames = list("par1","par2","par3","par4"))
+xListMultipleChains &lt;- list(chain1 = cbind(rnorm(100),rnorm(100),rnorm(100),rnorm(100)),
+                            chain2 = cbind(rnorm(100),rnorm(100),rnorm(100),rnorm(100)))
+summMCMC(xListMultipleChains,parNames = list("par1","par2","par3","par4"))
+</code></pre>
+
+
+</div>

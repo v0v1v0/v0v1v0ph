@@ -1,0 +1,83 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>det_guard_width</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Estimation of width of a guard region given an estimated highriskzone</h2>
+
+<h3>Description</h3>
+
+<p><code>det_guard_width</code> determines the necessary width of a guard region in which
+the existence of additional observed bomb craters could change a intensity based estimated 
+highriskzone within the evaluation area of interest.
+Within the evaluation area, the high risk zone consists of all points at which the estimated 
+intensity of unexploded bombs exceeds a certain, specified or estimated threshold c. At a given 
+point s, the intensity of unexploded bombs is given by the sum of all evaluated bivariate normal kernels
+centered at the observed bomb craters multiplied by a constant nxprob/1-nxprob.
+If the estimated intensity of unexploaded bombs is zero at a point at the boarder of the evaluation area
+an additional observation outside the area could lift the intensity only above the determined threshold if the 
+distance to the boarder is small enough so that the density of the normal kernel (which is centered at the additional 
+observation) is bigger than the threshold at the boarder (assuming that the estimated kernel doesn't change due to the 
+additional observation). The function returns the biggest distance in which it is possible that the density of
+the bivariate normal kernel of the intensity of the supplied highriskzone exceeds thresh_const times the threshold
+of the highriskzone. If thresh_const is set to 1, the guard region is the smallest region with constant width around 
+the evaluation area in which a single additional observation could (but not necessarily does) increase the 
+highriskzone within the evaluation area at a point at the boarder if the intensity of unexploaded bombs was zero at this point before. 
+If the intensity was &gt;0 at a point at the boarder of the evaluation area, or more than 1 additional observations
+are found nearby outside of the evaluation area, the highriskzone within the evaluation area could already expand  
+by addditional observations with a bigger distance from the boarder. This can be considered by setting thresh_const &lt; 1, 
+which intuitively means that 1/thresh_const crater observation at the same point could expand the highriskzone within 
+the evaluation area in the direction of the additional observations, or that a point the boarder becomes part of the highriskzone
+by the observation of a single additional crater if the intensity at this point was thresh_cont times the highriskzone threshold
+based on all crater observations within the evaluation area.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">det_guard_width(highriskzone, thresh_const = 0.5)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>highriskzone</code></td>
+<td>
+<p>the estimated highriskzone for the evaluation area</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>thresh_const</code></td>
+<td>
+<p>the constant multiplied with the determined threshold, 0 &lt; thresh_const &lt; 1.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>For more infos on the construction of guard zones see Mahling (2013, Appendix B, Approach 2)
+</p>
+
+
+<h3>Value</h3>
+
+<p>The constant width of the guard region.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## change npixel to 1000 to obtain nicer plots
+spatstat.geom::spatstat.options(npixel=100)
+data(craterA)
+# reduce number of observations for faster computation
+thin.craterA &lt;- craterA[1:50]
+hrzi1 &lt;- det_hrz(thin.craterA, type = "intens", criterion = "area", cutoff = 100000, nxprob = 0.1)
+det_guard_width(hrzi1, thresh_const = .25)
+</code></pre>
+
+
+</div>

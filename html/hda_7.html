@@ -1,0 +1,118 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>showloadings</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Loadings plot for heteroscedastic discriminant analysis</h2>
+
+<h3>Description</h3>
+
+<p>Visualizes the loadings of the original variables on the components of the transformed 
+discriminant space of reduced dimension.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">showloadings(object, comps = 1:object$reduced.dimension, loadings = TRUE, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>object</code></td>
+<td>
+<p>An object of class <code>hda</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>comps</code></td>
+<td>
+<p>A vector of component ids for which the loadings should be displayed.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>loadings</code></td>
+<td>
+<p>Logical indicating whether loadings or variable importance lifts should be plotted.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Further arguments to be passed to the plot functions.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Scatterplots of loadings (or lifts) of any variable on any hda component to give an idea of what variables do mainly contribute to the different discriminant components (see corresponding values of <code>object</code>). Note that as opposed to linear discriminant analysis not only location but also scale differences contribute to class discrimination of the hda components.    
+</p>
+
+
+<h3>Value</h3>
+
+<p>No value is returned.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Gero Szepannek</p>
+
+
+<h3>References</h3>
+
+<p>Kumar, N. and Andreou, A. (1998): <em>Heteroscedastic discriminant analysis and reduced rank HMMs 
+for improved speech recognition.</em> Speech Communication 25, pp.283-297.
+</p>
+<p>Szepannek G., Harczos, T., Klefenz, F. and Weihs, C. (2009): <em>Extending features for automatic speech recognition 
+by means of auditory modelling.</em> In: Proceedings of European Signal Processing Conference (EUSIPCO) 2009, Glasgow, pp.1235-1239. 
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>hda</code>, <code>predict.hda</code>, <code>plot.hda</code></p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">library(mvtnorm)
+library(MASS)
+
+# simulate data for two classes
+n           &lt;- 50
+meana       &lt;- meanb &lt;- c(0,0,0,0,0)
+cova        &lt;- diag(5)
+cova[1,1]   &lt;- 0.2
+for(i in 3:4){
+  for(j in (i+1):5){
+    cova[i,j] &lt;- cova[j,i] &lt;- 0.75^(j-i)}
+  }
+covb       &lt;- cova
+diag(covb)[1:2]  &lt;- c(1,0.2)
+
+xa      &lt;- rmvnorm(n, meana, cova)
+xb      &lt;- rmvnorm(n, meanb, covb)
+x       &lt;- rbind(xa,xb)
+classes &lt;- as.factor(c(rep(1,n), rep(2,n)))
+# rotate simulated data
+symmat &lt;- matrix(runif(5^2),5)
+symmat &lt;- symmat + t(symmat)
+even   &lt;- eigen(symmat)$vectors
+rotatedspace &lt;- x %*% even
+plot(as.data.frame(rotatedspace), col = classes)
+
+# apply heteroscedastic discriminant analysis and plot data in discriminant space
+hda.res &lt;- hda(rotatedspace, classes)
+
+# visualize loadings
+showloadings(hda.res)
+</code></pre>
+
+
+</div>

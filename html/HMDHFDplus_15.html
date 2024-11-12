@@ -1,0 +1,104 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>readHFDweb</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>read an HFD data file directly from the web as an R data.frame</h2>
+
+<h3>Description</h3>
+
+<p>Read HFD data directly from the web. This function is useful for short reproducible examples, or to make code guaranteed to always use the most up to date version of a particular HFD data file. For working with the entire HFD for a comparative study, it may be more efficient to download the full HFD zip files and read in the elements using <code>readHFD()</code>. This function returns data formatted in the same way as <code>readHFD()</code>, that is, with Age columns (and others) converted to integer, and with open age group identifiers stored in a new logical column called <code>OpenInterval</code>. It is faster to specify <code>CNTRY</code> and <code>item</code> as arguments than to make the function figure out what's available. For repeated calls to this function, you can pass your username and password in as variables without having to include these in you R script by using <code>userInput()</code>– see example. The user also has the option of querying particular updates from the HFD revision history. If you wish to specify a particular update, you must know the date that a particular country was updated, in the format <code>"YYYYMMDD"</code>. These dates differ between countries, so keep a good record if you wish your work to be reproducible to that extent (as well as lightweight)!
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">readHFDweb(
+  CNTRY = NULL,
+  item = NULL,
+  username = NULL,
+  password = NULL,
+  fixup = TRUE,
+  Update = NULL
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>CNTRY</code></td>
+<td>
+<p>character string of the HFD short code. Only one!</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>item</code></td>
+<td>
+<p>character string of the data product code, which is the base file name, but excluding the country code and file extension <code>.txt</code>. For instance, <code>"mabRR"</code> or <code>"tfrVHbo"</code>. If you're not sure, then leave it blank and a list will be shown. Only one item!</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>username</code></td>
+<td>
+<p>your HFD usernames, which is usually the email address you registered with</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>password</code></td>
+<td>
+<p>your HFD password. Don't make this a sensitive password, as things aren't encrypted.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fixup</code></td>
+<td>
+<p>logical. Should columns be made more user-friendly, e.g., forcing Age to be integer?</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Update</code></td>
+<td>
+<p>character string of 8-digit date code of the format <code>"YYYYMMDD"</code>. Defaults to most recent update.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>You need to register for HFD to use this function: <a href="https://www.humanfertility.org">https://www.humanfertility.org</a>. It is advised to pass in your credentials as named vectors rather than directly as character strings, so that they are not saved directly in your code. See examples. One option is to just save them in your Rprofile file.
+</p>
+
+
+<h3>Value</h3>
+
+<p>data.frame of the given HFD data file, modified in some friendly ways.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">### # this will ask you to enter your login details in the R console
+### DAT &lt;- readHFDweb("JPN","tfrRR") 
+###
+### # ----------------------------------------
+### # this is a good way to reuse your login credentials without 
+### # having to reveal them in your R script.
+### # if you want to do this in batch then I'm 
+### # afraid you'll have to find a clever way to 
+### # pass in your credentials without an interactive 
+### # session, such as reading them in from a system file of your own.
+### myusername &lt;- userInput()
+### mypassword &lt;- userInput()
+### DAT &lt;- readHMDweb("USA","mltper_1x1",mypassword,myusername)
+###
+### #-----------------------------------------
+### # this also works, but you'll need to make two selections, 
+### # plus enter data in the console twice:
+### DAT &lt;- readHFDweb()
+
+</code></pre>
+
+
+</div>

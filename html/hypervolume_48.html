@@ -1,0 +1,216 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hypervolume_resample</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Hypervolume resampling methods
+</h2>
+
+<h3>Description</h3>
+
+<p><code>hypervolume_resample</code> generates new hyperolumes based on the method input. Outputs written to file.
+</p>
+<p>- <code>"bootstrap"</code>:        Generates n hypervolumes using data bootstrapped from original data
+</p>
+<p>- <code>"bootstrap seq"</code>:    Generates n hypervolumes for each sample size in sequence specified by user
+</p>
+<p>- <code>"weighted bootstrap"</code>: Same procedure as bootstrap but with sampling weights applied to data (default weights are normal distributed)
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hypervolume_resample(name, 
+                      hv, 
+                      method, 
+                      n = 10, 
+                      points_per_resample = "sample_size", 
+                      seq = 3:nrow(hv@Data), 
+                      cores = 1,
+                      verbose = TRUE,
+                      to_file = TRUE,
+                      mu = NULL, 
+                      sigma = NULL, 
+                      cols_to_weigh = 1:ncol(hv@Data), 
+                      weights = NULL)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>name</code></td>
+<td>
+
+<p>File name; The function writes hypervolumes to file in ./Objects/&lt;name&gt;
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>hv</code></td>
+<td>
+
+<p>A hypervolume object
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+
+<p>String input; options are <code>"bootstrap"</code>, <code>"bootstrap seq"</code>, and <code>"weighted bootstrap"</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n</code></td>
+<td>
+
+<p>Number of resamples to take.
+Used for every method.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>points_per_resample</code></td>
+<td>
+
+<p>Number of points in each resample. If the input is "sample_size", then the same number of points as the original sample is used.
+Used for <code>method = "bootstrap"</code> and <code>method = "weighted bootstrap"</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>seq</code></td>
+<td>
+
+<p>Sequence of sample sizes. If <code>method = "bootstrap seq"</code> then the function generates n bootstrapped hypervolumes for each sample size in seq.
+Used for <code>method = "bootstrap seq"</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cores</code></td>
+<td>
+
+<p>Number of logical cores to use while generating bootstraped hypervolumes. If parallel backend already registered to <code>doParallel</code>, function will use that backend and ignore the argument in cores.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+
+<p>Logical value; If function is being run sequentially, outputs progress bar in console.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>to_file</code></td>
+<td>
+
+<p>Logical value; If TRUE, writes resampled hypervolumes to file, otherwise returns an object from <code>HypervolumeList-class</code>.
+Used for <code>method = "bootstrap"</code> and <code>method = "weighted bootstrap"</code>
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mu</code></td>
+<td>
+
+<p>Array of values specifying the mean of multivariate normal weights.
+Used for <code>method = "weighted bootstrap"</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sigma</code></td>
+<td>
+
+<p>Array of values specifying the variance in each dimension. (higher variance corresponds to more even weights)
+Used for <code>method = "weighted bootstrap"</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cols_to_weigh</code></td>
+<td>
+
+<p>Array of column indices; must be same length as mu and sigma.  
+Used for <code>method = "weighted bootstrap"</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>weights</code></td>
+<td>
+
+<p>Custom weight assigned to each row of data when resampling.
+Used for <code>method = "weighted bootstrap"</code>.
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p><code>hypervolume_resample</code> creates a directory called Objects in the current working directory if a directory of that name doesn't already exist. Returns an absolute path to directory with resampled hypervolumes. rds files are stored in different file structures depending on which method is called.
+</p>
+<p>Use <code>to_hv_list</code> to extract every hypervolume object in a directory into a HypervolumeList object.
+It is also possible to access the hypervolumes by using readRDS to read the hypervolume objects in one by one.
+</p>
+<p>The resampled hypervolumes are generated using the same parameters used to generate the input hypervolume. The only exception is that the bandwidth is re-estimated if <code>method = "gaussian"</code> or <code>method = "box"</code>. See <code>copy_param_hypervolume</code> for more details.
+</p>
+
+
+<h3>Value</h3>
+
+<p>returns a string containing an absolute path equivalent to ./Objects/&lt;name&gt;
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>to_hv_list</code>, <code>hypervolume_overlap_test</code>, <code>hypervolume_funnel</code>, <code>hypervolume_overlap_confidence</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+library(palmerpenguins)
+data(penguins)
+bill_data = na.omit(penguins[,3:4])
+hv = hypervolume(bill_data)
+
+# Example 1: Get 50 resampled hypervolumes
+# Use detectCores to see how many cores are availible in current environment
+# Set cores = 1 to run sequentially (default)
+path = hypervolume_resample("example_bootstrap", 
+                              hv, 
+                              method = "bootstrap", 
+                              n = 50, 
+                              cores = 12)
+hvs = to_hv_list(path)
+
+# Example 2: Get resample with applied weights
+# Get maximum bill length
+max_bill = max(bill_data$bill_length_mm)
+# Make data with larger bill length slightly more likley to be resampled
+weighted_path = hypervolume_resample("weighted test", 
+                                    hv, 
+                                    method = "weighted bootstrap", 
+                                    n = 50, 
+                                    cores = 12, 
+                                    mu = max_bill, 
+                                    sigma = 90, 
+                                    cols_to_weigh = "bill_length_mm")
+hvs_weighted = to_hv_list(weighted_path)
+
+## End(Not run)
+</code></pre>
+
+
+</div>

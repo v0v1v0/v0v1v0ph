@@ -1,0 +1,240 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>mh</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Fit a generic model using Metropolis-Hastings (MH)</h2>
+
+<h3>Description</h3>
+
+<p>This function runs the MH algorithm on a generic model provided
+the <code>logPOSTERIOR</code> function.
+All parameters specified within the list <code>param</code> are passed to these the posterior function.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">mh(
+  N,
+  theta.init,
+  qPROP,
+  qFUN,
+  logPOSTERIOR,
+  nu = 0.001,
+  varnames = NULL,
+  param = list(),
+  chains = 1,
+  parallel = FALSE,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>N</code></td>
+<td>
+<p>Number of MCMC samples</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>theta.init</code></td>
+<td>
+<p>Vector of initial values for the parameters</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>qPROP</code></td>
+<td>
+<p>Function to generate proposal</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>qFUN</code></td>
+<td>
+<p>Probability for proposal function.  First argument is where to evaluate, and second argument is the conditional parameter</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>logPOSTERIOR</code></td>
+<td>
+<p>Function to calculate and return the log posterior given a vector of values of <code>theta</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nu</code></td>
+<td>
+<p>Single value or vector parameter passed to <code>qPROP</code> or <code>qFUN</code> for the proposal density</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>varnames</code></td>
+<td>
+<p>Optional vector of theta parameter names</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>param</code></td>
+<td>
+<p>List of additional parameters for <code>logPOSTERIOR</code> and <code>glogPOSTERIOR</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>chains</code></td>
+<td>
+<p>Number of MCMC chains to run</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>parallel</code></td>
+<td>
+<p>Logical to set whether multiple MCMC chains should be run in parallel</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Additional parameters for <code>logPOSTERIOR</code></p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>Object of class <code>hmclearn</code>
+</p>
+
+
+<h3>Elements for <code>hmclearn</code> objects</h3>
+
+
+<dl>
+<dt><code>N</code></dt>
+<dd>
+<p>Number of MCMC samples
+</p>
+</dd>
+<dt><code>theta</code></dt>
+<dd>
+<p>Nested list of length <code>N</code> of the sampled values of <code>theta</code> for each chain
+</p>
+</dd>
+<dt><code>thetaCombined</code></dt>
+<dd>
+<p>List of dataframes containing sampled values, one for each chain
+</p>
+</dd>
+<dt><code>r</code></dt>
+<dd>
+<p>NULL for Metropolis-Hastings
+</p>
+</dd>
+<dt><code>theta.all</code></dt>
+<dd>
+<p>Nested list of all parameter values of <code>theta</code> sampled prior to accept/reject step for each
+</p>
+</dd>
+<dt><code>r.all</code></dt>
+<dd>
+<p>NULL for Metropolis-Hastings
+</p>
+</dd>
+<dt><code>accept</code></dt>
+<dd>
+<p>Number of accepted proposals.  The ratio <code>accept</code> / <code>N</code> is the acceptance rate
+</p>
+</dd>
+<dt><code>accept_v</code></dt>
+<dd>
+<p>Vector of length <code>N</code> indicating which samples were accepted
+</p>
+</dd>
+<dt><code>M</code></dt>
+<dd>
+<p>NULL for Metropolis-Hastings
+</p>
+</dd>
+<dt><code>algorithm</code></dt>
+<dd>
+<p><code>MH</code> for Metropolis-Hastings
+</p>
+</dd>
+<dt><code>varnames</code></dt>
+<dd>
+<p>Optional vector of parameter names
+</p>
+</dd>
+<dt><code>chains</code></dt>
+<dd>
+<p>Number of MCMC chains
+</p>
+</dd>
+</dl>
+<h3>Available <code>logPOSTERIOR</code> functions</h3>
+
+
+<dl>
+<dt><code>linear_posterior</code></dt>
+<dd>
+<p>Linear regression:  log posterior
+</p>
+</dd>
+<dt><code>logistic_posterior</code></dt>
+<dd>
+<p>Logistic regression:  log posterior
+</p>
+</dd>
+<dt><code>poisson_posterior</code></dt>
+<dd>
+<p>Poisson (count) regression:  log posterior
+</p>
+</dd>
+<dt><code>lmm_posterior</code></dt>
+<dd>
+<p>Linear mixed effects model:  log posterior
+</p>
+</dd>
+<dt><code>glmm_bin_posterior</code></dt>
+<dd>
+<p>Logistic mixed effects model:  log posterior
+</p>
+</dd>
+<dt><code>glmm_poisson_posterior</code></dt>
+<dd>
+<p>Poisson mixed effects model:  log posterior
+</p>
+</dd>
+</dl>
+<h3>Author(s)</h3>
+
+<p>Samuel Thomas <a href="mailto:samthoma@iu.edu">samthoma@iu.edu</a>, Wanzhu Tu <a href="mailto:wtu@iu.edu">wtu@iu.edu</a>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Linear regression example
+set.seed(521)
+X &lt;- cbind(1, matrix(rnorm(300), ncol=3))
+betavals &lt;- c(0.5, -1, 2, -3)
+y &lt;- X%*%betavals + rnorm(100, sd=.2)
+
+f1_mh &lt;- mh(N = 3e3,
+         theta.init = c(rep(0, 4), 1),
+         nu &lt;- c(rep(0.001, 4), 0.1),
+         qPROP = qprop,
+         qFUN = qfun,
+         logPOSTERIOR = linear_posterior,
+         varnames = c(paste0("beta", 0:3), "log_sigma_sq"),
+         param=list(y=y, X=X), parallel=FALSE, chains=1)
+
+summary(f1_mh, burnin=1000)
+
+
+</code></pre>
+
+
+</div>

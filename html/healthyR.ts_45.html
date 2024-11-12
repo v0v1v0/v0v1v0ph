@@ -1,0 +1,230 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>ts_auto_smooth_es</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Boilerplate Workflow</h2>
+
+<h3>Description</h3>
+
+<p>This is a boilerplate function to automatically create the following:
+</p>
+
+<ul>
+<li>
+<p> recipe
+</p>
+</li>
+<li>
+<p> model specification
+</p>
+</li>
+<li>
+<p> workflow
+</p>
+</li>
+<li>
+<p> tuned model (grid ect)
+</p>
+</li>
+<li>
+<p> calibration tibble and plot
+</p>
+</li>
+</ul>
+<h3>Usage</h3>
+
+<pre><code class="language-R">ts_auto_smooth_es(
+  .data,
+  .date_col,
+  .value_col,
+  .formula,
+  .rsamp_obj,
+  .prefix = "ts_smooth_es",
+  .tune = TRUE,
+  .grid_size = 10,
+  .num_cores = 1,
+  .cv_assess = 12,
+  .cv_skip = 3,
+  .cv_slice_limit = 6,
+  .best_metric = "rmse",
+  .bootstrap_final = FALSE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>.data</code></td>
+<td>
+<p>The data being passed to the function. The time-series object.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.date_col</code></td>
+<td>
+<p>The column that holds the datetime.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.value_col</code></td>
+<td>
+<p>The column that has the value</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.formula</code></td>
+<td>
+<p>The formula that is passed to the recipe like <code>value ~ .</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.rsamp_obj</code></td>
+<td>
+<p>The rsample splits object</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.prefix</code></td>
+<td>
+<p>Default is <code>ts_smooth_es</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.tune</code></td>
+<td>
+<p>Defaults to TRUE, this creates a tuning grid and tuned model.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.grid_size</code></td>
+<td>
+<p>If <code>.tune</code> is TRUE then the <code>.grid_size</code> is the size of the
+tuning grid.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.num_cores</code></td>
+<td>
+<p>How many cores do you want to use. Default is 1</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.cv_assess</code></td>
+<td>
+<p>How many observations for assess. See <code>timetk::time_series_cv()</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.cv_skip</code></td>
+<td>
+<p>How many observations to skip. See <code>timetk::time_series_cv()</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.cv_slice_limit</code></td>
+<td>
+<p>How many slices to return. See <code>timetk::time_series_cv()</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.best_metric</code></td>
+<td>
+<p>Default is "rmse". See <code>modeltime::default_forecast_accuracy_metric_set()</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.bootstrap_final</code></td>
+<td>
+<p>Not yet implemented.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>This uses <code>modeltime::exp_smoothing()</code> and sets the <code>parsnip::engine</code>
+to <code>smooth_es</code>.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A list
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Steven P. Sanderson II, MPH
+</p>
+
+
+<h3>See Also</h3>
+
+<p><a href="https://business-science.github.io/modeltime/reference/exp_smoothing.html#ref-examples">https://business-science.github.io/modeltime/reference/exp_smoothing.html#ref-examples</a>
+</p>
+<p><a href="https://github.com/config-i1/smooth">https://github.com/config-i1/smooth</a>
+</p>
+<p>Other Boiler_Plate: 
+<code>ts_auto_arima()</code>,
+<code>ts_auto_arima_xgboost()</code>,
+<code>ts_auto_croston()</code>,
+<code>ts_auto_exp_smoothing()</code>,
+<code>ts_auto_glmnet()</code>,
+<code>ts_auto_lm()</code>,
+<code>ts_auto_mars()</code>,
+<code>ts_auto_nnetar()</code>,
+<code>ts_auto_prophet_boost()</code>,
+<code>ts_auto_prophet_reg()</code>,
+<code>ts_auto_svm_poly()</code>,
+<code>ts_auto_svm_rbf()</code>,
+<code>ts_auto_theta()</code>,
+<code>ts_auto_xgboost()</code>
+</p>
+<p>Other exp_smoothing: 
+<code>ts_auto_croston()</code>,
+<code>ts_auto_exp_smoothing()</code>,
+<code>ts_auto_theta()</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+library(dplyr)
+library(timetk)
+library(modeltime)
+
+data &lt;- AirPassengers %&gt;%
+  ts_to_tbl() %&gt;%
+  select(-index)
+
+splits &lt;- time_series_split(
+  data
+  , date_col
+  , assess = 12
+  , skip = 3
+  , cumulative = TRUE
+)
+
+ts_smooth_es &lt;- ts_auto_smooth_es(
+  .data = data,
+  .num_cores = 2,
+  .date_col = date_col,
+  .value_col = value,
+  .rsamp_obj = splits,
+  .formula = value ~ .,
+  .grid_size = 3,
+  .tune = FALSE
+)
+
+ts_smooth_es$recipe_info
+
+
+</code></pre>
+
+
+</div>

@@ -1,0 +1,89 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hilbertProjection</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Project a Cut Reference Matrix to a Different Space through an Hilbert Index</h2>
+
+<h3>Description</h3>
+
+<p>Starting from a Hilbert Index generated in a high dimensional space, returns a set of coordinates
+in a new (lower) dimensional space
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hilbertProjection(hc, target = 2)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>hc</code></td>
+<td>
+<p>the hilbert index returned by <code>do.hilbert</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>target</code></td>
+<td>
+<p>the number of dimensions in the target space (defaults to 2)</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Based on the maximum index and the targeted number of dimensions the number of target bins is computed and used
+to generate a reference matrix and a reference index. The reference matrix is returned, ordered by the reference index.
+</p>
+
+
+<h3>Value</h3>
+
+<p>a matrix with <code>target</code> columns, corresponding to
+the projection of each Hilbert index to <code>target</code> dimensions
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Marilisa Neri
+</p>
+<p>Yann Abraham
+</p>
+<p>John Skilling (for the original <code>C</code> function)
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># generate a random matrix
+ncols &lt;- 5
+mat &lt;- matrix(rnorm(ncols*5000),ncol=ncols)
+dimnames(mat)[[2]] &lt;- LETTERS[seq(ncols)]
+
+# generate 4 bins with a minimum bin size of 5
+horder &lt;- 4
+cuts &lt;- make.cut(mat,n=horder+1,count.lim=5)
+
+# Generate the cuts and compute the Hilbert index
+cut.mat &lt;- do.cut(mat,cuts,type='fixed')
+hc &lt;- do.hilbert(cut.mat,horder)
+chc &lt;- table(hc)
+idx &lt;- as.numeric(names(chc))
+
+# project the matrix to 2 dimensions
+proj &lt;- hilbertProjection(hc)
+
+# visualize the result
+img &lt;- matrix(0,ncol=max(proj[,2])+1,nrow = max(proj[,1])+1)
+img[proj[idx,]+1] &lt;- chc
+image(img)
+</code></pre>
+
+
+</div>

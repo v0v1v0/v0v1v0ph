@@ -1,0 +1,124 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>create_input_mats</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Create input matrices</h2>
+
+<h3>Description</h3>
+
+<p><code>create_input_mats()</code> is a generic function for creating an object of class
+<code>input_mats</code>. Model matrices are constructed based on the
+variables specified in the model <code>object</code> and the data specified in <code>input_data</code>.
+<code>create_input_mats()</code> is not typically called by users directly, but is
+instead used by functions that create model objects (e.g.,
+<code>create_IndivCtstmTrans()</code>, <code>create_CohortDtstmTrans()</code>,
+<code>create_PsmCurves()</code>).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">create_input_mats(object, ...)
+
+## S3 method for class 'lm'
+create_input_mats(object, input_data, ...)
+
+## S3 method for class 'flexsurvreg'
+create_input_mats(object, input_data, ...)
+
+## S3 method for class 'flexsurvreg_list'
+create_input_mats(object, input_data, ...)
+
+## S3 method for class 'partsurvfit'
+create_input_mats(object, input_data, ...)
+
+## S3 method for class 'params_lm'
+create_input_mats(object, input_data, ...)
+
+## S3 method for class 'params_surv'
+create_input_mats(object, input_data, ...)
+
+## S3 method for class 'params_surv_list'
+create_input_mats(object, input_data, ...)
+
+## S3 method for class 'multinom'
+create_input_mats(object, input_data, ...)
+
+## S3 method for class 'multinom_list'
+create_input_mats(object, input_data, ...)
+
+## S3 method for class 'params_mlogit_list'
+create_input_mats(object, input_data, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>object</code></td>
+<td>
+<p>An object of the appropriate class.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Further arguments passed to <code>model.matrix()</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>input_data</code></td>
+<td>
+<p>An object of class <code>expanded_hesim_data</code> returned by
+<code>expand.hesim_data()</code>. It is used to look for the variables needed to create
+an input matrix for use in a statistical models and the ID variables for
+indexing rows in the input matrix.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>An object of class <code>input_mats</code>.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>input_mats()</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">library("flexsurv")
+
+strategies &lt;- data.frame(strategy_id = c(1, 2))
+patients &lt;- data.frame(patient_id = seq(1, 3),
+                       age = c(45, 47, 60),
+                       female = c(1, 0, 0),
+                       group = factor(c("Good", "Medium", "Poor")))
+states &lt;- data.frame(state_id =  seq(1, 3),
+                     state_name = factor(paste0("state", seq(1, 3))))
+hesim_dat &lt;- hesim_data(strategies = strategies,
+                        patients = patients,
+                        states = states)
+
+# Class "lm"
+input_data &lt;- expand(hesim_dat, by = c("strategies", "patients", "states"))
+medcost_fit &lt;- lm(costs ~ female + state_name, psm4_exdata$costs$medical)
+input_mats &lt;- create_input_mats(medcost_fit, input_data)
+input_mats
+
+# Class "flexsurvreg"
+input_data &lt;- expand(hesim_dat, by = c("strategies", "patients"))
+fit_wei &lt;- flexsurvreg(formula = Surv(futime, fustat) ~ 1,
+                       data = ovarian, dist = "weibull")
+input_mats &lt;- create_input_mats(fit_wei, input_data)
+input_mats
+</code></pre>
+
+
+</div>

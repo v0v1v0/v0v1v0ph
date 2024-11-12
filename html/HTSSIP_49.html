@@ -1,0 +1,117 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>qPCR_sim</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Simulate qPCR values</h2>
+
+<h3>Description</h3>
+
+<p>qPCR values will be simulated for each sample in the provided phyloseq object.
+The error distribution for each sample is drawn from a Gaussian distribution,
+where the mean and standard deviation of the Gaussian distribution are set by
+user-defined functions. The user-defined functions that take buoyant density
+as input and returns a numeric value (see examples), which allows the qPCR
+values to increase in mean &amp; variance at certain buoyant densities.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">qPCR_sim(physeq, control_mean_fun, control_sd_fun, treat_mean_fun,
+  treat_sd_fun, n_tech_rep = 3, control_expr = NULL)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>physeq</code></td>
+<td>
+<p>Object of class "phyloseq"</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>control_mean_fun</code></td>
+<td>
+<p>Function used for simulating the qPCR normal distribution mean
+for control samples.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>control_sd_fun</code></td>
+<td>
+<p>Function used for simulating the qPCR normal distribution
+standard deviation for control samples.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>treat_mean_fun</code></td>
+<td>
+<p>Function used for simulating the qPCR normal distribution mean
+for treatment samples.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>treat_sd_fun</code></td>
+<td>
+<p>Function used for simulating the qPCR normal distribution
+standard deviation for treatment samples.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n_tech_rep</code></td>
+<td>
+<p>Number of technical replicates.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>control_expr</code></td>
+<td>
+<p>Expression used to identify control samples based on sample_data.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>data.frame of qPCR values
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># making functions for simulating values
+## 'x' will be Buoyant_density as defined in the phyloseq object sample_data
+control_mean_fun = function(x) dnorm(x, mean=1.70, sd=0.01) * 1e8
+## This will set sd to scale with the mean
+control_sd_fun = function(x) control_mean_fun(x) / 3
+## This will 'shift' the gene copy distribution to 'heavier' BDs
+treat_mean_fun = function(x) dnorm(x, mean=1.75, sd=0.01) * 1e8
+treat_sd_fun = function(x) treat_mean_fun(x) / 3
+# simulating qPCR values
+df_qPCR = qPCR_sim(physeq_S2D2,
+                control_expr='Substrate=="12C-Con"',
+                control_mean_fun=control_mean_fun,
+                control_sd_fun=control_sd_fun,
+                treat_mean_fun=treat_mean_fun,
+                treat_sd_fun=treat_sd_fun)
+
+# using the Cauchy distribution instead of normal distributions
+control_mean_fun = function(x) dcauchy(x, location=1.70, scale=0.01) * 1e8
+control_sd_fun = function(x) control_mean_fun(x) / 3
+treat_mean_fun = function(x) dcauchy(x, location=1.74, scale=0.01) * 1e8
+treat_sd_fun = function(x) treat_mean_fun(x) / 3
+# simulating qPCR values
+df_qPCR = qPCR_sim(physeq_S2D2,
+                control_expr='Substrate=="12C-Con"',
+                control_mean_fun=control_mean_fun,
+                control_sd_fun=control_sd_fun,
+                treat_mean_fun=treat_mean_fun,
+                treat_sd_fun=treat_sd_fun)
+
+</code></pre>
+
+
+</div>

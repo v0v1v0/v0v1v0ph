@@ -1,0 +1,112 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>latentIndex</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Calculate the latent index</h2>
+
+<h3>Description</h3>
+
+<p>Calculate the latent index from the fitted model. The latent index is a standardized latent measure that takes values from 0 to 1, where
+0 refers to the worst predicted state (the maximal observed value for the latent measure) and 1 refers
+to the best predicted state (the minimal observed value for the latent measure).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">latentIndex(model, subset = NULL)
+
+healthIndex(model, subset = NULL)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>model</code></td>
+<td>
+<p>a fitted <code>hopit</code> model.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>subset</code></td>
+<td>
+<p>an optional vector that specifies a subset of observations.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>a vector with a latent index for each individual.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Maciej J. Danko
+</p>
+
+
+<h3>References</h3>
+
+<p>Jurges H (2007).
+“True health vs response styles: exploring cross-country differences in self-reported health.”
+<em>Health Economics</em>, <b>16</b>(2), 163-178.
+<a href="https://doi.org/10.1002/hec.1134">doi:10.1002/hec.1134</a>.<br><br>
+Oksuzyan A, Danko MJ, Caputo J, Jasilionis D, Shkolnikov VM (2019).
+“Is the story about sensitive women and stoical men true? Gender differences in health after adjustment for reporting behavior.”
+<em>Social Science &amp; Medicine</em>, <b>228</b>, 41-50.
+<a href="https://doi.org/10.1016/j.socscimed.2019.03.002">doi:10.1016/j.socscimed.2019.03.002</a>.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>standardizeCoef</code>, <code>getCutPoints</code>, <code>getLevels</code>, <code>hopit</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># DATA
+data(healthsurvey)
+
+# the order of response levels decreases from the best health to
+# the worst health; hence the hopit() parameter decreasing.levels
+# is set to TRUE
+levels(healthsurvey$health)
+
+# Example 1 ---------------------
+
+# fit a model
+model1 &lt;- hopit(latent.formula = health ~ hypertension + high_cholesterol +
+                  heart_attack_or_stroke + poor_mobility + very_poor_grip +
+                  depression + respiratory_problems +
+                  IADL_problems + obese + diabetes + other_diseases,
+                thresh.formula = ~ sex + ageclass + country,
+                decreasing.levels = TRUE,
+                control = list(trace = FALSE),
+                data = healthsurvey)
+
+# calculate the health index
+hi &lt;- latentIndex(model1)
+
+summary(hi)
+
+# plot a simple histogram of the function output
+hist(hi, col='deepskyblue3')
+
+#plot the reported health status versus the health index.
+plot(hi, response = "data", ylab = 'Health index',
+     col='deepskyblue3', main = 'Reported health levels')
+
+# plot the model-predicted health levels versus the health index.
+plot(hi, response = "fitted", ylab = 'Health index',
+     col='deepskyblue3', main = 'Model-predicted health levels')
+</code></pre>
+
+
+</div>

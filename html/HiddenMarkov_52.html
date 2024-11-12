@@ -1,0 +1,96 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>mmpp</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Markov Modulated Poisson Process Object</h2>
+
+<h3>Description</h3>
+
+<p>Creates a Markov modulated Poisson process model object with class <code>"mmpp"</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">mmpp(tau, Q, delta, lambda, nonstat = TRUE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>tau</code></td>
+<td>
+<p>vector containing the <em>event times</em>. Note that the first event is at time zero. Alternatively, <code>tau</code> could be specified as <code>NULL</code>, meaning that the data will be added later (e.g. simulated).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Q</code></td>
+<td>
+<p>the infinitesimal generator matrix of the Markov process.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>delta</code></td>
+<td>
+<p>is the marginal probability distribution of the <code class="reqn">m</code> hidden states at time zero.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lambda</code></td>
+<td>
+<p>a vector containing the Poisson rates.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nonstat</code></td>
+<td>
+<p>is logical, <code>TRUE</code> if the homogeneous Markov process is assumed to be non-stationary, default.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The Markov modulated Poisson process is based on a hidden Markov process in continuous time. The initial state probabilities (at time zero) are specified by <code>delta</code> and the transition rates by the <code>Q</code> matrix. The rate parameter of the Poisson process (<code>lambda</code>) is determined by the current state of the hidden Markov process. Within each state, the Poisson process is homogeneous (constant rate parameter). A Poisson event is assumed to occur at time zero and at the end of the observation period, however, state transitions of the Markov process do not necessarily coincide with Poisson events. For more details, see Ryden (1996).
+</p>
+
+
+<h3>Value</h3>
+
+<p>A <code>list</code> object with class <code>"mmpp"</code>, containing the above arguments as named components.
+</p>
+
+
+<h3>References</h3>
+
+<p>Cited references are listed on the HiddenMarkov manual page.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">Q &lt;- matrix(c(-2,  2,
+               1, -1),
+            byrow=TRUE, nrow=2)/10
+
+#    NULL indicates that we have no data at this point
+x &lt;- mmpp(NULL, Q, delta=c(0, 1), lambda=c(5, 1))
+
+x &lt;- simulate(x, nsim=5000, seed=5)
+
+y &lt;- BaumWelch(x)
+
+print(summary(y))
+
+#    log-likelihood using initial parameter values
+print(logLik(x))
+
+#    log-likelihood using estimated parameter values
+print(logLik(y))
+</code></pre>
+
+
+</div>

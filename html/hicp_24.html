@@ -1,0 +1,137 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>rates</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Change rates and contributions</h2>
+
+<h3>Description</h3>
+
+<p>Function <code>rates()</code> computes monthly, annual and annual average rates of change for an index series. Function <code>contrib()</code> computes the contributions of a subcomponent to the annual change rate of the overall index.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">rates(x, t=NULL, type="monthly")
+
+contrib(x, w, t, x.all, w.all, method="ribe")
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x, x.all</code></td>
+<td>
+<p>numeric vector of index values.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>w, w.all</code></td>
+<td>
+<p>numeric vector of weights of the subcomponent (<code>w</code>) and the overall index (<code>w.all</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>t</code></td>
+<td>
+<p>date vector.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>type</code></td>
+<td>
+<p>character specifying the type of change rate. Allowed values are <code>monthly</code> for monthly change rates, <code>annual</code> for annual change rates, and <code>annual-average</code> for annual average change rates.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+<p>character specifying the method used for the calculations. Allowed values are <code>ribe</code> and <code>kirchner</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>For <code>rates()</code>, a numeric vector of the same length as <code>x</code> if <code>type='monthly'</code> or <code>type='annual'</code>. If <code>type='annual-average'</code>, same length as years available.
+</p>
+<p>For <code>contrib()</code>, a numeric vector of the same length as <code>x</code>.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Sebastian Weinand</p>
+
+
+<h3>References</h3>
+
+<p>European Commission, Eurostat, <em>Harmonised Index of Consumer Prices (HICP) - Methodological Manual - 2024 edition</em>, Publications Office of the European Union, 2024, <a href="https://data.europa.eu/doi/10.2785/055028">https://data.europa.eu/doi/10.2785/055028</a>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">### EXAMPLE 1
+
+P &lt;- rnorm(n=25,mean=100,sd=5)
+t &lt;- seq.Date(from=as.Date("2021-01-01"), by="1 month", length.out=length(P))
+
+rates(x=P, type="monthly")
+rates(x=P, type="annual")
+rates(x=P, type="annual-average")
+rates(x=P, t=t, type="annual-average")
+
+### EXAMPLE 2: Contributions using published HICP data
+
+# set cores for testing on CRAN:
+library(restatapi)
+options(restatapi_cores=1)
+library(data.table)
+
+# import monthly price indices:
+prc &lt;- hicp.dataimport(id="prc_hicp_midx", filter=list(unit="I15", geo="EA"))
+prc[, "time":=as.Date(paste0(time, "-01"))]
+prc[, "year":=as.integer(format(time, "%Y"))]
+setnames(x=prc, old="values", new="index")
+
+# import item weights:
+inw &lt;- hicp.dataimport(id="prc_hicp_inw", filter=list(geo="EA"))
+inw[, "time":=as.integer(time)]
+setnames(x=inw, old=c("time","values"), new=c("year","weight"))
+
+# merge price indices and item weights:
+hicp.data &lt;- merge(x=prc, y=inw, by=c("geo","coicop","year"), all.x=TRUE)
+
+# add all-items hicp:
+hicp.data &lt;- merge(x=hicp.data,
+                   y=hicp.data[coicop=="CP00", list(geo,time,index,weight)],
+                   by=c("geo","time"), all.x=TRUE, suffixes=c("","_all"))
+
+# ribe decomposition:
+hicp.data[, "ribe" := contrib(x=index, w=weight, t=time, 
+                              x.all=index_all, w.all=weight_all), by="coicop"]
+
+# annual change rates over time:
+plot(rates(x=index, t=time, type="annual")~time,
+     data=hicp.data[coicop=="CP00",],
+     type="l", ylim=c(-2,12))
+
+# add contribution of energy:
+lines(ribe~time, data=hicp.data[coicop=="NRG"], col="red")
+
+# compare to published contributions:
+hicp.ctrb &lt;- hicp.dataimport(id="prc_hicp_ctrb")
+hicp.ctrb[, "time":=as.Date(paste0(time, "-01"))]
+dt.comp &lt;- merge(x=hicp.ctrb,
+                 y=hicp.data[, list(coicop, time, ribe)],
+                 by=c("coicop","time"),
+                 all=TRUE)
+head(dt.comp[!is.na(values) &amp; abs(values-ribe)&gt;0.1, ]) # should be empty
+</code></pre>
+
+
+</div>

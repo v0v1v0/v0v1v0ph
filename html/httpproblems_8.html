@@ -1,0 +1,118 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>stop_for_http_problem</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Signal an Error Caused by an HTTP Problem</h2>
+
+<h3>Description</h3>
+
+<p>The various <code style="white-space: pre;">⁠stop_for_*()⁠</code> functions leverage R's condition system to signal
+an error with a custom type embedding the "Problem Details" structure
+defined in <a href="https://tools.ietf.org/html/rfc7807">RFC 7807</a>.
+</p>
+<p>They can be used for reporting errors from HTTP APIs in a standard way.
+</p>
+<p>There are also helper methods for the most common HTTP problems:
+HTTP 400 Bad Request, 404 Not Found, 401 Unauthorized, 403 Forbidden, 409
+Conflict, and 500 Internal Server Error.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">stop_for_http_problem(
+  detail = NULL,
+  status = 500L,
+  type = NULL,
+  title = NULL,
+  instance = NULL,
+  ...
+)
+
+stop_for_bad_request(detail = NULL, instance = NULL, ...)
+
+stop_for_unauthorized(detail = NULL, instance = NULL, ...)
+
+stop_for_forbidden(detail = NULL, instance = NULL, ...)
+
+stop_for_not_found(detail = NULL, instance = NULL, ...)
+
+stop_for_conflict(detail = NULL, instance = NULL, ...)
+
+stop_for_internal_server_error(detail = NULL, instance = NULL, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>detail</code></td>
+<td>
+<p>A human-readable string giving more detail about the error,
+if possible.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>status</code></td>
+<td>
+<p>The HTTP status code appropriate for the response.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>type</code></td>
+<td>
+<p>A URL pointing to human-readable documentation for this type of
+problem. When <code>NULL</code>, the type is generated based on the status code; see
+<code>http_problem_types()</code> for a list of the defaults.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>title</code></td>
+<td>
+<p>A <a href="https://tools.ietf.org/html/rfc7807#section-3.1">"short, human-readable summary of the problem type"</a>.
+When <code>NULL</code>, the title is generated based on the status code; see
+<code>http_problem_types()</code> for a list of the defaults.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>instance</code></td>
+<td>
+<p>A URL that identifies the specific occurrence of the
+problem, if possible. When <code>NULL</code> this field is simply excluded.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Additional fields added to the problem as <a href="https://tools.ietf.org/html/rfc7807#section-3.2">Extension Members</a>.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>These functions call <code>stop()</code> with a custom condition (with class
+<code>"http_problem_error"</code>), so they do not return a value.
+</p>
+
+
+<h3>See Also</h3>
+
+<p>http_problem for creating the structure directly.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">tryCatch(
+  stop_for_bad_request("Parameter 'id' must be a number."),
+  error = function(e) {
+    str(e)
+  }
+)
+</code></pre>
+
+
+</div>

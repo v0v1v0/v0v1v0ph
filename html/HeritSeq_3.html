@@ -1,0 +1,81 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>fit.CP</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Fit compound Poisson mixed effect models (CPMM) for one or more features.</h2>
+
+<h3>Description</h3>
+
+<p>Fit a CPMM for one or more features and output the fit parameters. 
+It is used before the function computeVPC.CP(). This function also allows 
+to test the presence of heritability via random effect variance of the model.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">fit.CP(CountMatrix, Strains, test = FALSE, optimizer = "nlminb")
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>CountMatrix</code></td>
+<td>
+<p>Sequencing count matrix for one or more features. Each 
+row is for one feature, and the columns are for samples.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Strains</code></td>
+<td>
+<p>Strain labels for the samples.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>test</code></td>
+<td>
+<p>TRUE or FALSE (default). Test the presence of heritability 
+through examining the random effect variance <code class="reqn">\sigma_g^2 = 0</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>optimizer</code></td>
+<td>
+<p>A character string that determines which optimization 
+routine is to be used. Possible choices are "nlminb" (default), 
+"L-BFGS-B", and "bobyqa".</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A list with two objects. The first object is a 
+<code class="reqn">G \times 4</code> matrix indicating the fitted parameters for each 
+feature. The columns are ordered by intercept <code class="reqn">\alpha_g</code>, tweedie 
+parameter <code class="reqn">p_g</code>, random effect variance <code class="reqn">\sigma^2_g</code>, and dispersion
+<code class="reqn">\phi_g</code>. Row names are feature names. If the argument test is set to
+be true, the second object of the list consists of p-values for testing 
+the hypothesis that random effects <code class="reqn">\sigma_a^2 = 0</code>; 
+otherwise, the second object is NULL.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Fit CPMM for the first two features and test the presence of 
+## heritability. 
+result.cp &lt;- fit.CP(simData[1:2, ], strains, test = TRUE)
+## Extract parameters
+para.cp &lt;- result.cp[[1]]
+## Extract p-values
+pval.cp &lt;- result.cp[[2]]
+
+</code></pre>
+
+
+</div>

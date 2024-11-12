@@ -1,0 +1,211 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>computePredictedValues</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>computePredictedValues</h2>
+
+<h3>Description</h3>
+
+<p>Computes predicted values from the fitted <code>Hmsc</code> model
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">computePredictedValues(
+  hM,
+  partition = NULL,
+  partition.sp = NULL,
+  start = 1,
+  thin = 1,
+  Yc = NULL,
+  mcmcStep = 1,
+  expected = TRUE,
+  initPar = NULL,
+  nParallel = 1,
+  nChains = length(hM$postList),
+  updater = list(),
+  verbose = hM$verbose,
+  alignPost = TRUE
+)
+
+pcomputePredictedValues(
+  hM,
+  partition = NULL,
+  partition.sp = NULL,
+  start = 1,
+  thin = 1,
+  Yc = NULL,
+  mcmcStep = 1,
+  expected = TRUE,
+  initPar = NULL,
+  nParallel = 1,
+  useSocket = .Platform$OS.type == "windows",
+  nChains = length(hM$postList),
+  updater = list(),
+  verbose = nParallel == 1,
+  alignPost = TRUE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>hM</code></td>
+<td>
+<p>a fitted <code>Hmsc</code> model object</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>partition</code></td>
+<td>
+<p>partition vector for cross-validation created by <code>createPartition</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>partition.sp</code></td>
+<td>
+<p>species partitioning vector for conditional cross-validation</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>start</code></td>
+<td>
+<p>index of first MCMC sample included</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>thin</code></td>
+<td>
+<p>thinning interval of posterior distribution</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Yc</code></td>
+<td>
+<p>response matrix on which the predictions are to be conditioned</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mcmcStep</code></td>
+<td>
+<p>number of MCMC steps used to make conditional predictions</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>expected</code></td>
+<td>
+<p>whether expected values (TRUE) or realizations (FALSE) are to be predicted</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>initPar</code></td>
+<td>
+<p>a named list of parameter values used for initialization of MCMC states</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nParallel</code></td>
+<td>
+<p>number of parallel processes by which the chains are executed</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nChains</code></td>
+<td>
+<p>number of independent MCMC chains to be run</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>updater</code></td>
+<td>
+<p>a named list, specifying which conditional updaters should be omitted</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p>the interval between MCMC steps printed to the console</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alignPost</code></td>
+<td>
+<p>boolean flag indicating whether the posterior of each chains should be aligned</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>useSocket</code></td>
+<td>
+<p>(logical) use socket clusters in parallel processing;
+these can be used in all operating systems, but they are
+usually slower than forking which can only be used
+in non-Windows operating systems (macOS, Linux, unix-like
+systems).</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>There are two alternative functions <code>computePredictedValues</code>
+and <code>pcomputePredictedValues</code>. Function
+<code>pcomputePredictedValues</code> uses more aggressive parallelization
+and can be much faster when <code>partition</code> is used. Function
+<code>computePredictedValues</code> can run chains of each
+<code>sampleMcmc</code> partition in parallel, but
+<code>pcomputePredictedValues</code> can run each partition fold times
+chain in parallel (if hardware and operating systems
+permit). Function <code>pcomputePredictedValues</code> is still
+experimental, and therefore we provide both the old and new
+functions, but the old functions is scheduled to be removed in the
+future. Species partitions are not yet parallelized, and they can
+be very slow, especially with many <code>mcmcSteps</code>.
+</p>
+<p>If the option <code>partition</code> is not used, the posterior predictive distribution is based on the model
+fitted to the full data. If the option <code>partition</code> is used but <code>partition.sp</code> is not used, the posterior predictive distribution
+is based on cross-validation over the sampling units. If <code>partition.sp</code> is additionally used, then, when predictions are made for
+each fold of the sampling units, the predictions are done separately for each fold of species. When making the predictions
+for one fold of species, the predictions are conditional on known occurrences (those observed in the data) of the species
+belonging to the other folds. If <code>partition.sp</code> is used, the parameter <code>mcmcStep</code> should be set high enough to obtain
+appropriate conditional predictions. The option <code>Yc</code> can be used alternatively to <code>partition.sp</code> if the conditioning is to be done
+based on a fixed set of data (independently of which sampling unit and species the predictions are made for).
+</p>
+
+
+<h3>Value</h3>
+
+<p>an array of model predictions, made for each posterior sample
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>predict.Hmsc</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Compute predicted values using a previously fitted HMSC model
+preds = computePredictedValues(TD$m)
+
+## Not run: 
+# Compute predicted values for a previously fitted HMSC model using 2 folds
+partition = createPartition(TD$m, nfolds = 2)
+predsCV1 = computePredictedValues(TD$m,partition=partition)
+
+# Compute conditional predictions for a previously fitted HMSC model using 2 folds
+partition = createPartition(TD$m, nfolds = 2)
+predsCV2 = computePredictedValues(TD$m, partition = partition,
+partition.sp = 1:TD$m$ns, mcmcStep = 100)
+
+## End(Not run)
+
+</code></pre>
+
+
+</div>

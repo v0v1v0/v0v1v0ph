@@ -1,0 +1,244 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hypervolume_n_occupancy</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Operations for groups of hypervolumes
+</h2>
+
+<h3>Description</h3>
+
+<p>Computes the occupancy of hyperspace by one or more groups of hypervolumes.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hypervolume_n_occupancy(hv_list,
+                        classification = NULL,
+                        method = "subsample",
+                        FUN = mean,
+                        num.points.max = NULL,
+                        verbose = TRUE,
+                        distance.factor = 1,
+                        check.hyperplane = FALSE,
+                        box_density = 5000,
+                        thin = FALSE,
+                        quant.thin = 0.5,
+                        seed = NULL,
+                        print_log = FALSE)
+                        
+hypervolume_n_occupancy_bootstrap(path,
+                                  name = NULL,
+                                  classification = NULL,
+                                  method = "subsample",
+                                  FUN = mean,
+                                  num.points.max = NULL,
+                                  verbose = TRUE,
+                                  distance.factor = 1,
+                                  check.hyperplane = FALSE,
+                                  box_density = 5000,
+                                  thin = FALSE,
+                                  quant.thin = 0.5,
+                                  seed = NULL)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>hv_list</code></td>
+<td>
+
+<p>An <code>HypervolumeList</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>classification</code></td>
+<td>
+
+<p>A vector assigning each hypervolume in the <code>HypervolumeList</code> to a group.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+
+<p>Can be <code>subsample</code> or <code>box</code>. See details.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>FUN</code></td>
+<td>
+
+<p>A function to aggregate points within each group. Default to <code>mean</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>num.points.max</code></td>
+<td>
+
+<p>Maximum number of random points to use for set operations. If <code>NULL</code> defaults to 10^(3+sqrt(n)) where n is the dimensionality of the input hypervolumes. Note that this default parameter value has been increased by a factor of 10 since the 1.2 release of this package.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+
+<p>Logical value; print diagnostic output if <code>TRUE</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>distance.factor</code></td>
+<td>
+
+<p>Numeric value; multiplicative factor applied to the critical distance for all inclusion tests (see below). Recommended to not change this parameter.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>check.hyperplane</code></td>
+<td>
+
+<p>Check if data is hyperplanar.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>box_density</code></td>
+<td>
+
+<p>Density of random points to fill the hyperbox when method is equal to <code>box</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>thin</code></td>
+<td>
+
+<p>Take a subsample of random points to get a more uniform distribution of random points. Intended to be used with <code>method = "subsample"</code>, but can be used with <code>method = "box"</code> too. Can be slow, especially in high dimensions. See details.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>quant.thin</code></td>
+<td>
+
+<p>Set quantile for using when <code>thin = TRUE</code>. See details.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>seed</code></td>
+<td>
+
+<p>Set seed for random number generation. Useful for having reproducible results and with the use of <code>find_optimal_occupancy_thin()</code>
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>print_log</code></td>
+<td>
+
+<p>Save a log file with the volume of each input hypervolume, recomputed volume and the ratio between the original and recomputed hypervolumes. It works for <code>hypervolume_n_occupancy()</code> only.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>path</code></td>
+<td>
+
+<p>A path to a directory of bootstrapped hypervolumes obtained with <br><code>hypervolume_n_resample()</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>name</code></td>
+<td>
+
+<p>File name; The function writes hypervolumes to file in "./Objects/&lt;name&gt;".
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Uses the inclusion test approach to count how many hypervolumes include each random point. Counts range from 0 (no hypervolumes contain a given random point), to the number of hypervolumes in a group (all the hypervolumes contain a given random point). A function <code>FUN</code>, usually <code>mean</code> or <code>sum</code>, is then applied. A hypervolume is then returned for each group and the occupancy stored in <code>ValueAtRandomPoints</code>. IMPORTANT: random points with 
+<code>ValueAtRandomPoints</code> equal to 0 are not removed to ease downstream calculation. <br>
+When <code>method = "subsample"</code> the computation is performed on a random sample from input hypervolumes, constraining each to have the same point density given by the minimum of the point density of each input hypervolume and the point density calculated using the volumes of each input hypervolume divided by <code>num.points.max</code>. <br>
+Because this algorithm is based on distances calculated between the distributions of random points, the critical distance (point density ^ (-1/n)) can be scaled by a user-specified factor to provide more or less liberal estimates (<code>distance_factor</code> greater than or less than 1). <br>
+Two methods can be used for calculating the occupancy. The method <code>subsample</code> is based on a random sample of points from input hypervolumes. Each point is selected with a probability set to the inverse of the number of neighbour points calculated according to the critical distance. This method performs accurately when input hypervolumes have a low degree of overlap. The method <code>box</code> create a bounding box around the union of input hypervolumes. The bounding box is filled with points following a uniform distribution and with a density set with the argument <code>box_density</code>. A greater density usually provides more accurate results. The method <code>box</code> performs better than the method <code>subsample</code> in low dimensions, while in higher dimensions the method <code>box</code> become computationally inefficient as nearly all of the hyperbox sampling space will end up being empty and most of the points will be rejected. <br>
+When <code>verbose = TRUE</code> the volume of each input hypervolume will be printed to screen togheter with the recomputed volume and the ratio between the original and recomputed hypervolumes. Mean absolute error (MAE) and root mean square error (RMSE) are also provided as overall measures of the goodness of fit. A log file will be saved in the working directory with the information about the volume of input hypervolumes, the recomputed volume and the ratio between the original and recomputed hypervolumes. <br>
+When <code>thin = TRUE</code> an algorithm is applied to try to make the distribution of random points more uniform. Moderate departures from uniform distribution can in fact result from applying <code>hypervolume_n_occupancy()</code> on hypervolumes with a high overlap degree. At first, the algorithm in <code>thin</code> calculates the minimum distance from the neighboor points within the critical distance for each random point. A quantile (set with <code>quant.thin</code>) of these distances is taken and set as the threshold distance. Random points are then subset so that the distance of a point to another is greater than the threshold distance. <br>
+The function <code>hypervolume_n_occupancy_bootstrap()</code> takes a path of bootstrapped hypervolumes generated with <code>hypervolume_n_resample()</code> as input. It creates a directory called Objects in the current working directory if a directory of that name doesn't already exist where storing occupancy objects. The function <code>hypervolume_n_occupancy_bootstrap()</code> returns the absolute path to the directory with bootstrapped hypervolumes. It automatically saves a log file with the volume of each input hypervolume, the recomputed volume and the ratio between the original and recomputed hypervolumes. The log file is used with <code>occupancy_bootstrap_gof()</code>.
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>hypervolume_n_occupancy()</code> returns a <code>Hypervolume</code> or <code>HypervolumeList</code> whose number of hypervolumes equals the number of groups in <code>classification</code>. <code>hypervolume_n_occupancy_bootstrap()</code> returns a string containing an absolute path equivalent to ./Objects/&lt;name&gt;.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>find_optimal_occupancy_thin</code>, <code>occupancy_bootstrap_gof</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+data(penguins,package='palmerpenguins')
+penguins_no_na = as.data.frame(na.omit(penguins))
+
+# split the dataset on species and sex
+penguins_no_na_split = split(penguins_no_na, 
+                        paste(penguins_no_na$species, penguins_no_na$sex, sep = "_"))
+
+
+# calculate the hypervolume for each element of the splitted dataset
+hv_list = mapply(function(x, y) 
+  hypervolume_gaussian(x[, c("bill_length_mm", "flipper_length_mm")],
+                       samples.per.point=100, name = y), 
+  x = penguins_no_na_split, 
+  y = names(penguins_no_na_split))
+
+hv_list &lt;- hypervolume_join(hv_list)
+
+# calculate occupancy without groups
+hv_occupancy &lt;- hypervolume_n_occupancy(hv_list)
+plot(hv_occupancy, cex.random = 1)
+
+# calculate occupancy with groups
+hv_occupancy_list_sex &lt;- hypervolume_n_occupancy(hv_list, 
+                          classification = rep(c("female", "male"), each = 3))
+
+plot(hv_occupancy_list_sex, cex.random = 1, show.density = FALSE)
+
+
+### hypervolume_n_occupancy_bootstrap  ###
+
+# bootstrap the hypervolumes
+hv_list_boot = hypervolume_n_resample(name = "example", hv_list)
+
+# calculate occupancy on bootstrapped hypervolumes
+hv_occupancy_boot_sex = hypervolume_n_occupancy_bootstrap(path = hv_list_boot,
+                                    name = "example_occ",
+                                    classification = rep(c("female", "male"), 3))
+
+
+## End(Not run)
+</code></pre>
+
+
+</div>

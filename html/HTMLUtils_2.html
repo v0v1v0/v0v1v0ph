@@ -1,0 +1,236 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>BasicHTML</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>creates a basic HTML page displaying plots and annota</h2>
+
+<h3>Description</h3>
+
+<p>Creates a basic HTML page displaying plots and annotations that can easily be navigated. The plots can be created either 'on the fly' by passing the appropriate commands or beforehand in which case just the filenames need to be passed.                   </p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">BasicHTML(cmds = NULL, HTMLobjects, Captions, MenuLabels, Comments = NULL,
+
+    file = "tmp.html", title = "", width = 480, height = 480,
+
+    FRAMES = FALSE, JSCPATH = "jsc", LaunchPage = FALSE, APPEND = FALSE,
+
+    href = NULL, verbose = 0)</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>cmds</code></td>
+<td>
+<p>list of commands that generates the plots. If missing, the graphfiles are assumed to exist already.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>HTMLobjects</code></td>
+<td>
+<p>list of graph filenames, either to be created by the list of commands or to be copied to the Figures subdirectory and/or dataframes to be displayed in sortable tables.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Captions</code></td>
+<td>
+<p>vector of captions; these go directly below the graphs</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>MenuLabels</code></td>
+<td>
+<p>vector of labels for the main page.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Comments</code></td>
+<td>
+<p>Text/comments to be written between the graphs</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>file</code></td>
+<td>
+<p>file name of main page; '.html' extension will be added. The 'main' and 'menu' pages use this base as well.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>title</code></td>
+<td>
+<p>title to be written in the navigation/menu page</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>width</code></td>
+<td>
+<p>width for all graphfiles</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>height</code></td>
+<td>
+<p>height for all graphfiles</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>FRAMES</code></td>
+<td>
+<p>is this an HTML page with frames ?</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>JSCPATH</code></td>
+<td>
+<p>path that should contain the jsc components. If non existing, user will be prompted for installation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>LaunchPage</code></td>
+<td>
+<p>launch the page ?</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>APPEND</code></td>
+<td>
+<p>append to existing HTML page ?</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>href</code></td>
+<td>
+<p>links to other HTML pages</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p>level of verbosity</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>no return value</p>
+
+
+<h3>Author(s)</h3>
+
+<p>"Markus Loecher, Berlin School of Economics and Law (BSEL)"  &lt;markus.loecher@gmail.com&gt;</p>
+
+
+<h3>See Also</h3>
+
+<p>FramedHTML</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+  if (interactive()){
+
+  owd=setwd(tempdir())
+
+  BasicHTML(cmds = list("plot(rnorm(100));","plot(1:10);"),
+
+            HTMLobjects = list("Fig1.png", "Fig2.png"),
+
+            Captions=c("Gaussian noise","seq 1:10"),
+
+            MenuLabels = c("Marvel at the graph below","scatterplots are nice"),
+
+            title="Test Page",width=480, height=480, verbose=1, JSCPATH = NULL)
+
+
+
+    #example with plots and graphfiles having been generated beforehand:
+
+    png("Fig1.png");
+
+      plot(rnorm(100));
+
+    dev.off()
+
+    png("Fig2.png");
+
+      plot(1:10);
+
+    dev.off();
+
+
+
+BasicHTML( HTMLobjects = list("Fig1.png", "Fig2.png"),
+
+  Captions=c("Gaussian noise","seq 1:10"),
+
+   MenuLabels = c("Marvel at the graph below","scatterplots are nice"),
+
+  title="Test Page",
+
+  width=480, height=480, verbose=1, JSCPATH = NULL);
+
+
+
+    #example with absolute paths for graphfiles :
+
+    Fig1 &lt;- paste(tempdir(),"/Fig1.png",sep="")
+
+    png(Fig1);
+
+      plot(rnorm(100));
+
+    dev.off()
+
+    Fig2 &lt;- paste(tempdir(),"/Fig2.png",sep="")
+
+    png(Fig2);
+
+      plot(1:10);
+
+    dev.off();
+
+
+
+BasicHTML( HTMLobjects = list(Fig1, Fig2),
+
+    Captions=c("Gaussian noise","seq 1:10"),
+
+    MenuLabels = c("Marvel at the graph below","scatterplots are nice"), title="Test Page",
+
+    width=480, height=480, verbose=1, JSCPATH = NULL);
+
+    #cleanup:
+
+    #system(paste("rm ", Fig1));system(paste("rm ", Fig2))
+
+
+
+  #example with sorted table:
+
+  x &lt;- cbind.data.frame(x1 = round(rnorm(10),3), x2 = round(runif(10),3));
+
+  attr(x, "HEADER") &lt;- "some random numbers";
+
+  BasicHTML(HTMLobjects = list("Fig1.png", x, "Fig2.png"),
+
+            Captions=c("Gaussian noise","Gaussian and uniform random numbers", "seq 1:10"),
+
+            file = paste(Sys.getenv("HOME"), "/public_html/tmp/tmp.html",sep=""),
+
+            JSCPATH = "../jsc");
+
+  setwd(owd)
+
+}
+
+</code></pre>
+
+
+</div>

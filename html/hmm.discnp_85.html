@@ -1,0 +1,200 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>viterbi</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2> Most probable state sequence. </h2>
+
+<h3>Description</h3>
+
+<p>Calculates “the” most probable state sequence underlying
+each of one or more replicate observation sequences.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">viterbi(y, model = NULL, tpm, Rho, ispd=NULL,log=FALSE, warn=TRUE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+<p>The observations for which the most probable sequence(s)
+of underlying hidden states are required.  May be a sequence of
+observations in the form of a vector or a one or two column matrix,
+or a list each component of which constitutes a (replicate)
+sequence of observations.  It may also be an object of class
+<code>"multipleHmmDataSets"</code> as returned by <code>rhmm()</code>
+with <code>nsim&gt;1</code>.
+</p>
+<p>If <code>y</code> is missing, it is extracted from
+<code>model</code> (whence it will <em>not</em> be of class
+<code>"multipleHmmDataSets"</code>!) provided that <code>model</code> and
+its <code>y</code> component are not <code>NULL</code>.  Otherwise an error
+is given.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>model</code></td>
+<td>
+<p> An object describing a hidden Markov model, as
+fitted to the data set <code>y</code> by <code>hmm()</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tpm</code></td>
+<td>
+<p> The transition probability matrix for a hidden
+Markov model; ignored if <code>model</code> is non-null.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Rho</code></td>
+<td>
+<p>An object specifying the probability distributions
+of the observations for a hidden Markov model.  See
+<code>hmm()</code>. Ignored if <code>model</code> is non-null. Should
+bear some reasonable relationship to <code>y</code>.
+</p>
+<p>If <code>Rho</code> has dimension names (or if its entries have
+dimension names in the case where <code>Rho</code> is a list) then the
+appropriate dimension names must include all corresponding values
+of the observations.  If a relevant vector of dimension names is
+<code>NULL</code> then it is formed as the sort unique values of the
+approprate columns of the observation matrices.   In this case the
+corresponding dimensions must match the number of unique values.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ispd</code></td>
+<td>
+<p> The initial state probability distribution for a hidden
+Markov model; ignored if <code>model</code> is non-null. Should
+bear some reasonable relationship to <code>y</code>. If <code>model</code>
+and <code>ispd</code> are both <code>NULL</code> then <code>ispd</code> is set
+equal to the stationary distribution calculated from <code>tpm</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>log</code></td>
+<td>
+<p>Logical scalar.  Should logarithms be used in the
+recursive calculations of the probabilities involved in the
+Viterbi algorithm, so as to avoid underflow?  If <code>log</code> is
+<code>FALSE</code> then underflow is avoided instead by a normalization
+procedure.  The quantity <code>delta</code> (see Rabiner 1989, page 264)
+is replaced by <code>delta/sum(delta)</code> at each step.  It should
+actually make no difference whether <code>log</code> is set to <code>TRUE</code>.
+I just included the option because I could.  Also the <code>HMM</code>
+package uses the logarithm approach so setting <code>log=TRUE</code>
+might be of interest if comparisons are to be made between
+results from the two packages.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>warn</code></td>
+<td>
+<p>Logical scalar; should a warning be issued if <code>Rho</code>
+hasn't got relevant dimension names?  (Note that if this is so,
+then the corresponding dimension names are formed from the sorted
+unique values of <code>y</code> or of the appropriate column(s) of <code>y</code>.
+And if <em>this</em> is so, then the user should be sure that the
+ordering of the entries of <code>Rho</code> corresponds properly to the
+the sorted unique values of <code>y</code>.)  This argument is passed
+to the utility function <code>check.yval()</code> which actually issues
+the warning if <code>warn=TRUE</code>.
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Applies the Viterbi algorithm to calculate “the” most probable
+robable state sequence underlying each observation sequences.
+</p>
+
+
+<h3>Value</h3>
+
+<p>If <code>y</code> consists of a single observation sequence, the
+value is the underlying most probable observation sequence,
+or a matrix whose columns consist of such sequences if there
+is more than one (equally) most probable sequence.
+</p>
+<p>If <code>y</code> consists of a list of observation sequences, the
+value is a list each entry of which is of the form described
+above.
+</p>
+<p>If <code>y</code> is of class <code>"multipleHmmDataSets"</code> then the
+value returned is a list of lists of the sort described above.
+</p>
+
+
+<h3>Warning</h3>
+
+<p>There <em>may</em> be more than one equally most probable state
+sequence underlying a given observation sequence.  This phenomenon
+can occur but appears to be unlikely to do so in practice.
+</p>
+
+
+<h3>Thanks</h3>
+
+<p>The correction made to the code so as to avoid underflow
+problems was made due to an inquiry and suggestion from
+Owen Marshall.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Rolf Turner
+<a href="mailto:r.turner@auckland.ac.nz">r.turner@auckland.ac.nz</a><br></p>
+
+
+<h3>References</h3>
+
+<p>Rabiner, L. R., "A tutorial on hidden Markov models and
+selected applications in speech recognition," Proc. IEEE vol. 77,
+pp. 257 – 286, 1989.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>hmm()</code>, <code>rhmm()</code>,
+<code>mps()</code>, <code>pr()</code></p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># See the help for logLikHmm() for how to generate y.num and y.let.
+## Not run: 
+fit.num     &lt;- hmm(y.num,K=2,verb=TRUE,keep.y=TRUE)
+v.1         &lt;- viterbi(model=fit.num)
+rownames(R) &lt;- 1:5 # Avoids a (harmless) warning.
+v.2         &lt;- viterbi(y.num,tpm=P,Rho=R)
+# P and R as in the help for logLikHmm() and for sp().
+
+# Note that the order of the states has gotten swapped; 3-v.1[[1]]
+# is identical to v.2[[1]]; for other k = 2, ..., 20, 3-v.1[[k]]
+# is much more similar to v.2[[k]] than is v.1[[k]].
+
+fit.let &lt;- hmm(y.let,K=2,verb=TRUE,keep.y=TRUE))
+v.3 &lt;- viterbi(model=fit.let)
+rownames(R) &lt;- letters[1:5]
+v.4 &lt;- viterbi(y.let,tpm=P,Rho=R)
+
+## End(Not run)
+</code></pre>
+
+
+</div>

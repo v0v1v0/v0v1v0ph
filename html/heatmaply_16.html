@@ -1,0 +1,384 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>heatmapr</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Creates a heatmapr object</h2>
+
+<h3>Description</h3>
+
+<p>An object of class heatmapr includes all the needed information
+for producing a heatmap. The goal is to separate the pre-processing of the
+heatmap elements from the graphical rendering of the object, which could be done
+using plotly (but potentially also with other graphical devices).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">heatmapr(
+  x,
+  Rowv = NULL,
+  Colv = NULL,
+  distfun = dist,
+  hclustfun = hclust,
+  dist_method = NULL,
+  hclust_method = NULL,
+  distfun_row = distfun,
+  hclustfun_row = hclustfun,
+  distfun_col = distfun,
+  hclustfun_col = hclustfun,
+  dendrogram = c("both", "row", "column", "none"),
+  show_dendrogram = c(TRUE, TRUE),
+  reorderfun = function(d, w) reorder(d, w),
+  k_row = 1,
+  k_col = 1,
+  symm = FALSE,
+  revC = symm || (is.dendrogram(Colv) &amp; is.dendrogram(Rowv) &amp; identical(Rowv, rev(Colv))),
+  scale = c("none", "row", "column"),
+  na.rm = TRUE,
+  labRow = rownames(x),
+  labCol = colnames(x),
+  cexRow = NULL,
+  cexCol = NULL,
+  digits = 3L,
+  cellnote = NULL,
+  theme = NULL,
+  colors = "RdYlBu",
+  width = NULL,
+  height = NULL,
+  xaxis_height = 80,
+  yaxis_width = 120,
+  xaxis_font_size = NULL,
+  yaxis_font_size = NULL,
+  brush_color = "#0000FF",
+  show_grid = TRUE,
+  anim_duration = 500,
+  row_side_colors = NULL,
+  col_side_colors = NULL,
+  seriate = c("OLO", "mean", "none", "GW"),
+  point_size_mat = NULL,
+  custom_hovertext = NULL,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>A numeric matrix
+Defaults to <code>TRUE</code> unless <code>x</code> contains any <code>NA</code>s.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Rowv</code></td>
+<td>
+<p>determines if and how the row dendrogram should be reordered.    By default, it is TRUE, which implies dendrogram is computed and reordered based on row means. If NULL or FALSE, then no dendrogram is computed and no reordering is done. If a dendrogram (or hclust), then it is used "as-is", ie without any reordering. If a vector of integers, then dendrogram is computed and reordered based on the order of the vector.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Colv</code></td>
+<td>
+<p>determines if and how the column dendrogram should be reordered.    Has the options as the Rowv argument above and additionally when x is a square matrix, Colv = "Rowv" means that columns should be treated identically to the rows.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>distfun</code></td>
+<td>
+<p>function used to compute the distance (dissimilarity) between both rows and columns. Defaults to dist.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>hclustfun</code></td>
+<td>
+<p>function used to compute the hierarchical clustering when Rowv or Colv are not dendrograms. Defaults to hclust.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dist_method</code></td>
+<td>
+<p>default is NULL (which results in "euclidean" to be used). Can accept alternative character strings indicating the
+method to be passed to distfun. By default distfun. is dist hence
+this can be one of "euclidean", "maximum", "manhattan", "canberra", "binary" or "minkowski".</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>hclust_method</code></td>
+<td>
+<p>default is NULL (which results in "complete" to be used). Can accept alternative character strings indicating the
+method to be passed to hclustfun By default hclustfun is hclust hence
+this can be one of "ward.D", "ward.D2", "single", "complete", "average" (= UPGMA), "mcquitty" (= WPGMA), "median" (= WPGMC) or "centroid" (= UPGMC).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>distfun_row</code></td>
+<td>
+<p>distfun for row dendrogram only.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>hclustfun_row</code></td>
+<td>
+<p>hclustfun for col dendrogram only.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>distfun_col</code></td>
+<td>
+<p>distfun for row dendrogram only.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>hclustfun_col</code></td>
+<td>
+<p>hclustfun for col dendrogram only.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dendrogram</code></td>
+<td>
+<p>character string indicating whether to compute 'none',
+'row', 'column' or 'both' dendrograms. Defaults to 'both'. However, if Rowv
+(or Colv) is FALSE or NULL and dendrogram is 'both', then a warning is issued
+and Rowv (or Colv) arguments are honoured.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>show_dendrogram</code></td>
+<td>
+<p>Logical vector of length controlling whether the row
+and column dendrograms are displayed. If a logical scalar is
+provided, it is repeated to become a logical vector of length two.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>reorderfun</code></td>
+<td>
+<p>function(d, w) of dendrogram and weights for reordering the row and column dendrograms. The default uses statsreorder.dendrogram</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>k_row</code></td>
+<td>
+<p>an integer scalar with the desired number of groups by which to color the dendrogram's branches in the rows (uses color_branches)
+If NA then find_k is used to deduce the optimal number of clusters.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>k_col</code></td>
+<td>
+<p>an integer scalar with the desired number of groups by which to color the dendrogram's branches in the columns (uses color_branches)
+If NA then find_k is used to deduce the optimal number of clusters.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>symm</code></td>
+<td>
+<p>logical indicating if x should be treated symmetrically; can only be true when x is a square matrix.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>revC</code></td>
+<td>
+<p>logical indicating if the column order should be reversed for plotting.
+Default (when NULL) - is FALSE, unless symm is TRUE.
+This is useful for cor matrix.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>scale</code></td>
+<td>
+<p>character indicating if the values should be centered and scaled in either the row direction or the column direction, or none. The default is "none".</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>na.rm</code></td>
+<td>
+<p>logical indicating whether NA's should be removed.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>labRow</code></td>
+<td>
+<p>character vectors with row labels to use (from top to bottom); default to rownames(x).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>labCol</code></td>
+<td>
+<p>character vectors with column labels to use (from left to right); default to colnames(x).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cexRow</code></td>
+<td>
+<p>positive numbers. If not NULL, it will override <code>xaxis_font_size</code>
+and will give it a value cexRow*14</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cexCol</code></td>
+<td>
+<p>positive numbers. If not NULL, it will override <code>yaxis_font_size</code>
+and will give it a value cexCol*14</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>digits</code></td>
+<td>
+<p>integer indicating the number of decimal places to be used by round for 'label'.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cellnote</code></td>
+<td>
+<p>(optional) matrix of the same dimensions as <code>x</code>
+that has the human-readable version of each value,
+for displaying on top of the heatmap cells.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>theme</code></td>
+<td>
+<p>A custom CSS theme to use. Currently the only valid values are
+<code>""</code> and <code>"dark"</code>. <code>"dark"</code> is primarily intended for
+standalone visualizations, not R Markdown or Shiny.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>colors</code></td>
+<td>
+<p>Either a colorbrewer2.org palette name (e.g. <code>"YlOrRd"</code> or
+<code>"Blues"</code>), or a vector of colors to interpolate in hexadecimal
+<code>"#RRGGBB"</code> format, or a color interpolation function like
+<code>colorRamp</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>width</code></td>
+<td>
+<p>Width in pixels (optional, defaults to automatic sizing).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>height</code></td>
+<td>
+<p>Height in pixels (optional, defaults to automatic sizing).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>xaxis_height</code></td>
+<td>
+<p>Size of axes, in pixels.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>yaxis_width</code></td>
+<td>
+<p>Size of axes, in pixels.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>xaxis_font_size</code></td>
+<td>
+<p>Font size of axis labels, as a CSS size (e.g. "14px" or "12pt").</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>yaxis_font_size</code></td>
+<td>
+<p>Font size of axis labels, as a CSS size (e.g. "14px" or "12pt").</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>brush_color</code></td>
+<td>
+<p>The base color to be used for the brush. The brush will be
+filled with a low-opacity version of this color. <code>"#RRGGBB"</code> format
+expected.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>show_grid</code></td>
+<td>
+<p><code>TRUE</code> to show gridlines, <code>FALSE</code> to hide them, or
+a numeric value to specify the gridline thickness in pixels (can be a
+non-integer).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>anim_duration</code></td>
+<td>
+<p>Number of milliseconds to animate zooming in and out.
+For large <code>x</code> it may help performance to set this value to <code>0</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>row_side_colors, col_side_colors</code></td>
+<td>
+<p>data.frame of factors to produce
+row/column side colors in the style of heatmap.2/heatmap.3.
+col_side_colors should be "wide", ie be the same dimensions
+as the column side colors it will produce.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>seriate</code></td>
+<td>
+<p>character indicating the method of matrix sorting (default: "OLO").
+Implemented options include:
+"OLO" (Optimal leaf ordering, optimizes the Hamiltonian path length that is restricted by the dendrogram structure - works in O(n^4) )
+"mean" (sorts the matrix based on the reorderfun using marginal means of the matrix. This is the default used by heatmap.2),
+"none" (the default order produced by the dendrogram),
+"GW" (Gruvaeus and Wainer heuristic to optimize the Hamiltonian path length that is restricted by the dendrogram structure)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>point_size_mat</code></td>
+<td>
+<p>A matrix of values which can be mapped to point size</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>custom_hovertext</code></td>
+<td>
+<p>Custom hovertext matrix (the same dimensions as the input).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>currently ignored</p>
+</td>
+</tr>
+</table>
+<h3>Source</h3>
+
+<p>The interface was designed based on heatmap, heatmap.2, and (the also d3heatmap).
+</p>
+
+
+<h3>See Also</h3>
+
+<p>heatmap, heatmap.2
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+library(heatmaply)
+hm &lt;- heatmapr(mtcars, scale = "column", colors = "Blues")
+heatmaply(hm)
+
+## End(Not run)
+
+</code></pre>
+
+
+</div>

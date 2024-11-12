@@ -1,0 +1,102 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>UH</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Transfer function</h2>
+
+<h3>Description</h3>
+
+<p>Use a triangular transfer function to adjust the timing of the
+simulated streamflow discharge. This module represents the runoff routing in
+the streams.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">UH(
+  model,
+  Qg,
+  param
+  )
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>model</code></td>
+<td>
+<p>numeric integer with the transfer function model. The current HBV.IANIGLA
+model only allows for a single option.
+</p>
+
+<ul><li>
+<p> 1: triangular function with a static base.
+</p>
+</li></ul>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Qg</code></td>
+<td>
+<p>numeric vector with the water that gets into the stream.
+If you are not modeling glaciers is the output of the
+<code>Routing_HBV</code> module, otherwise, is the sum of the <code>Routing_HBV</code>
+output plus the glacier discharge coming from the <code>Glacier_Disch</code> module.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>param</code></td>
+<td>
+<p>numeric vector with the following values,
+</p>
+<p><strong>Model 1</strong>
+</p>
+
+<ul><li> <p><code>Bmax</code>: base of the transfer function triangle <code class="reqn">[timestep]</code>.
+</p>
+</li></ul>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>Numeric vector with the simulated streamflow discharge.
+</p>
+
+
+<h3>References</h3>
+
+<p>Bergström, S., Lindström, G., 2015. Interpretation of runoff processes in hydrological
+modelling—experience from the HBV approach. Hydrol. Process.
+29, 3535–3545. https://doi.org/10.1002/hyp.10510
+</p>
+<p>Parajka, J., Merz, R., &amp; Blöschl, G. (2007). Uncertainty and multiple objective
+calibration in regional water balance modelling: Case study in 320 Austrian catchments.
+Hydrological Processes, 21(4), 435-446. https://doi.org/10.1002/hyp.6253
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># The following is a toy example. I strongly recommend to see
+# the package vignettes in order to improve your skills on HBV.IANIGLA
+
+## Routing example
+inputMatrix &lt;- cbind(runif(n = 200, max = 100, min = 0), runif(n = 200, max = 50, min = 5),
+                 runif(n = 100, max = 3, min = 1))
+
+routeMod1   &lt;- Routing_HBV(model = 1, lake = TRUE, inputData = inputMatrix,
+                         initCond = c(10, 15, 20), param = c(0.1, 0.05, 0.001, 1, 0.8))
+
+## UH
+dischOut &lt;- UH(model = 1, Qg = routeMod1[ , 1], param = 2.2)
+
+</code></pre>
+
+
+</div>

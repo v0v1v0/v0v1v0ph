@@ -1,0 +1,114 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>smartjitter</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Smart jittering function for deterministic shifting of overlapping values
+</h2>
+
+<h3>Description</h3>
+
+<p>This function takes in a vector of measurements and computes overlapping bins of observations, and applies a jittering function within each overlapping bin.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">smartjitter(x, q = seq(from = 0, to = 1, length.out = 10), type = 1, 
+amount = 0.1, jitterfuncs = list(function(n) {
+    (1:n)/(1/amount)
+}, function(n) {
+    (((-1)^c(0:(n - 1))) * (0:(n - 1)))/(1/amount)
+}), jits = jitterfuncs[[type]])
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+
+<p>The values that should be jittered. Notice that these are used to determine which are overlapping, and should not be though of as x-axis positions (see example).
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>q</code></td>
+<td>
+
+<p>Probability quantiles where the ends of the bins should be placed
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>type</code></td>
+<td>
+
+<p>Type of jittering, by default it is used to choose which element (1 or 2) of the list of jittering functions is chosen as the final jittering function. Customized functions may be provided to the jitterfuncs-parameter.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>amount</code></td>
+<td>
+
+<p>Amount of jittering (here deterministic shifting) for the jittering function
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>jitterfuncs</code></td>
+<td>
+
+<p>List of possible jittering functions for n overlapping values. The jittering function at list position 'type' is chosen
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>jits</code></td>
+<td>
+
+<p>Final jittering function from the jitterfuncs-list
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The smart jittering is applied to the x-parameter values, and returns a vector of shifting amounts per each observation. Notice that in the typical case, parameter 'x' are the desired response values e.g. among the y-axis, and the returned value of smartjitter are the amounts of jittering done on the x-axis of a plot.
+</p>
+
+
+<h3>Value</h3>
+
+<p>The function returns a vector of values with same length as x. The values in this vector indicate what should be the shifting per each observation, if the observations should be jittered along an another axis.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Teemu Daniel Laajala &lt;teelaa@utu.fi&gt;
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(vcapwide)
+
+plot.new()
+plot.window(xlim=extendrange(c(0,1)), ylim=extendrange(vcapwide[,"PSAWeek4"]))
+y1 &lt;- vcapwide[vcapwide[,"CastrationDate"]=="100413","PSAWeek4"]
+y2 &lt;- vcapwide[vcapwide[,"CastrationDate"]=="170413","PSAWeek4"]
+points(x=0+smartjitter(y1, type=2, amount=0.02), y=y1)
+points(x=1+smartjitter(y2, type=2, amount=0.02), y=y2)
+axis(1, at=c(0,1), labels=c("10.04.13", "17.04.13"))
+axis(2); box()
+title(ylab="PSA at week 4", xlab="Castration batches")
+</code></pre>
+
+
+</div>

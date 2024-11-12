@@ -1,0 +1,127 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hdrconf</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>HDRs with confidence intervals</h2>
+
+<h3>Description</h3>
+
+<p>Calculates Highest Density Regions with confidence intervals.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hdrconf(x, den, prob = 95, conf = 95)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>Numeric vector containing data.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>den</code></td>
+<td>
+<p>Density of data as list with components <code>x</code> and <code>y</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>prob</code></td>
+<td>
+<p>Probability coverage for for HDRs.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>conf</code></td>
+<td>
+<p>Confidence for limits on HDR.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p><code>hdrconf</code> returns list containing the following components:
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>hdr</code></td>
+<td>
+<p>Highest density regions</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>hdr.lo</code></td>
+<td>
+<p>Highest density regions
+corresponding to lower confidence limit.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>hdr.hi</code></td>
+<td>
+<p>Highest density
+regions corresponding to upper confidence limit.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>falpha</code></td>
+<td>
+<p>Values of
+<code class="reqn">f_\alpha</code> corresponding to HDRs.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>falpha.ci</code></td>
+<td>
+<p>Values of
+<code class="reqn">f_\alpha</code> corresponding to lower and upper limits.</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>Rob J Hyndman
+</p>
+
+
+<h3>References</h3>
+
+<p>Hyndman, R.J. (1996) Computing and graphing highest density
+regions <em>American Statistician</em>, <b>50</b>, 120-126.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>hdr</code>, <code>plot.hdrconf</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">x &lt;- c(rnorm(100,0,1),rnorm(100,4,1))
+den &lt;- density(x,bw=hdrbw(x,50))
+trueden &lt;- den
+trueden$y &lt;- 0.5*(exp(-0.5*(den$x*den$x)) + exp(-0.5*(den$x-4)^2))/sqrt(2*pi)
+sortx &lt;- sort(x)
+
+par(mfcol=c(2,2))
+for(conf in c(50,95))
+{
+  m &lt;- hdrconf(sortx,trueden,conf=conf)
+  plot(m,trueden,main=paste(conf,"% HDR from true density"))
+  m &lt;- hdrconf(sortx,den,conf=conf)
+  plot(m,den,main=paste(conf,"% HDR from empirical density\n(n=200)"))
+}
+</code></pre>
+
+
+</div>

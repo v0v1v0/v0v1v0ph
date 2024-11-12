@@ -1,0 +1,232 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>newhnp</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Method for non-implemented model classes</h2>
+
+<h3>Description</h3>
+
+<p>Uses user defined functions to produce the (half-)normal plot with simulated envelope.</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">newhnp(object, sim=99, conf=.95, halfnormal=T, plot.sim=T,
+       verb.sim=F, how.many.out=F, print.on=F, paint.out=F,
+       col.paint.out, diagfun, simfun, fitfun, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>object </code></td>
+<td>
+<p>fitted model object or numeric vector.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sim </code></td>
+<td>
+<p>number of simulations used to compute envelope. Default is 99.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>conf </code></td>
+<td>
+<p>confidence level of the simulated envelope. Default is 0.95.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>halfnormal </code></td>
+<td>
+<p>logical. If <code>TRUE</code>, a half-normal plot is produced. If <code>FALSE</code>, a normal plot is produced. Default is <code>TRUE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>plot.sim </code></td>
+<td>
+<p>logical. Should the (half-)normal plot be plotted? Default is <code>TRUE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verb.sim </code></td>
+<td>
+<p>logical. If <code>TRUE</code>, prints each step of the simulation procedure. Default is <code>FALSE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>how.many.out </code></td>
+<td>
+<p>logical. If <code>TRUE</code>, the number of points out of the envelope is printed. Default is <code>FALSE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>print.on </code></td>
+<td>
+<p>logical. If <code>TRUE</code>, the number of points out of the envelope is printed on the plot. Default is <code>FALSE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>paint.out </code></td>
+<td>
+<p>logical. If <code>TRUE</code>, points out of the simulation envelope are plotted in a different color. Default is <code>FALSE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>col.paint.out </code></td>
+<td>
+<p>If <code>paint.out=TRUE</code>, sets the color of points out of the envelope. Default is <code>"red"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>diagfun </code></td>
+<td>
+<p>user-defined function used to obtain the diagnostic measures from the fitted model object (only used when <code>newclass=TRUE</code>). Default is <code>resid</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>simfun </code></td>
+<td>
+<p>user-defined function used to simulate a random sample from the model estimated parameters (only used when <code>newclass=TRUE</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fitfun </code></td>
+<td>
+<p>user-defined function used to re-fit the model to simulated data (only used when <code>newclass=TRUE</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>... </code></td>
+<td>
+<p>extra graphical arguments passed to <code>plot.hnp</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>By providing three user-defined functions, <code>newhnp</code> produces the half-normal plot with simulated envelope for a model whose class is not yet implemented in the package.
+</p>
+<p>The first function, <code>diagfun</code>, must extract the desired model diagnostics from a model fit object. The second function, <code>simfun</code>, must return the response variable (numeric vector or matrix), simulated using the same error distributions and estimated parameters from the fitted model. The third and final function, <code>fitfun</code>, must return a fitted model object. See the Examples section.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Rafael A. Moral &lt;rafael_moral@yahoo.com.br&gt;, John Hinde and Clarice G. B. Demétrio
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Implementing new classes
+## Users provide three functions - diagfun, simfun and fitfun,
+## in the following way:
+##
+## diagfun &lt;- function(obj) {
+##   userfunction(obj, other_argumens)
+##     # e.g., resid(obj, type="pearson")
+##   }
+##
+## simfun &lt;- function(n, obj) {
+##   userfunction(n, other_arguments) # e.g., rpois(n, fitted(obj))
+##   }
+##
+## fitfun &lt;- function(y.) {
+##  userfunction(y. ~ linear_predictor, other_arguments, data=data)
+##    # e.g., glm(y. ~ block + factor1 * factor2, family=poisson,
+##    #           data=mydata)
+##  }
+##
+## when response is binary:
+## fitfun &lt;- function(y.) {
+##  userfunction(cbind(y., m-y.) ~ linear_predictor,
+##               other_arguments, data=data)
+##    #e.g., glm(cbind(y., m-y.) ~ treatment - 1,
+##    #          family=binomial, data=data)
+##  }
+
+## Not run: 
+## Example no. 1: Using Cook's distance as a diagnostic measure
+y &lt;- rpois(30, lambda=rep(c(.5, 1.5, 5), each=10))
+tr &lt;- gl(3, 10)
+fit1 &lt;- glm(y ~ tr, family=poisson)
+
+# diagfun
+d.fun &lt;- function(obj) cooks.distance(obj)
+
+# simfun
+s.fun &lt;- function(n, obj) {
+  lam &lt;- fitted(obj)
+  rpois(n, lambda=lam)
+}
+
+# fitfun
+my.data &lt;- data.frame(y, tr)
+f.fun &lt;- function(y.) glm(y. ~ tr, family=poisson, data=my.data)
+
+# hnp call
+hnp(fit1, newclass=TRUE, diagfun=d.fun, simfun=s.fun, fitfun=f.fun)
+
+## Example no. 2: Implementing gamma model using package gamlss
+# load package
+require(gamlss)
+
+# model fitting
+y &lt;- rGA(30, mu=rep(c(.5, 1.5, 5), each=10), sigma=.5)
+tr &lt;- gl(3, 10)
+fit2 &lt;- gamlss(y ~ tr, family=GA)
+
+# diagfun
+d.fun &lt;- function(obj) resid(obj) # this is the default if no
+                                  # diagfun is provided
+
+# simfun
+s.fun &lt;- function(n, obj) {
+  mu &lt;- obj$mu.fv
+  sig &lt;- obj$sigma.fv
+  rGA(n, mu=mu, sigma=sig)
+}
+
+# fitfun
+my.data &lt;- data.frame(y, tr)
+f.fun &lt;- function(y.) gamlss(y. ~ tr, family=GA, data=my.data)
+
+# hnp call
+hnp(fit2, newclass=TRUE, diagfun=d.fun, simfun=s.fun,
+    fitfun=f.fun, data=data.frame(y, tr))
+
+## Example no. 3: Implementing binomial model in gamlss
+# model fitting
+y &lt;- rBI(30, bd=50, mu=rep(c(.2, .5, .9), each=10))
+m &lt;- 50
+tr &lt;- gl(3, 10)
+fit3 &lt;- gamlss(cbind(y, m-y) ~ tr, family=BI)
+
+# diagfun
+d.fun &lt;- function(obj) resid(obj)
+
+# simfun
+s.fun &lt;- function(n, obj) {
+  mu &lt;- obj$mu.fv
+  bd &lt;- obj$bd
+  rBI(n, bd=bd, mu=mu)
+}
+
+# fitfun
+my.data &lt;- data.frame(y, tr, m)
+f.fun &lt;- function(y.) gamlss(cbind(y., m-y.) ~ tr,
+                               family=BI, data=my.data)
+
+# hnp call
+hnp(fit3, newclass=TRUE, diagfun=d.fun, simfun=s.fun, fitfun=f.fun)
+
+## End(Not run)
+</code></pre>
+
+
+</div>

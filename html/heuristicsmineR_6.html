@@ -1,0 +1,153 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>causal_net</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Create a Causal net (also Heuristics net)</h2>
+
+<h3>Description</h3>
+
+<p>Creates a Causal net, also known as Heuristics net. This is similar to a processmapR process map.
+However, the causal map deals with parallelism by trying to identifying causal dependencies
+between activities by using different heuristics as documented in <code>dependency_matrix</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">causal_net(
+  eventlog = NULL,
+  dependencies = dependency_matrix(eventlog = eventlog, threshold = threshold,
+    threshold_frequency = threshold_frequency, ...),
+  bindings = causal_bindings(eventlog, dependencies),
+  threshold = 0.9,
+  threshold_frequency = 0,
+  type = causal_frequency("absolute"),
+  sec = NULL,
+  type_nodes = type,
+  type_edges = type,
+  sec_nodes = sec,
+  sec_edges = sec,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>eventlog</code></td>
+<td>
+<p>The event log for which a causal map should be computed.
+Can be left NULL for more control if parameters <code>dependencies</code> and <code>bindings</code> are provided directly.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dependencies</code></td>
+<td>
+<p>A dependency matrix created for the event log, for example, by <code>dependency_matrix</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>bindings</code></td>
+<td>
+<p>Causal bindings created by <code>causal_bindings</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>threshold</code></td>
+<td>
+<p>The dependency threshold to be used when using the default dependency matrix computation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>threshold_frequency</code></td>
+<td>
+<p>The frequency threshold to be used when using the default dependency matrix computation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>type</code></td>
+<td>
+<p>A causal map type. For example, <code>causal_frequency</code> or <code>causal_performance</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sec</code></td>
+<td>
+<p>A causal process map type. Values are shown between brackets.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>type_nodes</code></td>
+<td>
+<p>A causal map type to be used for nodes only.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>type_edges</code></td>
+<td>
+<p>A causal map type to be used for edges only.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sec_nodes</code></td>
+<td>
+<p>A secondary causal map type for nodes only.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sec_edges</code></td>
+<td>
+<p>A secondary causal map type for edges only.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Further parameters forwarded to the default <code>dependency_matrix</code> function.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Warning: Projected frequencies are heuristically determined and counts may not add up.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A DiagrammeR graph of the causal map.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Causal map with default parameters
+causal_net(L_heur_1)
+
+# Causal map with lower dependency treshold
+causal_net(L_heur_1, threshold = .8)
+
+# For even more control omit the `eventlog` parameter
+# and provide `dependencies` and `bindings` directly.
+d &lt;- dependency_matrix(L_heur_1, threshold = .8)
+causal_net(dependencies = d,
+           bindings = causal_bindings(L_heur_1, d, "nearest"))
+
+# The returned DiagrammeR object can be further augmented with
+# panning and zooming before rendering:
+
+library(magrittr)
+causal_net(L_heur_1) %&gt;%
+ render_causal_net(render = TRUE) %&gt;%
+ DiagrammeRsvg::export_svg() %&gt;%
+ svgPanZoom::svgPanZoom()
+
+
+</code></pre>
+
+
+</div>

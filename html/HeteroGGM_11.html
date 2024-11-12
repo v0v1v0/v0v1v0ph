@@ -1,0 +1,77 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>summary_network</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>The summary of the resulting network structures.</h2>
+
+<h3>Description</h3>
+
+<p>Summarize the characteristics of the resulting network structures.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">summary_network(opt_Mu_hat, opt_Theta_hat, data)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>opt_Mu_hat</code></td>
+<td>
+<p>A p * K0_hat matrix, the optional mean vectors of K0_hat subgroups.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>opt_Theta_hat</code></td>
+<td>
+<p>n * p * K0_hat matrix, the optional precision matrices of K0_hat subgroups.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>A n * p matrix, the design matrix.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A list including the overlap of edges of different subgroups, the number of edges, and the names of connected nodes to each nodes in each subgroup.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+data(example.data)
+K &lt;- 6
+lambda &lt;- genelambda.obo(nlambda1=5,lambda1_max=0.5,lambda1_min=0.1,
+                         nlambda2=15,lambda2_max=1.5,lambda2_min=0.1,
+                         nlambda3=10,lambda3_max=3.5,lambda3_min=0.5)
+
+res &lt;- GGMPF(lambda, example.data$data, K, initial.selection="K-means")
+Theta_hat.list &lt;- res$Theta_hat.list
+Mu_hat.list &lt;- res$Mu_hat.list
+opt_num &lt;- res$Opt_num
+opt_Theta_hat &lt;- Theta_hat.list[[opt_num]]
+opt_Mu_hat &lt;- Mu_hat.list[[opt_num]]
+K_hat &lt;- dim(opt_Theta_hat)[3]
+K_hat
+
+summ &lt;- summary_network(opt_Mu_hat, opt_Theta_hat, example.data$data)
+summ$Theta_summary$overlap
+va_names &lt;- c("1","6")
+linked_node_names(summ, va_names, num_subgroup=1)
+plot_network(summ, num_subgroup = c(1:K_hat), plot.mfrow = c(1,K_hat))
+
+
+</code></pre>
+
+
+</div>

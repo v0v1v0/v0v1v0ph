@@ -1,0 +1,101 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>export_template</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Safely export templates to file.</h2>
+
+<h3>Description</h3>
+
+<p>This is a simple wrapper function around <code>as_utf8</code> and
+<code>writeLines</code>, letting users write their template strings
+to file without having to worry about file encodings. For more details on
+why UTF-8 encoding is necessary, check out
+<a href="https://yihui.org/en/2018/11/biggest-regret-knitr/">Yihui Xie's</a> post
+on the subject.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">export_template(
+  template,
+  filename,
+  sep = "",
+  filename.is.string = TRUE,
+  strip.carriage.returns = TRUE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>template</code></td>
+<td>
+<p>The template string to be written out</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>filename</code></td>
+<td>
+<p>The path to write the template to, passed to
+<code>writeLines</code>. Also accepts <code>stdout</code>
+(and likely other similar functions) with a warning.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sep</code></td>
+<td>
+<p>Separator to use between lines written, passed to
+<code>writeLines</code>. Defaults to no separator, as templates are
+generally already spaced appropriately.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>filename.is.string</code></td>
+<td>
+<p>A logical value indicating whether or not the
+filename parameter is expected to be a string (that is, a character
+vector). Setting the value to FALSE disables the warning when a
+non-character argument is passed, but this is unsupported functionality.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>strip.carriage.returns</code></td>
+<td>
+<p>A logical value indicating whether or not to
+strip carriage feed characters, should any exist. This
+preserves line spacing when writing out files originally written on Windows;
+otherwise <code>writeLines</code> appears to not recognize lines as ending with
+a newline and inserts one, resulting in 2x the number of line breaks as
+anticipated.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Note that this function is effectively the inverse of
+<code>import_pattern</code> –
+<code>export_template(import_pattern("out.txt"), "out.txt")</code> should
+always result in an unchanged file, and exceptions to this rule would be
+considered bugs.
+</p>
+
+
+<h3>Value</h3>
+
+<p>Returns the input template invisibly.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">pattern_file &lt;- tempfile("out", tempdir(), ".Rmd")
+export_template("my sample pattern", pattern_file)
+</code></pre>
+
+
+</div>

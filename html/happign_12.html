@@ -1,0 +1,218 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>get_iso</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>isochronous/isodistance  calculations</h2>
+
+<h3>Description</h3>
+
+<p>Calculates isochrones or isodistances in France from an sf object using the
+IGN API on the Géoportail platform. The reference data comes from the IGN
+BD TOPO® database. For further information see IGN
+<a href="https://geoservices.ign.fr/documentation/services/api-et-services-ogc/isochrone/api">documentation.</a>
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">get_iso(x,
+        value,
+        type = "time",
+        profile = "pedestrian",
+        time_unit = "minute",
+        distance_unit = "meter",
+        direction = "departure",
+        source = "pgr",
+        constraints = NULL)
+
+get_isodistance(x,
+                dist,
+                unit = "meter",
+                source = "pgr",
+                profile = "car",
+                direction = "departure",
+                constraints = NULL)
+
+get_isochrone(x,
+              time,
+              unit = "minute",
+              source = "pgr",
+              profile = "car",
+              direction = "departure",
+              constraints = NULL)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>Object of class <code>sf</code> or <code>sfc</code> with POINT geometry. There may be
+several points in the object. In this case, the output will contain as many
+polygons as points.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>value</code></td>
+<td>
+<p><code>numeric</code>; A quantity of time or distance.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>type</code></td>
+<td>
+<p><code>character</code>; Specifies the type of calculation performed:
+"time" for isochrone or "distance" for isodistance (isochrone by default).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>profile</code></td>
+<td>
+<p><code>character</code>; Type of cost used for calculation: "pedestrian"
+for #' pedestrians and "car" for cars. and "car" for cars ("pedestrian"
+by default).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>time_unit</code></td>
+<td>
+<p><code>character</code>; Allows you to specify the unit in which times
+are expressed in the answer: "hour", "minute" or "second" (minutes by
+default).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>distance_unit</code></td>
+<td>
+<p><code>character</code>; Allows you to specify the unit in which
+distances are expressed in the answer: "meter" or "kilometer" (meter by
+default).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>direction</code></td>
+<td>
+<p><code>character</code>; Direction of travel. Either define a
+"departure" point and obtain the potential arrival points. Or define an
+"arrival" point and obtain the potential points ("departure" by default).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>source</code></td>
+<td>
+<p><code>character</code>; This parameter specifies which source will
+be used for the calculation. Currently, "valhalla" and "pgr" sources are
+available (default "pgr"). See section <code>SOURCE</code> for further information.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>constraints</code></td>
+<td>
+<p>Used to express constraints on the characteristics
+to calculate isochrones/isodistances. See section <code>CONSTRAINTS</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dist</code></td>
+<td>
+<p><code>numeric</code>; A quantity of time.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>unit</code></td>
+<td>
+<p>see <code>time_unit</code> and <code>distance_unit</code> param.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>time</code></td>
+<td>
+<p><code>numeric</code>; A quantity of time.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>object of class <code>sf</code> with <code>POLYGON</code> geometry
+</p>
+
+
+<h3>Functions</h3>
+
+
+<ul>
+<li> <p><code>get_isodistance()</code>: Wrapper function to calculate isodistance from get_iso.
+</p>
+</li>
+<li> <p><code>get_isochrone()</code>: Wrapper function to calculate isochrone from get_iso.
+</p>
+</li>
+</ul>
+<h3>SOURCE</h3>
+
+<p>Isochrones are calculated using the same resources as for route calculation.
+PGR" and "VALHALLA" resources are used, namely "bdtopo-valhalla" and "bdtopo-pgr".
+</p>
+
+<ul>
+<li>
+<p> bdtopo-valhalla" : To-Do
+</p>
+</li>
+<li>
+<p> bdtopo-iso" is based on the old services over a certain distance, to solve
+performance problems. We recommend its use for large isochrones.
+</p>
+</li>
+</ul>
+<p>PGR resources are resources that use the PGRouting engine to calculate
+isochrones. ISO resources are more generic. The engine used for calculations
+varies according to several parameters. At present, the parameter concerned
+is cost_value, i.e. the requested time or distance.
+</p>
+
+
+<h3>See Also</h3>
+
+<p>get_isodistance, get_isochrone
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+library(sf)
+library(tmap)
+
+# All area i can acces in less than 5 minute from penmarch centroid
+penmarch &lt;- get_apicarto_cadastre("29158")
+penmarch_centroid &lt;- st_centroid(penmarch)
+isochrone &lt;- get_isochrone(penmarch_centroid, 5)
+
+qtm(penmarch, col = "red")+qtm(isochrone, col = "blue")+qtm(penmarch_centroid, fill = "red")
+
+# All area i can acces as pedestrian in less than 1km
+isodistance &lt;- get_isodistance(penmarch_centroid, 1, unit = "kilometer", profile = "pedestrian")
+
+qtm(penmarch, col = "red")+qtm(isodistance, col = "blue")+qtm(penmarch_centroid, fill = "red")
+
+# In case of multiple point provided, the output will contain as many polygons as points.
+code_insee &lt;- c("29158", "29072", "29171")
+communes_centroid &lt;- get_apicarto_cadastre(code_insee) |&gt; st_centroid()
+isochrones &lt;- get_isochrone(communes_centroid, 8)
+isochrones$code_insee &lt;- code_insee
+qtm(isochrones, fill = "code_insee")
+
+# Find area where i can acces all communes centroid in less than 8 minutes
+area &lt;- st_intersection(isochrones)
+qtm(communes_centroid, fill = "red")+ qtm(area[area$origins == "1:3",])
+
+## End(Not run)
+</code></pre>
+
+
+</div>

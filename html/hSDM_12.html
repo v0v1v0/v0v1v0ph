@@ -1,0 +1,427 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hSDM.Nmixture.K</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>N-mixture model with K, the maximal theoretical abundance</h2>
+
+<h3>Description</h3>
+
+<p>The <code>hSDM.Nmixture.K</code> function can be used to model
+species distribution including different processes in a hierarchical
+Bayesian framework: a <code class="reqn">\mathcal{P}oisson</code> suitability
+process (refering to environmental suitability explaining abundance)
+and a <code class="reqn">\mathcal{B}inomial</code> observability process
+(refering to various ecological and methodological issues explaining
+species detection). The <code>hSDM.Nmixture.K</code> function calls a Gibbs
+sampler written in C code which uses an adaptive Metropolis algorithm
+to estimate the conditional posterior distribution of hierarchical
+model's parameters. K is the maximal theoretical abundance sensus
+Royle 2004.</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hSDM.Nmixture.K(# Observations
+                       counts, observability, site, data.observability,
+                       # Habitat
+                       suitability, data.suitability,
+                       # Predictions
+                       suitability.pred = NULL,
+                       # Chains
+                       burnin = 5000, mcmc = 10000, thin = 10,
+                       # Starting values
+                       beta.start,
+                       gamma.start,
+                       # Priors
+                       mubeta = 0, Vbeta = 1.0E6,
+                       mugamma = 0, Vgamma = 1.0E6,
+                       # Various
+                       K,
+                       seed = 1234, verbose = 1,
+                       save.p = 0)</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>counts</code></td>
+<td>
+<p>A vector indicating the count (or abundance) for each
+observation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>observability</code></td>
+<td>
+<p>A one-sided formula of the form
+<code class="reqn">\sim w_1+...+w_q</code> with <code class="reqn">q</code> terms specifying the
+explicative variables for the observability process.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>site</code></td>
+<td>
+<p>A vector indicating the site identifier (from one to the
+total number of sites) for each observation. Several observations
+can occur at one site. A site can be a raster cell for example.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>data.observability</code></td>
+<td>
+<p>A data frame containing the model's
+variables for the observability process.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>suitability</code></td>
+<td>
+<p>A one-sided formula of the form
+<code class="reqn">\sim x_1+...+x_p</code> with <code class="reqn">p</code> terms specifying the
+explicative variables for the suitability process.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>data.suitability</code></td>
+<td>
+<p>A data frame containing the model's
+variables for the suitability process.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>suitability.pred</code></td>
+<td>
+<p>An optional data frame in which to look for
+variables with which to predict. If NULL, the observations are
+used.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>burnin</code></td>
+<td>
+<p>The number of burnin iterations for the sampler.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mcmc</code></td>
+<td>
+<p>The number of Gibbs iterations for the sampler. Total
+number of Gibbs iterations is equal to
+<code>burnin+mcmc</code>. <code>burnin+mcmc</code> must be divisible by 10 and
+superior or equal to 100 so that the progress bar can be displayed.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>thin</code></td>
+<td>
+<p>The thinning interval used in the simulation. The number
+of mcmc iterations must be divisible by this value.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>beta.start</code></td>
+<td>
+<p>Starting values for <code class="reqn">\beta</code> parameters of
+the suitability process. This can either be a scalar or a
+<code class="reqn">p</code>-length vector.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>gamma.start</code></td>
+<td>
+<p>Starting values for <code class="reqn">\beta</code> parameters
+of the observability process. This can either be a scalar or a
+<code class="reqn">q</code>-length vector.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mubeta</code></td>
+<td>
+<p>Means of the priors for the <code class="reqn">\beta</code> parameters
+of the suitability process. <code>mubeta</code> must be either a scalar or a
+p-length vector. If <code>mubeta</code> takes a scalar value, then that value will
+serve as the prior mean for all of the betas. The default value is set
+to 0 for an uninformative prior.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Vbeta</code></td>
+<td>
+<p>Variances of the Normal priors for the <code class="reqn">\beta</code>
+parameters of the suitability process. <code>Vbeta</code> must be either a
+scalar or a p-length vector. If <code>Vbeta</code> takes a scalar value,
+then that value will serve as the prior variance for all of the
+betas. The default variance is large and set to 1.0E6 for an
+uninformative flat prior.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mugamma</code></td>
+<td>
+<p>Means of the Normal priors for the <code class="reqn">\gamma</code>
+parameters of the observability process. <code>mugamma</code> must be either
+a scalar or a p-length vector. If <code>mugamma</code> takes a scalar value,
+then that value will serve as the prior mean for all of the
+gammas. The default value is set to 0 for an uninformative prior.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Vgamma</code></td>
+<td>
+<p>Variances of the Normal priors for the
+<code class="reqn">\gamma</code> parameters of the observability
+process. <code>Vgamma</code> must be either a scalar or a p-length
+vector. If <code>Vgamma</code> takes a scalar value, then that value will
+serve as the prior variance for all of the gammas. The default
+variance is large and set to 1.0E6 for an uninformative flat prior.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>K</code></td>
+<td>
+<p>Maximal theoretical abundance sensus Royle 2004. It
+corresponds to the integer upper index of integration for
+N-mixture. This should be set high enough so that it does not affect
+the parameter estimates. Note that computation time will increase
+with K.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>seed</code></td>
+<td>
+<p>The seed for the random number generator. Default set to
+1234.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p>A switch (0,1) which determines whether or not the
+progress of the sampler is printed to the screen. Default is 1: a
+progress bar is printed, indicating the step (in %) reached by the
+Gibbs sampler.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>save.p</code></td>
+<td>
+<p>A switch (0,1) which determines whether or not the
+sampled values for predictions are saved. Default is 0: the
+posterior mean is computed and returned in the <code>lambda.pred</code>
+vector. Be careful, setting <code>save.p</code> to 1 might require a large
+amount of memory.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The model integrates two processes, an ecological process associated
+to the abundance of the species due to habitat suitability and an
+observation process that takes into account the fact that the
+probability of detection of the species is inferior to one.
+</p>
+<p><b>Ecological process:</b>
+</p>
+<p style="text-align: center;"><code class="reqn">N_i \sim \mathcal{P}oisson(\lambda_i)</code>
+</p>
+
+<p style="text-align: center;"><code class="reqn">log(\lambda_i) = X_i \beta</code>
+</p>
+
+<p><b>Observation process:</b>
+</p>
+<p style="text-align: center;"><code class="reqn">y_{it} \sim \mathcal{B}inomial(N_i, \delta_{it})</code>
+</p>
+
+<p style="text-align: center;"><code class="reqn">logit(\delta_{it}) = W_{it} \gamma</code>
+</p>
+ 
+
+
+<h3>Value</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>mcmc</code></td>
+<td>
+<p>An mcmc object that contains the posterior sample. This
+object can be summarized by functions provided by the coda
+package. The posterior sample of the deviance <code class="reqn">D</code>, with
+<code class="reqn">D=-2\log(\prod_{it} P(y_{it},N_i|...))</code>, is also
+provided.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lambda.pred</code></td>
+<td>
+<p>If <code>save.p</code> is set to 0 (default),
+<code>lambda.pred</code> is the predictive posterior mean of the abundance
+associated to the suitability process for each prediction. If
+<code>save.p</code> is set to 1, <code>lambda.pred</code> is an <code>mcmc</code>
+object with sampled values of the abundance associated to the
+suitability process for each prediction.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lambda.latent</code></td>
+<td>
+<p>Predictive posterior mean of the abundance
+associated to the suitability process for each observation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>delta.latent</code></td>
+<td>
+<p>Predictive posterior mean of the probability
+associated to the observability process for each observation.</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>Ghislain Vieilledent <a href="mailto:ghislain.vieilledent@cirad.fr">ghislain.vieilledent@cirad.fr</a>
+</p>
+
+
+<h3>References</h3>
+
+<p>Gelfand, A. E.; Schmidt, A. M.; Wu, S.; Silander, J. A.; Latimer, A. and
+Rebelo, A. G. (2005) Modelling species diversity through species level
+hierarchical modelling. <em>Applied Statistics</em>, 54, 1-20.
+</p>
+<p>Latimer, A. M.; Wu, S. S.; Gelfand, A. E. and Silander, J. A. (2006) Building
+statistical models to analyze species distributions. <em>Ecological
+Applications</em>, 16, 33-50.
+</p>
+<p>Royle, J. A. (2004) N-mixture models for estimating population size from
+spatially replicated counts. <em>Biometrics</em>, 60, 108-115.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>plot.mcmc</code>, <code>summary.mcmc</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+## Not run: 
+
+#==============================================
+# hSDM.Nmixture.K()
+# Example with simulated data
+#==============================================
+
+#=================
+#== Load libraries
+library(hSDM)
+
+#==================
+#== Data simulation
+
+# Number of observation sites
+nsite &lt;- 200
+
+#= Set seed for repeatability
+seed &lt;- 4321
+
+#= Ecological process (suitability)
+set.seed(seed)
+x1 &lt;- rnorm(nsite,0,1)
+set.seed(2*seed)
+x2 &lt;- rnorm(nsite,0,1)
+X &lt;- cbind(rep(1,nsite),x1,x2)
+beta.target &lt;- c(-1,1,-1) # Target parameters
+log.lambda &lt;- X %*% beta.target
+lambda &lt;- exp(log.lambda)
+set.seed(seed)
+N &lt;- rpois(nsite,lambda)
+
+#= Number of visits associated to each observation point
+set.seed(seed)
+visits &lt;- rpois(nsite,3)
+visits[visits==0] &lt;- 1
+# Vector of observation points
+sites &lt;- vector()
+for (i in 1:nsite) {
+    sites &lt;- c(sites,rep(i,visits[i]))
+}
+
+#= Observation process (detectability)
+nobs &lt;- sum(visits)
+set.seed(seed)
+w1 &lt;- rnorm(nobs,0,1)
+set.seed(2*seed)
+w2 &lt;- rnorm(nobs,0,1)
+W &lt;- cbind(rep(1,nobs),w1,w2)
+gamma.target &lt;- c(-1,1,-1) # Target parameters
+logit.delta &lt;- W %*% gamma.target
+delta &lt;- inv.logit(logit.delta)
+set.seed(seed)
+Y &lt;- rbinom(nobs,N[sites],delta)
+
+#= Data-sets
+data.obs &lt;- data.frame(Y,w1,w2,site=sites)
+data.suit &lt;- data.frame(x1,x2)
+
+#================================
+#== Parameter inference with hSDM
+
+Start &lt;- Sys.time() # Start the clock
+mod.hSDM.Nmixture.K &lt;- hSDM.Nmixture.K(# Observations
+                           counts=data.obs$Y,
+                           observability=~w1+w2,
+                           site=data.obs$site,
+                           data.observability=data.obs,
+                           # Habitat
+                           suitability=~x1+x2,
+                           data.suitability=data.suit,
+                           # Predictions
+                           suitability.pred=NULL,
+                           # Chains
+                           burnin=5000, mcmc=5000, thin=5,
+                           # Starting values
+                           beta.start=0,
+                           gamma.start=0,
+                           # Priors
+                           mubeta=0, Vbeta=1.0E6,
+                           mugamma=0, Vgamma=1.0E6,
+                           # Various
+                           K=max(data.obs$Y)*2,
+                           seed=1234, verbose=1,
+                           save.p=0)
+Time.hSDM &lt;- difftime(Sys.time(),Start,units="sec") # Time difference
+
+#= Computation time
+Time.hSDM
+
+#==========
+#== Outputs
+
+#= Parameter estimates
+summary(mod.hSDM.Nmixture.K$mcmc)
+pdf(file="Posteriors_hSDM.Nmixture.K.pdf")
+plot(mod.hSDM.Nmixture.K$mcmc)
+dev.off()
+
+#= Predictions
+summary(mod.hSDM.Nmixture.K$lambda.latent)
+summary(mod.hSDM.Nmixture.K$delta.latent)
+summary(mod.hSDM.Nmixture.K$lambda.pred)
+pdf(file="Pred-Init.K.pdf")
+plot(lambda,mod.hSDM.Nmixture.K$lambda.pred)
+abline(a=0,b=1,col="red")
+dev.off()
+
+
+## End(Not run)
+
+</code></pre>
+
+
+</div>

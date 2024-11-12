@@ -1,0 +1,283 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>print.TwoTrellisColumns</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Print two conformable trellis plots in adjacent columns with user
+control of widths.</h2>
+
+<h3>Description</h3>
+
+<p>Print two conformable trellis plots in adjacent columns with user
+control of widths.  Left y tick-labels and left.strip are removed from the
+right-hand plot.</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">as.TwoTrellisColumns5(left,  ## left  is the left trellis object
+                      right, ## right is the right trellis object
+                      ## Both left and right must have identical
+                      ## settings for number and size of vertical panels,
+                      ## left-axis labels, number of lines in main, sub, legend.
+                      ...,
+                      pw=c(.3, .30, .01, .30, .09),
+                      px=list(
+                        LL=c(0, pwc[1]),
+                        LP=pwc[1:2],
+                        ML=pwc[2:3],
+                        RP=pwc[3:4],
+                        RL=pwc[4:5]),
+                      pwc=cumsum(pw),
+                      strip.left=TRUE,
+                      y.tck=c(0,0)
+                      )
+
+## S3 method for class 'TwoTrellisColumns5'
+print(x, px=attr(x, "px"), ...)
+
+leftLabels.trellis(x)
+rightLabels.trellis(x)
+panelOnly.trellis(x, strip.left=FALSE, y.tck=0)
+mainSubLegend.trellis(x)
+emptyRightAxis(x)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>left, right</code></td>
+<td>
+<p>Conformable <code>"trellis"</code> objects.
+Both must have the identical settings for number and size of
+vertical panels, left-axis labels, number of
+lines in main, sub, legend.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p><code>"trellis"</code> object.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>px</code></td>
+<td>
+<p>These are used <code>x</code>-values used in the position argument
+of the <code>print.trellis</code> function.  The default (constructed from
+the <code>pw</code> argument) makes the Left and Right panels the same
+width and the Middle containing the y-axis is given the remainder.
+Overlapping is permitted.  The appearance depends on the width of
+the graphics device.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pw, pwc</code></td>
+<td>
+<p><code>pw</code> vector of five positive numbers that sum to 1.  These
+are the relative widths of the five sections of the result: LeftLabels,
+LeftPanel, MainSubLegend, RightPanel, RightLabels.  <code>pwc</code> is
+the cumulative sum of <code>pw</code>.
+<code>pwc</code> is expanded in the <code>px</code> argument to the <code>x</code> values
+used in the <code>position</code> argument of the
+<code>print.trellis</code> function.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>strip.left</code></td>
+<td>
+<p>See <code>barchart</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>y.tck</code></td>
+<td>
+<p>A vector of one or two numeric values.
+This will be used as the <code>y</code> <code>tck</code> value
+for the right column of panels.  See <code>'tck'</code> in
+<code>barchart</code> for details.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Other arguments are ignored.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p><code>as.TwoTrellisColumns5</code> constructs a <code>"TwoTrellisColumns5"</code>
+object, which is a list of five trellis objects named <code>"LL", "LP",
+"ML", "RP", "RL"</code>.  <code>LL</code> is the left labels from the <code>left</code>
+input object. <code>LP</code> is the panels from the <code>left</code> input object.
+<code>ML</code> is the middle labels from the <code>left</code> object; these are
+the <code>main</code> title, <code>sub</code> title, and <code>legend</code>.  <code>RP</code>
+is the panels from the <code>right</code> input object.  <code>RL</code> is the
+right labels from the <code>right</code> input object.
+</p>
+<p><code>print.TwoTrellisColumns5</code> is a print method for a
+<code>"TwoTrellisColumns5"</code> object.  It takes left-to-right positioning
+information from the <code>"px"</code> attribute of its argument <code>x</code> or
+from an input argument.  The numbers are used as the <code>"x"</code>
+information for the <code>position</code> argument to the <code>print.trellis</code>
+method.
+</p>
+<p><code>emptyLeftAxis,
+leftLabels.trellis,
+rightLabels.trellis,
+panelOnly.trellis,</code><br><code>mainSubLegend.trellis,
+emptyLeftStrip,
+emptyRightAxis</code> are functions which blank out the various components of the trellis
+argument and retains their vertical spacing.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A <code>"TwoTrellisColumns5"</code> object, consisting of a list
+containing the constructed left, middle, and right trellis objects,
+and an attribute containing the <code>px</code> value.</p>
+
+
+<h3>Author(s)</h3>
+
+<p> Richard M. Heiberger &lt;rmh@temple.edu&gt; </p>
+
+
+<h3>See Also</h3>
+
+<p><code>likert</code> for the details on the motivating example.</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+
+## These are based on the Professional Challenges example in ?likert
+data(ProfChal)
+levels(ProfChal$Subtable)[6] &lt;- "Prof Recog" ## reduce length of label
+
+## initial ordering of Question factor
+PCC &lt;- likert(Question ~ . | Subtable, ProfChal, ylab=NULL,
+              rightAxis=TRUE,
+              layout=c(1,6),
+              strip=FALSE,
+              strip.left=strip.custom(bg="gray97"),
+              par.strip.text=list(cex=.7),
+              scales=list(y=list(relation="free")),
+              main="Is your job professionally challenging?")
+
+## initial ordering of Question factor
+PCP &lt;- likert(Question ~ . | Subtable, ProfChal, ylab=NULL,
+              as.percent=TRUE,
+              layout=c(1,6),
+              strip=FALSE,
+              strip.left=strip.custom(bg="gray97"),
+              par.strip.text=list(cex=.7),
+              scales=list(y=list(relation="free")),
+              main="Is your job professionally challenging?")
+
+## Not run: 
+## default equal widths of the two panels
+as.TwoTrellisColumns5(PCP, PCC)  ## 11in x 7in
+
+## make left panel twice as wide as right panel
+as.TwoTrellisColumns5(PCP, PCC, pw=c(.3, .4, .01, .2, .09))  ## 11in x 7in
+##                                   --------------------    ## sum to 1.00
+
+## make left panel twice as wide as right panel, and control position of main and legend
+as.TwoTrellisColumns5(PCP, PCC,  ## 11in x 7in
+                      px=list(
+                        LL=c(.00,  .30),
+                        LP=c(.30,  .70),
+                        ML=c(.60,  .61),  ## arbitrary,
+                                          ## visually center the labels and legend
+                        RP=c(.71,  .91),
+                        RL=c(.91, 1.00)))
+
+## End(Not run)
+
+## Size that works in default 7x7 window.  7x7 is not recommended for
+## this example because most of the space is used for labeling and not
+## much for the panels containing the data.  Use the px values for the
+## 11x7 illustrated above in the dontrun section.
+
+as.TwoTrellisColumns5(PCP, PCC,  ## 7in x 7in
+                      px=list(
+                        LL=c(.00,  .50),
+                        LP=c(.50,  .70),
+                        ML=c(.50,  .51),  ## arbitrary,
+                                          ## visually center the labels and legend
+                        RP=c(.71,  .87),
+                        RL=c(.87, 1.00)))
+
+## Ordering the rows by the lengths of the positive bars and also
+## put percents and counts on the same plot.
+## The easiest way is to use the LikertPercentCountColumns function:
+
+LikertPercentCountColumns(Question ~ . | Subtable, ProfChal,
+                          layout=c(1,6), scales=list(y=list(relation="free")),
+                          ylab=NULL, between=list(y=0),
+                          strip.left=strip.custom(bg="gray97"), strip=FALSE,
+                          par.strip.text=list(cex=.7),
+                          positive.order=TRUE,
+                          main="Is your job professionally challenging?")
+
+## Not run: 
+
+## Ordering the rows by the lengths of the positive bars and also
+## putting percents and counts on the same plot requires coordination.
+## The easiest way is to order the original tables of counts by the
+## order of the percent plot.
+
+percentPlot &lt;- likert(Question ~ . | Subtable, ProfChal,
+                      as.percent=TRUE,
+                      layout=c(1,6), scales=list(y=list(relation="free")),
+                      ylab=NULL, between=list(y=0),
+                      strip.left=strip.custom(bg="gray97"), strip=FALSE,
+                      par.strip.text=list(cex=.7),
+                      positive.order=TRUE,
+                      main="Is your job professionally challenging?")
+## percentPlot
+pct.order &lt;- percentPlot$y.limits[[1]]
+
+ProfChal2 &lt;- ProfChal
+ProfChal2$Question &lt;- factor(ProfChal2$Question, levels=rev(pct.order))
+
+countPlot   &lt;- likert(Question ~ . | Subtable, ProfChal2,
+                      layout=c(1,6),
+                      rightAxis=TRUE,
+                      scales=list(y=list(relation="free"),
+                                  x=list(at=c(0, 250, 500))),
+                      ylab=NULL, between=list(y=0),
+                      strip.left=strip.custom(bg="gray97"), strip=FALSE,
+                      par.strip.text=list(cex=.7),
+                      main="Is your job professionally challenging?")
+## countPlot
+levels(ProfChal$Subtable)[6] &lt;-
+      "Attitude\ntoward\nProfessional\nRecognition" ## Restore original label
+
+## Size that works in default 7x7 window.  7x7 is not recommended for
+## this example because most of the space is used for labeling and not
+## much for the panels containing the data.  Use the px values for the
+## 11x7 illustrated above in the dontrun section.
+
+as.TwoTrellisColumns5(percentPlot, countPlot,  ## 7in x 7in
+                      px=list(
+                        LL=c(.00,  .50),
+                        LP=c(.50,  .70),
+                        ML=c(.50,  .51),  ## arbitrary,
+                                          ## visually center the labels and legend
+                        RP=c(.71,  .87),
+                        RL=c(.87, 1.00)))
+
+## End(Not run)
+</code></pre>
+
+
+</div>

@@ -1,0 +1,72 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>apply_copy_map</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Apply copy map</h2>
+
+<h3>Description</h3>
+
+<p>OR duplicate training set columns together
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">apply_copy_map(X, copy_map)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>X</code></td>
+<td>
+<p>Sparse matrix containing columns of indicator functions.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>copy_map</code></td>
+<td>
+<p>the copy map</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A <code>dgCMatrix</code> sparse matrix corresponding to the design matrix
+for a zero-th order highly adaptive lasso, but with all duplicated columns
+(basis functions) removed.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+gendata &lt;- function(n) {
+  W1 &lt;- runif(n, -3, 3)
+  W2 &lt;- rnorm(n)
+  W3 &lt;- runif(n)
+  W4 &lt;- rnorm(n)
+  g0 &lt;- plogis(0.5 * (-0.8 * W1 + 0.39 * W2 + 0.08 * W3 - 0.12 * W4))
+  A &lt;- rbinom(n, 1, g0)
+  Q0 &lt;- plogis(0.15 * (2 * A + 2 * A * W1 + 6 * A * W3 * W4 - 3))
+  Y &lt;- rbinom(n, 1, Q0)
+  data.frame(A, W1, W2, W3, W4, Y)
+}
+set.seed(1234)
+data &lt;- gendata(100)
+covars &lt;- setdiff(names(data), "Y")
+X &lt;- as.matrix(data[, covars, drop = FALSE])
+basis_list &lt;- enumerate_basis(X)
+x_basis &lt;- make_design_matrix(X, basis_list)
+copy_map &lt;- make_copy_map(x_basis)
+x_basis_uniq &lt;- apply_copy_map(x_basis, copy_map)
+
+
+</code></pre>
+
+
+</div>

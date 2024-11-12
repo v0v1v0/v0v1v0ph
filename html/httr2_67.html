@@ -1,0 +1,67 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>req_perform_connection</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Perform a request and return a streaming connection</h2>
+
+<h3>Description</h3>
+
+<p><a href="https://lifecycle.r-lib.org/articles/stages.html#experimental"><img src="../help/figures/lifecycle-experimental.svg" alt="[Experimental]"></a>
+</p>
+<p>Use <code>req_perform_connection()</code> to perform a request if you want to stream the
+response body. A response returned by <code>req_perform_connection()</code> includes a
+connection as the body. You can then use <code>resp_stream_raw()</code>,
+<code>resp_stream_lines()</code>, or <code>resp_stream_sse()</code> to retrieve data a chunk at a
+time. Always finish up by closing the connection by calling
+<code>close(response)</code>.
+</p>
+<p>This is an alternative interface to <code>req_perform_stream()</code> that returns a
+connection that you can use to pull the data, rather
+than providing callbacks that the data is pushed to. This is useful if you
+want to do other work in between handling inputs from the stream.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">req_perform_connection(req, blocking = TRUE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>req</code></td>
+<td>
+<p>A httr2 request object.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>blocking</code></td>
+<td>
+<p>When retrieving data, should the connection block and wait
+for the desired information or immediately return what it has (possibly
+nothing)?</p>
+</td>
+</tr>
+</table>
+<h3>Examples</h3>
+
+<pre><code class="language-R">req &lt;- request(example_url()) |&gt;
+  req_url_path("/stream-bytes/32768")
+resp &lt;- req_perform_connection(req)
+
+length(resp_stream_raw(resp, kb = 16))
+length(resp_stream_raw(resp, kb = 16))
+# When the stream has no more data, you'll get an empty result:
+length(resp_stream_raw(resp, kb = 16))
+
+# Always close the response when you're done
+close(resp)
+</code></pre>
+
+
+</div>

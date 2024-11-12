@@ -1,0 +1,196 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>gigMom</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Calculate Moments of the Generalized Inverse Gaussian Distribution</h2>
+
+<h3>Description</h3>
+
+<p>Functions to calculate raw moments and moments about a given location
+for the generalized inverse Gaussian (GIG) distribution, including the
+gamma and inverse gamma distributions as special cases.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">gigRawMom(order, Theta)
+gigMom(order, Theta, about = 0)
+gammaRawMom(order, shape = 1, rate = 1, scale = 1/rate)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>order</code></td>
+<td>
+<p>Numeric. The order of the moment to be calculated. Not
+permitted to be a vector. Must be a positive whole number except for
+moments about zero.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Theta</code></td>
+<td>
+<p>Numeric. The parameter vector specifying the GIG
+distribution. Of the form <code>c(lambda, chi, psi)</code> (see
+<code>dgig</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>about</code></td>
+<td>
+<p>Numeric. The point around which the moment is to be
+calculated.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>shape</code></td>
+<td>
+<p>Numeric. The shape parameter, must be non-negative, not
+permitted to be a vector.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>scale</code></td>
+<td>
+<p>Numeric. The scale parameter, must be positive, not
+permitted to be a vector.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rate</code></td>
+<td>
+<p>Numeric. The rate parameter, an alternative way to specify
+the scale.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The vector <code>Theta</code> of parameters is examined using
+<code>gigCheckPars</code> to see if the parameters are valid for the GIG
+distribution and if they correspond to the special cases which are the
+gamma and inverse gamma distributions. Checking of special cases and
+valid parameter vector values is carried out using the function
+<code>gigCheckPars</code>. Checking whether <code>order</code>
+is a whole number is carried out using the function
+<code>is.wholenumber</code>.
+</p>
+<p>Raw moments (moments about zero) are calculated using the
+functions <code>gigRawMom</code> or <code>gammaRawMom</code>. For moments not
+about zero, the function <code>momChangeAbout</code> is used to
+derive moments about another point from raw moments. Note that raw moments
+of the inverse gamma distribution can be obtained from the raw moments
+of the gamma distribution because of the relationship between the two
+distributions. An alternative implementation of raw moments of the gamma
+and inverse gamma distributions may be found in the package
+<span class="pkg">actuar</span> and these may be faster since they are written in C.
+</p>
+<p>To calculate the raw moments of the GIG distribution it is convenient to
+use the alternative parameterization of the GIG in terms of
+<code class="reqn">\omega</code> and <code class="reqn">\eta</code>, given as parameterization 3
+in <code>gigChangePars</code>. Then the raw moment of the GIG
+distribution of order <code class="reqn">k</code> is given by
+</p>
+<p style="text-align: center;"><code class="reqn">\eta^k K_{\lambda+k}(\omega)/K_{\lambda}(\omega)</code>
+</p>
+
+<p>where <code class="reqn">K_\lambda()</code> is the modified Bessel function of
+the third kind of order <code class="reqn">\lambda</code>.
+</p>
+<p>The raw moment of the gamma distribution of order <code class="reqn">k</code> with
+shape parameter <code class="reqn">\alpha</code> and rate parameter
+<code class="reqn">\beta</code> is given by
+</p>
+<p style="text-align: center;"><code class="reqn">\beta^{-k}\Gamma(\alpha+k)/\Gamma(\alpha)</code>
+</p>
+
+<p>The raw moment of order <code class="reqn">k</code> of the inverse gamma distribution
+with shape parameter <code class="reqn">\alpha</code> and rate parameter
+<code class="reqn">\beta</code> is the raw moment of order <code class="reqn">-k</code> of the gamma
+distribution with shape parameter <code class="reqn">\alpha</code> and rate parameter
+<code class="reqn">1/\beta</code>.
+</p>
+
+
+<h3>Value</h3>
+
+<p>The moment specified. In the case of raw moments, <code>Inf</code> is
+returned if the moment is infinite.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>David Scott <a href="mailto:d.scott@auckland.ac.nz">d.scott@auckland.ac.nz</a></p>
+
+
+<h3>References</h3>
+
+<p>Paolella, Marc S. (2007)
+Intermediate Probability: A Computational Approach,
+Chichester: Wiley
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>gigCheckPars</code>, <code>gigChangePars</code>,
+<code>is.wholenumber</code>, <code>momChangeAbout</code>,
+<code>momIntegrated</code>, <code>gigMean</code>,
+<code>gigVar</code>, <code>gigSkew</code>, <code>gigKurt</code>.</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">### Raw moments of the generalized inverse Gaussian distribution
+Theta &lt;- c(-0.5,5,2.5)
+gigRawMom(1, Theta)
+momIntegrated("gig", order = 1, param = Theta, about = 0)
+gigRawMom(2, Theta)
+momIntegrated("gig", order = 2, param = Theta, about = 0)
+gigRawMom(10, Theta)
+momIntegrated("gig", order = 10, param = Theta, about = 0)
+gigRawMom(2.5, Theta)
+
+### Moments of the generalized inverse Gaussian distribution
+Theta &lt;- c(-0.5,5,2.5)
+(m1 &lt;- gigRawMom(1, Theta))
+gigMom(1, Theta)
+gigMom(2, Theta, m1)
+(m2 &lt;- momIntegrated("gig", order = 2, param = Theta, about = m1))
+gigMom(1, Theta, m1)
+gigMom(3, Theta, m1)
+momIntegrated("gig", order = 3, param = Theta, about = m1)
+
+### Raw moments of the gamma distribution
+shape &lt;- 2
+rate &lt;- 3
+Theta &lt;- c(shape, rate)
+gammaRawMom(1, shape, rate)
+momIntegrated("gamma", order = 1, param = Theta, about = 0)
+gammaRawMom(2, shape, rate)
+momIntegrated("gamma", order = 2, param = Theta, about = 0)
+gammaRawMom(10, shape, rate)
+momIntegrated("gamma", order = 10, param = Theta, about = 0)
+
+### Moments of the inverse gamma distribution
+Theta &lt;- c(-0.5,5,0)
+gigRawMom(2, Theta)              # Inf
+gigRawMom(-2, Theta)
+momIntegrated("invgamma", order = -2,
+              param = c(-Theta[1],Theta[2]/2), about = 0)
+
+### An example where the moment is infinite: inverse gamma
+Theta &lt;- c(-0.5,5,0)
+gigMom(1, Theta)
+gigMom(2, Theta)
+</code></pre>
+
+
+</div>

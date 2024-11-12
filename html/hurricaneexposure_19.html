@@ -1,0 +1,82 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>multi_county_distance</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Hurricane exposure by distance for communities</h2>
+
+<h3>Description</h3>
+
+<p>This function takes a dataframe with multi-county communities and returns a
+community-level dataframe of "exposed" storms, based on the shortest distance
+between the storm's track and the population-based centers of each county
+in the community.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">multi_county_distance(communities, start_year, end_year, dist_limit)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>communities</code></td>
+<td>
+<p>A dataframe with the FIPS codes for all counties within
+each community. It must include columns with a column identifier
+(<code>commun</code>) and with the FIPS codes of counties included in each
+community (<code>fips</code>). See the example code.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>start_year</code></td>
+<td>
+<p>Four-digit integer with first year to consider.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>end_year</code></td>
+<td>
+<p>Four-digit integer with last year to consider.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dist_limit</code></td>
+<td>
+<p>Maximum distance, in kilometers, of how close the storm
+track must come to the county's population mean center to classify
+the county as "exposed" to the storm.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>Returns the same type dataframe as <code>county_distance</code>,
+but with storms listed by community instead of county.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Ensure that data package is available before running the example.
+#  If it is not, see the `hurricaneexposure` package vignette for details
+# on installing the required data package.
+if (requireNamespace("hurricaneexposuredata", quietly = TRUE)) {
+
+communities &lt;- data.frame(community_name = c(rep("ny", 6), "no", "new"),
+                         fips = c("36005", "36047", "36061",
+                                  "36085", "36081", "36119",
+                                  "22071", "51700"))
+distance_df &lt;- multi_county_distance(communities = communities,
+                                     start_year = 1995, end_year = 2005,
+                                     dist_limit = 75)
+}
+</code></pre>
+
+
+</div>

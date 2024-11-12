@@ -1,0 +1,197 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>sim_alphas</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Generate attribute trajectories under the specified hidden Markov models</h2>
+
+<h3>Description</h3>
+
+<p>Based on the learning model parameters, create cube of attribute patterns
+of all subjects across time.
+Currently available learning models are Higher-order hidden Markov DCM('HO_sep'),
+Higher-order hidden Markov DCM with learning ability as a random effect('HO_joint'),
+the simple independent-attribute learning model('indept'),
+and the first order hidden Markov model('FOHM').
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">sim_alphas(
+  model,
+  lambdas = NULL,
+  thetas = NULL,
+  Q_matrix = NULL,
+  Design_array = NULL,
+  taus = NULL,
+  Omega = NULL,
+  N = NA_integer_,
+  L = NA_integer_,
+  R = NULL,
+  alpha0 = NULL
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>model</code></td>
+<td>
+<p>The learning model under which the attribute trajectories are generated. Available options are: 'HO_joint', 'HO_sep', 'indept', 'FOHM'.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lambdas</code></td>
+<td>
+<p>A <code>vector</code> of transition model coefficients. With 'HO_sep' model specification, <code>lambdas</code> should be a length 4 <code>vector</code>. First entry is intercept of the logistic transition
+model, second entry is the slope of general learning ability, third entry is the slope for number of other mastered skills,
+fourth entry is the slope for amount of practice.
+With 'HO_joint' model specification, <code>lambdas</code> should be a length 3 <code>vector</code>. First entry is intercept of the logistic transition
+model, second entry is the slope for number of other mastered skills, third entry is the slope for amount of practice.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>thetas</code></td>
+<td>
+<p>A length N <code>vector</code> of learning abilities of each subject.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Q_matrix</code></td>
+<td>
+<p>A J-by-K Q-matrix</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Design_array</code></td>
+<td>
+<p>A N-by-J-by-L array indicating items administered to examinee n at time point l.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>taus</code></td>
+<td>
+<p>A length K <code>vector</code> of transition probabilities from 0 to 1 on each skill</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Omega</code></td>
+<td>
+<p>A 2^K-by-2^K <code>matrix</code> of transition probabilities from row pattern to column pattern</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>N</code></td>
+<td>
+<p>An <code>int</code> of number of examinees.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>L</code></td>
+<td>
+<p>An <code>int</code> of number of time points.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>R</code></td>
+<td>
+<p>A K-by-K dichotomous reachability <code>matrix</code> indicating the attribute hierarchies. The k,k'th entry of R is 1 if k' is prereq to k.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alpha0</code></td>
+<td>
+<p>Optional. An N-by-K <code>matrix</code> of subjects' initial attribute patterns.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>An N-by-K-by-L <code>array</code> of attribute patterns of subjects at each time point.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+## HO_joint ##
+N = nrow(Design_array)
+J = nrow(Q_matrix)
+K = ncol(Q_matrix)
+L = dim(Design_array)[3]
+class_0 &lt;- sample(1:2^K, N, replace = TRUE)
+Alphas_0 &lt;- matrix(0,N,K)
+for(i in 1:N){
+  Alphas_0[i,] &lt;- inv_bijectionvector(K,(class_0[i]-1))
+}
+thetas_true = rnorm(N, 0, 1.8)
+lambdas_true &lt;- c(-2, .4, .055)
+Alphas &lt;- sim_alphas(model="HO_joint", 
+                    lambdas=lambdas_true, 
+                    thetas=thetas_true, 
+                    Q_matrix=Q_matrix, 
+                    Design_array=Design_array)
+
+## HO_sep ##
+N = dim(Design_array)[1]
+J = nrow(Q_matrix)
+K = ncol(Q_matrix)
+L = dim(Design_array)[3]
+class_0 &lt;- sample(1:2^K, N, replace = L)
+Alphas_0 &lt;- matrix(0,N,K)
+for(i in 1:N){
+  Alphas_0[i,] &lt;- inv_bijectionvector(K,(class_0[i]-1))
+}
+thetas_true = rnorm(N)
+lambdas_true = c(-1, 1.8, .277, .055)
+Alphas &lt;- sim_alphas(model="HO_sep", 
+                     lambdas=lambdas_true, 
+                     thetas=thetas_true, 
+                     Q_matrix=Q_matrix, 
+                     Design_array=Design_array)
+
+## indept ##
+N = dim(Design_array)[1]
+K = dim(Q_matrix)[2]
+L = dim(Design_array)[3]
+tau &lt;- numeric(K)
+for(k in 1:K){
+  tau[k] &lt;- runif(1,.2,.6)
+}
+R = matrix(0,K,K)
+p_mastery &lt;- c(.5,.5,.4,.4)
+Alphas_0 &lt;- matrix(0,N,K)
+for(i in 1:N){
+  for(k in 1:K){
+    prereqs &lt;- which(R[k,]==1)
+    if(length(prereqs)==0){
+      Alphas_0[i,k] &lt;- rbinom(1,1,p_mastery[k])
+    }
+    if(length(prereqs)&gt;0){
+      Alphas_0[i,k] &lt;- prod(Alphas_0[i,prereqs])*rbinom(1,1,p_mastery)
+    }
+  }
+}
+Alphas &lt;- sim_alphas(model="indept", taus=tau, N=N, L=L, R=R)
+
+## FOHM ##
+N = dim(Design_array)[1]
+K = ncol(Q_matrix)
+L = dim(Design_array)[3]
+TP &lt;- TPmat(K)
+Omega_true &lt;- rOmega(TP)
+class_0 &lt;- sample(1:2^K, N, replace = L)
+Alphas_0 &lt;- matrix(0,N,K)
+for(i in 1:N){
+  Alphas_0[i,] &lt;- inv_bijectionvector(K,(class_0[i]-1))
+}
+Alphas &lt;- sim_alphas(model="FOHM", Omega = Omega_true, N=N, L=L)
+
+</code></pre>
+
+
+</div>

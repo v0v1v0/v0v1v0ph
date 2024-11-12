@@ -1,0 +1,112 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>allocate_mult</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Allocation of replicates on existing designs</h2>
+
+<h3>Description</h3>
+
+<p>Allocation of replicates on existing design locations, based on (29) from (Ankenman et al, 2010)
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">allocate_mult(model, N, Wijs = NULL, use.Ki = FALSE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>model</code></td>
+<td>
+<p><code>hetGP</code> model</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>N</code></td>
+<td>
+<p>total budget of replication to allocate</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Wijs</code></td>
+<td>
+<p>optional previously computed matrix of <code>Wijs</code>, see <code>Wij</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>use.Ki</code></td>
+<td>
+<p>should <code>Ki</code> from <code>model</code> be used? 
+Using the inverse of C (covariance matrix only, without noise, using <code>ginv</code>) is also possible</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>vector with approximated best number of replicates per design
+</p>
+
+
+<h3>References</h3>
+
+<p>B. Ankenman, B. Nelson, J. Staum (2010), Stochastic kriging for simulation metamodeling, Operations research, pp. 371–382, 58
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">##------------------------------------------------------------
+## Example: Heteroskedastic GP modeling on the motorcycle data
+##------------------------------------------------------------
+set.seed(32)
+
+## motorcycle data
+library(MASS)
+X &lt;- matrix(mcycle$times, ncol = 1)
+Z &lt;- mcycle$accel
+nvar &lt;- 1
+
+data_m &lt;- find_reps(X, Z, rescale = TRUE)
+
+plot(rep(data_m$X0, data_m$mult), data_m$Z, ylim = c(-160, 90),
+     ylab = 'acceleration', xlab = "time")
+
+
+## Model fitting
+model &lt;- mleHetGP(X = list(X0 = data_m$X0, Z0 = data_m$Z0, mult = data_m$mult),
+                  Z = Z, lower = rep(0.1, nvar), upper = rep(5, nvar),
+                  covtype = "Matern5_2")
+## Compute best allocation                  
+A &lt;- allocate_mult(model, N = 1000)
+
+## Create a prediction grid and obtain predictions
+xgrid &lt;- matrix(seq(0, 1, length.out = 301), ncol = 1) 
+predictions &lt;- predict(x = xgrid, object =  model)
+
+## Display mean predictive surface
+lines(xgrid, predictions$mean, col = 'red', lwd = 2)
+## Display 95% confidence intervals
+lines(xgrid, qnorm(0.05, predictions$mean, sqrt(predictions$sd2)), col = 2, lty = 2)
+lines(xgrid, qnorm(0.95, predictions$mean, sqrt(predictions$sd2)), col = 2, lty = 2)
+## Display 95% prediction intervals
+lines(xgrid, qnorm(0.05, predictions$mean, sqrt(predictions$sd2 + predictions$nugs)), 
+col = 3, lty = 2)
+lines(xgrid, qnorm(0.95, predictions$mean, sqrt(predictions$sd2 + predictions$nugs)), 
+col = 3, lty = 2)
+
+par(new = TRUE)
+plot(NA,NA, xlim = c(0,1), ylim = c(0,max(A)), axes = FALSE, ylab = "", xlab = "")
+segments(x0 = model$X0, x1 = model$X0, 
+y0 = rep(0, nrow(model$X)), y1 = A, col = 'grey')
+axis(side = 4)
+mtext(side = 4, line = 2, expression(a[i]), cex = 0.8)       
+</code></pre>
+
+
+</div>

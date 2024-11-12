@@ -1,0 +1,401 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hisse</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Hidden State Speciation and Extinction</h2>
+
+<h3>Description</h3>
+
+<p>Sets up and executes a HiSSE model (Hidden State Speciation and Extinction) 
+on a phylogeny and character distribution.</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hisse(phy, data, f=c(1,1), turnover=c(1,2), eps=c(1,2), 
+hidden.states=FALSE, trans.rate=NULL, condition.on.survival=TRUE, 
+root.type="madfitz", root.p=NULL, includes.fossils=FALSE, k.samples=NULL, 
+strat.intervals=NULL, sann=TRUE, sann.its=5000, bounded.search=TRUE, 
+max.tol=.Machine$double.eps^.50, starting.vals=NULL, turnover.upper=10000, eps.upper=3,
+trans.upper=100, restart.obj=NULL, ode.eps=0, dt.threads=1)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>phy</code></td>
+<td>
+<p>a phylogenetic tree, in <code>ape</code> “phylo” format.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>a matrix (or dataframe) with three columns. The first column 
+containing the species names and the second and third containing the binary 
+character information. Character "0" is on column 2 and chracter "1" is on 
+column 3. A value of 0 means character absent and a value of 1 character 
+present. The input of data follows a Pagel model. See 'Details'.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>f</code></td>
+<td>
+<p>vector of length 2 with the estimated proportion of extant species in 
+state 0 and 1 that are included in the phylogeny. A value of c(0.25, 0.5) means 
+that 25 percent of species in state 0 and 50 percent of species in state 1 are 
+included in the phylogeny. By default all species are assumed to be sampled.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>turnover</code></td>
+<td>
+<p>a numeric vector indicating the number of free turnover parameters in the
+model.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>eps</code></td>
+<td>
+<p>a numeric vector indicating the number of free extinction fraction parameters 
+in the model.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>hidden.states</code></td>
+<td>
+<p>a logical indicating whether the model includes a
+hidden states. The default is <code>FALSE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>trans.rate</code></td>
+<td>
+<p>provides the transition rate model. See function
+<code>TransMatMakerHiSSE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>condition.on.survival</code></td>
+<td>
+<p>a logical indicating whether the likelihood
+should be conditioned on the survival of two lineages and the
+speciation event subtending them (Nee et al. 1994). The default is <code>TRUE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>root.type</code></td>
+<td>
+<p>indicates whether root summarization follow the procedure described by 
+FitzJohn et al. 2009, “madfitz” or Herrera-Alsina et al. 2018, “herr_als”.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>root.p</code></td>
+<td>
+<p>a vector indicating fixed root state probabilities. The
+default is <code>NULL</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>includes.fossils</code></td>
+<td>
+<p>a logical indicating whether the tree contains fossil taxa. The default is <code>FALSE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>k.samples</code></td>
+<td>
+<p>a table of extinct individuals with sampled descendants. See details for how the table must be formatted.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>strat.intervals</code></td>
+<td>
+<p>a table of extinct individuals with sampled descendants. See vignette for how the table must be formatted.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sann</code></td>
+<td>
+<p>a logical indicating whether a two-step optimization
+procedure is to be used. The first includes a simulate annealing
+approach, with the second involving a refinement using
+<code>subplex</code>. The default is <code>TRUE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sann.its</code></td>
+<td>
+<p>a numeric indicating the number of times the simulated
+annealing algorithm should call the objective function.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>bounded.search</code></td>
+<td>
+<p>a logical indicating whether or not bounds should
+be enforced during optimization. The default is is <code>TRUE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>max.tol</code></td>
+<td>
+<p>supplies the relative optimization tolerance to
+<code>subplex</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>starting.vals</code></td>
+<td>
+<p>a numeric vector of length 3 with starting values for the
+model for all areas and hidden states. Position [1] sets turnover, [2]
+sets extinction fraction, and [3] transition rates.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>turnover.upper</code></td>
+<td>
+<p>sets the upper bound for the turnover parameters.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>eps.upper</code></td>
+<td>
+<p>sets the upper bound for the eps parameters.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>trans.upper</code></td>
+<td>
+<p>sets the upper bound for the transition rate parameters.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>restart.obj</code></td>
+<td>
+<p>an object of class  that contains everything to restart an optimization.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ode.eps</code></td>
+<td>
+<p>sets the tolerance for the integration at the end of a
+branch. Essentially if the sum of compD is less than this tolerance,
+then it assumes the results are unstable and discards them. The
+default is set to zero, but in testing a value of 1e-8 can sometimes
+produce stable solutions for both easy and very difficult optimization problems.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dt.threads</code></td>
+<td>
+<p>sets the number of threads available to data.table. In practice this 
+need not change from the default of 1 thread, as we have not seen any speedup from 
+allowing more threads.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>This function sets up and executes a new and faster version of the HiSSE model. Note that
+the four-state character-independent model can be called from this command in addition to
+the two-state BiSSE model and the full character-dependent HiSSE model. See vignette on 
+how to set this up.
+</p>
+<p>The “trans.rate” input is the transition model and has an
+entirely different setup than turnover rates and extinction fraction. See 
+<code>TransMatMakerHiSSE</code> function for more details. 
+</p>
+<p>For the “root.type” option, we are currently maintaining the previous default of 
+“madfitz”. However, it was recently pointed out by Herrera-Alsina et al. (2018)
+that at the root, the individual likelihoods for each possible state should be conditioned
+prior to averaging the individual likelihoods across states. This can be set doing 
+“herr_als”. It is unclear to us which is exactly correct, but it does seem that 
+both “madfitz” and “herr_als” behave exactly as they should in the case of 
+character-independent diversification (i.e., reduces to likelihood of tree + likelihood of
+trait model). We've also tested the behavior and the likelihood differences are very 
+subtle and the parameter estimates in simulation are nearly indistinguishable from the
+“madfitz” conditioning scheme. We provide both options and encourage users to try 
+both and let us know conditions in which the result vary dramatically under the two root
+implementations. We suspect they do not. 
+</p>
+<p>For user-specified “root.p”, you should specify the probability for each state. If
+you are doing a hidden model, there will be four states: 0A, 1A, 0B, 1B. So if you 
+wanted to say the root had to be state 0, you would specify
+“root.p = c(0.5, 0, 0.5, 0)”.
+</p>
+<p>This code will completely replace the original hisse function in the next version.
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>hisse</code> returns an object of class <code>hisse.fit</code>. This is a list with 
+elements:
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>$loglik</code></td>
+<td>
+<p>the maximum negative log-likelihood.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>$AIC</code></td>
+<td>
+<p>Akaike information criterion.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>$AICc</code></td>
+<td>
+<p>Akaike information criterion corrected for sample-size.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>$solution</code></td>
+<td>
+<p>a matrix containing the maximum likelihood estimates of the model 
+parameters.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>$index.par</code></td>
+<td>
+<p>an index matrix of the parameters being estimated.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>$f</code></td>
+<td>
+<p>user-supplied sampling frequencies.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>$hidden.states</code></td>
+<td>
+<p>a logical indicating whether hidden states were included in the 
+model.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>$condition.on.surivival</code></td>
+<td>
+<p>a logical indicating whether the
+likelihood was conditioned on the survival of two lineages and the speciation event 
+subtending them.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>$root.type</code></td>
+<td>
+<p>indicates the user-specified root prior assumption.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>$root.p</code></td>
+<td>
+<p>indicates whether the user-specified fixed root probabilities.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>$phy</code></td>
+<td>
+<p>user-supplied tree</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>$data</code></td>
+<td>
+<p>user-supplied dataset</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>$trans.matrix</code></td>
+<td>
+<p>the user-supplied transition matrix</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>$max.tol</code></td>
+<td>
+<p>relative optimization tolerance.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>$starting.vals</code></td>
+<td>
+<p>The starting values for the optimization.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>$upper.bounds</code></td>
+<td>
+<p>the vector of upper limits to the optimization search.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>$lower.bounds</code></td>
+<td>
+<p>the vector of lower limits to the optimization
+search.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>$ode.eps</code></td>
+<td>
+<p>The ode.eps value used for the estimation.</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>Jeremy M. Beaulieu</p>
+
+
+<h3>References</h3>
+
+<p>Beaulieu, J.M, and B.C. O'Meara. 2016. Detecting hidden diversification shifts in models 
+of trait-dependent speciation and extinction. Syst. Biol. 65:583-601. 
+</p>
+<p>FitzJohn R.G., Maddison W.P., and Otto S.P. 2009. Estimating trait-dependent speciation 
+and extinction rates from incompletely resolved phylogenies. Syst. Biol. 58:595-611.
+</p>
+<p>Herrera-Alsina, L., P. van Els, and R.S. Etienne. 2018. Detecting the dependence of diversification on multiples traits from phylogenetic trees and trait data. Systematic Biology, 68:317-328.
+</p>
+<p>Maddison W.P., Midford P.E., and Otto S.P. 2007. Estimating a binary characters effect on 
+speciation and extinction. Syst. Biol. 56:701-710.
+</p>
+<p>Nee S., May R.M., and Harvey P.H. 1994. The reconstructed evolutionary process. Philos. 
+Trans. R. Soc. Lond. B Biol. Sci. 344:305-311.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+library(diversitree)
+pars &lt;- c(0.1, 0.2, 0.03, 0.03, 0.01, 0.01)
+set.seed(4) 
+phy &lt;- tree.bisse(pars, max.t=30, x0=0)
+sim.dat &lt;- data.frame(names(phy$tip.state), phy$tip.state)
+
+## Fit BiSSE equivalent:
+trans.rates.bisse &lt;-  TransMatMakerHiSSE(hidden.traits=0)
+pp.bisse &lt;- hisse(phy, sim.dat, hidden.states=FALSE, turnover=c(1,2), 
+eps=c(1,2), trans.rate=trans.rates.bisse)
+
+## Now fit HiSSE equivalent with a hidden state for state 1:
+trans.rates.hisse &lt;- TransMatMakerHiSSE(hidden.traits=1)
+pp.hisse &lt;- hisse(phy, sim.dat, hidden.states=TRUE, turnover=c(1,2,1,2), 
+eps=c(1,2,1,2), trans.rate=trans.rates.hisse)
+
+</code></pre>
+
+
+</div>

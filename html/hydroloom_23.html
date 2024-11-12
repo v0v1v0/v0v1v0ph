@@ -1,0 +1,75 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>add_streamorder</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>add Streamorder</h2>
+
+<h3>Description</h3>
+
+<p>Adds a strahler stream order.
+</p>
+<p>Algorithm: If more than one upstream flowpath has an order equal to the
+maximum upstream order then the downstream flowpath is assigned the maximum
+upstream order plus one. Otherwise it is assigned the maximum upstream order.
+</p>
+<p>To match the NHDPlus algorithm, non-dendritic network connectivity and a
+<code>divergence</code> attribute must be included. All secondary paths will have the
+<code>stream_order</code> of upstream primary paths and a <code>stream_calculator</code> value of 0.
+Secondary paths have no affect on the order of downstream paths.
+</p>
+<p>Requires a toid attribute or fromnode, tonode, and divergence attributes
+that will be used to construct a toid attribute.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">add_streamorder(x, status = TRUE)
+
+## S3 method for class 'data.frame'
+add_streamorder(x, status = TRUE)
+
+## S3 method for class 'hy'
+add_streamorder(x, status = TRUE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>data.frame network compatible with hydroloom_names.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>status</code></td>
+<td>
+<p>boolean if status updates should be printed.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>data.frame containing added <code>stream_order</code> and <code>stream_calculator</code> attribute.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">x &lt;- sf::read_sf(system.file("extdata/new_hope.gpkg", package = "hydroloom"))
+
+x &lt;- dplyr::select(x, COMID, FromNode, ToNode, Divergence)
+
+x &lt;- add_streamorder(x)
+
+plot(sf::st_geometry(x), lwd = x$stream_order, col = "blue")
+plot(sf::st_geometry(x), lwd = x$stream_calculator, col = "blue")
+
+</code></pre>
+
+
+</div>

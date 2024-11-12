@@ -1,0 +1,245 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>compare_values</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Compare two values and get talking points</h2>
+
+<h3>Description</h3>
+
+<p>A function to create "talking points" that
+describes the difference between two values.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">compare_values(
+  x,
+  y,
+  trend_phrases = headliner::trend_terms(),
+  orig_values = "{x} vs. {y}",
+  plural_phrases = NULL,
+  n_decimal = 1,
+  round_all = TRUE,
+  multiplier = 1,
+  check_rounding = TRUE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>a numeric value to compare to the reference value of 'y'</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+<p>a numeric value to act as a control for the 'x' value</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>trend_phrases</code></td>
+<td>
+<p>list of values to use for when x is more than y
+or x is less than y. You can pass it just
+<code>trend_terms</code> (the default) and call the result with
+<code>"...{trend}..."</code> or pass is a named list (see examples)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>orig_values</code></td>
+<td>
+<p>a string using <code>glue</code> syntax.
+example: <code style="white-space: pre;">⁠({x} vs {y})⁠</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>plural_phrases</code></td>
+<td>
+<p>named list of values to use when difference (delta) is
+singular (delta = 1) or plural (delta != 1)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n_decimal</code></td>
+<td>
+<p>numeric value to limit the number of decimal places in
+the returned values.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>round_all</code></td>
+<td>
+<p>logical value to indicate if all values should be rounded.
+When FALSE, the values will return with no modification. When TRUE (default)
+all values will be round to the length specified by 'n_decimal'.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>multiplier</code></td>
+<td>
+<p>number indicating the scaling factor. When multiplier = 1
+(default), 0.25 will return 0.25. When multiplier = 100, 0.25 will return 25.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>check_rounding</code></td>
+<td>
+<p>when TRUE (default) inputs will be checked to confirm if
+a difference of zero may be due to rounding. Ex: 0.16 and 0.24 with
+'n_decimal = 1' will both return 0.2. Because this will show no difference,
+a message will be displayed</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Given <code>compare_values(x = 8, y = 10)</code> the following items will be returned
+in the list:</p>
+
+<table>
+<tr>
+<td style="text-align: left;">
+   item </td>
+<td style="text-align: left;"> value </td>
+<td style="text-align: left;"> description </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+   <code>x</code> </td>
+<td style="text-align: left;"> 2 </td>
+<td style="text-align: left;"> original <code>x</code> value to compare against <code>y</code> </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+   <code>y</code> </td>
+<td style="text-align: left;"> 10 </td>
+<td style="text-align: left;"> original <code>y</code> value </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+   <code>delta</code> </td>
+<td style="text-align: left;"> 8 </td>
+<td style="text-align: left;"> absolute difference between <code>x</code> &amp; <code>y</code> </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+   <code>delta_p</code> </td>
+<td style="text-align: left;"> 80 </td>
+<td style="text-align: left;"> % difference between <code>x</code> &amp; <code>y</code> </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+   <code>article_delta</code> </td>
+<td style="text-align: left;"> "an 8" </td>
+<td style="text-align: left;"> <code>delta</code> with the article included </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+   <code>article_delta_p</code> </td>
+<td style="text-align: left;"> "an 80" </td>
+<td style="text-align: left;"> <code>delta_p</code> with the article included </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+   <code>raw_delta</code> </td>
+<td style="text-align: left;"> -8 </td>
+<td style="text-align: left;"> true difference between <code>x</code> &amp; <code>y</code> </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+   <code>raw_delta_p</code> </td>
+<td style="text-align: left;"> -80 </td>
+<td style="text-align: left;"> true % difference between <code>x</code> &amp; <code>y</code> </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+   <code>article_raw_delta</code> </td>
+<td style="text-align: left;"> "a -8" </td>
+<td style="text-align: left;"> <code>raw_delta</code> with the article </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+   <code>article_raw_delta_p</code> </td>
+<td style="text-align: left;"> "a -80" </td>
+<td style="text-align: left;"> <code>raw_delta_p</code> with the article </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+   <code>sign</code> </td>
+<td style="text-align: left;"> -1 </td>
+<td style="text-align: left;"> the direction, 1 (increase), -1 (decrease), or 0 (no change) </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+   <code>orig_values</code> </td>
+<td style="text-align: left;"> "2 vs. 10" </td>
+<td style="text-align: left;"> shorthand for <code style="white-space: pre;">⁠{x} vs {y}⁠</code> </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+   <code>trend</code> </td>
+<td style="text-align: left;"> "decrease" </td>
+<td style="text-align: left;"> influenced by the values in <code>trend_phrases</code> argument </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p><code>compare_values()</code> returns a list object that can be used with
+<code>glue</code> syntax
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>headline()</code>, <code>trend_terms()</code>, <code>plural_phrasing()</code> and <code>view_list()</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># the values can be manually entered
+
+compare_values(10, 8) |&gt; head(2)
+# percent difference (10-8)/8
+compare_values(10, 8)$delta_p
+
+# trend_phrases returns an object called trend if nothing is passed
+compare_values(10, 8)$trend
+
+# or if one argument is passed using trend_terms()
+compare_values(10, 8, trend_phrases = trend_terms(more = "higher"))$trend
+
+# if a named list is used, the objects are called by their names
+compare_values(
+  10, 8,
+  trend_phrases = list(
+    more = trend_terms(),
+    higher = trend_terms("higher", "lower")
+  )
+)$higher
+
+# a phrase about the comparison can be edited by providing glue syntax
+# 'c' = the 'compare' value, 'r' = 'reference'
+compare_values(10, 8, orig_values = "{x} to {y} people")$orig_values
+
+# you can also adjust the rounding, although the default is 1
+compare_values(0.1234, 0.4321)$orig_values
+compare_values(0.1234, 0.4321, n_decimal = 3)$orig_values
+# or add a multiplier
+compare_values(0.1234, 0.4321, multiplier = 100)$orig_values
+</code></pre>
+
+
+</div>

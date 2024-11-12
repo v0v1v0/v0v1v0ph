@@ -1,0 +1,96 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>InvCovShrinkBGP16</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Linear shrinkage estimator of the inverse covariance matrix
+(Bodnar et al. 2016)</h2>
+
+<h3>Description</h3>
+
+<p>The optimal linear shrinkage estimator of the inverse covariance (precision)
+matrix that minimizes the Frobenius norm is given by:
+</p>
+<p style="text-align: center;"><code class="reqn">\hat{\Pi}_{OLSE} = \hat{\alpha} \hat{\Pi} + \hat{\beta} \Pi_0,</code>
+</p>
+
+<p>where <code class="reqn">\hat{\alpha}</code> and <code class="reqn">\hat{\beta}</code> are optimal shrinkage
+intensities given in Eq. (4.4) and (4.5) of Bodnar et al. (2016).
+<code class="reqn">\hat{\Pi}</code> is the inverse of the sample covariance matrix (iSCM) and
+<code class="reqn">\Pi_0</code> is a positive definite symmetric matrix used as the target
+matrix (TM), for example, I.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">InvCovShrinkBGP16(n, p, TM, iSCM)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>n</code></td>
+<td>
+<p>the number of observations</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>p</code></td>
+<td>
+<p>the number of variables (rows of the covariance matrix)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>TM</code></td>
+<td>
+<p>the target matrix for the shrinkage estimator</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>iSCM</code></td>
+<td>
+<p>the inverse of the sample covariance matrix</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>a list containing an object of class matrix (S) and the estimated
+shrinkage intensities <code class="reqn">\hat{\alpha}</code> and <code class="reqn">\hat{\beta}</code>.
+</p>
+
+
+<h3>References</h3>
+
+<p>Bodnar T, Gupta AK, Parolya N (2016).
+“Direct shrinkage estimation of large dimensional precision matrix.”
+<em>Journal of Multivariate Analysis</em>, <b>146</b>, 223–236.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Parameter setting
+n &lt;- 3e2
+c &lt;- 0.7
+p &lt;- c*n
+mu &lt;- rep(0, p)
+Sigma &lt;- RandCovMtrx(p=p)
+
+# Generating observations
+X &lt;- t(MASS::mvrnorm(n=n, mu=mu, Sigma=Sigma))
+
+# Estimation
+TM &lt;- matrix(0, nrow=p, ncol=p)
+diag(TM) &lt;- 1
+iSCM &lt;- solve(Sigma_sample_estimator(X))
+Sigma_shr &lt;- InvCovShrinkBGP16(n=n, p=p, TM=TM, iSCM=iSCM)
+Sigma_shr$S[1:6, 1:6]
+</code></pre>
+
+
+</div>

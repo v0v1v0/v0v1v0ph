@@ -1,0 +1,96 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>qmatrix.msm</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Transition intensity matrix from <code>msm</code> object</h2>
+
+<h3>Description</h3>
+
+<p>Draw transition intensity matrices for a probabilistic sensitivity analysis
+from a fitted <code>msm</code> object.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">## S3 method for class 'msm'
+qmatrix(x, newdata = NULL, uncertainty = c("normal", "none"), n = 1000, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>A <code>msm::msm</code> object.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>newdata</code></td>
+<td>
+<p>A data frame to look for variables with which to predict. A
+separate transition intensity matrix is predicted based on each row in
+<code>newdata</code>. Can be <code>NULL</code> if no covariates are included in the fitted <code>msm</code>
+object.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>uncertainty</code></td>
+<td>
+<p>Method used to draw transition intensity matrices. If <code style="white-space: pre;">⁠"none⁠</code>",
+then point estimates are used. If <code>"normal"</code>, then samples are drawn from the
+multivariate normal distribution of the regression coefficients.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n</code></td>
+<td>
+<p>Number of random observations of the parameters to draw.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Further arguments passed to or from other methods. Currently unused.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>An array of transition intensity matrices with the third dimension
+equal to the number of rows in <code>newdata</code>.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>qmatrix.matrix()</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">library("msm")
+set.seed(101)
+ qinit &lt;- rbind(
+   c(0, 0.28163, 0.01239),
+   c(0, 0, 0.10204),
+   c(0, 0, 0)
+ )
+fit &lt;- msm(state_id ~ time, subject = patient_id, 
+           data = onc3p[patient_id %in% sample(patient_id, 100)],
+           covariates = list("1-2" =~ age + strategy_name), 
+           qmatrix = qinit)
+qmatrix(fit, newdata = data.frame(age = 55, strategy_name = "New 1"),
+        uncertainty = "none")
+qmatrix(fit, newdata = data.frame(age = 55, strategy_name = "New 1"),
+        uncertainty = "normal",  n = 3)
+
+</code></pre>
+
+
+</div>

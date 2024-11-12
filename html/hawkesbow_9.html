@@ -1,0 +1,97 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hawkes</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Simulation of a Hawkes process</h2>
+
+<h3>Description</h3>
+
+<p>Simulates a Hawkes process using its cluster representation:
+</p>
+
+<ul>
+<li>
+<p> First, the immigrants are drawn according to an (inhomogeneous) Poisson process with intensity measure <code>fun</code>.
+</p>
+</li>
+<li>
+<p> Second, the number of offsprings of an immigrant follows a Poisson distribution with intensity <code>repr</code>.
+</p>
+</li>
+<li>
+<p> Third, these offsprings are distributed according to the <code>family</code> distribution.
+</p>
+</li>
+<li>
+<p> Then, generate further offsprings according to the last two steps.
+</p>
+</li>
+</ul>
+<h3>Usage</h3>
+
+<pre><code class="language-R">hawkes(end, fun, repr, family, M = NULL, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>end</code></td>
+<td>
+<p>A non-negative numeric value - right bound of the interval <code class="reqn">[0,\mathrm{end}]</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fun</code></td>
+<td>
+<p>A non-negative function or numeric value - intensity (function) of the immigrant process.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>repr</code></td>
+<td>
+<p>A non-negative numeric value - mean number of offsprings.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>family</code></td>
+<td>
+<p>A character string "name" naming a distribution with corresponding random generation function <code>rname</code>, or directly the random generation function.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>M</code></td>
+<td>
+<p>(default = NULL) A non-negative numeric value - upper bound on <code>fun</code>(ignored if <code>fun</code> is a numeric value).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Additional arguments passed on to the random generation function.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A S3 object of class Hawkes containing a vector ($p) of simulated values,
+and all other objects used for the simulation.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Simulate an exponential Hawkes process with baseline intensity 1,
+# reproduction mean 0.5 and exponential fertility function with rate 2.
+x &lt;- hawkes(10, fun=1, repr=0.5, family="exp", rate=2)
+# Simulate a Hawkes process with baseline intensity function 1 + sin(x),
+# reproduction mean 0.5 and custom [0,1]-triangular fertility function.
+x &lt;- hawkes(10, fun=function(y) {1+sin(y)}, M=2, repr=0.5,
+            family=function(n) {1 - sqrt(1 - runif(n))})
+</code></pre>
+
+
+</div>

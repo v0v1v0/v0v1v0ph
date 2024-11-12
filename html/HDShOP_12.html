@@ -1,0 +1,222 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>MVShrinkPortfolio</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Shrinkage mean-variance portfolio</h2>
+
+<h3>Description</h3>
+
+<p>The main function for mean-variance (also known as expected utility)
+portfolio construction. It is a dispatcher using methods according to
+argument type, values of gamma and dimensionality of matrix x.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">MVShrinkPortfolio(x, gamma, type = c("shrinkage", "traditional"), ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>a p by n matrix or a data frame of asset returns. Rows represent
+different assets, columns – observations.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>gamma</code></td>
+<td>
+<p>a numeric variable. Coefficient of risk aversion.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>type</code></td>
+<td>
+<p>a character. The type of methods to use to construct the
+portfolio.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>arguments to pass to portfolio constructors</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The sample estimator of the mean-variance portfolio weights, which results in
+a traditional mean-variance portfolio, is calculated by
+</p>
+<p style="text-align: center;"><code class="reqn">\hat w_{MV} = \frac{S^{-1} 1}{1' S^{-1} 1} +
+      \gamma^{-1} \hat Q \bar x,</code>
+</p>
+
+<p>where <code class="reqn">S^{-1}</code> and <code class="reqn">\bar x</code> are the inverse of the sample covariance
+matrix and the sample mean vector of asset returns respectively, <code class="reqn">\gamma</code>
+is the coefficient of risk aversion and <code class="reqn">\hat Q</code> is given by
+</p>
+<p style="text-align: center;"><code class="reqn">\hat Q = S^{-1} - \frac{S^{-1} 1 1' S^{-1}}{1' S^{-1} 1} .</code>
+</p>
+
+<p>In the case when <code class="reqn">p&gt;n</code>, <code class="reqn">S^{-1}</code> becomes <code class="reqn">S^{+}</code>- Moore-Penrose
+inverse. The shrinkage estimator for the mean-variance portfolio weights in
+a high-dimensional setting is given by
+</p>
+<p style="text-align: center;"><code class="reqn">\hat w_{ShMV} = \hat \alpha \hat w_{MV} + (1- \hat \alpha)b,</code>
+</p>
+
+<p>where <code class="reqn">\hat \alpha</code> is the estimated shrinkage intensity and <code class="reqn">b</code> is
+a target vector with the sum of the elements equal to one.
+</p>
+<p>In the case <code class="reqn">\gamma \neq \infty</code>, <code class="reqn">\hat{\alpha}</code> is computed following
+Eq. (2.22) of Bodnar et al. (2023) for c&lt;1 and following
+Eq. (2.29) of Bodnar et al. (2023) for c&gt;1.
+</p>
+<p>The case of a fully risk averse investor (<code class="reqn">\gamma=\infty</code>) leads to the
+traditional global minimum variance (GMV) portfolio with the weights given by
+</p>
+<p style="text-align: center;"><code class="reqn">\hat w_{GMV} = \frac{S^{-1} 1}{1' S^{-1} 1} .</code>
+</p>
+
+<p>The shrinkage estimator for the GMV portfolio is then calculated by
+</p>
+<p style="text-align: center;"><code class="reqn">\hat w_{ShGMV} = \hat\alpha \hat w_{GMV} + (1-\hat \alpha)b,</code>
+</p>
+
+<p>with <code class="reqn">\hat{\alpha}</code>  given in
+Eq. (2.31) of Bodnar et al. (2018) for c&lt;1 and in
+Eq. (2.33) of Bodnar et al. (2018) for c&gt;1.
+</p>
+<p>These estimation methods are available as separate functions employed by
+MVShrinkPortfolio accordingly to the following parameter configurations:</p>
+
+<table>
+<tr>
+<td style="text-align: left;">
+   Function </td>
+<td style="text-align: left;"> Paper </td>
+<td style="text-align: left;"> Type </td>
+<td style="text-align: left;"> gamma </td>
+<td style="text-align: left;"> p/n </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+   <code>new_MV_portfolio_weights_BDOPS21</code> </td>
+<td style="text-align: left;"> Bodnar et al. (2023) </td>
+<td style="text-align: left;"> shrinkage </td>
+<td style="text-align: left;"> &lt; Inf </td>
+<td style="text-align: left;"> &lt;1 </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+   <code>new_MV_portfolio_weights_BDOPS21_pgn</code> </td>
+<td style="text-align: left;"> Bodnar et al. (2023) </td>
+<td style="text-align: left;"> shrinkage </td>
+<td style="text-align: left;"> &lt; Inf </td>
+<td style="text-align: left;"> &gt;1 </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+   <code>new_GMV_portfolio_weights_BDPS19</code> </td>
+<td style="text-align: left;"> Bodnar et al. (2018) </td>
+<td style="text-align: left;"> shrinkage </td>
+<td style="text-align: left;"> Inf </td>
+<td style="text-align: left;"> &lt;1 </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+   <code>new_GMV_portfolio_weights_BDPS19_pgn</code> </td>
+<td style="text-align: left;"> Bodnar et al. (2018) </td>
+<td style="text-align: left;"> shrinkage </td>
+<td style="text-align: left;"> Inf </td>
+<td style="text-align: left;"> &gt;1 </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+   <code>new_MV_portfolio_traditional</code> </td>
+<td style="text-align: left;">  </td>
+<td style="text-align: left;"> traditional </td>
+<td style="text-align: left;"> &gt; 0 </td>
+<td style="text-align: left;"> &lt;1 </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+   <code>new_MV_portfolio_traditional_pgn</code> </td>
+<td style="text-align: left;">  </td>
+<td style="text-align: left;"> traditional </td>
+<td style="text-align: left;"> &gt; 0 </td>
+<td style="text-align: left;"> &gt;1 </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A portfolio in the form of an object of class MeanVar_portfolio
+potentially with a subclass.
+See <code>Class_MeanVar_portfolio</code> for the details of the class.
+</p>
+
+
+<h3>References</h3>
+
+<p>Bodnar T, Okhrin Y, Parolya N (2023).
+“Optimal shrinkage-based portfolio selection in high dimensions.”
+<em>Journal of Business &amp; Economic Statistics</em>, <b>41</b>, 140-156.<br><br> Bodnar T, Parolya N, Schmid W (2018).
+“Estimation of the global minimum variance portfolio in high dimensions.”
+<em>European Journal of Operational Research</em>, <b>266</b>(1), 371–390.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">n&lt;-3e2 # number of realizations
+gamma&lt;-1
+
+# The case p&lt;n
+
+p&lt;-.5*n # number of assets
+b&lt;-rep(1/p,p)
+
+x &lt;- matrix(data = rnorm(n*p), nrow = p, ncol = n)
+
+test &lt;- MVShrinkPortfolio(x=x, gamma=gamma,
+                          type='shrinkage', b=b, beta = 0.05)
+str(test)
+
+test &lt;- MVShrinkPortfolio(x=x, gamma=Inf,
+                          type='shrinkage', b=b, beta = 0.05)
+str(test)
+
+test &lt;- MVShrinkPortfolio(x=x, gamma=gamma, type='traditional')
+str(test)
+
+# The case p&gt;n
+
+p&lt;-1.2*n # Re-define the number of assets
+b&lt;-rep(1/p,p)
+
+x &lt;- matrix(data = rnorm(n*p), nrow = p, ncol = n)
+
+test &lt;- MVShrinkPortfolio(x=x, gamma=gamma, type='shrinkage',
+                          b=b, beta = 0.05)
+str(test)
+
+test &lt;- MVShrinkPortfolio(x=x, gamma=Inf, type='shrinkage',
+                          b=b, beta = 0.05)
+str(test)
+
+</code></pre>
+
+
+</div>

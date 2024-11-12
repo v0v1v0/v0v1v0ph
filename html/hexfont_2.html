@@ -1,0 +1,81 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>unifont_combining</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Get combining character code points</h2>
+
+<h3>Description</h3>
+
+<p><code>unifont_combining()</code> returns a character vector of the code points
+for all the "combining" characters in Unifont.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">unifont_combining(upper = TRUE, csur = TRUE, unicode = FALSE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>upper</code></td>
+<td>
+<p>Include glyphs above the Unicode Basic Multilingual plane.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>csur</code></td>
+<td>
+<p>Include (Under-)Conscript Unicode Registry glyphs.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>unicode</code></td>
+<td>
+<p>Include combining glyphs assigned by the Unicode Consortium
+(i.e. not ones in the Private Use Area like the CSUR ones).
+By default <code>FALSE</code> since <code>bittermelon::bm_compose()</code> can usually guess that
+a Unicode Consortium assigned glyph is a combining glyph by
+using <code>Unicode::u_char_property()</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A character vector of Unicode code points
+</p>
+
+
+<h3>See Also</h3>
+
+<p>Can be used with the <code>pua_combining</code> argument of <code>bittermelon::bm_compose()</code>
+and <code>bittermelon::as_bm_bitmap()</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">uc &lt;- unifont_combining()
+print(uc)
+
+# Tengwar with combining glyphs
+if (require("bittermelon")) {
+  s &lt;- "\ue004\ue014\ue04a\ue005\ue000\ue040\ue022\ue04a\ue003\ue04e"
+  font &lt;- unifont(ucp = str2ucp(s))
+  bml &lt;- as_bm_list(s, font = font)
+  to_raise &lt;- which(names(bml) %in% c("U+E04A", "U+E04E"))
+  bml[to_raise] &lt;- bm_shift(bml[to_raise], top = 1L)
+  bml &lt;- bm_compose(bml, pua_combining = uc)
+  bml &lt;- bm_pad(bml, type = "trim", left = 1L, right = 0L)
+  bm &lt;- bm_call(bml, cbind)
+  print(bm, px = px_ascii)
+}
+</code></pre>
+
+
+</div>

@@ -1,0 +1,178 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>series.compare</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Data series comparison using Akaike weight</h2>
+
+<h3>Description</h3>
+
+<p>This function is used as a replacement of t.test() to not use p-value.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">series.compare(..., criterion = c("BIC", "AIC", "AICc"), var.equal = TRUE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Series of data (at least two or data are in a table with series in different rows)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>criterion</code></td>
+<td>
+<p>Which criterion is used for model selection. can be AIC, AICc or BIC</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>var.equal</code></td>
+<td>
+<p>Should the variances of all series being equal? Default TRUE</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>series.compare compares series of data using Akaike weight.
+</p>
+
+
+<h3>Value</h3>
+
+<p>The probability that a single proportion model is sufficient to explain the data
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Marc Girondot <a href="mailto:marc.girondot@gmail.com">marc.girondot@gmail.com</a>
+</p>
+
+
+<h3>References</h3>
+
+<p>Girondot, M., Guillon, J.-M., 2018. The w-value: An alternative to t- and X2 tests. Journal of Biostatistics &amp; Biometrics 1, 1-4.
+</p>
+
+
+<h3>See Also</h3>
+
+<p>Other w-value functions: 
+<code>compare()</code>,
+<code>contingencyTable.compare()</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+library("HelpersMG")
+A &lt;- rnorm(100, 10, 2)
+B &lt;- rnorm(100, 11.1, 2)
+series.compare(A, B, criterion = "BIC", var.equal=TRUE)
+B &lt;- B[1:10]
+series.compare(A, B, criterion = "BIC", var.equal=TRUE)
+A &lt;- rnorm(100, 10, 2)
+B &lt;- rnorm(100, 10.1, 2)
+C &lt;- rnorm(100, 10.5, 2)
+series.compare(A, B, C, criterion = "BIC", var.equal=TRUE)
+B &lt;- B[1:10]
+series.compare(A, B, criterion = "BIC", var.equal=TRUE)
+t.test(A, B, var.equal=TRUE)
+# Example with a data.frame
+series.compare(t(data.frame(A=c(10, 27, 19, 20, NA), B=c(10, 20, NA, NA, NA))))
+# Test in the context of big data
+A &lt;- rnorm(10000, 10, 2)
+B &lt;- rnorm(10000, 10.1, 2)
+series.compare(A, B, criterion = "BIC", var.equal=TRUE)
+t.test(A, B, var.equal=TRUE)
+###########################
+w &lt;- NULL
+p &lt;- NULL
+
+for (i in 1:1000) {
+  
+  A &lt;- rnorm(50000, 10, 2)
+  B &lt;- rnorm(50000, 10.01, 2)
+  w &lt;- c(w, unname(series.compare(A, B, criterion = "BIC", var.equal=TRUE)[1]))
+  p &lt;- c(p, t.test(A, B, var.equal=TRUE)$p.value)
+
+}
+
+layout(mat = 1:2)
+par(mar=c(4, 4, 1, 1)+0.4)
+hist(p, main="", xlim=c(0, 1), las=1, breaks = (0:20)/20, 
+     freq=FALSE, xlab = expression(italic("p")*"-value"))
+hist(w, main="", xlim=c(0, 1), las=1, breaks = (0:20)/20, 
+    freq=FALSE, xlab = expression(italic("w")*"-value"))
+###########################
+
+x &lt;- seq(from=8, to=13, by=0.1)
+
+pv &lt;- NULL
+aw &lt;- NULL
+A &lt;- rnorm(100, mean=10, sd=2)
+B &lt;- A-2
+
+for (meanB in x) {
+  pv &lt;- c(pv, t.test(A, B, var.equal = FALSE)$p.value)
+  aw &lt;- c(aw, series.compare(A, B, criterion="BIC", var.equal = FALSE)[1])
+  B &lt;- B + 0.1
+}
+
+par(mar=c(4, 4, 2, 1)+0.4)
+y &lt;- pv
+plot(x=x, y=y, type="l", lwd=2,
+     bty="n", las=1, xlab="Mean B value (SD = 4)", ylab="Probability", ylim=c(0,1), 
+     main="")
+y2 &lt;- aw
+lines(x=x, y=y2, type="l", col="red", lwd=2)
+
+l1 &lt;- which(aw&gt;0.05)[1]
+l2 &lt;- max(which(aw&gt;0.05))
+
+aw[l1]
+pv[l1]
+
+aw[l2]
+pv[l2]
+
+l1 &lt;- which(pv&gt;0.05)[1]
+l2 &lt;- max(which(pv&gt;0.05))
+
+aw[l1]
+pv[l1]
+
+aw[l2]
+pv[l2]
+
+par(xpd=TRUE)
+segments(x0=10-1.96*2/10, x1=10+1.96*2/10, y0=1.1, y1=1.1, lwd=2)
+segments(x0=10, x1=10, y0=1.15, y1=1.05, lwd=2)
+par(xpd=TRUE)
+text(x=10.5, y=1.1, labels = "Mean A = 10, SD = 2", pos=4)
+
+v1 &lt;- c(expression(italic("p")*"-value"), expression("based on "*italic("t")*"-test"))
+v2 &lt;- c(expression(italic("w")*"-value for A"), expression("and B identical models"))
+legend("topright", legend=c(v1, v2), 
+       y.intersp = 1, 
+       col=c("black", "black", "red", "red"), bty="n", lty=c(1, 0, 1, 0))
+
+segments(x0=min(x), x1=max(x), y0=0.05, y1=0.05, lty=2)
+par(xpd = TRUE)
+text(x=13.05, y=0.05, labels = "0.05", pos=4)
+
+## End(Not run)
+</code></pre>
+
+
+</div>

@@ -1,0 +1,154 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>pred_noisy_input</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Gaussian process prediction prediction at a noisy input <code>x</code>, with centered Gaussian noise of variance <code>sigma_x</code>. 
+Several options are available, with different efficiency/accuracy tradeoffs.</h2>
+
+<h3>Description</h3>
+
+<p>Gaussian process prediction prediction at a noisy input <code>x</code>, with centered Gaussian noise of variance <code>sigma_x</code>. 
+Several options are available, with different efficiency/accuracy tradeoffs.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">pred_noisy_input(x, model, sigma_x, type = c("simple", "taylor", "exact"))
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>design considered</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>model</code></td>
+<td>
+<p>GP</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sigma_x</code></td>
+<td>
+<p>input variance</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>type</code></td>
+<td>
+<p>available options include
+</p>
+
+<ul>
+<li> <p><code>simple</code> relying on a corrective term, see (McHutchon2011);
+</p>
+</li>
+<li> <p><code>taylor</code> based on a Taylor expansion, see, e.g., (Girard2003);
+</p>
+</li>
+<li> <p><code>exact</code> for exact moments (only for the <code>Gaussian</code> covariance).
+</p>
+</li>
+</ul>
+</td>
+</tr>
+</table>
+<h3>Note</h3>
+
+<p>Beta version.
+</p>
+
+
+<h3>References</h3>
+
+<p>A. McHutchon and C.E. Rasmussen (2011), 
+Gaussian process training with input noise, 
+Advances in Neural Information Processing Systems, 1341-1349. <br></p>
+<p>A. Girard, C.E. Rasmussen, J.Q. Candela and R. Murray-Smith (2003), 
+Gaussian process priors with uncertain inputs application to multiple-step ahead time series forecasting,
+Advances in Neural Information Processing Systems, 545-552.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">################################################################################
+### Illustration of prediction with input noise
+################################################################################
+
+## noise std deviation function defined in [0,1]
+noiseFun &lt;- function(x, coef = 1.1, scale = 0.25){
+  if(is.null(nrow(x))) x &lt;- matrix(x, nrow = 1)
+  return(scale*(coef + sin(x * 2 * pi)))
+}
+
+## data generating function combining mean and noise fields
+ftest &lt;- function(x, scale = 0.25){
+if(is.null(nrow(x))) x &lt;- matrix(x, ncol = 1)
+  return(f1d(x) + rnorm(nrow(x), mean = 0, sd = noiseFun(x, scale = scale)))
+}
+
+ntest &lt;- 101; xgrid &lt;- seq(0,1, length.out = ntest); Xgrid &lt;- matrix(xgrid, ncol = 1)
+set.seed(42)
+Xpred &lt;- Xgrid[rep(1:ntest, each = 100),,drop = FALSE]
+Zpred &lt;- matrix(ftest(Xpred), byrow = TRUE, nrow = ntest)
+n &lt;- 10
+N &lt;- 20
+X &lt;- matrix(seq(0, 1, length.out = n))
+if(N &gt; n) X &lt;- rbind(X, X[sample(1:n, N-n, replace = TRUE),,drop = FALSE])
+X &lt;- X[order(X[,1]),,drop = FALSE]
+
+Z &lt;- apply(X, 1, ftest)
+par(mfrow = c(1, 2))
+plot(X, Z, ylim = c(-10,15), xlim = c(-0.1,1.1))
+lines(xgrid, f1d(xgrid))
+lines(xgrid, drop(f1d(xgrid)) + 2*noiseFun(xgrid), lty = 3)
+lines(xgrid, drop(f1d(xgrid)) - 2*noiseFun(xgrid), lty = 3)
+model &lt;- mleHomGP(X, Z, known = list(beta0 = 0))
+preds &lt;- predict(model, Xgrid)
+lines(xgrid, preds$mean, col = "red", lwd = 2)
+lines(xgrid, preds$mean - 2*sqrt(preds$sd2), col = "blue")
+lines(xgrid, preds$mean + 2*sqrt(preds$sd2), col = "blue")
+lines(xgrid, preds$mean - 2*sqrt(preds$sd2 + preds$nugs), col = "blue", lty = 2)
+lines(xgrid, preds$mean + 2*sqrt(preds$sd2 + preds$nugs), col = "blue", lty = 2)
+
+sigmax &lt;- 0.1
+X1 &lt;- matrix(0.5)
+
+lines(xgrid, dnorm(xgrid, X1, sigmax) - 10, col = "darkgreen")
+
+# MC experiment
+nmc &lt;- 1000
+XX &lt;- matrix(rnorm(nmc, X1, sigmax))
+pxx &lt;- predict(model, XX)
+YXX &lt;- rnorm(nmc, mean = pxx$mean, sd = sqrt(pxx$sd2 + pxx$nugs))
+points(XX, YXX, pch = '.')
+
+hh &lt;- hist(YXX, breaks = 51, plot = FALSE)
+dd &lt;- density(YXX)
+plot(hh$density, hh$mids, ylim = c(-10, 15))
+lines(dd$y, dd$x)
+
+# GP predictions
+pin1 &lt;- pred_noisy_input(X1, model, sigmax^2, type = "exact")
+pin2 &lt;- pred_noisy_input(X1, model, sigmax^2, type = "taylor")
+pin3 &lt;- pred_noisy_input(X1, model, sigmax^2, type = "simple")
+ygrid &lt;- seq(-10, 15,, ntest)
+lines(dnorm(ygrid, pin1$mean, sqrt(pin1$sd2)), ygrid, lty = 2, col = "orange")
+lines(dnorm(ygrid, pin2$mean, sqrt(pin2$sd2)), ygrid, lty = 2, col = "violet")
+lines(dnorm(ygrid, pin3$mean, sqrt(pin3$sd2)), ygrid, lty = 2, col = "grey")
+abline(h = mean(YXX), col = "red") # empirical mean
+
+par(mfrow = c(1, 1))
+</code></pre>
+
+
+</div>

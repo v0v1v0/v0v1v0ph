@@ -1,0 +1,415 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>mmglm</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Markov Modulated GLM Object</h2>
+
+<h3>Description</h3>
+
+<p>These functions create Markov modulated generalised linear model objects. <em><b>These functions are in development and may change</b></em>, see “Under Development” below.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">mmglm0(x, Pi, delta, family, link, beta, glmformula = formula(y~x1),
+       sigma = NA, nonstat = TRUE, msg = TRUE)
+mmglm1(y, Pi, delta, glmfamily, beta, Xdesign,
+       sigma = NA, nonstat = TRUE, size = NA, msg = TRUE)
+mmglmlong1(y, Pi, delta, glmfamily, beta, Xdesign, longitude, 
+           sigma = NA, nonstat = TRUE, size = NA, msg = TRUE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>a dataframe containing the observed variable (i.e. the response variable in the generalised linear model) and the covariate. The function <code>mmglm0</code> requires that the response variable be named <code>y</code> and the covariate <code>x1</code>.  Alternatively, <code>x</code> could be specified as <code>NULL</code>, meaning that the data will be added later (e.g. simulated). See Details below for the binomial case. The functions <code>mmglm1</code> and <code>mmglmlong1</code> do not have these naming restrictions.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+<p>numeric vector, response variable. In the case of binomial, it is the number of successes (see argument <code>size</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Pi</code></td>
+<td>
+<p>is the <code class="reqn">m \times m</code> transition probability matrix of the hidden Markov chain.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>delta</code></td>
+<td>
+<p>is the marginal probability distribution of the <code class="reqn">m</code> hidden states at the first time point.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>family</code></td>
+<td>
+<p>character string, the GLM family, one of <code>"gaussian"</code>, <code>"poisson"</code>, <code>"Gamma"</code> or <code>"binomial"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>link</code></td>
+<td>
+<p>character string, the link function. If <code>family == "binomial"</code>, then one of <code>"logit"</code>, <code>"probit"</code> or <code>"cloglog"</code>; else one of <code>"identity"</code>, <code>"inverse"</code> or <code>"log"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>glmfamily</code></td>
+<td>
+<p>a <code>family</code> object defining the glm family and link function. It is currently restricted to Gaussian, Poisson, Binomial or Gamma models with the standard link functions provided by <code>glm</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Xdesign</code></td>
+<td>
+<p>a <code class="reqn">nN \times p</code> design matrix, where <code class="reqn">p</code> is the number of parameters in the linear predictor, <code class="reqn">N</code> is the number of subjects (<code class="reqn">N=1</code> in <code>mmglm1</code>), and <code class="reqn">n</code> is the number of observations for each subject (<em>assumed to be the same</em>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>beta</code></td>
+<td>
+<p>a <code class="reqn">p \times m</code> matrix containing parameter values, used as initial values during estimation. In the case of the simple regression model of <code>mmglm0</code>, <code class="reqn">p=2</code>. In the case of <code>mmglm1</code> and <code>mmglmlong1</code>, <code class="reqn">p</code> is the number of columns of <code>Xdesign</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>glmformula</code></td>
+<td>
+<p>the only model formula for <code>mmglm0</code> is <code>y~x1</code>. Note that the functions <code>mmglm1</code> and <code>mmglmlong1</code> do not have this restriction, however, in those cases, the model formula is currently implicitly defined through <code>Xdesign</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sigma</code></td>
+<td>
+<p>if <code>family == "gaussian"</code>, then it is the variance; if <code>family == "Gamma"</code>, then it is <code>1/sqrt(shape)</code>. It is of length <code class="reqn">m</code> for each Markov state.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nonstat</code></td>
+<td>
+<p>is logical, <code>TRUE</code> if the homogeneous Markov chain is assumed to be non-stationary, default.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>longitude</code></td>
+<td>
+<p>a vector the same length as <code>y</code> identifying the subject for each observation. The observations must be grouped by subject, and ordered by “time” within subject.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>size</code></td>
+<td>
+<p>is number of Bernoulli trials in each observation when the glm <code>family</code> is binomial. It is the same length as <code>y</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>msg</code></td>
+<td>
+<p>is logical, suppress messages about developmental status.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>This family of models is similar in nature to those of the class <code>dthmm</code>, in that both classes have the distribution of the observed variable being “modulated” by the changing hidden Markov state. They differ slightly in the mechanism. This family assumes that the mean of the observation distribution can be expressed as a linear model of other known variables, but it is the parameters in the linear predictor that are being modulated by the hidden Markov process, thus causing the changes in the observed means. The linear model is assumed to be a generalised linear model as described by McCullagh &amp; Nelder (1989).
+</p>
+<p>The function <code>mmglm0</code> is a very simple trivial case where the linear predictor is of the form <code class="reqn">\beta_0 + \beta_1 x_1</code>. The version <code>mmglm1</code> does not have this limitation. The model formula for <code>mmglm1</code> is defined implicitly through the structure of the specified design matrix. The model <code>mmglmlong1</code> is similar to <code>mmglm1</code> but can be applied to longitudinal observations. Models of the form given by <code>mmglm1</code> are assumed to have one time series, and from a theoretical perspective, one would be interested in the asymptotic properties of the parameter estimates as the series length gets very large. In the longitudinal case (<code>mmglmlong1</code>), the series of observations per individual is probably very small (<code class="reqn">&lt;10</code>), and hence interest is in the asymptotic properties as the number of individuals becomes large. Note that in the longitudinal case, the number of observations per individual is assumed to be the same. The responses are assumed to be conditionally independent given the value of the Markov chain and the explanatory variables in the linear predictor.
+</p>
+<p>If <code>family == "binomial"</code> then the response variable <code>y</code> is interpreted as the number of successes. The dataframe <code>x</code> must also contain a variable called <code>size</code> being the number of Bernoulli trials. This is different to the format used by the function <code>glm</code> where <code>y</code> would be a matrix with two columns containing the number of successes and failures, respectively. The different format here allows one to specify the number of Bernoulli trials <em>only</em> so that the number of successes or failures can be simulated later.
+</p>
+<p>When the density function of the response variable is from the exponential family (Charnes et al, 1976, Eq. 2.1), the likelihood function (Charnes et al, 1976, Eq. 2.4) can be maximised by using iterative weighted least squares (Charnes et al, 1976, Eq. 1.1 and 1.2). This is the method used by the <span style="font-family: Courier New, Courier; color: #666666;"><b>R</b></span> function <code>glm</code>. In this Markov modulated version of the model, the third term of the complete data log-likelihood, as given in Harte (2006, Sec. 2.3), needs to be maximised. This is simply the sum of the individual log-likelihood contributions of the response variable weighted by the Markov state probabilities calculated in the E-step. This can also be maximised using iterative least squares by passing these additional weights (Markov state probabilities) into the <code>glm</code> function.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A <code>list</code> object with class <code>"mmglm0"</code>, containing the above arguments as named components.
+</p>
+
+
+<h3>Under Development</h3>
+
+<p>These functions are still being developed. In previous releases of the package (<code class="reqn">&lt; 1.3</code>), there was only one function called <code>mmglm</code>. This has been renamed to <code>mmglm0</code>. The most recent version is <code>mmglm1</code> along with <code>mmglmlong1</code> which has flexibility to include longitudinal data. Further development versions will be numbered sequentially. The name <code>mmglm</code> has been reserved for the final stable version, at which point the numbered versions will become deprecated.
+</p>
+
+
+<h3>References</h3>
+
+<p>Cited references are listed on the HiddenMarkov manual page.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">#--------------------------------------------------------
+#     Gaussian with identity link function
+#         using mmglm0
+
+delta &lt;- c(0,1)
+
+Pi &lt;- matrix(c(0.8, 0.2,
+               0.3, 0.7),
+             byrow=TRUE, nrow=2)
+
+beta &lt;- matrix(c(0.1, -0.1,
+                 1.0,  5.0),
+               byrow=TRUE, nrow=2)
+
+x &lt;- mmglm0(NULL, Pi, delta, family="gaussian", link="identity",
+            beta=beta, sigma=c(1, 2))
+
+n &lt;- 1000
+x &lt;- simulate(x, nsim=n, seed=10)
+
+#   Increase maxiter below to achieve convergence
+#   Has been restricted to minimise time of package checks
+y &lt;- BaumWelch(x, bwcontrol(maxiter=2))
+
+w &lt;- hist(residuals(y))
+z &lt;- seq(-3, 3, 0.01)
+points(z, dnorm(z)*n*(w$breaks[2]-w$breaks[1]), col="red", type="l")
+box()
+
+print(summary(y))
+print(logLik(y))
+
+
+#--------------------------------------------------------
+#    Gaussian with log link function
+#         using mmglm1
+
+n &lt;- 1000
+
+#   the range of x needs changing according to the glmfamily
+x &lt;- seq(-0.9, 1.5, length.out=n)
+
+colour &lt;- c("blue", "green", "red")
+colnum &lt;- rep(1:3, n/3+1)[1:n] - 1
+
+data &lt;- data.frame(x=x, colour=colour[colnum+1])
+
+#   will simulate response variable, not required in formula
+#   design matrix only depends on RHS of formula
+glmformula &lt;- formula( ~ x + I(x^2) + colour)
+glmfamily &lt;- gaussian(link="log")
+Xdesign &lt;- model.matrix(glmformula, data=data)
+
+# --- Parameter Values and Simulation ---
+
+Pi &lt;- matrix(c(0.8, 0.2,
+               0.3, 0.7),
+             byrow=TRUE, nrow=2)
+
+delta &lt;- c(1, 0)
+
+sd &lt;- c(1.2, 1)
+
+beta &lt;- matrix(c(-1, -1.2,
+                 -2, -1.8,
+                  3,  2.8,
+                  1,  0.8, 
+                  2,  2.2), 
+               ncol=ncol(Pi), nrow=ncol(Xdesign), byrow=TRUE)
+
+y &lt;- mmglm1(NULL, Pi, delta, glmfamily, beta, Xdesign, sigma=sd)
+
+y &lt;- simulate(y, seed=5)
+
+# --- Estimation ---
+
+#   Increase maxiter below to achieve convergence
+#   Has been restricted to minimise time of package checks
+tmp &lt;- BaumWelch(y, bwcontrol(posdiff=FALSE, maxiter=2))
+print(summary(tmp))
+
+
+#-------------------------------------------------
+#    Binomial with logit link function
+#         using mmglm1
+
+#   n = series length
+n &lt;- 1000
+
+#   the range of x need changing according to the glmfamily
+x &lt;- seq(-1, 1.5, length.out=n)
+
+colour &lt;- c("blue", "green", "red")
+colnum &lt;- rep(1:3, n/3+1)[1:n] - 1
+
+data &lt;- data.frame(x=x, colour=colour[colnum+1])
+
+glmformula &lt;- formula( ~ x + I(x^2) + colour)
+glmfamily &lt;- binomial(link="logit")
+Xdesign &lt;- model.matrix(glmformula, data=data)
+
+# --- Parameter Values and Simulation ---
+
+Pi &lt;- matrix(c(0.8, 0.2,
+               0.3, 0.7),
+             byrow=TRUE, nrow=2)
+
+delta &lt;- c(1, 0)
+
+beta &lt;- matrix(c(-1, -1.2,
+                 -2, -1.8,
+                  3,  2.8,
+                  1,  0.8, 
+                  2,  2.2), 
+               ncol=ncol(Pi), nrow=ncol(Xdesign), byrow=TRUE)
+
+y &lt;- mmglm1(NULL, Pi, delta, glmfamily, beta, Xdesign, sigma=sd,
+            size=rep(100, n))
+
+#   each element of y$y is the number of successes in 100 Bernoulli trials
+y &lt;- simulate(y, seed=5)
+
+
+# --- Estimation ---
+
+#   Increase maxiter below to achieve convergence
+#   Has been restricted to minimise time of package checks
+tmp &lt;- BaumWelch(y, bwcontrol(posdiff=FALSE, maxiter=2))
+print(summary(tmp))
+
+
+#-------------------------------------------------
+#    Gaussian with log link function, longitudinal data
+#         using mmglmlong1
+
+#   n = series length for each subject
+#   N = number of subjects
+n &lt;- 5
+N &lt;- 1000
+
+#   the range of x need changing according to the glmfamily
+x &lt;- seq(-0.9, 1.5, length.out=n)
+
+colour &lt;- c("blue", "green", "red")
+colnum &lt;- rep(1:3, n/3+1)[1:n] - 1
+
+data &lt;- data.frame(x=x, colour=colour[colnum+1])
+
+#   will simulate response variable, not required in formula
+#   design matrix only depends on RHS of formula
+glmformula &lt;- formula( ~ x + I(x^2) + colour)
+glmfamily &lt;- gaussian(link="log")
+Xdesign0 &lt;- model.matrix(glmformula, data=data)
+
+#    multiple subjects
+Xdesign &lt;- NULL
+for (i in 1:N) Xdesign &lt;- rbind(Xdesign, Xdesign0)
+
+# --- Parameter Values and Simulation ---
+
+Pi &lt;- matrix(c(0.8, 0.2,
+               0.3, 0.7),
+             byrow=TRUE, nrow=2)
+
+delta &lt;- c(0.5, 0.5)
+
+sd &lt;- c(1.2, 1)
+
+beta &lt;- matrix(c(-1, -1.2,
+                 -2, -1.8,
+                  3,  2.8,
+                  1,  0.8, 
+                  2,  2.2), 
+               ncol=ncol(Pi), nrow=ncol(Xdesign), byrow=TRUE)
+
+y &lt;- mmglmlong1(NULL, Pi, delta, glmfamily, beta, Xdesign, sigma=sd,
+                longitude=rep(1:N, each=n))
+
+y &lt;- simulate(y, seed=5)
+
+# --- Estimation ---
+
+#    Note: the "Not run" blocks below are not run during package checks
+#    as the makePSOCKcluster definition is specific to my network,
+#    modify accordingly if you want parallel processing.
+
+cl &lt;- NULL
+## Not run: 
+if (require(parallel)){
+    cl &lt;- makePSOCKcluster(c("localhost", "horoeka.localdomain", 
+                             "horoeka.localdomain", "localhost"))
+}
+## End(Not run)
+
+#   Increase maxiter below to achieve convergence
+#   Has been restricted to minimise time of package checks
+tmp &lt;- BaumWelch(y, bwcontrol(posdiff=FALSE, maxiter=2),
+                 PSOCKcluster=cl)
+
+## Not run: 
+if (!is.null(cl)){
+    stopCluster(cl)
+    rm(cl)
+}
+## End(Not run)
+
+print(summary(tmp))
+
+
+#-------------------------------------------------
+#    Binomial with logit link function, longitudinal data
+#         using mmglmlong1
+
+#   n = series length for each subject
+#   N = number of subjects
+n &lt;- 10
+N &lt;- 100
+
+#   the range of x need changing according to the glmfamily
+x &lt;- seq(-1, 1.5, length.out=n)
+
+colour &lt;- c("blue", "green", "red")
+colnum &lt;- rep(1:3, n/3+1)[1:n] - 1
+
+data &lt;- data.frame(x=x, colour=colour[colnum+1])
+
+glmformula &lt;- formula( ~ x + I(x^2) + colour)
+glmfamily &lt;- binomial(link="logit")
+Xdesign0 &lt;- model.matrix(glmformula, data=data)
+
+#    multiple subjects
+Xdesign &lt;- NULL
+for (i in 1:N) Xdesign &lt;- rbind(Xdesign, Xdesign0)
+
+# --- Parameter Values and Simulation ---
+
+Pi &lt;- matrix(c(0.8, 0.2,
+               0.3, 0.7),
+             byrow=TRUE, nrow=2)
+
+delta &lt;- c(0.5, 0.5)
+
+beta &lt;- matrix(c(-1, -1.2,
+                 -2, -1.8,
+                  3,  2.8,
+                  1,  0.8, 
+                  2,  2.2), 
+               ncol=ncol(Pi), nrow=ncol(Xdesign), byrow=TRUE)
+
+y &lt;- mmglmlong1(NULL, Pi, delta, glmfamily, beta, Xdesign, sigma=sd,
+                longitude=rep(1:N, each=n), size=rep(200, N*n))
+
+y &lt;- simulate(y, seed=5)
+
+# --- Estimation ---
+
+#   Increase maxiter below to achieve convergence
+#   Has been restricted to minimise time of package checks
+tmp &lt;- BaumWelch(y, bwcontrol(posdiff=FALSE, maxiter=1))
+print(summary(tmp))
+</code></pre>
+
+
+</div>

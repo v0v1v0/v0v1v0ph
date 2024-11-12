@@ -1,0 +1,125 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>summarise_routes</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Summarise a set of routes</h2>
+
+<h3>Description</h3>
+
+<p>Reduce a set of routes to a one-line per route summary
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">summarise_routes(routes, ap_loc, arrdep_h = 0.5)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>routes</code></td>
+<td>
+<p>Each segment in each route, as produced by
+<code>find_route</code> or <code>find_leg</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ap_loc</code></td>
+<td>
+<p>List of airport locations, output of
+<code>make_airports</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>arrdep_h</code></td>
+<td>
+<p>Total time for the M084 comparator aircraft to arrive &amp;
+depart in hours. Default 0.5.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>This function takes the output of <code>find_route</code> and summarises to
+one line per (full) route.
+</p>
+<p>With refuelling, there can be multiple 'full routes' for each 'route'. The
+<code>best</code> column indicates the best route for each <code>routeID</code>.
+</p>
+<p>The results are rounded to a reasonable number of significant figures. After
+all this is just an approximate model. The <code>arrdep_h</code> has been checked
+against actual and is reasonable (observed range roughly 0.3-0.5).
+</p>
+
+
+<h3>Value</h3>
+
+<p>Dataframe with summary of the route, sorted in ascending order of <code>advantage_h</code>
+so that the best route are plotted on top. The fields are:
+</p>
+
+<ul>
+<li> <p><code>timestamp</code>: when the leg was originally generated (it may have been cached)
+</p>
+</li>
+<li> <p><code>fullRouteID</code>: including the refuel stop if any
+</p>
+</li>
+<li> <p><code>routeID</code>: origin and destination airport, in <code>make_AP2</code> order
+</p>
+</li>
+<li> <p><code>refuel_ap</code>: code for the refuelling airport, or NA
+</p>
+</li>
+<li> <p><code>acID, acType</code>: aircraft identifiers taken from the aircraft set
+</p>
+</li>
+<li> <p><code>M084_h</code>: flight time for a Mach 0.84 comparator aircraft (including <code>2*arrdep_h</code>)
+</p>
+</li>
+<li> <p><code>gcdist_km</code>: great circle distance between the origin and destination airports
+</p>
+</li>
+<li> <p><code>sea_time_frac</code>: Fraction of <code>time_h</code> time spent over sea, hence at supersonic speed,
+or accelerating to, or decelerating from supersonic speed
+</p>
+</li>
+<li> <p><code>sea_dist_frac</code>: as sea_time_frac, but fraction of <code>dist_km</code>
+</p>
+</li>
+<li> <p><code>dist_km</code>: total length of the route, in km
+</p>
+</li>
+<li> <p><code>time_h</code>: total time, in hours
+</p>
+</li>
+<li> <p><code>n_phases</code>: number of distinct phases: arr/dep, transition, land, sea, refuel.
+</p>
+</li>
+<li> <p><code>advantage_h</code>: <code>M084_h - time_h</code>
+</p>
+</li>
+<li> <p><code>circuity</code>: the route distance extension (1 = perfect) <code>dist_km / gcdist_km</code>
+</p>
+</li>
+<li> <p><code>best</code>: for each <code>routeID</code>, the <code>fullrouteID</code> with maximum <code>advantage_h</code>
+</p>
+</li>
+</ul>
+<h3>Examples</h3>
+
+<pre><code class="language-R"># here we use a built-in set of routes
+# see vignette for more details of how to obtain it
+airports &lt;- make_airports(crs = crs_Pacific)
+NZ_routes &lt;- hm_get_test("route")
+sumy &lt;- summarise_routes(NZ_routes, airports)
+
+</code></pre>
+
+
+</div>

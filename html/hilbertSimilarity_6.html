@@ -1,0 +1,78 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hilbert.order</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Estimate the Hilbert order for a given matrix</h2>
+
+<h3>Description</h3>
+
+<p>Estimate the Hilbert order, or the number of bins in each dimension, so that if the matrix was
+random every row in the matrix would correspond to a single bin.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hilbert.order(mat)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table><tr style="vertical-align: top;">
+<td><code>mat</code></td>
+<td>
+<p>the matrix for which to estimate the Hilbert order</p>
+</td>
+</tr></table>
+<h3>Details</h3>
+
+<p>Assuming the matrix is fully random, there is no need to generate more voxels
+(the combination of bins over all dimensions) than there are rows in the matrix. The number can be
+derived from the following formula:
+</p>
+<p style="text-align: center;"><code class="reqn">c^{d} &lt; N</code>
+</p>
+
+<p>where <em>c</em> is the number of bins, <em>d</em> is the number of dimensions and <em>N</em> is the total
+number of cells in the dataset. <em>c</em> can be computed easily using the following formula:
+</p>
+<p style="text-align: center;"><code class="reqn">c = \lfloor \sqrt[d]{N}</code>
+</p>
+
+<p>The number of cuts for <code>do.cut</code> is the number of bins plus 1.
+</p>
+
+
+<h3>Value</h3>
+
+<p>the suggested number of bins to use for the specified <code>mat</code>.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Yann Abraham
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># generate a random 3D matrix with 2 peaks
+mat &lt;- rbind(matrix(rnorm(300),ncol=3),
+             matrix(rnorm(300,5,1),ncol=3))
+dimnames(mat)[[2]] &lt;- LETTERS[1:3]
+# estimate the Hilbert order
+hilbert.order(mat)
+# generate 2 bins with a minimum bin size of 5
+cuts &lt;- make.cut(mat,n=3,count.lim=5)
+show.cut(cuts)
+# Generate the cuts
+cut.mat &lt;- do.cut(mat,cuts,type='fixed')
+head(cut.mat)
+</code></pre>
+
+
+</div>

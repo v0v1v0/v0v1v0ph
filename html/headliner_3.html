@@ -1,0 +1,190 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>add_headline_column</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Add column of headlines</h2>
+
+<h3>Description</h3>
+
+<p>This works similar to <code>headline()</code> but acts on and returns a
+data frame.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">add_headline_column(
+  df,
+  x,
+  y,
+  headline = "{trend} of {delta} ({orig_values})",
+  ...,
+  .name = "headline",
+  if_match = "There was no difference",
+  trend_phrases = headliner::trend_terms(),
+  plural_phrases = NULL,
+  orig_values = "{x} vs. {y}",
+  n_decimal = 1,
+  round_all = TRUE,
+  multiplier = 1,
+  return_cols = .name
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>df</code></td>
+<td>
+<p>data frame, must be a single row</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>a numeric value to compare to the reference value of 'y'</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+<p>a numeric value to act as a control for the 'x' value</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>headline</code></td>
+<td>
+<p>a string to format the final output. Uses
+<code>glue</code> syntax</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>arguments passed to <code>glue_data</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.name</code></td>
+<td>
+<p>string value for the name of the new column to create</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>if_match</code></td>
+<td>
+<p>string to display if numbers match, uses
+<code>glue</code> syntax</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>trend_phrases</code></td>
+<td>
+<p>list of values to use for when x is more than y
+or x is less than y. You can pass it just
+<code>trend_terms</code> (the default) and call the result with
+<code>"...{trend}..."</code> or pass is a named list (see examples)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>plural_phrases</code></td>
+<td>
+<p>named list of values to use when difference (delta) is
+singular (delta = 1) or plural (delta != 1)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>orig_values</code></td>
+<td>
+<p>a string using <code>glue</code> syntax.
+example: <code style="white-space: pre;">⁠({x} vs {y})⁠</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n_decimal</code></td>
+<td>
+<p>numeric value to limit the number of decimal places in
+the returned values.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>round_all</code></td>
+<td>
+<p>logical value to indicate if all values should be rounded.
+When FALSE, the values will return with no modification. When TRUE (default)
+all values will be round to the length specified by 'n_decimal'.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>multiplier</code></td>
+<td>
+<p>number indicating the scaling factor. When multiplier = 1
+(default), 0.25 will return 0.25. When multiplier = 100, 0.25 will return 25.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>return_cols</code></td>
+<td>
+<p>arguments that can be passed to
+<code>select</code>, ex: c("a", "b"),
+<code>starts_with</code>, etc.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>What is nice about this function is you can return some of the
+"talking points" used in the headline calculation. For example, if you want
+to find the most extreme headlines, you can use
+<code>add_headline_column(..., return_cols = delta)</code> This will bring back a
+<code>headline</code> column as well as the <code>delta</code> talking point (the absolute
+difference between <code>x</code> and <code>y</code>). With this result, you can sort in descending
+order and filter for the biggest difference.
+</p>
+
+
+<h3>Value</h3>
+
+<p>Returns the original data frame with columns appended.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+# You can use 'add_headline_column()' to reference values in an existing data set.
+# Here is an example comparing the box office sales of different Pixar films
+head(pixar_films) |&gt;
+  dplyr::select(film, bo_domestic, bo_intl) |&gt;
+  add_headline_column(
+    x = bo_domestic,
+    y = bo_intl,
+    headline = "{film} was ${delta}M higher {trend} (${x}M vs ${y}M)",
+    trend_phrases = trend_terms(more = "domestically", less = "internationally")
+  ) |&gt;
+  knitr::kable("pandoc")
+
+# You can also use 'return_cols' to return any and all "talking points".
+# You can use tidyselect helpers like 'starts_with("delta")' or
+# 'everything()'. In this example, I returned the 'raw_delta' &amp; 'trend' columns
+# and then identified the records at the extremes
+pixar_films |&gt;
+  dplyr::select(film, bo_domestic, bo_intl) |&gt;
+  add_headline_column(
+    x = bo_domestic,
+    y = bo_intl,
+    headline = "${delta}M {trend} (${x}M vs ${y}M)",
+    trend_phrases = trend_terms(more = "higher", less = "lower"),
+    return_cols = c(raw_delta, trend)
+  ) |&gt;
+  dplyr::filter(raw_delta %in% range(raw_delta)) |&gt;
+  knitr::kable("pandoc")
+
+</code></pre>
+
+
+</div>

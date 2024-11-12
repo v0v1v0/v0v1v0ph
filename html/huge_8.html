@@ -1,0 +1,88 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>huge.npn</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Nonparanormal(npn) transformation</h2>
+
+<h3>Description</h3>
+
+<p>Implements the Gausianization to help relax the assumption of normality.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">huge.npn(x, npn.func = "shrinkage", npn.thresh = NULL, verbose = TRUE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>The <code>n</code> by <code>d</code> data matrix representing <code>n</code> observations in <code>d</code> dimensions</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>npn.func</code></td>
+<td>
+<p>The transformation function used in the npn transformation. If <code>npn.func = "truncation"</code>, the truncated ECDF is applied. If <code>npn.func = "shrinkage"</code>, the shrunken ECDF is applied. The default is <code>"shrinkage"</code>. If <code>npn.func = "skeptic"</code>, the nonparanormal skeptic is applied.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>npn.thresh</code></td>
+<td>
+<p>The truncation threshold used in nonparanormal transformation, ONLY applicable when <code>npn.func = "truncation"</code>. The default value is <code>1/(4*(n^0.25)*</code> <code>sqrt(pi*log(n)))</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p>If <code>verbose = FALSE</code>, tracing information printing is disabled. The default value is <code>TRUE</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The nonparanormal extends Gaussian graphical models to semiparametric Gaussian copula models.Motivated by sparse additive models, the nonparanormal method estimates the Gaussian copula by marginally transforming the variables using smooth functions.Computationally, the estimation of a nonparanormal transformation is very efficient and only requires one pass of the data matrix.
+</p>
+
+
+<h3>Value</h3>
+
+<table><tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+
+<p>A <code>d</code> by <code>d</code> nonparanormal correlation matrix if <code>npn.func = "skeptic"</code>, and A <code>n</code> by <code>d</code> data matrix representing <code>n</code> observations in <code>d</code> transformed dimensions other wise.
+</p>
+</td>
+</tr></table>
+<h3>See Also</h3>
+
+<p><code>huge</code> and <code>huge-package</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># generate nonparanormal data
+L = huge.generator(graph = "cluster", g = 5)
+L$data = L$data^5
+
+# transform the data using the shrunken ECDF
+Q = huge.npn(L$data)
+
+# transform the non-Gaussian data using the truncated ECDF
+Q = huge.npn(L$data, npn.func = "truncation")
+
+# transform the non-Gaussian data using the truncated ECDF
+Q = huge.npn(L$data, npn.func = "skeptic")
+</code></pre>
+
+
+</div>

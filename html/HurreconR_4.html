@@ -1,0 +1,183 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hurrecon_model_site</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Modeling Functions</h2>
+
+<h3>Description</h3>
+
+<p>hurrecon_model_site calculates wind speed (meters/second), gust speed 
+(meters/second), wind direction (degrees), and enhanced Fujita scale wind 
+damage for a given hurricane and site. If width is TRUE, the radius of 
+maximum wind (rmw) and scaling parameter (s_par) for this hurricane 
+are used; otherwise values for ALL are used. If save is TRUE, results are 
+saved to a CSV file on the site subdirectory.
+</p>
+<p>hurrecon_model_site_all creates a table of peak values for all hurricanes
+for a given site. If width is TRUE, the radius of maximum wind (rmw) and 
+scaling parameter (s_par) specified for each hurricane is used; otherwise 
+values for ALL are used. If save is TRUE, results are saved to a CSV file
+on the site-all subdirectory.
+</p>
+<p>hurrecon_model_region calculates peak wind speed (meters/second), peak 
+enhanced Fujita scale, peak wind direction (degrees), peak cardinal wind 
+direction, and duration of EF0, EF1, EF2, EF3, EF4, and EF5 winds (minutes)
+for a given hurricane over a region. If width is TRUE, the radius of maximum 
+wind (rmw) and scaling parameter (s_par) specified for each hurricane is used; 
+otherwise values for ALL are used. If time_step is NULL, the time step is 
+calculated. If water is FALSE, results are calculated for land areas only. 
+If save is TRUE, results are saved as a GeoTiff file on the region subdirectory.
+</p>
+<p>hurrecon_model_region_dt calculates wind speed (meters/second), enhanced
+Fujita scale, wind direction (degrees), and cardinal wind direction for a
+given hurricane over a region at a specified datetime. If width is TRUE, 
+the radius of maximum wind (rmw) and scaling parameter (s_par) specified 
+for the hurricane are used; otherwise values for ALL are used. If water 
+is FALSE, results are calculated for land areas only. If save is TRUE, 
+results are saved as a GeoTiff file on the region-dt subdirectory.
+</p>
+<p>hurrecon_model_region_all runs hurrecon_model_region for each hurricane
+and calculates the maximum Fujita value and the number of hurricanes for 
+each Fujita value (EF0-EF5) across a region. If width is TRUE, the 
+radius of maximum wind (rmw) and scaling parameter (s_par) specified for 
+each hurricane is used; otherwise values for ALL are used. If time_step is 
+NULL, the time step is calculated. If water is FALSE, results are calculated 
+for land areas only. If save is TRUE, intermediate results for each hurricane 
+are saved as GeoTiff files on the region-all subdirectory, along with summary 
+results for all hurricanes (summary.csv, summary.tif). If save is FALSE,
+intermediate results are saved to the R session temporary directory.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hurrecon_model_site(
+  hur_id,
+  site_name,
+  width = FALSE,
+  time_step = 1,
+  msg = TRUE,
+  save = TRUE,
+  hur_path = NULL
+)
+
+hurrecon_model_site_all(
+  site_name,
+  width = FALSE,
+  time_step = 1,
+  save = TRUE,
+  hur_path = NULL
+)
+
+hurrecon_model_region(
+  hur_id,
+  width = FALSE,
+  time_step = NULL,
+  water = FALSE,
+  msg = TRUE,
+  save = TRUE,
+  hur_path = NULL
+)
+
+hurrecon_model_region_dt(
+  hur_id,
+  dt,
+  width = FALSE,
+  water = FALSE,
+  save = TRUE,
+  hur_path = NULL
+)
+
+hurrecon_model_region_all(
+  width = FALSE,
+  time_step = NULL,
+  water = FALSE,
+  save = TRUE,
+  hur_path = NULL
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>hur_id</code></td>
+<td>
+<p>hurricane id</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>site_name</code></td>
+<td>
+<p>name of site</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>width</code></td>
+<td>
+<p>whether to use width parameters for the specified hurricane</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>time_step</code></td>
+<td>
+<p>time step (minutes)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>msg</code></td>
+<td>
+<p>whether to use message to display progress</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>save</code></td>
+<td>
+<p>whether to save results to file</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>hur_path</code></td>
+<td>
+<p>path for current set of model runs</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>water</code></td>
+<td>
+<p>whether to calculate results over water</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dt</code></td>
+<td>
+<p>datetime in the format YYYY-MM-DDThh:mm</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>a data frame of results
+</p>
+<p>a data frame of results
+</p>
+<p>a raster with 10 layers
+</p>
+<p>a raster of 4 layers
+</p>
+<p>a list containing a data frame and a raster of summary values
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">hur_path &lt;- system.file("", package="HurreconR", mustWork=TRUE)
+hurrecon_model_site(hur_id="AL1935-03", site_name="Miami FL", time_step=60, 
+msg=FALSE, save=FALSE, hur_path=hur_path)
+</code></pre>
+
+
+</div>

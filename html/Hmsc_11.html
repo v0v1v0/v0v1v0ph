@@ -1,0 +1,110 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>constructGradient</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>constructGradient</h2>
+
+<h3>Description</h3>
+
+<p>Constructs an environmental gradient over one of the variables included in <code>XData</code>
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">constructGradient(
+  hM,
+  focalVariable,
+  non.focalVariables = list(),
+  ngrid = 20,
+  coordinates = list()
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>hM</code></td>
+<td>
+<p>a fitted <code>Hmsc</code> model object</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>focalVariable</code></td>
+<td>
+<p>focal variable over which the gradient is constructed</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>non.focalVariables</code></td>
+<td>
+<p>list giving assumptions on how non-focal variables co-vary with the focal variable or a single number given the default type for all non-focal variables</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ngrid</code></td>
+<td>
+<p>number of points along the gradient (for continuous focal variables)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>coordinates</code></td>
+<td>
+<p>A named list of coordinates were model is
+evaluated in spatial or temporal models. The name should be one
+of the random levels, and value can be <code>"c"</code> for mean of
+coordinates (default), <code>"i"</code> for infinite coordinates
+without effect of spatial dependence, or a numeric vector of
+coordinates where the model is evaluated.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>In basic form, <code>non.focalVariables</code> is a list, where each element is on the form variable=list(type,value),
+where <code>variable</code> is one of the non-focal variables, and the <code>value</code> is needed only if <code>type = 3</code>. Alternatives
+<code>type = 1</code> sets the values of the non-focal variable
+to the most likely value (defined as expected value for covariates, mode for factors),
+<code>type = 2</code> sets the values of the non-focal variable to most likely value, given the value of focal variable,
+based on a linear relationship, and
+<code>type = 3</code> fixes to the value given.
+As a shortcut, a single number <code>1</code> or <code>2</code> can be given as a type
+used for all non-focal variables.
+If a <code>non.focalVariable</code> is not listed, <code>type=2</code> is used as default.
+Note that if the focal variable is continuous, selecting type 2 for a non-focal categorical variable can cause abrupt changes in response.
+</p>
+<p>The function needs access to the original <code>XData</code> data frame,
+and cannot be used if you defined your model with <code>X</code> model
+matrix. In that case you must construct your gradient manually.
+</p>
+
+
+<h3>Value</h3>
+
+<p>a named list with slots <code>XDataNew</code>, <code>studyDesignNew</code> and <code>rLNew</code>
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>plotGradient</code>, <code>predict</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Construct gradient for environmental covariate called 'x1'.
+Gradient = constructGradient(TD$m, focalVariable="x1")
+
+# Construct gradient for environmental covariate called 'x1'
+# while setting the other covariate to its most likely values
+Gradient = constructGradient(TD$m, focalVariable="x1",non.focalVariables=list(x2=list(1)))
+
+</code></pre>
+
+
+</div>

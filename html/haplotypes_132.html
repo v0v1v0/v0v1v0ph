@@ -1,0 +1,180 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>plot-methods</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Methods for function <code>plot</code> in the package <span class="pkg">haplotypes</span>
+</h2>
+
+<h3>Description</h3>
+
+<p>Plots statistical parsimony networks.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">## S4 method for signature 'Parsimnet'
+plot(x,y,net=1,inter.labels=FALSE,...)
+ </code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>an object of class <code>Parsimnet</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+<p>not used (needed for compatibility with generic plot function).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>net</code></td>
+<td>
+<p>a numeric vector of length one indicating which network to plot.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>inter.labels</code></td>
+<td>
+<p>boolean; should vertex labels of intermediate haplotypes to be displayed? </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p> additional arguments to <code>plot.default</code>, <code>plot.network.default</code> and arguments to be passed to plot method for <code>Parsimnet</code> objects. See ‘Details’</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>These methods call <code>plot.network.default</code> from package <span class="pkg">network</span>. Some default parameters are changed:
+</p>
+
+<dl>
+<dt>label</dt>
+<dd>
+<p> a vector of vertex labels. By default the row names of the distance matrices in slot <code>d</code> are used. If <code>inter.labels==FALSE</code> only haplotype labels are displayed. </p>
+</dd>
+<dt>usearrows</dt>
+<dd>
+<p> boolean; should arrows (rather than line segments) be used to indicate edges? Default is set to FALSE. </p>
+</dd>
+<dt>mode</dt>
+<dd>
+<p> the vertex placement algorithm. Default is set to <code>"kamadakawai"</code>. </p>
+</dd>
+<dt>pad</dt>
+<dd>
+<p> amount to pad the plotting range; useful if labels are being clipped. Default is set to 1.</p>
+</dd>
+<dt>label.cex</dt>
+<dd>
+<p> character expansion factor for label text. Default is set to 0.75.</p>
+</dd>
+<dt>vertex.cex</dt>
+<dd>
+<p> a numeric vector of expansion factor for vertices. By default it is 0.8 for haplotypes and 0.5 for intermediates. </p>
+</dd>
+<dt>vertex.col</dt>
+<dd>
+<p> an integer or character vector for the vertex colors. By default it is 2 (red) for haplotypes and 4 (blue) for intermediates. </p>
+</dd>
+</dl>
+<h3>Value</h3>
+
+<p>A two-column matrix containing the vertex positions as x,y coordinates.
+</p>
+
+
+<h3>Methods</h3>
+
+
+<dl>
+<dt><code>signature(x = "Parsimnet",y = "missing")</code></dt>
+<dd>
+<p>Plots Parsimnet objects.
+</p>
+</dd>
+</dl>
+<h3>Author(s)</h3>
+
+<p>Caner Aktas, <a href="mailto:caktas.aca@gmail.com">caktas.aca@gmail.com</a>. 
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>parsimnet</code>, <code>plot.default</code> and <code>plot.network.default</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">	
+	
+## Not run: 
+	
+data("dna.obj")
+x&lt;-dna.obj
+
+
+### Method for signature 'Parsimnet'.
+
+## Statistical parsimony with 95
+p&lt;-parsimnet(x) 
+p
+## Plotting with default parameters.
+plot(p)
+
+## Displaying vertex labels of intermediate haplotypes.
+plot(p, inter.labels=TRUE)
+
+## Interactively adjusting vertex positions.
+plot(p, interactive=TRUE)
+
+## Interactively adjusting and saving vertex positions.
+p&lt;-parsimnet(x)
+#saving vertex positions as x,y coordinates. 
+coo&lt;-plot(p,interactive=TRUE) 
+#reuse saved coordinates.
+plot(p,coord=coo)
+
+## Adjusting vertex sizes.
+plot(p, vertex.cex=c(rep(3,nrow(p@d[[1]]))))
+# different sizes for haplotypes and intermediates
+plot(p, vertex.cex=c(rep(3,p@nhap),rep(1,c(nrow(p@d[[1]])-p@nhap)))) 
+
+## Adjusting vertex colors
+# different color for haplotypes and intermediates
+plot(p, vertex.col=c(rep("magenta",p@nhap),rep("deepskyblue3",c(nrow(p@d[[1]])-p@nhap))))  
+ 
+## Statistical parsimony with 98
+p&lt;-parsimnet(x,prob=.99) 
+p
+#plot the first network
+plot(p,net=1)
+#plot the second network
+plot(p,net=2)
+#plot the third network. It is a single vertex.
+plot(p,net=3) 
+
+
+
+
+
+
+## End(Not run)
+
+</code></pre>
+
+
+</div>

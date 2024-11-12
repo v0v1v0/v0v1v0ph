@@ -1,0 +1,91 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>divideUp</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Partition data into mutiple nearly equal subsets</h2>
+
+<h3>Description</h3>
+
+<p>Randomly partition data into nearly equal subsets. If
+<code>balanced=TRUE</code> the requirement is imposed that the subsets
+should as far as possible be balanced with respect to a classifying
+factor.  The multiple sets are suitable for use for determining the
+folds in a cross-validation.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">divideUp(cl, nset = 2, seed = NULL, balanced=TRUE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>cl</code></td>
+<td>
+<p>classifying factor</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nset</code></td>
+<td>
+<p>number of subsets into which to partition data</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>seed</code></td>
+<td>
+<p>set the seed, if required, in order to obtain
+reproducible results</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>balanced</code></td>
+<td>
+<p>logical: should subsets be as far as possible balanced
+with respect to the classifying factor?</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>a set of indices that identify the <code>nset</code> subsets
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>John Maindonald</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">foldid &lt;- divideUp(cl=rep(1:3, c(17,14,8)), nset=10)
+table(rep(1:3, c(17,14,8)), foldid)
+foldid &lt;- divideUp(cl=rep(1:3, c(17,14,8)), nset=10,
+       	    balanced=FALSE)
+table(rep(1:3, c(17,14,8)), foldid)
+
+
+## The function is currently defined as
+function(cl = rep(1:3, c(7, 4, 8)), nset=2, seed=NULL, balanced=TRUE){
+    if(!is.null(seed))set.seed(seed)
+    if(balanced){
+      ord &lt;- order(cl)
+      ordcl &lt;- cl[ord]
+      gp0 &lt;- rep(sample(1:nset), length.out=length(cl))
+      gp &lt;- unlist(split(gp0,ordcl), function(x)sample(x))
+      gp[ord] &lt;- gp
+    } else
+    gp &lt;- sample(rep(1:nset, length.out=length(cl)))
+    as.vector(gp)
+  }
+</code></pre>
+
+
+</div>

@@ -1,0 +1,178 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>HCD</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+hierarchical community detection with recursive spectral methods
+</h2>
+
+<h3>Description</h3>
+
+<p>Hierarchical community by recursive spectral partitioning. It includes
+the splitting methods of spectral clustering and sign splitting, as well
+stopping rules for fixed stopping, non-backtracking matrix checking and
+edge cross-validation.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">HCD(A, method = "SS", stopping = "NB", reg = FALSE, n.min = 25, D = NULL,notree=TRUE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>A</code></td>
+<td>
+
+<p>adjacency matrix. Can be standard R matrix or dsCMatrix (or other type in package Matrix)
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+
+<p>splitting method. "SS" (default) for sign splitting, "SC" for spectral clustering
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>stopping</code></td>
+<td>
+
+<p>stopping rule. "NB" (default) for non-backtracking matrix spectrum,
+"ECV" for edge cross-validation, "Fix"for fixed D layers of partitioning
+(needs D value)
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>reg</code></td>
+<td>
+
+<p>logic value on whether regularization is needed. By default it is FALSE.Set it to be TRUE will add reguarlization, which help the performance on sparse networks, but it will make the computation slower.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n.min</code></td>
+<td>
+
+<p>integer number. The algorithm will stop splitting if the current size is &lt;= 2*n.min.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>D</code></td>
+<td>
+
+<p>the number of layers to partition, if stopping=="Fix".
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>notree</code></td>
+<td>
+
+<p>logical value on whether the tree and the corresponding similarity will
+be computed. If TRUE (default), will not produce the data.tree object or the community similarity matrix. Only the cluster label and the tree path strings will be returned. This typically makes the runing faster.
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>For stopping rules, ECV is nonparametric rank evaluation by
+cross-validation, a more generally applicable approach without assuming
+SBM or its variants. ECV is also applicable for weighted networks.So it is
+believed to be more robust than NB but less effective if the true model
+is close to BTSBM. However, the ECV is computationally much more
+intensive.
+</p>
+<p>Notice that the algorithm does not reply on the assumption of the BTSBM.
+But
+the estimated probabiilty matrix from the output is based on the
+BTSBM.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A list of the following objects:
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>labels</code></td>
+<td>
+<p>detected community labels of nodes</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ncl</code></td>
+<td>
+<p>number of clusters from the algorithm</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cluster.tree</code></td>
+<td>
+<p>a data.tree object for the binary tree between
+communities</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>P</code></td>
+<td>
+<p>estimated connection probability matrix between n nodes,
+according to BTSBM</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>node.bin.sim.mat</code></td>
+<td>
+<p>binary string similarity between nodes</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>comm.bin.sim.mat</code></td>
+<td>
+<p>binary string similarity between communities</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tree.path</code></td>
+<td>
+<p>a list of strings to describe the path from root to
+each community along the tree</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>Tianxi Li, Lihua Lei, Sharmodeep Bhattacharyya, Purnamrita Sarkar, Peter Bickel, and Elizaveta Levina.<br></p>
+<p>Maintainer: Tianxi Li &lt;tianxili@umn.edu&gt;
+</p>
+
+
+<h3>References</h3>
+
+<p>Li, T., Lei, L., Bhattacharyya, S., Van den Berge, K., Sarkar, P., Bickel, P.J. and Levina, E., 2022. Hierarchical community detection by recursive partitioning. Journal of the American Statistical Association, 117(538), pp.951-968.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">dt &lt;- BTSBM(n=1600,d=4,a.seq=0.2^seq(0,4),lambda=50)
+A &lt;- dt$A.list[[1]]
+# you can try various versions of the algorithm as below: the Fix is fastest and ECV is slowest.
+system.time(HCD.result &lt;- HCD(A,method="SC",stopping="Fix",D=4))
+</code></pre>
+
+
+</div>

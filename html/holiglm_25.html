@@ -1,0 +1,119 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>pairwise_sign_coherence</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Pairwise Sign Coherence</h2>
+
+<h3>Description</h3>
+
+<p>Ensures that coefficients of covariates which exhibit strong pairwise correlation
+have a coherent sign.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">pairwise_sign_coherence(
+  rho = 0.8,
+  exclude = "(Intercept)",
+  big_m = 100,
+  eps = 1e-06,
+  use = c("everything", "all.obs", "complete.obs", "na.or.complete",
+    "pairwise.complete.obs"),
+  method = c("pearson", "kendall", "spearman")
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>rho</code></td>
+<td>
+<p>a value in the range [0,1] specifying the maximum
+allowed collinearity between pairs of covariates.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>exclude</code></td>
+<td>
+<p>a character vector giving the names of the covariates to be
+excluded from the constraint (default is "(Intercept)").</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>big_m</code></td>
+<td>
+<p>a double giving the big-M parameter.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>eps</code></td>
+<td>
+<p>a double giving the epsilon for the equal sign constraint.
+Since most numerical solvers can only handle constraints up to some epsilon,
+e.g., the constraint <code class="reqn">A x \geq b</code> is typically transformed to
+<code class="reqn">|A x - b| \geq 0</code>. By providing an <code>eps</code><code class="reqn"> &gt; 0</code> and changing
+the constraint to <code class="reqn">|A x - b| \geq</code> <code>eps</code> we can ensure <code class="reqn">|A x - b| &gt; 0</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>use</code></td>
+<td>
+<p>an optional character string giving a method for computing
+covariances in the presence of missing values.
+The parameter is passed to <code>cor</code>,
+therefore see <code>cor</code> for more information.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+<p>a character string indicating which correlation coefficient
+is to be computed.
+The parameter is passed to <code>cor</code>,
+therefore see <code>cor</code> for more information.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A holistic generalized model constraint, object inheriting from class <code>"hglmc"</code>.
+</p>
+
+
+<h3>References</h3>
+
+<p>Carrizosa, E., Olivares-Nadal, A. V., &amp; Ramírez-Cobo, P. (2020).
+Integer Constraints for Enhancing Interpretability in Linear Regression.
+SORT. Statistics and Operations Research Transactions, 44: 67-98.
+<a href="https://doi.org/10.2436/20.8080.02.95">doi:10.2436/20.8080.02.95</a>.
+</p>
+
+
+<h3>See Also</h3>
+
+<p>Other Constraint-Constructors: 
+<code>group_equal()</code>,
+<code>group_inout()</code>,
+<code>group_sparsity()</code>,
+<code>include()</code>,
+<code>k_max()</code>,
+<code>linear()</code>,
+<code>lower()</code>,
+<code>rho_max()</code>,
+<code>sign_coherence()</code>,
+<code>upper()</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">constraints &lt;- c(k_max(7), pairwise_sign_coherence())
+</code></pre>
+
+
+</div>

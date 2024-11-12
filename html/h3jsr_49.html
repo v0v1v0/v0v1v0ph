@@ -1,0 +1,87 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>point_to_cell</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Convert point location to H3 cell index</h2>
+
+<h3>Description</h3>
+
+<p>This function takes point location data and returns a H3 cell index for each
+point at the chosen resolution(s).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">point_to_cell(input = NULL, res = NULL, simple = TRUE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>input</code></td>
+<td>
+<p><code>sf</code> object with point geometry, <code>sfc_POINT</code> object,
+<code>sfg</code> point, data frame or matrix.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>res</code></td>
+<td>
+<p>Integer; Desired H3 resolution. See
+<a href="https://h3geo.org/docs/core-library/restable/">https://h3geo.org/docs/core-library/restable/</a> for allowable values and related dimensions.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>simple</code></td>
+<td>
+<p>Logical; whether to return outputs as character vector where
+possible.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+
+<ul>
+<li> <p>if <code>simple = TRUE</code> and one resolution is requested, a character vector
+of H3 addresses.
+</p>
+</li>
+<li> <p>if <code>simple = TRUE</code> and multiple resolutions are requested, a data
+frame of H3 addresses.
+</p>
+</li>
+<li> <p>if <code>simple = FALSE</code> and a matrix, sfc or sfg object is supplied, a
+data frame of H3 addresses.
+</p>
+</li>
+<li> <p>if <code>simple = FALSE</code> and a data frame or sf object with other
+attributes is supplied, a data frame of non-spatial attributes with new
+columns containing addresses for one or more H3 resolutions.
+</p>
+</li>
+</ul>
+<h3>Note</h3>
+
+<p>While multiple resolutions can be requested for multiple points, be
+aware of the memory demand on large datasets.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># where is the Brisbane Town Hall at resolution 15?
+bth &lt;- sf::st_sfc(sf::st_point(c(153.023503, -27.468920)), crs = 4326)
+bth_15 &lt;- point_to_cell(bth, res = 15)
+
+# where is it at several resolutions?
+bth_many &lt;- point_to_cell(bth, res = seq(10, 15), simple = FALSE)
+</code></pre>
+
+
+</div>

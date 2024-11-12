@@ -1,0 +1,146 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>momChangeAbout</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Obtain Moments About a New Location</h2>
+
+<h3>Description</h3>
+
+<p>Using the moments up to a given order about one location, this function
+either returns the moments up to that given order about a new location as a 
+vector or it returns a moment of a specific order defined by users 
+(order &lt;= maximum order of the given moments) about a new location as a single
+number. 
+A generalization of using raw moments to obtain a central moment or using 
+central moments to obtain a raw moment.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">  momChangeAbout(order = "all", oldMom, oldAbout, newAbout)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>order</code></td>
+<td>
+<p>One of:
+</p>
+
+<ul>
+<li>
+<p> the character string "all", the default;
+</p>
+</li>
+<li>
+<p> a positive integer less than the maximum order of <code>oldMom</code>.
+</p>
+</li>
+</ul>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>oldMom</code></td>
+<td>
+<p>Numeric. Moments of orders 1, 2, ..., about the point 
+<code>oldAbout</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>oldAbout</code></td>
+<td>
+<p>Numeric. The point about which the moments <code>oldMom</code> have
+been calculated.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>newAbout</code></td>
+<td>
+<p>Numeric. The point about which the desired moment or
+moments are to be
+obtained.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+  
+<p>Suppose <code class="reqn">m_k</code> denotes the <code class="reqn">k</code>-th moment of a random
+variable <code class="reqn">X</code> about a point <code class="reqn">a</code>, and <code class="reqn">m_k^*</code>
+denotes the <code class="reqn">k</code>-th moment about <code class="reqn">b</code>. Then
+<code class="reqn">m_k^*</code> may be determined from the moments
+<code class="reqn">m_1,m_2,\dots,m_k</code> according to the formula
+</p>
+<p style="text-align: center;"><code class="reqn">m_k^*=\sum_{i=0}^k (a-b)^i m^{k-i}</code>
+</p>
+
+<p>This is the formula implemented by the function
+<code>momChangeAbout</code>. It is a generalization of the well-known
+formulae used to change raw moments to central moments or to change
+central moments to raw moments. See for example Kendall and Stuart
+(1989), Chapter 3.
+</p>
+
+
+<h3>Value</h3>
+
+<p>The moment of order <code>order</code> about the location <code>newAbout</code> when 
+<code>order</code> is specified.
+The vector of moments about the location <code>newAbout</code> from first
+order up to the maximum order of the <code>oldMom</code> when <code>order</code>
+takes the value <code>"all"</code> or is not specified. 
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>David Scott <a href="mailto:d.scott@auckland.ac.nz">d.scott@auckland.ac.nz</a>, 
+Christine Yang Dong <a href="mailto:c.dong@auckland.ac.nz">c.dong@auckland.ac.nz</a></p>
+
+
+<h3>References</h3>
+
+<p>Kendall, M. G. and Stuart, A. (1969).
+The Advanced Theory of Statistics, Volume 1, 3rd Edition.
+London: Charles Griffin &amp; Company.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">### Gamma distribution
+k &lt;- 4
+shape &lt;- 2
+old &lt;- 0
+new &lt;- 1
+sampSize &lt;- 1000000
+
+### Calculate 1st to 4th raw moments 
+m &lt;- numeric(k)
+for (i in 1:k){
+   m[i] &lt;- gamma(shape + i)/gamma(shape)
+}
+m
+
+### Calculate 4th moment about new 
+momChangeAbout(k, m, old, new)
+### Calculate 3rd about new
+momChangeAbout(3, m, old, new)
+
+### Calculate 1st to 4th moments about new
+momChangeAbout(oldMom = m, oldAbout = old, newAbout = new)
+momChangeAbout(order = "all", m, old, new)
+  
+### Approximate kth moment about new using sampling
+x &lt;- rgamma(sampSize, shape)
+mean((x - new)^k) 
+</code></pre>
+
+
+</div>

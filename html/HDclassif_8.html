@@ -1,0 +1,271 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hdmda</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Mixture Discriminant Analysis with HD Gaussians</h2>
+
+<h3>Description</h3>
+
+<p>HD-MDA implements mixture discriminant analysis (MDA, Hastie &amp; Tibshirani, 1996) with HD Gaussians instead of full Gaussians. Each class is assumed to be made of several class-specific groups in which the data live in low-dimensional subspaces. From a technical point of view, a clustering is done using <code>hddc</code> in each class.</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hdmda(X,cls,K=1:10,model='AkjBkQkDk',show=FALSE,...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>X</code></td>
+<td>
+<p>A matrix or a data frame of observations, assuming the rows are the observations and the columns the variables. Note that NAs are not allowed.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cls</code></td>
+<td>
+<p>The vector of the class of each observations, its type can be numeric or string.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>K</code></td>
+<td>
+<p>A vector of integers specifying the number of clusters for which the BIC and the parameters are to be calculated; the function keeps the parameters which maximises the BIC. Note that the length of the vector K can't be larger than 20. Default is 1:10.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>model</code></td>
+<td>
+<p>A character string vector, or an integer vector indicating the models to be used. The available models are: "AkjBkQkDk" (default), "AkBkQkDk", "ABkQkDk", "AkjBQkDk", "AkBQkDk", "ABQkDk", "AkjBkQkD", "AkBkQkD", "ABkQkD", "AkjBQkD", "AkBQkD", "ABQkD", "AjBQD", "ABQD". It is not case sensitive and integers can be used instead of names, see details for more information. Several models can be used, if it is, only the results of the one which maximizes the BIC criterion is kept. To run all models, use model="ALL".</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>show</code></td>
+<td>
+<p>Use show = TRUE to display some information related to the clustering.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Any argument that can be used by the function <code>hddc</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Some information on the signification of the model names:
+</p>
+
+<dl>
+<dt>Akj are the parameters of the classes subspaces:</dt>
+<dd>
+
+<ul>
+<li>
+<p>if Akj: each class has its parameters and there is one parameter for each dimension
+</p>
+</li>
+<li>
+<p>if Ak: the classes have different parameters but there is only one per class
+</p>
+</li>
+<li>
+<p>if Aj: all the classes have the same parameters for each dimension (it's a particular case with a common orientation matrix)
+</p>
+</li>
+<li>
+<p>if A: all classes have the same one parameter
+</p>
+</li>
+</ul>
+</dd>
+<dt>Bk are the noises of the classes subspaces:</dt>
+<dd>
+
+<ul>
+<li>
+<p>If Bk: each class has its proper noise
+</p>
+</li>
+<li>
+<p>if B:  all classes have the same noise
+</p>
+</li>
+</ul>
+</dd>
+<dt>Qk is the orientation matrix of each class:</dt>
+<dd> 
+
+<ul>
+<li>
+<p>if Qk: all classes have its proper orientation matrix
+</p>
+</li>
+<li>
+<p>if Q: all classes have the same orientation matrix
+</p>
+</li>
+</ul>
+</dd>
+<dt>Dk is the intrinsic dimension of each class:</dt>
+<dd> 
+
+<ul>
+<li>
+<p>if Dk: the dimensions are free and proper to each class
+</p>
+</li>
+<li>
+<p>if D: the dimension is common to all classes
+</p>
+</li>
+</ul>
+</dd>
+</dl>
+<p>The model “all” will compute all the models, give their BIC and keep the model with the highest BIC value.
+Instead of writing the model names, they can also be specified using an integer.  1 represents the most general model (“AkjBkQkDk”) while 14 is the most constrained (“ABQD”), the others  number/name matching are given below:
+</p>
+
+<table>
+<tr>
+<td style="text-align: left;">
+AkjBkQkDk </td>
+<td style="text-align: center;">   1   </td>
+<td style="text-align: center;">   </td>
+<td style="text-align: left;">  AkjBkQkD </td>
+<td style="text-align: center;">   7   </td>
+</tr>
+<tr>
+<td style="text-align: left;"> 
+AkBkQkDk </td>
+<td style="text-align: center;">   2   </td>
+<td style="text-align: center;"> </td>
+<td style="text-align: left;">  AkBkQkD </td>
+<td style="text-align: center;">   8   </td>
+</tr>
+<tr>
+<td style="text-align: left;">   
+ABkQkDk </td>
+<td style="text-align: center;">   3   </td>
+<td style="text-align: center;">  </td>
+<td style="text-align: left;"> ABkQkD </td>
+<td style="text-align: center;">   9   </td>
+</tr>
+<tr>
+<td style="text-align: left;">   
+AkjBQkDk </td>
+<td style="text-align: center;">   4   </td>
+<td style="text-align: center;">  </td>
+<td style="text-align: left;">  AkjBQkD </td>
+<td style="text-align: center;">   10   </td>
+</tr>
+<tr>
+<td style="text-align: left;">   
+AkBQkDk </td>
+<td style="text-align: center;">   5   </td>
+<td style="text-align: center;">  </td>
+<td style="text-align: left;">  AkBQkD </td>
+<td style="text-align: center;">   11   </td>
+</tr>
+<tr>
+<td style="text-align: left;">   
+ABQkDk </td>
+<td style="text-align: center;">   6   </td>
+<td style="text-align: center;">  </td>
+<td style="text-align: left;">  ABQkD </td>
+<td style="text-align: center;">   12  </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+AjBQD </td>
+<td style="text-align: center;"> 13 </td>
+<td style="text-align: center;">  </td>
+<td style="text-align: left;"> ABQD </td>
+<td style="text-align: center;"> 14
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p><code>hdmda</code> returns an 'hdmda' object which is a list containing:
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>alpha</code></td>
+<td>
+<p>Estimated prior probabilities for the classes.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>prms</code></td>
+<td>
+<p>Estimated mixture parameters for each class.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>kname</code></td>
+<td>
+<p>The name (level) of each class.</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>Laurent Berge, Charles Bouveyron and Stephane Girard
+</p>
+
+
+<h3>References</h3>
+
+<p>C. Bouveyron and C. Brunet (2014), “Model-based clustering of high-dimensional data: A review”, Computational Statistics and Data Analysis, vol. 71, pp. 52-78.
+</p>
+<p>Bouveyron, C. Girard, S. and Schmid, C. (2007), “High Dimensional Discriminant Analysis”, Communications in Statistics: Theory and Methods, vol. 36 (14), pp. 2607-2623.
+</p>
+<p>Bouveyron, C. Celeux, G. and Girard, S. (2011), “Intrinsic dimension estimation by maximum likelihood in probabilistic PCA”, Pattern Recognition Letters, vol. 32 (14), pp. 1706-1713.
+</p>
+<p>Berge, L. Bouveyron, C. and Girard, S. (2012), “HDclassif: An R Package for Model-Based Clustering and Discriminant Analysis of High-Dimensional Data”, Journal of Statistical Software, 46(6), pp. 1-29, url: <a href="https://doi.org/10.18637/jss.v046.i06">doi:10.18637/jss.v046.i06</a>.
+</p>
+<p>Hastie, T., &amp; Tibshirani, R. (1996), “Discriminant analysis by Gaussian mixtures”, Journal of the Royal Statistical Society, Series B (Methodological), pp. 155-176.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>hdda</code>, <code>hddc</code></p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Load the Wine data set
+data(wine)
+cls = wine[,1]; X = scale(wine[,-1])
+
+# A simple use...
+out = hdmda(X[1:100,],cls[1:100])
+res = predict(out,X[101:nrow(X),])
+
+# Comparison between hdmda and hdda in a CV setup
+set.seed(123); nb = 10; Err = matrix(NA,2,nb)
+for (i in 1:nb){
+  cat('.')
+  test = sample(nrow(X),50)
+  out0 = lda(X[-test,],cls[-test])
+  res0 = predict(out0,X[test,])
+  Err[1,i] = sum(res0$class != cls[test]) / length(test)
+  out = hdmda(X[-test,],cls[-test],K=1:3,model="AKJBQKDK")
+  res = predict(out,X[test,])
+  Err[2,i] = sum(res$class != cls[test]) / length(test)
+}
+cat('\n')
+boxplot(t(Err),names=c('LDA','HD-MDA'),col=2:3,ylab="CV classifciation error",
+  main='CV classifciation error on Wine data')
+</code></pre>
+
+
+</div>

@@ -1,0 +1,125 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>Conf_bands</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Confidence bands</h2>
+
+<h3>Description</h3>
+
+<p>Implements the uniform and pointwise confidence bands for the future conditional hazard rate based on the last observed marker measure.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">Conf_bands(data, marker_name, event_time_name = 'years',
+            time_name = 'year', event_name = 'status2', x, b)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>A data frame of time dependent data points.  Missing values are allowed.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>marker_name</code></td>
+<td>
+<p>The column name of the marker values in the data frame <code>data</code>. </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>event_time_name</code></td>
+<td>
+<p>The column name of the event times in the data frame <code>data</code>. </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>time_name</code></td>
+<td>
+<p>The column name of the times the marker values were observed in the data frame <code>data</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>event_name</code></td>
+<td>
+<p>The column name of the events in the data frame <code>data</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>Numeric value of the last observed marker value.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>b</code></td>
+<td>
+<p>Bandwidth.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The function <code>Conf_bands</code> implements the pointwise and uniform confidence bands for the estimator of the future conditional hazard rate <code class="reqn">\hat h_x(t)</code>. The confidence bands are based on a wild bootstrap approach <code class="reqn">{h^*}_{{x_*},B}(t)</code>.
+</p>
+<p>Pointwise:
+For a given <code class="reqn">t\in (0,T)</code> generate <code class="reqn">{h^*}_{{x_*},B}^{(1)}(t),...,{h^*}_{{x_*},B}^{(N)}(t)</code> for <code class="reqn">N = 1000</code> and order it <code class="reqn">{h^*}_{{x_*},B}^{[1]}(t)\leq ...\leq {h^*}_{{x_*},B}^{[N]}(t)</code>. Then
+</p>
+<p style="text-align: center;"><code class="reqn">
+\hat{I}^1_{n,N} = \Bigg[\hat{h}_{x_*}(t) - \hat{\sigma}_{{G}_{x_*}}(t)\frac{{h^*}_{{x_*},B}^{[ N(1-\frac{\alpha}{2})]}(t)}{\sqrt{n}}, \hat{h}_{x_*}(t) -  \hat{\sigma}_{ {G}_x}(t)\frac{{h^*}_{{x_*},B}^{[ N\frac{\alpha}{2}]}(t)}{\sqrt{n}}\Bigg]
+</code>
+</p>
+
+<p>is a <code class="reqn">1-\alpha</code> pointwise confidence band for <code class="reqn">h_{x_*}(t)</code>, where <code class="reqn">\hat{\sigma}_{{G}_{x_*}}(t)</code> is a bootrap estimate of the variance. For more details on the wild bootstrap approach, please see <code>prep_boot</code> and <code>g_xt</code>.
+</p>
+<p>Uniform:
+Generate <code class="reqn">\bar{h}_{{x_*},B}^{(1)}(t),...,\bar{h}_{{x_*},B}^{(N)}(t)</code> for <code class="reqn">N = 1000</code> for all <code class="reqn">t\in [\delta_T,T-\delta_T]</code> and define <code class="reqn">W^{(i)} = \sup_{t\in[0,T]}\big|\bar{h}_{{x_*},B}^{(i)}(t)|</code> for <code class="reqn">i = 1,...,N</code>. Order <code class="reqn">W^{[1]} \leq ... \leq W^{[N]}</code>. Then
+</p>
+<p style="text-align: center;"><code class="reqn">\hat{I}^2_{n,N} = \Bigg[\hat{h}_{x_*}(t) \pm \hat{\sigma}_{{G}_{x_*}}(t) \frac{W^{[ N(1 - \alpha)]}}{\sqrt{n}} \Bigg]</code>
+</p>
+
+<p>is a <code class="reqn">1-\alpha</code> uniform confidence band for <code class="reqn">h_{x_*}(t)</code>.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A list with pointwise, uniform confidence bands and the estimator <code class="reqn">\hat h_x(t)</code> for all possible time points <code class="reqn">t</code>.
+</p>
+
+
+<h3>See Also</h3>
+
+ <p><code>g_xt, prep_boot </code></p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">b = 10
+x = 3
+size_s_grid &lt;- 100
+s = pbc2$year
+br_s = seq(0, max(s), max(s)/( size_s_grid-1))
+
+
+c_bands = Conf_bands(pbc2, 'serBilir', event_time_name = 'years',
+                    time_name = 'year', event_name = 'status2', x, b)
+
+J = 60
+plot(br_s[1:J], c_bands$h_hat[1:J], type = "l", ylim = c(0,1), ylab = 'Hazard', xlab = 'Years')
+
+lines(br_s[1:J], c_bands$I_p_up[1:J], col = "red")
+lines(br_s[1:J], c_bands$I_p_do[1:J], col = "red")
+lines(br_s[1:J], c_bands$I_nu[1:J], col = "blue")
+lines(br_s[1:J], c_bands$I_nd[1:J], col = "blue")
+</code></pre>
+
+
+</div>

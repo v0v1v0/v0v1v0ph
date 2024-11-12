@@ -1,0 +1,81 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>swe_derive</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Snow Water Equivalent to melt or snowfall</h2>
+
+<h3>Description</h3>
+
+<p>Derive melt or snowfall series from snow water
+equivalent measurements (snow pillows measurements).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">swe_derive(x, col_name, out_name = NULL, case)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>data frame or tibble with class Date or POSIX* in the
+first column.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>col_name</code></td>
+<td>
+<p>string with column(s) name(s) where to apply the function.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>out_name</code></td>
+<td>
+<p>optional. String with new column(s) name(s). If you
+set it as <code>NULL</code>, the function will overwrite the original table.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>case</code></td>
+<td>
+<p>string vector with "sf" (meaning snowfall) or "m" (meaning melt).</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>The same data frame but with the derived series.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+# set path to file
+path_file &lt;- system.file('extdata', 'dgi_toscas.xlsx',
+             package = 'hydrotoolbox')
+
+# swe table
+swe_toscas &lt;- read_dgi(path = path_file,
+                       sheet = 'swe',
+                       out_name = 'swe(mm)')
+
+# add melt and snowfall
+swe_toscas &lt;-
+  swe_toscas %&gt;%
+  swe_derive(col_name = rep('swe(mm)', 2),
+             out_name = c('melt(mm)', 'snowfall(mm)'),
+             case = c('m', 'sf') )
+
+
+</code></pre>
+
+
+</div>

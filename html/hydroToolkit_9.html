@@ -1,0 +1,133 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>build_hydroMet</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Automatically load native data files</h2>
+
+<h3>Description</h3>
+
+<p>This method is the recommended one for loading your data-sets (as provided by the agency).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">build_hydroMet(
+  obj,
+  slot_list,
+  path = NULL,
+  col_names = NULL,
+  start_date = NULL,
+  end_date = NULL
+)
+
+## S4 method for signature 'hydroMet_BDHI'
+build_hydroMet(obj, slot_list, path = NULL)
+
+## S4 method for signature 'hydroMet_CR2'
+build_hydroMet(obj, slot_list, path = NULL)
+
+## S4 method for signature 'hydroMet_DGI'
+build_hydroMet(obj, slot_list, path = NULL)
+
+## S4 method for signature 'hydroMet_IANIGLA'
+build_hydroMet(obj, slot_list, path = NULL)
+
+## S4 method for signature 'hydroMet_compact'
+build_hydroMet(
+  obj,
+  slot_list,
+  col_names = NULL,
+  start_date = NULL,
+  end_date = NULL
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>obj</code></td>
+<td>
+<p>an <code>hydroMet_XXX</code> class object (see create_hydroMet).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>slot_list</code></td>
+<td>
+<p>a list containing (in each element) a vector string with the slot names. The name of the list elements are the native file names (e.g.: <em>Qmd_Guido_BDHI.txt</em>). <b>NOTE</b>: when the <code>obj</code> argument is of class <code>hydroMet_compact</code>, <code>slot_list</code> allows to build from multiple objects. So, in this case you have to provide a list of list: the top <code>list</code> contains as <code>names</code> the objects names (as you read them from <em>Global Environment</em>); then every object (top level) contains another <code>list</code> with <code>slot</code> names as <code>names</code> and the column(s) number(s) to extract as numeric value. E.g.: <code>list(bdhi_obj = list(Qmd = 2, Qmm = c(2, 5)), cr2_obj = list(precip = 4) )</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>path</code></td>
+<td>
+<p>string with the files directory. If not provided, the method will use the current working directory. <b>NOTE</b>: this argument is harmless for an object of class <code>hydroMet_compact</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>col_names</code></td>
+<td>
+<p>it just make sense if <code>'obj'</code> argument is of <code>hydroMet_compact</code> class. String vector with the names of the column output. Default value (NULL) will return expressive column names.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>start_date</code></td>
+<td>
+<p>it just make sense if <code>'obj'</code> argument is of <code>hydroMet_compact</code> class. String or POSIXct with the starting date to extract. You can use <code>start_date</code> without <code>end_date</code>. In this case you will subset your data from <code>start_date</code> till the end.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>end_date</code></td>
+<td>
+<p>it just make sense if <code>'obj'</code> argument is of <code>hydroMet_compact</code> class. String or POSIXct with the last date to extract. You can use <code>end_date</code> without <code>start_date</code>. In this case you will subset your data from the beginning till <code>end_date</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>An S4 object of class <code>hydroMet_XXX</code> with the data loaded in each slot.
+</p>
+
+
+<h3>Functions</h3>
+
+
+<ul>
+<li> <p><code>build_hydroMet,hydroMet_BDHI-method</code>: build up method for BDHI class
+</p>
+</li>
+<li> <p><code>build_hydroMet,hydroMet_CR2-method</code>: build up method for CR2 class
+</p>
+</li>
+<li> <p><code>build_hydroMet,hydroMet_DGI-method</code>: build up method for DGI class
+</p>
+</li>
+<li> <p><code>build_hydroMet,hydroMet_IANIGLA-method</code>: build up method for IANIGLA class
+</p>
+</li>
+<li> <p><code>build_hydroMet,hydroMet_compact-method</code>: build up method for <code>compact</code> class
+</p>
+</li>
+</ul>
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Path to file
+dgi_path  &lt;- system.file('extdata', package = "hydroToolkit")
+file_name &lt;- list.files(path = dgi_path, pattern = 'Toscas')
+
+# Read Toscas
+var_nom &lt;- list(slotNames(x = 'hydroMet_DGI')[2:7])
+names(var_nom) &lt;- file_name
+
+# Load Toscas meteo station data
+toscas_dgi &lt;- create_hydroMet(class_name = 'DGI')
+toscas_dgi &lt;- build_hydroMet(obj = toscas_dgi, slot_list = var_nom,
+                 path = dgi_path)
+
+</code></pre>
+
+
+</div>

@@ -1,0 +1,182 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>convert_units</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>convert_units</h2>
+
+<h3>Description</h3>
+
+<p>This function is designed to accept input units, output units, and the 
+molecular weight (MW) of a substance of interest to then use a table lookup
+to return a scaling factor that can be readily applied for the intended
+conversion. It can also take chemical identifiers in the place of a 
+specified molecular weight value to retrieve that value for its own use.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">convert_units(
+  input.units = NULL,
+  output.units = NULL,
+  MW = NULL,
+  vol = NULL,
+  chem.cas = NULL,
+  chem.name = NULL,
+  dtxsid = NULL,
+  parameters = NULL,
+  temp = 25,
+  liquid.density = 1,
+  state = "liquid"
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>input.units</code></td>
+<td>
+<p>Assigned input units of interest</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>output.units</code></td>
+<td>
+<p>Desired output units</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>MW</code></td>
+<td>
+<p>Molecular weight of substance of interest in g/mole</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>vol</code></td>
+<td>
+<p>Volume for the target tissue of interest in liters (L).
+NOTE: Volume should not be in units of per BW, i.e. "kg".</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>chem.cas</code></td>
+<td>
+<p>Either the chemical name, CAS number, or the parameters must
+be specified.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>chem.name</code></td>
+<td>
+<p>Either the chemical name, CAS number, or the parameters
+must be specified.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dtxsid</code></td>
+<td>
+<p>EPA's DSSTox Structure ID 
+(<a href="https://comptox.epa.gov/dashboard">https://comptox.epa.gov/dashboard</a>) the chemical must be identified by
+either CAS, name, or DTXSIDs</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>parameters</code></td>
+<td>
+<p>A set of model parameters, especially a set that
+includes MW (molecular weight) for our conversions</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>temp</code></td>
+<td>
+<p>Temperature for conversions (default = 25 degreees C)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>liquid.density</code></td>
+<td>
+<p>Density of the specified chemical in liquid state,
+numeric value, (default 1.0 g/mL).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>state</code></td>
+<td>
+<p>Chemical state (gas or default liquid).</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>If input or output units not contained in the table are queried,
+it gives a corresponding error message. It gives a warning message about the
+handling of 'ppmv,' as the function is only set up to convert between ppmv 
+and mass-based units (like 
+mg/m<sup>3</sup> or umol/L) 
+in the context of ideal gases.
+</p>
+<p>convert_units is not directly configured to accept and convert units based
+on BW, like mg/kg. For this purpose, see <code>scale_dosing</code>.
+</p>
+<p>The function supports a limited set of most relevant units across
+toxicological models, currently including umol, uM, mg, mg/L, 
+mg/m<sup>3</sup> or umol/L), and
+in the context of gases assumed to be ideal, ppmv. 
+</p>
+<p><em>Andersen and Clewell's Rules of PBPK Modeling:</em>
+</p>
+
+<ol>
+<li>
+<p> Check Your Units
+</p>
+</li>
+<li> <p><strong>Check Your Units</strong>
+</p>
+</li>
+<li>
+<p> Check Mass Balance
+</p>
+</li>
+</ol>
+<h3>Author(s)</h3>
+
+<p>Mark Sfeir, John Wambaugh, and Sarah E. Davidson
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+# MW BPA is 228.29 g/mol
+# 1 mg/L -&gt; 1/228.29*1000 = 4.38 uM
+convert_units("mg/L","uM",chem.cas="80-05-7")
+
+# MW Diclofenac is 296.148 g/mol
+# 1 uM -&gt; 296.148/1000 =  0.296
+convert_units("uM","mg/L",chem.name="diclofenac")
+
+# ppmv only works for gasses:
+try(convert_units("uM","ppmv",chem.name="styrene"))
+convert_units("uM","ppmv",chem.name="styrene",state="gas")
+
+# Compare with https://www3.epa.gov/ceampubl/learn2model/part-two/onsite/ia_unit_conversion.html
+# 1 ug/L Toluene -&gt; 0.263 ppmv
+convert_units("ug/L","ppmv",chem.name="toluene",state="gas")
+# 1 pppmv Toluene, 0.0038 mg/L
+convert_units("ppmv","mg/L",chem.name="toluene",state="gas")
+
+MW_pyrene &lt;- get_physchem_param(param='MW', chem.name='pyrene')
+conversion_factor &lt;- convert_units(input.units='mg/L', output.units ='uM',
+  MW=MW_pyrene)
+
+calc_mc_oral_equiv(15, parameters=p)
+</code></pre>
+
+
+</div>

@@ -1,0 +1,183 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>higgins</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Compute heterogeneity statistics after Higgins</h2>
+
+<h3>Description</h3>
+
+<p>Computes various statistics suggested by Higgins and Thompson for
+quantifying heterogeneity in meta-analysis<script id="MathJax-script" async src="../../mathjaxr/doc/mathjax/es5/tex-chtml-full.js"></script></p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">higgins(Q = NULL, k = NULL, I2 = NULL,
+   pval = NULL, slab = NULL, conflevel = 95)
+## S3 method for class 'higgins'
+print(x, type = "I2", na.print = "", ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>Q</code></td>
+<td>
+<p>Numeric: a vector of heterogeneity \(\chi^2\) from the meta–analyses</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>k</code></td>
+<td>
+<p>Numeric: a vector of number of studies in each meta-analysis</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>I2</code></td>
+<td>
+<p>Numeric: a vector of values of \(I^2\)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pval</code></td>
+<td>
+<p>Numeric: a vector of \(p\) values</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>slab</code></td>
+<td>
+<p>Character: a vector of labels for the meta-analyses</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>conflevel</code></td>
+<td>
+<p>Numeric: a vector of confidence levels</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>An object of class <code>higgins</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>type</code></td>
+<td>
+<p>One of "H", "I2", "both"</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>na.print</code></td>
+<td>
+<p>What to print instead of NA</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Argument(s) to be passed through</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Either <code>Q</code> or <code>pval</code> or
+<code>I2</code> should be provided.
+If <code>I2</code> is provided it may be either
+as a percentage or a proportion.
+If a single value is given for <code>conflevel</code>
+it is used for all the analyses.
+</p>
+<p>Limited error checks for illegal parameters are performed.
+If <code>conflevel</code> is \(&lt;=1\)
+the function proceeds assuming that was meant
+as a value of \(\alpha\).
+If the parameters are supplied as vectors a check
+is made for equal length.
+If they are not then a warning is issued
+but the function tries to return a sensible
+result which should be checked to
+see if it is what was desired.
+</p>
+<p>For reference the formulae used are
+\(Q = H^2 (k - 1)\),
+\(H^2 = \frac{Q}{k - 1}\),
+\(I^2 = \frac{H^2 - 1}{H^2}\),
+\(H^2 = - \frac{1}{I^2 - 1}\).
+</p>
+<p>The print method allows for printing \(H\) or
+\(I^2\) or both of
+these and this is controlled by the parameter
+<code>type</code>.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A list of type <code>higgins</code> containing
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>H</code></td>
+<td>
+<p>A data frame with columns Q, k, H, ll, ul, where ll and ul are the confidence limits</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>I2</code></td>
+<td>
+<p>A data frame with columns Q, k, I2, ll, ul</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>call</code></td>
+<td>
+<p>The call</p>
+</td>
+</tr>
+</table>
+<h3>Note</h3>
+
+<p>\(I^2\) is always printed as a percentage even if
+the input parameter
+was supplied as a proportion.</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Michael Dewey</p>
+
+
+<h3>References</h3>
+
+<p>Higgins JPT, Thompson SG (2002).
+“Quantifying heterogeneity in a meta–analysis.”
+<em>Statistics in Medicine</em>, <b>21</b>, 1539–1558.
+<a href="https://doi.org/10.1002/sim.1186">doi:10.1002/sim.1186</a>.</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># first the examples one by one
+higgins(14.4, 24) # 1    (1, 1.34)      0 (0, 45)
+higgins(14.1, 11) # 1.19 (1, 1.64)     20 (0, 65) probably a typo for 29
+higgins(81.5, 19) # 2.13 (1.71, 2.64)  78 (66, 86)
+higgins(41.5, 7)  # 2.63 (1.90, 3.65)  86 (72, 92)
+higgins(130.3, 3) # 8.07 (6.08, 10.72) 98 (97, 99)
+# now repeat getting from dat.higgins02
+data(dat.higgins02)
+dat &lt;- dat.higgins02
+with(dat, higgins(Q, trials, slab = rownames(dat.higgins02)))
+# supply I2 or pval
+higgins(I2 = dat$I2[3], k = dat$trials[3])
+higgins(pval = dat$pval[3], k = dat$trials[3])
+</code></pre>
+
+
+</div>

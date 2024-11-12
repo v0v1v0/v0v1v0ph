@@ -1,0 +1,100 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>routing</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Estimate Models and Make Predictions</h2>
+
+<h3>Description</h3>
+
+<p>Performs the “routing” procedure, i.e., based on associated events,
+it uses (linear) models to describe translation and retention processes
+between neighboring hydrographs.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">routing(
+  real_AE,
+  initials,
+  relation,
+  formula = y ~ x,
+  model = stats::lm,
+  FKM_MAX = 65,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>real_AE</code></td>
+<td>
+<p>Data frame that contains real AEs of two neighboring hydrographs
+estimated with <code>estimate_AE()</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>initials</code></td>
+<td>
+<p>Data frame that contains initial values for predictions
+(see vignette).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>relation</code></td>
+<td>
+<p>Data frame that contains the relation between upstream and
+downstream hydrograph. Must only contain two rows (one for each hydrograph)
+in order of their location in downstream direction.
+See the appended example data <code>relation.csv</code> or vignette for details on
+the structure. See <code>get_lag()</code> for further information
+about the relation and the lag between the hydrographs.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>formula</code></td>
+<td>
+<p>An object of class <code>stats::formula()</code>
+to fit models.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>model</code></td>
+<td>
+<p>Function which specifies the method used for fitting models
+(default: <code>stats::lm()</code>). The model class must have a
+<code>stats::predict()</code> function.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>FKM_MAX</code></td>
+<td>
+<p>Numeric value that specifies the maximum fkm (see relation
+file) for which predictions seem valid.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Additional arguments to be passed to the function specified in
+argument <code>model</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A nested list containing a grid of scatterplots ('gtable' object) for
+neighboring hydrographs with a regression line for each metric, a data
+frame of results of the model fitting where each row contains the
+corresponding stations and metric, the model type (default: "lm"), formula,
+coefficients, number of observations and <code class="reqn">R^2</code>, and a plot of predicted
+values based on the “initial values”.
+</p>
+
+
+</div>

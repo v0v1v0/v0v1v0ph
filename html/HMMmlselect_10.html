@@ -1,0 +1,107 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>HMMmlselect</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>HMMmlselect</h2>
+
+<h3>Description</h3>
+
+<p>This function computes the marginal likelihood of the HMM model
+with the observed data and various number of states, and choose the one
+with the highest marginal likelihood as the estimated number of states.
+The method in Chen et al. (2017) is used, which we will denote it as
+HMMml2017 afterward.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">HMMmlselect(y, optionalfit = list())
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+<p>The observed data.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>optionalfit</code></td>
+<td>
+<p>Optional variables as a list. Possible options include:</p>
+</td>
+</tr>
+</table>
+<ul>
+<li>
+<p>Kfits: Possible numbers of states. The function will compute the marginal likelihood under each of these numbers, and choose the one with the highest values as the estimated number of states. Default is {2,3,...,6}
+</p>
+</li>
+<li>
+<p>RIS: Logical variable indicating whether to use the reciprocal importance sampling method in HMMml2017. Default is set to be <code>FALSE</code>.
+</p>
+</li>
+<li>
+<p>IS: Logical variable indicating whether to use the importance sampling method in HMMml2017. Default is set to be <code>TRUE</code>.
+</p>
+</li>
+<li>
+<p>RunParallel: Logical variable indicating whether to run using parallelization or not. Default is <code>TRUE</code>.
+</p>
+</li>
+<li>
+<p>boolUseMclust: Logical variable indicating whether to use the <code>Mclust</code> package. Default is set to be <code>FALSE</code>.
+</p>
+</li>
+<li>
+<p>priors: Lists of hyper parameters for the prior. Default is flat prior.
+</p>
+</li>
+<li>
+<p>boolHMM: Compute using marginal likelihood of HMM. Default is <code>TRUE</code>. If it is set to <code>FALSE</code>, then the program will use the marignal likelihood of mixture model instead.
+</p>
+</li>
+</ul>
+<h3>Details</h3>
+
+<p>See Manual.pdf in "inst/extdata" folder.
+</p>
+
+
+<h3>Value</h3>
+
+<p>It returns (1) the estimated number of hidden states using the marginal likelihood method,
+(2) the marginal likelihood values corresponding to 2, 3, ... number of hidden states, and (3)
+the fitted model parameters given the estimated number of hidden states.
+</p>
+
+
+<h3>References</h3>
+
+<p>Yang Chen, Cheng-Der Fuh, Chu-Lan Kao, and Samuel Kou (2019+) "Determine the number of states
+in hidden markov models via marginal likelihood." Submitted.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">library(HMMmlselect)
+
+# simulate a 25 observations HMM
+obs = HMMsim ( n = 25 )$obs
+
+# perform order selection and estimation
+results = HMMmlselect ( y = obs, list(Kfits = c(2,3), boolUseMclust = FALSE) )
+
+# visualize the results, see figure 1
+PlotHMM ( y = obs, results )
+</code></pre>
+
+
+</div>

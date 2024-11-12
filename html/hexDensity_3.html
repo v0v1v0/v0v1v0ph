@@ -1,0 +1,92 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hexContour</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Generate contour for a hexagonal grid.</h2>
+
+<h3>Description</h3>
+
+<p>Algorithm is a modification of the meandering triangles as described in 
+https://blog.bruce-hill.com/meandering-triangles to work with hexagons. See 
+isolines for details about the output.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hexContour(hexDensity, levels)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>hexDensity</code></td>
+<td>
+<p>hexDensity object to be contoured.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>levels</code></td>
+<td>
+<p>Numeric vector for which contour lines should be generated</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>This function is made to follow the same behaviour as
+isolines. A dedicated plotting function is in the work. 
+Meanwhile, see example of how to plot the output with ggplot2's 
+geom_path.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A list of x, y, and ID, for the contour line at each levels. 
+ID indicates the different line segments making up the contour.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">set.seed(133)
+x=rnorm(200)
+y=rnorm(200)
+d = hexDensity(x=x,y=y,bandwidth=0.4)
+cutoff=quantile(d@count,0.9)
+lines = hexContour(d,cutoff)
+
+library(ggplot2)
+library(hexbin)
+#plot against density
+ggplot()+
+  geom_point(
+    aes(x=hcell2xy(d)$x,
+        y=hcell2xy(d)$y,
+        col=d@count)
+ ) +
+  scale_color_viridis_c()+
+  geom_path(
+    aes(
+     x = lines[[1]]$x, y = lines[[1]]$y, group = lines[[1]]$id
+    )
+  )
+
+#plot against data points
+ggplot() +
+  geom_point(
+    aes(x=x,y=y)) +
+  geom_path(
+    aes(
+      x = lines[[1]]$x, y = lines[[1]]$y, group = lines[[1]]$id
+    )
+  )
+</code></pre>
+
+
+</div>

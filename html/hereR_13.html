@@ -1,0 +1,158 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>route</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>HERE Routing API: Calculate Route</h2>
+
+<h3>Description</h3>
+
+<p>Calculates route geometries (<code>LINESTRING</code>) between given pairs of points using the HERE 'Routing' API.
+Routes can be created for various transport modes, as for example 'car' or 'bicycle',
+incorporating current traffic information, if available.
+For routes using the transport mode <code>"car"</code> a vehicle consumption model can be specified,
+to obtain an estimate of the consumption.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">route(
+  origin,
+  destination,
+  datetime = Sys.time(),
+  arrival = FALSE,
+  results = 1,
+  routing_mode = "fast",
+  transport_mode = "car",
+  traffic = TRUE,
+  avoid_area = NULL,
+  avoid_feature = NULL,
+  consumption_model = NULL,
+  vignettes = TRUE,
+  url_only = FALSE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>origin</code></td>
+<td>
+<p><code>sf</code> object, the origin locations of geometry type <code>POINT</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>destination</code></td>
+<td>
+<p><code>sf</code> object, the destination locations of geometry type <code>POINT</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>datetime</code></td>
+<td>
+<p><code>POSIXct</code> object, datetime for the departure (or arrival if <code>arrival = TRUE</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>arrival</code></td>
+<td>
+<p>boolean, calculate routes for arrival at the defined time (<code>default = FALSE</code>)?</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>results</code></td>
+<td>
+<p>numeric, maximum number of suggested routes (Valid range: 1 and 7).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>routing_mode</code></td>
+<td>
+<p>character, set the routing type: <code>"fast"</code> or <code>"short"</code> (<code>default = "fast"</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>transport_mode</code></td>
+<td>
+<p>character, set the transport mode: <code>"car"</code>, <code>"truck"</code>, <code>"pedestrian"</code>, <code>"bicycle"</code>, <code>"scooter"</code>, <code>"taxi"</code>, <code>"bus"</code> or <code>"privateBus"</code> (<code>default = "car"</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>traffic</code></td>
+<td>
+<p>boolean, use real-time traffic or prediction in routing (<code>default = TRUE</code>)? If no traffic is selected, the <code>datetime</code> is set to <code>"any"</code> and the request is processed independently from time.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>avoid_area, </code></td>
+<td>
+<p><code>sf</code> object, area (only bounding box is taken) to avoid in routes (<code>default = NULL</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>avoid_feature</code></td>
+<td>
+<p>character, transport network features to avoid, e.g. <code>"tollRoad"</code> or <code>"ferry"</code> (<code>default = NULL</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>consumption_model</code></td>
+<td>
+<p>character, specify the consumption model of the vehicle (<code>default = NULL</code> an average electric car is set).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>vignettes</code></td>
+<td>
+<p>boolean, include vignettes in the total toll cost of routes (<code>default = TRUE</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>url_only</code></td>
+<td>
+<p>boolean, only return the generated URLs (<code>default = FALSE</code>)?</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>An <code>sf</code> object containing the requested routes.
+</p>
+<p>Tolls are requested for routes with transport mode <code>"car"</code>,
+<code>"truck"</code> <code>"taxi"</code> or <code>"bus"</code>. The currency defaults to the
+current system locale settings. A different currency can be set using
+set_currency and a currency code compliant to ISO 4217.
+</p>
+
+
+<h3>References</h3>
+
+<p><a href="https://developer.here.com/documentation/routing-api/dev_guide/index.html">HERE Routing API: Calculate Route</a>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Provide an API Key for a HERE project
+set_key("&lt;YOUR API KEY&gt;")
+
+# Get all from - to combinations from POIs
+to &lt;- poi[rep(seq_len(nrow(poi)), nrow(poi)), ]
+from &lt;- poi[rep(seq_len(nrow(poi)), each = nrow(poi)), ]
+idx &lt;- apply(to != from, any, MARGIN = 1)
+to &lt;- to[idx, ]
+from &lt;- from[idx, ]
+
+# Routing
+routes &lt;- route(
+  origin = from, destination = to, results = 3,
+  transport_mode = "car", url_only = TRUE
+)
+</code></pre>
+
+
+</div>

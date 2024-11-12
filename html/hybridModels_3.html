@@ -1,0 +1,285 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hybridModel</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Hybrid model simulation.</h2>
+
+<h3>Description</h3>
+
+<p><code>hybridModel</code> function runs hybrid models simulations.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hybridModel(
+  network = stop("undefined 'network'"),
+  var.names = NULL,
+  link.type = "migration",
+  model = "custom",
+  probWeights = NULL,
+  emigrRule = NULL,
+  init.cond = stop("undefined 'initial conditions'"),
+  fill.time = F,
+  model.parms = stop("undefined 'model parmeters'"),
+  prop.func = NULL,
+  state.var = NULL,
+  infl.var = NULL,
+  state.change.matrix = NULL,
+  ssa.method = NULL,
+  nodesCensus = NULL,
+  sim.number = 1,
+  pop.correc = TRUE,
+  num.cores = "max"
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>network</code></td>
+<td>
+<p>a <code>data.frame</code> with variables that describe
+the donor node, the receiver node, the time when each connection between
+donor to the receiver happened and the number of individual or weight of
+these connection.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>var.names</code></td>
+<td>
+<p>a <code>list</code> with variable names of the network:
+the donor node, the receiver node, the time when each connection between
+donor to the receiver happened and the weight of these connection.
+The variables names must be "from", "to", "Time" and "arc", respectively.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>link.type</code></td>
+<td>
+<p>a <code>character</code> describing the link type between 
+nodes. There are two types: 'migration' and 'influence'. In the migration
+link type there are actual migration between nodes. In the influence 
+link type individuals does not migrate, just influences another node.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>model</code></td>
+<td>
+<p>a <code>character</code> describing model's name.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>probWeights</code></td>
+<td>
+<p>a named <code>vector</code> (optional and for migration type
+only) mapping state variables to migration probability weights based on
+state variables. These argument can be used to give weights for sampling
+individuals from node. They need not sum to one, they should be
+non-negative and not zero. For more information on the sampling method
+sample.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>emigrRule</code></td>
+<td>
+<p>a string (optional and for migration type only) stating how
+many individual emigrate based on state variables. It requires that the
+network have weights instead of number of individuals that migrate.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>init.cond</code></td>
+<td>
+<p>a named <code>vector</code> with initial conditions.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fill.time</code></td>
+<td>
+<p>It indicates whether to return all dates or just the dates
+when nodes get connected.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>model.parms</code></td>
+<td>
+<p>a named <code>vector</code> with model's parameters.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>prop.func</code></td>
+<td>
+<p>a character <code>vector</code> with propensity functions
+of a generic node. See references for more details</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>state.var</code></td>
+<td>
+<p>a character <code>vector</code> with the state variables of
+the propensity functions.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>infl.var</code></td>
+<td>
+<p>a named <code>vector</code> mapping state variables to influence
+variables.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>state.change.matrix</code></td>
+<td>
+<p>is a state-change <code>matrix</code>. See references
+for more details</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ssa.method</code></td>
+<td>
+<p>a <code>list</code> with SSA parameters. The default method
+is the direct method. See references for more details</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nodesCensus</code></td>
+<td>
+<p>a <code>data.frame</code> with the first column describing
+nodes' ID, the second column with the number of individuals and the third
+describing the day of the census.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sim.number</code></td>
+<td>
+<p>Number of repetitions.The default value is 1</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pop.correc</code></td>
+<td>
+<p>Whether <code>hybridModel</code> function tries to balance the number
+of individuals or not. The default value is TRUE.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>num.cores</code></td>
+<td>
+<p>number of  threads/cores that the simulation will use. the
+default value is num.cores = 'max', the Algorithm will use all
+threads/cores available.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>Object containing a <code>data.frame</code> (results) with the number
+of individuals through time per node and per state.
+</p>
+
+
+<h3>References</h3>
+
+<p>[1] Pineda-krch, M. (2008). GillespieSSA : Implementing the Stochastic
+Simulation Algorithm in R. Journal of Statistical Software, Volume 25
+Issue 12 &lt;doi:10.1146/annurev.physchem.58.032806.104637&gt;.
+</p>
+<p>[2] Fernando S. Marques, Jose H. H. Grisi-Filho, Marcos Amaku et al.
+hybridModels: An R Package for the Stochastic Simulation of Disease Spreading
+in Dynamic Network. In: Jounal of Statistical Software Volume 94, Issue 6
+&lt;doi:10.18637/jss.v094.i06&gt;.
+</p>
+
+
+<h3>See Also</h3>
+
+<p>GillespieSSA.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Migration model
+# Parameters and initial conditions for an SIS model
+# loading the data set 
+data(networkSample) # help("networkSample"), for more info
+networkSample &lt;- networkSample[which(networkSample$Day &lt; "2012-03-20"),]
+
+var.names &lt;- list(from = 'originID', to = 'destinationID', Time = 'Day',
+                  arc = 'num.animals')
+                  
+prop.func &lt;- c('beta * S * I / (S + I)', 'gamma * I')
+state.var &lt;- c('S', 'I')
+state.change.matrix &lt;- matrix(c(-1,  1,  # S
+                                 1, -1), # I
+                              nrow = 2, ncol = 2, byrow = TRUE)
+                              
+model.parms &lt;- c(beta = 0.1, gamma = 0.01)
+
+init.cond &lt;- rep(100, length(unique(c(networkSample$originID,
+                                      networkSample$destinationID))))
+names(init.cond) &lt;- paste('S', unique(c(networkSample$originID,
+                                        networkSample$destinationID)), sep = '')
+init.cond &lt;- c(init.cond, c(I36811 = 10, I36812 = 10)) # adding infection
+                  
+# running simulations, check the number of cores available (num.cores)
+sim.results &lt;- hybridModel(network = networkSample, var.names = var.names,
+                           model.parms = model.parms, state.var = state.var,
+                           prop.func = prop.func, init.cond = init.cond,
+                           state.change.matrix = state.change.matrix,
+                           sim.number = 2, num.cores = 2)
+
+# default plot layout (plot.types: 'pop.mean', 'subpop', or 'subpop.mean')
+plot(sim.results, plot.type = 'subpop.mean')
+
+# changing plot layout with ggplot2 (example)
+# uncomment the lines below to test new layout exemple
+#library(ggplot2)
+#plot(sim.results, plot.type = 'subpop') + ggtitle('New Layout') + 
+#  theme_bw() + theme(axis.title = element_text(size = 14, face = "italic"))
+
+# Influence model
+# Parameters and initial conditions for an SIS model
+# loading the data set 
+data(networkSample) # help("networkSample"), for more info
+networkSample &lt;- networkSample[which(networkSample$Day &lt; "2012-03-20"),]
+
+var.names &lt;- list(from = 'originID', to = 'destinationID', Time = 'Day',
+                  arc = 'num.animals')
+                  
+prop.func &lt;- c('beta * S * (I + i) / (S + I + s + i)', 'gamma * I')
+state.var &lt;- c('S', 'I')
+infl.var &lt;- c(S = "s", I = "i") # mapping influence
+state.change.matrix &lt;- matrix(c(-1,  1,  # S
+                                 1, -1), # I
+                              nrow = 2, ncol = 2, byrow = TRUE)
+                              
+model.parms &lt;- c(beta = 0.1, gamma = 0.01)
+
+init.cond &lt;- rep(100, length(unique(c(networkSample$originID,
+                                      networkSample$destinationID))))
+names(init.cond) &lt;- paste('S', unique(c(networkSample$originID,
+                                        networkSample$destinationID)), sep = '')
+init.cond &lt;- c(init.cond, c(I36811 = 10, I36812 = 10)) # adding infection
+                  
+# running simulations, check num of cores available (num.cores)
+# Uncomment to run
+# sim.results &lt;- hybridModel(network = networkSample, var.names = var.names,
+#                            model.parms = model.parms, state.var = state.var,
+#                            infl.var = infl.var, prop.func = prop.func,
+#                            init.cond = init.cond,
+#                            state.change.matrix = state.change.matrix,
+#                            sim.number = 2, num.cores = 2)
+
+# default plot layout (plot.types: 'pop.mean', 'subpop', or 'subpop.mean')
+# plot(sim.results, plot.type = 'subpop.mean')
+
+</code></pre>
+
+
+</div>

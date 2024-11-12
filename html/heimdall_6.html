@@ -1,0 +1,85 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>dfr_hddm</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Adapted Hoeffding Drift Detection Method (HDDM) method</h2>
+
+<h3>Description</h3>
+
+<p>is a drift detection method based on the Hoeffding’s inequality. HDDM_A uses the average as estimator.  <a href="doi:10.1109/TKDE.2014.2345382">doi:10.1109/TKDE.2014.2345382</a>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">dfr_hddm(
+  drift_confidence = 0.001,
+  warning_confidence = 0.005,
+  two_side_option = TRUE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>drift_confidence</code></td>
+<td>
+<p>Confidence to the drift</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>warning_confidence</code></td>
+<td>
+<p>Confidence to the warning</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>two_side_option</code></td>
+<td>
+<p>Option to monitor error increments and decrements (two-sided) or only increments (one-sided)</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p><code>dfr_hddm</code> object
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">library(daltoolbox)
+library(heimdall)
+
+# This example uses an error-based drift detector with a synthetic a 
+# model residual where 1 is an error and 0 is a correct prediction.
+
+data(st_drift_examples)
+data &lt;- st_drift_examples$univariate
+data$event &lt;- NULL
+data$prediction &lt;- st_drift_examples$univariate$serie &gt; 4
+
+model &lt;- dfr_hddm()
+
+detection &lt;- NULL
+output &lt;- list(obj=model, drift=FALSE)
+for (i in 1:length(data$prediction)){
+ output &lt;- update_state(output$obj, data$prediction[i])
+ if (output$drift){
+   type &lt;- 'drift'
+   output$obj &lt;- reset_state(output$obj)
+ }else{
+   type &lt;- ''
+ }
+ detection &lt;- rbind(detection, data.frame(idx=i, event=output$drift, type=type))
+}
+
+detection[detection$type == 'drift',]
+</code></pre>
+
+
+</div>

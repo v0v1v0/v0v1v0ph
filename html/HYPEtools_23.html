@@ -1,0 +1,114 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>CompareFiles</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Compare HYPE model files to identify any differences.</h2>
+
+<h3>Description</h3>
+
+<p>Compare HYPE model files to identify any differences, typically used to check that no undesired changes were made when writing a new file.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">CompareFiles(
+  x,
+  y,
+  type = c("AquiferData", "BasinOutput", "BranchData", "CropData", "DamData", "ForcKey",
+    "FloodData", "GeoClass", "GeoData", "Info", "LakeData", "MapOutput", "MgmtData",
+    "Optpar", "Par", "PointSourceData", "Obs", "Simass", "Subass", "TimeOutput", "Xobs"),
+  by = NULL,
+  compare.order = TRUE,
+  threshold = 1e-10,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>Path to a HYPE model file to read, or an existing list/data frame object for a HYPE model file.
+File contents are compared to those of <code>y</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+<p>Path to a HYPE model file to read, or an existing list/data frame object for a HYPE model file.
+File contents are compared to those of <code>x</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>type</code></td>
+<td>
+<p>Character string identifying the type of HYPE model file. Used to determine appropriate read function. One of
+<code>AquiferData</code>, <code>BasinOutput</code>, <code>BranchData</code>, <code>CropData</code>, <code>DamData</code>, <code>ForcKey</code>, <code>FloodData</code>, <code>GeoClass</code>,
+<code>GeoData</code>, <code>Info</code>, <code>LakeData</code>, <code>MapOutput</code>, <code>MgmtData</code>, <code>Optpar</code>, <code>Par</code>, <code>PointSourceData</code>, <code>Obs</code>,
+<code>Simass</code>, <code>Subass</code>, <code>TimeOutput</code>, or <code>Xobs</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>by</code></td>
+<td>
+<p>Character vector, names of columns in <code>x</code> and <code>y</code> to use to join data. See dplyr::full_join.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>compare.order</code></td>
+<td>
+<p>Logical, whether or not the order of the rows should be compared. If <code>TRUE</code>, then <code>x</code> and <code>y</code>
+will also be joined by row number. See dplyr::full_join.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>threshold</code></td>
+<td>
+<p>Numeric, threshold difference for comparison of numeric values. Set to 0 to only accept identical values.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Other arguments passed on to functions to read the files to compare (e.g. <code>ReadGeoData</code>, <code>ReadPar</code>, etc.).</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p><code>CompareFiles</code> compares two HYPE model files and identifies any differences in values. The function reads two model files, compares
+the values in columns with corresponding names, and returns a data frame consisting of rows/columns with any differences. Values that are
+the same in both files are set to <code>NA</code>. If numeric values in two columns aren't exactly the same, then the difference between the values will be taken
+and compare to <code>theshold</code>. If the difference is &lt;= <code>theshold</code>, then the values will be considered the equal and set to <code>NA</code>.
+The function is primarily intended as a check to ensure that no unintended changes were made when writing
+model files using the various HYPEtools write functions. However, it can also be used to e.g. compare files between different model versions.
+</p>
+
+
+<h3>Value</h3>
+
+<p>Returns invisibly a data frame containing rows and columns in which differences exist between <code>x</code> and <code>y</code>. Values that are the same in both
+files are set to <code>NA</code>. If the returned data frame has 0 row, then there were no differences between the files.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Import demo model GeoData file, edit a SUBID
+te1 &lt;- ReadGeoData(filename = system.file("demo_model", "GeoData.txt", package = "HYPEtools"))
+te1$SUBID[1] &lt;- 1
+# Compare with original file
+te2 &lt;- CompareFiles(system.file("demo_model", "GeoData.txt", package = "HYPEtools"), te1, 
+                    type = "GeoData")
+te2
+
+</code></pre>
+
+
+</div>

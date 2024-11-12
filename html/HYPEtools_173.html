@@ -1,0 +1,123 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>WriteObs</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Write 'Pobs.txt', 'Tobs.txt', 'Qobs.txt', and other observation data files</h2>
+
+<h3>Description</h3>
+
+<p>Export forcing data and discharge observation files from R.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">WriteObs(
+  x,
+  filename,
+  dt.format = "%Y-%m-%d",
+  round = NULL,
+  signif = NULL,
+  obsid = NULL,
+  append = FALSE
+)
+
+WritePTQobs(
+  x,
+  filename,
+  dt.format = "%Y-%m-%d",
+  round = NULL,
+  signif = NULL,
+  obsid = NULL,
+  append = FALSE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>The object to be written, a <code>dataframe</code> containing observation date-times in first and observations in SUBIDs or OBSIDs in
+remaining columns. If argument <code>obsid</code> is not provided, <code>x</code> must have an additional attribute <code>obsid</code> containing
+observation IDs/SUBIDs in column order.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>filename</code></td>
+<td>
+<p>Path to and file name of the file to import. Windows users: Note that
+Paths are separated by '/', not '\'.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dt.format</code></td>
+<td>
+<p>Date-time <code>format</code> string as in <code>strptime</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>round, signif</code></td>
+<td>
+<p>Integer, number of decimal places and number of significant digits to export, respectively. See <code>round</code> and <code>signif</code>. Applied in
+sequence (<code>round</code> first and <code>signif</code> second). If <code>NULL</code> (default), the data to export is not touched.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>obsid</code></td>
+<td>
+<p>Integer vector containing observation IDs/SUBIDs in same order as columns in <code>x</code>. To be exported as header
+in the obs file. Must contain the same number of IDs as observation series in <code>x</code>. If <code>NULL</code>, an attribute <code>obsid</code>
+in <code>x</code> is mandatory. An existing <code>obsid</code> argument takes precedence over a <code>obsid</code> attribute.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>append</code></td>
+<td>
+<p>Logical, if <code>TRUE</code>, then table will be joined to the data in existing file and the output will be sorted by DATE (Rows will be added for any missing dates).</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p><code>WriteObs</code> is a convenience wrapper function of <code>fwrite</code> to export a HYPE-compliant observation file.
+Headers are generated from attribute <code>obsid</code> on export (see <code>attr</code> on how to create and access it).
+</p>
+<p>Observation IDs are SUBIDs or IDs connected to SUBIDs with a
+<a href="http://hype.smhi.net//wiki/doku.php?id=start:hype_file_reference:forckey.txt">ForcKey.txt file</a>.
+</p>
+<p>If the first column in <code>x</code> contains dates of class <code>POSIXt</code>, then they will be formatted according to <code>dt.format</code> before writing the output file.
+</p>
+<p>If <code>round</code> is specified, then <code>WriteObs()</code> will use <code>round</code> to round the observation values to a specified number of decimal places.
+Alternatively, <code>signif</code> can be used to round the observation values to a specified number of significant digits using <code>signif</code>.
+Finally, if both <code>round</code> and <code>signif</code> are specified, then the observation values will be first rounded to the number of decimal places specified
+with <code>round</code> and then rounded to the number of significant digits specified with <code>signif</code>.
+</p>
+
+
+<h3>Value</h3>
+
+<p>No return value, called for export to text files.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>ReadObs</code>
+<code>WriteXobs</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">te &lt;- ReadObs(filename = system.file("demo_model", "Tobs.txt", package = "HYPEtools"))
+WriteObs(x = te, filename = tempfile())
+
+</code></pre>
+
+
+</div>

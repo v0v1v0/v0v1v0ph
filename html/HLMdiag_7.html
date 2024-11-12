@@ -1,0 +1,176 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>case_delete.default</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Case Deletion for <code>mer</code>/<code>lmerMod</code> objects</h2>
+
+<h3>Description</h3>
+
+<p>This function is used to iteratively delete groups corresponding to the
+levels of a hierarchical linear model. It uses <code>lmer()</code> to fit
+the models for each deleted case (i.e. uses brute force). To investigate
+numerous levels of the model, the function will need to be called multiple
+times, specifying the group (level) of interest each time.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">## Default S3 method:
+case_delete(model, ...)
+
+## S3 method for class 'mer'
+case_delete(
+  model,
+  level = 1,
+  type = c("both", "fixef", "varcomp"),
+  delete = NULL,
+  ...
+)
+
+## S3 method for class 'lmerMod'
+case_delete(
+  model,
+  level = 1,
+  type = c("both", "fixef", "varcomp"),
+  delete = NULL,
+  ...
+)
+
+## S3 method for class 'lme'
+case_delete(
+  model,
+  level = 1,
+  type = c("both", "fixef", "varcomp"),
+  delete = NULL,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>model</code></td>
+<td>
+<p>the original hierarchical model fit using <code>lmer()</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>do not use</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>level</code></td>
+<td>
+<p>a variable used to define the group for which cases will be
+deleted.  If <code>level = 1</code> (default), then the function will delete
+individual observations.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>type</code></td>
+<td>
+<p>the part of the model for which you are obtaining deletion
+diagnostics: the fixed effects (<code>"fixef"</code>), variance components
+(<code>"varcomp"</code>), or <code>"both"</code> (default).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>delete</code></td>
+<td>
+<p>numeric index of individual cases to be deleted. If the <code>level</code> parameter 
+is specified, <code>delete</code> may also take the form of a character vector consisting of group 
+names as they appear in <code>flist</code>. It is possible to set <code>level</code> and delete individual
+cases from different groups using <code>delete</code>, so numeric indices should be double checked 
+to confirm that they encompass entire groups. If <code>delete = NULL</code> then all cases are iteratively deleted.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>a list with the following components:
+</p>
+
+<dl>
+<dt><code>fixef.original</code></dt>
+<dd>
+<p>the original fixed effects estimates</p>
+</dd>
+<dt><code>ranef.original</code></dt>
+<dd>
+<p>the original predicted random effects</p>
+</dd>
+<dt><code>vcov.original</code></dt>
+<dd>
+<p>the original variance-covariance matrix for the fixed effects</p>
+</dd>
+<dt><code>varcomp.original</code></dt>
+<dd>
+<p>the original estimated variance components</p>
+</dd>
+<dt><code>fixef.delete</code></dt>
+<dd>
+<p>a list of the fixed effects estimated after case deletion</p>
+</dd>
+<dt><code>ranef.delete</code></dt>
+<dd>
+<p>a list of the random effects predicted after case deletion</p>
+</dd>
+<dt><code>vcov.delete</code></dt>
+<dd>
+<p>a list of the variance-covariance matrices for the fixed 
+effects obtained after case deletion</p>
+</dd>
+<dt><code>fitted.delete</code></dt>
+<dd>
+<p>a list of the fitted values obtained after case
+deletion</p>
+</dd>
+<dt><code>varcomp.delete</code></dt>
+<dd>
+<p>a list of the estimated variance components obtained after
+case deletion</p>
+</dd>
+</dl>
+<h3>Author(s)</h3>
+
+<p>Adam Loy <a href="mailto:loyad01@gmail.com">loyad01@gmail.com</a>
+</p>
+
+
+<h3>References</h3>
+
+<p>Christensen, R., Pearson, L.M., and Johnson, W. (1992)
+Case-Deletion Diagnostics for Mixed Models, <em>Technometrics</em>, <b>34</b>, 38
+– 45.
+</p>
+<p>Schabenberger, O. (2004) Mixed Model Influence Diagnostics, in
+<em>Proceedings of the Twenty-Ninth SAS Users Group International
+Conference</em>, SAS Users Group International.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(sleepstudy, package = 'lme4')
+fm &lt;- lme4::lmer(Reaction ~ Days + (Days|Subject), sleepstudy)
+
+# Deleting every Subject
+fmDel &lt;- case_delete(model = fm, level = "Subject", type = "both")
+
+# Deleting only subject 308
+del308 &lt;- case_delete(model = fm, level = "Subject", type = "both", delete = 308)
+
+# Deleting a subset of subjects
+delSubset &lt;- case_delete(model = fm, level = "Subject", type = "both", delete = 308:310)
+
+</code></pre>
+
+
+</div>

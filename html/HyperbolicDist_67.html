@@ -1,0 +1,164 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>safeIntegrate</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Safe Integration of One-Dimensional Functions</h2>
+
+<h3>Description</h3>
+
+<p>Adaptive quadrature of functions of one variable over a finite or
+infinite interval.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">safeIntegrate(f, lower, upper, subdivisions=100,
+              rel.tol = .Machine$double.eps^0.25, abs.tol = rel.tol,
+              stop.on.error = TRUE, keep.xy = FALSE, aux = NULL, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>f</code></td>
+<td>
+<p>An <span style="font-family: Courier New, Courier; color: #666666;"><b>R</b></span> function taking a numeric first argument and returning
+a numeric vector of the same length.  Returning a non-finite element will
+generate an error.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lower, upper</code></td>
+<td>
+<p>The limits of integration.  Can be infinite.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>subdivisions</code></td>
+<td>
+<p>The maximum number of subintervals.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rel.tol</code></td>
+<td>
+<p>Relative accuracy requested.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>abs.tol</code></td>
+<td>
+<p>Absolute accuracy requested.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>stop.on.error</code></td>
+<td>
+<p>Logical. If true (the default) an error stops the
+function.  If false some errors will give a result with a warning in
+the <code>message</code> component.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>keep.xy</code></td>
+<td>
+<p>Unused.  For compatibility with S.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>aux</code></td>
+<td>
+<p>Unused.  For compatibility with S.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Additional arguments to be passed to <code>f</code>.  Remember
+to use argument names <em>not</em> matching those of
+<code>safeIntegrate(.)</code>!</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>This function is just a wrapper around
+<code>integrate</code> to check for equality of
+<code>upper</code> and <code>lower</code>. A check is made using
+<code>all.equal</code>. When numerical equality is
+detected, if <code>lower</code> (and hence <code>upper</code>) is infinite, the
+value of the integral and the absolute error are both set to 0. When
+<code>lower</code> is finite, the value of the integral is set to 0, and the
+absolute error to the average of the function values at <code>upper</code> and
+<code>lower</code> times the difference between <code>upper</code> and <code>lower</code>.
+</p>
+<p>When <code>upper</code> and <code>lower</code> are determined to be different, the
+result is exactly as given by  <code>integrate</code>.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A list of class <code>"integrate"</code> with components:
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>value</code></td>
+<td>
+<p>The final estimate of the integral.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>abs.error</code></td>
+<td>
+<p>Estimate of the modulus of the absolute error.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>subdivisions</code></td>
+<td>
+<p>The number of subintervals produced in the
+subdivision process.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>message</code></td>
+<td>
+<p><code>"OK"</code> or a character string giving the error message.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>call</code></td>
+<td>
+<p>The matched call.</p>
+</td>
+</tr>
+</table>
+<h3>See Also</h3>
+
+<p>The function <code>integrate</code> and
+<code>all.equal</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">integrate(dnorm, -1.96, 1.96)
+safeIntegrate(dnorm, -1.96, 1.96)  # Same as for integrate()
+integrate(dnorm, -Inf, Inf)
+safeIntegrate(dnorm, -Inf, Inf)    # Same as for integrate()
+integrate(dnorm, 1.96, 1.96)       # OK here but can give an error
+safeIntegrate(dnorm, 1.96, 1.96)
+integrate(dnorm, -Inf, -Inf)
+safeIntegrate(dnorm, -Inf, -Inf)   # Avoids nonsense answer
+integrate(dnorm, Inf, Inf)
+safeIntegrate(dnorm, Inf, Inf)     # Avoids nonsense answer
+</code></pre>
+
+
+</div>

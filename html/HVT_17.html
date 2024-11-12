@@ -1,0 +1,157 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>scoreHVT</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Score which cell each point in the test dataset belongs to.</h2>
+
+<h3>Description</h3>
+
+<p>This function scores each data point in the test dataset based on a trained hierarchical Voronoi tessellations model.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">scoreHVT(
+  dataset,
+  hvt.results.model,
+  child.level = 1,
+  mad.threshold = 0.2,
+  line.width = 0.6,
+  color.vec = c("navyblue", "slateblue", "lavender"),
+  normalize = TRUE,
+  distance_metric = "L1_Norm",
+  error_metric = "max",
+  yVar = NULL,
+  analysis.plots = FALSE,
+  names.column = NULL
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>dataset</code></td>
+<td>
+<p>Data frame. A data frame which to be scored. Can have categorical columns if 'analysis.plots' are required.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>hvt.results.model</code></td>
+<td>
+<p>List. A list obtained from the trainHVT function</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>child.level</code></td>
+<td>
+<p>Numeric. A number indicating the depth for which the heat map is to be plotted.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mad.threshold</code></td>
+<td>
+<p>Numeric. A numeric value indicating the permissible Mean Absolute Deviation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>line.width</code></td>
+<td>
+<p>Vector. A vector indicating the line widths of the tessellation boundaries for each layer.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>color.vec</code></td>
+<td>
+<p>Vector. A vector indicating the colors of the tessellation boundaries at each layer.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>normalize</code></td>
+<td>
+<p>Logical. A logical value indicating if the dataset should be normalized. When set to TRUE,
+the data (testing dataset) is standardized by ‘mean’ and ‘sd’ of the training dataset referred from the trainHVT(). 
+When set to FALSE, the data is used as such without any changes.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>distance_metric</code></td>
+<td>
+<p>Character. The distance metric can be L1_Norm(Manhattan) or L2_Norm(Eucledian). L1_Norm is selected by default.
+The distance metric is used to calculate the distance between an n dimensional point and centroid.
+The distance metric can be different from the one used during training.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>error_metric</code></td>
+<td>
+<p>Character. The error metric can be mean or max. max is selected by default. 
+max will return the max of m values and mean will take mean of m values where
+each value is a distance between a point and centroid of the cell.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>yVar</code></td>
+<td>
+<p>Character. A character or a vector representing the name of the dependent variable(s)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>analysis.plots</code></td>
+<td>
+<p>Logical. A logical value indicating that the scored plot should be plotted or not. If TRUE, 
+the identifier column(character column) name should be supplied in 'names.column' argument. The output will
+be a 2D heatmap plotly which gives info on the cell id and the observations of a cell.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>names.column</code></td>
+<td>
+<p>Character. A character or a vector representing the name of the identifier column/character column.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>Dataframe containing scored data, plots and summary
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Shubhra Prakash &lt;shubhra.prakash@mu-sigma.com&gt;, Sangeet Moy Das &lt;sangeet.das@mu-sigma.com&gt;
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>trainHVT</code> <br><code>plotHVT</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data("EuStockMarkets")
+dataset &lt;- data.frame(date = as.numeric(time(EuStockMarkets)),
+                     DAX = EuStockMarkets[, "DAX"],
+                     SMI = EuStockMarkets[, "SMI"],
+                     CAC = EuStockMarkets[, "CAC"],
+                     FTSE = EuStockMarkets[, "FTSE"])
+rownames(EuStockMarkets) &lt;- dataset$date
+# Split in train and test
+train &lt;- EuStockMarkets[1:1302, ]
+test &lt;- EuStockMarkets[1303:1860, ]
+#model training
+hvt.results&lt;- trainHVT(train,n_cells = 60, depth = 1, quant.err = 0.1,
+                      distance_metric = "L1_Norm", error_metric = "max",
+                      normalize = TRUE,quant_method = "kmeans")
+scoring &lt;- scoreHVT(test, hvt.results)
+data_scored &lt;- scoring$scoredPredictedData
+</code></pre>
+
+
+</div>

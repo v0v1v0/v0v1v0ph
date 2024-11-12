@@ -1,0 +1,84 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>HDCATE.inference</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Construct uniform confidence bands</h2>
+
+<h3>Description</h3>
+
+<p>Construct uniform confidence bands
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">HDCATE.inference(
+  HDCATE_model,
+  sig_level = 0.01,
+  n_rep_boot = 1000,
+  verbose = FALSE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>HDCATE_model</code></td>
+<td>
+<p>an object created via HDCATE</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sig_level</code></td>
+<td>
+<p>a (vector of) significant level, such as 0.01, or c(0.01, 0.05, 0.10)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n_rep_boot</code></td>
+<td>
+<p>repeat n times for bootstrap, the default is 1000</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p>whether the verbose message is displayed, the default is <code>FALSE</code></p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>None. The HDCATE confidence bands are constructed.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># get simulation data
+n_obs &lt;- 500  # Num of observations
+n_var &lt;- 100  # Num of observed variables
+n_rel_var &lt;- 4  # Num of relevant variables
+data &lt;- HDCATE.get_sim_data(n_obs, n_var, n_rel_var)
+# conditional expectation model is misspecified
+x_formula &lt;- paste(paste0('X', c(2:n_var)), collapse ='+')
+# propensity score model is misspecified
+# x_formula &lt;- paste(paste0('X', c(1:(n_var-1))), collapse ='+')
+
+# create a new HDCATE model
+model &lt;- HDCATE(data=data, y_name='Y', d_name='D', x_formula=x_formula)
+
+HDCATE.set_condition_var(model, 'X2', min=-1, max=1, step=0.01)
+
+
+HDCATE.fit(model)
+HDCATE.inference(model)
+
+</code></pre>
+
+
+</div>

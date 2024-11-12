@@ -1,0 +1,143 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>pwr.snpblup</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Wrapper function for sample size calculation</h2>
+
+<h3>Description</h3>
+
+<p>Given parameters specified by the experimenter, optimal sample
+size is estimated by repeatedly applying <code>search.best.n.bisection</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">pwr.snpblup(
+  nfathers,
+  nqtl,
+  h2,
+  R,
+  rep = 10,
+  nmax = 5000,
+  weights = 1,
+  typeII = 0.2,
+  alpha = 0.01
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>nfathers</code></td>
+<td>
+<p>number of half-sib families</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nqtl</code></td>
+<td>
+<p>number of QTL assumed</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>h2</code></td>
+<td>
+<p>heritability captured by QTL</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>R</code></td>
+<td>
+<p>(p x p) matrix containing theoretical correlation between SNP pairs</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rep</code></td>
+<td>
+<p>number of repetitions; default value 10</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nmax</code></td>
+<td>
+<p>maximum value for grid search; default value 5000</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>weights</code></td>
+<td>
+<p>vector (LEN p) of SNP-specific weights or scalar if weights
+are equal for all SNPs; default value 1</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>typeII</code></td>
+<td>
+<p>type-II error level; default value 0.2</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alpha</code></td>
+<td>
+<p>type-I error level; default value 0.01</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Sample size depends on parameters specified by the experimenter
+(number of half-sib families, number of QTL, heritability, correlation
+matrix). These values are converted into parameters required for the
+probability density function under the alternative hypothesis (beta_k !=0,
+for k selected QTL positions). As power depends on the selected QTL
+positions, these are sampled at random and power calculations are repeated.
+Afterwards the mean value is a plausible estimate of optimal sample size.
+</p>
+<p>Linear model for SNP-BLUP approach:
+<code>y = X beta + e</code>
+with <code>t(beta) = (beta_1, ldots, beta_p)</code>
+Ridge approach:
+<code>hat{beta} = (Xt X + I lambda)^{-1} Xt y</code>
+</p>
+<p>The identity matrix <code>I</code> can be replaced by a diagonal matrix
+containing SNP-specific weights yielding a generalised ridge approach.
+</p>
+
+
+<h3>Value</h3>
+
+<p>vector of optimal sample size over all repetitions
+</p>
+
+
+<h3>References</h3>
+
+<p>Wittenburg, Bonk, Doschoris, Reyer (2020) Design of Experiments
+for Fine-Mapping Quantitative Trait Loci in Livestock Populations. BMC
+Genetics 21:66. doi: <a href="https://doi.org/10.1186/s12863-020-00871-1">10.1186/s12863-020-00871-1</a>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">  ### input parameters specified by experimenter
+  # number of half-sib families
+  nfathers &lt;- 10
+  # number of assumed QTL
+  nqtl &lt;- 2
+  # QTL heritability
+  h2 &lt;- 0.2
+  ### correlation matrix (should depend on sire haplotypes)
+  R &lt;- AR1(100, rho = 0.1)
+  ### optimal sample size in a multi-marker approach
+  set.seed(11)
+  pwr.snpblup(nfathers, nqtl, h2, R, rep = 1)
+</code></pre>
+
+
+</div>

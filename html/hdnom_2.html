@@ -1,0 +1,104 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>as_nomogram</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Construct nomogram ojects for high-dimensional Cox models</h2>
+
+<h3>Description</h3>
+
+<p>Construct nomograms ojects for high-dimensional Cox models
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">as_nomogram(
+  object,
+  x,
+  time,
+  event,
+  pred.at = NULL,
+  fun.at = NULL,
+  funlabel = NULL
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>object</code></td>
+<td>
+<p>Model object fitted by 'hdnom::fit_*()' functions.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>Matrix of training data used for fitting the model.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>time</code></td>
+<td>
+<p>Survival time. Must be of the same length with
+the number of rows as <code>x</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>event</code></td>
+<td>
+<p>Status indicator, normally 0 = alive, 1 = dead.
+Must be of the same length with the number of rows as <code>x</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pred.at</code></td>
+<td>
+<p>Time point at which to plot nomogram prediction axis.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fun.at</code></td>
+<td>
+<p>Function values to label on axis.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>funlabel</code></td>
+<td>
+<p>Label for <code>fun</code> axis.</p>
+</td>
+</tr>
+</table>
+<h3>Note</h3>
+
+<p>The nomogram visualizes the model under the automatically
+selected "optimal" hyperparameters (e.g. lambda, alpha, gamma).
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(smart)
+x &lt;- as.matrix(smart[, -c(1, 2)])
+time &lt;- smart$TEVENT
+event &lt;- smart$EVENT
+y &lt;- survival::Surv(time, event)
+
+fit &lt;- fit_lasso(x, y, nfolds = 5, rule = "lambda.1se", seed = 11)
+
+nom &lt;- as_nomogram(
+  fit, x, time, event, pred.at = 365 * 2,
+  funlabel = "2-Year Overall Survival Probability"
+)
+
+print(nom)
+plot(nom)
+</code></pre>
+
+
+</div>

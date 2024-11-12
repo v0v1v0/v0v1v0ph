@@ -1,0 +1,168 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>coarseR</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Coarsening spatial resolution for gridded data</h2>
+
+<h3>Description</h3>
+
+<p><code>coarseR</code> is a helper function that helps coarsening spatial
+resolution of the input matrix for the <code>HiClimR</code> function.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">coarseR(x = x, lon = lon, lat = lat, lonStep = 1, latStep = 1, verbose = TRUE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>an (<code>N</code> rows by <code>M</code> columns) matrix of 'double' values:
+<code>N</code> objects (spatial points or stations) to be clustered by <code>M</code>
+observations (temporal points or years). For gridded data, the <code>N</code>
+objects should be created from the original matrix <code>x0</code> using
+<code>as.vector(t(x0))</code>, where <code>x0</code> is an (<code>n</code> rows by
+<code>m</code> columns) matrix, <code>n = length(unique(lon))</code> and
+<code>m = length(unique(lat))</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lon</code></td>
+<td>
+<p>a vector of longitudes with length <code>N</code>. For gridded data,
+the length may have the value (<code>n</code>) provided that <code>n * m = N</code> where
+<code>n = length(unique(lon))</code> and <code>m = length(unique(lat))</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lat</code></td>
+<td>
+<p>a vector of latitudes with length <code>N</code> or <code>m</code>. See <code>lon</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lonStep</code></td>
+<td>
+<p>an integer greater than or equal to <code>1</code> for longitude
+step to coarsen gridded data in the longitudinal direction. If <code>lonStep = 1</code>,
+gridded data will not be coarsened in the longitudinal direction (the default).
+If <code>lonStep = 2</code>, every other grid in longitudinal direction will be retained.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>latStep</code></td>
+<td>
+<p>an integer greater than or equal to <code>1</code> for latitude
+step to coarsen gridded data in the latitudinal direction. If <code>latStep = 1</code>,
+gridded data will not be coarsened in the latitudinal direction (the default).
+If <code>latStep = 2</code>, every other grid in latitudinal direction will be retained.
+<code>lonStep</code> and <code>latStep</code> are independent so that user can optionally
+apply different coarsening level to each dimension.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p>logical to print processing information if <code>verbose = TRUE</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>For high-resolution data, the computational and memory requirements may not be
+met on old machines. This function enables the user to use coarser data in any
+spatial dimension:longitude, latitude, or both. It is available  for testing
+or running <code>HiClimR</code> package on old computers or machines with small memory
+resources. The rows of output matrix (<code>x</code> component) will be also named
+by longitude and latitude coordinates. If <code>lonStep = 1</code> and <code>latStep = 1</code>,
+<code>coarseR</code> function will just rename rows of matrix <code>x</code>.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A list with the following components:
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>lon</code></td>
+<td>
+<p>longitude mesh vector for the coarsened data.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lat</code></td>
+<td>
+<p>latitude mesh vector for the coarsened data.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rownum</code></td>
+<td>
+<p>original row numbers for the coarsened data.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>coarsened data of the input data matrix <code>x</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>Hamada S. Badr &lt;badr@jhu.edu&gt;, Benjamin F. Zaitchik &lt;zaitchik@jhu.edu&gt;,
+and Amin K. Dezfuli &lt;amin.dezfuli@nasa.gov&gt;.
+</p>
+
+
+<h3>References</h3>
+
+<p>Hamada S. Badr, Zaitchik, B. F., and Dezfuli, A. K. (2015):
+A Tool for Hierarchical Climate Regionalization, <em>Earth Science Informatics</em>,
+<b>8</b>(4), 949-958, doi: <a href="https://doi.org/10.1007/s12145-015-0221-7">10.1007/s12145-015-0221-7</a>.
+</p>
+<p>Hamada S. Badr, Zaitchik, B. F., and Dezfuli, A. K. (2014):
+Hierarchical Climate Regionalization,
+<em>Comprehensive R Archive Network (CRAN)</em>,
+<a href="https://cran.r-project.org/package=HiClimR">https://cran.r-project.org/package=HiClimR</a>.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>HiClimR</code>, <code>HiClimR2nc</code>, <code>validClimR</code>,
+<code>geogMask</code>, <code>coarseR</code>, <code>fastCor</code>,
+<code>grid2D</code> and <code>minSigCor</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">require(HiClimR)
+
+## Load test case data
+x &lt;- TestCase$x
+
+## Generate longitude and latitude mesh vectors
+xGrid &lt;- grid2D(lon = unique(TestCase$lon), lat = unique(TestCase$lat))
+lon &lt;- c(xGrid$lon)
+lat &lt;- c(xGrid$lat)
+
+## Coarsening spatial resolution
+xc &lt;- coarseR(x = x, lon = lon, lat = lat, lonStep = 2, latStep = 2)
+lon &lt;- xc$lon
+lat &lt;- xc$lat
+x &lt;- xc$x
+</code></pre>
+
+
+</div>

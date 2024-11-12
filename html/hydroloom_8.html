@@ -1,0 +1,131 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>add_levelpaths</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Add Level Paths</h2>
+
+<h3>Description</h3>
+
+<p>Assigns level paths using the stream-leveling approach of
+NHD and NHDPlus. If arbolate sum is provided in the weight column, this
+will match the behavior of NHDPlus. Any numeric value can be
+included in this column and the largest value will be followed when
+no nameid is available.
+</p>
+<p>x must include id, toid, and conditionally divergence attributes.
+If a "topo_sort" (hydrosequence in nhdplus terms) attribute is included,
+it will be used instead of recreation.
+</p>
+<p>If a future plan is set, it will be used for a preprocess step of the function.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">add_levelpaths(
+  x,
+  name_attribute,
+  weight_attribute,
+  override_factor = NULL,
+  status = FALSE
+)
+
+## S3 method for class 'data.frame'
+add_levelpaths(
+  x,
+  name_attribute,
+  weight_attribute,
+  override_factor = NULL,
+  status = FALSE
+)
+
+## S3 method for class 'hy'
+add_levelpaths(
+  x,
+  name_attribute,
+  weight_attribute,
+  override_factor = NULL,
+  status = FALSE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>data.frame network compatible with hydroloom_names.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>name_attribute</code></td>
+<td>
+<p>character attribute to be used as name identifiers.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>weight_attribute</code></td>
+<td>
+<p>character attribute to be used as weight.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>override_factor</code></td>
+<td>
+<p>numeric multiplier to use to override <code>name_attribute</code>.
+See details.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>status</code></td>
+<td>
+<p>boolean if status updates should be printed.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The levelpath algorithm defines upstream mainstem paths through a network.
+At a given junction with two or more upstream flowpaths, the main path is
+either 1) the path with the same name, 2) the path with any name, 3) or the
+path with the larger weight. If the <code>weight_attribute</code> is <code>override_factor</code>
+times larger on a path, it will be followed regardless of the name_attribute
+indication.
+</p>
+<p>If id and toid are non-dendritic so id:toid is many to one and id is
+non-unique, a divergence attribute must be included such that the dendritic
+network can be extracted after the network is sorted.
+</p>
+
+
+<h3>Value</h3>
+
+<p>data.frame with id, levelpath_outlet_id, topo_sort, and levelpath columns.
+See details for more info.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">g &lt;- sf::read_sf(system.file("extdata/new_hope.gpkg", package = "hydroloom"))
+
+test_flowline &lt;- add_toids(g)
+
+# use NHDPlus attributes directly
+add_levelpaths(test_flowline,
+               name_attribute = "GNIS_ID",
+               weight_attribute = "ArbolateSu")
+
+# use hy attributes where they can be mapped
+add_levelpaths(hy(test_flowline),
+               name_attribute = "GNIS_ID",
+               weight_attribute = "arbolate_sum")
+
+</code></pre>
+
+
+</div>

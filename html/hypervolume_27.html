@@ -1,0 +1,111 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hypervolume_box</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Hypervolume construction via hyperbox kernel density estimation
+</h2>
+
+<h3>Description</h3>
+
+<p>Constructs a hypervolume from a set of observations via thresholding a kernel density estimate of the observations. Assumes an axis-aligned hyperbox kernel.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hypervolume_box(data, name = NULL, verbose = TRUE, samples.per.point =
+                 ceiling((10^(3 + sqrt(ncol(data))))/nrow(data)),
+                 kde.bandwidth = 2*estimate_bandwidth(data),
+                 tree.chunksize = 10000)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+
+<p>A m x n matrix or data frame, where m is the number of observations and n is the dimensionality.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>name</code></td>
+<td>
+
+<p>A string to assign to the hypervolume for later output and plotting. Defaults to the name of the variable if NULL.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+
+<p>Logical value; print diagnostic output if <code>TRUE</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>samples.per.point</code></td>
+<td>
+
+<p>Number of random points to be evaluated per data point in <code>data</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>kde.bandwidth</code></td>
+<td>
+
+<p>A scalar or a n x 1 vector corresponding to the half-width of the box kernel in each dimension. If a scalar input, the single value is used for all dimensions. Several esimation methods are available in <code>estimate_bandwidth</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tree.chunksize</code></td>
+<td>
+
+<p>Number of random points to process per internal step. Larger values may have better performance on machines with large amounts of free memory. Changing this parameter does not change the output of the function; only how this output is internally assembled.
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Constructs a kernel density estimate by overlaying hyperbox kernels on each datapoint, then sampling uniformly random points from each kernel. Kernel density at each point is then determined by a range query on a recursive partitioning tree and used to resample these random points to a uniform density and fixed number, from which a volume can be inferred.
+</p>
+<p>Note that when comparing among hypervolumes constructed with fixed bandwidth, volume will be approximately a an approximately linear function of the number of input data points.
+</p>
+<p>Note that this function returns an unthresholded hypervolume. To assign a quantile threshold, use <code>hypervolume_threshold</code>.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A <code>Hypervolume-class</code> object corresponding to the inferred hypervolume.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>hypervolume_threshold</code>, <code>estimate_bandwidth</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(penguins,package='palmerpenguins')
+penguins_no_na = as.data.frame(na.omit(penguins))
+penguins_adelie = penguins_no_na[penguins_no_na$species=="Adelie",
+                    c("bill_length_mm","bill_depth_mm","flipper_length_mm")]
+hv = hypervolume_box(penguins_adelie,name='Adelie')
+summary(hv)
+</code></pre>
+
+
+</div>

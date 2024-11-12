@@ -1,0 +1,171 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>ResizeEtc</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Display multiple independent trellis objects on the same
+coordinated scale.</h2>
+
+<h3>Description</h3>
+
+<p>This function is a wrapper for several of the functions in the
+<code>latticeExtra</code> package.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">ResizeEtc(c.list,
+           condlevelsName,
+           x.same, y.same,
+           layout,
+           strip=TRUE,
+           strip.left=TRUE,
+           strip.values, strip.left.values,
+           strip.par, strip.left.par,  ## only the second is effective
+                                       ## when both are specified
+           resize.height, resize.width,
+           main,
+           ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>c.list</code></td>
+<td>
+<p>combination of two or more trellis objects
+from <code>c.trellis</code>.  If <code>c.list</code> has
+names, the names will appear in the strips.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>condlevelsName</code></td>
+<td>
+<p>Name of the dimname of the items in the <code>c.list</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x.same, y.same</code></td>
+<td>
+<p>If <code>TRUE</code>, force all panels to have the same
+<code>x.limits</code> or <code>y.limits</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>layout</code></td>
+<td>
+<p>Standard lattice <code>layout</code> argument.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>strip, strip.left</code></td>
+<td>
+<p>standard lattice arguments described in <code>barchart.</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>strip.values, strip.left.values</code></td>
+<td>
+<p>strip names for the panels.
+Only the second is effective when both are specified.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>strip.par, strip.left.par</code></td>
+<td>
+<p><code>par.strip.text</code>.
+Only the second is effective when both are specified.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>resize.height, resize.width</code></td>
+<td>
+<p><code>h</code> and <code>w</code> arguments to
+<code>resizePanels</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>main</code></td>
+<td>
+<p>Main title for resulting combined plot.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Other arguments to <code>barchart.</code></p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p><code>"trellis"</code> object combining each of the individual plots in the
+<code>c.list</code> argument according to the specifications in the other arguments.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p> Richard M. Heiberger &lt;rmh@temple.edu&gt; </p>
+
+
+<h3>See Also</h3>
+
+<p><code>c.trellis</code>, <code>plot.likert</code></p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## see the examples in ?HH:::plot.likert
+
+require(grid)
+require(lattice)
+require(latticeExtra)
+require(HH)
+
+## This is the same example as in ?HH:::plot.likert
+## Here, it is done with explicit use of ResizeEtc.
+
+data(ProfChal)
+tmp &lt;- data.matrix(ProfChal[,1:5])
+rownames(tmp) &lt;- ProfChal$Question
+
+AA &lt;- likert(tmp[1,], box.width=unit(.4,"cm"), positive.order=TRUE)
+BB &lt;- likert(tmp[2:6,], box.width=unit(.4,"cm"), positive.order=TRUE)
+CC &lt;- likert(tmp[7:10,], box.width=unit(.4,"cm"), positive.order=TRUE)
+DD &lt;- likert(tmp[11:12,], box.width=unit(.4,"cm"), positive.order=TRUE)
+EE &lt;- likert(tmp[13:14,], box.width=unit(.4,"cm"), positive.order=TRUE)
+FF &lt;- likert(tmp[15:16,], box.width=unit(.4,"cm"), positive.order=TRUE)
+
+BB
+
+## print(AA, more=TRUE,  split=c(1,1,3,2))
+## print(BB, more=TRUE,  split=c(2,1,3,2))
+## print(CC, more=TRUE,  split=c(3,1,3,2))
+## print(DD, more=TRUE,  split=c(1,2,3,2))
+## print(EE, more=TRUE,  split=c(2,2,3,2))
+## print(FF, more=FALSE, split=c(3,2,3,2))
+
+ResizeEtc(c.list=c(AA,BB,CC,DD,EE,FF),
+          layout=c(1,6), main="Not yet good enough")
+
+Group &lt;- levels(ProfChal$Subtable)
+
+ResizeEtc(c.list=c(AA,BB,CC,DD,EE,FF),
+          condlevelsName='Group',
+          x.same=TRUE,
+          layout=c(1,6),
+          strip.left.values=Group,
+          strip.left.par=list(cex=.7, lines=5),
+          resize.height=c(1,5,4,2,2,2)+.5,
+          main=list("Is your job professionally challenging?", x=unit(.65, "npc")))
+
+
+</code></pre>
+
+
+</div>

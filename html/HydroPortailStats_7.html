@@ -1,0 +1,195 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>GetEstimate_HBay</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Bayesian estimation using historical data</h2>
+
+<h3>Description</h3>
+
+<p>Bayesian estimation of a GEV or Gumbel distribution based on a mixed sample containing 
+point (i.e. perfectly known) or interval (i.e. known to be within bounds) data.
+Systematic errors induced by rating curve errors can also be accounted for. 
+Returns MCMC samples from the posterior distribution.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">GetEstimate_HBay(
+  y,
+  dist,
+  prior,
+  SystErrorIndex = rep(0, NROW(y)),
+  SystErrorPrior = list(),
+  par0 = GetEstimate_ROUGH(0.5 * (y[, 1] + y[, 2])[is.finite(y[, 1] + y[, 2])], dist)$par,
+  SystError0 = rep(1, length(SystErrorPrior)),
+  mult = 0.1,
+  eps = 0.1,
+  batch.length = 100,
+  batch.n = 100,
+  moverate.min = 0.1,
+  moverate.max = 0.5,
+  mult.down = 0.9,
+  mult.up = 1.1
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+<p>numeric 2-column matrix, data. 
+The first column gives the lower bound, the second column gives the upper bound.
+Where y[i,1]==y[i,2], the value is assumed perfectly known (up to systematic errors, see below).
+Where y[i,1]&lt;y[i,2], the value is assumed to be in the interval [y[i,1];y[i,2]]
+-Inf and +Inf are allowed for data being only right- or left-censored 
+(i.e. values known to be smaller than or larger than some threshold).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dist</code></td>
+<td>
+<p>character, distribution name. Only distributions 'GEV' and 'Gumbel' are supported.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>prior</code></td>
+<td>
+<p>list of lists, prior distributions. For each parameter to be estimated, the prior
+is a list of the form pr=list(dist=..., par=...). See example below.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>SystErrorIndex</code></td>
+<td>
+<p>integer vector, length NROW(y). Index of systematic errors.
+Rows where SystErrorIndex==k are all affected by the same multiplicative error gamma_k, 
+typically induced by the kth rating curve. SystErrorIndex==0 means no systematic error.
+Should only contain integer values between 0 and N_{systematic errors}.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>SystErrorPrior</code></td>
+<td>
+<p>list of lists,  prior distribution for each systematic error.
+For instance for a systematic error in the range +/- 20%, you may use a Uniform
+between 0.8 and 1.2, or a triangular distribution with the same bounds and peak at 1.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>par0</code></td>
+<td>
+<p>numeric vector, initial parameter guess.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>SystError0</code></td>
+<td>
+<p>numeric vector, initial guess for systematic errors. Typically a vector of 1.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mult</code></td>
+<td>
+<p>numeric, initial jump standard deviations are set to mult * abs(par0)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>eps</code></td>
+<td>
+<p>numeric, where par0 is zero, initial jump standard deviations are set to eps (to avoid jumps of size zero)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>batch.length</code></td>
+<td>
+<p>integer, MCMC parameter: length of each non-adaptive batch</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>batch.n</code></td>
+<td>
+<p>integer, MCMC parameter: number of batches (= adaptation period). Total number of simulations is nsim=batch.n*batch.length</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>moverate.min</code></td>
+<td>
+<p>numeric in (0;1), MCMC parameter: lower bound for the desired move rate interval</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>moverate.max</code></td>
+<td>
+<p>numeric in (0;1), MCMC parameter: upper bound for the desired move rate interval</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mult.down</code></td>
+<td>
+<p>numeric in (0;1), MCMC parameter: multiplication factor used to decrease jump size when move rate is too low.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mult.up</code></td>
+<td>
+<p>numeric (&gt;1, avoid 1/mult.down), MCMC parameter: multiplication factor used to increase jump size when move rate is too high.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A list with the following components:
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>numeric matrix nsim * (length(par0)+length(SystError0)), MCMC simulations</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fx</code></td>
+<td>
+<p>numeric vector, corresponding values f(x)</p>
+</td>
+</tr>
+</table>
+<h3>Examples</h3>
+
+<pre><code class="language-R">set.seed(98765)
+n=50;n_censored=30
+y0=Generate('GEV',c(100,50,-0.2),n)
+y=cbind(y0,y0)
+# Mimics censoring between 0 and 300 for first n_censored years
+y[1:n_censored,1][y0[1:n_censored]&lt;300]=0
+y[1:n_censored,2][y0[1:n_censored]&lt;300]=300
+plot(y[,1]);points(y[,2])
+# Systematic errors
+SystErrorIndex=c(rep(1,n_censored),rep(2,n-n_censored))
+SystErrorPrior=list(list(dist="Triangle",par=c(1,0.7,1.3)),
+                    list(dist="Triangle",par=c(1,0.95,1.05)))
+# Priors on GEV parameters
+prior=list(list(dist="FlatPrior",par=NULL),
+           list(dist="FlatPrior",par=NULL),
+           list(dist="Normal",par=c(0,0.25)))
+# Go!
+mcmc=GetEstimate_HBay(y=y,dist='GEV',prior=prior,
+                      SystErrorIndex=SystErrorIndex,
+                      SystErrorPrior=SystErrorPrior,
+                      # The values below aim at making this example fast to run.
+                      # In practice, it is recommended to use the default values
+                      # (batch.length=100,batch.n=100) or larger.
+                      batch.length=25,batch.n=20) 
+graphicalpar=par(mfrow=c(2,3))
+for(i in 1:5){hist(mcmc$x[,i])}
+par(graphicalpar)
+</code></pre>
+
+
+</div>

@@ -1,0 +1,91 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>select_grep</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Select names matching a pattern</h2>
+
+<h3>Description</h3>
+
+<p>Select names matching a pattern
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">select_grep(
+  DT,
+  patterns,
+  .and = NULL,
+  .but.not = NULL,
+  ignore.case = FALSE,
+  perl = TRUE,
+  fixed = FALSE,
+  useBytes = FALSE,
+  invert = FALSE,
+  .warn.fixed.mismatch = TRUE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>DT</code></td>
+<td>
+<p>A <code>data.frame</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>patterns</code></td>
+<td>
+<p>Regular expressions to be matched against the names of <code>DT</code>. If <code>length(patterns) &gt; 1</code> the patterns are concatenated using alternation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.and</code></td>
+<td>
+<p>Character or integer positions of names to select, regardless of whether or not they are matched by <code>patterns</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.but.not</code></td>
+<td>
+<p>Character or integer positions of names to drop, regardless of whether or not they are matched by <code>patterns</code> or whether they are explicitly added by <code>.and</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ignore.case, perl, fixed, useBytes, invert</code></td>
+<td>
+<p>Arguments passed to <code>grep</code>. Note that <code>perl = TRUE</code> by default (unlike <code>grep</code>) unless <code>fixed = TRUE</code> (and <code>perl</code> is missing).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.warn.fixed.mismatch</code></td>
+<td>
+<p>(logical, default: <code>TRUE</code>) If <code>TRUE</code>, the default, selecting <code>fixed = TRUE</code> with <code>perl = TRUE</code> or <code>ignore.case = TRUE</code> results in <code>perl</code> and <code>ignore.case</code> being reset to <code>FALSE</code> with a warning (as in <code>grep</code>), even if it makes no difference to the columns eventually selected. If <code>FALSE</code> unambiguous results are allowed; if <code>ignore.case = TRUE</code> and <code>fixed = TRUE</code>, the result is <strong>unambiguous</strong> if <code>select_grep(DT, tolower(patterns), fixed = TRUE)</code> and <code>select_grep(DT, toupper(patterns), fixed = TRUE)</code> are identical.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p><code>DT</code> with the selected names.
+</p>
+<p>integer vector of positions
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">library(data.table)
+dt &lt;- data.table(x1 = 1, x2 = 2, y = 0)
+select_grep(dt, "x")
+select_grep(dt, "x", .and = "y")
+select_grep(dt, "x", .and = "y", .but.not = "x2")
+
+</code></pre>
+
+
+</div>

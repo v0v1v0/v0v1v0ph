@@ -1,0 +1,113 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hai_umap_list</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>UMAP Projection</h2>
+
+<h3>Description</h3>
+
+<p>Create a umap object from the <code>uwot::umap()</code> function.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hai_umap_list(.data, .kmeans_map_tbl, .k_cluster = 5)
+
+umap_list(.data, .kmeans_map_tbl, .k_cluster = 5)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>.data</code></td>
+<td>
+<p>The data from the <code>hai_kmeans_user_item_tbl()</code> function.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.kmeans_map_tbl</code></td>
+<td>
+<p>The data from the <code>hai_kmeans_mapped_tbl()</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.k_cluster</code></td>
+<td>
+<p>Pick the desired amount of clusters from your analysis of
+the scree plot.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>This takes in the user item table/matix that is produced by
+<code>hai_kmeans_user_item_tbl()</code> function. This function uses the defaults of
+<code>uwot::umap()</code>.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A list of tibbles and the umap object
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Steven P. Sanderson II, MPH
+</p>
+
+
+<h3>See Also</h3>
+
+
+<ul>
+<li> <p><a href="https://cran.r-project.org/package=uwot">https://cran.r-project.org/package=uwot</a> (CRAN)
+</p>
+</li>
+<li> <p><a href="https://github.com/jlmelville/uwot">https://github.com/jlmelville/uwot</a> (GitHub)
+</p>
+</li>
+<li> <p><a href="https://github.com/jlmelville/uwot">https://github.com/jlmelville/uwot</a> (arXiv paper)
+</p>
+</li>
+</ul>
+<p>Other UMAP: 
+<code>hai_umap_plot()</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">library(healthyR.data)
+library(dplyr)
+library(broom)
+
+data_tbl &lt;- healthyR_data %&gt;%
+  filter(ip_op_flag == "I") %&gt;%
+  filter(payer_grouping != "Medicare B") %&gt;%
+  filter(payer_grouping != "?") %&gt;%
+  select(service_line, payer_grouping) %&gt;%
+  mutate(record = 1) %&gt;%
+  as_tibble()
+
+uit_tbl &lt;- hai_kmeans_user_item_tbl(
+  .data = data_tbl,
+  .row_input = service_line,
+  .col_input = payer_grouping,
+  .record_input = record
+)
+
+kmm_tbl &lt;- hai_kmeans_mapped_tbl(uit_tbl)
+
+umap_list(.data = uit_tbl, kmm_tbl, 3)
+
+</code></pre>
+
+
+</div>

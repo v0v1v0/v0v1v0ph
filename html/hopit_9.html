@@ -1,0 +1,227 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>getLevels</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Summarize the adjusted and the original self-rated response levels</h2>
+
+<h3>Description</h3>
+
+<p>Summarize the adjusted and the original self-rated response levels.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">getLevels(
+  model,
+  formula = model$thresh.formula,
+  data = model$frame,
+  sep = "_",
+  decreasing.levels = model$decreasing.levels,
+  sort.flag = FALSE,
+  weight.original = TRUE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>model</code></td>
+<td>
+<p>a fitted <code>hopit</code> model.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>formula</code></td>
+<td>
+<p>a formula containing the grouping variables. It is by default set to threshold formula.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>data used to fit the model.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sep</code></td>
+<td>
+<p>a separator for the level names.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>decreasing.levels</code></td>
+<td>
+<p>a logical indicating whether self-reported health classes are ordered in increasing order.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sort.flag</code></td>
+<td>
+<p>a logical indicating whether to sort the levels.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>weight.original</code></td>
+<td>
+<p>a logical indicating if use survey weights for calcualtion of original responses.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>a list with the following components:
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>original</code></td>
+<td>
+<p> frequencies of original response levels for selected groups/categories.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>adjusted</code></td>
+<td>
+<p> frequencies of adjusted response levels (Jurges 2007 method) for selected groups/categories.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>N.original</code></td>
+<td>
+<p> the number of original response levels for selected groups/categories.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>N.adjusted</code></td>
+<td>
+<p> the number of adjusted response levels (Jurges 2007 method) for selected groups/categories.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>categories</code></td>
+<td>
+<p> selected groups/categories used in summary.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tab</code></td>
+<td>
+<p> an original vs. an adjusted contingency table.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mat</code></td>
+<td>
+<p> a matrix with columns: grouping variables, original response levels, adjusted response levels.
+Each row corresponds to a single individual from the data used to fit the model.</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>Maciej J. Danko
+</p>
+
+
+<h3>References</h3>
+
+<p>Jurges H (2007).
+“True health vs response styles: exploring cross-country differences in self-reported health.”
+<em>Health Economics</em>, <b>16</b>(2), 163-178.
+<a href="https://doi.org/10.1002/hec.1134">doi:10.1002/hec.1134</a>.<br><br>
+Oksuzyan A, Danko MJ, Caputo J, Jasilionis D, Shkolnikov VM (2019).
+“Is the story about sensitive women and stoical men true? Gender differences in health after adjustment for reporting behavior.”
+<em>Social Science &amp; Medicine</em>, <b>228</b>, 41-50.
+<a href="https://doi.org/10.1016/j.socscimed.2019.03.002">doi:10.1016/j.socscimed.2019.03.002</a>.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>getCutPoints</code>, <code>latentIndex</code>, <code>standardiseCoef</code>, <code>hopit</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># DATA
+data(healthsurvey)
+
+# the order of response levels decreases from the best health to
+# the worst health; hence the hopit() parameter decreasing.levels
+# is set to TRUE
+levels(healthsurvey$health)
+
+# fit a model
+model1 &lt;- hopit(latent.formula = health ~ hypertension + high_cholesterol +
+                heart_attack_or_stroke + poor_mobility + very_poor_grip +
+                depression + respiratory_problems +
+                IADL_problems + obese + diabetes + other_diseases,
+              thresh.formula = ~ sex + ageclass + country,
+              decreasing.levels = TRUE,
+              control = list(trace = FALSE),
+              data = healthsurvey)
+
+# Example 1 ---------------------
+
+# calculate a summary by country
+hl &lt;- getLevels(model=model1, formula=~ country, sep=' ')
+plot(hl, las=1, mar = c(3,2,1.5,0.5))
+
+# differences between frequencies of original and adjusted health levels
+round(100*(hl$original - hl$adjusted),2)
+
+# extract good and bad health levels (combined levels)
+Org &lt;- cbind(bad = rowSums(hl$original[,1:2]),
+             good = rowSums(hl$original[,4:5]))
+Adj &lt;- cbind(bad = rowSums(hl$adjusted[,1:2]),
+             good = rowSums(hl$adjusted[,4:5]))
+round(100*(Org - Adj),2)
+
+# plot the differences
+barplot(t(Org - Adj), beside = TRUE, density = 20, angle = c(-45, 45),
+        col = c('pink4', 'green2'),
+        ylab = 'Original - adjusted reported health frequencies')
+abline(h = 0); box()
+legend('top', c('Bad health','Good health'),
+       density = 20, angle = c(-45, 45),
+       fill = c('pink4', 'green2'), bty = 'n', cex = 1.2)
+
+# in country X, bad health seems to be over-reported while good health
+# is under-reported; in country Z, good health is highly over-reported.
+
+# Example 2 ---------------------
+
+# summary by gender and age
+hl &lt;- getLevels(model = model1, formula=~ sex + ageclass, sep=' ')
+plot(hl)
+
+# differences between frequencies of original and adjusted health levels
+round(100*(hl$original - hl$adjusted),2)
+
+# extract good health levels (combined "Very good" and "Excellent" levels)
+Org &lt;- rowSums(hl$original[,4:5])
+Adj &lt;- rowSums(hl$adjusted[,4:5])
+round(100*(Org - Adj),2)
+
+pmar &lt;- par('mar'); par(mar = c(9.5, pmar[2:4]))
+barplot(Org-Adj,
+        ylab = 'Original - adjusted reported good health frequencies',
+        las = 3,
+        density = 20, angle = c(45, -45), col = c('blue', 'orange'))
+abline(h = 0); box(); par(mar = pmar)
+legend('top', c('Man','Woman'), density = 20, angle = c(-45, 45),
+       fill = c('blue', 'orange'), bty = 'n', cex = 1.2)
+
+# results show that women in general tend to over-report good health,
+# while men aged 50-59 greatly under-report good health.
+
+# more examples can be found in the description of the boot_hopit() function.
+</code></pre>
+
+
+</div>

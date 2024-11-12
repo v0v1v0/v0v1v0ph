@@ -1,0 +1,97 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>cut_period</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Cut the time period in one row into multiple rows by interval</h2>
+
+<h3>Description</h3>
+
+<p>This function is for cutting time periods into segments, which could be useful for subsequent overlap joins. Each original period (per row) will be expanded to multiple rows by weeks, months, etc. Only data.frame input is accepted as the output size is greater than the input. Thus, remote tables should be collected before running this function for optimal performance.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">cut_period(
+  data,
+  start,
+  end,
+  len,
+  unit = c("day", "week", "month", "quarter", "year"),
+  .dt_trans = NULL
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>Input data.frame that each row has start and end dates</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>start</code></td>
+<td>
+<p>Record start date column (unquoted)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>end</code></td>
+<td>
+<p>Record end date column (unquoted)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>len</code></td>
+<td>
+<p>An integer, the interval that would be used to divide the record duration</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>unit</code></td>
+<td>
+<p>One of "day" (default), "week", "month", "quarter, or "year" used in combination of <code>len</code> to specify the time length of the interval.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.dt_trans</code></td>
+<td>
+<p>Function to transform start/end, such as <code>lubridate::ymd()</code>. Default is NULL.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>Data frame that each row is now a segment of the period defined by <code>c(start, end)</code> in the original row. Original variables are retained and repeated for each segment plus new variables defining the segment interval.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># toy data
+df &lt;- data.frame(sample_id = 1, period_id = 1, start_date = "2015-01-01", end_date = "2019-12-31")
+
+# divide period into segments (multiple rows per period)
+df_seg &lt;- cut_period(
+  data = df, start = start_date, end = end_date,
+  len = 1,
+  unit = "year",
+  .dt_trans = lubridate::ymd
+)
+
+# categorize segment_id as factor
+df_seg$segment &lt;- cut(df_seg$segment_id,
+  breaks = c(0, 1, 2, Inf),
+  labels = c("&lt; 1 year", "1 - 2 years", "Remainder")
+)
+
+head(df_seg)
+</code></pre>
+
+
+</div>

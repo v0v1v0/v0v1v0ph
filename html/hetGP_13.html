@@ -1,0 +1,131 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>crit_IMSPE</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Sequential IMSPE criterion</h2>
+
+<h3>Description</h3>
+
+<p>Compute the integrated mean square prediction error after adding a new design
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">crit_IMSPE(x, model, id = NULL, Wijs = NULL)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>matrix for the new design (size 1 x d)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>model</code></td>
+<td>
+<p><code>homGP</code> or <code>hetGP</code> model, including inverse matrices</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>id</code></td>
+<td>
+<p>instead of providing <code>x</code>, one can provide the index of a considered existing design</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Wijs</code></td>
+<td>
+<p>optional previously computed matrix of Wijs, to avoid recomputing it; see <code>Wij</code></p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The computations are scale free, i.e., values are not multiplied by <code>nu_hat</code> from <code>homGP</code> or <code>hetGP</code>.
+Currently this function ignores the extra terms related to the estimation of the mean.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>deriv_crit_IMSPE</code> for the derivative
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## One-d toy example
+
+set.seed(42)
+ftest &lt;- function(x, coef = 0.1) return(sin(2*pi*x) + rnorm(1, sd = coef))
+
+n &lt;- 9
+designs &lt;- matrix(seq(0.1, 0.9, length.out = n), ncol = 1)
+X &lt;- matrix(designs[rep(1:n, sample(1:10, n, replace = TRUE)),])
+Z &lt;- apply(X, 1, ftest)
+
+prdata &lt;- find_reps(X, Z, inputBounds = matrix(c(0,1), nrow = 2, ncol = 1))
+Z &lt;- prdata$Z
+plot(prdata$X0[rep(1:n, times = prdata$mult),], prdata$Z, xlab = "x", ylab = "Y")
+
+model &lt;- mleHetGP(X = list(X0 = prdata$X0, Z0 = prdata$Z0, mult = prdata$mult),
+                  Z = Z, lower = 0.1, upper = 5)
+
+ngrid &lt;- 501
+xgrid &lt;- matrix(seq(0,1, length.out = ngrid), ncol = 1)
+
+## Precalculations
+Wijs &lt;- Wij(mu1 = model$X0, theta = model$theta, type = model$covtype)
+
+
+t0 &lt;- Sys.time()
+
+IMSPE_grid &lt;- apply(xgrid, 1, crit_IMSPE, Wijs = Wijs, model = model)
+
+t1 &lt;- Sys.time()
+print(t1 - t0)
+
+plot(xgrid, IMSPE_grid * model$nu_hat, xlab = "x", ylab = "crit_IMSPE values")
+abline(v = designs)
+
+###############################################################################
+## Bi-variate case
+
+nvar &lt;- 2 
+
+set.seed(2)
+ftest &lt;- function(x, coef = 0.1) return(sin(2*pi*sum(x)) + rnorm(1, sd = coef))
+
+n &lt;- 16 # must be a square
+xgrid0 &lt;- seq(0.1, 0.9, length.out = sqrt(n))
+designs &lt;- as.matrix(expand.grid(xgrid0, xgrid0))
+X &lt;- designs[rep(1:n, sample(1:10, n, replace = TRUE)),]
+Z &lt;- apply(X, 1, ftest)
+
+prdata &lt;- find_reps(X, Z, inputBounds = matrix(c(0,1), nrow = 2, ncol = 1))
+Z &lt;- prdata$Z
+
+model &lt;- mleHetGP(X = list(X0 = prdata$X0, Z0 = prdata$Z0, mult = prdata$mult), Z = Z, 
+ lower = rep(0.1, nvar), upper = rep(1, nvar))
+ngrid &lt;- 51
+xgrid &lt;- seq(0,1, length.out = ngrid)
+Xgrid &lt;- as.matrix(expand.grid(xgrid, xgrid))
+## Precalculations
+Wijs &lt;- Wij(mu1 = model$X0, theta = model$theta, type = model$covtype)
+t0 &lt;- Sys.time()
+
+IMSPE_grid &lt;- apply(Xgrid, 1, crit_IMSPE, Wijs = Wijs, model = model)
+filled.contour(x = xgrid, y = xgrid, matrix(IMSPE_grid, ngrid),
+               nlevels = 20, color.palette = terrain.colors,
+               main = "Sequential IMSPE values")
+</code></pre>
+
+
+</div>

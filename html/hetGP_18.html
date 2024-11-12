@@ -1,0 +1,111 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>crit_qEI</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Parallel Expected improvement</h2>
+
+<h3>Description</h3>
+
+<p>Fast approximated batch-Expected Improvement criterion (for minimization)
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">crit_qEI(x, model, cst = NULL, preds = NULL)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>matrix of new designs representing the batch of q points,
+one point per row (size q x d)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>model</code></td>
+<td>
+<p><code>homGP</code> or <code>hetGP</code> model, including inverse matrices.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cst</code></td>
+<td>
+<p>optional plugin value used in the EI, see details</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>preds</code></td>
+<td>
+<p>optional predictions at <code>x</code> to avoid recomputing if already done (must include the predictive covariance, i.e., the <code>cov</code> slot)</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p><code>cst</code> is classically the observed minimum in the deterministic case. 
+In the noisy case, the min of the predictive mean works fine.
+</p>
+
+
+<h3>Note</h3>
+
+<p>This is a beta version at this point. It may work for for TP models as well.
+</p>
+
+
+<h3>References</h3>
+
+<p>M. Binois (2015), Uncertainty quantification on Pareto fronts and high-dimensional strategies in Bayesian optimization, with applications in multi-objective automotive design.
+Ecole Nationale Superieure des Mines de Saint-Etienne, PhD thesis.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Optimization example (noiseless)
+set.seed(42)
+
+## Test function defined in [0,1]
+ftest &lt;- f1d
+
+n_init &lt;- 5 # number of unique designs
+X &lt;- seq(0, 1, length.out = n_init)
+X &lt;- matrix(X, ncol = 1)
+Z &lt;- ftest(X)
+
+## Predictive grid
+ngrid &lt;- 51
+xgrid &lt;- seq(0,1, length.out = ngrid)
+Xgrid &lt;- matrix(xgrid, ncol = 1)
+
+model &lt;- mleHomGP(X = X, Z = Z, lower = 0.01, upper = 1, known = list(g = 2e-8))
+
+# Regular EI function
+cst &lt;- min(model$Z0)
+EIgrid &lt;- crit_EI(Xgrid, model, cst = cst)
+plot(xgrid, EIgrid, type = "l")
+abline(v = X, lty = 2) # observations
+
+# Create batch (based on regular EI peaks)
+xbatch &lt;- matrix(c(0.37, 0.17, 0.7), 3, 1)
+abline(v = xbatch, col = "red")
+fqEI &lt;- crit_qEI(xbatch, model, cst = cst)
+
+# Compare with Monte Carlo qEI
+preds &lt;- predict(model, xbatch, xprime = xbatch)
+nsim &lt;- 1e4
+simus &lt;- matrix(rnorm(3 * nsim), nsim) %*% chol(preds$cov)
+simus &lt;- simus + matrix(preds$mean, nrow = nsim, ncol = 3, byrow = TRUE)
+MCqEI &lt;- mean(apply(cst - simus, 1, function(x) max(c(x, 0))))
+
+</code></pre>
+
+
+</div>

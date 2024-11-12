@@ -1,0 +1,277 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>Hydro3_Estimation</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Hydro3 estimation</h2>
+
+<h3>Description</h3>
+
+<p>Main estimation function used in the HydroPortail.
+In short, this function estimates a distribution and the associated uncertainty, 
+and returns all needed information to display and plot the results 
+(parameter estimates, quantile curves, etc.)
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">Hydro3_Estimation(
+  y,
+  dist,
+  Emeth = Emeth_def,
+  Umeth = Umeth_def,
+  options = options_def,
+  mcmcoptions = mcmcoptions_def,
+  prior = GetDefaultPrior(GetParNumber(dist)),
+  do.KS = TRUE,
+  do.MK = TRUE,
+  do.Pettitt = TRUE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+<p>numeric vector, data.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dist</code></td>
+<td>
+<p>character, distribution name. See dataset distInfo for a description of available distributions.
+In particular, type names(distInfo) for the list of available distributions, and 
+distInfo[['GEV']] for more information on a particular distribution (here, GEV).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Emeth</code></td>
+<td>
+<p>character, estimation method. Default is 'LMOM' (L-Moments), available: 
+'MOM' (Moments), 'ML' (Maximum Likelihood), 'BAY' (Bayesian).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Umeth</code></td>
+<td>
+<p>character, uncertainty quantification method. Default is 'PBOOT' (Parametric bootstrap), available: 
+'BOOT' (Bootstrap, not recommended), 'NONE', 'ML' (only usable when Emeth='ML' as well), 
+and 'BAY' (the only usable method when Emeth='BAY').</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>options</code></td>
+<td>
+<p>list, options, see details below.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mcmcoptions</code></td>
+<td>
+<p>list, MCMC options, see details below.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>prior</code></td>
+<td>
+<p>list, prior distributions, only used when Emeth='BAY'. See ?GetEstimate_BAY for details.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>do.KS, do.MK, do.Pettitt</code></td>
+<td>
+<p>logical, perform KS/MK/Pettitt tests?</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The argument 'options' allows controlling various properties of the analysis and results.
+It is a list with the following components:
+</p>
+
+<ul>
+<li>
+<p>FreqFormula, character, formula for computing nonexceedance frequency, see ?GetEmpFreq.
+</p>
+</li>
+<li>
+<p>pgrid, numeric vector, probabilities defining the x values where pdf f(x) and cdf F(x) 
+are computed. These x values are quantiles from the estimated distribution 
+with probabilities pgrid.
+</p>
+</li>
+<li>
+<p>Tgrid, numeric vector, return periods where quantile function q(T) is computed.
+</p>
+</li>
+<li>
+<p>IClevel, numeric, level of uncertainty interval.
+</p>
+</li>
+<li>
+<p>p2T, numeric, conversion factor between nonexceedance probability p and return period T.
+p=1-1/(p2T*T). In general p2T=1 but for a peak-over-threshold approach leading to say 3 events
+per year on average, p2T=3.
+</p>
+</li>
+<li>
+<p>invertT, logical, when invertT=TRUE, LARGE return periods correspond to SMALL data values.
+This is typically used for low-flow statistics.
+</p>
+</li>
+<li>
+<p>splitZeros, logical, when splitZeros=TRUE zero and negative values are removed from the data y before 
+estimating the distribution,and are used to estimate the probability of zeros p0. This is 
+typically used for low-flow statistics to estimate the probability of zero streamflow.
+</p>
+</li>
+<li>
+<p>lang, chanracter, language ('fr' or 'en').
+</p>
+</li>
+<li>
+<p>nsim, integer, number of replicated parameters representing uncertainty.
+</p>
+</li>
+</ul>
+<p>The argument 'mcmcoptions' is only used when Emeth='BAY' and is a list controlling MCMC properties: 
+</p>
+
+<ul>
+<li>
+<p>mult, numeric, see ?Metropolis_OAAT_adaptive
+</p>
+</li>
+<li>
+<p>eps, numeric, see ?Metropolis_OAAT_adaptive
+</p>
+</li>
+<li>
+<p>batch.length, integer, see ?Metropolis_OAAT_adaptive
+</p>
+</li>
+<li>
+<p>batch.n, integer, see ?Metropolis_OAAT_adaptive
+</p>
+</li>
+<li>
+<p>moverate.min, numeric, see ?Metropolis_OAAT_adaptive
+</p>
+</li>
+<li>
+<p>moverate.max, numeric, see ?Metropolis_OAAT_adaptive
+</p>
+</li>
+<li>
+<p>mult.down, numeric, see ?Metropolis_OAAT_adaptive
+</p>
+</li>
+<li>
+<p>mult.up, numeric, see ?Metropolis_OAAT_adaptive
+</p>
+</li>
+<li>
+<p>burn, numeric, burn-in factor, e.g. if burn=0.2 the first 20 percents of MCMC samples are discarded
+</p>
+</li>
+<li>
+<p>slim, integer, sliming factor, e.g. if slim=5 only one MCMC sample every 5 is kept (after burn-in)
+</p>
+</li>
+</ul>
+<h3>Value</h3>
+
+<p>A list with the following components:
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>dist</code></td>
+<td>
+<p>character, estimated distribution.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ok</code></td>
+<td>
+<p>logical, did estimation succeed?</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>err</code></td>
+<td>
+<p>integer, error code (0 if ok).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>message</code></td>
+<td>
+<p>error message.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>empirical</code></td>
+<td>
+<p>data frame, sorted data and empirical estimates 
+(nonexceedance frequency, return period and reduced variate) </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pcdf</code></td>
+<td>
+<p>data frame, estimated pdf and cdf</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>quantile</code></td>
+<td>
+<p>data frame, estimated quantiles and uncertainty intervals</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>par</code></td>
+<td>
+<p>data frame, estimated parameters and uncertainty intervals</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>KS</code></td>
+<td>
+<p>list, result of the Kolmogorov-Smirnov test, see ?KS</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>MK</code></td>
+<td>
+<p>list, result of the Mann-Kendall test, see ?MK</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Pettitt</code></td>
+<td>
+<p>list, result of the Pettitt test, see ?Pettitt</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>u</code></td>
+<td>
+<p>list, parameter uncertainty in the form of a covariance matrix ($cov)
+and simulated parameter replicates ($sim). Also contains error-handling flags 
+$ok, $err and $message.</p>
+</td>
+</tr>
+</table>
+<h3>Examples</h3>
+
+<pre><code class="language-R">y=stats::rnorm(50)
+H3=Hydro3_Estimation(y,'Normal')
+H3=Hydro3_Estimation(y,'GEV',Emeth='ML',Umeth='ML')
+</code></pre>
+
+
+</div>

@@ -1,0 +1,152 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>leverage.default</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Leverage for HLMs</h2>
+
+<h3>Description</h3>
+
+<p>This function calculates the leverage of
+a hierarchical linear model fit by <code>lmer</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">## Default S3 method:
+leverage(object, ...)
+
+## S3 method for class 'mer'
+leverage(object, level = 1, ...)
+
+## S3 method for class 'lmerMod'
+leverage(object, level = 1, ...)
+
+## S3 method for class 'lme'
+leverage(object, level = 1, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>object</code></td>
+<td>
+<p>fitted object of class <code>mer</code> of <code>lmerMod</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>do not use</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>level</code></td>
+<td>
+<p>the level at which the leverage should be calculated: either
+1 for observation level leverage (default) or the name of the grouping factor 
+(as defined in <code>flist</code> of the <code>mer</code> object) for group level
+leverage. <code>leverage</code> assumes that the grouping factors are unique;
+thus, if IDs are repeated within each unit, unique IDs must be generated 
+by the user prior to use of <code>leverage</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Demidenko and Stukel (2005) describe leverage for mixed (hierarchical)
+linear models as being the sum of two components, a leverage associated with the 
+fixed (<code class="reqn">H_1</code>) and a leverage associated with the random effects (<code class="reqn">H_2</code>) where
+</p>
+<p style="text-align: center;"><code class="reqn">H_1 = X (X^\prime V^{-1} X)^{-1} X^\prime V^{-1}</code>
+</p>
+
+<p>and
+</p>
+<p style="text-align: center;"><code class="reqn">H_2 = ZDZ^{\prime} V^{-1} (I - H_1)</code>
+</p>
+
+<p>Nobre and Singer (2011) propose using
+</p>
+<p style="text-align: center;"><code class="reqn">H_2^* = ZDZ^{\prime}</code>
+</p>
+
+<p>as the random effects leverage as it does not rely on the fixed effects.
+</p>
+<p>For individual observations <code>leverage</code> uses the diagonal elements of the 
+above matrices as the measure of leverage. For higher-level units, 
+<code>leverage</code> uses the mean trace of the above matrices associated with each
+higher-level unit.
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>leverage</code> returns a data frame with the following columns:
+</p>
+
+<dl>
+<dt><code>overall</code></dt>
+<dd>
+<p>The overall leverage, i.e. <code class="reqn">H = H_1 + H_2</code>.</p>
+</dd>
+<dt><code>fixef</code></dt>
+<dd>
+<p>The leverage corresponding to the fixed effects.</p>
+</dd>
+<dt><code>ranef</code></dt>
+<dd>
+<p>The leverage corresponding to the random effects 
+proposed by Demidenko and Stukel (2005).</p>
+</dd>
+<dt><code>ranef.uc</code></dt>
+<dd>
+<p>The (unconfounded) leverage corresponding to the 
+random effects proposed by Nobre and Singer (2011).</p>
+</dd>
+</dl>
+<h3>Author(s)</h3>
+
+<p>Adam Loy <a href="mailto:loyad01@gmail.com">loyad01@gmail.com</a>
+</p>
+
+
+<h3>References</h3>
+
+<p>Demidenko, E., &amp; Stukel, T. A. (2005) 
+Influence analysis for linear mixed-effects models. 
+<em>Statistics in Medicine</em>, <b>24</b>(6), 893–909.
+</p>
+<p>Nobre, J. S., &amp; Singer, J. M. (2011) 
+Leverage analysis for linear mixed  models. 
+<em>Journal of Applied Statistics</em>, <b>38</b>(5), 1063–1072.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>cooks.distance.mer</code>, <code>mdffits.mer</code>,
+<code>covratio.mer</code>, <code>covtrace.mer</code>, <code>rvc.mer</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(sleepstudy, package = 'lme4')
+fm &lt;- lme4::lmer(Reaction ~ Days + (Days | Subject), sleepstudy)
+
+# Observation level leverage
+lev1 &lt;- leverage(fm, level = 1)
+head(lev1)
+
+# Group level leverage
+lev2 &lt;- leverage(fm, level = "Subject")
+head(lev2)
+</code></pre>
+
+
+</div>

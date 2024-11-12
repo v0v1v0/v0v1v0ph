@@ -1,0 +1,173 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>gradient</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Differential calculus</h2>
+
+<h3>Description</h3>
+
+<p>Given a <code>hyper2</code> object and a point in probability space,
+function <code>gradient()</code> returns the gradient of the log-likelihood;
+function <code>hessian()</code> returns the bordered Hessian matrix.  By
+default, both functions are evaluated at the maximum likelihood estimate
+for <code class="reqn">p</code>, as given by <code>maxp()</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">gradient(H, probs=indep(maxp(H)))
+hessian(H,probs=indep(maxp(H)),border=TRUE)
+hessian_lowlevel(L, powers, probs, pnames,n) 
+is_ok_hessian(M, give=TRUE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>H</code></td>
+<td>
+<p>A <code>hyper2</code> object</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>L,powers,n</code></td>
+<td>
+<p>Components of a <code>hyper2</code> object</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>probs</code></td>
+<td>
+<p>A vector of probabilities</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pnames</code></td>
+<td>
+<p>Character vector of names</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>border</code></td>
+<td>
+<p>Boolean, with default <code>TRUE</code> meaning to return the
+bordered Hessian and <code>FALSE</code> meaning to return the Hessian
+(warning: this option does not respect the unit sum constraint)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>M</code></td>
+<td>
+<p>A bordered Hessian matrix, understood to have a single
+constraint (the unit sum) at the last row and column; the output of
+<code>hessian(border=TRUE)</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>give</code></td>
+<td>
+<p>Boolean with default <code>FALSE</code> meaning for function
+<code>is_ok_hessian()</code> to return whether or not <code>M</code>
+corresponds to a negative-definite  matrix, and <code>TRUE</code> meaning
+to return more details</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Function <code>gradient()</code> returns the gradient of the log-likelihood
+function.  If the <code>hyper2</code> object is of size <code class="reqn">n</code>, then argument
+<code>probs</code> may be a vector of length <code class="reqn">n-1</code> or <code class="reqn">n</code>; in the
+former case it is interpreted as <code>indep(p)</code>.  In both cases, the
+returned gradient is a vector of length <code class="reqn">n-1</code>.
+The function returns the derivative of the loglikelihood with respect to
+the <code class="reqn">n-1</code> independent components of
+<code class="reqn">\left(p_1,\ldots,p_n\right)</code>, namely
+<code class="reqn">\left(p_1,\ldots,p_{n-1}\right)</code>.  The fillup
+value <code class="reqn">p_n</code> is calculated as
+<code class="reqn">1-\left(p_1+\cdots + p_{n-1}\right)</code>.
+</p>
+<p>Function <code>gradientn()</code> returns the gradient of the loglikelihood
+function but ignores the unit sum constraint.  If the <code>hyper2</code>
+object is of size <code class="reqn">n</code>, then argument <code>probs</code> must be a vector
+of length <code class="reqn">n</code>, and the function returns a named vector of length
+<code class="reqn">n</code>.  The last element of the vector is not treated differently from
+the others; all <code class="reqn">n</code> elements are treated as independent.  The sum
+need not equal one.
+</p>
+<p>Function <code>hessian()</code> returns the <dfn>bordered Hessian</dfn>, a matrix
+of size <code class="reqn">n+1\times n+1</code>, which is useful when using
+Lagrange's method of undetermined multipliers.  The first row and column
+correspond to the unit sum constraint, <code class="reqn">\sum p_1=1</code>.
+Row and column names of the matrix are the <code>pnames()</code> of the
+<code>hyper2</code> object, plus “<code>usc</code>” for “Unit Sum
+Constraint”.
+</p>
+<p>The unit sum constraint borders could have been added with idiom
+<code>magic::adiag(0,pad=1,hess)</code>, which might be preferable.
+</p>
+<p>Function <code>is_ok_hessian()</code> returns the result of the second
+derivative test for the maximum likelihood estimate being a local
+maximum on the constraint hypersurface.  This is a generalization of the
+usual unconstrained problem, for which the test is the Hessian's being
+negative-definite.
+</p>
+<p>Function <code>hessian_lowlevel()</code> is a low-level helper function that
+calls the C++ routine.
+</p>
+<p>Further examples and discussion is given in file
+<code>inst/gradient.Rmd</code>.  See also the discussion at maxp on the
+different optimization routines available.
+</p>
+
+
+<h3>Value</h3>
+
+<p>Function <code>gradient()</code> returns a vector of length <code class="reqn">n-1</code> with
+entries being the gradient of the log-likelihood with respect to the
+<code class="reqn">n-1</code> independent components of
+<code class="reqn">\left(p_1,\ldots,p_n\right)</code>, namely
+<code class="reqn">\left(p_1,\ldots,p_{n-1}\right)</code>.  The fillup
+value <code class="reqn">p_n</code> is calculated as
+<code class="reqn">1-\left(p_1,\ldots,p_{n-1}\right)</code>.
+</p>
+<p>If argument <code>border</code> is <code>TRUE</code>, function <code>hessian()</code>
+returns an <code class="reqn">n</code>-by-<code class="reqn">n</code> matrix of second derivatives; the borders
+are as returned by <code>gradient()</code>.  If <code>border</code> is <code>FALSE</code>,
+ignore the fillup value and return an <code class="reqn">n-1</code>-by-<code class="reqn">n-1</code> matrix.
+</p>
+<p>Calling <code>hessian()</code> at the evaluate will not return exact zeros for
+the constraint on the fillup value; <code>gradient()</code> is used and this
+does not return exactly zeros at the evaluate.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Robin K. S. Hankin</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+data(chess)
+p &lt;- c(1/2,1/3)
+delta &lt;- rnorm(2)/1e5  # delta needs to be quite small
+
+deltaL  &lt;- loglik(p+delta,chess) - loglik(p,chess)
+deltaLn &lt;- sum(delta*gradient(chess,p + delta/2))   # numeric
+
+deltaL - deltaLn  # should be small [zero to first order]
+
+H &lt;- hessian(icons)
+is_ok_hessian(H)
+
+</code></pre>
+
+
+</div>

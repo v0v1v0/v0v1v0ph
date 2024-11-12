@@ -1,0 +1,134 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>repeatability</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>ANOVA-based estimates of repeatability</h2>
+
+<h3>Description</h3>
+
+<p>Given a population where each genotype is phenotyped for a number of genetically
+identical replicates (either individual plants or plots in a field trial), the repeatability
+or intra-class correlation can be estimated by
+<code class="reqn">V_g / (V_g + V_e)</code>, where <code class="reqn">V_g = (MS(G) - MS(E)) / r</code> and <code class="reqn">V_e = MS(E)</code>. In these expressions,
+<code class="reqn">r</code> is the number of replicates per genotype, and <code class="reqn">MS(G)</code> and <code class="reqn">MS(E)</code> are
+the mean sums of squares for genotype and residual error obtained from analysis
+of variance. In case <code class="reqn">MS(G) &lt; MS(E)</code>, <code class="reqn">V_g</code> is set to zero.
+See Singh <em>et al.</em> (1993) or Lynch and Walsh (1998), p.563.
+When the genotypes have differing numbers of replicates, <code class="reqn">r</code> is replaced by
+<code class="reqn">\bar r = (n-1)^{-1} (R_1 - R_2 / R_1)</code>, where <code class="reqn">R_1 = \sum r_i</code> and <code class="reqn">R_2 = \sum r_i^2</code>.
+Under the assumption that all differences between genotypes are genetic,
+repeatability equals broad-sense heritability; otherwise it only provides an upper-bound for broad-sense heritability.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">repeatability(data.vector, geno.vector, line.repeatability = FALSE,
+              covariates.frame = data.frame())
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>data.vector</code></td>
+<td>
+<p>A vector of phenotypic observations. Needs to be of type numeric. May contain
+missing values.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>geno.vector</code></td>
+<td>
+<p>A vector of genotype labels, either a factor or character. This vector should
+correspond to <code>data.vector</code>, and hence needs to be of the same length.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>line.repeatability</code></td>
+<td>
+<p>If <code>TRUE</code>, the line-repeatability or
+line-heritability <code class="reqn">\sigma_G^2 / (\sigma_G^2 + \sigma_E^2 / r)</code> is estimated,
+otherwise (the default) the repeatability at plot- or plant level, which is <code class="reqn">\sigma_G^2 / (\sigma_G^2 + \sigma_E^2)</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>covariates.frame</code></td>
+<td>
+<p>A data-frame with additional covariates, the rows corresponding to
+<code>geno.vector</code> and the phenotypic observations in <code>data.vector</code>.
+May contain missing values. Each column can be numeric or a factors.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A list with the following components:
+</p>
+
+<ul>
+<li>
+<p>repeatability:  the estimated repeatability.
+</p>
+</li>
+<li>
+<p>gen.variance:  the estimated genetic variance.
+</p>
+</li>
+<li>
+<p>res.variance:  the estimated residual variance.
+</p>
+</li>
+<li>
+<p>line.repeatability:  whether repeatability was estimated at the
+individual plant or plot level (the default), or at the level of
+genotypic means (in the latter case, <code>line.repeatability=TRUE</code>) 
+</p>
+</li>
+<li>
+<p>average.number.of.replicates:  The average number of replicates. See the description above.
+</p>
+</li>
+<li>
+<p>conf.int:  Confidence interval for repeatability. See Singh <em>et al.</em> (1993) or Lynch and Walsh (1998)
+</p>
+</li>
+</ul>
+<h3>Author(s)</h3>
+
+<p>Willem Kruijer <a href="mailto:willem.kruijer@wur.nl">willem.kruijer@wur.nl</a>
+</p>
+
+
+<h3>References</h3>
+
+
+<ul>
+<li>
+<p> Kruijer, W. <em>et al.</em> (2015) Marker-based estimation of heritability in immortal
+populations. <em>Genetics</em>, Vol. 199(2), p. 1-20.
+</p>
+</li>
+<li>
+<p> Lynch, M., and B. Walsh (1998) Genetics and Analysis of Quantitative Traits. Sinauer As-
+sociates, 1st edition.
+</p>
+</li>
+<li>
+<p> Singh, M., S. Ceccarelli, and J. Hamblin (1993) Estimation of heritability from varietal
+trials data. <em>Theoretical and Applied Genetics</em> 86: 437-441.
+</p>
+</li>
+</ul>
+<h3>Examples</h3>
+
+<pre><code class="language-R">repeatability(data.vector=rep(rnorm(26),each=5) + rnorm(5*26),
+              geno.vector=rep(letters,each=5))
+</code></pre>
+
+
+</div>

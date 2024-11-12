@@ -1,0 +1,122 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>getHDmembers</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Partitioning Stage of the <em>hdoutliers</em> Algorithm
+</h2>
+
+<h3>Description</h3>
+
+<p>Implements the first stage of the <em>hdoutliers</em> Algorithm, in which the
+data is partitioned according to <em>exemplars</em>
+and their associated lists of <em>members</em>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">getHDmembers(data, maxrows = 10000, radius = NULL) 
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+
+<p>A vector, matrix, or data frame consisting of numeric and/or categorical
+variables.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>maxrows</code></td>
+<td>
+
+<p>If the number of observations is greater than <code>maxrows</code>,
+<code>HDoutliers</code> reduces the number used in nearest-neighbor 
+computations to a set of <em>exemplars</em>. The default value is 10000.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>radius</code></td>
+<td>
+
+<p>Threshold for determining membership in the <em>exemplars</em>'s lists
+(used only when the number of observations is greater than <code>maxrows</code>).
+An observation is added to an <em>exemplars</em>' list if its distance
+to that <em>exemplar</em> is less than <code>radius</code>.
+The default value is <code class="reqn">.1/(log n)^(1/p)</code>, where <code class="reqn">n</code> is the 
+number of observations and <code class="reqn">p</code> is the dimension of the data.
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>If the number of observations exceeds <code>maxrows</code>, the data is 
+partitioned into lists corresponding to <em>exemplars</em> 
+and their <em>members</em> within <code>radius</code> of each <em>exemplar</em>,
+to reduce the number of nearest-neighbor computations required for
+outlier detection. <br>
+When there are fewer observations, the result is a list whose elements are 
+the individual observations (each observation is an exemplar, with  no
+other members). 
+</p>
+
+
+<h3>Value</h3>
+
+<p>A list in which each component is a vector of observation indexes.
+The first index in each list is the index of the <em>exemplar</em>
+defining that list, and any remaining indexes are the
+associated <em>members</em>, within <code>radius</code> of the <em>exemplar</em>.
+</p>
+
+
+<h3>References</h3>
+
+<p>Wilkinson, L. (2016). Visualizing Outliers.
+&lt;https://www.cs.uic.edu/~wilkinson/Publications/outliers.pdf&gt;.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>HDoutliers</code>,
+<code>getHDoutliers</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+data(dots)
+mem.W &lt;- getHDmembers(dots$W)
+out.W &lt;- getHDoutliers(dots$W,mem.W)
+
+data(ex2D)
+mem.ex2D &lt;- getHDmembers(ex2D)
+out.ex2D &lt;- getHDoutliers(ex2D,mem.ex2D)
+
+## Not run: 
+n &lt;- 100000 # number of observations
+set.seed(3)
+x &lt;- matrix(rnorm(2*n),n,2)
+nout &lt;- 10 # number of outliers
+x[sample(1:n,size=nout),] &lt;- 10*runif(2*nout,min=-1,max=1)
+
+mem.x &lt;- getHDmembers(x)
+out.x &lt;- getHDoutliers(x,mem.x)
+## End(Not run)
+
+</code></pre>
+
+
+</div>

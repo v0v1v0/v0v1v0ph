@@ -1,0 +1,292 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>plot.multicomp</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Multiple comparisons plot that gives independent user control
+over the appearance of the significant and not significant comparisons.
+</h2>
+
+<h3>Description</h3>
+
+<p>Multiple comparisons plot that gives independent user control
+over the appearance of the significant and not significant
+comparisons.
+In R, both <code>plot.multicomp</code> <code>plot.multicomp.hh</code> coerce their argument
+to an <code>"glht"</code> object and plots
+that with the appropriate <code>plot</code> method.
+In R, <code>plot.multicomp.adjusted</code> replaces the bounds
+calculated by <code>multcomp:::confint.glht</code> with bounds based on
+a common standard error for a set of anova tables that are
+partitioned for the simple effects on an analysis conditioned on
+the levels of one of the factors.
+In S-Plus,
+<code>plot.multicomp.hh</code> augments the standard <code>plot.multicomp</code> to
+give additional user arguments to control the appearance of the plot.
+</p>
+<p><code>plotMatchMMC</code> uses the <code>plot.multicomp.hh</code> code.
+<code>plotMatchMMC</code> must immediately follow a plot of an
+<code>mmc.multicomp</code> object and is applied to either the <code>$mca</code>
+or <code>$lmat</code> component of the <code>mmc.multicomp</code> object.
+<code>plotMatchMMC</code> is used as a tiebreaker plot for the <code>MMC</code>
+plot.  <code>plotMatchMMC</code> matches the horizontal scaling of the
+<code>MMC</code> plot and displays the individual contrasts in the same
+order as the <code>MMC</code> plot.  See <code>mmc</code> for examples.
+</p>
+<p>These functions are no longer recommended.  Use <code>mmcplot</code> instead.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">## S3 method for class 'multicomp'
+plot(x, ...) ## R only
+
+## S3 method for class 'multicomp.hh'
+plot(x, ylabel = x$ylabel, href = 0, uniform = TRUE,
+           plt.in = c(0.2, 0.9, 0.1, 0.9),
+           x.label.adj=1,
+           xrange.include=href,
+           xlim,
+           comparisons.per.page=21,
+           col.signif=1, col.not.signif=1,
+           lty.signif=4, lty.not.signif=4,
+           lwd.signif=1, lwd.not.signif=1,
+           ...,
+           xlabel.print=TRUE, y.axis.side=2, ylabel.inside=FALSE)
+
+plotMatchMMC(x, ...,
+             xlabel.print=FALSE,
+             cex.axis=par()$cex.axis,
+             col.signif='red', main="",
+             ylabel.inside=FALSE,
+             y.axis.side=4,
+             adjusted=FALSE)
+
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>A <code>"multicomp"</code> object.  <code>plotMatchMMC</code> will also
+accept a <code>mmc.multicomp</code> object.  It will use the <code>lmat</code>
+component if there is one, otherwise it will use the <code>mca</code> component.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ylabel</code></td>
+<td>
+<p>Y label on graph.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>y.axis.side</code></td>
+<td>
+<p>Y labels are on the left by default when plotting a
+<code>"multicomp"</code> object.  We move them to the
+right when matching the x-axis of an MMC plot.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>other arguments to <code>plot.multicomp</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ylabel.inside</code></td>
+<td>
+<p>Logical value, if <code>FALSE</code> (the default), the
+<code>plotMatchMMC</code> right-axis labels are in the margin.  If
+<code>TRUE</code>, the right-axis labels are in the figure area.
+Setting the argument to
+<code>TRUE</code> makes sense when plotting the <code>lmat</code> component of an
+<code>mmc.multicomp</code> object.</p>
+</td>
+</tr>
+</table>
+<table>
+<tr style="vertical-align: top;">
+<td><code>href</code></td>
+<td>
+<p>reference line for the intervals. The default is 0. S-Plus only.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>xrange.include</code></td>
+<td>
+<p><code>xlim</code>
+will be extended to include these values. S-Plus only.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>uniform</code></td>
+<td>
+<p>S-Plus only.  Logical value, if <code>TRUE</code> and the plots fill
+more than one page, the scale will be uniform across pages.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>plt.in</code></td>
+<td>
+<p>S-Plus only.  Value for <code>par("plt")</code> to make better
+use of the space on the plotting page.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x.label.adj</code></td>
+<td>
+<p>S-Plus only.  This is the <code>par("adj")</code> applied
+to the x-location of the y.labels on the <code>multicomp</code> plot.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>xlim</code></td>
+<td>
+<p>x-range of the plot.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>comparisons.per.page</code></td>
+<td>
+<p>The default S-Plus <code>plot.multicomp</code>
+hardwires this to 21, which allows
+for all pairwise comparisons of 7 levels taken 2 at a time.
+The HH <code>plot.multicomp</code> makes it a variable.
+Use it together with <code>plt.in</code> to make better use of the space
+on the plot.  S-Plus only.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lty.signif, lwd.signif</code></td>
+<td>
+<p>Line type, and line width for
+significant comparisons. S-Plus only.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>col.signif</code></td>
+<td>
+<p>Color for significant comparisons. S-Plus only for
+<code>plot.multicomp</code>.  Both R and S-Plus for <code>plotMatchMMC</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>col.not.signif, lty.not.signif, lwd.not.signif</code></td>
+<td>
+<p>Color, line
+type, and line width for non-significant comparisons. S-Plus only.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>xlabel.print</code></td>
+<td>
+<p>logical.  When <code>TRUE</code>, the caption under the
+plot is printed.  When <code>FALSE</code>, the caption under the plot is not
+printed.  It is helpful to set this to <code>FALSE</code> when
+the <code>multicomp</code>
+plot is used as a tiebreaker plot for the MMC plot.  S-Plus only.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cex.axis</code></td>
+<td>
+<p><code>cex</code> for axis ticklabels.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>main</code></td>
+<td>
+<p>Main title for plot.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>adjusted</code></td>
+<td>
+<p>Logical. When <code>TRUE</code>,
+<code>HH:::plot.multicomp.adjusted</code> is used to replace the standard
+confidence bounds
+calculated by <code>multcomp:::confint.glht</code>, with bounds
+calculated by <code>as.multicomp.glht</code> with a rescaled critical
+value based on rescaling the standard error.  This rescaling is
+used to construct a common standard error for a set of anova tables that are
+partitioned for the simple effects on an analysis conditioned on
+the levels of one of the factors.  See the
+<code>clover.commonstrMS.clov.mmc</code> example in file <code>hh("scripts/Ch12-tway.r")</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p><code>plot.multicomp</code> plots a <code>"multicomp"</code> object.  In S-Plus, this
+masks the standard <code>plot.multicomp</code> in order to provide additional
+arguments for controlling the appearance.  It defaults to the standard
+appearance.  In R, it coerces its argument to a <code>"glht"</code> object and plots
+that with the appropriate <code>plot</code> method.
+</p>
+
+
+<h3>Note</h3>
+
+<p>The multiple comparisons calculations in R and S-Plus use
+completely different packages.
+
+Multiple comparisons in R are based on <code>glht</code>.
+Multiple comparisons in S-Plus are based on <code>multicomp</code>.
+</p>
+<p>The MMC plot in the HH package is the same in both systems.
+The details of getting the plot differ.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p> Richard M. Heiberger &lt;rmh@temple.edu&gt; </p>
+
+
+<h3>References</h3>
+
+<p>Heiberger, Richard M. and Holland, Burt (2015).
+<em>Statistical Analysis and Data Display: An Intermediate Course with Examples in R</em>.
+Second Edition.
+Springer-Verlag, New York.
+<a href="https://link.springer.com/book/10.1007/978-1-4939-2122-5">https://link.springer.com/book/10.1007/978-1-4939-2122-5</a>
+</p>
+<p>Heiberger, R. M. and Holland, B. (2006).
+"Mean–mean multiple comparison displays for families of linear contrasts."
+<em>Journal of Computational and Graphical Statistics</em>, 15:937–955.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>mmc</code> in both languages,
+
+<code>glht</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## data and ANOVA
+data(catalystm)
+
+catalystm1.aov &lt;- aov(concent ~ catalyst, data=catalystm)
+summary(catalystm1.aov)
+
+catalystm.mca &lt;-
+if.R(r=glht(catalystm1.aov, linfct = mcp(catalyst = "Tukey")),
+     s=multicomp(catalystm1.aov, plot=FALSE))
+if.R(s=plot(catalystm.mca),
+     r=plot(confint(catalystm.mca, calpha=qtukey(.95, 4, 12)/sqrt(2))))
+       ## calpha is strongly recommended in R with a large number of levels
+       ## See ?MMC for details.
+</code></pre>
+
+
+</div>

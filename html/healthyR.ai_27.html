@@ -1,0 +1,203 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hai_data_scale</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Data Preprocessor - Scale/Normalize</h2>
+
+<h3>Description</h3>
+
+<p>Takes in a recipe and will scale values using a selected recipe. To call the
+recipe use a quoted argument like "scale" or "normalize".
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hai_data_scale(
+  .recipe_object = NULL,
+  ...,
+  .type_of_scale = "center",
+  .range_min = 0,
+  .range_max = 1,
+  .scale_factor = 1
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>.recipe_object</code></td>
+<td>
+<p>The data that you want to process</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>One or more selector functions to choose variables to be imputed.
+When used with imp_vars, these dots indicate which variables are used to
+predict the missing data in each variable. See selections() for more details</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.type_of_scale</code></td>
+<td>
+<p>This is a quoted argument and can be one of the following:
+</p>
+
+<ul>
+<li>
+<p> "center"
+</p>
+</li>
+<li>
+<p> "normalize"
+</p>
+</li>
+<li>
+<p> "range"
+</p>
+</li>
+<li>
+<p> "scale"
+</p>
+</li>
+</ul>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.range_min</code></td>
+<td>
+<p>A single numeric value for the smallest value in the range.
+This defaults to 0.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.range_max</code></td>
+<td>
+<p>A single numeric value for the largeest value in the range.
+This defaults to 1.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.scale_factor</code></td>
+<td>
+<p>A numeric value of either 1 or 2 that scales the numeric
+inputs by one or two standard deviations. By dividing by two standard
+deviations, the coefficients attached to continuous predictors can be
+interpreted the same way as with binary inputs. Defaults to 1. More in reference below.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>This function will get your data ready for processing with many types of ml/ai
+models.
+</p>
+<p>This is intended to be used inside of the data processor and
+therefore is an internal function. This documentation exists to explain the process
+and help the user understand the parameters that can be set in the pre-processor function.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A list object
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Steven P. Sanderson II, MPH
+</p>
+
+
+<h3>References</h3>
+
+<p>Gelman, A. (2007) "Scaling regression inputs by
+dividing by two standard deviations." Unpublished. Source:
+<a href="http://www.stat.columbia.edu/~gelman/research/unpublished/standardizing.pdf">http://www.stat.columbia.edu/~gelman/research/unpublished/standardizing.pdf</a>.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><a href="https://recipes.tidymodels.org/reference/index.html#section-step-functions-normalization">https://recipes.tidymodels.org/reference/index.html#section-step-functions-normalization</a>
+</p>
+<p>step_center
+</p>
+<p><code>recipes::step_center()</code>
+</p>
+<p><a href="https://recipes.tidymodels.org/reference/step_center.html">https://recipes.tidymodels.org/reference/step_center.html</a>
+</p>
+<p>step_normalize
+</p>
+<p><code>recipes::step_normalize()</code>
+</p>
+<p><a href="https://recipes.tidymodels.org/reference/step_normalize.html">https://recipes.tidymodels.org/reference/step_normalize.html</a>
+</p>
+<p>step_range
+</p>
+<p><code>recipes::step_range()</code>
+</p>
+<p><a href="https://recipes.tidymodels.org/reference/step_range.html">https://recipes.tidymodels.org/reference/step_range.html</a>
+</p>
+<p>step_scale
+</p>
+<p><code>recipes::step_scale()</code>
+</p>
+<p><a href="https://recipes.tidymodels.org/reference/step_scale.html">https://recipes.tidymodels.org/reference/step_scale.html</a>
+</p>
+<p>Other Data Recipes: 
+<code>hai_data_impute()</code>,
+<code>hai_data_poly()</code>,
+<code>hai_data_transform()</code>,
+<code>hai_data_trig()</code>,
+<code>pca_your_recipe()</code>
+</p>
+<p>Other Preprocessor: 
+<code>hai_c50_data_prepper()</code>,
+<code>hai_cubist_data_prepper()</code>,
+<code>hai_data_impute()</code>,
+<code>hai_data_poly()</code>,
+<code>hai_data_transform()</code>,
+<code>hai_data_trig()</code>,
+<code>hai_earth_data_prepper()</code>,
+<code>hai_glmnet_data_prepper()</code>,
+<code>hai_knn_data_prepper()</code>,
+<code>hai_ranger_data_prepper()</code>,
+<code>hai_svm_poly_data_prepper()</code>,
+<code>hai_svm_rbf_data_prepper()</code>,
+<code>hai_xgboost_data_prepper()</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">suppressPackageStartupMessages(library(dplyr))
+suppressPackageStartupMessages(library(recipes))
+
+date_seq &lt;- seq.Date(from = as.Date("2013-01-01"), length.out = 100, by = "month")
+val_seq &lt;- rep(rnorm(10, mean = 6, sd = 2), times = 10)
+df_tbl &lt;- tibble(
+  date_col = date_seq,
+  value    = val_seq
+)
+
+rec_obj &lt;- recipe(value ~ ., df_tbl)
+
+hai_data_scale(
+  .recipe_object = rec_obj,
+  value,
+  .type_of_scale = "center"
+)$scale_rec_obj %&gt;%
+  get_juiced_data()
+
+</code></pre>
+
+
+</div>

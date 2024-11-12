@@ -1,0 +1,137 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>checkGeneSymbols</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Identify outdated or Excel-mogrified gene symbols</h2>
+
+<h3>Description</h3>
+
+<p>This function identifies gene symbols which are outdated or may 
+have been mogrified by Excel or other spreadsheet programs. If output is assigned 
+to a variable, it returns a data.frame of the same number of rows as the input, 
+with a second column indicating whether the symbols are valid and a third column 
+with a corrected gene list.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">checkGeneSymbols(
+  x,
+  chromosome = NULL,
+  unmapped.as.na = TRUE,
+  map = NULL,
+  species = "human",
+  expand.ambiguous = FALSE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>A character vector of gene symbols to check for modified or outdated values</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>chromosome</code></td>
+<td>
+<p>An optional integer vector containing the chromosome number of each gene
+provided through the argument <code>x</code>. It should be the 
+same length as the input for <code>x</code>. Currently, this argument is implemented
+only for human gene cases.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>unmapped.as.na</code></td>
+<td>
+<p>If <code>TRUE</code> (default), unmapped symbols will appear as 
+NA in the <code>Suggested.Symbol</code> column. If <code>FALSE</code>, the original unmapped 
+symbol will be kept.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>map</code></td>
+<td>
+<p>Specify if you do not want to use the default maps provided by setting 
+species equal to "mouse" or "human". Map can be any other data.frame with colnames 
+identical to <code>c("Symbol", "Approved.Symbol")</code>. The default maps can be updated 
+by running the interactive example below.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>species</code></td>
+<td>
+<p>A character vector of length 1, either "human" (default) or "mouse". 
+If <code>NULL</code>, or anything other than "human" or "mouse", then the map argument 
+must be provided.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>expand.ambiguous</code></td>
+<td>
+<p>If <code>FALSE</code> (default), genes with multiple mapping will only 
+map to its approved symbol as the correct one. If <code>TRUE</code>, genes with multiple/ambiguous mapping
+will map to all the symbols linked to it.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>The function will return a data.frame of the same number of rows as the 
+input, with corrections possible from map.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>mouse.table</code> for the mouse lookup table, <code>hgnc.table</code> for the human lookup table
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">library(HGNChelper)
+
+## Human
+human &lt;- c("FN1", "TP53", "UNKNOWNGENE","7-Sep", "9/7", "1-Mar", "Oct4", "4-Oct",
+      "OCT4-PG4", "C19ORF71", "C19orf71")
+checkGeneSymbols(human)
+
+## Mouse
+mouse &lt;- c("1-Feb", "Pzp", "A2m")
+checkGeneSymbols(mouse, species="mouse")
+
+## expand.ambiguous
+
+## Human
+human &lt;- "AAVS1"
+checkGeneSymbols(human, expand.ambiguous=FALSE)
+checkGeneSymbols(human, expand.ambiguous=TRUE)
+
+## Mouse
+mouse &lt;- c("Cpamd8", "Mug2")
+checkGeneSymbols(mouse, species = "mouse", expand.ambiguous = FALSE)
+checkGeneSymbols(mouse, species = "mouse", expand.ambiguous = TRUE)
+
+## Updating the map
+if (interactive()) {
+    currentHumanMap &lt;- getCurrentHumanMap()
+    checkGeneSymbols(human, map=currentHumanMap)
+
+    # You should save this if you are going to use it multiple times,   
+    # then load it from file rather than burdening HGNC's servers.
+    save(hgnc.table, file="hgnc.table.rda", compress="bzip2")
+    load("hgnc.table.rda")
+    checkGeneSymbols(human, map=hgnc.table)
+}
+  
+</code></pre>
+
+
+</div>

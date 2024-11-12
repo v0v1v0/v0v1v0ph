@@ -1,0 +1,145 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hdd_setkey</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Sorts HDD objects</h2>
+
+<h3>Description</h3>
+
+<p>This function sets a key to a HDD file. It creates a copy of the HDD file sorted
+by the key. Note that the sorting process is very time consuming.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hdd_setkey(x, key, newfile, chunkMB = 500, replace = FALSE, verbose = 1)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>A hdd file.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>key</code></td>
+<td>
+<p>A character vector of the keys.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>newfile</code></td>
+<td>
+<p>Destination of the result, i.e., a destination folder that will
+receive the HDD data.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>chunkMB</code></td>
+<td>
+<p>The size of chunks used to sort the data. Default is 500MB. The
+bigger this number the faster the sorting is (depends on your memory available though).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>replace</code></td>
+<td>
+<p>Default is <code>FALSE</code>: if the destination folder already contains
+data, whether to replace it.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p>Numeric, default is 1. Whether to display information on the advancement
+of the algorithm. If equal to 0, nothing is displayed.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>This function is provided for convenience reason: it does the job of sorting
+the data and ensuring consistency across files, but it is very slow since it
+involves copying several times the entire data set. To be used parsimoniously.
+</p>
+
+
+<h3>Value</h3>
+
+<p>This functions does not return anything in R, instead its result is a new
+folder populated with <code>.fst</code> files which represent a data set that can be loaded
+with the function <code>hdd()</code>.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Laurent Berge
+</p>
+
+
+<h3>See Also</h3>
+
+<p>See <code>hdd</code>, <code>sub-.hdd</code> and <code>cash-.hdd</code>
+for the extraction and manipulation of out of memory data. For importation of
+HDD data sets from text files: see <code>txt2hdd</code>.
+</p>
+<p>See <code>hdd_slice</code> to apply functions to chunks of data (and create
+HDD objects) and <code>hdd_merge</code> to merge large files.
+</p>
+<p>To create/reshape HDD objects from memory or from other HDD objects, see
+<code>write_hdd</code>.
+</p>
+<p>To display general information from HDD objects: <code>origin</code>,
+<code>summary.hdd</code>, <code>print.hdd</code>,
+<code>dim.hdd</code> and <code>names.hdd</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+# Toy example with iris data
+
+# Creating HDD data to be sorted
+hdd_path = tempfile() # =&gt; folder where the data will be saved
+write_hdd(iris, hdd_path)
+# Let's add data to it
+for(i in 1:5) write_hdd(iris, hdd_path, add = TRUE)
+
+base_hdd = hdd(hdd_path)
+summary(base_hdd)
+
+# Sorting by Sepal.Width
+hdd_sorted = tempfile()
+# we use a very small chunkMB to show how the function works
+hdd_setkey(base_hdd, key = "Sepal.Width",
+		   newfile = hdd_sorted, chunkMB = 0.010)
+
+
+base_hdd_sorted = hdd(hdd_sorted)
+summary(base_hdd_sorted) # =&gt; additional line "Sorted by:"
+print(base_hdd_sorted)
+
+# Sort with two keys:
+hdd_sorted = tempfile()
+# we use a very small chunkMB to show how the function works
+hdd_setkey(base_hdd, key = c("Species", "Sepal.Width"),
+		   newfile = hdd_sorted, chunkMB = 0.010)
+
+
+base_hdd_sorted = hdd(hdd_sorted)
+summary(base_hdd_sorted)
+print(base_hdd_sorted)
+
+</code></pre>
+
+
+</div>

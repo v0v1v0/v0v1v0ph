@@ -1,0 +1,204 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>rrank</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Random ranks</h2>
+
+<h3>Description</h3>
+
+<p>A function for producing ranks randomly, consistent with a specified
+strength vector
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">rrank(n = 1, p, pnames=NULL, fill = FALSE, rnames=NULL)
+## S3 method for class 'ranktable'
+print(x, ...)
+rrank_single(p)
+rorder_single(p)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>n</code></td>
+<td>
+<p>Number of observations</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>p</code></td>
+<td>
+<p>Strength vector</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pnames</code></td>
+<td>
+<p>Character vector (“player names”) specifying
+names of the columns</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rnames</code></td>
+<td>
+<p>Character vector (“row names” or “race
+names”) specifying names of the rows</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fill</code></td>
+<td>
+<p>Boolean, with default <code>FALSE</code> meaning to interpret
+the elements of <code>p</code> as strengths, notionally summing to one;
+and <code>TRUE</code> meaning to augment <code>p</code> with a fillup value</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x, ...</code></td>
+<td>
+<p>Arguments passed to the print method</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>If <code>n=1</code>, <code>rrank()</code> returns a vector; if <code>n&gt;1</code> it returns
+a matrix with <code>n</code> rows, each corresponding to a ranking.  The
+canonical example is a race in which the probability of competitor
+<code class="reqn">i</code> coming first is <code class="reqn">p_i/\sum p_j</code>, where the
+summation is over the competitors who have not already finished.
+</p>
+<p>If, say, the first row of <code>rrank()</code> is <code>c(2,5,1,3,4)</code>, then
+competitor 2 came first, competitor 5 came second, competitor 1 came
+third, and so on.
+</p>
+<p>Note that function <code>rrank()</code> returns an object of class
+<code>ranktable</code>, which has its own special print method.  The column
+names appear as “<code>c1, c2, ...</code>” which is intended to be read
+“came first”, “came second”, and so on.  The difference
+between <em>rank</em> and <em>order</em> can be confusing.
+</p>
+<pre>
+&gt; x &lt;- c(a=3.01, b=1.04, c=1.99, d=4.1)
+&gt; x
+   a    b    c    d 
+3.01 1.04 1.99 4.10 
+&gt; rank(x)
+a b c d 
+3 1 2 4 
+&gt; order(x)
+[1] 2 3 1 4
+</pre>
+<p>In the above, <code>rank()</code> shows us that element <code>a</code> of <code>x</code>
+(viz 3.01) is the third largest, element <code>b</code> (viz 1.04) is the
+smallest, and so on; <code>order(x)</code> shows us that the smallest element
+<code>x</code> is <code>x[2]</code>, the next smallest is <code>x[3]</code>, and so on.
+Thus <code>x[order(x)] == sort(x)</code>, and <code>rank(x)[order(x)] ==
+seq_along(x)</code>.  In the current context we want ranks not orders; we want
+to know who came first, who came second, and so on:
+</p>
+<pre>
+R&gt; rrank(2,(4:1)/10)
+     c1 c2 c3 c4
+[1,]  2  3  1  4
+[2,]  1  3  2  4
+R&gt; 
+</pre>
+<p>In the above, each row is a race; we have four runners and two races.
+In the first race (the top row), runner number 2 came first, runner 3
+came second, runner 1 came third, and so on.  In the second race (bottom
+row), runner 1 came first, etc.  Taking the first race as an example:
+</p>
+<p><strong>Rank:</strong> who came first? runner 2.  Who came second? runner 3.
+Who came third? runner 1.  Who came fourth? runner 4.  Recall that the
+Placket-Luce likelihood for a race in which the rank statistic was
+<code>2314</code> (the first race) would be <code class="reqn">
+\frac{p_2}{p_2+p_3+p_1+p_4}\cdot
+\frac{p_3}{p_3+p_1+p_4}\cdot
+\frac{p_1}{p_1+p_4}\cdot
+\frac{p_4}{p_4}</code>.
+</p>
+<p><strong>Order:</strong> where did runner 1 come?  third.  Where did runner 2
+come?  first.  Where did runner 3 come?  second.  Where did runner 4
+come?  fourth.  Thus the order statistic would be <code>3124</code>.
+</p>
+<p>Function <code>rrank()</code> is designed for <code>rank_likelihood()</code>, which
+needs rank data, not order data.  Vignette
+“<code>skating_analysis</code>” gives another discussion.
+</p>
+<p>Note that function <code>rrank()</code> returns an object of class
+“<code>rrank</code>”, which has its own print method.  This can be
+confusing.  Further details are given at <code>ranktable.Rd</code>.
+</p>
+<p>Function <code>rrank_single()</code> is a low-level helper function:
+</p>
+<pre>
+&gt; p &lt;- c(0.02,0.02,0.9,0.02,0.02,0.02)  # competitor 3 the strongest
+&gt; rank_single(p)
+[1] 3 2 4 6 4 1
+</pre>
+<p>Above, we see from <code>p</code> that competitor 3 is the strongest, coming
+first with 90% probability.  And indeed the resulting rank statistic
+given by <code>rorder_single()</code> shows competitor 3 coming first, 2
+coming second, and so on.  Compare <code>rrank_single()</code>:
+</p>
+<pre>
+&gt; rorder_single(p)
+[1] 6 3 1 4 5 2
+&gt; 
+</pre>
+<p>Above we see see from <code>rrank_single(p)</code> that competitor 1 came
+sixth, competitor 2 came third, and competitor 3 came first (as you
+might expect, as competitor 3 is the strongest).  Note that the R idiom
+for <code>rorder_single()</code> is the same as that used in the
+<a href="https://CRAN.R-project.org/package=permutations"><span class="pkg">permutations</span></a> package for inverting a permutation: <code>o[o] &lt;-
+seq_along(o)</code>.
+</p>
+
+
+<h3>Note</h3>
+
+<p>Similar functionality is given by <code>rrace()</code>, documented at
+rhyper3.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Robin K. S. Hankin</p>
+
+
+<h3>See Also</h3>
+
+<p><code>ordertrans</code>,<code>rank_likelihood</code>,<code>skating</code>,<code>rhyper3</code></p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+rrank_single(zipf(9))
+
+ptrue &lt;- (4:1)/10
+names(ptrue) &lt;- letters[1:4]
+rrank(10,p=ptrue)
+
+H &lt;- rank_likelihood(rrank(40,p=ptrue))
+
+## Following code commented out because they take too long:
+
+# mH &lt;- maxp(H)   # should be close to ptrue
+# H &lt;- H + rank_likelihood(rrank(30,mH)) # run some more races
+# maxp(H)  # revised estimate with additional data
+
+
+</code></pre>
+
+
+</div>

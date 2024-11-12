@@ -1,0 +1,222 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>ordervec2supp3</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Various functionality for races and hyper3 likelihood functions</h2>
+
+<h3>Description</h3>
+
+<p>Various functions for calculating the likelihood function for order
+statistics in the context of hyper3 likelihood functions.  Compare
+<code>ggol()</code> for <code>hyper2</code> objects.  Used in the
+<code>constructor()</code> suite of analysis.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">num3(v,helped=NULL,lambda=1)
+den3(v,helped=NULL,lambda=1)
+char2nv(x)
+ordervec2supp3(v,nonfinishers=NULL)
+ordervec2supp3a(v,nonfinishers=NULL,helped=NULL,lambda=1)
+rankvec_likelihood3(v,nonfinishers=NULL)
+ordertable2supp3(a)
+cheering3(v,e,help,nonfinishers=NULL)
+args2ordervec(...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>v</code></td>
+<td>
+<p>Ranks in the form of a character vector.  Element <code>v[1]</code>
+is the first-placed competitor, element <code>v[2]</code> the second, and
+so on.  For example, <code>ordervec2supp3(c('b','b','a','c','a'))</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nonfinishers</code></td>
+<td>
+<p>Character vector (a set) showing players that did
+not finish.  See details section and examples</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>a</code></td>
+<td>
+<p>An ordertable</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>helped</code></td>
+<td>
+<p>vector of entities being helped</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>e,help,lambda</code></td>
+<td>
+<p>Parameters controlling non-independence with
+<code>e</code> a named integer vector specifying equivalence classes of
+the competitors: names correspond to the competitors, values to
+their equivalence class, and <code>help</code> a numeric vector with
+entries corresponding to the equivalence classes of <code>e</code> and
+values the strength of the support</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>A character vector of competitors</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Arguments passed to <code>args2ordervec()</code></p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Function <code>args2ordervec()</code> takes arguments with names
+corresponding to players, and entries corresponding to performances
+(e.g. distances thrown by a javelin, or times for completing a
+race).  It returns a character vector indicating the rank statistic.
+See examples, and also the javelin vignette.
+</p>
+<p>Function <code>ordervec2supp3()</code> takes character vector showing the
+order of finishing [i.e. a rank statistic], and returns a generalized
+Plackett-Luce support function in the form of a <code>hyper3</code> object.
+It can take the output of <code>args2ordervec()</code> or <code>rrace3()</code>.
+For example:
+</p>
+<p><code>ordervec2supp3(c("a","b"),nonfinishers=c("a","b"))</code>
+</p>
+<p>corresponds to a race between two twins of strength <code>a</code> and two
+twins of strength <code>b</code>, with only one of each pair finishing;
+<code>a</code> comes first and <code>b</code> comes second; symbolically
+</p>
+<p style="text-align: center;"><code class="reqn">a\succ b\succ\left\lbrace a,b\right\rbrace\longrightarrow
+    \mathcal{L}(a,b\left|a+b=1\right.)=\frac{a}{2a+2b}\cdot\frac{b}{a+2b}</code>
+</p>
+
+<p>Further,
+</p>
+<p><code>ordervec2supp3(c("a","b"),c("a","b","c"))</code>
+</p>
+<p>corresponds to adding a singleton competitor of strength <code>c</code> who
+did not finish:
+</p>
+<p style="text-align: center;"><code class="reqn">a\succ b\succ\left\lbrace a,b,c\right\rbrace\longrightarrow
+    \mathcal{L}(a,b,c\left|a+b+c=1\right.)=\frac{a}{2a+2b+c}\cdot\frac{b}{a+2b+c}</code>
+</p>
+
+<p>(observe that this likelihood function is informative about
+<code class="reqn">c</code>).  See the examples section below.  Experimental function
+<code>ordervec2supp3a()</code> is a generalized version of
+<code>ordervec2supp3()</code> that allows for cheering effects.
+</p>
+<p>Functions <code>num3()</code> and <code>den3()</code> are low-level helper
+functions that calculate the numerator and denominator for
+Plackett-Luce likelihood functions with clones; used in
+<code>ordervec2supp3()</code> and <code>ordervec2supp3a()</code>.
+</p>
+<p>Function <code>ordertable2supp3()</code> takes an order table (the canonical
+example is the constructors' formula 1 grand prix results, see
+<code>constructor.Rd</code> and returns a generalized Plackett-Luce support
+function in the form of a <code>hyper3</code> object.
+</p>
+<p>Function <code>char2nv()</code> takes a character vector and returns a named
+vector with entries corresponding to their names' counts.  It is used
+in the extraction and replacement methods for <code>hyper3</code> objects.
+</p>
+<p>Function <code>cheering3()</code> is a generalization of
+<code>ordervec2supp3()</code>.  Competitors who are not mentioned in
+argument <code>e</code> are assumed to be in an equivalence class of size 1,
+that is, they are not supported (or indeed suppressed) by anyone else:
+they are singletons in the terminology of Hankin (2006).  Extensive
+discussions are presented at <code>inst/plackett_luce_monster.Rmd</code> and
+<code>inst/eurovision.Rmd</code>.
+</p>
+<p>File <code>inst/javelin.Rmd</code> and <code>inst/race3.Rmd</code> show some
+use-cases for these functions.
+</p>
+
+
+<h3>Note</h3>
+
+<p>Function <code>ordervec2supp3()</code> is mis-named [it takes a <em>rank</em>
+vector, not an <em>order</em> vector]; it will be renamed
+<code>rankvec_likelihood3()</code>, eventually.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Robin K. S. Hankin</p>
+
+
+<h3>See Also</h3>
+
+<p><code>ordertable2supp</code>,<code>ordertrans</code></p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+
+ordervec2supp3(c("a","a","b","c","a","b","c"))
+ordervec2supp3(rrace3())
+ordervec2supp3(c("a","b"),nonfinishers=c("a","b"))  # a &gt; b &gt;&gt; {a,b}
+
+
+
+(o &lt;- args2ordervec(a=c(1,6,9), b=c(2,3,4), c=c(1.1,11.1)))
+H &lt;- ordervec2supp3(o)
+H
+# equalp.test(H)   # takes too long for here
+
+
+## Race: six competitors a-f finishing in alphabetical order.  Mutually
+## supporting groups: (acd), (bf), (e).  Competitor "e" is not
+## suppported by anyone else (he is a singleton) so does not need to be
+## mentioned in argument 'e' and there are only two helpfulnesses to be
+## considered: that of (acd) and that of (bf), which we will take to be
+## 1.88 and 1.1111 respectively:
+
+cheering3(v=letters[1:6],e=c(a=1,c=1,b=2,d=1,e=2),help=c(1.88,1.1111))
+
+
+
+
+## Another race: four competitors, including two clones of "a", and two
+## singletons "b" and "c".  Here "a" helps his clone at 1.88; and "b"
+## and "c" help one another at 1.111:
+
+cheering3(v=c("a","b","a","c"),e=c(a=1,b=2,c=2),help=c(1.8,1.111))
+
+
+## Same race as above but this time there are two clones of "b", one of
+## whom did not finish:
+
+cheering3(v=c("a","b","a","c"),e=c(a=1,b=2,c=2),help=c(1.8,1.111),"b")
+
+
+## Most common case would be that the clones help each other but noone
+## else:
+
+cheering3(v=c("a","b","a","c"),e=c(a=1,b=2,c=3),help=c(1.8,1.111,1),"b")
+
+
+
+</code></pre>
+
+
+</div>

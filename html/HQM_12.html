@@ -1,0 +1,173 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>h_xtll</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Local linear future conditional hazard rate estimation at a single time point</h2>
+
+<h3>Description</h3>
+
+<p>Calculates the local linear future conditional hazard rate for a marker value <code>x</code> and a time value <code>t</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">h_xtll(br_X, br_s, int_X, size_s_grid, alpha, x,t, b, Yi,n, Y)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>br_X</code></td>
+<td>
+<p>Vector of grid points for the marker values <code class="reqn">X</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>br_s</code></td>
+<td>
+<p>Vector of grid points for the time values <code class="reqn">s</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>int_X</code></td>
+<td>
+<p>Position of the linear interpolated marker values on the marker grid.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>size_s_grid</code></td>
+<td>
+<p>Size of the time grid.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alpha</code></td>
+<td>
+<p>Marker-hazard obtained from <code>get_alpha</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>Numeric value of the last observed marker value.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>t</code></td>
+<td>
+<p>Numeric time value.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>b</code></td>
+<td>
+<p>Bandwidth.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Yi</code></td>
+<td>
+<p>A matrix made by <code>make_Yi</code> indicating the exposure. </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n</code></td>
+<td>
+<p>Number of individuals.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Y</code></td>
+<td>
+<p>A matrix made by <code>make_Y</code> indicating the exposure. </p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Function <code>h_xtll</code> implements the future conditional hazard estimator
+</p>
+<p style="text-align: center;"><code class="reqn">\hat{h}_x(t) = \frac{\sum_{i=1}^n \int_0^T\hat{\alpha}_i(X_i(t+s))Z_i(t+s)Z_i(s)K_{b}(x-X_i(s))\mathrm {d}s}{\sum_{i=1}^n\int_0^TZ_i(t+s)Z_i(s)K_{b}(x-X_i(s))\mathrm {d}s},</code>
+</p>
+
+<p>where <code class="reqn">X</code> is the marker, <code class="reqn">Z</code> is the exposure and <code class="reqn">\alpha(z)</code> is the marker-only hazard, see <code>get_alpha</code> for more details. The future conditional hazard is defined as
+</p>
+<p style="text-align: center;"><code class="reqn">h_{x,T}(t) = P\left(T_i\in (t+T, t+T+dt)| X_i(T)=x, T_i &gt; t+T\right),</code>
+</p>
+
+<p>where <code class="reqn">T_i</code> is the survival time and <code class="reqn">X_i</code> the marker of individual <code class="reqn">i</code> observed in the time frame <code class="reqn">[0,T]</code>.
+</p>
+<p>The function <code>h_xtll</code>, in the place of <code class="reqn">K_b()</code> uses the kernel    
+</p>
+<p style="text-align: center;"><code class="reqn">K_{x,b}(u)= \frac{K_b(u)-K_b(u)u^T D^{-1}c_1}{c_0 - c_1^T D^{-1} c_1}, </code>
+</p>
+
+<p>where <code class="reqn">c_1 = (c_{11}, \dots, c_{1d})^T, D = (d_{ij})_{(d+1) \times (d+1)}</code> with
+</p>
+<p style="text-align: center;"><code class="reqn">
+c_0  = \sum_{i=1}^n \int_0^T K_b(x-X_i(s)) Z_i(s)ds, \\
+c_{ij}  = \sum_{i=1}^n \int_0^T K_b(x-X_i(s))\{x-X_{ij}(s)\} Z_i(s)ds, \\
+d_{jk}  =  \sum_{i=1}^n \int_0^T K_b(x-X_i(s))\{x-X_{ij}(s)\}\{x-X_{ik}(s)\} Z_i(s)ds,
+</code>
+</p>
+
+<p>see also Nielsen (1998).
+</p>
+
+
+<h3>Value</h3>
+
+<p>A single numeric value of <code class="reqn">\hat h_x(t)</code>.
+</p>
+
+
+<h3>References</h3>
+
+
+<p><a href="https://doi.org/10.1080/03461238.1998.10413997">doi:10.1080/03461238.1998.10413997</a>
+</p>
+
+
+<h3>See Also</h3>
+
+ <p><code>get_alpha</code>, <code>dij</code> </p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">pbc2_id = to_id(pbc2)
+size_s_grid &lt;- size_X_grid &lt;- 100
+n = max(as.numeric(pbc2$id))
+s = pbc2$year
+X = pbc2$serBilir
+XX = pbc2_id$serBilir
+ss &lt;- pbc2_id$years
+delta &lt;- pbc2_id$status2
+br_s = seq(0, max(s), max(s)/( size_s_grid-1))
+br_X = seq(min(X), max(X), (max(X)-min(X))/( size_X_grid-1))
+
+X_lin = lin_interpolate(br_s, pbc2_id$id, pbc2$id, X, s)
+
+int_X &lt;- findInterval(X_lin, br_X)
+int_s = rep(1:length(br_s), n)
+
+N &lt;- make_N(pbc2, pbc2_id, breaks_X=br_X, breaks_s=br_s, ss, XX, delta)
+Y &lt;- make_Y(pbc2, pbc2_id, X_lin, br_X, br_s, size_s_grid, size_X_grid, int_s, int_X, 'years', n)
+
+b = 1.7
+alpha&lt;-get_alpha(N, Y, b, br_X, K=Epan )
+
+Yi &lt;- make_Yi(pbc2, pbc2_id, X_lin, br_X, br_s, size_s_grid, size_X_grid, int_s, int_X,'years', n)
+
+x = 2
+t = 2
+h_hat = h_xtll(br_X, br_s, int_X, size_s_grid, alpha, x, t, b, Yi, n, Y)
+</code></pre>
+
+
+</div>

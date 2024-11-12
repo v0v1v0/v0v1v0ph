@@ -1,0 +1,110 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>extrapol.return.level</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Spatial extrapolation of a return level.</h2>
+
+<h3>Description</h3>
+
+<p>Predictive distribution of a T-years return level at ungauged positions (targets), given the output from the MCMC procedures <code>hkevp.fit</code> or <code>latent.fit</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">extrapol.return.level(period, fit, targets, targets.covariates)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>period</code></td>
+<td>
+<p>An integer indicating the wished return period T.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fit</code></td>
+<td>
+<p>Output from the <code>hkevp.fit</code> procedure.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>targets</code></td>
+<td>
+<p>A matrix of real values giving the spatial coordinates of the ungauged positions. Each row corresponds to an ungauged position.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>targets.covariates</code></td>
+<td>
+<p>A matrix of real values giving the spatial covariates of the ungauged positions. Must match with the covariates used in <code>hkevp.fit</code> or <code>latent.fit</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Spatial extrapolation of the return level at target positions <code class="reqn">(s^*_1, ..., s^*_k)</code> is a two-step procedure:
+</p>
+
+<ul>
+<li>
+<p>Estimation of the predictive distribution for GEV parameters at <code class="reqn">(s^*_1, ..., s^*_k)</code>, by using <code>{extrapol.gev}</code>.
+</p>
+</li>
+<li>
+<p>Computation of the associated return level for each state of the predictive distribution.</p>
+</li>
+</ul>
+<h3>Value</h3>
+
+<p>A matrix of predictive sample. Each column corresponds to a target position and each row to a predictive draw.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Quentin Sebille
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>extrapol.gev</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+# Simulation of HKEVP:
+sites &lt;- as.matrix(expand.grid(1:3,1:3))
+knots &lt;- sites
+loc &lt;- sites[,1]*10
+scale &lt;- 1
+shape &lt;- .2
+alpha &lt;- .4
+tau &lt;- 1
+ysim &lt;- hkevp.rand(10, sites, knots, loc, scale, shape, alpha, tau)
+
+# HKEVP fit:
+fit &lt;- hkevp.fit(ysim, sites, niter = 1000)
+
+## Extrapolation of the 100-years return level (may need more iterations and burn-in/nthin):
+targets &lt;- as.matrix(expand.grid(1.5:2.5,1.5:2.5))
+pred.sample &lt;- extrapol.return.level(100, fit, targets)
+pred.mean &lt;- apply(pred.sample, 2, mean)
+pred.sd &lt;- apply(pred.sample, 2, sd)
+true &lt;- return.level(100, targets[,1]*10, scale, shape)
+# cbind(true, pred.mean, pred.sd)
+
+
+
+</code></pre>
+
+
+</div>

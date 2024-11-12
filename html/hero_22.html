@@ -1,0 +1,133 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>enhance.grid</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Enhance penalty value using grid search</h2>
+
+<h3>Description</h3>
+
+<p><code>enhance.grid</code> enhances the sandwich smoother by
+choosing a optimal penalty value to lower the GCV
+statistic.  A grid search algorithm is utilized based on
+the each row of <code>par</code>.  The penalty values (assumed
+to be on the log scale) are passed to the
+<code>loglambda2gcv</code> function.  If <code>prepare</code>
+is <code>TRUE</code>, then <code>obj</code> is returned with the
+penalty values that minimize the GCV statistic during the
+grid search.  Otherwise, the complete results of the grid
+search are returned.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">enhance.grid(obj, par, prepare = TRUE, loggcv = FALSE, ..., cl = NULL)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>obj</code></td>
+<td>
+<p>A <code>prepared_*</code> object from a
+<code>prepare</code> function.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>par</code></td>
+<td>
+<p>A matrix-like object (i.e.,
+<code>!is.null(dim(par)))</code>).  Each row contains a set
+of parameter values for which the GCV statistic should
+be computed.  The number of columns of <code>par</code>
+should match the dimensionality of <code>obj</code>, i.e,
+should equal <code>length(obj)$n</code>.  If missing, the
+default choices are a row of -20s, a row of 0s, and a
+row of 20s.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>prepare</code></td>
+<td>
+<p>A logical value.  The default is <code>TRUE</code>,
+indicating that a <code>prepared_data</code> object should be
+returned.  If <code>FALSE</code>, then the results of the
+call to the <code>optimx</code> function is
+returned.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>loggcv</code></td>
+<td>
+<p>A logical value indicating whether the log
+of the GCV statistic should be used.  Useful for very large
+data sets.  Default is <code>TRUE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Additional arguments to pass to to the
+<code>loglambda2gcv</code> function.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cl</code></td>
+<td>
+
+<p>A cluster object created by <code>makeCluster</code>,
+or an integer to indicate number of child-processes
+(integer values are ignored on Windows) for parallel evaluations
+(see Details on performance).
+It can also be <code>"future"</code> to use a future backend (see Details),
+<code>NULL</code> (default) refers to sequential evaluation.
+</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>By default, a <code>prepared_*</code> object with the
+optimal <code>loglambda</code> values that minimize the GCV,
+along with an additional component, <code>results</code>,
+that contains the optimization results. Otherwise, the
+complete results of the grid search.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Joshua French
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># create b-splines
+b1 = bspline(nbasis = 10)
+b2 = bspline(nbasis = 12)
+
+# observed data locations
+x1 = seq(0, 1, len = 60)
+x2 = seq(0, 1, len = 80)
+
+# construct "true" data
+mu = matrix(0, nrow = 60, ncol = 80)
+for(i in seq_len(60)) {
+   for(j in seq_len(80)) {
+      mu[i, j] =  sin(2*pi*(x1[i]-.5)^3)*cos(4*pi*x2[j])
+   }
+}
+# construct noisy data
+data = mu + rnorm(60 * 80)
+
+obj = prepare(data, list(x1, x2), list(b1, b2))
+enhance.grid(obj, prepare = FALSE)
+</code></pre>
+
+
+</div>

@@ -1,0 +1,98 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>constructBipartiteGraph</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Construct Bipartite Graph Edge Weight Matrix of Gene-drug Association Patterns</h2>
+
+<h3>Description</h3>
+
+<p>Constructs edge weight matrix B representing association between set of variables in mat1 and set of variables in mat2 (see paper).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">constructBipartiteGraph(
+  mat1,
+  mat2,
+  n_subsample = 1,
+  subsampling_ratio = 1,
+  parallel = FALSE,
+  maxCores = 7
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>mat1</code></td>
+<td>
+<p>an n x p matrix of variable set 1 (e.g. gene expression)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mat2</code></td>
+<td>
+<p>an n x q matrix of variable set 2 (e.g. drug sensitivity)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n_subsample</code></td>
+<td>
+<p>number of times to perform subsampling to generate B</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>subsampling_ratio</code></td>
+<td>
+<p>fraction of samples to subsample each time</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>parallel</code></td>
+<td>
+<p>boolean for whether to parallelize subsampling</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>maxCores</code></td>
+<td>
+<p>maximum number of cores to use (only applicable when parallel = TRUE)</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>a p x q matrix of bipartite graph edge weights
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Extract bipartite edge weight matrix B for cell lines from the
+# squamous cell carcinoma, esophagus group
+data(ctrp2)
+
+groups = ctrp2$groups
+X = ctrp2$X
+Y = ctrp2$Y
+
+x = X[groups[["squamous_cell_carcinoma_esophagus"]], ]
+y = Y[groups[["squamous_cell_carcinoma_esophagus"]], ]
+
+# Extract bipartite edge weight matrix B with subsampling
+## Not run: 
+B = constructBipartiteGraph(x, y, n_subsample = 100,
+                            subsampling_ratio = 0.90,
+                            parallel = TRUE, maxCores = 2)
+
+## End(Not run)
+
+</code></pre>
+
+
+</div>

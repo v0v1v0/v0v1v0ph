@@ -1,0 +1,75 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>capm</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Stock indices</h2>
+
+<h3>Description</h3>
+
+<p>Daily returns on the Standard &amp; Poors' 500 stock market index, daily rate of the U.S. Treasury bills, and 3 companies' stocks including Microsoft, the General Electric and the Ford Motor Company during the period from November 1, 1993 to March 31, 2003.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">data(capm)</code></pre>
+
+
+<h3>Format</h3>
+
+<p>A data frame with 2363 observations on the following 6 variables:
+</p>
+
+<dl>
+<dt><code>Close.tbill</code></dt>
+<dd>
+<p>Daily Treasury bill rate expressed as a percentage.</p>
+</dd>
+<dt><code>Close.msft</code></dt>
+<dd>
+<p>Daily closing price of the Microsoft stock.</p>
+</dd>
+<dt><code>Close.sp500</code></dt>
+<dd>
+<p>Daily closing Standard and Poor's 500 index.</p>
+</dd>
+<dt><code>Close.ge</code></dt>
+<dd>
+<p>Daily closing price of the General Electric stock.</p>
+</dd>
+<dt><code>Close.ford</code></dt>
+<dd>
+<p>Daily closing price of the Ford Motor Company stock.</p>
+</dd>
+<dt><code>Date</code></dt>
+<dd>
+<p>Dates from November 1, 1993 to March 31, 2003 (d-Mon-yy and dd-Mon-yr formats).</p>
+</dd>
+</dl>
+<h3>Source</h3>
+
+<p>Federal Reserve Bank of St. Louis U.S.A. (Treasury bill rates) and Yahoo Finance (stock prices).
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># The Capital Asset Pricing Model (CAPM) states that the excess returns on a stock 
+# have a linear relationship with the returns on the market. This example investigates
+# the CAPM for General Electric stock:
+
+library(HRW) ; data(capm)
+n &lt;- dim(capm)[1]
+riskfree &lt;- capm$Close.tbill[2:n]/365
+elrGE &lt;- diff(log(capm$Close.ge)) - riskfree
+elrSP500 &lt;- diff(log(capm$Close.sp500)) - riskfree
+plot(elrSP500,elrGE,col = "blue",cex = 0.2)
+fitOLS &lt;- lm(elrGE ~ elrSP500)
+summary(fitOLS)
+par(mfrow = c(2,2)) ; plot(fitOLS)
+</code></pre>
+
+
+</div>

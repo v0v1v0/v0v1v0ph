@@ -1,0 +1,105 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>binarize_fisheye</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Compute the threshold of a single-channel fisheye image, and return a binary fisheye image of canopy (0) and gap (1) pixels</h2>
+
+<h3>Description</h3>
+
+<p>The function calculates a single threshold of a single-channel raster image using  the <code>autothresholdr::auto_thresh()</code> functionality.
+The single thresholding is also applied at sub-image level if zonal=TRUE.
+The available methods are described at <a href="https://imagej.net/plugins/auto-threshold">https://imagej.net/plugins/auto-threshold</a>.
+The thresholding value is then used to make a binary raster image of canopy (0) and gap (1) pixels.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">binarize_fisheye(
+  img,
+  method = "Otsu",
+  zonal = FALSE,
+  manual = NULL,
+  display = FALSE,
+  export = FALSE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>img</code></td>
+<td>
+<p>SpatRaster. A single layer fisheye image imported by <code>import_fisheye()</code> using the <code>terra::rast()</code> functionality.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+<p>Character. The method used to threshold the image, using the <code>autothresholdr::auto_thresh()</code> function. For details, see <a href="https://imagej.net/plugins/auto-threshold">https://imagej.net/plugins/auto-threshold</a>. Default = 'Otsu'.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>zonal</code></td>
+<td>
+<p>Logical. If is set to TRUE, it divides the images in four (N, W, S, E) regions and classify each region separately. Useful in case of uneven illumination condition in the image.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>manual</code></td>
+<td>
+<p>Numeric. It uses a manual thresholding instead of automatic one. If selected, it overrides automatic thresholding.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>display</code></td>
+<td>
+<p>Logical. If is set to TRUE, it plots the classified binary image. Default to FALSE.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>export</code></td>
+<td>
+<p>Logical. If is set to TRUE, it saves the binary fisheye image as tif file. Default to FALSE.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A binary single-layer image (SpatRaster)
+</p>
+
+
+<h3>See Also</h3>
+
+<p><a href="https://imagej.net/plugins/auto-threshold">https://imagej.net/plugins/auto-threshold</a>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+c.im&lt;-system.file('extdata/circular_coolpix4500+FC-E8_chestnut.jpg',package='hemispheR')
+
+c.im |&gt;
+import_fisheye(circ.mask=camera_fisheye('Coolpix4500+FC-E8')) |&gt;
+ binarize_fisheye(display=TRUE)
+
+#zonal thresholding:
+c.im |&gt;
+import_fisheye(circ.mask=camera_fisheye('Coolpix4500+FC-E8')) |&gt;
+ binarize_fisheye(zonal=TRUE,display=TRUE)
+
+#manual thresholding:
+c.im |&gt;
+import_fisheye(circ.mask=camera_fisheye('Coolpix4500+FC-E8')) |&gt;
+binarize_fisheye(manual=55,display=TRUE)
+
+</code></pre>
+
+
+</div>

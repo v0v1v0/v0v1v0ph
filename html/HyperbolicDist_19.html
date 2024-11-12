@@ -1,0 +1,144 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>ghypMom</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Calculate Moments of the Generalized Hyperbolic Distribution</h2>
+
+<h3>Description</h3>
+
+<p>This function can be used to calculate raw moments, mu moments,
+central moments and moments about any other given location for the
+generalized hyperbolic distribution.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">ghypMom(order, Theta, momType = "raw", about = 0)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>order</code></td>
+<td>
+<p>Numeric. The order of the moment to be calculated. Not
+permitted to be a vector. Must be a positive whole number except for
+moments about zero.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Theta</code></td>
+<td>
+<p>Numeric. The parameter vector specifying the GIG
+distribution. Of the form <code>c(lambda, alpha, beta, delta, mu)</code>
+(see <code>dghyp</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>momType</code></td>
+<td>
+<p>Common types of moments to be calculated, default is "raw".
+See <b>Details</b>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>about</code></td>
+<td>
+<p>Numeric. The point around which the moment is to be
+calculated, default is 0. See <b>Details</b>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Checking whether <code>order</code> is a whole number is carried out using
+the function <code>is.wholenumber</code>.
+</p>
+<p><code>momType</code> can be either "raw" (moments about zero), "mu" (moments
+about mu), or "central" (moments about mean). If one of these moment
+types is specified, then there is no need to specify the <code>about</code>
+value. For moments about any other location, the <code>about</code> value
+must be specified. In the case that both <code>momType</code> and
+<code>about</code> are specified and contradicting, the function will always
+calculate the moments based on <code>about</code> rather than
+<code>momType</code>.
+</p>
+<p>To calculate moments of the generalized hyperbolic distribution, the
+function first calculates mu moments by the formula defined below and
+then transforms mu moments to central moments or raw moments or
+moments about any other location as required by calling
+<code>momChangeAbout</code>.
+</p>
+<p>The mu moments are obtained from the recursion formula given in Scott,
+Würtz and Tran (2008).
+</p>
+
+
+<h3>Value</h3>
+
+<p>The moment specified.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>David Scott <a href="mailto:d.scott@auckland.ac.nz">d.scott@auckland.ac.nz</a></p>
+
+
+<h3>References</h3>
+
+<p>Scott, D. J., Würtz, D. and Tran, T. T. (2008)
+Moments of the Generalized Hyperbolic Distribution. Preprint.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>ghypChangePars</code>, <code>is.wholenumber</code>,
+<code>momChangeAbout</code>, <code>momIntegrated</code>,
+<code>ghypMean</code>, <code>ghypVar</code>, <code>ghypSkew</code>,
+<code>ghypKurt</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">Theta &lt;- c(2,2,1,2,1)
+mu &lt;- Theta[5]
+### mu moments
+(m1 &lt;- ghypMean(Theta))
+m1 - mu
+ghypMom(1, Theta, momType = "mu")
+momIntegrated("ghyp", order = 1, param = Theta, about = mu)
+ghypMom(2, Theta, momType = "mu")
+momIntegrated("ghyp", order = 2, param = Theta, about = mu)
+ghypMom(10, Theta, momType = "mu")
+momIntegrated("ghyp", order = 10, param = Theta, about = mu)
+
+### raw moments
+ghypMean(Theta)
+ghypMom(1, Theta, momType = "raw")
+momIntegrated("ghyp", order = 1, param = Theta, about = 0)
+ghypMom(2, Theta, momType = "raw")
+momIntegrated("ghyp", order = 2, param = Theta, about = 0)
+ghypMom(10, Theta, momType = "raw")
+momIntegrated("ghyp", order = 10, param = Theta, about = 0)
+
+### central moments
+ghypMom(1, Theta, momType = "central")
+momIntegrated("ghyp", order = 1, param = Theta, about = m1)
+ghypVar(Theta)
+ghypMom(2, Theta, momType = "central")
+momIntegrated("ghyp", order = 2, param = Theta, about = m1)
+ghypMom(10, Theta, momType = "central")
+momIntegrated("ghyp", order = 10, param = Theta, about = m1)
+
+</code></pre>
+
+
+</div>

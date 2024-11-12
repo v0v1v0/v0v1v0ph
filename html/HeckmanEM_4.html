@@ -1,0 +1,82 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>HeckmanEM.envelope</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Envelope for the Heckman Selection model</h2>
+
+<h3>Description</h3>
+
+<p>'HeckmanEM.envelope()' plots the envelope for the fitted Heckman selection model.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">HeckmanEM.envelope(obj, envelope = 0.95, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>obj</code></td>
+<td>
+<p>An object of the class HeckmanEM.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>envelope</code></td>
+<td>
+<p>The envelope coverage percentage.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Other option for chart.QQPlot from PerformanceAnalytics package.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A residual plot of the fitted data and its envelope.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+n &lt;- 100
+family &lt;- "T"
+nu &lt;- 4
+rho &lt;- .6
+cens &lt;- .25
+
+set.seed(20200527)
+w &lt;- cbind(1,runif(n,-1,1),rnorm(n))
+x &lt;- cbind(w[,1:2])
+c &lt;- qt(cens, df=nu)
+
+sigma2 &lt;- 1
+
+beta &lt;- c(1,0.5)
+gamma &lt;- c(1,0.3,-.5)
+gamma[1] &lt;- -c*sqrt(sigma2)
+
+set.seed(1)
+datas &lt;- rHeckman(x,w,beta,gamma,sigma2,rho,nu,family=family)
+y &lt;- datas$y
+cc &lt;- datas$cc
+
+res &lt;- HeckmanEM(y, x, w, cc, nu = 4, family = "Normal", error = 1e-05, iter.max = 500,
+                 im = TRUE, criteria = TRUE)
+HeckmanEM.envelope(res, ylab="Normalized Quantile Residuals",xlab="Standard normal quantile",
+                   line="quartile", col=c(20,1), pch=19, ylim = c(-5,4))
+
+</code></pre>
+
+
+</div>

@@ -1,0 +1,125 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>scovmat</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Simulation based covariance matrix.
+</h2>
+
+<h3>Description</h3>
+
+<p>Produces an estimate of the covariance matrix of the parameter
+estimates in a model fitted by <code>hmm.discnp</code>.  Uses a method
+based on simulation (or “parametric bootstrapping”).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">scovmat(object, expForm=TRUE, seed = NULL, nsim=100, verbose = TRUE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>object</code></td>
+<td>
+
+<p>An object of class <code>hmm.discnp</code> as returned by <code>hmm()</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>expForm</code></td>
+<td>
+
+<p>Logical scalar.  Should the covariance matrix produced
+be that of the estimates of the parameters expressed in
+“exponential” (or “smooth” or “logistic”)
+form?  If <code>expForm=FALSE</code> then the parameter estimates
+considered are “raw” probabilities, with redundancies
+(last column of <code>tpm</code>; last row of <code>Rho</code>) removed.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>seed</code></td>
+<td>
+
+<p>Integer scalar serving as a seed for the random number generator.
+If left <code>NULL</code> the seed itself is chosen randomly from the
+set of integers between 1 and <code class="reqn">10^5</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nsim</code></td>
+<td>
+
+<p>A positive integer.  The number of simulations upon which
+the covariance matrix estimate will be based.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+
+<p>Logical scalar; if <code>TRUE</code>, iteration counts will be
+printed out during each of the simulation and model-fitting
+stages.
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>This function is currently applicable only to models fitted to
+univariate data.  If there are <em>predictors</em> in the model,
+then only the exponential form of the parameters may be used,
+i.e. <code>expForm</code> <em>must</em> be <code>TRUE</code>.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A (positive definite) matrix which is an estimate of the
+covariance of the parameter estimates from the fitted model
+specified by <code>object</code>.  It has row and column labels
+which indicate the parameters to which its entries pertain,
+in a reasonably perspicuous manner.
+</p>
+<p>This matrix has an attribute <code>seed</code> (the random number
+generation seed that was used) so that the calculations can
+be reproduced.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Rolf Turner
+<a href="mailto:r.turner@auckland.ac.nz">r.turner@auckland.ac.nz</a><br></p>
+
+
+<h3>See Also</h3>
+
+<p><code>squantCI()</code> <code>link{rhmm}()</code> <code>link{hmm)}()</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+y   &lt;- list(lindLandFlows$deciles,ftLiardFlows$deciles)
+fit &lt;- hmm(y,K=3)
+ccc &lt;- scovmat(fit,nsim=100)
+
+## End(Not run)
+</code></pre>
+
+
+</div>

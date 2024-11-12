@@ -1,0 +1,147 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>residual.plots</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Residual plots for a linear model.</h2>
+
+<h3>Description</h3>
+
+<p>Residual plots for a linear model.  Four sets of plots are produced:
+(1) response against each of the predictor variables,
+(2) residuals against each of the predictor variables,
+(3) partial residuals for each predictor against that predictor
+("partial residuals plots", and
+(4) partial residuals against the residuals of each predictor
+regressed on the other predictors ("added variable plots").
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">residual.plots(lm.object, X=dft$x,
+               layout=c(dim(X)[2],1),
+               par.strip.text=list(cex=.8),
+               scales.cex=.6,
+               na.action=na.pass,
+               y.relation="free",
+               ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>lm.object</code></td>
+<td>
+<p>An object inheriting from <code>"lm"</code>.
+It may be necessary for the <code>lm.object</code> to be constructed with
+arguments <code>x=TRUE, y=TRUE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>X</code></td>
+<td>
+<p>The x matrix of predictor variables used in the linear model
+<code>lm.object</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>layout, par.strip.text</code></td>
+<td>
+<p>trellis or lattice arguments.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>scales.cex</code></td>
+<td>
+<p><code>cex</code> argument forwarded to the scales argument
+of <code>xyplot</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>na.action</code></td>
+<td>
+<p>A function to filter missing data.  See <code>lm</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>y.relation</code></td>
+<td>
+<p>See <code>relation</code> in the discussion of the
+<code>scales</code> argument in
+
+<code>xyplot</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Other arguments for <code>xysplom</code> or <code>xyplot</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A list of four trellis objects, one for each of the four sets of
+plots.  The objects are named <code>"y.X"</code>, <code>"res.X"</code>
+<code>"pres.X"</code>, <code>"pres.Xj"</code>.  The default "printing" of the
+result will produce four pages of plots, one set per page.  They are
+often easier to read when all four sets appear as separate rows on one
+page (this usually requires an oversize device), or two rows are
+printed on each of two pages.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p> Richard M. Heiberger &lt;rmh@temple.edu&gt; </p>
+
+
+<h3>References</h3>
+
+<p>Heiberger, Richard M. and Holland, Burt (2015).
+<em>Statistical Analysis and Data Display: An Intermediate Course with Examples in R</em>.
+Second Edition.
+Springer-Verlag, New York.
+<a href="https://link.springer.com/book/10.1007/978-1-4939-2122-5">https://link.springer.com/book/10.1007/978-1-4939-2122-5</a>
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>residual.plots.lattice</code></p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">if.R(s={
+     longley &lt;- data.frame(longley.x, Employed = longley.y)
+     },r={
+     data(longley)
+     })
+
+longley.lm &lt;- lm( Employed ~ . , data=longley, x=TRUE, y=TRUE)
+## 'x=TRUE, y=TRUE' are needed to pass the S-Plus CMD check.
+## They may be needed if residual.plots() is inside a nested set of
+## function calls.
+
+tmp &lt;- residual.plots(longley.lm)
+
+## print two rows per page
+print(tmp[[1]], position=c(0, 0.5, 1, 1.0), more=TRUE)
+print(tmp[[2]], position=c(0, 0.0, 1, 0.5), more=FALSE)
+print(tmp[[3]], position=c(0, 0.5, 1, 1.0), more=TRUE)
+print(tmp[[4]], position=c(0, 0.0, 1, 0.5), more=FALSE)
+
+## print as a single trellis object
+ABCD &lt;- do.call(rbind, lapply(tmp, as.vector))
+dimnames(ABCD)[[1]] &lt;- dimnames(tmp[[1]])[[1]]
+ABCD
+</code></pre>
+
+
+</div>

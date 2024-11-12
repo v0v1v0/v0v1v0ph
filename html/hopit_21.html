@@ -1,0 +1,94 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>lrt.hopit</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Likelihood ratio test for a pair of models</h2>
+
+<h3>Description</h3>
+
+<p>Likelihood ratio test for a pair of models
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">lrt.hopit(full, nested)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table><tr style="vertical-align: top;">
+<td><code>full, nested</code></td>
+<td>
+<p>models to be compared.</p>
+</td>
+</tr></table>
+<h3>Value</h3>
+
+<p>a vector with the results of the test.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Maciej J. Danko
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>print.lrt.hopit</code>, <code>anova.hopit</code>,
+<code>hopit</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+# DATA
+data(healthsurvey)
+
+# the order of response levels decreases from the best health to
+# the worst health; hence the hopit() parameter decreasing.levels
+# is set to TRUE
+levels(healthsurvey$health)
+
+# Example 1 ---------------------
+
+# fitting two nested models
+model1 &lt;- hopit(latent.formula = health ~ hypertension + high_cholesterol +
+                heart_attack_or_stroke + poor_mobility + very_poor_grip +
+                depression + respiratory_problems +
+                IADL_problems + obese + diabetes + other_diseases,
+              thresh.formula = ~ sex + ageclass + country,
+              decreasing.levels = TRUE,
+              control = list(trace = FALSE),
+              data = healthsurvey)
+
+# model with an interaction between hypertension and high_cholesterol
+model2 &lt;- hopit(latent.formula = health ~ hypertension * high_cholesterol +
+                heart_attack_or_stroke + poor_mobility + very_poor_grip +
+                depression + respiratory_problems +
+                IADL_problems + obese + diabetes + other_diseases,
+              thresh.formula = ~ sex + ageclass + country,
+              decreasing.levels = TRUE,
+              control = list(trace = FALSE),
+              data = healthsurvey)
+
+# Likelihood ratio test
+lrt1 &lt;- lrt.hopit(full = model2, nested = model1)
+lrt1
+
+# print the results in a shorter form
+print(lrt1, short = TRUE)
+
+# equivalently
+print(anova(model2, model1), short = TRUE)
+
+</code></pre>
+
+
+</div>

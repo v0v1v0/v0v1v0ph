@@ -1,0 +1,160 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>panel.hextri</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+A lattice panel function for hexagonal binning with classes
+</h2>
+
+<h3>Description</h3>
+
+<p>Displays a hexagonally-binned scatterplot with coloured subtriangles to indicate number of observations in each class. Uses the Sainte-Lague method to apportion counts to triangles, ensuring the counts round to exactly six triangles per hexagon.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">panel.hextri(x, y, groups, subscripts, colours, nbins = 10, border = TRUE,
+   diffuse = FALSE, style = c("alpha", "size"), weights = NULL,
+   sorted=!diffuse, shape = 1, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x,y</code></td>
+<td>
+
+<p>point coordinates for the subset being plotted
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>groups</code></td>
+<td>
+
+<p>A factor giving the class identity for all points (will be filled in automatically by <code>xyplot</code>)
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>subscripts</code></td>
+<td>
+
+<p>Vector selecting the elements of <code>groups</code> that are in the panel (will be filled in automatically by <code>xyplot</code>)
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>colours</code></td>
+<td>
+
+<p>Vector of colors (number, name, or hashtag format) giving the colours for each class
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nbins</code></td>
+<td>
+
+<p>Number of bins along the x axis
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>border</code></td>
+<td>
+
+<p>If <code>TRUE</code>, leave a transparent border around each element drawn
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>diffuse</code></td>
+<td>
+
+<p>If <code>TRUE</code> pass on rounding error to nearest not-yet-drawn hexes so that rare classes get represented
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>style</code></td>
+<td>
+<p>Represent data by hexagon size or by alpha-blending</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>weights</code></td>
+<td>
+<p>If not <code>NULL</code>, sampling weights or frequency
+weights. The hexbin plot will be based on the sum of weights in the
+hex</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sorted</code></td>
+<td>
+<p>Sort the triangles into a consistent order within each hex?</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>shape</code></td>
+<td>
+
+<p>Aspect ratio for each hex. 
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+
+<p>because you have to.
+</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A panel
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Thomas Lumley
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>hextri</code> is the base-graphics plot
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">library(lattice)
+xx&lt;-rnorm(1000)
+yy&lt;-rnorm(1000)
+cc&lt;-cut(xx*yy,c(-Inf,-.4,0,.4,Inf))
+zz&lt;-cut(xx+yy,c(-Inf,-1,0,1,Inf))
+
+plot(xx,yy,col=(1:4)[cc])
+xyplot(yy~xx|zz, panel=panel.hextri,groups=cc,colours=1:4,style="size",nbins=10)
+
+data(airquality)
+airquality$o3group&lt;-with(airquality, cut(Ozone, c(0,18,60,Inf)))
+
+xyplot(Temp~Solar.R|equal.count(Wind,4), groups=o3group, panel=panel.hextri,
+  data=na.omit(airquality),colours=c("royalblue","grey60","goldenrod"),
+  strip=strip.custom(var.name="Wind Speed"),xlab="Solar Radiation (langley)",
+  ylab="Temperature (F)")
+</code></pre>
+
+
+</div>

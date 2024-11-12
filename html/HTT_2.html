@@ -1,0 +1,108 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>Hypothesis Testing Tree</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Hypothesis Testing Tree
+</h2>
+
+<h3>Description</h3>
+
+<p>Fit a hypothesis testing tree.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">HTT(formula, data, method, distance, controls = htt_control(...), ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>formula</code></td>
+<td>
+<p> a symbolic description of the model to be fit. </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p> a data frame containing the variables in the model. </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+ <p><code>"regression"</code> or <code>"classification"</code>.
+If <code>method</code> is missing then the routine tries to make an intelligent guess.
+If <code>Y</code> is factor, then <code>method = "classification"</code>.
+If <code>Y</code> is numeric vector or numeric matrix, then <code>method = "classification"</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>distance</code></td>
+<td>
+<p> If <code>distance</code> is missing, then Euclidean distance with exponent alpha is used for regression tree,
+0-1 distance is used for classification tree.
+Otherwise, use the <code>distance</code> as the distance matrix of <code>Y</code>. </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>controls</code></td>
+<td>
+<p> a list of options that control details of the <code>HTT</code> algorithm. See <code>htt_control</code>. </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>arguments passed to <code>htt_control</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Hypothesis testing trees examines the distribution difference over two child nodes by the binary partitioning in a hypothesis testing framework. At each split, it finds the maximum distribution difference over all possible binary partitions, the test statistic is based on generalized energy distance. The permutation test is used to estimate the p-value of the hypothesis testing.
+</p>
+
+
+<h3>Value</h3>
+
+<p>An object of class <code>htt</code>. See <code>htt.object</code>.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Jiaqi Hu
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>htt_control</code>, <code>print.htt</code>, <code>plot.htt</code>, <code>predict.htt</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## regression
+data("Boston", package = "MASS")
+Bostonhtt &lt;- HTT(medv ~ . , data = Boston, controls = htt_control(R = 99))
+plot(Bostonhtt)
+mean((Boston$medv - predict(Bostonhtt))^2)
+
+## classification
+irishtt &lt;- HTT(Species ~., data = iris)
+plot(irishtt)
+mean(iris$Species == predict(irishtt))
+</code></pre>
+
+
+</div>

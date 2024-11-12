@@ -1,0 +1,201 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>validate_external</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Externally validate high-dimensional Cox models with time-dependent AUC</h2>
+
+<h3>Description</h3>
+
+<p>Externally validate high-dimensional Cox models with time-dependent AUC
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">validate_external(
+  object,
+  x,
+  time,
+  event,
+  x_new,
+  time_new,
+  event_new,
+  tauc.type = c("CD", "SZ", "UNO"),
+  tauc.time
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>object</code></td>
+<td>
+<p>Model object fitted by <code>hdnom::fit_*()</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>Matrix of training data used for fitting the model.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>time</code></td>
+<td>
+<p>Survival time of the training data.
+Must be of the same length with the number of rows as <code>x</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>event</code></td>
+<td>
+<p>Status indicator of the training data,
+normally 0 = alive, 1 = dead.
+Must be of the same length with the number of rows as <code>x</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x_new</code></td>
+<td>
+<p>Matrix of predictors for the external validation data.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>time_new</code></td>
+<td>
+<p>Survival time of the external validation data.
+Must be of the same length with the number of rows as <code>x_new</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>event_new</code></td>
+<td>
+<p>Status indicator of the external validation data,
+normally 0 = alive, 1 = dead.
+Must be of the same length with the number of rows as <code>x_new</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tauc.type</code></td>
+<td>
+<p>Type of time-dependent AUC.
+Including <code>"CD"</code> proposed by Chambless and Diao (2006).,
+<code>"SZ"</code> proposed by Song and Zhou (2008).,
+<code>"UNO"</code> proposed by Uno et al. (2007).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tauc.time</code></td>
+<td>
+<p>Numeric vector. Time points at which to evaluate
+the time-dependent AUC.</p>
+</td>
+</tr>
+</table>
+<h3>References</h3>
+
+<p>Chambless, L. E. and G. Diao (2006).
+Estimation of time-dependent area under the ROC curve for long-term
+risk prediction.
+<em>Statistics in Medicine</em> 25, 3474–3486.
+</p>
+<p>Song, X. and X.-H. Zhou (2008).
+A semiparametric approach for the covariate specific ROC curve with
+survival outcome.
+<em>Statistica Sinica</em> 18, 947–965.
+</p>
+<p>Uno, H., T. Cai, L. Tian, and L. J. Wei (2007).
+Evaluating prediction rules for t-year survivors with censored
+regression models.
+<em>Journal of the American Statistical Association</em> 102, 527–537.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(smart)
+# Use the first 1000 samples as training data
+# (the data used for internal validation)
+x &lt;- as.matrix(smart[, -c(1, 2)])[1:1000, ]
+time &lt;- smart$TEVENT[1:1000]
+event &lt;- smart$EVENT[1:1000]
+
+# Take the next 1000 samples as external validation data
+# In practice, usually use data collected in other studies
+x_new &lt;- as.matrix(smart[, -c(1, 2)])[1001:2000, ]
+time_new &lt;- smart$TEVENT[1001:2000]
+event_new &lt;- smart$EVENT[1001:2000]
+
+# Fit Cox model with lasso penalty
+fit &lt;- fit_lasso(
+  x, survival::Surv(time, event),
+  nfolds = 5, rule = "lambda.1se", seed = 11
+)
+
+# External validation with time-dependent AUC
+val.ext &lt;- validate_external(
+  fit, x, time, event,
+  x_new, time_new, event_new,
+  tauc.type = "UNO",
+  tauc.time = seq(0.25, 2, 0.25) * 365
+)
+
+print(val.ext)
+summary(val.ext)
+plot(val.ext)
+
+# # Test fused lasso, MCP, and Snet models
+# data(smart)
+# # Use first 600 samples as training data
+# # (the data used for internal validation)
+# x &lt;- as.matrix(smart[, -c(1, 2)])[1:600, ]
+# time &lt;- smart$TEVENT[1:600]
+# event &lt;- smart$EVENT[1:600]
+#
+# # Take 500 samples as external validation data.
+# # In practice, usually use data collected in other studies.
+# x_new &lt;- as.matrix(smart[, -c(1, 2)])[1001:1500, ]
+# time_new &lt;- smart$TEVENT[1001:1500]
+# event_new &lt;- smart$EVENT[1001:1500]
+#
+# flassofit &lt;- fit_flasso(x, survival::Surv(time, event), nfolds = 5, seed = 11)
+# scadfit &lt;- fit_mcp(x, survival::Surv(time, event), nfolds = 5, seed = 11)
+# mnetfit &lt;- fit_snet(x, survival::Surv(time, event), nfolds = 5, seed = 11)
+#
+# val.ext1 &lt;- validate_external(
+#   flassofit, x, time, event,
+#   x_new, time_new, event_new,
+#   tauc.type = "UNO",
+#   tauc.time = seq(0.25, 2, 0.25) * 365)
+#
+# val.ext2 &lt;- validate_external(
+#   scadfit, x, time, event,
+#   x_new, time_new, event_new,
+#   tauc.type = "CD",
+#   tauc.time = seq(0.25, 2, 0.25) * 365)
+#
+# val.ext3 &lt;- validate_external(
+#   mnetfit, x, time, event,
+#   x_new, time_new, event_new,
+#   tauc.type = "SZ",
+#   tauc.time = seq(0.25, 2, 0.25) * 365)
+#
+# print(val.ext1)
+# summary(val.ext1)
+# plot(val.ext1)
+#
+# print(val.ext2)
+# summary(val.ext2)
+# plot(val.ext2)
+#
+# print(val.ext3)
+# summary(val.ext3)
+# plot(val.ext3)
+</code></pre>
+
+
+</div>

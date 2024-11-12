@@ -1,0 +1,167 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>forwardback</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Forward and Backward Probabilities of DTHMM</h2>
+
+<h3>Description</h3>
+
+<p>These functions calculate the forward and backward probabilities for a <code>dthmm</code> process, as defined in MacDonald &amp; Zucchini (1997, Page 60).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">backward(x, Pi, distn, pm, pn = NULL)
+forward(x, Pi, delta, distn, pm, pn = NULL)
+forwardback(x, Pi, delta, distn, pm, pn = NULL, fortran = TRUE)
+forwardback.dthmm(Pi, delta, prob, fortran = TRUE, fwd.only = FALSE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>is a vector of length <code class="reqn">n</code> containing the observed process.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Pi</code></td>
+<td>
+<p>is the <code class="reqn">m \times m</code> transition probability matrix of the hidden Markov chain.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>delta</code></td>
+<td>
+<p>is the marginal probability distribution of the <code class="reqn">m</code> hidden states.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>distn</code></td>
+<td>
+<p>is a character string with the distribution name, e.g. <code>"norm"</code> or <code>"pois"</code>. If the distribution is specified as <code>"wxyz"</code> then a probability (or density) function called <code>"dwxyz"</code> should be available, in the standard <span style="font-family: Courier New, Courier; color: #666666;"><b>R</b></span> format (e.g. <code>dnorm</code> or <code>dpois</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pm</code></td>
+<td>
+<p>is a list object containing the current (Markov dependent) parameter estimates associated with the distribution of the observed process (see <code>dthmm</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pn</code></td>
+<td>
+<p>is a list object containing the observation dependent parameter values associated with the distribution of the observed process (see <code>dthmm</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>prob</code></td>
+<td>
+<p>an <code class="reqn">n \times m</code> matrix containing the observation probabilities or densities (rows) by Markov state (columns).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fortran</code></td>
+<td>
+<p>logical, if <code>TRUE</code> (default) use the Fortran code, else use the <span style="font-family: Courier New, Courier; color: #666666;"><b>R</b></span> code.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fwd.only</code></td>
+<td>
+<p>logical, if <code>FALSE</code> (default) calculate both forward and backward probabilities; else calculate and return only forward probabilities and log-likelihood.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Denote the <code class="reqn">n \times m</code> matrices containing the forward and backward probabilities as <code class="reqn">A</code> and <code class="reqn">B</code>, respectively. Then the <code class="reqn">(i,j)</code>th elements are
+</p>
+<p style="text-align: center;"><code class="reqn">
+\alpha_{ij} = \Pr\{ X_1 = x_1, \cdots, X_i = x_i, C_i = j \}
+</code>
+</p>
+
+<p>and
+</p>
+<p style="text-align: center;"><code class="reqn">
+\beta_{ij} = \Pr\{ X_{i+1} = x_{i+1}, \cdots, X_n = x_n \,|\, C_i = j \} \,.
+</code>
+</p>
+
+<p>Further, the diagonal elements of the product matrix <code class="reqn">A B^\prime</code> are all the same, taking the value of the log-likelihood.
+</p>
+
+
+<h3>Value</h3>
+
+<p>The function <code>forwardback</code> returns a list with two matrices containing the forward and backward (log) probabilities, <code>logalpha</code> and <code>logbeta</code>, respectively, and the log-likelihood (<code>LL</code>).
+</p>
+<p>The functions <code>backward</code> and <code>forward</code> return a matrix containing the forward and backward (log) probabilities, <code>logalpha</code> and <code>logbeta</code>, respectively.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>The algorithm has been taken from Zucchini (2005).</p>
+
+
+<h3>References</h3>
+
+<p>Cited references are listed on the HiddenMarkov manual page.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>logLik</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">#    Set Parameter Values
+
+Pi &lt;- matrix(c(1/2, 1/2,   0,   0,   0,
+               1/3, 1/3, 1/3,   0,   0,
+                 0, 1/3, 1/3, 1/3,   0,
+                 0,   0, 1/3, 1/3, 1/3,
+                 0,   0,   0, 1/2, 1/2),
+             byrow=TRUE, nrow=5)
+
+p &lt;- c(1, 4, 2, 5, 3)
+delta &lt;- c(0, 1, 0, 0, 0)
+
+#------   Poisson HMM   ------
+
+x &lt;- dthmm(NULL, Pi, delta, "pois", list(lambda=p), discrete=TRUE)
+
+x &lt;- simulate(x, nsim=10)
+
+y &lt;- forwardback(x$x, Pi, delta, "pois", list(lambda=p))
+
+# below should be same as LL for all time points
+print(log(diag(exp(y$logalpha) %*% t(exp(y$logbeta)))))
+print(y$LL)
+
+#------   Gaussian HMM   ------
+
+x &lt;- dthmm(NULL, Pi, delta, "norm", list(mean=p, sd=p/3))
+
+x &lt;- simulate(x, nsim=10)
+
+y &lt;- forwardback(x$x, Pi, delta, "norm", list(mean=p, sd=p/3))
+
+# below should be same as LL for all time points
+print(log(diag(exp(y$logalpha) %*% t(exp(y$logbeta)))))
+print(y$LL)
+</code></pre>
+
+
+</div>

@@ -1,0 +1,242 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>escv.glmnet</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+escv glmnet
+</h2>
+
+<h3>Description</h3>
+
+<p>Does k-fold estimation stability with cross-validation (escv) for glmnet and returns optimal values for lambda.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">escv.glmnet(x, y, lambda = NULL, nfolds = 10, foldid, cv.OLS = FALSE, tau = 0, parallel 
+            = FALSE, standardize = TRUE, intercept = TRUE, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+
+<p>Input matrix as in glmnet, of dimension nobs x nvars; each row is an observation vector. Can be in sparse matrix format (inherit from class "sparseMatrix" as in package Matrix).
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+
+<p>Response variable.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lambda</code></td>
+<td>
+
+<p>Optional user-supplied lambda sequence for the Lasso; default is NULL, and glmnet chooses its own sequence.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nfolds</code></td>
+<td>
+
+<p>Number of folds - default is 10.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>foldid</code></td>
+<td>
+
+<p>An optional vector of values between 1 and nfold identifying what fold each observation is in. If supplied, nfolds can be missing.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cv.OLS</code></td>
+<td>
+
+<p>If TRUE, uses two-stage estimator Lasso+OLS in the fits (using Lasso to select variables/predictors and then using OLS to refit the coefficients for the selected variables/predictors. The default value is FALSE.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tau</code></td>
+<td>
+
+<p>Tuning parameter in modified Least Squares (mls). Default value is 0, which corresponds to OLS.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>parallel</code></td>
+<td>
+
+<p>If TRUE, use parallel foreach to fit each fold. Must register parallel before hand, such as doParallel or others. See the example below.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>standardize</code></td>
+<td>
+
+<p>Logical flag for x variable standardization, prior to fitting the model sequence. Default is standardize=TRUE.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>intercept</code></td>
+<td>
+
+<p>Should intercept be fitted (default is TRUE) or set to zero (FALSE).
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+
+<p>Other arguments that can be passed to glmnet.
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The function is similar to cv.glmnet, and returns the values of lambda selected by cross-validation (cv), by cross-validation within 1 standard error (cv1se) and by estimation stability with cross-validation (escv). The function runs glmnet nfolds+1 times; the first to get the lambda sequence, and then the remainder to compute the first stage fit (i.e., Lasso) with each of the folds omitted. The error (cv and also es) is accumulated, and the average error and standard deviation over the folds is computed. Note that, similar to cv.glmnet,  the results of escv.glmnet are random, since the folds are selected at random. Users can reduce this randomness by running escv.glmnet many times, and averaging the error curves.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A list consisting of the following elements is returned.
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>lambda</code></td>
+<td>
+
+<p>The values of lambda used in the fits.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>glmnet.fit</code></td>
+<td>
+
+<p>A fitted glmnet object for the full data.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cv</code></td>
+<td>
+
+<p>The mean cross-validated error - a vector of length length(lambda).
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cv.error</code></td>
+<td>
+
+<p>Estimate of standard error of cv.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>es</code></td>
+<td>
+
+<p>The mean estimation stability (es) value - a vector of length length(lambda).
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>es.error</code></td>
+<td>
+
+<p>Estimate of standard error of es.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lambda.cv</code></td>
+<td>
+
+<p>Value of lambda that gives minimum cv.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lambda.cv1se</code></td>
+<td>
+
+<p>Largest value of lambda such that cross-validated error is within 1 standard error of the minimum.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lambda.escv</code></td>
+<td>
+
+<p>Value of lambda selected by escv – giving the minimum es within the range of lambdas which are no less than lambda.cv.
+</p>
+</td>
+</tr>
+</table>
+<h3>Examples</h3>
+
+<pre><code class="language-R">library("glmnet")
+library("mvtnorm") 
+
+## generate the data
+set.seed(2015)
+n &lt;- 200      # number of obs
+p &lt;- 500
+s &lt;- 10
+beta &lt;- rep(0, p)
+beta[1:s] &lt;- runif(s, 1/3, 1)
+x &lt;- rmvnorm(n = n, mean = rep(0, p), method = "svd")
+signal &lt;- sqrt(mean((x %*% beta)^2))
+sigma &lt;- as.numeric(signal / sqrt(10))  # SNR=10
+y &lt;- x %*% beta + rnorm(n)
+
+## escv without parallel
+# using Lasso+OLS in the cv fit.
+set.seed(0)
+obj &lt;- escv.glmnet(x, y, cv.OLS = TRUE) 
+
+# using Lasso in the cv fit.
+set.seed(0)
+obj &lt;- escv.glmnet(x, y)
+
+## escv with parallel
+#library("doParallel")
+#library("doRNG")
+#registerDoParallel(2)
+
+# using Lasso+OLS in the cv fit.
+#registerDoRNG(seed = 0)
+#obj &lt;- escv.glmnet(x, y, cv.OLS = TRUE, nfolds = 4, parallel = TRUE)
+
+# using Lasso in the cv fit.
+#registerDoRNG(seed = 0) 
+#obj &lt;- escv.glmnet(x, y, parallel = TRUE)
+
+</code></pre>
+
+
+</div>

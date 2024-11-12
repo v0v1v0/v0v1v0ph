@@ -1,0 +1,452 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>climograph</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Climograph
+</h2>
+
+<h3>Description</h3>
+
+<p>Function to draw a climograph based on precipitation and air temperature data, with several options for customisation.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">climograph(pcp, tmean, tmx, tmn, na.rm=TRUE,  
+           from, to, date.fmt="%Y-%m-%d", 
+           main="Climograph", pcp.label="Precipitation, [mm]", 
+           tmean.label="Air temperature, [\U00B0 C]", start.month=1, pcp.solid.thr,
+           pcp.ylim, temp.ylim,pcp.col="lightblue", pcp.solid.col="skyblue2", 
+           tmean.col="darkred", tmn.col="blue", tmx.col="red",
+           pcp.labels=TRUE, 
+           tmean.labels=TRUE, tmx.labels=TRUE, tmn.labels=TRUE,
+           pcp.labels.cex=0.8, temp.labels.cex=0.8,
+           pcp.labels.dx=c(rep(ifelse(plot.pcp.probs, -0.25,  0.0),6), 
+                           rep(ifelse(plot.pcp.probs, -0.25,  0.0),6)),
+           pcp.labels.dy=rep(2, 12),
+           temp.labels.dx=c(rep(-0.2,6), rep(0.2,6)), temp.labels.dy=rep(-0.4, 12),
+           plot.pcp.probs=TRUE, pcp.probs=c(0.25, 0.75),
+           plot.temp.probs=TRUE, temp.probs=c(0.25, 0.75), 
+           temp.probs.col=c("#3399FF", "#FF9966", "#FFCC66"),
+           temp.probs.alpha=0.3,
+           lat, lon
+           )
+
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>pcp</code></td>
+<td>
+
+<p>variable of type zoo with monthly, daily or subdaily precipitation data.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tmean</code></td>
+<td>
+
+<p>variable of type 'zoo' with monthly, daily or subdaily mean temperature data.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tmx</code></td>
+<td>
+
+<p>variable of type 'zoo' with monthly, daily or subdaily maximum temperature data. <br>
+ONLY used (together with <code>tmn</code>) when <code>tmean</code>' is missing.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tmn</code></td>
+<td>
+
+<p>variable of type 'zoo' with monthly, daily or subdaily minimum temperature data. 
+ONLY used (together with <code>tmx</code>) when <code>tmean</code> is missing.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>na.rm</code></td>
+<td>
+
+<p>Logical. Should missing values be removed? <br>
+-) <kbd>TRUE</kbd> : the monthly values  are computed considering only those values different from NA <br>
+-) <kbd>FALSE</kbd>: if there is AT LEAST one NA within a month, the resulting average monthly value is NA .
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>from</code></td>
+<td>
+
+<p>OPTIONAL, used for extracting a subset of values. <br>
+Character indicating the starting date for the values to be extracted. It must be provided in the format specified by <code>date.fmt</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>to</code></td>
+<td>
+
+<p>OPTIONAL, used for extracting a subset of values. <br>
+Character indicating the ending date for the values to be extracted. It must be provided in the format specified by <code>date.fmt</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>date.fmt</code></td>
+<td>
+
+<p>Character indicating the format in which the dates are stored in <var>dates</var>, <var>from</var> and <var>to</var>. See <code>format</code> in <code>as.Date</code>. <br>
+ONLY required when <code>class(dates)=="factor"</code> or <code>class(dates)=="numeric"</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>main</code></td>
+<td>
+
+<p>Character representing the main title of the plot. 
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pcp.label</code></td>
+<td>
+
+<p>Character used in the legend to represent the monthly average precipitation (mostly thought for languages different from English). 
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tmean.label</code></td>
+<td>
+
+<p>Character used in the legend to represent the monthly average temperature (mostly thought for languages different from English). 
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>start.month</code></td>
+<td>
+
+<p>[OPTIONAL]. Only used when the (hydrological) year of interest is different from the calendar year.
+</p>
+<p>numeric in [1:12] indicating the starting month of the (hydrological) year. Numeric values in [1, 12] represents months in [January, December]. By default <code>start.month=1</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pcp.solid.thr</code></td>
+<td>
+
+<p>[OPTIONAL]. Only used when using (sub)daily precipitation and temperature are gives as input data. <br>
+numeric, indicating the temperature, in degrees Celsius, used to discriminate between solid and liquid precipitation. <br></p>
+<p>When daily <code>tmean &lt;= pcp.solid.thr</code> the precipitation for that day is considered as solid precipitation.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pcp.ylim</code></td>
+<td>
+
+<p>[OPTIONAL] numeric of length 2 with the the range used for the precipitation axis. The second value should be larger than the first one.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>temp.ylim</code></td>
+<td>
+
+<p>[OPTIONAL] numeric of length 2 with the the range used for the secondary temperature axis. The second value should be larger than the first one.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pcp.col</code></td>
+<td>
+
+<p>Color used in the legend to represent the monthly average precipitation. 
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pcp.solid.col</code></td>
+<td>
+
+<p>Color used in the legend to represent the monthly average solid precipitation. 
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tmean.col</code></td>
+<td>
+
+<p>Color used in the legend to represent the monthly average temperature. 
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tmn.col</code></td>
+<td>
+
+<p>Color used in the legend to represent the monthly minimum temperature. 
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tmx.col</code></td>
+<td>
+
+<p>Color used in the legend to represent the monthly maximum temperature. 
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pcp.labels</code></td>
+<td>
+
+<p>logical. Should monthly precipitation values to be shown above the bars?. By default <code>pcp.labels=TRUE</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tmean.labels</code></td>
+<td>
+
+<p>logical. Should monthly mean temperature values to be shown above the lines?. By default <code>tmean.labels=TRUE</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tmx.labels</code></td>
+<td>
+
+<p>logical. Should monthly maximum temperature values to be shown above the lines?. By default <code>tmx.labels=TRUE</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tmn.labels</code></td>
+<td>
+
+<p>logical. Should monthly minimum temperature values to be shown above the lines?. By default <code>tmn.labels=TRUE</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pcp.labels.cex</code></td>
+<td>
+
+<p>numeric giving the amount by which plotting characters used to show the numeric values of monthly precipitation values are scaled relative to the default. <br>
+It is only used when <code>pcp.labels=TRUE</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>temp.labels.cex</code></td>
+<td>
+
+<p>numeric giving the amount by which plotting characters used to show the numeric values of monthly air temperature values (mean, maximum, minimum) are scaled relative to the default.   <br>
+It is only used when <code>tmean.labels=TRUE</code> or <code>tmx.labels=TRUE</code> or <code>tmn.labels=TRUE</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pcp.labels.dx</code></td>
+<td>
+
+<p>numeric of length 12 giving the amount of horizontal coordinate positions that have to be used to shift the labels of monthly precipitation values. <br>
+It is only used when <code>pcp.labels=TRUE</code>. <br>
+Lengths smaller than 12 are recycled and larger lengths are not used.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pcp.labels.dy</code></td>
+<td>
+
+<p>numeric of length 12 giving the amount of vertical coordinate positions that have to be used to shift the labels of monthly precipitation values. <br>
+It is only used when <code>pcp.labels=TRUE</code>. <br>
+Lengths smaller than 12 are recycled and larger lengths are not used.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>temp.labels.dx</code></td>
+<td>
+
+<p>numeric of length 12 giving the amount of horizontal coordinate positions that have to be used to shift the labels of monthly air temperature values (mean, maximum, minimum). <br>
+It is only used when <code>tmean.labels=TRUE</code> or <code>tmx.labels=TRUE</code> or <code>tmn.labels=TRUE</code>. <br>
+Lengths smaller than 12 are recycled and larger lengths are not used.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>temp.labels.dy</code></td>
+<td>
+
+<p>numeric of length 12 giving the amount of vertical coordinate positions that have to be used to shift the labels of monthly air temperature values (mean, maximum, minimum). <br>
+It is only used when <code>tmean.labels=TRUE</code> or <code>tmx.labels=TRUE</code> or <code>tmn.labels=TRUE</code>. <br>
+Lengths smaller than 12 are recycled and larger lengths are not used.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>plot.pcp.probs</code></td>
+<td>
+
+<p>logical used to decide whether to show uncertainty values around the monthly mean precipitation values. By default <code>plot.pcp.probs=TRUE</code>. <br> 
+When <code>plot.pcp.probs=TRUE</code> the <code>pcp.probs</code> argument is used to define the values of the lower an upper uncertainty bounds.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pcp.probs</code></td>
+<td>
+
+<p>numeric of length 2. It defines the quantile values used to compute the lower an upper uncertainty bounds for each one of the 12 monthly precipitation values.<br> 
+By default <code>pcp.probs=c(0.25, 0.75)</code>, which indicates that the quantiles 0.25 and 0.75 are used to compute the lower an upper uncertainty bounds for each one of the 12 monthly precipitation values. 
+If <code>pcp</code> is a (sub)daily zoo object, it is first aggregated into monthly values using <code>mean</code>, and then the <code>pcp.probs</code> quantiles are computed over all the monthly values belonging to a calendar month.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>plot.temp.probs</code></td>
+<td>
+
+<p>logical used to decide whether to show uncertainty values around the monthly mean temperature values. By default <code>plot.temp.probs=TRUE</code>. <br> 
+When <code>plot.temp.probs=TRUE</code> the <code>temp.probs</code> argument is used to define the values of the lower an upper uncertainty bounds.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>temp.probs</code></td>
+<td>
+
+<p>numeric of length 2. It is used to define quantile values used to compute the lower an upper uncertainty bounds for each one of the 12 monthly mean temperature values.<br> 
+If <code>tmx</code> and <code>tmn</code> are provided, then <code>temp.probs</code> are used to compute the lower an upper uncertainty bounds for each one of the 12 monthly maximum/minimum temperature values. <br>
+By default <code>temp.probs=c(0.25, 0.75)</code>, which indicates that the quantiles 0.25 and 0.75 are used to compute the lower an upper uncertainty bounds for each one of the 12 monthly mean(maximum/minimum) values. 
+If <code>tmx/tmn</code> is provided and is a (sub)daily zoo object, it is first aggregated into monthly values using <code>mean</code>, and then the <code>temp.probs</code> quantiles are computed over all the monthly values belonging to a calendar month.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>temp.probs.col</code></td>
+<td>
+
+<p>character of length 3, with the colors used to for plotting the uncertainty bands around the average monthly values of the minimum, mean and maximum air temperature, respectively. <br>
+If <code>tmx</code> and <code>tmn</code> are not provided by the user, the second element of <code>temp.probs.col</code> will still be used to define the color of the  uncertainty band around the mean monthly values of air temperature.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>temp.probs.alpha</code></td>
+<td>
+
+<p>numeric of length 1, with the factor used to modify the opacity of <code>temp.probs.col</code>. Typically in [0,1], with 0 indicating a completely transparent colour and 1 indicating no transparency.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lat</code></td>
+<td>
+
+<p>[OPTIONAL] numeric or character used to show the latitude for which the climograph was plotted for.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lon</code></td>
+<td>
+
+<p>[OPTIONAL] numeric or character used to show the longitude for which the climograph was plotted for.
+</p>
+</td>
+</tr>
+</table>
+<h3>Note</h3>
+
+<p>If the output climograph present some mixed or not legible characters, you might try resizing the graphical window and run climograph again with the new size, until you get the climograph in the way you want to.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Mauricio Zambrano-Bigiarini, <a href="mailto:mzb.devel@gmail">mzb.devel@gmail</a>
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>monthlyfunction</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">######################
+## Ex1: Loading the DAILY precipitation, maximum and minimum air temperature at 
+##      station Maquehue Temuco Ad (Chile)
+data(MaquehueTemuco)
+pcp &lt;- MaquehueTemuco[, 1]
+tmx &lt;- MaquehueTemuco[, 2]
+tmn &lt;- MaquehueTemuco[, 3]
+
+## Plotting a full climograph
+m &lt;- climograph(pcp=pcp, tmx=tmx, tmn=tmn, na.rm=TRUE, 
+                main="Maquehue Temuco Ad (Chile)", lat=-38.770, lon=-72.637)
+
+## Not run: 
+## Plotting a climograph with uncertainty bands around mean values, 
+## but with no labels for tmx and tmn
+m &lt;- climograph(pcp=pcp, tmx=tmx, tmn=tmn, na.rm=TRUE, tmx.labels=FALSE, tmn.labels=FALSE, 
+                main="Maquehue Temuco Ad (Chile)", lat=-38.770, lon=-72.637)
+
+## Plotting a climograph with uncertainty bands around mean values, but with no labels for 
+##  tmx, tmn and pcp
+m &lt;- climograph(pcp=pcp, tmx=tmx, tmn=tmn, na.rm=TRUE, 
+                pcp.labels=FALSE, tmean.labels=FALSE, tmx.labels=FALSE, tmn.labels=FALSE, 
+                main="Maquehue Temuco Ad (Chile)", lat=-38.770, lon=-72.637)
+
+## Plotting a climograph with no uncertainty bands around mean values
+m &lt;- climograph(pcp=pcp, tmx=tmx, tmn=tmn, na.rm=TRUE, plot.pcp.probs=FALSE, plot.temp.probs=FALSE, 
+                main="Maquehue Temuco Ad (Chile)", lat=-38.770, lon=-72.637)
+
+## Plotting the most basic climograph: only mean values of precipiation and air temperature
+m &lt;- climograph(pcp=pcp, tmean=0.5*(tmn+tmx), na.rm=TRUE, plot.pcp.probs=FALSE, 
+                plot.temp.probs=FALSE, main="Maquehue Temuco Ad (Chile)", 
+                lat=-38.770, lon=-72.637)
+
+
+## Plotting a full climograph, starting in April (start.month=4) instead of January (start.month=1),
+## to better represent the hydrological year in Chile (South America)
+m &lt;- climograph(pcp=pcp, tmx=tmx, tmn=tmn, na.rm=TRUE, 
+                start.month=4, temp.labels.dx=c(rep(-0.2,4), rep(0.2,6),rep(-0.2,2)),
+                main="Maquehue Temuco Ad (Chile)", lat=-38.770, lon=-72.637)
+
+
+## Plotting a full climograph with monthly data
+pcp.m &lt;- daily2monthly(pcp, FUN=sum)
+tmx.m &lt;- daily2monthly(tmx, FUN=mean)
+tmn.m &lt;- daily2monthly(tmn, FUN=mean)
+m &lt;- climograph(pcp=pcp.m, tmx=tmx.m, tmn=tmn.m, na.rm=TRUE, 
+                main="Maquehue Temuco Ad (Chile)", lat=-38.770, lon=-72.637)
+
+## End(Not run)
+
+</code></pre>
+
+
+</div>

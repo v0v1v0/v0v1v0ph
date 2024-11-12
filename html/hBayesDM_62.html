@@ -1,0 +1,324 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>pstRT_rlddm1</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Reinforcement Learning Drift Diffusion Model 1</h2>
+
+<h3>Description</h3>
+
+<p>Hierarchical Bayesian Modeling of the Probabilistic Selection Task (with RT data) using Reinforcement Learning Drift Diffusion Model 1.
+It has the following parameters: <code>a</code> (boundary separation), <code>tau</code> (non-decision time), <code>v</code> (drift rate scaling), <code>alpha</code> (learning rate).
+</p>
+
+<ul>
+<li> <p><strong>Task</strong>: Probabilistic Selection Task (with RT data) (Frank et al., 2007; Frank et al., 2004)
+</p>
+</li>
+<li> <p><strong>Model</strong>: Reinforcement Learning Drift Diffusion Model 1 (Pedersen et al., 2017)
+</p>
+</li>
+</ul>
+<h3>Usage</h3>
+
+<pre><code class="language-R">pstRT_rlddm1(
+  data = NULL,
+  niter = 4000,
+  nwarmup = 1000,
+  nchain = 4,
+  ncore = 1,
+  nthin = 1,
+  inits = "vb",
+  indPars = "mean",
+  modelRegressor = FALSE,
+  vb = FALSE,
+  inc_postpred = FALSE,
+  adapt_delta = 0.95,
+  stepsize = 1,
+  max_treedepth = 10,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>Data to be modeled. It should be given as a data.frame object,
+a filepath for a tab-seperated txt file, <code>"example"</code> to use example data, or
+<code>"choose"</code> to choose data with an interactive window.
+Columns in the dataset must include:
+"subjID", "cond", "prob", "choice", "RT", "feedback". See <b>Details</b> below for more information.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>niter</code></td>
+<td>
+<p>Number of iterations, including warm-up. Defaults to 4000.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nwarmup</code></td>
+<td>
+<p>Number of iterations used for warm-up only. Defaults to 1000.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nchain</code></td>
+<td>
+<p>Number of Markov chains to run. Defaults to 4.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ncore</code></td>
+<td>
+<p>Number of CPUs to be used for running. Defaults to 1.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nthin</code></td>
+<td>
+<p>Every <code>i == nthin</code> sample will be used to generate the posterior distribution.
+Defaults to 1. A higher number can be used when auto-correlation within the MCMC sampling is
+high.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>inits</code></td>
+<td>
+<p>Character value specifying how the initial values should be generated.
+Possible options are "vb" (default), "fixed", "random", or your own initial values.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>indPars</code></td>
+<td>
+<p>Character value specifying how to summarize individual parameters. Current options
+are: "mean", "median", or "mode".</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>modelRegressor</code></td>
+<td>
+<p>Whether to export model-based regressors (<code>TRUE</code> or <code>FALSE</code>).
+For this model they are: "Q1", "Q2".</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>vb</code></td>
+<td>
+<p>Use variational inference to approximately draw from a posterior distribution. Defaults
+to <code>FALSE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>inc_postpred</code></td>
+<td>
+<p>Include trial-level posterior predictive simulations in model output (may greatly increase file
+size). Defaults to <code>FALSE</code>.
+If set to <code>TRUE</code>, it includes: "choice_os", "RT_os", "choice_sm", "RT_sm", "fd_sm"</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>adapt_delta</code></td>
+<td>
+<p>Floating point value representing the target acceptance probability of a new
+sample in the MCMC chain. Must be between 0 and 1. See <b>Details</b> below.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>stepsize</code></td>
+<td>
+<p>Integer value specifying the size of each leapfrog step that the MCMC sampler can
+take on each new iteration. See <b>Details</b> below.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>max_treedepth</code></td>
+<td>
+<p>Integer value specifying how many leapfrog steps the MCMC sampler can take
+on each new iteration. See <b>Details</b> below.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>For this model, it's possible to set <strong>model-specific argument(s)</strong> as follows: 
+</p>
+
+<dl>
+<dt>RTbound</dt>
+<dd>
+<p>Floating point value representing the lower bound (i.e., minimum allowed) reaction time. Defaults to 0.1 (100 milliseconds).</p>
+</dd>
+<dt>initQ</dt>
+<dd>
+<p>Floating point value representing the model's initial value of any choice.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>This section describes some of the function arguments in greater detail.
+</p>
+<p><strong>data</strong> should be assigned a character value specifying the full path and name (including
+extension information, e.g. ".txt") of the file that contains the behavioral data-set of all
+subjects of interest for the current analysis. The file should be a <strong>tab-delimited</strong> text
+file, whose rows represent trial-by-trial observations and columns represent variables.<br>
+For the Probabilistic Selection Task (with RT data), there should be 6 columns of data with the
+labels "subjID", "cond", "prob", "choice", "RT", "feedback". It is not necessary for the columns to be in this particular order,
+however it is necessary that they be labeled correctly and contain the information below:
+</p>
+
+<dl>
+<dt>subjID</dt>
+<dd>
+<p>A unique identifier for each subject in the data-set.</p>
+</dd>
+<dt>cond</dt>
+<dd>
+<p>Integer value representing the task condition of the given trial (AB == 1, CD == 2, EF == 3).</p>
+</dd>
+<dt>prob</dt>
+<dd>
+<p>Float value representing the probability that a correct response (1) is rewarded in the current task condition.</p>
+</dd>
+<dt>choice</dt>
+<dd>
+<p>Integer value representing the option chosen on the given trial (1 or 2).</p>
+</dd>
+<dt>RT</dt>
+<dd>
+<p>Float value representing the time taken for the response on the given trial.</p>
+</dd>
+<dt>feedback</dt>
+<dd>
+<p>Integer value representing the outcome of the given trial (where 'correct' == 1, and 'incorrect' == 0).</p>
+</dd>
+</dl>
+<p><strong>*</strong>Note: The file may contain other columns of data (e.g. "ReactionTime", "trial_number",
+etc.), but only the data within the column names listed above will be used during the modeling.
+As long as the necessary columns mentioned above are present and labeled correctly, there is no
+need to remove other miscellaneous data columns.
+</p>
+<p><strong>nwarmup</strong> is a numerical value that specifies how many MCMC samples should not be stored
+upon the beginning of each chain. For those familiar with Bayesian methods, this is equivalent
+to burn-in samples. Due to the nature of the MCMC algorithm, initial values (i.e. where the
+sampling chains begin) can have a heavy influence on the generated posterior distributions. The
+<code>nwarmup</code> argument can be set to a high number in order to curb the effects that initial
+values have on the resulting posteriors.
+</p>
+<p><strong>nchain</strong> is a numerical value that specifies how many chains (i.e. independent sampling
+sequences) should be used to draw samples from the posterior distribution. Since the posteriors
+are generated from a sampling process, it is good practice to run multiple chains to ensure
+that a reasonably representative posterior is attained. When the sampling is complete, it is
+possible to check the multiple chains for convergence by running the following line of code:
+<code>plot(output, type = "trace")</code>. The trace-plot should resemble a "furry caterpillar".
+</p>
+<p><strong>nthin</strong> is a numerical value that specifies the "skipping" behavior of the MCMC sampler,
+using only every <code>i == nthin</code> samples to generate posterior distributions. By default,
+<code>nthin</code> is equal to 1, meaning that every sample is used to generate the posterior.
+</p>
+<p><strong>Control Parameters:</strong> <code>adapt_delta</code>, <code>stepsize</code>, and <code>max_treedepth</code> are
+advanced options that give the user more control over Stan's MCMC sampler. It is recommended
+that only advanced users change the default values, as alterations can profoundly change the
+sampler's behavior. Refer to 'The No-U-Turn Sampler: Adaptively Setting Path Lengths in
+Hamiltonian Monte Carlo (Hoffman &amp; Gelman, 2014, Journal of Machine Learning Research)' for
+more information on the sampler control parameters. One can also refer to 'Section 34.2. HMC
+Algorithm Parameters' of the <a href="https://mc-stan.org/users/documentation/">Stan User's Guide
+and Reference Manual</a>, or to the help page for <code>stan</code> for a less technical
+description of these arguments.
+</p>
+
+
+<h4>Contributors</h4>
+
+<p><a href="https://hydoh.github.io/">Hoyoung Doh</a> &lt;<a href="mailto:hoyoung.doh@gmail.com">hoyoung.doh@gmail.com</a>&gt;, <a href="https://medicine.yale.edu/lab/goldfarb/profile/sanghoon_kang/">Sanghoon Kang</a> &lt;<a href="mailto:sanghoon.kang@yale.edu">sanghoon.kang@yale.edu</a>&gt;, <a href="https://jihyuncindyhur.github.io/">Jihyun K. Hur</a> &lt;<a href="mailto:jihyun.hur@yale.edu">jihyun.hur@yale.edu</a>&gt;</p>
+
+
+
+<h3>Value</h3>
+
+<p>A class "hBayesDM" object <code>modelData</code> with the following components:
+</p>
+
+<dl>
+<dt>model</dt>
+<dd>
+<p>Character value that is the name of the model (\code"pstRT_rlddm1").</p>
+</dd>
+<dt>allIndPars</dt>
+<dd>
+<p>Data.frame containing the summarized parameter values (as specified by
+<code>indPars</code>) for each subject.</p>
+</dd>
+<dt>parVals</dt>
+<dd>
+<p>List object containing the posterior samples over different parameters.</p>
+</dd>
+<dt>fit</dt>
+<dd>
+<p>A class <code>stanfit</code> object that contains the fitted Stan
+model.</p>
+</dd>
+<dt>rawdata</dt>
+<dd>
+<p>Data.frame containing the raw data used to fit the model, as specified by
+the user.</p>
+</dd>
+<dt>modelRegressor</dt>
+<dd>
+<p>List object containing the extracted model-based regressors.</p>
+</dd>
+</dl>
+<h3>References</h3>
+
+<p>Frank, M. J., Santamaria, A., O'Reilly, R. C., &amp; Willcutt, E. (2007). Testing computational models of dopamine and noradrenaline dysfunction in attention deficit/hyperactivity disorder. Neuropsychopharmacology, 32(7), 1583-1599.
+</p>
+<p>Frank, M. J., Seeberger, L. C., &amp; O'reilly, R. C. (2004). By carrot or by stick: cognitive reinforcement learning in parkinsonism. Science, 306(5703), 1940-1943.
+</p>
+<p>Pedersen, M. L., Frank, M. J., &amp; Biele, G. (2017). The drift diffusion model as the choice rule in reinforcement learning. Psychonomic bulletin &amp; review, 24(4), 1234-1251.
+</p>
+
+
+<h3>See Also</h3>
+
+<p>We refer users to our in-depth tutorial for an example of using hBayesDM:
+<a href="https://rpubs.com/CCSL/hBayesDM">https://rpubs.com/CCSL/hBayesDM</a>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+# Run the model with a given data.frame as df
+output &lt;- pstRT_rlddm1(
+  data = df, niter = 2000, nwarmup = 1000, nchain = 4, ncore = 4)
+
+# Run the model with example data
+output &lt;- pstRT_rlddm1(
+  data = "example", niter = 2000, nwarmup = 1000, nchain = 4, ncore = 4)
+
+# Visually check convergence of the sampling chains (should look like 'hairy caterpillars')
+plot(output, type = "trace")
+
+# Check Rhat values (all Rhat values should be less than or equal to 1.1)
+rhat(output)
+
+# Plot the posterior distributions of the hyper-parameters (distributions should be unimodal)
+plot(output)
+
+# Show the WAIC and LOOIC model fit estimates
+printFit(output)
+
+## End(Not run)
+</code></pre>
+
+
+</div>

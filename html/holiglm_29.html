@@ -1,0 +1,94 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>rho_max</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Constraint on the Pairwise Correlation of Covariates</h2>
+
+<h3>Description</h3>
+
+<p>Constraint which ensures that only one covariate out of a pair of covariates with a correlation of at least <code>rho</code>
+will be included in the final model.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">rho_max(
+  rho = 0.8,
+  exclude = "(Intercept)",
+  use = c("everything", "all.obs", "complete.obs", "na.or.complete",
+    "pairwise.complete.obs"),
+  method = c("pearson", "kendall", "spearman")
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>rho</code></td>
+<td>
+<p>a value in the range [0,1] specifying, the maximum
+allowed collinearity between pairs of covariates.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>exclude</code></td>
+<td>
+<p>variables to be excluded form the pairwise
+correlation constraints (default is <code>"(Intercept)"</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>use</code></td>
+<td>
+<p>an optional character string giving a method for computing
+co-variances in the presence of missing values.
+The parameter is passed to <code>cor</code>,
+therefore see <code>cor</code> for more information.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+<p>a character string indicating which correlation coefficient
+is to be computed. See <code>cor</code>
+for more information.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A holistic generalized model constraint, object inheriting from class <code>"hglmc"</code>.
+</p>
+
+
+<h3>See Also</h3>
+
+<p>Other Constraint-Constructors: 
+<code>group_equal()</code>,
+<code>group_inout()</code>,
+<code>group_sparsity()</code>,
+<code>include()</code>,
+<code>k_max()</code>,
+<code>linear()</code>,
+<code>lower()</code>,
+<code>pairwise_sign_coherence()</code>,
+<code>sign_coherence()</code>,
+<code>upper()</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">beta &lt;- 1:3
+Sigma &lt;- cov_matrix(k = length(beta) - 1L, 1, 2, 0.9)
+dat &lt;- rhglm(100, beta, sigma = Sigma)
+hglm(y ~ ., constraints = rho_max(0.8), data = dat)
+</code></pre>
+
+
+</div>

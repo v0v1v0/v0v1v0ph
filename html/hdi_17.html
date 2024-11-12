@@ -1,0 +1,226 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>rXb</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Generate Data Design Matrix <code class="reqn">X</code> and Coefficient Vector <code class="reqn">\beta</code>
+</h2>
+
+<h3>Description</h3>
+
+<p>Generate a random design matrix <code class="reqn">X</code> and coefficient vector <code class="reqn">\beta</code>
+useful for simulations of (high dimensional) linear models.
+In particular, the function <code>rXb()</code> can be used to exactly
+recreate the reference linear model datasets of the hdi paper.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">rXb(n, p, s0,
+    xtype = c("toeplitz", "exp.decay", "equi.corr"),
+    btype = "U[-2,2]",
+    permuted = FALSE, iteration = NA, do2S = TRUE,
+    x.par = switch(xtype,
+                   "toeplitz"  = 0.9,
+                   "equi.corr" = 0.8,
+                   "exp.decay" = c(0.4, 5)),
+   verbose = TRUE)
+
+rX(n, p, xtype, permuted, do2S = TRUE,
+   par = switch(xtype,
+                "toeplitz"  = 0.9,
+                "equi.corr" = 0.8,
+                "exp.decay" = c(0.4, 5)))
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>n</code></td>
+<td>
+<p>integer; the sample size <code class="reqn">n</code> (paper had always <code>n = 100</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>p</code></td>
+<td>
+<p>integer; the number of coefficients in the linear
+model. (paper had always <code>p = 500</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>s0</code></td>
+<td>
+<p>integer number of <em>nonzero</em> coefficients desired in the
+model; hence at most <code>p</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>xtype</code></td>
+<td>
+<p>a <code>character</code> string specifying the type of design matrix
+one wants to generate.  Must be one of <code>"toeplitz"</code>,
+<code>"equi.corr"</code> or <code>"exp.decay"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>btype</code></td>
+<td>
+<p>a <code>character</code> string specifying the type of
+nonzero coefficients (“beta”) one wants to generate.  In the hdi
+paper, this has been one of
+"U[-2,2]", "U[0,2]", "U[0,4]", "bfix1", "bfix2" and "bfix10".  In
+general, any string of the form <code>"U[a,b]"</code> or <code>"bfix&lt;c&gt;"</code>
+is allowed, where <code>a</code>, <code>b</code>, and <code>&lt;c&gt;</code> must be numbers
+(with <code class="reqn">a \le b</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>permuted</code></td>
+<td>
+<p>logical specifying if the columns of the design matrix
+should be permuted.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>iteration</code></td>
+<td>
+<p>integer or <code>NA</code> specifying if seeds should be
+set to generate reproducible
+realizations of the design type and coefficients type. <code>NA</code>
+corresponds to not setting seeds. Iteration numbers 1 to 50
+correspond to the setups from the paper.
+If a seed is set, the original <code>.Random.seed</code> at the
+point of entering the function is saved and is restored upon exit of
+the data generation.
+If <code>NA</code>, the current <code>.Random.seed</code> is
+taken as usual in <span style="font-family: Courier New, Courier; color: #666666;"><b>R</b></span>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>do2S</code></td>
+<td>
+<p>logical indicating if in the case of <code>xtype</code>s
+<code>"toeplitz"</code> or <code>"equi.corr"</code>, the <code class="reqn">p \times p</code>
+covariance matrix should be inverted twice.  Must be true, to
+regenerate the <code class="reqn">X</code> matrices from the hdi paper exactly
+“to the last bit”.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x.par,par</code></td>
+<td>
+<p>the parameters to be used for the design matrix.  Must be
+a numeric vector of length one or two.  The default uses the
+parameters also used in the hdi paper.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p>should the function give a message if seeds are being
+set? (logical).</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p><b>Generation of the design matrix <code class="reqn">X</code>:</b>
+<br>
+For all <code>xtype</code>'s, the <code class="reqn">X</code> matrix will be multivariate
+normal, with mean zero and (co)variance matrix <code class="reqn">\Sigma = </code><code>C</code>
+determined from <code>xtype</code>, <code>x.par</code> and <code class="reqn">p</code> as follows:
+</p>
+
+<dl>
+<dt>
+<code>xtype = "toeplitz"</code>:</dt>
+<dd>
+<p><code>C &lt;- par ^ abs(toeplitz(0:(p-1)))</code></p>
+</dd>
+<dt>
+<code>xtype = "equi.corr"</code>:</dt>
+<dd>
+<p><code class="reqn">\Sigma_{i,j} = \code{par}</code>
+for <code class="reqn">i \ne j</code>, and <code class="reqn">= 1</code>
+for <code class="reqn">i = j</code>, i.e., on the diagonal.</p>
+</dd>
+<dt>
+<code>xtype = "exp.decay"</code>:</dt>
+<dd>
+<p><code>C &lt;- solve(par[1] ^
+	abs(toeplitz(0:(p-1)) / par[2]))</code></p>
+</dd>
+</dl>
+<h3>Value</h3>
+
+
+<dl>
+<dt>For <code>rXb()</code>:</dt>
+<dd>
+<p>A <code>list</code> with components
+</p>
+
+<dl>
+<dt>x</dt>
+<dd>
+<p>the generated <code class="reqn">n \times p</code> design matrix <code class="reqn">X</code>.</p>
+</dd>
+<dt>beta</dt>
+<dd>
+<p>the generated coefficient vector <code class="reqn">\beta</code> (‘beta’).</p>
+</dd>
+</dl>
+</dd>
+<dt>For <code>rX()</code>:</dt>
+<dd>
+<p>the generated <code class="reqn">n \times p</code> design
+matrix <code class="reqn">X</code>.</p>
+</dd>
+</dl>
+<h3>Author(s)</h3>
+
+<p>Ruben Dezeure <a href="mailto:dezeure@stat.math.ethz.ch">dezeure@stat.math.ethz.ch</a></p>
+
+
+<h3>References</h3>
+
+<p>Dezeure, R., Bühlmann, P., Meier, L. and
+Meinshausen, N. (2015) 
+High-dimensional inference: confidence intervals, p-values and
+R-software hdi.
+<em>Statistical Science</em> <b>30</b>, 533–558.</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Generate the first realization of the linear model with design matrix
+## type Toeplitz and coefficients type uniform between -2 and 2
+
+dset &lt;- rXb(n = 80, p = 20, s0 = 3,
+            xtype = "toeplitz", btype = "U[-2,2]")
+x &lt;- dset$x
+beta &lt;- dset$beta
+
+## generate 100 response vectors of this linear model
+y &lt;- as.vector( x %*% beta ) + replicate(100, rnorm(nrow(x)))
+
+## Use  'beta_min' fulfilling  beta's  (non standard 'btype'):
+str(ds2 &lt;- rXb(n = 50, p = 12, s0 = 3,
+               xtype = "exp.decay", btype = "U[0.1, 5]"))
+
+## Generate a design matrix of type "toeplitz"
+set.seed(3) # making it reproducible
+X3 &lt;- rX(n = 800, p = 500, xtype = "toeplitz", permuted = FALSE)
+
+## permute the columns
+set.seed(3)
+Xp &lt;- rX(n = 800, p = 500, xtype = "toeplitz", permuted = TRUE)
+</code></pre>
+
+
+</div>

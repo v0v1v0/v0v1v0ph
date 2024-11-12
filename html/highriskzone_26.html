@@ -1,0 +1,115 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>est_intens_spde</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Estimates the intensity of the point pattern by using the SPDE method from r-INLA.</h2>
+
+<h3>Description</h3>
+
+<p>Estimates the intensity of the point pattern by using the SPDE method from r-INLA.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">est_intens_spde(
+  coords,
+  win = NULL,
+  npixel = 50,
+  fine_mesh = FALSE,
+  mesh = NULL,
+  weights = NULL,
+  alpha = 2,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>coords</code></td>
+<td>
+<p>ppp object or matrix with x and y coordinates of the observed bombs</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>win</code></td>
+<td>
+<p>observation window, either of class owin or a matrix with the x and y coordinates of the boundary,
+not neccessary if coords is a ppp object</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>npixel</code></td>
+<td>
+<p>number of pixel per dimension (see <code>spatstat.options</code>)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fine_mesh</code></td>
+<td>
+<p>logical, if FALSE a coarse mesh will be created, if TRUE a fine mesh will be created, 
+only used if argument mesh is NULL</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mesh</code></td>
+<td>
+<p>(optional) a predefined mesh for the spde model</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>weights</code></td>
+<td>
+<p>(optional) integration weights for the spde model, only used if argument mesh is NULL</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alpha</code></td>
+<td>
+<p>(optional) alpha value for the spde model, only used if argument spde is NULL</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>additional arguments for the construction of the spde model (see INLA/inla.spde2.matern documentation)</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A list of
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code> intensest </code></td>
+<td>
+<p> Pixel image with the estimated intensities of the random field. </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code> mesh </code></td>
+<td>
+<p> The mesh. </p>
+</td>
+</tr>
+</table>
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+data(craterA)
+est_spde &lt;- est_intens_spde(coords=craterA)
+image.plot(list(x=est_spde$intensest$xcol, y=est_spde$intensest$yrow, 
+                z=log(t(est_spde$intensest$v))), main="estimated logarithmic intensity")
+points(craterA)
+
+## End(Not run)
+</code></pre>
+
+
+</div>

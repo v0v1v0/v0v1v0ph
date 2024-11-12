@@ -1,0 +1,224 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>LD50</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Estimate the parameters that best describe LD50</h2>
+
+<h3>Description</h3>
+
+<p>Estimate the parameters that best describe LD50<br>
+Logistic and logit models are the same but with different parametrization:<br>
+logistic = 1/(1+exp((1/S)<em>(P-d)))<br>
+logit = 1/(1+exp(P+d</em>S))<br>
+See these publications for the description of equations:<br>
+Girondot, M. 1999. Statistical description of temperature-dependent sex determination using maximum likelihood. Evolutionary Ecology Research, 1, 479-486.<br>
+Godfrey, M.H., Delmas, V., Girondot, M., 2003. Assessment of patterns of temperature-dependent sex determination using maximum likelihood model selection. Ecoscience 10, 265-272.<br>
+Hulin, V., Delmas, V., Girondot, M., Godfrey, M.H., Guillon, J.-M., 2009. Temperature-dependent sex determination and global change: are some species at greater risk? Oecologia 160, 493-506.<br>
+The flexit equation is not still published :
+</p>
+<p style="text-align: center;"><code class="reqn">if dose &lt; P then (1 + (2^K1 - 1) *  exp(4 * S1 * (P - x)))^(-1/K1)</code>
+</p>
+
+<p style="text-align: center;"><code class="reqn">if dose &gt; P then 1-((1 + (2^K2 - 1) * exp(4 * S2 * (x - P)))^(-1/K2)</code>
+</p>
+
+<p>with:<br></p>
+<p style="text-align: center;"><code class="reqn">S1 = S/((4/K1)*(2^(-K1))^(1/K1+1)*(2^K1-1))</code>
+</p>
+
+<p style="text-align: center;"><code class="reqn">S2 = S/((4/K2)*(2^(-K2))^(1/K2+1)*(2^K2-1))</code>
+</p>
+
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">LD50(
+  df = NULL,
+  alive = NULL,
+  dead = NULL,
+  N = NULL,
+  doses = NULL,
+  l = 0.05,
+  parameters.initial = NULL,
+  fixed.parameters = NULL,
+  SE = NULL,
+  equation = "logistic",
+  replicates = 1000,
+  range.CI = 0.95,
+  limit.low.TRD.minimum = 5,
+  limit.high.TRD.maximum = 1000,
+  print = TRUE,
+  doses.plot = seq(from = 0, to = 1000, by = 0.1)
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>df</code></td>
+<td>
+<p>A dataframe with at least two columns named alive, dead or N and doses columns</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alive</code></td>
+<td>
+<p>A vector with alive individuals at the end of experiment</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dead</code></td>
+<td>
+<p>A vector with dead individuals at the end of experiment</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>N</code></td>
+<td>
+<p>A vector with total numbers of tested individuals</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>doses</code></td>
+<td>
+<p>The doses</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>l</code></td>
+<td>
+<p>The limit to define TRD (see Girondot, 1999)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>parameters.initial</code></td>
+<td>
+<p>Initial values for P, S or K search as a vector, ex. c(P=29, S=-0.3)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fixed.parameters</code></td>
+<td>
+<p>Parameters that will not be changed during fit</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>SE</code></td>
+<td>
+<p>Standard errors for parameters</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>equation</code></td>
+<td>
+<p>Could be "logistic", "logit", "probit", Hill", "Richards", "Hulin", "flexit" or "Double-Richards"</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>replicates</code></td>
+<td>
+<p>Number of replicates to estimate confidence intervals</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>range.CI</code></td>
+<td>
+<p>The range of confidence interval for estimation, default=0.95</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>limit.low.TRD.minimum</code></td>
+<td>
+<p>Minimum lower limit for TRD</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>limit.high.TRD.maximum</code></td>
+<td>
+<p>Maximum higher limit for TRD</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>print</code></td>
+<td>
+<p>Do the results must be printed at screen? TRUE (default) or FALSE</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>doses.plot</code></td>
+<td>
+<p>Sequences of doses that will be used for plotting. If NULL, does not estimate them</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>LD50 estimates the parameters that best describe LD50
+</p>
+
+
+<h3>Value</h3>
+
+<p>A list with the LD50, Transitional Range of Doses and their SE
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Marc Girondot <a href="mailto:marc.girondot@gmail.com">marc.girondot@gmail.com</a>
+</p>
+
+
+<h3>See Also</h3>
+
+<p>Other LD50 functions: 
+<code>LD50_MHmcmc()</code>,
+<code>LD50_MHmcmc_p()</code>,
+<code>logLik.LD50()</code>,
+<code>plot.LD50()</code>,
+<code>predict.LD50()</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+library("HelpersMG")
+data &lt;- data.frame(Doses=c(80, 120, 150, 150, 180, 200),
+Alive=c(10, 12, 8, 6, 2, 1),
+Dead=c(0, 1, 5, 6, 9, 15))
+LD50_logistic &lt;- LD50(data, equation="logistic")
+predict(LD50_logistic, doses=c(140, 170))
+plot(LD50_logistic, xlim=c(0, 300), at=seq(from=0, to=300, by=50))
+LD50_probit &lt;- LD50(data, equation="probit")
+predict(LD50_probit, doses=c(140, 170))
+plot(LD50_probit)
+LD50_logit &lt;- LD50(data, equation="logit")
+predict(LD50_logit, doses=c(140, 170))
+plot(LD50_logit)
+LD50_hill &lt;- LD50(data, equation="hill")
+predict(LD50_hill, doses=c(140, 170))
+plot(LD50_hill)
+LD50_Richards &lt;- LD50(data, equation="Richards")
+predict(LD50_Richards, doses=c(140, 170))
+plot(LD50_Richards)
+LD50_Hulin &lt;- LD50(data, equation="Hulin")
+predict(LD50_Hulin, doses=c(140, 170))
+plot(LD50_Hulin)
+LD50_DoubleRichards &lt;- LD50(data, equation="Double-Richards")
+predict(LD50_DoubleRichards, doses=c(140, 170))
+plot(LD50_DoubleRichards)
+LD50_flexit &lt;- LD50(data, equation="flexit")
+predict(LD50_flexit, doses=c(140, 170))
+plot(LD50_flexit)
+
+## End(Not run)
+</code></pre>
+
+
+</div>

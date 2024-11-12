@@ -1,0 +1,163 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>ts_forecast_simulator</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Time-series Forecasting Simulator</h2>
+
+<h3>Description</h3>
+
+<p>Creating different forecast paths for forecast objects (when applicable),
+by utilizing the underlying model distribution with the <code>simulate</code> function.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">ts_forecast_simulator(
+  .model,
+  .data,
+  .ext_reg = NULL,
+  .frequency = NULL,
+  .bootstrap = TRUE,
+  .horizon = 4,
+  .iterations = 25,
+  .sim_color = "steelblue",
+  .alpha = 0.05
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>.model</code></td>
+<td>
+<p>A forecasting model of one of the following from the <code>forecast</code> package:
+</p>
+
+<ul>
+<li> <p><code>Arima</code>
+</p>
+</li>
+<li> <p><code>auto.arima</code>
+</p>
+</li>
+<li> <p><code>ets</code>
+</p>
+</li>
+<li> <p><code>nnetar</code>
+</p>
+</li>
+<li> <p><code>Arima()</code> with xreg
+</p>
+</li>
+</ul>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.data</code></td>
+<td>
+<p>The data that is used for the <code>.model</code> parameter. This is used with
+<code>timetk::tk_index()</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.ext_reg</code></td>
+<td>
+<p>A <code>tibble</code> or <code>matrix</code> of future xregs that should be the same
+length as the horizon you want to forecast.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.frequency</code></td>
+<td>
+<p>This is for the conversion of an internal table and should
+match the time frequency of the data.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.bootstrap</code></td>
+<td>
+<p>A boolean value of TRUE/FALSE. From <code>forecast::simulate.Arima()</code>
+Do simulation using resampled errors rather than normally distributed errors.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.horizon</code></td>
+<td>
+<p>An integer defining the forecast horizon.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.iterations</code></td>
+<td>
+<p>An integer, set the number of iterations of the simulation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.sim_color</code></td>
+<td>
+<p>Set the color of the simulation paths lines.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.alpha</code></td>
+<td>
+<p>Set the opacity level of the simulation path lines.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>This function expects to take in a model of either <code>Arima</code>,
+<code>auto.arima</code>, <code>ets</code> or <code>nnetar</code> from the <code>forecast</code> package. You can supply a
+forecasting horizon, iterations and a few other items. You may also specify
+an Arima() model using xregs.
+</p>
+
+
+<h3>Value</h3>
+
+<p>The original time series, the simulated values and a some plots
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Steven P. Sanderson II, MPH
+</p>
+
+
+<h3>See Also</h3>
+
+<p>Other Simulator: 
+<code>ts_arima_simulator()</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">suppressPackageStartupMessages(library(forecast))
+suppressPackageStartupMessages(library(dplyr))
+
+# Create a model
+fit &lt;- auto.arima(AirPassengers)
+data_tbl &lt;- ts_to_tbl(AirPassengers)
+
+# Simulate 50 possible forecast paths, with .horizon of 12 months
+output &lt;- ts_forecast_simulator(
+  .model        = fit
+  , .horizon    = 12
+  , .iterations = 50
+  , .data       = data_tbl
+)
+
+output$ggplot
+
+</code></pre>
+
+
+</div>

@@ -1,0 +1,117 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>map.sel.poly</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Interactively select a polygon (grid graphics) and highlight points</h2>
+
+<h3>Description</h3>
+
+<p>Click the points that should be connected as polygon. Input ends with right click (see
+<code>grid.locator</code>). Polygon will be drawn closed.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">map.sel.poly(data, pch = 19, size = 0.3, ...)
+
+sel.poly(pch = 19, size = 0.3, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>hyperSpec object for plotting map or list returned by <code>plotmap</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pch</code></td>
+<td>
+<p>symbol to display the points of the polygon for <code>sel.poly</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>size</code></td>
+<td>
+<p>size for polygon point symbol for <code>sel.poly</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>further arguments for <code>grid.points</code> and
+<code>grid.lines</code></p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p><code>map.sel.poly</code> is a convenience wrapper for <code>plotmap</code>, <code>sel.poly</code>, 
+and <code>point.in.polygon</code>. For custiomized plotting, the plot can be produced by 
+<code>plotmap</code>, <code>plotvoronoi</code> or <code>levelplot</code>, and the result of 
+that plot command handed over to <code>map.sel.poly</code>, see the example below.
+</p>
+<p>If even more customized plotting is required,<code>sel.poly</code> should be used (see example).
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>map.sel.poly</code>: array of indices for points within the selected polygon
+</p>
+<p><code>sel.poly</code>: n x 2 matrix with the corner points of the polygon
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Claudia Beleites, Sebastian Mellor
+</p>
+<p>Claudia Beleites
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>grid.locator</code>, <code>map.identify</code>
+</p>
+<p><code>grid.locator</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">if (interactive ()){
+## convenience wrapper
+map.sel.poly (chondro)
+
+## customized version
+data &lt;- sample (chondro [,, 1004 - 2i ~ 1004 + 2i], 300)
+
+plotdata &lt;- plotvoronoi (data, clusters ~ y * x, col.regions = alois.palette ())
+print (plotdata)
+map.sel.poly (plotdata)
+
+## even more customization:
+plotvoronoi (data)
+
+## interactively retrieve polygon
+polygon &lt;- sel.poly ()
+
+## find data points within polygon
+require ("sp")     
+i.sel &lt;- which (point.in.polygon (data$x, data$y, polygon [, 1], polygon [, 2]) &gt; 0)
+
+## work with selected points
+grid.points (unit (data$x [i.sel], "native"), unit (data$y [i.sel], "native"))
+}
+</code></pre>
+
+
+</div>

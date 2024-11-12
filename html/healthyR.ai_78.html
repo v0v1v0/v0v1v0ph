@@ -1,0 +1,101 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hai_kmeans_mapped_tbl</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>K-Means Mapping Function</h2>
+
+<h3>Description</h3>
+
+<p>Create a tibble that maps the <code>hai_kmeans_obj()</code> using <code>purrr::map()</code>
+to create a nested data.frame/tibble that holds n centers. This tibble will be
+used to help create a scree plot.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hai_kmeans_mapped_tbl(.data, .centers = 15)
+
+kmeans_mapped_tbl(.data, .centers = 15)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>.data</code></td>
+<td>
+<p>You must have a tibble in the working environment from the
+<code>hai_kmeans_user_item_tbl()</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.centers</code></td>
+<td>
+<p>How many different centers do you want to try</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Takes in a single parameter of .centers. This is used to create the tibble
+and map the <code>hai_kmeans_obj()</code> function down the list creating a nested tibble.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A nested tibble
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Steven P. Sanderson II, MPH
+</p>
+
+
+<h3>See Also</h3>
+
+<p><a href="https://en.wikipedia.org/wiki/Scree_plot">https://en.wikipedia.org/wiki/Scree_plot</a>
+</p>
+<p>Other Kmeans: 
+<code>hai_kmeans_automl()</code>,
+<code>hai_kmeans_automl_predict()</code>,
+<code>hai_kmeans_obj()</code>,
+<code>hai_kmeans_scree_data_tbl()</code>,
+<code>hai_kmeans_scree_plt()</code>,
+<code>hai_kmeans_tidy_tbl()</code>,
+<code>hai_kmeans_user_item_tbl()</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">library(healthyR.data)
+library(dplyr)
+
+data_tbl &lt;- healthyR_data %&gt;%
+  filter(ip_op_flag == "I") %&gt;%
+  filter(payer_grouping != "Medicare B") %&gt;%
+  filter(payer_grouping != "?") %&gt;%
+  select(service_line, payer_grouping) %&gt;%
+  mutate(record = 1) %&gt;%
+  as_tibble()
+
+ui_tbl &lt;- hai_kmeans_user_item_tbl(
+  .data = data_tbl,
+  .row_input = service_line,
+  .col_input = payer_grouping,
+  .record_input = record
+)
+
+hai_kmeans_mapped_tbl(ui_tbl)
+
+</code></pre>
+
+
+</div>

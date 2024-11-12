@@ -1,0 +1,231 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hglm</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Fitting Holistic Generalized Linear Models</h2>
+
+<h3>Description</h3>
+
+<p>Fit a generalized linear model under holistic constraints.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hglm(
+  formula,
+  family = gaussian(),
+  data,
+  constraints = NULL,
+  weights = NULL,
+  scaler = c("auto", "center_standardization", "center_minmax", "standardization",
+    "minmax", "off"),
+  scale_response = NULL,
+  big_m = 100,
+  solver = "auto",
+  control = list(),
+  dry_run = FALSE,
+  object_size = c("normal", "big")
+)
+
+holiglm(
+  formula,
+  family = gaussian(),
+  data,
+  constraints = NULL,
+  weights = NULL,
+  scaler = c("auto", "center_standardization", "center_minmax", "standardization",
+    "minmax", "off"),
+  scale_response = NULL,
+  big_m = 100,
+  solver = "auto",
+  control = list(),
+  dry_run = FALSE,
+  object_size = c("normal", "big")
+)
+
+hglm_seq(
+  k_seq,
+  formula,
+  family = gaussian(),
+  data,
+  constraints = NULL,
+  weights = NULL,
+  scaler = c("auto", "center_standardization", "center_minmax", "standardization",
+    "minmax", "off"),
+  big_m = 100,
+  solver = "auto",
+  control = list(),
+  object_size = c("normal", "big"),
+  parallel = FALSE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>formula</code></td>
+<td>
+<p>an object of class <code>"formula"</code> giving the symbolic description
+of the model to be fitted.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>family</code></td>
+<td>
+<p>a description of the error distribution and link function to be used in the model.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>a <code>data.frame</code> or <code>matrix</code> giving the data for the estimation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>constraints</code></td>
+<td>
+<p>a list of 'HGLM' constraints stored in a list of class <code>"lohglmc"</code>.
+Use <code>NULL</code> to turn off constraints.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>weights</code></td>
+<td>
+<p>an optional vector of 'prior weights' to be used for the estimation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>scaler</code></td>
+<td>
+<p>a character string giving the name of the scaling function (default is <code>"auto"</code>)
+to be employed for the covariates. This typically does not need to be changed.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>scale_response</code></td>
+<td>
+<p>a boolean whether the response shall be standardized or not. Can only
+be used with family <code>gaussian()</code>. Default is <code>TRUE</code> for
+family <code>gaussian()</code> and <code>FALSE</code> for other families.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>big_m</code></td>
+<td>
+<p>an upper bound for the coefficients, needed for the big-M constraint.
+Required to inherit from <code>"hglmc"</code>. Currently constraints created by
+<code>group_sparsity()</code>, <code>group_inout()</code>,
+<code>include()</code> and <code>group_equal()</code> use the big-M value specified here.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>solver</code></td>
+<td>
+<p>a character string giving the name of the solver to be used for the estimation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>control</code></td>
+<td>
+<p>a list of control parameters passed to <code>ROI_solve</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dry_run</code></td>
+<td>
+<p>a logical; if <code>TRUE</code> the model is not fit but only constructed.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>object_size</code></td>
+<td>
+<p>a character string giving the object size, allowed values
+are <code>"normal"</code> and <code>"big"</code>. If <code>"big"</code> is choosen, also
+the <span class="pkg">ROI</span> solution and the <code>"hglm_model"</code> object are returned.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>k_seq</code></td>
+<td>
+<p>an integer vector giving the values of <code>k_max</code> for which the model
+should be estimated.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>parallel</code></td>
+<td>
+<p>whether estimation of sequence shall be parallelized</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>In the case of binding linear constraints the standard errors are corrected,
+more information about the correction can be found in
+Schwendinger, Schwendinger and Vana (2024) <a href="https://doi.org/10.18637/jss.v108.i07">doi:10.18637/jss.v108.i07</a>.
+</p>
+
+
+<h3>Value</h3>
+
+<p>An object of class <code>"hglm"</code> inheriting from <code>"glm"</code>.
+</p>
+
+
+<h3>References</h3>
+
+<p>Schwendinger B., Schwendinger F., Vana L. (2024).
+Holistic Generalized Linear Models
+<a href="https://doi.org/10.18637/jss.v108.i07">doi:10.18637/jss.v108.i07</a>
+</p>
+<p>Bertsimas, D., &amp; King, A. (2016).
+OR Forum-An Algorithmic Approach to Linear Regression
+Operations Research 64(1):2-16.
+<a href="https://doi.org/10.1287/opre.2015.1436">doi:10.1287/opre.2015.1436</a>
+</p>
+<p>McCullagh, P., &amp; Nelder, J. A. (2019).
+Generalized Linear Models (2nd ed.)
+Routledge.
+<a href="https://doi.org/10.1201/9780203753736">doi:10.1201/9780203753736</a>.
+</p>
+<p>Dobson, A. J., &amp; Barnett, A. G. (2018).
+An Introduction to Generalized Linear Models (4th ed.)
+Chapman and Hall/CRC.
+<a href="https://doi.org/10.1201/9781315182780">doi:10.1201/9781315182780</a>
+</p>
+<p>Chares, Robert. (2009).
+“Cones and Interior-Point Algorithms for Structured Convex Optimization involving Powers and Exponentials.”
+</p>
+<p>Chen, J., &amp; Chen, Z. (2008).
+Extended Bayesian information criteria for model selection with large model spaces.
+Biometrika, 95 (3): 759–771.
+Oxford University Press.
+<a href="https://doi.org/10.1093/biomet/asn034">doi:10.1093/biomet/asn034</a>
+</p>
+<p>Zhu, J., Wen, C., Zhu, J., Zhang, H., &amp; Wang, X. (2020).
+A polynomial algorithm for best-subset selection problem.
+Proceedings of the National Academy of Sciences, 117 (52): 33117–33123.
+<a href="https://doi.org/10.1073/pnas.2014241117">doi:10.1073/pnas.2014241117</a>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">dat &lt;- rhglm(100, c(1, 2, -3, 4, 5, -6))
+hglm(y ~ ., constraints = NULL, data = dat)
+# estimation without constraints
+hglm(y ~ ., constraints = NULL, data = dat)
+# estimation with an upper bound on the number of coefficients to be selected
+hglm(y ~ ., constraints = k_max(3), data = dat)
+# estimation without intercept
+hglm(y ~ . - 1, data = dat)
+
+</code></pre>
+
+
+</div>

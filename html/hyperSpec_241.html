@@ -1,0 +1,153 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>bind</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Binding hyperSpec Objects</h2>
+
+<h3>Description</h3>
+
+<p>The former difficulties with binding S4 objects
+are resolved since R version 3.2.0 and <code>cbind</code> and <code>rbind</code> now work as intended and
+expected for hyperSpec objects.
+</p>
+<p><code>cbind2</code> binds the spectral matrices of two <code>hyperSpec</code> objects by column. All columns
+besides <code>spc</code> with the same name in <code>x@data</code> and <code>y@data</code> must have the same
+elements.  Rows are ordered before checking.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">bind(
+  direction = stop("direction ('c' or 'r') required"),
+  ...,
+  wl.tolerance = hy.getOption("wl.tolerance")
+)
+
+## S3 method for class 'hyperSpec'
+cbind(...)
+
+## S3 method for class 'hyperSpec'
+rbind(...)
+
+## S4 method for signature 'hyperSpec,hyperSpec'
+cbind2(x, y)
+
+## S4 method for signature 'hyperSpec,missing'
+cbind2(x, y)
+
+## S4 method for signature 'hyperSpec,hyperSpec'
+rbind2(x, y, wl.tolerance = hy.getOption("wl.tolerance"))
+
+## S4 method for signature 'hyperSpec,missing'
+rbind2(x, y, wl.tolerance)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>direction</code></td>
+<td>
+<p>"r" or "c" to bind rows or columns</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>The <code>hyperSpec</code> objects to be combined.
+</p>
+<p>Alternatively, <em>one</em> list of <code>hyperSpec</code> objects can be given to
+<code>bind</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>wl.tolerance</code></td>
+<td>
+<p><code>rbind</code> and <code>rbind2</code> check for equal wavelengths
+with this tolerance.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x, y</code></td>
+<td>
+<p><code>hyperSpec</code> objects</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Therefore, calling <code>rbind.hyperSpec</code> and
+<code>cbind.hyperSpec</code> is now depecated: <code>cbind</code> and <code>rbind</code> should now be called
+directly.
+</p>
+<p>However, in consequence it is no longer possible to call <code>cbind</code> or <code>rbind</code> with a
+list of hyperSpec objects. In that case, use <code>bind</code> or <code>do.call</code> (see example).
+</p>
+<p><code>bind</code> does the common work for both column- and row-wise binding.
+</p>
+
+
+<h3>Value</h3>
+
+<p>a <code>hyperSpec</code> object, possibly with different row order (for
+<code>bind ("c", ...{})</code> and <code>cbind2</code>).
+</p>
+
+
+<h3>Note</h3>
+
+<p>You might have to make sure that the objects either all have or all
+do not have rownames and/or colnames.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>C. Beleites
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>rbind2</code>, <code>cbind2</code>
+<code>rbind</code>, <code>cbind</code>
+</p>
+<p><code>merge</code> and <code>collapse</code> for combining objects that do not share spectra
+or wavelengths, respectively.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+chondro
+bind ("r", chondro, chondro)
+rbind (chondro, chondro)
+cbind (chondro, chondro)
+bind ("r", list (chondro, chondro, chondro))
+
+x &lt;- chondro[,, 600 : 605]
+x$a &lt;- 1
+x@data &lt;- x@data[, sample (ncol (x), ncol (x))] # reorder columns
+
+y &lt;- chondro [nrow (chondro) : 1,, 1730 : 1750] # reorder rows
+y$b &lt;- 2
+
+cbind2 (x, y) # works
+
+y$y[3] &lt;- 5
+try (cbind2 (x, y)) # error
+
+# list of hyperSpec objects
+
+lhy &lt;- list (flu, flu)
+do.call ("rbind", lhy)
+bind ("r", lhy)
+</code></pre>
+
+
+</div>

@@ -1,0 +1,74 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>polygon_to_cells</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Get H3 cell index within a polygon</h2>
+
+<h3>Description</h3>
+
+<p>This function returns all the H3 cell indexes within the supplied polygon
+geometry.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">polygon_to_cells(geometry = NULL, res = NULL, simple = TRUE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>geometry</code></td>
+<td>
+<p><code>sf</code> object of type <code>POLYGON</code> or
+<code>MULTIPOLYGON</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>res</code></td>
+<td>
+<p>Integer; Desired H3 resolution. See
+<a href="https://h3geo.org/docs/core-library/restable/">https://h3geo.org/docs/core-library/restable/</a> for allowable values and related dimensions.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>simple</code></td>
+<td>
+<p>Logical; whether to return a vector of outputs or an sf object
+containing both inputs and outputs.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>By default, a list of <code>length(h3_address)</code>. Each list element
+contains a character vector of H3 cell indices belonging to that geometry.
+A result of NA indicates that no H3 cell indices of the chosen resolution
+are centered over the geometry.
+</p>
+
+
+<h3>Note</h3>
+
+<p>This function will be slow with a large number of polygons, and/or
+polygons that are large relative to the hexagon area at the chosen
+resolution. A message is printed to console where the total input area is
+(roughly) &gt; 100000x the area of the chosen H3 resolution.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Which level 5 H3 cell indices have centers inside County Ashe, NC?
+nc &lt;- sf::st_read(system.file("shape/nc.shp", package="sf"), quiet = TRUE)
+nc1 &lt;- nc[1, ]
+fillers &lt;- polygon_to_cells(geometry = nc1, res = 5)
+</code></pre>
+
+
+</div>

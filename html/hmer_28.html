@@ -1,0 +1,163 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>nth_implausible</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>nth Maximum Implausibility</h2>
+
+<h3>Description</h3>
+
+<p>Computes the nth-maximum implausibility of points relative to a set of emulators.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">nth_implausible(
+  ems,
+  x,
+  z,
+  n = NULL,
+  max_imp = Inf,
+  cutoff = NULL,
+  sequential = FALSE,
+  get_raw = FALSE,
+  ordered = FALSE,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>ems</code></td>
+<td>
+<p>A set of <code>Emulator</code> objects or nested sets thereof (see description)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>An input point, or <code>data.frame</code> of points.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>z</code></td>
+<td>
+<p>The target values, in the usual form or nested thereof.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n</code></td>
+<td>
+<p>The implausibility level to return.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>max_imp</code></td>
+<td>
+<p>A maximum implausibility to return (often used with plotting)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cutoff</code></td>
+<td>
+<p>A numeric value, or vector of such, representing allowed implausibility</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sequential</code></td>
+<td>
+<p>Should the emulators be evaluated sequentially?</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>get_raw</code></td>
+<td>
+<p>Boolean - determines whether nth-implausibility should be applied.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ordered</code></td>
+<td>
+<p>If FALSE, emulators are ordered according to restrictiveness.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Any additional arguments to pass to chained functions (e.g. <code>ordering</code>
+to pass to <code>collect_emulators</code>)</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>For a collection of emulators, we often combine the implausibility
+measures for a given set of observations. The maximum implausibility of a point,
+given a set of univariate emulators and an associated collection of target values,
+is the largest implausibility of the collected set of implausibilities. The 2nd
+maximum is the maximum of the set without the largest value, and so on. By default,
+maximum implausibility will be considered when there are fewer than 10 targets to
+match to; otherwise second-maximum implausibility is considered.
+</p>
+<p>If <code>sequential = TRUE</code> and a specific <code>cutoff</code> has been provided, then the
+emulators' implausibility will be evaluated one emulator at a time. If a point
+is judged implausible by more than <code>n</code> emulators, <code>FALSE</code> is
+returned without evaluating any more. Due to R efficiencies, this is more efficient
+than the 'evaluate all' method once more than around 10 emulators are considered.
+</p>
+<p>This function also deals with variance emulators and bimodal emulators, working in a nested
+fashion. If targets are provided for both the expectation and variance as a list, then
+given <code>ems = list(expectation = ..., variance = ...)</code> the implausibility is calculated
+with respect to both sets of emulators, maximising as relevant. If targets are provided in
+the 'normal' fashion, then only the mean emulators are used. The bimodal case is similar;
+given a set of emulators <code>list(mode1 = list(expectation = ..., variance = ...), ...)</code>
+then each mode has implausibility evaluated separately. The results from the two modes are
+combined via piecewise minimisation.
+</p>
+
+
+<h3>Value</h3>
+
+<p>Either the nth maximum implausibilities, or booleans (if cutoff is given).
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># A single point
+nth_implausible(SIREmulators$ems, data.frame(aSI = 0.4, aIR = 0.25, aSR = 0.025),
+ SIREmulators$targets)
+# A data.frame of points
+grid &lt;- expand.grid(
+ aSI = seq(0.1, 0.8, length.out = 4),
+ aIR = seq(0, 0.5, length.out = 4),
+ aSR = seq(0, 0.05, length.out = 4)
+)
+# Vector of numerics
+i1 &lt;- nth_implausible(SIREmulators$ems, grid, SIREmulators$targets)
+# Vector of booleans (same as i1 &lt;= 3)
+i2 &lt;- nth_implausible(SIREmulators$ems, grid, SIREmulators$targets, cutoff = 3)
+# Throws a warning as n &gt; no. of targets
+i3 &lt;- nth_implausible(SIREmulators$ems, grid, SIREmulators$targets, n = 4)
+# Vector of booleans (note different output to i2)
+i4 &lt;- nth_implausible(SIREmulators$ems, grid, SIREmulators$targets,
+ cutoff = c(4, 2.5, 2))
+
+# Variance Emulators
+v_ems &lt;- emulator_from_data(BirthDeath$training, c('Y'),
+ list(lambda = c(0, 0.08), mu = c(0.04, 0.13)), emulator_type = "variance")
+v_targs = list(expectation = list(Y = c(90, 110)), variance = list(Y = c(55, 95)))
+nth_implausible(v_ems, unique(BirthDeath$validation[,1:2]), v_targs)
+## If there is a mismatch between emulators and targets, expectation is assumed
+nth_implausible(v_ems$expectation, unique(BirthDeath$validation[,1:2]), v_targs)
+nth_implausible(v_ems, unique(BirthDeath$validation[,1:2]), v_targs$expectation)
+
+</code></pre>
+
+
+</div>

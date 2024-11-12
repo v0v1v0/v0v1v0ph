@@ -1,0 +1,67 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hydro_year_DGI</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Hydrological year classification</h2>
+
+<h3>Description</h3>
+
+<p>This function allows you to get the hydrological year. The criteria is consistent with the one of <a href="http://www.irrigacion.gov.ar/dgi/">Departamento General de Irrigacion</a> (Mendoza - Argentina).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hydro_year_DGI(df)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table><tr style="vertical-align: top;">
+<td><code>df</code></td>
+<td>
+<p>a data frame with total annual volumes discharges created with agg_serie function.</p>
+</td>
+</tr></table>
+<h3>Value</h3>
+
+<p>A data frame containing the hydrological classification for each year.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Create BDHI hydro-met station
+guido &lt;- create_hydroMet(class_name = 'BDHI')
+
+# List with meteorological variables (slots in BDHI's object)
+cargar &lt;- list('precip', 'Qmd', 'Qmm')
+
+# Now assign as names the files
+hydro_files   &lt;- list.files( system.file('extdata', package = "hydroToolkit"), pattern = 'Guido' )
+names(cargar) &lt;- hydro_files
+
+# Build the object with the met records
+guido &lt;- build_hydroMet(obj = guido, slot_list = cargar, 
+               path = system.file('extdata', package = "hydroToolkit") )
+               
+# Now get mean monthly discharge
+Qmm &lt;- get_hydroMet(obj = guido, name = 'Qmm')[[1]]
+
+# Get the monthly water volume
+Qmm_vol &lt;- Qmm_to_Dm(df = Qmm)
+
+# Aggregate data frame to get total annual discharges
+AD  &lt;- agg_serie(df = Qmm_vol, fun = 'sum', period = 'annual', out_name = 'Ann_vol',
+         start_month = 7, end_month = 6, allow_NA = 2)
+         
+# Get hydrological year classification
+AD_class &lt;- hydro_year_DGI(df = AD)
+               
+</code></pre>
+
+
+</div>

@@ -1,0 +1,117 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>glht_sf2006</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Test proposed by Srivastava and Fujikoshi (2006)</h2>
+
+<h3>Description</h3>
+
+<p>Srivastava and Fujikoshi (2006)'s test for general linear hypothesis testing (GLHT) problem for high-dimensional data with assuming that underlying covariance matrices are the same.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">glht_sf2006(Y,X,C)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>Y</code></td>
+<td>
+<p>An <code class="reqn">n\times p</code> response matrix obtained by independently observing a <code class="reqn">p</code>-dimensional response variable for <code class="reqn">n</code> subjects.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>X</code></td>
+<td>
+<p>A known <code class="reqn">n\times k</code> full-rank design matrix with <code class="reqn">\operatorname{rank}(\boldsymbol{G})=k&lt;n</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>C</code></td>
+<td>
+<p>A known matrix of size <code class="reqn">q\times k</code> with <code class="reqn">\operatorname{rank}(\boldsymbol{C})=q&lt;k</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>A high-dimensional linear regression model can be expressed as
+</p>
+<p style="text-align: center;"><code class="reqn">\boldsymbol{Y}=\boldsymbol{X\Theta}+\boldsymbol{\epsilon},</code>
+</p>
+
+<p>where <code class="reqn">\Theta</code> is a <code class="reqn">k\times p</code> unknown parameter matrix and <code class="reqn">\boldsymbol{\epsilon}</code> is an <code class="reqn">n\times p</code> error matrix.
+</p>
+<p>It is of interest to test the following GLHT problem
+</p>
+<p style="text-align: center;"><code class="reqn">H_0: \boldsymbol{C\Theta}=\boldsymbol{0}, \quad \text { vs. } \quad H_1: \boldsymbol{C\Theta} \neq \boldsymbol{0}.</code>
+</p>
+
+<p>Srivastava and Fujikoshi (2006) proposed the following test statistic:
+</p>
+<p style="text-align: center;"><code class="reqn">T_{SF}=\left[2q\hat{a}_2(1+(n-k)^{-1}q)\right]^{-1/2}\left[\frac{\operatorname{tr}(\boldsymbol{B})}{\sqrt{p}}-\frac{q}{\sqrt{n-k}}\frac{\operatorname{tr}(\boldsymbol{W})}{\sqrt{(n-k)p}}\right].</code>
+</p>
+
+<p>where <code class="reqn">\boldsymbol{W}</code> and <code class="reqn">\boldsymbol{B}</code> are the matrix of sum of squares and products due to error and the error, respectively, and <code class="reqn">\hat{a}_2=[\operatorname{tr}(\boldsymbol{W}^2)-\operatorname{tr}^2(\boldsymbol{W})/(n-k)]/[(n-k-1)(n-k+2)p]</code>.
+They showed that under the null hypothesis, <code class="reqn">T_{SF}</code> is asymptotically normally distributed.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A  (list) object of  <code>S3</code> class <code>htest</code>  containing the following elements:
+</p>
+
+<dl>
+<dt>statistic</dt>
+<dd>
+<p>the test statistic proposed by Srivastava and Fujikoshi (2006).</p>
+</dd>
+<dt>p.value</dt>
+<dd>
+<p>the <code class="reqn">p</code>-value of the test proposed by Srivastava and Fujikoshi (2006).</p>
+</dd>
+</dl>
+<h3>References</h3>
+
+<p>Srivastava MS, Fujikoshi Y (2006).
+“Multivariate analysis of variance with fewer observations than the dimension.”
+<em>Journal of Multivariate Analysis</em>, <b>97</b>(9), 1927–1940.
+<a href="https://doi.org/10.1016/j.jmva.2005.08.010">doi:10.1016/j.jmva.2005.08.010</a>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">set.seed(1234)
+k &lt;- 3
+q &lt;- k-1
+p &lt;- 50
+n &lt;- c(25,30,40)
+rho &lt;- 0.01
+Theta &lt;- matrix(rep(0,k*p),nrow=k)
+X &lt;- matrix(c(rep(1,n[1]),rep(0,sum(n)),rep(1,n[2]),rep(0,sum(n)),rep(1,n[3])),ncol=k,nrow=sum(n))
+y &lt;- (-2*sqrt(1-rho)+sqrt(4*(1-rho)+4*p*rho))/(2*p)
+x &lt;- y+sqrt((1-rho))
+Gamma &lt;- matrix(rep(y,p*p),nrow=p)
+diag(Gamma) &lt;- rep(x,p)
+U &lt;- matrix(ncol = sum(n),nrow=p)
+for(i in 1:sum(n)){
+U[,i] &lt;- rnorm(p,0,1)
+}
+Y &lt;- X%*%Theta+t(U)%*%Gamma
+C &lt;- cbind(diag(q),-rep(1,q))
+glht_sf2006(Y,X,C)
+
+
+</code></pre>
+
+
+</div>

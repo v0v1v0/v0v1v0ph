@@ -1,0 +1,79 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>dfr_ecdd</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Adapted EWMA for Concept Drift Detection (ECDD) method</h2>
+
+<h3>Description</h3>
+
+<p>ECDD is a concept change detection method that uses an exponentially weighted moving average (EWMA) chart to monitor the misclassification rate of an streaming classifier.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">dfr_ecdd(lambda = 0.2, min_run_instances = 30, average_run_length = 100)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>lambda</code></td>
+<td>
+<p>The minimum number of instances before detecting change</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>min_run_instances</code></td>
+<td>
+<p>Necessary level for warning zone (2 standard deviation)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>average_run_length</code></td>
+<td>
+<p>Necessary level for a positive drift detection</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p><code>dfr_ecdd</code> object
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">library(daltoolbox)
+library(heimdall)
+
+# This example uses a dist-based drift detector with a synthetic dataset.
+
+data(st_drift_examples)
+data &lt;- st_drift_examples$univariate
+data$event &lt;- NULL
+
+model &lt;- dfr_ecdd()
+
+detection &lt;- NULL
+output &lt;- list(obj=model, drift=FALSE)
+for (i in 1:length(data$serie)){
+ output &lt;- update_state(output$obj, data$serie[i])
+ if (output$drift){
+   type &lt;- 'drift'
+   output$obj &lt;- reset_state(output$obj)
+ }else{
+   type &lt;- ''
+ }
+ detection &lt;- rbind(detection, data.frame(idx=i, event=output$drift, type=type))
+}
+
+detection[detection$type == 'drift',]
+</code></pre>
+
+
+</div>

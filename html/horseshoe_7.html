@@ -1,0 +1,112 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>HS.post.mean</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Posterior mean for the horseshoe for the normal means problem.</h2>
+
+<h3>Description</h3>
+
+<p>Compute the posterior mean for the horseshoe for the normal means problem
+(i.e. linear regression with the design matrix equal to the identity matrix),
+for a fixed value of tau, without using MCMC, leading to a quick estimate of
+the underlying parameters (betas). Details on computation are given
+in Carvalho et al. (2010) and Van der Pas et al. (2014).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">HS.post.mean(y, tau, Sigma2 = 1)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+<p>The data. An <code class="reqn">n*1</code> vector.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tau</code></td>
+<td>
+<p>Value for tau. Warning: tau should be greater than 1/450.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Sigma2</code></td>
+<td>
+<p>The variance of the data.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The normal means model is:
+</p>
+<p style="text-align: center;"><code class="reqn">y_i=\beta_i+\epsilon_i, \epsilon_i \sim N(0,\sigma^2)</code>
+</p>
+
+<p>And the horseshoe prior:
+</p>
+<p style="text-align: center;"><code class="reqn">\beta_j \sim N(0,\sigma^2 \lambda_j^2 \tau^2)</code>
+</p>
+
+<p style="text-align: center;"><code class="reqn">\lambda_j \sim Half-Cauchy(0,1).</code>
+</p>
+
+<p>If <code class="reqn">\tau</code> and <code class="reqn">\sigma^2</code> are known, the posterior mean can be computed without
+using MCMC.
+</p>
+
+
+<h3>Value</h3>
+
+<p>The posterior mean (horseshoe estimator) for each of the datapoints.
+</p>
+
+
+<h3>References</h3>
+
+<p>Carvalho, C. M., Polson, N. G., and Scott, J. G. (2010), The horseshoe
+estimator for sparse signals. Biometrika 97(2), 465–480.
+</p>
+<p>van der Pas, S. L., Kleijn, B. J. K., and van der Vaart, A. W. (2014), The horseshoe
+estimator: Posterior concentration around nearly black vectors. Electronic
+Journal of Statistics 8(2), 2585–2618.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>HS.post.var</code> to compute the posterior variance. See
+<code>HS.normal.means</code> for an implementation that does use MCMC, and
+returns credible intervals as well as the posterior mean (and other quantities).
+See <code>horseshoe</code> for linear regression.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+#Plot the posterior mean for a range of deterministic values
+y &lt;- seq(-5, 5, 0.05)
+plot(y, HS.post.mean(y, tau = 0.5, Sigma2 = 1))
+
+#Example with 20 signals, rest is noise
+#Posterior mean for the signals is plotted in blue
+truth &lt;- c(rep(0, 80), rep(8, 20))
+data &lt;-  truth + rnorm(100)
+tau.example &lt;- HS.MMLE(data, 1)
+plot(data, HS.post.mean(data, tau.example, 1),
+ col = c(rep("black", 80), rep("blue", 20)))
+
+
+</code></pre>
+
+
+</div>

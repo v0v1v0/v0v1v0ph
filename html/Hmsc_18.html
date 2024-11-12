@@ -1,0 +1,153 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>HmscRandomLevel</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Create an <code>Hmsc</code> random level</h2>
+
+<h3>Description</h3>
+
+<p>Specifies the structure of a random factor, including
+whether the random factor is assumed to be spatially explicit
+or not, the spatial coordinates and the potential structure of
+covariate-dependent random factors.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">HmscRandomLevel(
+  sData = NULL,
+  sMethod = "Full",
+  distMat = NULL,
+  xData = NULL,
+  units = NULL,
+  N = NULL,
+  nNeighbours = 10,
+  sKnot = NULL,
+  longlat = FALSE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>sData</code></td>
+<td>
+<p>a matrix or a dataframe containing spatial or temporal
+coordinates of units of the random level, or a similar
+<code>SpatialPoints</code> structure of the <a href="https://CRAN.R-project.org/package=sp"><span class="pkg">sp</span></a> package. If
+spatial coordinates are unprojected longitude and latitude,
+great circle distances will be calculated internally. All
+spatial locations should be unique. If you have several
+observations in the same point, they should be identified by
+the random levels.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sMethod</code></td>
+<td>
+<p>a string specifying which spatial method to be
+used. Possible values are <code>"Full"</code>, <code>"GPP"</code> and
+<code>"NNGP"</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>distMat</code></td>
+<td>
+<p>a distance matrix containing the distances between
+units of the random level, with unit names as rownames, or a
+<code>dist</code> structure with location
+Labels. <code>distMat</code> cannot be used with <code>"GPP"</code> spatial
+model.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>xData</code></td>
+<td>
+<p>a dataframe containing the covariates measured at the
+units of the random level for covariate-dependent associations</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>units</code></td>
+<td>
+<p>a vector, specifying the names of the units of a
+non-structured level</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>N</code></td>
+<td>
+<p>number of unique units on this level</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nNeighbours</code></td>
+<td>
+<p>a scalar specifying the number of neighbours to
+be used in case the spatial method is set to <code>NNGP</code>. Only
+positive values smaller than the total number of plots are
+allowed.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sKnot</code></td>
+<td>
+<p>a dataframe containing the knot locations to be used
+for the Gaussian predictive process if <code>sMethod</code> is set to
+<code>"GPP"</code>. Suitable data can be produced with
+<code>constructKnots</code>. The knot locations shall not
+duplicate <code>sData</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>longlat</code></td>
+<td>
+<p>Interpret coordinate data <code>sData</code> as longitude
+and latitude in decimal degrees. If this is <code>TRUE</code>, great
+circle distances will be used instead of Euclidean distances.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Only one of <code>sData</code>, <code>distMat</code>, <code>xData</code>, <code>units</code> and <code>N</code> arguments can be
+provided.
+</p>
+<p>As a good practice, we recommend to specify all available units for a random level, even if some of those are not
+used for training the model.
+</p>
+
+
+<h3>Value</h3>
+
+<p>a <code>HmscRandomLevel</code>-class object that can be used for <code>Hmsc</code>-class object construction
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>setPriors.Hmsc</code> to change the default priors
+of an existing <code>HmscRandomLevel</code> object.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Setting a random level with 50 units
+rL = HmscRandomLevel(units=TD$studyDesign$sample)
+
+# Setting a spatial random level
+rL = HmscRandomLevel(sData=TD$xycoords)
+
+# Setting a covariate-dependent random level.
+rL = HmscRandomLevel(xData=data.frame(x1=rep(1,length(TD$X$x1)),x2=TD$X$x2))
+
+</code></pre>
+
+
+</div>

@@ -1,0 +1,134 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>calcKFoldError</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Calculate index error with FKold (out of sample)</h2>
+
+<h3>Description</h3>
+
+<p>Use a KFold (out of sample) approach to estimate index accuracy
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">calcKFoldError(hpi_obj, pred_df, k = 10, seed = 1, smooth = FALSE,
+  ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>hpi_obj</code></td>
+<td>
+<p>HPI object of class 'hpi'</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pred_df</code></td>
+<td>
+<p>Data.frame of sales to be used for assessing predictive quality of index</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>k</code></td>
+<td>
+<p>default=10; Number of folds to apply to holdout process</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>seed</code></td>
+<td>
+<p>default=1; Random seed generator to control the folding process</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>smooth</code></td>
+<td>
+<p>default = FALSE; Calculate on the smoothed index</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Additional Arguments</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>object of class 'hpiaccuracy' inheriting from class 'data.frame' containing the
+following fields:
+</p>
+
+<dl>
+<dt>pair_id</dt>
+<dd>
+<p>Unique Pair ID</p>
+</dd>
+<dt>price</dt>
+<dd>
+<p>Transaction Price</p>
+</dd>
+<dt>pred_price</dt>
+<dd>
+<p>Predicted price</p>
+</dd>
+<dt>error</dt>
+<dd>
+<p>(Prediction - Actual) / Actual</p>
+</dd>
+<dt>log_error</dt>
+<dd>
+<p>log(prediction) - log(actual)</p>
+</dd>
+<dt>pred_period</dt>
+<dd>
+<p>Period of the prediction</p>
+</dd>
+</dl>
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+ # Load data
+ data(ex_sales)
+
+ # Create index with raw transaction data
+ rt_index &lt;- rtIndex(trans_df = ex_sales,
+                     periodicity = 'monthly',
+                     min_date = '2010-06-01',
+                     max_date = '2015-11-30',
+                     adj_type = 'clip',
+                     date = 'sale_date',
+                     price = 'sale_price',
+                     trans_id = 'sale_id',
+                     prop_id = 'pinx',
+                     estimator = 'robust',
+                     log_dep = TRUE,
+                     trim_model = TRUE,
+                     max_period = 48,
+                     smooth = FALSE)
+
+  # Create prediction data
+  rt_data &lt;- rtCreateTrans(trans_df = ex_sales,
+                          prop_id = 'pinx',
+                          trans_id = 'sale_id',
+                          price = 'sale_price',
+                          periodicity = 'monthly',
+                          date = 'sale_date')
+
+  # Calc Accuracy
+  kf_accr &lt;- calcKFoldError(hpi_obj = rt_index,
+                            pred_df = rt_data,
+                            k = 10,
+                            seed = 123,
+                            smooth = FALSE)
+
+</code></pre>
+
+
+</div>

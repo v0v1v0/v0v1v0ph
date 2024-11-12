@@ -1,0 +1,256 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>manningc</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Solves the Manning Equation for gravity flow in a circular pipe</h2>
+
+<h3>Description</h3>
+
+<p>This function solves the Manning equation for water flow in a circular pipe 
+at less than full. Uniform flow conditions are assumed, so that the pipe slope 
+is equal to the slope of the water surface and the energy grade line. This is a 
+modification of the code prepared by Irucka Embry in his iemisc package.
+The iemisc::manningcirc function was adapted here for more limited cases
+commonly used in classroom exercises, additional checks were included to ensure
+the pipe is flowing less than full, and a cross-section figure is also
+available. The iemisc::manningcirc and iemisc::manningcircy functions were
+combined into a single function. Manning n supplied is assumed to be that for
+full pipe flow; an optional argument may be supplied to account for n varying 
+with depth.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">manningc(
+  Q = NULL,
+  n = NULL,
+  Sf = NULL,
+  y = NULL,
+  d = NULL,
+  y_d = NULL,
+  n_var = FALSE,
+  units = c("SI", "Eng"),
+  ret_units = FALSE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>Q</code></td>
+<td>
+<p>numeric vector that contains the flow rate [<code class="reqn">m^3 s^{-1}</code> or <code class="reqn">ft^3 s^{-1}</code>]</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n</code></td>
+<td>
+<p>numeric vector that contains the Manning roughness coefficient (for full flow or fixed).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Sf</code></td>
+<td>
+<p>numeric vector that contains the slope of the pipe [unitless]</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+<p>numeric vector that contains the water depth [<code class="reqn">m</code> or <code class="reqn">ft</code>]</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>d</code></td>
+<td>
+<p>numeric vector that contains the pipe diameter [<code class="reqn">m</code> or <code class="reqn">ft</code>]</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>y_d</code></td>
+<td>
+<p>numeric vector that contains the ratio of depth to diameter [unitless]</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n_var</code></td>
+<td>
+<p>If set to TRUE the value of n for full flow is adjusted with depth. [Default is FALSE]</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>units</code></td>
+<td>
+<p>character vector that contains the system of units [options are
+<code>SI</code> for International System of Units and <code>Eng</code> for English (US customary)
+units. This is used for compatibility with iemisc package]</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ret_units</code></td>
+<td>
+<p>If set to TRUE the value(s) returned are of class <code>units</code> with
+units attached to the value. [Default is FALSE]</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The possible applications of this function for solving the Manning equation
+for circular pipes are:
+</p>
+
+<table>
+<tr>
+<td style="text-align: left;">
+  <strong>Given</strong> </td>
+<td style="text-align: left;"> <strong>Solve for</strong> </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+  y_d, Q, Sf, n </td>
+<td style="text-align: left;"> d </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+  d, Sf, Q, n </td>
+<td style="text-align: left;"> y </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+  y, d, Q, n </td>
+<td style="text-align: left;"> Sf </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+  y, d, Sf, n </td>
+<td style="text-align: left;"> Q </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+  d, Q, Sf, y </td>
+<td style="text-align: left;"> n
+</td>
+</tr>
+</table>
+<p>The Manning equation (also known as the Strickler equation) describes flow conditions in
+an open channel under uniform flow conditions. It is often expressed as: 
+</p>
+<p style="text-align: center;"><code class="reqn">Q = A\frac{C}{n}{R}^{\frac{2}{3}}{S_f}^{\frac{1}{2}}</code>
+</p>
+
+<p>where <code class="reqn">C</code> is 1.0 for SI units and 1.49 for Eng (U.S. Customary) units. Critical depth is 
+defined by the relation (at critical conditions):
+</p>
+<p style="text-align: center;"><code class="reqn">\frac{Q^{2}B}{g\,A^{3}}=1</code>
+</p>
+
+<p>where <code class="reqn">B</code> is the top width of the water surface. Since B equals zero for a full pipe, critical 
+depth is set to the pipe diameter <code class="reqn">d</code> if the flow <code class="reqn">Q</code> exceeds a value that would produce a 
+critical flow at <code class="reqn">\frac{y}{d}=0.99</code>.
+</p>
+
+
+<h3>Value</h3>
+
+<p>Returns a list including the missing parameter:
+</p>
+
+<ul>
+<li>
+<p> Q - flow rate
+</p>
+</li>
+<li>
+<p> V - flow velocity
+</p>
+</li>
+<li>
+<p> A - cross-sectional area of flow
+</p>
+</li>
+<li>
+<p> P - wetted perimeter
+</p>
+</li>
+<li>
+<p> R - hydraulic radius (A/P)
+</p>
+</li>
+<li>
+<p> y - flow depth
+</p>
+</li>
+<li>
+<p> d - pipe diameter
+</p>
+</li>
+<li>
+<p> Sf - slope
+</p>
+</li>
+<li>
+<p> n - Manning's roughness (for full flow, or as adjusted if n_var is TRUE)
+</p>
+</li>
+<li>
+<p> yc - critical depth
+</p>
+</li>
+<li>
+<p> Fr - Froude number
+</p>
+</li>
+<li>
+<p> Re - Reynolds number
+</p>
+</li>
+<li>
+<p> Qf - Full pipe flow rate
+</p>
+</li>
+</ul>
+<h3>Author(s)</h3>
+
+<p>Ed Maurer, Irucka Embry
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>xc_circle</code> for a cross-section diagram of the circular channel
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+#Solving for flow rate, Q: SI Units
+manningc(d = 0.6, n = 0.013, Sf = 1./400., y = 0.24, units = "SI")
+#returns 0.1 m3/s
+
+#Solving for Sf, if d=600 mm and pipe is to flow half full
+manningc(d = 0.6, Q = 0.17, n = 0.013, y = 0.3, units = "SI")
+#returns required slope of 0.003
+
+#Solving for diameter, d when given y_d): Eng (US) units
+manningc(Q = 83.5, n = 0.015, Sf = 0.0002, y_d = 0.9, units = "Eng")
+#returns 7.0 ft required diameter
+
+#Solving for depth, y when given Q: SI units
+manningc(Q=0.01, n=0.013, Sf=0.001, d = 0.2, units="SI")
+#returns depth  y = 0.158 m, critical depth, yc = 0.085 m
+
+#Solving for depth, y when given Q: SI units, and n variable with depth
+manningc(Q=0.01, n=0.013, Sf=0.001, d = 0.2, n_var = TRUE, units="SI")
+#returns depth  y = 0.174 m, critical depth, yc = 0.085 m
+
+</code></pre>
+
+
+</div>

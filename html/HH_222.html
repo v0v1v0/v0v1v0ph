@@ -1,0 +1,307 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>intxplot</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Interaction plot, with an option to print standard error bars.
+</h2>
+
+<h3>Description</h3>
+
+<p>Interaction plot, with an option to print standard error bars.
+There is an option to offset group lines to prevent the
+bars from overprinting.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">intxplot(x, data=NULL, groups.in,
+          scales,
+          key.length=1,
+          key.lines,
+          key=TRUE,
+          trace.factor.name=deparse(substitute(groups.in)),
+          x.factor.name=x.factor,
+          xlab=x.factor.name,
+          main=list(main.title, cex=main.cex),
+          condition.name="condition",
+          panel="panel.intxplot",
+          summary.function="sufficient",
+          se,
+          ...,
+          data.is.summary=FALSE,
+          main.title=paste(
+            "Interactions of", trace.factor.name, "and",
+            x.factor.name,
+            if (length(x[[3]]) &gt; 1)
+            paste("|", condition.name.to.use)),
+          main.cex=1.5,
+          col, lwd, lty, alpha)
+
+panel.intxplot(x, y, subscripts, groups, type = "l", se, cv=1.96,
+               offset.use=(!missing(groups) &amp;&amp; !missing(se)),
+               offset.scale=2*max(as.numeric(groups)),
+               offset=
+               as.numeric(groups[match(levels(groups), groups)]) / offset.scale,
+               rug.use=offset.use,
+               col, lwd, lty, alpha,
+               ...)
+
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>For <code>intxplot</code>, a formula with a factor as the
+predictor variable.
+For <code>panel.intxplot</code>, standard argument for panel functions.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>data.frame, as used in <code>xyplot</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>groups.in</code></td>
+<td>
+<p><code>groups.in</code>, as used in <code>xyplot</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>scales</code></td>
+<td>
+<p>Optional, additional arguments for the standard <code>scales</code>
+in <code>xyplot</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>key.length</code></td>
+<td>
+<p>Number of columns in the key.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>key.lines</code></td>
+<td>
+<p>default value for the <code>lines</code> argument of <code>key</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>key</code></td>
+<td>
+<p>logical.  If <code>TRUE</code>, draw the key.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>trace.factor.name</code></td>
+<td>
+<p>Name of the grouping variable.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x.factor.name</code></td>
+<td>
+<p>name of the dependent variable.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>xlab</code></td>
+<td>
+<p>as in <code>xyplot</code>, defaults to the name of the predictor variable
+from the formula.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>main</code></td>
+<td>
+<p>as in <code>xyplot</code>.  Defaults to the <code>main.title</code> argument.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>panel</code></td>
+<td>
+<p>as in <code>xyplot</code>.  Defaults to the <code>"panel.intxplot"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>condition.name</code></td>
+<td>
+<p>name of the conditioning variable.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>summary.function</code></td>
+<td>
+<p>The default <code>sufficient</code> finds the mean,
+standard deviation, and sample size of the response variable for each
+level of the conditioning factor. See <code>sufficient</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>se</code></td>
+<td>
+<p>standard errors to be passed to <code>panel.intxplot</code>.
+<code>se</code> Missing, logical, or a numeric vector.
+If missing or <code>FALSE</code>, standard errors are not plotted.
+If <code>se=TRUE</code> in <code>intxplot</code>,
+the standard errors are calculated from the
+sufficient statistics for each group as the group's standard deviation
+divided by the square root of the group's observation
+count.  If <code>se</code> is numeric vector, it is evaluated in the environment of
+the sufficient statistics.
+the <code>se</code> argument to <code>panel.intxplot</code> must be numeric.
+</p>
+</td>
+</tr>
+</table>
+<p>,
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>In <code>intxplot</code>, arguments for <code>panel.intxplot</code>.
+In <code>panel.intxplot</code>, arguments for <code>panel.superpose</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>data.is.summary</code></td>
+<td>
+<p>logical, defaults to <code>FALSE</code> under the
+assumption that the input data.frame is the original data and the
+<code>intxplot</code> function will generate the summary information
+(primarily standard deviation <code>sd</code> and number of
+observations <code>nobs</code> for each group).  When <code>TRUE</code>, the
+standard error calculation assumes variables <code>sd</code> and
+<code>nobs</code> are in the dataset.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>main.title</code></td>
+<td>
+<p>Default main title for plot.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>main.cex</code></td>
+<td>
+<p>Default character expansion for main title.</p>
+</td>
+</tr>
+</table>
+<table>
+<tr style="vertical-align: top;">
+<td><code>y, subscripts, groups, type</code></td>
+<td>
+<p>Standard arguments for panel functions.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cv</code></td>
+<td>
+<p>critical value for confidence intervals. Defaults to 1.96.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>offset.use</code></td>
+<td>
+<p>logical.  If <code>TRUE</code>, offset the endpoints
+of each group.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>offset.scale</code></td>
+<td>
+<p>Scale number indicating how far apart the
+ends of the groups will be placed.  Larger numbers make them closer
+together.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>offset</code></td>
+<td>
+<p>Actual numbers by which the end of the groups are offset
+from their nominal location which is the <code>as.numeric</code> of the
+group levels.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rug.use</code></td>
+<td>
+<p>logical. If <code>TRUE</code>, display a rug for the endpoints
+of each group.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>col, lwd, lty, alpha</code></td>
+<td>
+<p>Arguments to
+<code>trellis.par.set(superpose.line=list())</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p><code>"trellis"</code> object.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p> Richard M. Heiberger &lt;rmh@temple.edu&gt; </p>
+
+
+<h3>See Also</h3>
+
+<p><code>sufficient</code></p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## This uses the same data as the HH Section 12.13 rhizobium example.
+
+data(rhiz.clover)
+
+## interaction plot, no SE
+intxplot(Npg ~ strain, groups=comb, data=rhiz.clover,
+         main="Interaction Plot. No SE")
+
+## interaction plot, individual SE for each treatment combination
+## Rescaled to allow the CI bars to stay within the plot region
+intxplot(Npg ~ strain, groups=comb, data=rhiz.clover, se=TRUE,
+         ylim=c(17,47),
+         main="Interaction Plot. Rescaled to keep CI bars within the plot region")
+
+## Common SE based on ANOVA table. Rescaled to allow the CI bars to stay within the plot region
+intxplot(Npg ~ strain, groups=comb, data=rhiz.clover,
+         se=sqrt(sum((nobs-1)*sd^2)/(sum(nobs-1)))/sqrt(5),
+         ylim=c(16,41),
+         main=paste("Interaction Plot. Common SE based on ANOVA table.\n",
+                    "Rescaled to keep CI bars within the plot region"))
+
+## change distance between endpoints
+intxplot(Npg ~ strain, groups=comb, data=rhiz.clover, se=TRUE,
+         offset.scale=10, ylim=c(18,46),
+         main="Interaction plot. Change distance between endpoints")
+
+## When data includes the nobs and sd variables, data.is.summary=TRUE is needed.
+intxplot(Npg ~ strain, groups=comb,
+         se=sqrt(sum((nobs-1)*sd^2)/(sum(nobs-1)))/sqrt(5),
+         data=sufficient(rhiz.clover, y="Npg", c("strain","comb")),
+         data.is.summary=TRUE,
+         ylim=c(16,41),
+         main=paste("Interaction plot. When data includes the nobs and sd variables,\n",
+           "'data.is.summary=TRUE' is needed"))
+
+</code></pre>
+
+
+</div>

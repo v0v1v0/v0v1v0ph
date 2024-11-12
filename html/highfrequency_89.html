@@ -1,0 +1,148 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>rSemiCov</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Realized semicovariance</h2>
+
+<h3>Description</h3>
+
+<p>Calculate the Realized Semicovariances (rSemiCov).
+Let <code class="reqn"> r_{t,i} </code> be an intraday <code class="reqn">M x N</code> return matrix and <code class="reqn">i=1,...,M</code>
+the number of intraday returns. Then, let <code class="reqn">r_{t,i}^{+} = max(r_{t,i},0)</code> and <code class="reqn">r_{t,i}^{-} = min(r_{t,i},0)</code>.
+</p>
+<p>Then, the realized semicovariance is given by the following three matrices:
+</p>
+<p style="text-align: center;"><code class="reqn">
+ \mbox{pos}_t =\sum_{i=1}^{M} r^{+}_{t,i} r^{+'}_{t,i}
+</code>
+</p>
+
+<p style="text-align: center;"><code class="reqn">
+ \mbox{neg}_t =\sum_{i=1}^{M} r^{-}_{t,i} r^{-'}_{t,i}
+</code>
+</p>
+
+<p style="text-align: center;"><code class="reqn">
+ \mbox{mixed}_t =\sum_{i=1}^{M} (r^{+}_{t,i} r^{-'}_{t,i} + r^{-}_{t,i} r^{+'}_{t,i})
+</code>
+</p>
+
+<p>The mixed covariance matrix will have 0 on the diagonal.
+From these three matrices, the realized covariance can be constructed as <code class="reqn">pos + neg + mixed</code>.
+The concordant semicovariance matrix is <code class="reqn">pos + neg</code>.
+The off-diagonals of the concordant matrix is always positive, while for the mixed matrix, it is always negative.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">rSemiCov(
+  rData,
+  cor = FALSE,
+  alignBy = NULL,
+  alignPeriod = NULL,
+  makeReturns = FALSE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>rData</code></td>
+<td>
+<p>an <code>xts</code> or <code>data.table</code> object containing returns or prices, possibly for multiple assets over multiple days.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cor</code></td>
+<td>
+<p>boolean, in case it is <code>TRUE</code>, and the input data is multivariate, the correlation is returned instead of the covariance matrix. <code>FALSE</code> by default.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alignBy</code></td>
+<td>
+<p>character, indicating the time scale in which <code>alignPeriod</code> is expressed. 
+Possible values are: <code>"ticks"</code>, <code>"secs"</code>, <code>"seconds"</code>, <code>"mins"</code>, <code>"minutes"</code>, <code>"hours"</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alignPeriod</code></td>
+<td>
+<p>positive numeric, indicating the number of periods to aggregate over. For example, to aggregate
+based on a 5-minute frequency, set <code>alignPeriod = 5</code> and <code>alignBy = "minutes"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>makeReturns</code></td>
+<td>
+<p>boolean, should be <code>TRUE</code> when <code>rData</code> contains prices instead of returns. <code>FALSE</code> by default.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>In the case that cor is <code>TRUE</code>, the mixed matrix will be an <code class="reqn">N \times N</code> matrix filled with NA as mapping the mixed covariance matrix into correlation space is impossible due to the 0-diagonal.
+</p>
+
+
+<h3>Value</h3>
+
+<p>In case the data consists of one day a list of five <code class="reqn">N \times N</code> matrices are returned. These matrices are named <code>mixed</code>, <code>positive</code>, <code>negative</code>, <code>concordant</code>, and <code>rCov</code>.
+The latter matrix corresponds to the realized covariance estimator and is thus named like the function <code>rCov</code>.
+In case the data spans more than one day, the list for each day will be put into another list named according to the date of the estimates.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Emil Sjoerup.
+</p>
+
+
+<h3>References</h3>
+
+<p>Bollerslev, T., Li, J., Patton, A. J., and Quaedvlieg, R. (2020). Realized semicovariances. <em>Econometrica</em>, 88, 1515-1551.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>ICov</code> for a list of implemented estimators of the integrated covariance.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+# Realized semi-variance/semi-covariance for prices aligned
+# at 5 minutes.
+
+# Univariate:
+rSVar = rSemiCov(rData = sampleTData[, list(DT, PRICE)], alignBy = "minutes",
+                   alignPeriod = 5, makeReturns = TRUE)
+rSVar
+## Not run: 
+library("xts")
+# Multivariate multi day:
+rSC &lt;- rSemiCov(sampleOneMinuteData, makeReturns = TRUE) # rSC is a list of lists
+# We extract the covariance between stock 1 and stock 2 for all three covariances.
+mixed &lt;- sapply(rSC, function(x) x[["mixed"]][1,2])
+neg &lt;- sapply(rSC, function(x) x[["negative"]][1,2])
+pos &lt;- sapply(rSC, function(x) x[["positive"]][1,2])
+covariances &lt;- xts(cbind(mixed, neg, pos), as.Date(names(rSC)))
+colnames(covariances) &lt;- c("mixed", "neg", "pos")
+# We make a quick plot of the different covariances
+plot(covariances)
+addLegend(lty = 1) # Add legend so we can distinguish the series.
+
+## End(Not run)
+
+</code></pre>
+
+
+</div>

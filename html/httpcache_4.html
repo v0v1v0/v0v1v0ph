@@ -1,0 +1,81 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>cached-http-verbs</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Cache-aware versions of httr verbs</h2>
+
+<h3>Description</h3>
+
+<p>These functions set, read from, and bust the HTTP query cache. They wrap
+the similarly named functions in the httr package and can be used as
+drop-in replacements for them.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">GET(url, ...)
+
+PUT(url, ..., drop = dropCache(url))
+
+POST(url, ..., drop = dropOnly(url))
+
+PATCH(url, ..., drop = dropCache(url))
+
+DELETE(url, ..., drop = dropCache(url))
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>url</code></td>
+<td>
+<p>character URL of the request</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>additional arguments passed to the httr functions</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>drop</code></td>
+<td>
+<p>For <code>PUT</code>, <code>PATCH</code>, <code>POST</code>, and <code>DELETE</code>,
+code to be executed after the request. This is intended to be for supplying
+cache-invalidation logic. By default, <code>POST</code> drops cache only for
+the specified <code>url</code> (i.e. <code>dropOnly()</code>), while the other
+verbs drop cache for the request URL and for any URLs nested below it
+(i.e. <code>dropCache()</code>).</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p><code>GET</code> checks the cache before making an HTTP request, and if there is a cache
+miss, it sets the response from the request into the cache for future
+requests. The other verbs, assuming a more or less RESTful API, would be
+assumed to modify server state, and thus they should trigger cache
+invalidation. They have default cache-invalidation strategies, but you can
+override them as desired.
+</p>
+
+
+<h3>Value</h3>
+
+<p>The corresponding httr response object, potentially read from cache
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>dropCache()</code> <code>cachedPOST()</code>
+</p>
+
+
+</div>

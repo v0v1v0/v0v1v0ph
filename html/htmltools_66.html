@@ -1,0 +1,171 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>builder</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Create HTML tags</h2>
+
+<h3>Description</h3>
+
+<p>Create an R object that represents an HTML tag. For convenience, common HTML
+tags (e.g., <code style="white-space: pre;">⁠&lt;div&gt;⁠</code>) can be created by calling for their tag name directly
+(e.g., <code>div()</code>). To create less common HTML5 (or SVG) tags (e.g.,
+<code style="white-space: pre;">⁠&lt;article&gt;⁠</code>), use the <code>tags</code> list collection (e.g., <code>tags$article()</code>). To
+create other non HTML/SVG tags, use the lower-level <code>tag()</code> constructor.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">tags
+
+p(..., .noWS = NULL, .renderHook = NULL)
+
+h1(..., .noWS = NULL, .renderHook = NULL)
+
+h2(..., .noWS = NULL, .renderHook = NULL)
+
+h3(..., .noWS = NULL, .renderHook = NULL)
+
+h4(..., .noWS = NULL, .renderHook = NULL)
+
+h5(..., .noWS = NULL, .renderHook = NULL)
+
+h6(..., .noWS = NULL, .renderHook = NULL)
+
+a(..., .noWS = NULL, .renderHook = NULL)
+
+br(..., .noWS = NULL, .renderHook = NULL)
+
+div(..., .noWS = NULL, .renderHook = NULL)
+
+span(..., .noWS = NULL, .renderHook = NULL)
+
+pre(..., .noWS = NULL, .renderHook = NULL)
+
+code(..., .noWS = NULL, .renderHook = NULL)
+
+img(..., .noWS = NULL, .renderHook = NULL)
+
+strong(..., .noWS = NULL, .renderHook = NULL)
+
+em(..., .noWS = NULL, .renderHook = NULL)
+
+hr(..., .noWS = NULL, .renderHook = NULL)
+
+tag(`_tag_name`, varArgs, .noWS = NULL, .renderHook = NULL)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Tag attributes (named arguments) and children (unnamed arguments).
+A named argument with an <code>NA</code> value is rendered as a boolean attributes
+(see example). Children may include any combination of:
+</p>
+
+<ul>
+<li>
+<p> Other tags objects
+</p>
+</li>
+<li> <p><code>HTML()</code> strings
+</p>
+</li>
+<li> <p><code>htmlDependency()</code>s
+</p>
+</li>
+<li>
+<p> Single-element atomic vectors
+</p>
+</li>
+<li> <p><code>list()</code>s containing any combination of the above
+</p>
+</li>
+</ul>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.noWS</code></td>
+<td>
+<p>Character vector used to omit some of the whitespace that would
+normally be written around this tag. Valid options include <code>before</code>,
+<code>after</code>, <code>outside</code>, <code>after-begin</code>, and <code>before-end</code>.
+Any number of these options can be specified.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.renderHook</code></td>
+<td>
+<p>A function (or list of functions) to call when the <code>tag</code> is rendered. This
+function should have at least one argument (the <code>tag</code>) and return anything
+that can be converted into tags via <code>as.tags()</code>. Additional hooks may also be
+added to a particular <code>tag</code> via <code>tagAddRenderHook()</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>_tag_name</code></td>
+<td>
+<p>A character string to use for the tag name.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>varArgs</code></td>
+<td>
+<p>List of tag attributes and children.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A <code>list()</code> with a <code>shiny.tag</code> class that can be converted into an
+HTML string via <code>as.character()</code> and saved to a file with <code>save_html()</code>.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>tagList()</code>, <code>withTags()</code>, <code>tagAppendAttributes()</code>, <code>tagQuery()</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">tags$html(
+  tags$head(
+    tags$title('My first page')
+  ),
+  tags$body(
+    h1('My first heading'),
+    p('My first paragraph, with some ', strong('bold'), ' text.'),
+    div(
+      id = 'myDiv', class = 'simpleDiv',
+      'Here is a div with some attributes.'
+     )
+  )
+)
+
+# html5 &lt;audio&gt; with boolean control attribute
+# https://www.w3.org/TR/html5/infrastructure.html#sec-boolean-attributes
+tags$audio(
+  controls = NA,
+  tags$source(
+    src = "myfile.wav",
+    type = "audio/wav"
+  )
+)
+
+# suppress the whitespace between tags
+tags$span(
+  tags$strong("I'm strong", .noWS="outside")
+)
+
+</code></pre>
+
+
+</div>

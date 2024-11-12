@@ -1,0 +1,201 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hm_agg</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Aggregates the table inside a slot to a larger time period</h2>
+
+<h3>Description</h3>
+
+<p>This method allows you to get your data temporally aggregated.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hm_agg(
+  obj,
+  slot_name,
+  col_name,
+  fun,
+  period,
+  out_name = NULL,
+  allow_na = 0,
+  start_month = 1,
+  end_month = 12,
+  relocate = NULL
+)
+
+## S4 method for signature 'hydromet_station'
+hm_agg(
+  obj,
+  slot_name,
+  col_name,
+  fun,
+  period,
+  out_name = NULL,
+  allow_na = 0,
+  start_month = 1,
+  end_month = 12,
+  relocate = NULL
+)
+
+## S4 method for signature 'hydromet_compact'
+hm_agg(
+  obj,
+  slot_name,
+  col_name,
+  fun,
+  period,
+  out_name = NULL,
+  allow_na = 0,
+  start_month = 1,
+  end_month = 12
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>obj</code></td>
+<td>
+<p>a valid <code>hydromet_XXX</code> class object.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>slot_name</code></td>
+<td>
+<p>string with the name of the slot to aggregate.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>col_name</code></td>
+<td>
+<p>string with column(s) name(s) to aggregate.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fun</code></td>
+<td>
+<p>string with supported aggregation function name (one per <span class="option">col_name</span>):
+<span class="option">mean</span>, <span class="option">min</span>, <span class="option">max</span>, <span class="option">sum</span>, <span class="option">last</span> or <span class="option">first</span>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>period</code></td>
+<td>
+<p>string with the aggregation time-step: <span class="option">hourly</span>, <span class="option">daily</span>,
+<span class="option">monthly</span>, <span class="option">annually</span> or <span class="option">climatic</span>. <b>NOTE 1</b>: the
+<span class="option">climatic</span> option returns the all series annual statistics (<span class="option">fun</span>).
+<b>NOTE 2</b>: when using <span class="option">annually</span> as <b>period</b>, the method will return
+the starting dates in the first slot column.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>out_name</code></td>
+<td>
+<p>string with the output column(s) name(s). Default values coerce the
+original name plus the <span class="option">fun</span> argument (e.g.: <code>tair_max</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>allow_na</code></td>
+<td>
+<p>optional. Numeric value with the maximum allowed number of <code>NA_real_</code>
+values. By default the function will not tolerate any <code>NA_real_</code> (and will
+return <code>NA_real_</code> instead).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>start_month</code></td>
+<td>
+<p>optional. Numeric value defining the first month of the annual
+period (it just make sense if <span class="option">period</span> is either <span class="option">annually</span> or
+<span class="option">climatic</span>). Default sets to 1 (January). <b>NOTE</b>: keep in mind that if
+you choose <span class="option">climatic</span> as period you have to round off a complete year (e.g.:
+<code>..., start_month = 6, end_month = 5, ...</code>)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>end_month</code></td>
+<td>
+<p>optional. Numeric value defining the last month of the annual period
+(it just make sense if <span class="option">period</span> is either <span class="option">annually</span> or <span class="option">climatic</span>).
+Default sets to 12 (December). <b>NOTE</b>: keep in mind that if you choose
+<span class="option">climatic</span> as period you have to round off a complete year (e.g.:
+<code>..., start_month = 6, end_month = 5, ...</code>)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>relocate</code></td>
+<td>
+<p>optional. String with the name of the slot where to allocate the
+aggregated table. It only make sense for <code>hydromet_station</code> class. When using
+it you must keep in mind that all aggregated series are allocated in a single slot.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A data frame with the Date and the aggregated variable(s) inside the
+specified slot.
+</p>
+
+
+<h3>Functions</h3>
+
+
+<ul>
+<li> <p><code>hm_agg(hydromet_station)</code>: temporal aggregation method for station class
+</p>
+</li>
+<li> <p><code>hm_agg(hydromet_compact)</code>: temporal aggregation method for compact class
+</p>
+</li>
+</ul>
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+# cuevas station
+path &lt;- system.file('extdata', package = 'hydrotoolbox')
+
+# use the build method
+hm_cuevas &lt;-
+  hm_create() %&gt;%
+  hm_build(bureau = 'ianigla', path = path,
+           file_name = 'ianigla_cuevas.csv',
+           slot_name = c('tair', 'rh', 'patm',
+                         'precip', 'wspd', 'wdir',
+                         'kin', 'hsnow', 'tsoil'),
+           by = 'hour',
+           out_name = c('tair(°C)', 'rh(%)', 'patm(mbar)',
+                        'p(mm)', 'wspd(km/hr)', 'wdir(°)',
+                        'kin(kW/m2)', 'hsnow(cm)', 'tsoil(°C)' )
+          )
+
+# aggregate air temperature data to mean value
+hm_agg(obj = hm_cuevas, slot_name = 'tair', col_name = 'tair(°C)',
+      fun = 'mean', period = 'daily', out_name = 't_mean') %&gt;%
+ hm_show(slot_name = 'tair')
+
+# the previous command overwrites the original slot, so now we are going
+# to relocate the agg values
+hm_agg(obj = hm_cuevas, slot_name = 'tair',
+      col_name = 'tair(°C)',
+      fun = 'mean',
+      period = 'daily',
+      relocate = 'tmean',
+      out_name = 'tmean(°C)',
+      ) %&gt;%
+ hm_show(slot_name = 'tmean')
+
+## End(Not run)
+
+
+</code></pre>
+
+
+</div>

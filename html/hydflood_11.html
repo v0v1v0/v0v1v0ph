@@ -1,0 +1,212 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hydSpatRaster</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Initialize a <code>SpatRaster</code> for the flood-functions</h2>
+
+<h3>Description</h3>
+
+<p>To initialize an object of class <code>SpatRaster</code>
+with layers dem and csa this function should be used. It checks all the
+required input data, downloads missing data automatically, clips and
+returns the final object, prepared for the <code>flood()</code> functions
+(<code>flood1</code>, <code>flood2</code> and <code>flood3</code>).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hydSpatRaster(filename_dem = "", filename_csa = "", ext, crs, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>filename_dem</code></td>
+<td>
+<p>an optional argument of length 1 with type
+<code>character</code> specifying a filename of a <strong>d</strong>igital <strong>e</strong>levation
+<strong>m</strong>odel raster dataset.
+</p>
+<p>If the file exists it is imported via <code>rast</code> and used
+to build the <code>SpatRaster</code>, potentially cropped by argument
+<code>ext</code>. If the dem file does not exist, data are downloaded
+automatically and exported using <code>writeRaster</code> and can
+be reused to accelerate later computations.
+</p>
+<p>An existing dataset must be either in the coordinate reference system (crs)
+'ETRS 1989 UTM 32N' (epsg: 25832) for the River Rhine or 'ETRS 1989 UTM 33N'
+(epsg: 25833) for the River Elbe. It must also overlap with the active
+floodplains (<code>sf.afe</code> or <code>sf.afr</code>) of the river
+selected through the crs.
+</p>
+<p>If argument <code>filename_csa</code> is specified and exists too,
+the coordinate reference system (<code>crs</code>), extent
+(<code>ext</code>) and resolution (<code>res</code>)
+of both raster datasets must match.
+</p>
+<p>Supported file types depend on available
+<a href="https://gdal.org/en/latest/drivers/raster/index.html">GDAL raster drivers</a>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>filename_csa</code></td>
+<td>
+<p>an optional argument of length 1 with type
+<code>character</code> specifying a filename of a <strong>c</strong>ross <strong>s</strong>ection
+<strong>a</strong>rea raster dataset.
+</p>
+<p>If the file exists it is imported via <code>rast</code> and used
+to build the <code>SpatRaster</code>, potentially cropped by argument
+<code>ext</code>. If the csa file does not exist, data are downloaded
+automatically and exported using <code>writeRaster</code> and can
+be reused to accelerate later computations.
+</p>
+<p>An existing dataset must be either in the coordinate reference system (crs)
+'ETRS 1989 UTM 32N' (epsg: 25832) for the River Rhine or 'ETRS 1989 UTM 33N'
+(epsg: 25833) for the River Elbe. It must also overlap with the active
+floodplains (<code>sf.afe</code> or <code>sf.afr</code>) of the river
+selected through the crs and be in the possible range of <code>station_int</code>
+values: Elbe (m 0 - 585700), Rhine (m 336200 - 865700).
+</p>
+<p>If argument <code>filename_dem</code> is specified too, coordinate reference
+system (<code>crs</code>), extent (<code>ext</code>)
+and resolution (<code>res</code>) of both raster datasets must
+match.
+</p>
+<p>Supported file types depend on available
+<a href="https://gdal.org/en/latest/drivers/raster/index.html">GDAL raster drivers</a>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ext</code></td>
+<td>
+<p>optional argument of type <code>SpatExtent</code>. If neither
+<code>filename_dem</code> nor <code>filename_csa</code> are specified, <code>ext</code> is
+required to download the respective data and generate temporary dem and csa
+datasets. If either <code>filename_dem</code> or <code>filename_csa</code> or both are
+specified, <code>ext</code> must be within the extent of provided raster layers.
+Then it is used to <code>crop</code> the supplied data.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>crs</code></td>
+<td>
+<p>optional argument of type <code>crs</code> or
+<code>crs</code>. If
+neither <code>filename_dem</code> nor <code>filename_csa</code> are specified,
+<code>crs</code> is used to select the respective river (Elbe:
+'ETRS 1989 UTM 33N' (epsg: 25833); Rhine: 'ETRS 1989 UTM 32N' (epsg:
+25832)) and <code>crop</code> downloaded dem and csa
+by the given <code>ext</code>. If either <code>filename_dem</code> or
+<code>filename_csa</code> or both are specified, <code>crs</code> must match their
+coordinate reference systems; otherwise an error is returned.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>additional parameters passed to
+<code>writeRaster</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Since the underlying tiled digital elevation models (dem) are rather
+large datasets hydflood provides options to permanentely cache these
+datasets. <code>options("hydflood.datadir" = tempdir())</code> is the default. To
+modify the location of your raster cache to your needs set the respective
+<code>options()</code> prior to loading the package, e.g.
+<code>options("hydflood.datadir" = "~/.hydflood");library(hydflood)</code>. The
+location can also be determined through the environmental variable
+<span class="env">hydflood_datadir</span>.
+</p>
+<p>Since downloads of large individual datasets might cause timeouts, it is
+recommended to increase <code>options("timeout")</code>.
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>SpatRaster</code> object containing digital elevation (<code>dem</code>)
+and cross section area (<code>csa</code>) raster layers.
+</p>
+
+
+<h3>References</h3>
+
+<p>Wasserstraßen- und Schifffahrtsverwaltung des Bundes (WSV) (2016).
+“Digitales Geländemodell des Wasserlaufs (DGM-W).”
+<a href="https://www.govdata.de/daten/-/details/1c669080-c804-11e4-8731-1681e6b88ec1">https://www.govdata.de/daten/-/details/1c669080-c804-11e4-8731-1681e6b88ec1</a>.
+</p>
+<p>Brockmann H, Großkordt U, Schumann L (2008).
+“Auswertung digitaler Fernerkundungsaufnahmen des Elbe-Wasserlaufes (FE-Datenauswertung Elbe).”
+</p>
+<p>Brockmann H, Schumann L (2012).
+“Produktblatt: DGM-W Elbe-Lenzen, 2003-2011.”
+</p>
+<p>Brockmann H, Großkordt U, Schumann L (2008).
+“Digitales Geländemodell des Rhein-Wasserlaufes von Iffezheim bis Bonn (DGM-W Rhein).”
+</p>
+<p>smile consult GmbH &amp; Inphoris GmbH (2011).
+“DGM-W Oberrhein 1.”
+</p>
+<p>FUGRO-HGN GmbH (2011).
+“Aufbau eines Digitalen Geländemodells des Oberrheinwasserverlaufes (DGM-W Oberrhein-2, Basel bis Iffezheim).”
+</p>
+<p>ARGE Vermessung Schmid - Inphoris (2012).
+“Aufbau eines Digitalen Geländemodells des Niederrheinwasserlaufes (DGM-W Niederrhein).”
+</p>
+<p>Weber A (2020).
+“Digital elevation models of German waterway and navigation authorities - Version 0.1.0.”
+<a href="https://doi.org/10.5675/BfG-2011">https://doi.org/10.5675/BfG-2011</a>.
+</p>
+<p>Weber A (2020).
+“Digital elevation model (DEM1) of the River Elbe floodplain between Schmilka and Geesthacht, Germany.”
+<a href="https://doi.org/10.1594/PANGAEA.919293">https://doi.org/10.1594/PANGAEA.919293</a>.
+</p>
+<p>Weber A (2020).
+“Digital elevation model (DEM1) of the River Rhine floodplain between Iffezheim and Kleve, Germany.”
+<a href="https://doi.org/10.1594/PANGAEA.919308">https://doi.org/10.1594/PANGAEA.919308</a>.
+</p>
+<p>Bundesanstalt für Gewässerkunde (2016).
+“FLYS – Flusshydrologischer Webdienst.”
+<a href="https://www.bafg.de/DE/5_Informiert/1_Portale_Dienste/FLYS/flys_node.html">https://www.bafg.de/DE/5_Informiert/1_Portale_Dienste/FLYS/flys_node.html</a>.
+</p>
+<p>Brunotte E, Dister E, Günther-Diringer D, Koenzen U, Mehl D (2009).
+“Zustand der rezenten Flussauen in Deutschland - Geodaten.”
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>SpatRaster-class</code>,
+<code>rast</code>, <code>writeRaster</code>,
+<code>flood1</code>, <code>flood2</code>, <code>flood3</code>,
+<code>sf.afe</code>, <code>sf.afr</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+  options("hydflood.datadir" = tempdir())
+  options("timeout" = 120)
+  library(hydflood)
+  
+  e &lt;- ext(436500, 438000, 5415000, 5416500)
+  c &lt;- st_crs("EPSG:25832")
+  
+  r &lt;- hydSpatRaster(ext = e, crs = c)
+  r
+
+
+</code></pre>
+
+
+</div>

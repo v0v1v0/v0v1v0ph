@@ -1,0 +1,187 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>pairnei-methods</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Provides the average number of pairwise Nei's (D) differences between populations</h2>
+
+<h3>Description</h3>
+
+<p>Function provides pairwise Nei's raw number of nucleotide differences between populations. 
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">## S4 method for signature 'Dna'
+pairnei(x,populations,indels="sic",nperm=99, subset=NULL,showprogbar=FALSE)
+## S4 method for signature 'dist'
+pairnei(x,populations,nperm=99, subset=NULL,showprogbar=FALSE)
+## S4 method for signature 'matrix'
+pairnei(x,populations,nperm=99, subset=NULL,showprogbar=FALSE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>an object of class <code>Dna</code>, <code>"dist"</code> or <code>"matrix"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>populations</code></td>
+<td>
+<p>a vector giving the populations, with one element per individual.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>indels</code></td>
+<td>
+<p>the indel coding method to be used. This must be one of "sic", "5th" or "missing". Any unambiguous substring can be given.  See <code>distance</code> for details. </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nperm</code></td>
+<td>
+<p>the number of permutations. Set this to 0 to skip the permutation procedure.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>subset</code></td>
+<td>
+<p>a vector of integers in the range [1, <code>length(unique(populations))</code>], only distances between selected population(s) and the rest of the populations are calculated. If it is NULL, all comparisons are done.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>showprogbar</code></td>
+<td>
+<p>boolean; whether the progress bar is displayed or not  displayed.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The null distribution of pairwise Nei's differences under the hypothesis of no difference between the populations is obtained by permuting individuals between populations.  
+</p>
+
+
+<h3>Value</h3>
+
+<p>a list with following components: 
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>neidist</code></td>
+<td>
+<p>a matrix giving the average number of pairwise Nei's (D) differences between populations (below diagonal elements) and  average number of pairwise differences within populations (diagonal elements).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>p</code></td>
+<td>
+<p>a matrix giving the p-values, or NULL if permutation test is not performed.</p>
+</td>
+</tr>
+</table>
+<h3>Methods</h3>
+
+
+<dl>
+<dt><code>signature(x = "Dna")</code></dt>
+<dd>
+</dd>
+<dt><code>signature(x = "dist")</code></dt>
+<dd>
+</dd>
+<dt><code>signature(x = "matrix")</code></dt>
+<dd>
+</dd>
+</dl>
+<h3>Author(s)</h3>
+
+<p>Caner Aktas, <a href="mailto:caktas.aca@gmail.com">caktas.aca@gmail.com</a>
+</p>
+
+
+<h3>References</h3>
+
+<p>Nei, M. and Li, W. H. (1979) Mathematical model for studying genetic variation in terms of restriction endonucleases. <em>Proceedings of the National Academy of Sciences of the United States of America </em> <b>76</b>, 5269-5273.		
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data("dna.obj")
+
+
+### Method for signature 'Dna'.
+x&lt;-dna.obj
+x&lt;-dna.obj[c(1,20,21,26,27,28,30,3,4,7,13,14,15,16,23,24,25),,as.matrix=FALSE]
+populations&lt;-c("pop1","pop1","pop1","pop1","pop1","pop1","pop1","pop2",
+"pop2","pop2","pop2","pop2","pop3","pop4","pop3","pop4","pop4")
+
+##skip permutation testing
+pn&lt;-pairnei(x, populations, nperm=0)
+pn
+
+#Between populations
+as.dist(pn$neidist)
+
+#Within populations
+diag(pn$neidist)
+
+##Gaps as missing characters.
+pn &lt;-pairnei(x, populations, indels="m", nperm=0)
+pn
+
+##using subset, third population against others
+pn&lt;-pairnei(x, populations, nperm=0,subset=c(3))
+pn
+
+## Not run: 
+## 999 permutations.
+pn&lt;-pairnei(x, populations, nperm=999, showprogbar=TRUE)
+pn
+
+## random populations
+x&lt;-dna.obj
+populations&lt;-sample(1:4,nrow(x),replace=TRUE)
+pn&lt;-pairnei(x, populations, nperm=999, showprogbar=TRUE)
+pn
+
+## populations based on clusters
+x&lt;-dna.obj
+d&lt;-distance(x)
+hc&lt;-hclust(d,method="ward.D")
+populations&lt;-cutree(hc,4)
+pn&lt;-pairnei(x, populations, nperm=999, showprogbar=TRUE)
+pn
+
+## End(Not run)
+
+### Method for signature 'dist'.
+x&lt;-dna.obj
+x&lt;-dna.obj[c(1,20,21,26,27,28,30,3,4,7,13,14,15,16,23,24,25),,as.matrix=FALSE]
+populations&lt;-c("pop1","pop1","pop1","pop1","pop1","pop1","pop1","pop2",
+"pop2","pop2","pop2","pop2","pop3","pop4","pop3","pop4","pop4")
+d&lt;-distance(x)
+pn&lt;-pairnei(d, populations,nperm=0)
+pn
+
+### Method for signature 'matrix'.
+x&lt;-dna.obj
+x&lt;-dna.obj[c(1,20,21,26,27,28,30,3,4,7,13,14,15,16,23,24,25),,as.matrix=FALSE]
+populations&lt;-c("pop1","pop1","pop1","pop1","pop1","pop1","pop1","pop2",
+"pop2","pop2","pop2","pop2","pop3","pop4","pop3","pop4","pop4")
+d&lt;-as.matrix(distance(x))
+pn&lt;-pairnei(d, populations,nperm=0)
+pn
+
+</code></pre>
+
+
+</div>

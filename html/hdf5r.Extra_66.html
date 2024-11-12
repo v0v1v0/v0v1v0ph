@@ -1,0 +1,92 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>h5Overwrite</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Overwrite an existing HDF5 link</h2>
+
+<h3>Description</h3>
+
+<p>Overwrite an existing HDF5 link
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">h5Overwrite(file, name, overwrite)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>file</code></td>
+<td>
+<p>An existing HDF5 file</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>name</code></td>
+<td>
+<p>Name of HDF5 link to be overwritten.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>overwrite</code></td>
+<td>
+<p>Whether or not to overwrite <code>name</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+
+<ul>
+<li>
+<p> When <code>file</code> doesn't exist, will create it.
+</p>
+</li>
+<li>
+<p> When the old link <code>name</code> doesn't exist, will simply return 
+<code>file</code>. 
+</p>
+</li>
+<li>
+<p> When <code>name</code> exists and <code>overwrite</code> is <code>TRUE</code>, will copy 
+the rest of HDF5 links to an updated <code>file</code> with <code>h5Backup</code>. 
+If <code>name</code> is "/", will create a new <code>file</code> and overwrite the old one.
+</p>
+</li>
+<li>
+<p> When <code>name</code> exists and <code>overwrite</code> is <code>FALSE</code>, will 
+raise an error.
+</p>
+</li>
+</ul>
+<h3>Value</h3>
+
+<p>Path to <code>file</code> which is ready to be written.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">file &lt;- system.file("extdata", "pbmc_small.h5ad", package = "hdf5r.Extra")
+tmp.file &lt;- tempfile(fileext = ".h5")
+file.copy(file, tmp.file)
+
+obs &lt;- h5Read(tmp.file, "obs")
+
+h5Overwrite(tmp.file, "layers", TRUE)
+stopifnot(!h5Exists(tmp.file, "layers"))
+
+# You can still read other links.
+obs2 &lt;- h5Read(tmp.file, "obs")
+stopifnot(identical(obs, obs2))
+
+</code></pre>
+
+
+</div>

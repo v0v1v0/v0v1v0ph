@@ -1,0 +1,411 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>haplo.score</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Score Statistics for Association of Traits with Haplotypes
+</h2>
+
+<h3>Description</h3>
+
+<p>Compute score statistics to evaluate the association of a trait
+with haplotypes, when linkage phase is unknown and diploid marker 
+phenotypes are observed among unrelated subjects. For now, only 
+autosomal loci are considered.  
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">haplo.score(y, geno, trait.type="gaussian", offset = NA, x.adj = NA,
+            min.count=5, skip.haplo=min.count/(2*nrow(geno)),
+            locus.label=NA, miss.val=c(0,NA), haplo.effect="additive",
+            eps.svd=1e-5, simulate=FALSE, sim.control=score.sim.control(),
+            em.control=haplo.em.control())
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+
+<p>Vector of trait values. For trait.type = "binomial", y must 
+have values of 1 for event, 0 for no event.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>geno</code></td>
+<td>
+
+<p>Matrix of alleles, such that each locus has a pair of
+adjacent columns of alleles, and the order of columns
+corresponds to the order of loci on a chromosome.  If
+there are K loci, then ncol(geno) = 2*K. Rows represent
+alleles for each subject.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>trait.type </code></td>
+<td>
+
+<p>Character string defining type of trait, with values of 
+"gaussian", "binomial", "poisson", "ordinal".
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>offset</code></td>
+<td>
+
+<p>Vector of offset when trait.type = "poisson"
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x.adj </code></td>
+<td>
+
+<p>Matrix of non-genetic covariates used to adjust the score 
+statistics.  Note that intercept should not be included, 
+as it will be added in this function.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>min.count </code></td>
+<td>
+
+<p>The minimum number of counts for a haplotype to be included in the
+model.  First, the haplotypes selected to score are chosen by minimum
+frequency greater than skip.haplo (based on min.count, by default).
+It is also used when haplo.effect is either dominant or
+recessive. This is explained best in the recessive instance, where
+only subjects who are homozygous for a haplotype will contribute
+information to the score for that haplotype.  If fewer than min.count
+subjects are estimated to be affected by that haplotype, it is not
+scored.  A warning is issued if no haplotypes can be scored.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>skip.haplo </code></td>
+<td>
+
+<p>Minimum haplotype frequency for which haplotypes are scored in the model.
+By default, the frequency is based on "min.count" divided by the 2*N total haplotype 
+occurrences in the sample.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>locus.label </code></td>
+<td>
+
+<p>Vector of labels for loci, of length K (see definition of geno matrix)
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>miss.val </code></td>
+<td>
+
+<p>Vector of codes for missing values of alleles
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>haplo.effect </code></td>
+<td>
+
+<p>the "effect" of a haplotypes, which determines the covariate (x)
+coding of haplotypes. Valid options are "additive" (causing x = 0,
+1, or 2, the count of a  particular haplotype), "dominant" (causing
+x = 1 if heterozygous or homozygous carrier of a particular
+haplotype; x = 0 otherwise), and "recessive" (causing x = 1 if
+homozygous for a particular haplotype; x = 0 otherwise).
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>eps.svd</code></td>
+<td>
+
+<p>epsilon value for singular value cutoff; to be used in the generalized
+inverse calculation on the variance matrix of the score vector (see
+help(Ginv) for details).  
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>simulate</code></td>
+<td>
+
+<p>Logical:  if FALSE, no empirical p-values are computed; if TRUE,
+simulations are performed. Specific simulation parameters
+can be controlled in the sim.control parameter list.  
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sim.control </code></td>
+<td>
+
+<p>A list of control parameters to determine how simulations are
+performed for simulated p-values.  The list is created by the function
+score.sim.control and the default values of this function can be
+changed as desired.  See score.sim.control for details.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>em.control </code></td>
+<td>
+
+<p>A list of control parameters to determine how to perform the EM
+algorithm for estimating haplotype frequencies when phase is unknown.
+The list is created by the function haplo.em.control - see this function
+for more details.
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Compute the maximum likelihood estimates of the haplotype frequencies
+and the posterior probabilities of the pairs of haplotypes for each
+subject using an EM algorithm. The algorithm begins with haplotypes
+from a subset of the loci and progressively discards those with low
+frequency before inserting more loci.  The process is repeated until
+haplotypes for all loci are established.  The posterior probabilities
+are used to compute the score statistics for the association of
+(ambiguous) haplotypes with traits. The glm function is used to
+compute residuals of the regression of the trait on the non-genetic
+covariates.  
+</p>
+
+
+<h3>Value</h3>
+
+<p>List with the following components:
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>score.global</code></td>
+<td>
+
+<p>Global statistic to test association of trait with 
+haplotypes that have frequencies &gt;= skip.haplo.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>df</code></td>
+<td>
+
+<p>Degrees of freedom for score.global.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>score.global.p</code></td>
+<td>
+
+<p>P-value of score.global based on chi-square distribution, 
+with degrees of freedom equal to df.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>score.global.p.sim</code></td>
+<td>
+
+<p>P-value of score.global based on simulations
+(set equal to NA when simulate=F).
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>score.haplo</code></td>
+<td>
+
+<p>Vector of score statistics for individual
+haplotypes that have frequencies &gt;= skip.haplo.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>score.haplo.p</code></td>
+<td>
+
+<p>Vector of p-values for score.haplo, based on a
+chi-square distribution with 1 df.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>score.haplo.p.sim</code></td>
+<td>
+
+<p>Vector of p-values for score.haplo, based on
+simulations (set equal to NA when simulate=F).
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>score.max.p.sim</code></td>
+<td>
+
+<p>Simulated p-value indicating for simulations the number of times a 
+maximum score.haplo value exceeds the maximum score.haplo from the
+original data (equal to NA when simulate=F).
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>haplotype</code></td>
+<td>
+
+<p>Matrix of hapoltypes  analyzed.  The ith row of
+haplotype corresponds to the ith item of score.haplo,
+score.haplo.p, and score.haplo.p.sim.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>hap.prob</code></td>
+<td>
+
+<p>Vector of haplotype probabilies, corresponding to the
+haplotypes in the matrix haplotype.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>locus.label</code></td>
+<td>
+
+<p>Vector of labels for loci, of length  K  (same  as
+input argument).
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>call</code></td>
+<td>
+
+<p>The call to the haplo.score function; useful for recalling what
+parameters were used.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>haplo.effect</code></td>
+<td>
+
+<p>The haplotype effect model parameter that was selected for haplo.score.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>simulate</code></td>
+<td>
+
+<p>Same as function input parameter.  If [T]rue, simulation results are
+included in the haplo.score object.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n.val.global</code></td>
+<td>
+
+<p>Vector containing the number of valid simulations used in the
+global score statistic simulation. The number of valid simulations can
+be less than the number of simulations requested (by sim.control)
+if simulated data sets produce unstable variances of the score
+statistics.  
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n.val.haplo</code></td>
+<td>
+
+<p>Vector containing the number of valid simulations used in the p-value
+simulations for maximum-score statistic and scores for the individual
+haplotypes.
+</p>
+</td>
+</tr>
+</table>
+<h3>References</h3>
+
+<p>Schaid DJ, Rowland CM, Tines DE, Jacobson RM,  Poland  GA.
+"Score tests for association of traits with haplotypes when
+linkage phase is ambiguous." Amer J Hum Genet. 70 (2002):  425-434.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>haplo.em</code>,
+<code>plot.haplo.score</code>,
+<code>print.haplo.score</code>,
+<code>haplo.em.control</code>,
+<code>score.sim.control</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">  # establish all hla.demo data, 
+  # remove genotypes with missing alleles just so haplo.score runs faster 
+  # with missing values included, this example takes 2-4 minutes
+  # FOR REGULAR USAGE, DO NOT DISCARD GENOTYPES WITH MISSING VALUES
+
+  data(hla.demo)
+  geno &lt;- as.matrix(hla.demo[,c(17,18,21:24)])
+  keep &lt;- !apply(is.na(geno) | geno==0, 1, any)
+  hla.demo &lt;- hla.demo[keep,]
+  geno &lt;- geno[keep,]
+  attach(hla.demo)
+  label &lt;- c("DQB","DRB","B")
+ 
+# For quantitative, normally distributed trait:
+
+  score.gaus &lt;- haplo.score(resp, geno, locus.label=label, 
+                            trait.type = "gaussian")
+  print(score.gaus)
+
+# For ordinal trait:
+  y.ord &lt;- as.numeric(resp.cat)
+  score.ord &lt;- haplo.score(y.ord, geno, locus.label=label,
+                           trait.type="ordinal")
+  print(score.ord)
+
+# For a  binary trait and simulations,
+# limit simulations to 500 in score.sim.control, default is 20000
+  y.bin &lt;-ifelse(y.ord==1,1,0)
+  score.bin.sim &lt;- haplo.score(y.bin, geno, trait.type = "binomial",
+                     locus.label=label, simulate=TRUE,
+                     sim.control=score.sim.control(min.sim=200,max.sim=500))
+
+  print(score.bin.sim)
+
+# For a binary trait, adjusted for sex and age:
+
+  x &lt;- cbind(male, age)
+  score.bin.adj &lt;- haplo.score(y.bin, geno, trait.type = "binomial", 
+                               locus.label=label, x.adj=x)
+  print(score.bin.adj)
+</code></pre>
+
+
+</div>

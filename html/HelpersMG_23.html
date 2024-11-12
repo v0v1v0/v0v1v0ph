@@ -1,0 +1,112 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>dnbinom_new</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Random numbers for the negative binomial distribution.</h2>
+
+<h3>Description</h3>
+
+<p>Density for the negative binomial distribution with parameters mu, sd, var, size or prob. See <code>dnbinom</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">dnbinom_new(
+  x,
+  size = NULL,
+  prob = NULL,
+  mu = NULL,
+  sd = NULL,
+  var = NULL,
+  log = FALSE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>vector of (non-negative integer) quantiles.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>size</code></td>
+<td>
+<p>target for number of successful trials, or dispersion parameter (the shape parameter of the gamma mixing distribution). Must be strictly positive, need not be integer.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>prob</code></td>
+<td>
+<p>probability of success in each trial. 0 &lt; prob &lt;= 1.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mu</code></td>
+<td>
+<p>alternative parametrization via mean.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sd</code></td>
+<td>
+<p>alternative parametrization via standard deviation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>var</code></td>
+<td>
+<p>alternative parametrization via variance.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>log</code></td>
+<td>
+<p>logical; if TRUE, probabilities p are given as log(p).</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>dnbinom_new returns density for the negative binomial distribution
+</p>
+
+
+<h3>Value</h3>
+
+<p>Random numbers for the negative binomial distribution
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Marc Girondot <a href="mailto:marc.girondot@gmail.com">marc.girondot@gmail.com</a>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+library("HelpersMG")
+set.seed(1)
+x &lt;- rnbinom_new(n=100, mu=2, sd=3)
+LnL &lt;- NULL
+df &lt;- data.frame(mu=seq(from=0.1, to=8, by=0.1), "-LnL"=NA)
+for (mu in df[, "mu"])
+LnL &lt;- c(LnL, -sum(dnbinom_new(x=x, mu=mu, sd=3, log=TRUE)))
+df[, "-LnL"] &lt;- LnL
+ggplot(data = df, aes(x = .data[["mu"]], y = .data[["-LnL"]])) + geom_line()
+# Examples of wrong parametrization
+dnbinom_new(x=x, mu=c(1, 2), sd=3, log=TRUE)
+
+## End(Not run)
+</code></pre>
+
+
+</div>

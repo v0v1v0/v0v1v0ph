@@ -1,0 +1,148 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>fit_flasso</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Model selection for high-dimensional Cox models with fused lasso penalty</h2>
+
+<h3>Description</h3>
+
+<p>Automatic model selection for high-dimensional Cox models
+with fused lasso penalty, evaluated by cross-validated likelihood.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">fit_flasso(
+  x,
+  y,
+  nfolds = 5L,
+  lambda1 = c(0.001, 0.05, 0.5, 1, 5),
+  lambda2 = c(0.001, 0.01, 0.5),
+  maxiter = 25,
+  epsilon = 0.001,
+  seed = 1001,
+  trace = FALSE,
+  parallel = FALSE,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>Data matrix.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+<p>Response matrix made by <code>Surv</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nfolds</code></td>
+<td>
+<p>Fold numbers of cross-validation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lambda1</code></td>
+<td>
+<p>Vector of lambda1 candidates.
+Default is <code>0.001, 0.05, 0.5, 1, 5</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lambda2</code></td>
+<td>
+<p>Vector of lambda2 candidates.
+Default is <code>0.001, 0.01, 0.5</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>maxiter</code></td>
+<td>
+<p>The maximum number of iterations allowed.
+Default is <code>25</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>epsilon</code></td>
+<td>
+<p>The convergence criterion.
+Default is <code>1e-3</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>seed</code></td>
+<td>
+<p>A random seed for cross-validation fold division.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>trace</code></td>
+<td>
+<p>Output the cross-validation parameter tuning
+progress or not. Default is <code>FALSE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>parallel</code></td>
+<td>
+<p>Logical. Enable parallel parameter tuning or not,
+default is <code>FALSE</code>. To enable parallel tuning, load the
+<code>doParallel</code> package and run <code>registerDoParallel()</code>
+with the number of CPU cores before calling this function.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>other parameters to <code>cvl</code>
+and <code>penalized</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Note</h3>
+
+<p>The cross-validation procedure used in this function is the
+<em>approximated cross-validation</em> provided by the <code>penalized</code>
+package. Be careful dealing with the results since they might be more
+optimistic than a traditional CV procedure. This cross-validation
+method is more suitable for datasets with larger number of observations,
+and a higher number of cross-validation folds.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data("smart")
+x &lt;- as.matrix(smart[, -c(1, 2)])[1:120, ]
+time &lt;- smart$TEVENT[1:120]
+event &lt;- smart$EVENT[1:120]
+y &lt;- survival::Surv(time, event)
+
+fit &lt;- fit_flasso(
+  x, y,
+  lambda1 = c(1, 10), lambda2 = c(0.01),
+  nfolds = 3, seed = 11
+)
+
+nom &lt;- as_nomogram(
+  fit, x, time, event,
+  pred.at = 365 * 2,
+  funlabel = "2-Year Overall Survival Probability"
+)
+
+plot(nom)
+</code></pre>
+
+
+</div>

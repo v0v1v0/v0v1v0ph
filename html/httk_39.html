@@ -1,0 +1,166 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>calc_kair</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Calculate air:matrix partition coefficients</h2>
+
+<h3>Description</h3>
+
+<p>This function uses the methods colleced by Linakis et al. (2020) to calculate
+air partition coefficients for blood, water, and mucus.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">calc_kair(
+  chem.cas = NULL,
+  chem.name = NULL,
+  dtxsid = NULL,
+  parameters = NULL,
+  species = "Human",
+  adjusted.Funbound.plasma = TRUE,
+  default.to.human = FALSE,
+  suppress.messages = FALSE,
+  pH = 7.4,
+  alpha = 0.001
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>chem.cas</code></td>
+<td>
+<p>Chemical Abstract Services Registry Number (CAS-RN) – if
+parameters is not specified then the chemical must be identified by either
+CAS, name, or DTXISD</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>chem.name</code></td>
+<td>
+<p>Chemical name (spaces and capitalization ignored) –  if
+parameters is not specified then the chemical must be identified by either
+CAS, name, or DTXISD</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dtxsid</code></td>
+<td>
+<p>EPA's 'DSSTox Structure ID (<a href="https://comptox.epa.gov/dashboard">https://comptox.epa.gov/dashboard</a>)
+– if parameters is not specified then the chemical must be identified by 
+either CAS, name, or DTXSIDs</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>parameters</code></td>
+<td>
+<p>Parameters from the appropriate parameterization function
+for the model indicated by argument model. Can include parameters "logHenry"
+and "body_temp", but if not included standard values are looked up from httk tables.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>species</code></td>
+<td>
+<p>Species used for body temperature, defaults to "Human"</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>adjusted.Funbound.plasma</code></td>
+<td>
+<p>Uses Pearce et al. (2017) lipid binding adjustment
+for Funbound.plasma (which impacts partition coefficients) when set to TRUE (Default).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>default.to.human</code></td>
+<td>
+<p>Substitutes missing species-specific values with human values if
+TRUE (default is FALSE).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>suppress.messages</code></td>
+<td>
+<p>Whether or not the output messages are suppressed.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pH</code></td>
+<td>
+<p>pH where ionization is evaluated.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alpha</code></td>
+<td>
+<p>Ratio of Distribution coefficient D of totally charged species
+and that of the neutral form</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The blood:air partition coefficient (PB:A) was calculated as 
+P<sub>B:A</sub> = P<sub>B:A</sub> * R<sub>B:P</sub> / f<sub>up</sub>
+where P_B:A is the blood:air partition, RB:P is the blood:plasma partition
+ratio, fup is the fraction unbound in the plasma, and
+P_W:A is the water:air partition coefficient:
+R * T<sub>body</sub> / HLC / P
+where R is the gas constant (8.314 J/mol/K), T_body is the 
+species-specific body temperature (K) from <code>physiology.data</code>,
+HLC is the Henry's Law Constant (atm*m^3 / mol), and P is conversion factor 
+from atmospheres to Pascals (1 atm = 101325 Pa).
+</p>
+<p>In the isopropanol PBTK
+model published by Clewell et al. (2001) it was noted that certain 
+chemicals are likely to be absorbed into the mucus or otherwise
+trapped in the upper respiratory tract (URT). Following Scott (2014), 
+the air:mucus partition coefficient (PA:M) calculated as
+log<sub>10</sub>(1/K<sub>water2air</sub>) - (log<sub>10</sub>(P<sub>ow</sub>) - 1) * 0.524
+where Pow is the octanol/water partition coefficient
+</p>
+
+
+<h3>Value</h3>
+
+<p>A named list containing the blood:air, water:air, and mucus:air 
+partition coefficients
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>John Wambaugh and Matt Linakis
+</p>
+
+
+<h3>References</h3>
+
+<p>Linakis, Matthew W., et al. "Development and evaluation of a 
+high throughput inhalation model for organic chemicals." Journal of exposure 
+Science &amp; Environmental Epidemiology 30.5 (2020): 866-877.
+</p>
+<p>Clewell III, Harvey J., et al. "Development of a physiologically based 
+pharmacokinetic model of isopropanol and its metabolite acetone." 
+Toxicological Sciences 63.2 (2001): 160-172.
+</p>
+<p>Scott, John W., et al. "Tuning to odor solubility and sorption pattern in 
+olfactory epithelial responses." Journal of Neuroscience 34.6 (2014): 
+2025-2036.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>calc_dow</code>
+</p>
+
+
+</div>

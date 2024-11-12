@@ -1,0 +1,235 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hmm0norm2d</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Parameter Estimation of a bivariate HMM with Extra Zeros
+</h2>
+
+<h3>Description</h3>
+
+<p>Calculates the parameter estimates of an HMM with bivariate observations having extra zeros.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hmm0norm2d(R, Z, pie, gamma, mu, sig, delta, tol=1e-6, print.level=1, fortran = TRUE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>R</code></td>
+<td>
+<p>is the observed data. <code>R</code> is a <code class="reqn">T * 2</code> matrix, where <code class="reqn">T</code> is the number of observations.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Z</code></td>
+<td>
+<p>is the binary data with the value 1 indicating that an event was observed and 0 otherwise. <code>Z</code> is a vector of length <code class="reqn">T</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pie</code></td>
+<td>
+<p>is a vector of length <code class="reqn">m</code>, the <code class="reqn">j</code>th element of which is the probability of <code class="reqn">Z=1</code> when the process is in state <code class="reqn">j</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>gamma</code></td>
+<td>
+<p>is the transition probability matrix (<code class="reqn">m * m</code>) of the hidden Markov chain.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mu</code></td>
+<td>
+<p>is an <code class="reqn">m * 2</code> matrix, the <code class="reqn">j</code>th row of which is the mean of the bivariate (Gaussian) distribution of the observations in state <code class="reqn">j</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sig</code></td>
+<td>
+<p>is a <code class="reqn">2 * 2 * m</code> array. The matrix <code>sig[,,j]</code> is the variance-covariance matrix of the bivariate (Gaussian) distribution of the observations in state <code class="reqn">j</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>delta</code></td>
+<td>
+<p>is a vector of length <code class="reqn">m</code>, the initial distribution vector of the Markov chain.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tol</code></td>
+<td>
+<p>is the tolerance for testing convergence of the iterative estimation process. Default is 1e-6. For initial test of model fit to your data, a larger tolerance (e.g., 1e-3) should be used to save time.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>print.level</code></td>
+<td>
+<p>controls the amount of output being printed. Default is 1. If <code>print.level=1</code>, only the log likelihoods and the differences between the log likelihoods at each step of the iterative estimation process, and the final estimates are printed. If <code>print.level=2</code>, the log likelihoods, the differences between the log likelihoods, and the estimates at each step of the iterative estimation process are printed.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fortran</code></td>
+<td>
+<p>is logical, and determines whether Fortran code is used; default is <code>TRUE</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Setting up initial values for the real world data can be challenging, especially when the model is large (the number of states is big). 
+In the example below, we include a simple way to set up initial values. If the model is large, the model fitting process should be repeated for
+many different initial values. In the example below, we set the number of initial values to be <code class="reqn">N=2</code> for the ease of compilation. For real-world data 
+analysis, taking the 2D model for the tremor data in Wang et al. (2018) for example, we used at least <code class="reqn">N=1000</code> initial values for the large models
+with more than 15 hidden states. 
+</p>
+
+
+<h3>Value</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>pie</code></td>
+<td>
+<p>is the estimated probability of <code class="reqn">Z=1</code> when the process is in each state.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mu</code></td>
+<td>
+<p>is the estimated mean of the bivariate (Gaussian) distribution of the observations in each state.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sig</code></td>
+<td>
+<p>is the estimated variance-covariance matrix of the bivariate (Gaussian) distribution of the observations in each state.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>gamma</code></td>
+<td>
+<p>is the estimated transition probability matrix of the hidden Markov chain.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>delta</code></td>
+<td>
+<p>is the estimated initial distribution vector of the Markov chain.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>LL</code></td>
+<td>
+<p>is the log likelihood.</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>Ting Wang
+</p>
+
+
+<h3>References</h3>
+
+
+<p>Wang, T., Zhuang, J., Buckby, J., Obara, K. and Tsuruoka, H. (2018) Identifying the recurrence patterns of non-volcanic tremors using a 2D hidden Markov model with extra zeros. Journal of Geophysical Research, doi: <a href="https://doi.org/10.1029/2017JB015360">10.1029/2017JB015360</a>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">pie &lt;- c(0.002,0.2,0.4)
+gamma &lt;- matrix(c(0.99,0.007,0.003,
+                  0.02,0.97,0.01,
+                  0.04,0.01,0.95),byrow=TRUE, nrow=3)
+mu &lt;- matrix(c(35.03,137.01,
+               35.01,137.29,
+               35.15,137.39),byrow=TRUE,nrow=3)
+sig &lt;- array(NA,dim=c(2,2,3))
+sig[,,1] &lt;- matrix(c(0.005, -0.001,
+                   -0.001,0.01),byrow=TRUE,nrow=2)
+sig[,,2] &lt;- matrix(c(0.0007,-0.0002,
+                    -0.0002,0.0006),byrow=TRUE,nrow=2)
+sig[,,3] &lt;- matrix(c(0.002,0.0018,
+                     0.0018,0.003),byrow=TRUE,nrow=2)
+delta &lt;- c(1,0,0)
+y &lt;- sim.hmm0norm2d(mu,sig,pie,gamma,delta, nsim=5000)
+R &lt;- y$x
+Z &lt;- y$z
+yn &lt;- hmm0norm2d(R, Z, pie, gamma, mu, sig, delta)
+yn
+
+# Setting up initial values when analysing real-world data
+## nk is the number of states for the fitted model
+### In this example we use nk=3
+
+LL &lt;- -10^200 ## A very small value to compare with
+              ## the log likelihood from the model
+
+nk = 3
+
+gamma &lt;- array(NA,dim=c(nk,nk))
+mu &lt;- array(NA,dim=c(nk,2))
+sig &lt;- array(NA,dim=c(2,2,nk))
+pie &lt;- array(NA,dim=c(1,nk))
+
+kk &lt;- 1
+N &lt;- 2
+while(kk&lt;N)
+{
+  temp &lt;- matrix(runif(nk*nk,0,1),ncol=nk)
+  diag(temp) = diag(temp) + rpois(1,6) * apply(temp, 1, sum)
+  temp &lt;- temp * matrix(rep(1/apply(temp, 1, sum), ncol(temp)), ncol=ncol(temp), byrow=FALSE)
+  gamma &lt;- temp
+
+  R1min &lt;- min((R[,1])[R[,1]&gt;=1e-6])
+  R1max &lt;- max((R[,1])[R[,1]&gt;=1e-6])
+  R2min &lt;- min((R[,2])[R[,2]&gt;=1e-6])
+  R2max &lt;- max((R[,2])[R[,2]&gt;=1e-6])
+  temp &lt;- cbind(runif(nk,R1min,R1max),runif(nk,R2min,R2max))
+  temp &lt;- temp[order(temp[,2]),]
+  mu &lt;- temp
+ 
+  sdR1 &lt;- sd((R[,1])[R[,1]&gt;=1e-6])
+  sdR2 &lt;- sd((R[,2])[R[,2]&gt;=1e-6])
+  for (j in 1:nk){
+    temp &lt;- matrix(runif(4,0.0001,max(sdR1,sdR2)), ncol=2)
+    temp[1,2] &lt;- temp[2,1] &lt;- runif(1,-1,1)* sqrt(prod(diag(temp)))
+    sig[, ,j] &lt;- temp
+  }
+
+  pie &lt;- matrix(sort(c(runif(1, 0, 0.01),runif(nk-1, 0, 1))), nrow = 1, byrow = TRUE )
+
+  delta &lt;- c(6,runif(nk-1, 0,1)) 
+  delta &lt;- delta/sum(delta)
+
+ tryCatch({
+    temp &lt;- hmm0norm2d(R, Z, pie, gamma, mu, sig, delta)
+    kk&lt;-kk+1
+    if( LL &lt;= temp$LL){
+      HMMest &lt;- temp
+      LL =HMMest$LL
+      eval(parse(text=paste('HMM',kk,'est = HMMest',sep="")))
+#      eval(parse(text=paste('save(HMM',kk,'est, file="HMM',kk,'est.image")',sep='')))
+## Uncomment the line above if you would like to save the result into a .image file.
+    }
+   }, error=function(e){})
+ print(kk)
+}
+
+
+</code></pre>
+
+
+</div>

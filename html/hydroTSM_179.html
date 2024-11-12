@@ -1,0 +1,228 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>weeklyfunction</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Weekly Function
+</h2>
+
+<h3>Description</h3>
+
+<p>Generic function for obtaining 52 weekly values of a zoo object, by applying any R function to ALL the values in the object belonging to each one of the 52 calendar weeks (starting on Monday).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">weeklyfunction(x, ...)
+
+## Default S3 method:
+weeklyfunction(x, FUN, na.rm=TRUE, na.rm.max=0, start="00:00:00", 
+                                 start.fmt= "%H:%M:%S", tz, ...)
+
+## S3 method for class 'zoo'
+weeklyfunction(x, FUN, na.rm=TRUE, na.rm.max=0, start="00:00:00", 
+                             start.fmt= "%H:%M:%S", tz, ...)
+
+## S3 method for class 'data.frame'
+weeklyfunction(x, FUN, na.rm=TRUE, na.rm.max=0, start="00:00:00", 
+                        start.fmt= "%H:%M:%S", tz, dates=1, date.fmt="%Y-%m-%d",
+                        out.type="data.frame", verbose=TRUE,...)
+             
+## S3 method for class 'matrix'
+weeklyfunction(x, FUN, na.rm=TRUE, na.rm.max=0, start="00:00:00", 
+                        start.fmt= "%H:%M:%S", tz, dates=1, date.fmt="%Y-%m-%d",
+                        out.type="data.frame", verbose=TRUE,...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+
+<p>zoo, xts, data.frame or matrix object, with daily or monthly time series. <br>
+Measurements at several gauging stations can be stored in a data.frame of matrix object, and in that case, each column of <code>x</code> represent the time series measured in each gauging station, and the column names of <code>x</code> have to correspond to the ID of each station (starting by a letter).
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>FUN</code></td>
+<td>
+
+<p>Function that will be applied to ALL the values in <code>x</code> belonging to each one of the 12 months of the year (e.g., FUN can be some of <code>mean</code>, <code>sum</code>, <code>max</code>, <code>min</code>, <code>sd</code>).
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>na.rm</code></td>
+<td>
+
+<p>Logical. Should missing values be removed? <br>
+-) <kbd>TRUE</kbd> : the monthly values and FUN are computed considering only those values in <code>x</code> different from NA <br>
+-) <kbd>FALSE</kbd>: if there is AT LEAST one NA within a month, the corresponding monthly value will be NA 
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>na.rm.max</code></td>
+<td>
+
+<p>Numeric in [0, 1]. It is used to define the maximum percentage of missing values allowed in each month to keep the weekly aggregated value in the output object of this function. In other words, if the percentage of missing values in a given month is larger or equal than <code>na.rm.max</code> the corresponding weekly value will be <code>NA</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>start</code></td>
+<td>
+
+<p>character, indicating the starting time used for aggregating sub-daily time series into daily ones. It MUST be provided in the format specified by <code>start.fmt</code>. <br>
+This value is used to define the time when a new day begins (e.g., for some rain gauge stations). <br>
+-) All the values of <code>x</code> with a time attribute before <code>start</code> are considered as belonging to the day before the one indicated in the time attribute of those values. <br>
+-) All the values of <code>x</code> with a time attribute equal to <code>start</code> are considered to be equal to <code>"00:00:00"</code> in the output zoo object. <br>
+-) All the values of <code>x</code> with a time attribute after <code>start</code> are considered as belonging to the same day as the one indicated in the time attribute of those values. <br></p>
+<p>It is useful when the daily values start at a time different from <code>"00:00:00"</code>. Use with caution. See examples.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>start.fmt</code></td>
+<td>
+
+<p>character indicating the format in which the time is provided in <code>start</code>, By default <code>date.fmt=%H:%M:%S</code>. See <code>format</code> in <code>as.POSIXct</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tz</code></td>
+<td>
+
+<p>character, with the specification of the time zone used in both <code>x</code> and <code>start</code>. System-specific (see time zones), but <code>""</code> is the current time zone, and <code>"GMT"</code> is UTC (Universal Time, Coordinated). See <code>Sys.timezone</code> and <code>as.POSIXct</code>. <br>
+If <code>tz</code> is missing (the default), it is automatically set to the time zone used in <code>time(x)</code>. <br>
+This argument can be used to force using the local time zone or any other time zone instead of UTC as time zone.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dates</code></td>
+<td>
+
+<p>It is only used when <code>x</code> is not a zoo object. <br>
+numeric, factor, Date indicating how to obtain the dates. <br>
+If <code>dates</code> is a number (default), it indicates the index of the column in <code>x</code> that stores the dates <br>
+If <code>dates</code> is a factor, it is converted into 'Date' class, using the date format specified by <code>date.fmt</code> <br>
+If <code>dates</code> is already of Date class, the code verifies that the number of days in <code>dates</code> be equal to the number of elements in <code>x</code>
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>date.fmt</code></td>
+<td>
+
+<p>It is only used when <code>x</code> is not a zoo object. <br>
+character indicating the format in which the dates are stored in <var>dates</var>, e.g. <kbd>%Y-%m-%d</kbd>. See <code>format</code> in <code>as.Date</code>. <br>
+ONLY required when <code>class(dates)=="factor"</code> or <code>class(dates)=="numeric"</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>out.type</code></td>
+<td>
+
+<p>It is only used when <code>x</code> is a matrix or data.frame. <br>
+Character defining the desired type of output. Valid values are: <br>
+-) <kbd>data.frame</kbd>: a data.frame, with 12 columns representing the months, and as many rows as gauging stations are included in <code>x</code> <br>
+-) <kbd>db</kbd>        : a data.frame, with 4 columns will be produced. Useful for a posterior boxplot <br>
+The first column ('StationID') will store the ID of the station,  <br>
+The second column ('Year') will store the year, <br>
+The third column ('Month') will store month,  <br>
+The fourth column ('Value') will contain the monthly value corresponding to the three previous columns.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+
+<p>Logical; if TRUE, progress messages are printed 
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+
+<p>further arguments passed to or from other methods
+</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>When <code>x</code> is a zoo object, a numeric vector with 12 elements representing the computed monthly value for each month. <br>
+When <code>x</code> is a data.frame which columns represent measurements at different gauging stations, the resulting object is a data.frame with 12 columns and as many rows as gauging stations are in <code>x</code>, each row storing the computed 12 monthly value for each gauging station.
+
+
+
+
+</p>
+
+
+<h3>Note</h3>
+
+<p>Due to the fact that <code>FUN</code> is applied over all the elements in <code>x</code> belonging to a given calendar month, its result will depend on the sampling frequency of <code>x</code> and the type of function provided by <code>FUN</code> (<b>special attention have to be put when <code>FUN=sum</code></b>)
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Mauricio Zambrano-Bigiarini, <a href="mailto:mzb.devel@gmail">mzb.devel@gmail</a>
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>annualfunction</code>, <code>seasonalfunction</code>, <code>dm2seasonal</code>, <code>daily2monthly</code>, <code>daily2annual</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Ex1: Computation of mean WEEKLY values from DAILY ts, removing any missing value in 'x'
+
+# Loading DAILY streamflows (3 years) at the station 
+# Oca en Ona (Ebro River basin, Spain)
+data(OcaEnOnaQts)
+x &lt;- OcaEnOnaQts
+
+## Mean WEEKLY streamflows at station 'x'
+weeklyfunction(x, FUN=mean, na.rm=TRUE)
+
+######################
+## Ex2: Computation of mean WEEKLY values from HOURLY ts, removing any missing value in 'x'
+
+# Loading HOURLY streamflows for the station Karamea at Gorge
+data(KarameaAtGorgeQts)
+x &lt;- KarameaAtGorgeQts
+
+## Mean WEEKLY streamflows at station 'x'. Each day starts at 00:00:00
+weeklyfunction(x, FUN=mean, na.rm=TRUE)
+
+######################
+## Ex3: Computation of mean WEEKLY values from HOURLY ts, removing any missing value in 'x'
+##      and starting each day at 08:00:00
+
+# Loading HOURLY streamflows for the station Karamea at Gorge
+data(KarameaAtGorgeQts)
+x &lt;- KarameaAtGorgeQts
+
+## Mean WEEKLY streamflows at station 'x'. Each day starts at 00:00:00
+weeklyfunction(x, FUN=mean, na.rm=TRUE, start="00:00:00")
+</code></pre>
+
+
+</div>

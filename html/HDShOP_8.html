@@ -1,0 +1,87 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>MeanVar_portfolio</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>A helper function for MeanVar_portfolio</h2>
+
+<h3>Description</h3>
+
+<p>A user-friendly function making mean-variance portfolios for assets
+with customly computed covariance matrix and mean returns.
+The weights are computed in accordance with the formula
+</p>
+<p style="text-align: center;"><code class="reqn">\hat w_{MV} = \frac{\hat{\Sigma}^{-1} 1}{1' \hat{\Sigma}^{-1} 1} +
+                    \gamma^{-1} \hat Q \hat{\mu},</code>
+</p>
+
+<p>where <code class="reqn">\hat{\Sigma}</code> is an estimator for the covariance matrix,
+<code class="reqn">\hat{\mu}</code> is an estimator for the mean vector, <code class="reqn">\gamma</code> is
+the coefficient of risk aversion, and <code class="reqn">\hat Q</code> is given by
+</p>
+<p style="text-align: center;"><code class="reqn">\hat Q = \hat{\Sigma}^{-1} - \frac{\hat{\Sigma}^{-1} 1
+1' \hat{\Sigma}^{-1}}{1' \hat{\Sigma}^{-1} 1} .</code>
+</p>
+
+<p>The computation is made by <code>new_MeanVar_portfolio</code> and
+the result is validated by <code>validate_MeanVar_portfolio</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">MeanVar_portfolio(mean_vec, cov_mtrx, gamma)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>mean_vec</code></td>
+<td>
+<p>mean vector of asset returns provided in the form of
+a vector or a list.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cov_mtrx</code></td>
+<td>
+<p>the covariance matrix of asset returns.
+It could be a matrix or a data frame.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>gamma</code></td>
+<td>
+<p>a numeric variable. Coefficient of risk aversion.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>Mean-variance portfolio in the form of object of
+S3 class MeanVar_portfolio.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">n&lt;-3e2 # number of realizations
+p&lt;-.5*n # number of assets
+gamma&lt;-1
+
+x &lt;- matrix(data = rnorm(n*p), nrow = p, ncol = n)
+
+# Simple MV portfolio
+cov_mtrx &lt;- Sigma_sample_estimator(x)
+means &lt;- rowMeans(x)
+
+cust_port_simp &lt;- MeanVar_portfolio(mean_vec=means,
+                                    cov_mtrx=cov_mtrx, gamma=2)
+str(cust_port_simp)
+</code></pre>
+
+
+</div>

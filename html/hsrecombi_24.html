@@ -1,0 +1,81 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>targetregion</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Description of the targetregion data set</h2>
+
+<h3>Description</h3>
+
+<p>The data set contains sire haplotypes, assignment of progeny to
+sire, progeny genotypes and physical map information in a target region
+</p>
+
+<p>The raw data can be downloaded at the source given below. Then,
+executing the following R code leads to the data provided in
+<code>targetregion.RData</code>.
+</p>
+<dl>
+<dt><code>hapSire</code></dt>
+<dd>
+<p>matrix of sire haplotypes of each sire; 2 lines per
+sire; 1. column contains sireID</p>
+</dd>
+<dt><code>daughterSire</code></dt>
+<dd>
+<p>vector of sire ID for each progeny</p>
+</dd>
+<dt><code>genotype.chr</code></dt>
+<dd>
+<p>matrix of progeny genotypes</p>
+</dd>
+<dt><code>map.chr</code></dt>
+<dd>
+<p>SNP marker map in target region</p>
+</dd>
+</dl>
+<h3>Source</h3>
+
+<p>The data are available at RADAR
+doi: <a href="https://doi.org/10.22000/280">10.22000/280</a>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+# download data from RADAR (requires about 1.4 GB)
+url &lt;- "https://www.radar-service.eu/radar-backend/archives/fqSPQoIvjtOGJlav/versions/1/content"
+curl_download(url = url, 'tmp.tar')
+untar('tmp.tar')
+file.remove('tmp.tar')
+path &lt;- '10.22000-280/data/dataset'
+## list of haplotypes of sires for each chromosome
+load(file.path(path, 'sire_haplotypes.RData'))
+## assign progeny to sire
+daughterSire &lt;- read.table(file.path(path, 'assign_to_family.txt'))[, 1]
+## progeny genotypes
+X &lt;- as.matrix(read.table(file.path(path, 'XFam-ARS.txt')))
+## physical and approximated genetic map
+map &lt;- read.table(file.path(path, 'map50K_ARS_reordered.txt'), header = T)
+## select target region
+chr &lt;- 1
+window &lt;- 301:500
+## map information of target region
+map.chr &lt;- map[map$Chr == chr, ][window, ]
+## matrix of sire haplotypes in target region
+hapSire &lt;- rlist::list.rbind(haps[[chr]])
+sireID &lt;- 1:length(unique(daughterSire))
+hapSire &lt;- cbind(rep(sireID, each = 2), hapSire[, window])
+## matrix of progeny genotypes
+genotype.chr &lt;- X[, map.chr$SNP]
+colnames(genotype.chr) &lt;- map.chr$SNP
+save(list = c('genotype.chr', 'hapSire', 'map.chr', 'daughterSire'),
+     file = 'targetregion.RData', compress = 'xz')
+
+## End(Not run)
+</code></pre>
+
+
+</div>

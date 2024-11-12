@@ -1,0 +1,142 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>rhineHYBASlev08</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>HydroBASINS Level 08 Data of the Rhine Catchment</h2>
+
+<h3>Description</h3>
+
+<p>This spatial dataset is a subset of the data layer
+<code>hybas_eu_lev08_v1c</code> from the HydroBASINS v1.c database
+(Lehner and Grill, 2013).
+The original data format was SHP (ESRI Shape File).
+The subset consists of subbasins within the Rhine basin, i.e.
+<code>MAIN_BAS = 2080023010</code>.
+</p>
+
+
+<h3>Format</h3>
+
+<p>An Object of class SpatialPolygonsDataFrame with 289 features.
+The attribute table comprises 13 fields:
+</p>
+
+<dl>
+<dt>HYBAS_ID</dt>
+<dd>
+<p>factor, unique basin identifier</p>
+</dd>
+<dt>NEXT_DOWN</dt>
+<dd>
+<p>factor, Hybas_id of the next downstream polygon</p>
+</dd>
+<dt>NEXT_SINK</dt>
+<dd>
+<p>factor, Hybas_id of the next downstream sink</p>
+</dd>
+<dt>MAIN_BAS</dt>
+<dd>
+<p>factor, Hybas_id of the most downstream sink, i.e. the outlet of the main river basin</p>
+</dd>
+<dt>DIST_SINK</dt>
+<dd>
+<p>numeric, Distance from polygon outlet to the next
+downstream sink along the river network, in kilometers</p>
+</dd>
+<dt>DIST_MAIN</dt>
+<dd>
+<p>numeric, Distance from polygon outlet to
+the most downstream sink, i.e. the outlet of the
+main river basin along the river network, in kilometers</p>
+</dd>
+<dt>SUB_AREA</dt>
+<dd>
+<p>numeric, Area of the individual polygon (i.e. sub-basin), in square kilometers</p>
+</dd>
+<dt>UP_AREA</dt>
+<dd>
+<p>numeric, Total upstream area, in square kilometers,
+calculated from the headwaters to the polygon location (including the polygon)</p>
+</dd>
+<dt>PFAF_IF</dt>
+<dd>
+<p>int, the Pfafstetter code</p>
+</dd>
+<dt>ENDO</dt>
+<dd>
+<p>int, Indicator for endorheic (inland) basins without
+surface flow connection to the ocean: 0 = not part of an endorheic basin;
+1 = part of an endorheic basin; 2 = sink (i.e. most downstream polygon)
+of an endorheic basin.</p>
+</dd>
+<dt>COAST</dt>
+<dd>
+<p>int, indicator for lumped coastal basins: 0 = no; 1 = yes</p>
+</dd>
+<dt>ORDER</dt>
+<dd>
+<p>int, Indicator of river order (classical ordering system):
+order 1 represents the main stem river from sink to source;
+order 2 represents all tributaries that flow into a 1 st order
+river; order 3 represents all tributaries that flow into a 2 nd order river;
+etc.; order 0 is used for conglomerates of small coastal watersheds</p>
+</dd>
+<dt>SORT</dt>
+<dd>
+<p>int, Indicator showing the record number (sequence)
+in which the original polygons are stored in the shapefile
+(i.e. counting upwards from 1 in the original shapefile).</p>
+</dd>
+</dl>
+<p>The PROJ.4 string is
+<code>+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84+towgs84=0,0,0</code>
+</p>
+
+
+<h3>Source</h3>
+
+<p>This product rhineHYBASlev08 incorporates data from the HydroSHEDS database which is (C) World
+Wildlife Fund, Inc. (2006-2013) and has been used herein under license. WWF has not evaluated the data as altered and
+incorporated within rhineHYBASlev08, and therefore gives no warranty regarding its accuracy,
+completeness, currency or suitability for any particular purpose. Portions of the HydroSHEDS database incorporate data
+which are the intellectual property rights of (C) USGS (2006-2008), NASA (2000-2005), ESRI (1992-1998), CIAT (2004-2006),
+UNEP-WCMC (1993), WWF (2004), Commonwealth of Australia (2007), and Her Royal Majesty and the British Crown and
+are used under license. The HydroSHEDS database and more information are available at http://www.hydrosheds.org.
+</p>
+
+
+<h3>References</h3>
+
+<p>B. Lehner and G. Grill, 2013, Global river hydrography and network
+routing: baseline data and new approaches to study the world’s
+large river systems, <em>Hydrological Processes</em>, <b>27</b>,
+2171–2186, <a href="https://doi.org/10.1002/hyp.9740">doi:10.1002/hyp.9740</a>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+## Catchment of gauge Mainz / Rhein
+## HYBAS uses a modified version of Pfafstetter
+op.old &lt;- options()
+options("hydrocode.alloddorzero" = TRUE)
+ok &lt;- is.downstream(23263070, rhineHYBASlev08$PFAF_ID)
+MzBas &lt;- subset(rhineHYBASlev08, subset = ok)
+sp::plot(rhineHYBASlev08)
+sp::plot(MzBas, add = TRUE, col = "red")
+
+## get catchment size
+## AEO : 98206 km2 according to website
+sum(MzBas$SUB_AREA)
+
+## reset previous settings
+options(op.old)
+
+## End(Not run)
+</code></pre>
+
+
+</div>

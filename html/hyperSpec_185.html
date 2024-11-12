@@ -1,0 +1,111 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>merge,hyperSpec,hyperSpec-method</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Merge hyperSpec objects</h2>
+
+<h3>Description</h3>
+
+<p>Merges two hyperSpec objects and <code>cbind</code>s their spectra
+matrices, or merges additional extra data into a hyperSpec object.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">## S4 method for signature 'hyperSpec,hyperSpec'
+merge(x, y, ...)
+
+## S4 method for signature 'hyperSpec,data.frame'
+merge(x, y, ...)
+
+## S4 method for signature 'data.frame,hyperSpec'
+merge(x, y, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>a hyperSpec object or data.frame</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+<p>a hyperSpec object or data.frame (including derived classes like tibble)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>handed to <code>merge.data.frame</code></p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>After merging, the spectra matrix can contain duplicates, and is not
+ordered according to the wavelength.
+</p>
+<p>If the wavelength axis should be ordered, use <code>orderwl</code>.
+</p>
+<p>If a <code>hyperSpec</code> object and  a <code>data.frame</code> are merged, the result is of the class of the first (<code>x</code>) object.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>C. Beleites
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>merge</code>.
+</p>
+<p><code>collapse</code> combines hyperSpec objects that do not share the wavelength axis.
+<code>rbind</code>, and <code>cbind</code> for combining hyperSpec objects that.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+merge (chondro [1:10,, 600], chondro [5:15,, 600], by = c("x", "y"))$.
+tmp &lt;- merge (chondro [1:10,, 610], chondro [5:15,, 610],
+              by = c("x", "y"), all = TRUE)
+tmp$.
+wl (tmp)
+
+## remove duplicated wavelengths:
+approxfun &lt;- function (y, wl, new.wl){
+  approx (wl, y, new.wl, method = "constant",
+          ties = function (x) mean (x, na.rm = TRUE)
+          )$y
+}
+
+merged &lt;- merge (chondro [1:7,, 610 ~ 620], chondro [5:10,, 615 ~ 625], all = TRUE)
+merged$.
+merged &lt;- apply (merged, 1, approxfun,
+                 wl = wl (merged), new.wl = unique (wl (merged)),
+                 new.wavelength = "new.wl")
+merged$.
+
+## merging data.frame into hyperSpec object =&gt; hyperSpec object
+y &lt;- data.frame (filename = sample (flu$filename, 4, replace = TRUE), cpred = 1:4)
+y
+tmp &lt;- merge (flu, y)
+tmp$..
+
+## merging hyperSpec object into data.frame =&gt; data.frame
+merge (y, flu)
+</code></pre>
+
+
+</div>

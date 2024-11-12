@@ -1,0 +1,181 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hms</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Maximization (or minimization) of a fitness function using Hierarchic Memetic Strategy.</h2>
+
+<h3>Description</h3>
+
+<p>Maximization (or minimization) of a fitness function using Hierarchic Memetic Strategy.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hms(
+  tree_height = 3,
+  minimize = FALSE,
+  fitness,
+  lower,
+  upper,
+  sigma = default_sigma(lower, upper, tree_height),
+  population_sizes = default_population_sizes(tree_height),
+  run_metaepoch = default_ga_metaepoch(tree_height),
+  gsc = gsc_default,
+  lsc = lsc_default,
+  sc = sc_max_metric(euclidean_distance, sprouting_default_euclidean_distances(sigma)),
+  create_population = default_create_population(sigma),
+  suggestions = NULL,
+  with_gradient_method = FALSE,
+  gradient_method_args = default_gradient_method_args,
+  run_gradient_method,
+  monitor_level = "basic",
+  parallel = FALSE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>tree_height</code></td>
+<td>
+<p>numeric - default value: 5. It determines the maximum tree height
+which will usually be reached unless a very strict local stopping condition, global
+stopping condition or sprouting condition is used.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>minimize</code></td>
+<td>
+<p>logical - <code>TRUE</code> when fitness shall be minimized.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fitness</code></td>
+<td>
+<p>fitness function, that returns a numerical value, to be optimized by the strategy.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lower</code></td>
+<td>
+<p>numeric - lower bound of the domain, a vector of length equal
+to the decision variables.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>upper</code></td>
+<td>
+<p>numeric - upper bound of the domain, a vector of length equal
+to the decision variables.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sigma</code></td>
+<td>
+<p>numeric - Vector of standard deviations for each tree level used to create
+a population of a sprouted deme.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>population_sizes</code></td>
+<td>
+<p>numeric - Sizes of deme populations on each tree level.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>run_metaepoch</code></td>
+<td>
+<p>A function that takes 5 parameters: fitness, suggestions, lower,
+upper, tree_level, runs a metaepoch on the given deme population and returns list with
+3 named fields: solution, population, value.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>gsc</code></td>
+<td>
+<p>global stopping condition function taking a list of MetaepochSnapshot
+objects and returning a logical value; it is evaluated after every metaepoch and
+determines whether whole computation should be stopped. See <code>gsc_metaepochs_count</code> for more details.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lsc</code></td>
+<td>
+<p>local stopping condition - function taking a deme and a list of MetaepochSmapshot
+objects representing previous metaepochs; it is run on every deme after it has run a metaepoch
+and determines whether that deme will remain active. See <code>lsc_max_fitness_evaluations</code> for more details.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sc</code></td>
+<td>
+<p>sprouting condition - function taking 3 arguments: an individual, a tree level
+and a list of Deme objects; it determines whether the given individual can sprout a new deme
+on the given level. See <code>sc_max_metric</code> for more details.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>create_population</code></td>
+<td>
+<p>function taking 6 parameters: mean, lower, upper, population_size,
+tree_level, sigma that returns a population for a Deme object to be created on the given
+tree level.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>suggestions</code></td>
+<td>
+<p>matrix of individuals for the initial population of the root</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>with_gradient_method</code></td>
+<td>
+<p>logical determining whether a gradient method should be run
+for all leaves at the end of the computation to refine their best solutions.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>gradient_method_args</code></td>
+<td>
+<p>list of parameters that are passed to the gradient method</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>run_gradient_method</code></td>
+<td>
+<p>function - returns list with named fields: solution, population, value</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>monitor_level</code></td>
+<td>
+<p>string - one of: 'none', 'basic', 'basic_tree', 'verbose_tree'.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>parallel</code></td>
+<td>
+<p>logical - <code>TRUE</code> when run_metaepoch runs in parallel.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>Returns an object of class hms.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">f &lt;- function(x) x
+result &lt;- hms(fitness = f, lower = -5, upper = 5)
+</code></pre>
+
+
+</div>

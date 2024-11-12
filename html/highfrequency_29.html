@@ -1,0 +1,132 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>knChooseReMeDI</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>ReMeDI tuning parameter</h2>
+
+<h3>Description</h3>
+
+<p>Function to choose the tuning parameter, kn in ReMeDI estimation. 
+The optimal parameter <code>kn</code> is the smallest value that where the criterion:
+</p>
+<p style="text-align: center;"><code class="reqn">
+    SqErr(k_{n})^{n}_{t} = \left(\hat{R}^{n,k_{n}}_{t,0} - \hat{R}^{n,k_{n}}_{t,1} - \hat{R}^{n,k_{n}}_{t,2} + \hat{R}^{n,k_{n}}_{t,3} - \hat{R}^{n, k_{n}}_{t,l}\right)^{2}
+</code>
+</p>
+
+<p>is perceived to be zero. The tuning parameter <code>tol</code> can be set to choose the tolerance of the perception of 'close to zero', a higher tolerance will lead to a higher optimal value.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">knChooseReMeDI(
+  pData,
+  knMax = 10,
+  tol = 0.05,
+  size = 3,
+  lower = 2,
+  upper = 5,
+  plot = FALSE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>pData</code></td>
+<td>
+<p><code>xts</code> or <code>data.table</code> containing the log-prices of the asset.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>knMax</code></td>
+<td>
+<p>max value of <code>kn</code> to be considered.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tol</code></td>
+<td>
+<p>tolerance for the minimizing value. If <code>tol</code> is high, the algorithm will choose a lower optimal value.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>size</code></td>
+<td>
+<p>size of the local window.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lower</code></td>
+<td>
+<p>lower boundary for the method if it fails to find an optimal value. If this is the case, the best kn between lower and upper is returned</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>upper</code></td>
+<td>
+<p>upper boundary for the method if it fails to find an optimal value. If this is the case, the best kn between lower and upper is returned</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>plot</code></td>
+<td>
+<p>logical whether to plot the errors.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>This is the algorithm B.2 in the appendix of the Li and Linton (2019) working paper.
+</p>
+
+
+<h3>Value</h3>
+
+<p>integer containing the optimal kn
+</p>
+
+
+<h3>Note</h3>
+
+<p>We Thank Merrick Li for contributing his Matlab code for this estimator.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Emil Sjoerup.
+</p>
+
+
+<h3>References</h3>
+
+<p>Li, M. and Linton, O. (2019). A ReMeDI for microstructure noise. Cambridge Working Papers in Economics 1908.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+optimalKn &lt;- knChooseReMeDI(sampleTData[as.Date(DT) == "2018-01-02",],
+                            knMax = 10, tol = 0.05, size = 3,
+                            lower = 2, upper = 5, plot = TRUE)
+optimalKn
+## Not run: 
+# We can also have a much larger search-space
+optimalKn &lt;- knChooseReMeDI(sampleTDataEurope,
+                            knMax = 50, tol = 0.05,
+                            size = 3, lower = 2, upper = 5, plot = TRUE)
+optimalKn
+
+## End(Not run)
+
+</code></pre>
+
+
+</div>

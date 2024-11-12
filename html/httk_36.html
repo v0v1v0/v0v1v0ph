@@ -1,0 +1,174 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>calc_hep_clearance</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Calculate the hepatic clearance.</h2>
+
+<h3>Description</h3>
+
+<p>This function calculates the hepatic clearance in plasma for using the
+"well-stirred" model by default. Other scaling options from 
+(Ito and Houston 2004) are also available.
+Parameters for scaling from flow-free intrinsic-hepatic clearance to 
+whole-liver metabolism rate are taken from 
+(Carlile et al. 1997).
+In vitro measured hepatic clearace is 
+corrected for estimated binding in the in vitro clearance assay 
+using the model of (Kilford et al. 2008).
+The agument restrictive.clearance (defaults to TRUE) describes the
+significance (or lack thereof) of plasma protein binding in metabolism. 
+Restrictive clearance assumes that only the free fraction of chemical in
+plasma is available for metabolism. 
+Non-restrictive clearance assumes that the compound is weakly bound to
+plasma protein and any free chemical metabolized is instantly
+replaced. For non-restrictive clearance the effective fup = 1.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">calc_hep_clearance(
+  chem.name = NULL,
+  chem.cas = NULL,
+  dtxsid = NULL,
+  parameters = NULL,
+  hepatic.model = "well-stirred",
+  suppress.messages = FALSE,
+  well.stirred.correction = TRUE,
+  restrictive.clearance = TRUE,
+  species = "Human",
+  adjusted.Funbound.plasma = TRUE,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>chem.name</code></td>
+<td>
+<p>Either the chemical name, CAS number, or the parameters
+must be specified.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>chem.cas</code></td>
+<td>
+<p>Either the chemical name, CAS number, or the parameters must
+be specified.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dtxsid</code></td>
+<td>
+<p>EPA's DSSTox Structure ID (<a href="https://comptox.epa.gov/dashboard">https://comptox.epa.gov/dashboard</a>)
+the chemical must be identified by either CAS, name, or DTXSIDs</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>parameters</code></td>
+<td>
+<p>Chemical parameters from parameterize_steadystate
+function, overrides chem.name and chem.cas.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>hepatic.model</code></td>
+<td>
+<p>Model used in calculating hepatic clearance, unscaled,
+parallel tube, dispersion, or default well-stirred.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>suppress.messages</code></td>
+<td>
+<p>Whether or not to suppress the output message.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>well.stirred.correction</code></td>
+<td>
+<p>Uses the (Yang et al. 2007) 
+blood:plasma ratio correction in the calculation of hepatic
+clearance for well-stirred model if TRUE if argument hepatic.model =
+"well-stirred".</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>restrictive.clearance</code></td>
+<td>
+<p>If TRUE (default)
+the rate of metabolism is restricted
+to the unbound fraction of chemical. If FALSE the free fraction is set to 1
+(that is, plasma protein binding is weak
+and metabolzied chemical is rapidly replaced)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>species</code></td>
+<td>
+<p>Species desired (either "Rat", "Rabbit", "Dog", "Mouse", or
+default "Human").</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>adjusted.Funbound.plasma</code></td>
+<td>
+<p>Uses the 
+(Pearce et al. 2017) lipid binding adjustment
+for Funbound.plasma (which also impacts partition coefficients such as 
+blood:plasma ratio) when set to TRUE (Default).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Additional parameters passed to parameterize_steadystate if
+parameters is NULL.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<table><tr style="vertical-align: top;">
+<td><code>Hepatic Clearance</code></td>
+<td>
+<p>Units of L/h/kg BW.</p>
+</td>
+</tr></table>
+<h3>Author(s)</h3>
+
+<p>John Wambaugh and Robert Pearce
+</p>
+
+
+<h3>References</h3>
+
+<p>Carlile DJ, Zomorodi K, Houston JB (1997).
+“Scaling factors to relate drug metabolic clearance in hepatic microsomes, isolated hepatocytes, and the intact liver: studies with induced livers involving diazepam.”
+<em>Drug metabolism and disposition</em>, <b>25</b>(8), 903–911.<br><br> Ito K, Houston JB (2004).
+“Comparison of the use of liver models for predicting drug clearance using in vitro kinetic data from hepatic microsomes and isolated hepatocytes.”
+<em>Pharmaceutical research</em>, <b>21</b>, 785–792.<br><br> Kilford PJ, Gertz M, Houston JB, Galetin A (2008).
+“Hepatocellular binding of drugs: correction for unbound fraction in hepatocyte incubations using microsomal binding or drug lipophilicity data.”
+<em>Drug Metabolism and Disposition</em>, <b>36</b>(7), 1194–1197.<br><br> Pearce RG, Setzer RW, Davis JL, Wambaugh JF (2017).
+“Evaluation and calibration of high-throughput predictions of chemical distribution to tissues.”
+<em>Journal of pharmacokinetics and pharmacodynamics</em>, <b>44</b>, 549–565.<br><br> Yang J, Jamei M, Yeo KR, Rostami-Hodjegan A, Tucker GT (2007).
+“Misuse of the well-stirred model of hepatic drug clearance.”
+<em>Drug Metabolism and Disposition</em>, <b>35</b>(3), 501–502.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+calc_hep_clearance(chem.name="Ibuprofen",hepatic.model='unscaled')
+calc_hep_clearance(chem.name="Ibuprofen",well.stirred.correction=FALSE)
+
+</code></pre>
+
+
+</div>

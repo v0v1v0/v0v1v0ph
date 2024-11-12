@@ -1,0 +1,132 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>tooltip_chart</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Helper to create charts in tooltips.</h2>
+
+<h3>Description</h3>
+
+<p>Helper to create charts in tooltips.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">tooltip_chart(accesor = NULL, hc_opts = NULL, width = 250, height = 150)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>accesor</code></td>
+<td>
+<p>A string indicating the name of the column where the data is.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>hc_opts</code></td>
+<td>
+<p>A list of options using the  <a href="https://api.highcharts.com/highcharts/">https://api.highcharts.com/highcharts/</a>
+syntax.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>width</code></td>
+<td>
+<p>A numeric input in pixels indicating the with of the tooltip.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>height</code></td>
+<td>
+<p>A numeric input in pixels indicating the height of the tooltip.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>This function needs to be used in the <code>pointFormatter</code> argument
+inside of <code>hc_tooltip</code> function an <code>useHTML = TRUE</code> option.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+require(dplyr)
+require(purrr)
+require(tidyr)
+require(gapminder)
+data(gapminder, package = "gapminder")
+
+gp &lt;- gapminder %&gt;%
+  arrange(desc(year)) %&gt;%
+  distinct(country, .keep_all = TRUE)
+
+gp2 &lt;- gapminder %&gt;%
+  nest(-country) %&gt;%
+  mutate(
+    data = map(data, mutate_mapping, hcaes(x = lifeExp, y = gdpPercap), drop = TRUE),
+    data = map(data, list_parse)
+  ) %&gt;%
+  rename(ttdata = data)
+
+gptot &lt;- left_join(gp, gp2)
+
+hc &lt;- hchart(
+  gptot,
+  "point",
+  hcaes(
+    lifeExp,
+    gdpPercap,
+    name = country,
+    size = pop,
+    group = continent
+  )
+) %&gt;%
+  hc_yAxis(type = "logarithmic")
+
+hc %&gt;%
+  hc_tooltip(useHTML = TRUE, pointFormatter = tooltip_chart(accesor = "ttdata"))
+
+hc %&gt;%
+  hc_tooltip(useHTML = TRUE, pointFormatter = tooltip_chart(
+    accesor = "ttdata",
+    hc_opts = list(chart = list(type = "column"))
+  ))
+
+hc %&gt;%
+  hc_tooltip(
+    useHTML = TRUE,
+    positioner = JS("function () { return { x: this.chart.plotLeft + 10, y: 10}; }"),
+    pointFormatter = tooltip_chart(
+      accesor = "ttdata",
+      hc_opts = list(
+        title = list(text = "point.country"),
+        xAxis = list(title = list(text = "lifeExp")),
+        yAxis = list(title = list(text = "gdpPercap"))
+      )
+    )
+  )
+
+hc %&gt;%
+  hc_tooltip(
+    useHTML = TRUE,
+    pointFormatter = tooltip_chart(
+      accesor = "ttdata",
+      hc_opts = list(
+        legend = list(enabled = TRUE),
+        series = list(list(color = "gray", name = "point.name"))
+      )
+    )
+  )
+
+
+</code></pre>
+
+
+</div>

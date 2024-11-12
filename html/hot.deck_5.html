@@ -1,0 +1,189 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hd.ord</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Implement hot deck multiple imputation with ordinal variables.</h2>
+
+<h3>Description</h3>
+
+<p>This function adapts the “hot.deck” function to impute data with missing observations by specifically accounting for ordinal variables.
+The ordinal variable is regressed on specified meaningful explanatory variables with the <code>polr</code> ordered probit approach.
+The approach assumes an underlying latent continuous variable and estimates the distances between ordinal variable categories.
+Ordinal levels are replaced with mid-cutpoints of the newly estimated intercepts. Categories that are not supported by the data are dropped.
+The resulting categories are used to impute the data with multiple hot deck imputation with either the “best cell” method (default) or the “probabilistic draw” method.
+Any number of ordinal variables can be specified. The specified ordinal variables must not contain missing values.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hd.ord(data, ord, evs, m = 5, method=c("best.cell", "p.draw"),
+cutoff=10, sdCutoff=1, optimizeSD = FALSE, optimStep = 0.1, optimStop = 5,
+weightedAffinity = FALSE, impContinuous = c("HD", "mice"), IDvars = NULL, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>A data frame with missing values to be imputed using multiple hot deck imputation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ord</code></td>
+<td>
+<p>A vector of ordinal variables to be used on the LHS of the ordered probit regression. Variables must not contain missing values</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>evs</code></td>
+<td>
+<p>A vector of explanatory variables to be used on the RHS of the ordered probit regression. Variables may contain missing values.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>m</code></td>
+<td>
+<p>Number of imputed datasets required.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+<p>Method used to draw donors based on affinity either “best.cell” (the default) or “p.draw” for probabilistic draw.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cutoff</code></td>
+<td>
+<p>A numeric scalar such that any variable with fewer than <code>cutoff</code> unique non-missing values will be considered discrete and necessarily imputed with hot deck imputation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sdCutoff</code></td>
+<td>
+<p>Number of standard deviations between observations such that observations fewer than <code>sdCutoff</code> standard deviations away from each other are considered sufficiently close to be a match, otherwise they are considered too far away to be a match.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>optimizeSD</code></td>
+<td>
+<p>Logical indicating whether the <code>sdCutoff</code> parameter should be optimized such that the smallest possible value is chosen that produces no thin cells from which to draw donors.  Thin cells are those where the number of donors is less than <code>m</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>optimStep</code></td>
+<td>
+<p>The size of the steps in the optimization if <code>optimizeSD</code> is <code>TRUE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>optimStop</code></td>
+<td>
+<p>The value at which optimization should stop if it has not already found a value that produces no thin cells.  If this value is reached and thin cells still exist, a warning will be returned, though the routine will continue using <code>optimStop</code> as <code>sdCutoff</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>weightedAffinity</code></td>
+<td>
+<p>Logical indicating whether a correlation-weighted affinity score should be used.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>impContinuous</code></td>
+<td>
+<p>Character string indicating how continuous missing data should be imputed.  Valid options are “HD” (the default) in which case hot-deck imputation will be used, or “mice” in which case multiple imputation by chained equations will be used.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>IDvars</code></td>
+<td>
+<p>A character vector of variable names not to be used in the imputation, but to be included in the final imputed datasets.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Optional additional arguments to be passed down to the <code>mice</code> routine.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>The output is a list with the following elements:
+</p>
+
+<ul>
+<li>
+<p>dataAn object of class <code>mi</code> which contains <code>m</code> imputed datasets.
+</p>
+</li>
+<li>
+<p>affinityA matrix of affinity scores see <code>affinity</code>.
+</p>
+</li>
+<li>
+<p>donorsA list of donors for each missing observation based on the affinity score.
+</p>
+</li>
+<li>
+<p>drawsThe <code>m</code> observations drawn from donors that were used for the multiple imputations.
+</p>
+</li>
+<li>
+<p>max.emp.affNormalization constant for each row of affinity scores; the maximum possible value of the affinity scores if correlation-weighting is used.
+</p>
+</li>
+<li>
+<p>max.the.affNormalization constant for each row of affinity scores; the number of columns in the original data. 
+</p>
+</li>
+<li>
+<p>data.origOriginal data fed into the function
+</p>
+</li>
+<li>
+<p>data.orig.na.omitOriginal data without missing values
+</p>
+</li>
+<li>
+<p>data.cutData after cutpoint replacements
+</p>
+</li>
+<li>
+<p>plr.outResults <code>polr</code>
+</p>
+</li>
+<li>
+<p>plr.dfResults of <code>polr</code> as a data frame
+</p>
+</li>
+<li>
+<p>int.dfsA list of intercepts as data frames
+</p>
+</li>
+<li>
+<p>ord.new.levNew ordinal variable levels
+</p>
+</li>
+<li>
+<p>ord.new.lev.numNumeric version of new ordinal levels
+</p>
+</li>
+</ul>
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(ampData)
+hd.ord(data = ampData,
+      ord = c("Educ", "Interest"),
+      evs = c("Dem", "Black", "Empl", "Male", "Inc", "Age"))
+
+</code></pre>
+
+
+</div>

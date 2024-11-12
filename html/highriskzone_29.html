@@ -1,0 +1,299 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>eval_method</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Evaluation of the procedures determining the high-risk zone.</h2>
+
+<h3>Description</h3>
+
+<p>Evaluates the performance of the three methods:
+</p>
+
+<ul>
+<li>
+<p> Method of fixed radius
+</p>
+</li>
+<li>
+<p> Quantile-based method
+</p>
+</li>
+<li>
+<p> Intensity-based method
+</p>
+</li>
+</ul>
+<p>For further details on the methods, see <code>det_hrz</code> or the paper of Mahling et al. (2013)(References). <br>
+There are three ways to simulate data for the evaluation.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">eval_method(
+  ppdata,
+  type,
+  criterion,
+  cutoff,
+  numit = 100,
+  nxprob = 0.1,
+  distancemap = NULL,
+  intens = NULL,
+  covmatrix = NULL,
+  simulate,
+  radiusClust = NULL,
+  clustering = 5,
+  pbar = TRUE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>ppdata</code></td>
+<td>
+<p>Observed spatial point process of class ppp.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>type</code></td>
+<td>
+<p>Method to use, can be one of <code>"dist"</code> (method of fixed radius or quantile-based method), or
+<code>"intens"</code> (intensity-based method)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>criterion</code></td>
+<td>
+<p>criterion to limit the high-risk zone, can be one of 
+<code>"area"</code> (giving size of hrz), <code>"indirect"</code> (giving quantile/alpha depending on type),
+or <code>"direct"</code> (giving radius/threshold c depending on type)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cutoff</code></td>
+<td>
+<p>Value of criterion (area, radius, quantile, alpha or threshold). 
+Depending on criterion and type: 
+If criterion = "direct" and type = "intens", cutoff is the maximum intensity of unexploded bombs
+outside the risk zone. If type = "dist" instead, cutoff is the radius of the circle around each exploded bomb.
+"If criterion = "indirect", cutoff is the quantile for the quantile-based method and the failure 
+probability alpha for the intensity-base method. If criterion = "area", cutoff is the area the high-risk zone should
+have.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>numit</code></td>
+<td>
+<p>Number of iterations</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nxprob</code></td>
+<td>
+<p>Probability of having unobserved events.
+Default value is 0.1.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>distancemap</code></td>
+<td>
+<p>(optional) distance map: distance of every pixel to the nearest observation 
+of the point pattern; only needed for <code>type="dist"</code>. If not given, 
+it will be computed by <code>distmap</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>intens</code></td>
+<td>
+<p>(optional) estimated intensity of the observed process (object of class "im"), 
+only needed for type="intens". If not given,
+it will be estimated using <code>density.ppp</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>covmatrix</code></td>
+<td>
+<p>(optional) Covariance matrix of the kernel of a normal distribution, only needed for 
+<code>type="intens"</code> if no intensity is given. If not given, it will be estimated
+using <code>Hscv</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>simulate</code></td>
+<td>
+<p>The type of simulation, can be one of <code>"thinning", "intens"</code> or <code>"clintens"</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>radiusClust</code></td>
+<td>
+<p>(Optional) radius of the circles around the parent points in which the cluster
+points are located. Only used for <code>simulate = "clintens"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>clustering</code></td>
+<td>
+<p>a value &gt;= 1 which describes the amount of clustering; the
+adjusted estimated intensity of the observed pattern is divided by
+this value; it is also the parameter of the Poisson distribution
+for the number of points per cluster. Only used for <code>simulate = "clintens"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pbar</code></td>
+<td>
+<p>logical. Should progress bar be printed?</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The three simulation types are:
+</p>
+
+<dl>
+<dt> Data-based simulation </dt>
+<dd>
+<p>Here a given data set is used. The data set is thinned as explained below.
+Note that this method is very different from the others, since it is using the real data.
+</p>
+</dd>
+<dt> Simulation of an inhomogeneous Poisson process </dt>
+<dd>
+<p>Here, an inhomogeneous Poisson process is simulated and then that data is thinned.
+</p>
+</dd>
+<dt> Simulation of a Neyman-Scott process </dt>
+<dd>
+<p>Here a Neyman-Scott process is simulated (see <code>sim_nsppp</code>, <code>rNeymanScott</code>)
+and this data is then also thinned.
+</p>
+</dd>
+</dl>
+<p>Thinning:<br>
+Let <code class="reqn">X</code> be the spatial point process, which is the location of all events and let <code class="reqn">Y</code>
+be a subset of <code class="reqn">X</code> describing the observed process. The process of unobserved events
+then is Z = X \ Y , meaning that <code class="reqn">Z</code> and <code class="reqn">Y</code> are disjoint and together 
+forming <code class="reqn">X</code>.<br>
+Since <code class="reqn">Z</code> is not known, in this function an observed or simulated spatial point pattern 
+<code>ppdata</code> is taken as the full pattern (which we denote by X') comprising the 
+observed events Y' as well as the unobserved Z'.
+Each event in X' is assigned to one of the two processes Y' or 
+Z' by drawing independent Bernoulli random numbers. <br>
+The resulting process of observed events Y' is used to determine the high-risk zone. 
+Knowing now the unobserved process, it can be seen how many events are outside and inside the
+high-risk zone.<br></p>
+<p><code>type</code> and <code>criterion</code> may be vectors in this function.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A <code>data.frame</code> with variables 
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code> Iteration </code></td>
+<td>
+<p> Iterationstep of the result </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code> Type, Criterion, Cutoff, nxprob </code></td>
+<td>
+<p> see arguments </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code> threshold </code></td>
+<td>
+<p> determined threshold. If criterion="area", it is either the distance (if type="dist")
+or the threshold c (for type="intens"). If criterion="indirect", it is either the quantile of the
+nearest-neighbour distance which is used as radius (if type="dist") or the threshold c (for type="intens"). If criterion="direct",
+it equals the cutoff for both types.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code> calccutoff </code></td>
+<td>
+<p> determined cutoff-value. For type="dist" and criterion="area", this is the
+quantile of the nearest-neighbour distance. For type="intens" and criterion="area", it is the failure
+probability alpha. For all other criterions it is NA.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code> covmatrix11, covmatrix12, covmatrix21, covmatrix22 </code></td>
+<td>
+<p> values in the covariance matrix. 
+covmatrix11 and covmatrix22 are the diagonal elements (variances). </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code> numbermiss </code></td>
+<td>
+<p> number of unobserved points outside the high-risk zone </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code> numberunobserved </code></td>
+<td>
+<p> number of observations in the unobserved point pattern Z' </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code> missingfrac </code></td>
+<td>
+<p> fraction of unobserved events outside the high-risk zone (numbermiss/numberunobserved) </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code> arearegion </code></td>
+<td>
+<p> area of the high-risk zone </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code> numberobs </code></td>
+<td>
+<p> number of observations in the observed point pattern Y' </p>
+</td>
+</tr>
+</table>
+<h3>See Also</h3>
+
+<p><code>det_hrz</code>, <code>rNeymanScott</code>, <code>thin</code>, <code>sim_nsppp</code>, <code>sim_intens</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run:     
+ data(craterB)
+ 
+ # the input values are mainly the same as in det_hrz, so for more example ideas, 
+ # see the documentation of det_hrz.
+ evalm &lt;- eval_method(craterB, type = c("dist", "intens"), criterion = c("area", "area"), 
+                      cutoff = c(1500000, 1500000), nxprob = 0.1, numit = 10, 
+                      simulate = "clintens", radiusClust = 300, 
+                      clustering = 15, pbar = FALSE)
+ evalm_d &lt;- subset(evalm, evalm$Type == "dist")
+ evalm_i &lt;- subset(evalm, evalm$Type == "intens")
+ 
+ # pout:  fraction of high-risk zones that leave at least one unobserved event uncovered
+ # pmiss:  Mean fraction of unobserved events outside the high-risk zone
+ data.frame(pmiss_d = mean(evalm_d$missingfrac),
+            pmiss_i = mean(evalm_i$missingfrac),
+            pout_d = ( sum(evalm_d$numbermiss &gt; 0) / nrow(evalm_d) ), 
+            pout_i = ( sum(evalm_i$numbermiss &gt; 0) / nrow(evalm_i) ))
+
+## End(Not run)
+</code></pre>
+
+
+</div>

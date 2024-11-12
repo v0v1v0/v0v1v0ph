@@ -1,0 +1,152 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hypervolume_gaussian</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Hypervolume construction via Gaussian kernel density estimation
+</h2>
+
+<h3>Description</h3>
+
+<p>Constructs a hypervolume by building a Gaussian kernel density estimate on an adaptive grid of random points wrapping around the original data points. The bandwidth vector reflects the axis-aligned standard deviations of a hyperelliptical kernel. 
+</p>
+<p>Because Gaussian kernel density estimates do not decay to zero in a finite distance, the algorithm evaluates the kernel density in hyperelliptical regions out to a distance set by <code>sd.count</code>. 
+</p>
+<p>After delineating the probability density, the function calls <code>hypervolume_threshold</code> to determine a boundary. The defaullt behavior ensures that 95 percent of the stimated probability density is enclosed by the chosen boundary. However note that theaccuracy of the total probability density depends on having set a large value of <code>sd.count</code>.
+</p>
+<p>Most use cases should not require modification of any parameters except <code>kde.bandwidth</code>. 
+</p>
+<p>Optionally, weighting of the data (e.g. for abundance-weighting) is possible. By default, the function estimates the probability density of the observations via Gaussian kernel functions, assuming each data point contributes equally. By setting a <code>weight</code> parameter, the algorithm can instead take a weighted average the kernel functions centered on each observation. Code for weighting data written by Yuanzhi Li (Yuanzhi.Li@usherbrooke.ca).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hypervolume_gaussian(data, name = NULL, 
+                      weight = NULL,
+                      samples.per.point = ceiling((10^(3 + sqrt(ncol(data))))/nrow(data)),
+                      kde.bandwidth = estimate_bandwidth(data), 
+                      sd.count = 3, 
+                      quantile.requested = 0.95, 
+                      quantile.requested.type = "probability", 
+                      chunk.size = 1000, 
+                      verbose = TRUE, 
+                      ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+
+<p>A m x n matrix or data frame, where m is the number of observations and n is the dimensionality.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>name</code></td>
+<td>
+
+<p>A string to assign to the hypervolume for later output and plotting. Defaults to the name of the variable if NULL.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>weight</code></td>
+<td>
+
+<p>An optional vector of weights for the kernel density estimation. Defaults to even weighting (<code>rep(1/nrow(data),nrow(data))</code>) if <code>NULL</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>samples.per.point</code></td>
+<td>
+
+<p>Number of random points to be evaluated per data point in <code>data</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>kde.bandwidth</code></td>
+<td>
+
+<p>A bandwidth vector obtained by running <code>estimate_bandwidth</code> Note that previous package version (&lt;3.0.0) allowed inputting a scalar/vector value here - this is now handled through the <code>estimate_bandwidth</code> interface.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sd.count</code></td>
+<td>
+
+<p>The number of standard deviations (converted to actual units by multiplying by <code>kde.bandwidth</code>) at which the 'edge' of the hypervolume should be evaluated. Larger values of <code>threshold.sd.count</code> will come closer to a true estimate of the Gaussian density over a larger region of hyperspace, but require rapidly increasing computational resources (see Details section). It is generally better to use a large/default value for this parameter. Warnings will be generated if chosen to take a value less than 3.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>quantile.requested</code></td>
+<td>
+<p>The quantile value used to delineate the boundary of the kernel density estimate. See <code>hypervolume_threshold</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>quantile.requested.type</code></td>
+<td>
+<p>The type of quantile (volume or probability) used for the boundary delineation. See <code>hypervolume_threshold</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>chunk.size</code></td>
+<td>
+
+<p>Number of random points to process per internal step. Larger values may have better performance on machines with large amounts of free memory. Changing this parameter does not change the output of the function; only how this output is internally assembled.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+
+<p>Logical value; print diagnostic output if <code>TRUE</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Other arguments to pass to  <code>hypervolume_threshold</code>
+</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A <code>Hypervolume-class</code> object corresponding to the inferred hypervolume.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>hypervolume_threshold</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(penguins,package='palmerpenguins')
+penguins_no_na = as.data.frame(na.omit(penguins))
+penguins_adelie = penguins_no_na[penguins_no_na$species=="Adelie",
+                    c("bill_length_mm","bill_depth_mm","flipper_length_mm")]
+  
+# low samples per point for CRAN demo
+hv = hypervolume_gaussian(penguins_adelie,name='Adelie',samples.per.point=100)
+summary(hv)
+
+</code></pre>
+
+
+</div>

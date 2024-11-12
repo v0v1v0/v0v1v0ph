@@ -1,0 +1,1091 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>likert</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Diverging stacked barcharts for Likert, semantic
+differential, rating scale data, and population pyramids.</h2>
+
+<h3>Description</h3>
+
+<p>Constructs and plots diverging stacked barcharts for Likert, semantic
+differential, rating scale data, and population pyramids.
+
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">likert(x, ...)
+likertplot(x, ...)
+## S3 method for class 'likert'
+plot(x, ...)
+
+## S3 method for class 'formula'
+plot.likert(x, data, ReferenceZero=NULL, value, levelsName="",
+                                scales.in=NULL,   ## use scales=
+                                between=list(x=1 + (horizontal), y=.5 + 2*(!horizontal)),
+                                auto.key.in=NULL, ## use auto.key=
+                                panel.in=NULL,    ## use panel=
+                                horizontal=TRUE,
+                                par.settings.in=NULL, ## use par.settings=
+                                ...,
+                                as.percent = FALSE,
+                                ## titles
+                                ylab= if (horizontal) {
+                                  if (length(x)==3)
+                                    deparse(x[[2]])
+                                  else
+                                    "Question"
+                                }
+                                else
+                                if (as.percent != FALSE) "Percent" else "Count",
+
+                                xlab= if (!horizontal) {
+                                  if (length(x)==3)
+                                    deparse(x[[2]])
+                                  else
+                                    "Question"
+                                }
+                                else
+                                if (as.percent != FALSE) "Percent" else "Count",
+
+                                main = x.sys.call,
+
+                                ## right axis
+                                rightAxisLabels = rowSums(data.list$Nums),
+                                rightAxis = !missing(rightAxisLabels),
+                                ylab.right = if (rightAxis) "Row Count Totals" else NULL,
+                                xlab.top = NULL,
+                                right.text.cex =
+                                  if (horizontal) { ## lazy evaluation
+                                    if (!is.null(scales$y$cex)) scales$y$cex else .8
+                                  }
+                                  else
+                                    {
+                                      if (!is.null(scales$x$cex)) scales$x$cex else .8
+                                    },
+
+                                ## scales
+                                xscale.components = xscale.components.top.HH,
+                                yscale.components = yscale.components.right.HH,
+                                xlimEqualLeftRight = FALSE,
+                                xTickLabelsPositive = TRUE,
+
+                                ## row sequencing
+                                as.table=TRUE,
+                                positive.order=FALSE,
+                                data.order=FALSE,
+                                reverse=ifelse(horizontal, as.table, FALSE),
+
+                                ## resizePanels arguments
+                                h.resizePanels=sapply(result$y.used.at, length),
+                                w.resizePanels=sapply(result$x.used.at, length),
+
+                                ## color options
+                                reference.line.col="gray65",
+                                col.strip.background="gray97",
+                                key.border.white=TRUE,
+                                col=likertColor(Nums.attr$nlevels,
+                                  ReferenceZero=ReferenceZero,
+                                  colorFunction=colorFunction,
+                                  colorFunctionOption=colorFunctionOption),
+                                colorFunction="diverge_hcl",
+                                colorFunctionOption="lighter"
+                                )
+## S3 method for class 'matrix'
+plot.likert(x,
+            positive.order=FALSE,
+            ylab=names(dimnames(x)[1]),
+            xlab=if (as.percent != FALSE) "Percent" else "Count",
+            main=xName,
+            reference.line.col="gray65",
+            col.strip.background="gray97",
+            col=likertColor(attr(x, "nlevels"),
+              ReferenceZero=ReferenceZero,
+              colorFunction=colorFunction,
+              colorFunctionOption=colorFunctionOption),
+            colorFunction="diverge_hcl",
+            colorFunctionOption="lighter",
+            as.percent=FALSE,
+            par.settings.in=NULL,
+            horizontal=TRUE,
+            ReferenceZero=NULL,
+            ...,
+            key.border.white=TRUE,
+            xName=deparse(substitute(x)),
+            rightAxisLabels=rowSums(abs(x)),
+            rightAxis=!missing(rightAxisLabels),
+            ylab.right=if (rightAxis) "Row Count Totals" else NULL,
+            panel=panel.barchart,
+            xscale.components=xscale.components.top.HH,
+            yscale.components=yscale.components.right.HH,
+            xlimEqualLeftRight=FALSE,
+            xTickLabelsPositive=TRUE,
+            reverse=FALSE)
+
+## Default S3 method:
+plot.likert(x, ...)  ## calls plot.likert.matrix
+
+## S3 method for class 'array'
+plot.likert(x,
+             condlevelsName=paste("names(dimnames(", xName, "))[-(1:2)]",
+                                  sep=""),
+             xName=deparse(substitute(x)),
+             main=paste("layers of", xName, "by", condlevelsName),
+             ...)
+
+## S3 method for class 'likert'
+plot.likert(x, ...)  ## See Details
+
+## S3 method for class 'list'
+plot.likert(x,  ## named list of matrices, 2D tables,
+                               ## 2D ftables, or 2D structables,
+                               ## or all-numeric data.frames
+            condlevelsName="ListNames",
+            xName=deparse(substitute(x)),
+            main=paste("List items of", xName, "by", condlevelsName),
+            layout=if (length(dim.x) &gt; 1) dim.x else {
+                               if (horizontal) c(1, length(x)) else c(length(x), 1)},
+            positive.order=FALSE,
+            strip=!horizontal,
+            strip.left=horizontal,
+            strip.left.values=names(x),
+            strip.values=names(x),
+            strip.par=list(cex=1, lines=1),
+            strip.left.par=list(cex=1, lines=1),
+            horizontal=TRUE,
+            ...,
+            rightAxisLabels=sapply(x, function(x) rowSums(abs(x)), simplify = FALSE),
+            rightAxis=!missing(rightAxisLabels),
+            resize.height.tuning=-.5,
+            resize.height=if (missing(layout) || length(dim.x) != 2) {
+              c("nrow","rowSums")
+            } else {
+              rep(1, layout[2])
+            },
+            resize.width=if (missing(layout)) {1 } else {
+              rep(1, layout[1])
+            },
+            box.ratio=if (
+              length(resize.height)==1 &amp;&amp;
+              resize.height == "rowSums") 1000 else 2,
+            xscale.components=xscale.components.top.HH,
+            yscale.components=yscale.components.right.HH)
+
+## S3 method for class 'table'
+plot.likert(x, ..., xName=deparse(substitute(x)))
+## S3 method for class 'ftable'
+plot.likert(x, ..., xName=deparse(substitute(x)))
+## S3 method for class 'structable'
+plot.likert(x, ..., xName=deparse(substitute(x)))
+
+## S3 method for class 'data.frame'
+plot.likert(x, ..., xName=deparse(substitute(x)))
+
+
+xscale.components.top.HH(...)
+yscale.components.right.HH(...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>For the formula method, a model formula.  All terms in the
+formula must be the names of columns in the data.frame argument
+<code>data</code> or the special abbreviation <code>.</code> only on the right-hand-side.  Functions of the
+names will not work.  The right-hand-side must be either <code>.</code> or
+the sum of the names of numeric variables in <code>data</code>.
+Non-syntactic names must be in quotes (single <code style="white-space: pre;">⁠'⁠</code> or double
+<code style="white-space: pre;">⁠"⁠</code>), 
+but not backticks <code style="white-space: pre;">⁠`⁠</code>.
+
+The <code>.</code> on the
+right-hand-side is expanded to the formula containing the sum of all
+remaining (after the response and the conditioning variables)
+numeric columns in <code>data</code>.  An empty left-hand-side is
+interpreted as the <code>rownames(data)</code>.  See the examples
+for all possible forms of formula recognized by the <code>likert</code> function.
+</p>
+<p>Otherwise, any numeric object stored as a vector, matrix, array,
+data.frame, table, ftable, structable (as defined in the <code>vcd</code>
+package), or as a list of named two-dimensional objects.  This is
+the only required argument.  See the Details section for
+restrictions on the form of data.frame, list, ftable, and structable
+arguments.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>For the formula method, a <code>data.frame</code>.
+Do not use variable names <code>".value"</code> or <code>".variable"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ReferenceZero</code></td>
+<td>
+<p>Numeric scalar or <code>NULL</code>.  The position in
+the range<br><code>seq(0, attr(x, "nlevels")+.5, .5)</code> where the
+reference line at 0 will be placed.  <code>attr(x, "nlevels")</code> is the
+number of columns of the original argument <code>x</code>, <em>before</em> it
+has been coerced to a <code>"likert"</code> object.  The default
+<code>NULL</code> corresponds to the middle level if there are an odd
+number of levels, and to half-way between the two middle levels if
+there are an even number of levels.  This argument is used when the
+number of positive levels and the number of negative levels are not
+the same.  For example, with 4 levels<br><code>c("Disagree", "Neutral", "Weak Agree", "Strong Agree")</code>, the
+argument would be specified <code>ReferenceZero=2</code> indicating that
+the graphical split would be in the middle of the second group with
+label <code>"Neutral"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>value</code></td>
+<td>
+<p>Name of the numeric variable containing the data when the
+formula method is used with the long data form.  The predictor in the
+formula will be a factor name.  The name of the predictor will be
+used as the title in the key.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>levelsName</code></td>
+<td>
+<p>(optional) Name of the implied factor distinguishing the
+columns of the response variables when the formula method is used
+with the wide data form.  This name will be used as the title in the key.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>positive.order</code></td>
+<td>
+<p>If <code>FALSE</code>, the default value, the original
+order of the rows is retained.  This is necessary for arrays,
+because each panel has the same rownames.  If <code>TRUE</code>, rows are
+ordered within each panel with the row whose bar goes farthest to
+the right at the top of a panel of horizontal bars or at the left of
+a panel of vertical bars.
+<code>positive.order</code> is frequently set to <code>TRUE</code> for lists.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>data.order</code></td>
+<td>
+<p><code>formula</code> method only.  If
+<code>positive.order</code> is <code>TRUE</code>, this <code>data.order</code>
+variable is ignored.
+If <code>FALSE</code>, the default value, and the rows are specified by a
+factor, then they are ordered by their levels.  If <code>TRUE</code>, then
+the rows are ordered by their order in the input <code>data.frame</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>as.percent</code></td>
+<td>
+<p>When <code>as.percent==TRUE</code> or
+<code>as.percent=="noRightAxis"</code>, then the values in each row are rescaled
+to row percents.
+When <code>as.percent==TRUE</code> the original row totals are used as
+<code>rightAxisLabels</code>,
+<code>rightAxis</code> is set to <code>TRUE</code>, the <code>ylab.right</code> is by
+default set to <code>"Row Count Totals"</code> (the user can change its value in
+the calling sequence).   When <code>as.percent=="noRightAxis"</code>, then
+<code>rightAxis</code> will be set to <code>FALSE</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>as.table</code></td>
+<td>
+<p>Standard <code>lattice</code> argument.  See <code>barchart</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>par.settings.in, scales.in, auto.key.in,
+panel.in</code></td>
+<td>
+<p>These are placeholders
+for <code>lattice</code> arguments that lets the user
+specify some lattice <code>par.settings</code> and still retain the
+ones that are prespecified in the<br><code>plot.likert.default</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ylab, xlab, ylab.right, xlab.top, main</code></td>
+<td>
+<p>Standard <code>lattice</code> graph
+labels in <code>barchart</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>right.text.cex</code></td>
+<td>
+<p>The right axis, as used here for the
+"Row Count Totals", has non-standard controls.  It's <code>cex</code>
+follows the <code>cex</code> of the left axis, unless this argument is
+used to override that value.  When <code>horizontal=FALSE</code>, then
+the top axis defaults to follow the bottom
+axis unless overridden by <code>right.text.cex</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>between</code></td>
+<td>
+<p>Standard <code>lattice</code> argument.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>col</code></td>
+<td>
+<p>Vector of color names for the levels of the agreement factor.
+Although the colors can be specified as an arbitrary vector of color names, for example,
+<code>col=c('red','blue','#4AB3F2')</code>, usually specifying one of the diverging
+palettes from <code>diverge_hcl</code> or sequential
+palettes from <code>sequential_hcl</code> will suffice.
+For less intense colors, you can use the middle colors from a larger
+set of colors; e.g., <code>col=sequential_hcl(11)[5:2]</code>.  See the last
+<code>AudiencePercent</code> example below for this usage.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>colorFunction, colorFunctionOption</code></td>
+<td>
+<p>See <code>likertColor</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>reference.line.col</code></td>
+<td>
+<p>Color for reference line at zero.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>col.strip.background</code></td>
+<td>
+<p>Background color for the strip labels.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>key.border.white</code></td>
+<td>
+<p>Logical. If <code>TRUE</code>, then place a white
+border around the <code>rect</code> in the key, else use the <code>col</code> of
+the rect itself.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>horizontal</code></td>
+<td>
+<p>Logical, with default <code>TRUE</code> indicating
+horizontal bars, will be passed to the
+<code>barchart</code> function by the <code>plot.likert</code> method.
+In addition, it interchanges the meaning of <code>resize.height</code> and
+<code>resize.width</code> arguments
+to the <code>likert</code> functions applied to arrays and lists.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>other arguments.  These will be passed to the <code>barchart</code>
+function by the <code>plot.likert</code> method.  The most useful of these
+is the <code>border</code> argument which defaults to make the borders of
+the bars the same color as the bars themselves.  A scalar
+alternative (<code>border="white"</code> being our first choice) puts a border
+around each bar in the stacked barchart.  This works very well when
+the <code>ReferenceZero</code> line is between two levels.  It gives a
+misleading division of the central bar when the <code>ReferenceZero</code>
+is in the middle of a level.  See the example in the examples
+section.
+Arguments to the <code>lattice</code> <code>auto.key=list()</code> argument
+(described in <code>barchart</code>) will be used in the
+legend.  See the examples.</p>
+</td>
+</tr>
+</table>
+<table>
+<tr style="vertical-align: top;">
+<td><code>strip.left, strip</code></td>
+<td>
+<p>Logical. The default <code>strip.left=TRUE</code>
+places the strip
+labels on the left of each panel as in the
+first professional challenges example.
+The alternative<br><code>strip.left=FALSE</code> puts
+the strip labels on the top of each panel, the traditional
+lattice strip label position.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>condlevelsName, strip.left.values, strip.values,
+strip.par, strip.left.par, layout</code></td>
+<td>
+<p>Arguments which will be passed to
+<code>ResizeEtc</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>xName</code></td>
+<td>
+<p>Name of the argument in its original environment.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rightAxis</code></td>
+<td>
+<p>logical.  Should right axis values be displayed?
+Defaults to <code>FALSE</code> unless<br><code>rightAxisLabels</code> are specified.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rightAxisLabels</code></td>
+<td>
+<p>Values to be displayed on the right axis.  The
+default values are the row totals.  These are sensible for
+tables of counts.  When the data is rescaled to percents by the
+<code>as.percent=TRUE</code> argument, then the <code>rightAxisLabels</code>
+are still defaulted to the row totals for the counts.
+We illustrate this usage in the <code>ProfChal</code> example.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>resize.height.tuning</code></td>
+<td>
+<p>Tuning parameter used to adjust the space
+between bars as specified by the <code>resize.height</code> argument to
+the <code>ResizeEtc</code> function.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>h.resizePanels, resize.height</code></td>
+<td>
+<p>Either character scalar or numeric vector.
+If <code>"nrow"</code>, then the panels heights are proportional to the number of
+bars in each panel.  If <code>"rowSums"</code> and there is exactly one bar
+per panel,
+then the panels heights are proportional to the total count in each
+bar, and see the discussion of the <code>box.ratio</code> argument.
+If a numeric vector, the panel heights are proportional to the numbers
+in the argument.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>w.resizePanels, resize.width</code></td>
+<td>
+<p>Numeric vector.  The panel widths are proportional to the numbers
+in the argument.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>box.ratio</code></td>
+<td>
+<p>If there are more than one bar in any panel, then
+this defaults to the <code>trellis</code> standard value of 2.
+If there is exactly one bar in a panel, then the value is 1000, with
+the intent to minimize the white space in the panel.  In this way,
+when <code>as.percent==TRUE</code>, the
+bar total area is the count and the bar widths are all equal at
+100%.  See the example below.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>panel</code></td>
+<td>
+<p>panel function eventually to be used by <code>barchart</code>.
+
+
+
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>xscale.components, yscale.components</code></td>
+<td>
+<p>See
+<code>yscale.components.default</code>.
+<code>xscale.components.top.HH</code> constructs the top x-axis
+labels, when needed, as the names of the bottom x-axis labels.
+<code>yscale.components.right.HH</code> constructs the right y-axis
+labels, when needed, as the names of the left y-axis labels.  The
+names are placed automatically by the <code>plot.likert</code> methods based on
+the value of the arguments <code>as.percent</code>, <code>rightAxis</code>,
+and <code>rightAxisLabels</code>.  By default, when <code>rightAxis != FALSE</code> the <code>layout.widths</code>
+are set to <code>list(ylab.right=5, right.padding=0)</code>.  Otherwise,
+those arguments are left at their default values.  They may be
+adjusted with an argument of the form <code>par.settings.in=</code><br><code>list(layout.widths=list(ylab.right=5, right.padding=0))</code>.<br>
+Similarly, spacing for the top labels can be adjusted with an
+argument of the form
+<code>par.settings.in=list(layout.heights=list(key.axis.padding=6))</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>xlimEqualLeftRight</code></td>
+<td>
+<p>Logical. The default is <code>FALSE</code>.  If
+<code>TRUE</code> and <code>at</code> and <code>labels</code> are not explicitly specified,
+then the left and right x limits are set to negative
+and positive of the larger of the absolute value of the original x limits.
+When <code>!horizontal</code>, this argument applies to the y coordinate.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>xTickLabelsPositive</code></td>
+<td>
+<p>Logical. The default is <code>TRUE</code>.
+If <code>TRUE</code> and <code>at</code> and <code>labels</code> are not explicitly specified,
+then the tick labels on the negative side are
+displayed as positive values.  When <code>!horizontal</code>, this argument
+applies to the y coordinate.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>reverse</code></td>
+<td>
+<p>Logical. The default is <code>FALSE</code>.
+If <code>TRUE</code>, the rows of the input matrix are reversed.
+The default is to plot the rows from top-to-bottom
+for horizontal bars
+and from left-to-write for vertical bars.
+<code>reverse</code>, <code>positive.order</code>, and <code>horizontal</code> are
+independent.
+All eight combinations are possible. See the<br><code>Eight sequences and orientations</code> section
+in the example for all eight.
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The counts (or percentages) of respondents on each row who agree with
+the statement are shown to the right of the zero line; the counts (or
+percentages) who disagree are shown to the left. The counts (or
+percentages) for respondents who neither agree nor disagree are split
+down the middle and are shown in a neutral color. The neutral category
+is omitted when the scale has an even number of choices.
+It is difficult to compare
+lengths without a common baseline. In this situation, we are primarily
+interested in the total count (or percent) to the right or left of the
+zero line; the breakdown into strongly or not is of lesser interest so
+that the primary comparisons do have a common baseline of zero. The
+rows within each panel are displayed in their original order by
+default. If the argument <code>positive.order=TRUE</code> is specified, the rows
+are ordered by the counts (or percentages) who agree.
+</p>
+<p>Diverging stacked barcharts are also called "two-directional stacked
+barcharts".  Some authors use the term "floating barcharts" for
+vertical diverging stacked barcharts and the term "sliding barcharts"
+for horizontal diverging stacked barcharts.
+</p>
+<p>All items in a list of named two-dimensional objects must have the
+same number of columns.  If the items have different column names, the
+column names of the last item in the list will be used in the key.  If
+the dimnames of the matrices are named, the names will be used in the
+plot.  It is possible to produce a likert plot with a list of objects
+with different numbers of columns, but not with the
+<code>plot.likert.list</code> method.  These must be done manually by using
+the <code>ResizeEtc</code> function on each of the individual likert
+plots.  The difficulty is that the legend is based on the last item in
+the list and will have the wrong number of values for some of the
+panels.
+</p>
+<p>A single data.frame <code>x</code> will be plotted as <code>data.matrix(x[sapply(x, is.numeric)])</code>.
+The subscripting on the class of the columns is there to remove
+columns of characters (which would otherwise be coerced to NA) and
+factor columns (which would otherwise be coerced to integers).
+A data.frame with only numeric columns will work in a named list.
+A list of data.frame with factors or characters will be plotted by
+automatically removing columns that are not numeric.
+</p>
+<p><code>ftable</code> and <code>structable</code> arguments <code>x</code> will be plotted as
+<code>as.table(x)</code>.  This changes the display sequence.
+Therefore the user will probably want to use <code>aperm</code> on the
+<code>ftable</code> or <code>structable</code> before using <code>plot.likert</code>.
+</p>
+<p>The <code>likert</code> method is designed for use with <code>"likert"</code>
+objects created with the independent <span class="pkg">likert</span> package.  It is not
+recommended that the <span class="pkg">HH</span> package and the <code>likert</code> package
+both be loaded at the same time, as they have incompatible usage of
+the exported function names <code>likert</code> and <code>plot.likert</code>.  If
+the <span class="pkg">likert</span> package is installed, it can be run without loading
+by using the function calls <code>likert::likert()</code> and
+<code>likert:::plot.likert()</code>.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A <code>"trellis"</code> object containing the plot.  The plot will be
+automatically displayed unless the result is assigned to an object.
+</p>
+
+
+<h3>Note</h3>
+
+<p>The current version of the <code>likert</code> function uses the default diverging
+palette from <code>diverge_hcl</code> as the default.
+Previous versions used the <code>RColorBrewer</code> palette <code>"RdBu"</code> as the default
+color palette.  The previous color palette is still available with an explicit
+call to <code>likertColorBrewer</code>, for example
+</p>
+<p><code>col=likertColorBrewer(nc, ReferenceZero=ReferenceZero,</code><br><code>                      BrewerPaletteName="RdBu", middle.color="gray90")</code>
+</p>
+
+
+<h3>Note</h3>
+
+<p>Ann Liu-Ferrara was a beta tester for the shiny app.</p>
+
+
+<h3>Note</h3>
+
+
+<dl>
+<dt>Documentation note:</dt>
+<dd>
+<p>Most of the plots drawn by <code>plot.likert</code> have a long
+left-axis tick label.  They therefore require a wider window
+than R's default of a nominal 7in <code class="reqn">\times</code> 7in window.  The
+comments with the examples suggest aesthetic window sizes.
+</p>
+</dd>
+<dt>Technical note:</dt>
+<dd>
+<p>There are three (almost) equivalent calling sequences for likert plots.
+</p>
+
+<ol>
+<li>
+<p><code>likert(x)  ## recommended</code><br><code>likert</code> is an alias for <code>plot.likert()</code>.
+</p>
+</li>
+<li>
+<p><code>plot.likert(x)</code><br><code>plot.likert</code> is both a method of
+<code>plot</code> for <code>"likert"</code> objects, and a generic function in its own
+right.  There are methods of <code>plot.likert</code> for
+<code>"formula"</code>,
+<code>"matrix"</code>,
+<code>"array"</code>, <code>"table"</code>, and several other classes of input objects.
+</p>
+</li>
+<li>
+<p><code>plot(as.likert(x))</code><br>
+Both <code>likert</code> and <code>plot.likert</code> work by calling the
+<code>as.likert</code> function on their argument <code>x</code>.  Once <code>as.likert</code>
+has converted its argument to a <code>"likert"</code> object, the method
+dispatch technology for the generic <code>plot.likert</code> is in play.
+The user can make the explicit call <code>as.likert(x)</code> to see what
+a <code>"likert"</code> object looks like, but is very unlikely to want to
+look a second time.
+</p>
+</li>
+</ol>
+</dd>
+</dl>
+<h3>Author(s)</h3>
+
+<p>Richard M. Heiberger, with contributions from Naomi B. Robbins &lt;naomi@nbr-graphs.com&gt;.
+</p>
+<p>Maintainer: Richard M. Heiberger &lt;rmh@temple.edu&gt; </p>
+
+
+<h3>References</h3>
+
+<p>Richard M. Heiberger, Naomi B. Robbins (2014).,
+"Design of Diverging Stacked Bar Charts for Likert Scales and Other Applications",
+Journal of Statistical Software, 57(5), 1–32,
+
+<a href="https://doi.org/10.18637/jss.v057.i05">doi:10.18637/jss.v057.i05</a>.
+</p>
+<p>Richard Heiberger and Naomi Robbins (2011),
+"Alternative to Charles Blow's Figure in \"Newt's War on Poor Children\"",
+Forbes OnLine, December 20, 2011.
+<a href="https://www.forbes.com/sites/naomirobbins/2011/12/20/alternative-to-charles-blows-figure-in-newts-war-on-poor-children-2/">https://www.forbes.com/sites/naomirobbins/2011/12/20/alternative-to-charles-blows-figure-in-newts-war-on-poor-children-2/</a>
+</p>
+<p>Naomi Robbins (2011), "Visualizing Data: Challenges to
+Presentation of Quality Graphics—and Solutions", Amstat News,
+September 2011, 28–30.
+<code>http://magazine.amstat.org/blog/2011/09/01/visualizingdata/</code>
+</p>
+
+
+
+
+<p>Luo, Amy and Tim Keyes (2005). "Second Set of Results in from the Career
+Track Member Survey," Amstat News. Arlington, VA: American Statistical
+Association.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>barchart</code>, <code>ResizeEtc</code>,
+<code>as.likert</code>,
+<code>as.matrix.listOfNamedMatrices</code>,
+<code>pyramidLikert</code></p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+## See file HH/demo/likert-paper.r for a complete set of examples using
+## the formula method into the underlying lattice:::barchart plotting
+## technology.  See file HH/demo/likert-paper-noFormula.r for the same
+## set of examples using the matrix and list of matrices methods.  See
+## file HH/demo/likertMosaic-paper.r for the same set of examples using
+## the still experimental functions built on the vcd:::mosaic as the
+## underlying plotting technology
+
+data(ProfChal)  ## ProfChal is a data.frame.
+## See below for discussion of the dataset.
+
+
+## Count plot
+likert(Question ~ . , ProfChal[ProfChal$Subtable=="Employment sector",],
+       main='Is your job professionally challenging?',
+       ylab=NULL,
+       sub="This plot looks better in a 9in x 4in window.")
+
+## Percent plot calculated automatically from Count data
+likert(Question ~ . , ProfChal[ProfChal$Subtable=="Employment sector",],
+       as.percent=TRUE,
+       main='Is your job professionally challenging?',
+       ylab=NULL,
+       sub="This plot looks better in a 9in x 4in window.")
+
+## formula method
+data(NZScienceTeaching)
+likert(Question ~ . | Subtable, data=NZScienceTeaching,
+       ylab=NULL,
+       scales=list(y=list(relation="free")), layout=c(1,2))
+
+## Not run: 
+## formula notation with expanded right-hand-side
+likert(Question ~
+       "Strongly disagree" + Disagree + Neutral + Agree + "Strongly agree" |
+       Subtable, data=NZScienceTeaching,
+       ylab=NULL,
+       scales=list(y=list(relation="free")), layout=c(1,2))
+
+## End(Not run)
+
+## Not run: 
+## formula notation with long data arrangement
+NZScienceTeachingLong &lt;- reshape2::melt(NZScienceTeaching,
+                                        id.vars=c("Question", "Subtable"))
+names(NZScienceTeachingLong)[3] &lt;- "Agreement"
+head(NZScienceTeachingLong)
+
+likert(Question ~ Agreement | Subtable, value="value", data=NZScienceTeachingLong,
+       ylab=NULL,
+       scales=list(y=list(relation="free")), layout=c(1,2))
+
+## End(Not run)
+
+## Examples with higher-dimensional arrays.
+tmp3 &lt;- array(1:24, dim=c(2,3,4),
+              dimnames=list(A=letters[1:2], B=LETTERS[3:5], C=letters[6:9]))
+
+## positive.order=FALSE is the default.  With arrays
+## the rownames within each item of an array are identical.
+
+## likert(tmp3)
+likert(tmp3, layout=c(1,4))
+likert(tmp3, layout=c(2,2), resize.height=c(2,1), resize.width=c(3,4))
+
+
+## plot.likert interprets vectors as single-row matrices.
+## http://survey.cvent.com/blog/customer-insights-2/box-scores-are-not-just-for-baseball
+Responses &lt;- c(15, 13, 12, 25, 35)
+names(Responses) &lt;- c("Strongly Disagree", "Disagree", "No Opinion",
+                      "Agree", "Strongly Agree")
+## Not run: 
+likert(Responses, main="Retail-R-Us offers the best everyday prices.",
+       sub="This plot looks better in a 9in x 2.6in window.")
+
+## End(Not run)
+## reverse=TRUE  is needed for a single-column key with
+## horizontal=FALSE and with space="right"
+likert(Responses, horizontal=FALSE,
+       aspect=1.5,
+       main="Retail-R-Us offers the best everyday prices.",
+       auto.key=list(space="right", columns=1,
+                     reverse=TRUE, padding.text=2),
+       sub="This plot looks better in a 4in x 3in window.")
+
+
+## Not run: 
+## Since age is always positive and increases in a single direction,
+## this example uses colors from a sequential palette for the age
+## groups.  In this example we do not use a diverging palette that is
+## appropriate when groups are defined by a characteristic, such as
+## strength of agreement or disagreement, that can increase in two directions.
+
+## Initially we use the default Blue palette in the sequential_hcl function.
+data(AudiencePercent)
+likert(AudiencePercent,
+       auto.key=list(between=1, between.columns=2),
+       xlab=paste("Percentage of audience younger than 35 (left of zero)",
+                  "and older than 35 (right of zero)"),
+       main="Target Audience",
+       col=rev(colorspace::sequential_hcl(4)),
+       sub="This plot looks better in a 7in x 3.5in window.")
+
+## The really light colors in the previous example are too light.
+## Therefore we use the col argument directly.  We chose to use an
+## intermediate set of Blue colors selected from a longer Blue palette.
+likert(AudiencePercent,
+       positive.order=TRUE,
+       auto.key=list(between=1, between.columns=2),
+       xlab=paste("Percentage of audience younger than 35",
+         "(left of zero) and older than 35 (right of zero)"),
+       main="Brand A has the most even distribution of ages",
+       col=colorspace::sequential_hcl(11)[5:2],
+       scales=list(x=list(at=seq(-90,60,10),
+                     labels=as.vector(rbind("",seq(-80,60,20))))),
+      sub="This plot looks better in a 7in x 3.5in window.")
+
+## End(Not run)
+
+
+## Not run: 
+## See the ?as.pyramidLikert help page for these examples
+## Population Pyramid
+data(USAge.table)
+USA79 &lt;- USAge.table[75:1, 2:1, "1979"]/1000000
+PL &lt;- likert(USA79,
+             main="Population of United States 1979 (ages 0-74)",
+             xlab="Count in Millions",
+             ylab="Age",
+             scales=list(
+               y=list(
+                 limits=c(0,77),
+                 at=seq(1,76,5),
+                 labels=seq(0,75,5),
+                 tck=.5))
+             )
+PL
+as.pyramidLikert(PL)
+
+likert(USAge.table[75:1, 2:1, c("1939","1959","1979")]/1000000,
+       main="Population of United States 1939,1959,1979 (ages 0-74)",
+       sub="Look for the Baby Boom",
+       xlab="Count in Millions",
+       ylab="Age",
+       scales=list(
+         y=list(
+           limits=c(0,77),
+           at=seq(1,76,5),
+           labels=seq(0,75,5),
+           tck=.5)),
+       strip.left=FALSE, strip=TRUE,
+       layout=c(3,1), between=list(x=.5))
+
+## End(Not run)
+
+
+Pop &lt;- rbind(a=c(3,2,4,9), b=c(6,10,12,10))
+dimnames(Pop)[[2]] &lt;- c("Very Low", "Low", "High", "Very High")
+likert(as.listOfNamedMatrices(Pop),
+            as.percent=TRUE,
+            resize.height="rowSums",
+            strip=FALSE,
+            strip.left=FALSE,
+            main=paste("Area and Height are proportional to 'Row Count Totals'.",
+                       "Width is exactly 100%.", sep="\n"))
+
+
+## Professional Challenges example.
+##
+## The data for this example is a list of related likert scales, with
+## each item in the list consisting of differently named rows.  The data
+## is from a questionnaire analyzed in a recent Amstat News article.
+## The study population was partitioned in several ways.  Data from one
+## of the partitions (Employment sector) was used in the first example
+## in this help file.  The examples here show various options for
+## displaying all partitions on the same plot.
+##
+data(ProfChal)
+levels(ProfChal$Subtable)[6] &lt;- "Prof Recog" ## reduce length of label
+
+## 1. Plot counts with rows in each panel sorted by positive counts.
+##
+## Not run: 
+likert(Question ~ . | Subtable, ProfChal,
+       positive.order=TRUE,
+       main="This works, but needs more specified arguments to look good")
+
+likert(Question ~ . | Subtable, ProfChal,
+       scales=list(y=list(relation="free")), layout=c(1,6),
+       positive.order=TRUE,
+       between=list(y=0),
+       strip=FALSE, strip.left=strip.custom(bg="gray97"),
+       par.strip.text=list(cex=.6, lines=5),
+       main="Is your job professionally challenging?",
+       ylab=NULL,
+       sub="This looks better in a 10inx7in window")
+
+## End(Not run)
+
+ProfChalCountsPlot &lt;-
+likert(Question ~ . | Subtable, ProfChal,
+       scales=list(y=list(relation="free")), layout=c(1,6),
+       positive.order=TRUE,
+       box.width=unit(.4,"cm"),
+       between=list(y=0),
+       strip=FALSE, strip.left=strip.custom(bg="gray97"),
+       par.strip.text=list(cex=.6, lines=5),
+       main="Is your job professionally challenging?",
+       rightAxis=TRUE,  ## display Row Count Totals
+       ylab=NULL,
+       sub="This looks better in a 10inx7in window")
+ProfChalCountsPlot
+
+
+## Not run: 
+## 2. Plot percents with rows in each panel sorted by positive percents.
+##    This is a different sequence than the counts.  Row Count Totals are
+##    displayed on the right axis.
+ProfChalPctPlot &lt;-
+likert(Question ~ . | Subtable, ProfChal,
+       as.percent=TRUE,    ## implies display Row Count Totals
+       scales=list(y=list(relation="free")), layout=c(1,6),
+       positive.order=TRUE,
+       box.width=unit(.4,"cm"),
+       between=list(y=0),
+       strip=FALSE, strip.left=strip.custom(bg="gray97"),
+       par.strip.text=list(cex=.6, lines=5),
+       main="Is your job professionally challenging?",
+       rightAxis=TRUE,  ## display Row Count Totals
+       ylab=NULL,
+       sub="This looks better in a 10inx7in window")
+ProfChalPctPlot
+
+## 3. Putting both percents and counts on the same plot, both in
+##    the order of the positive percents.
+
+LikertPercentCountColumns(Question ~ . | Subtable, ProfChal,
+                          layout=c(1,6), scales=list(y=list(relation="free")),
+                          ylab=NULL, between=list(y=0),
+                          strip.left=strip.custom(bg="gray97"), strip=FALSE,
+                          par.strip.text=list(cex=.7),
+                          positive.order=TRUE,
+                          main="Is your job professionally challenging?")
+
+
+## Restore original name
+## levels(ProfChal$Subtable)[6] &lt;- "Attitude\ntoward\nProfessional\nRecognition"
+
+## End(Not run)
+
+## Not run: 
+## 4. All possible forms of formula for the likert formula method:
+data(ProfChal)
+row.names(ProfChal) &lt;- abbreviate(ProfChal$Question, 8)
+
+likert( Question ~ . | Subtable,
+       data=ProfChal, scales=list(y=list(relation="free")), layout=c(1,6))
+
+likert( Question ~
+          "Strongly Disagree" + Disagree + "No Opinion" + Agree + "Strongly Agree" | Subtable,
+       data=ProfChal, scales=list(y=list(relation="free")), layout=c(1,6))
+
+likert( Question ~ . ,
+       data=ProfChal)
+
+likert( Question ~ "Strongly Disagree" + Disagree + "No Opinion" + Agree + "Strongly Agree",
+       data=ProfChal)
+
+likert( ~ . | Subtable,
+       data=ProfChal, scales=list(y=list(relation="free")), layout=c(1,6))
+
+likert( ~ "Strongly Disagree" + Disagree + "No Opinion" + Agree + "Strongly Agree" | Subtable,
+       data=ProfChal, scales=list(y=list(relation="free")), layout=c(1,6))
+
+likert( ~ . ,
+       data=ProfChal)
+
+likert( ~ "Strongly Disagree" + Disagree + "No Opinion" + Agree + "Strongly Agree",
+       data=ProfChal)
+
+
+## End(Not run)
+
+## Not run: 
+## 5. putting the x-axis tick labels on top for horizontal plots
+##    putting the y-axis tick lables on right for vertical plots
+##
+## This non-standard specification is a consequence of using the right
+## axis labels for different values than appear on the left axis labels
+## with horizontal plots, and using the top axis labels for different
+## values than appear on the bottom axis labels with vertical plots.
+
+## Percent plot calculated automatically from Count data
+
+tmph &lt;-
+likert(Question ~ . , ProfChal[ProfChal$Subtable=="Employment sector",],
+       as.percent=TRUE,
+       main='Is your job professionally challenging?',
+       ylab=NULL,
+       sub="This plot looks better in a 9in x 4in window.")
+tmph$x.scales$labels
+names(tmph$x.scales$labels) &lt;- tmph$x.scales$labels
+update(tmph, scales=list(x=list(alternating=2)), xlab=NULL, xlab.top="Percent")
+
+tmpv &lt;-
+likert(Question ~ . , ProfChal[ProfChal$Subtable=="Employment sector",],
+       as.percent=TRUE,
+       main='Is your job professionally challenging?',
+       sub="likert plots with long Question names look better horizontally.
+With effort they can be made to look adequate vertically.",
+       horizontal=FALSE,
+       scales=list(y=list(alternating=2), x=list(rot=c(90, 0))),
+       ylab.right="Percent",
+       ylab=NULL,
+       xlab.top="Column Count Totals",
+       par.settings=list(
+         layout.heights=list(key.axis.padding=5),
+         layout.widths=list(key.right=1.5, right.padding=0))
+)
+tmpv$y.scales$labels
+names(tmpv$y.scales$labels) &lt;- tmpv$y.scales$labels
+tmpv
+tmpv$x.limits &lt;- abbreviate(tmpv$x.limits,8)
+tmpv$x.scales$rot=c(0, 0)
+tmpv
+
+
+## End(Not run)
+
+## Not run: 
+## illustration that a border on the bars is misleading when it splits a bar.
+tmp &lt;- data.frame(a=1, b=2, c=3)
+likert(~ . , data=tmp, ReferenceZero=2, main="No border. OK.")
+likert(~ . , data=tmp, ReferenceZero=2, border="white",
+       main="Border. Misleading split of central bar.")
+likert(~ . , data=tmp, ReferenceZero=2.5, main="No border. OK.")
+likert(~ . , data=tmp, ReferenceZero=2.5, border="white", main="Border. OK.")
+
+## End(Not run)
+
+## Not run: 
+  ## run the shiny app
+if (interactive())  shiny::runApp(system.file("shiny/likert", package="HH"))
+
+## End(Not run)
+
+## The ProfChal data is done again with explicit use of ResizeEtc
+## in ?HH:::ResizeEtc
+
+</code></pre>
+
+
+</div>

@@ -1,0 +1,134 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>county_events</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Find events for storms by county</h2>
+
+<h3>Description</h3>
+
+<p>Takes a list of US counties, based on their 5-digit Federal Information Processing
+Standard (FIPS) codes, boundaries on the range of years to be considered, and
+the type of event (e.g., "flood", "tornado") and returns a list of all storms with
+listings for that type of event for the counties. This output is based on listings in
+the NOAA Storm Events database. See the help documentation for the <code>storm_events</code>
+dataset for more information and references on the data source used by this function.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">county_events(counties, start_year, end_year, event_type)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>counties</code></td>
+<td>
+<p>Character vector of the five-digit Federal Information
+Processing Standard (FIPS) codes for counties for which the user wants to
+determine storm exposure.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>start_year</code></td>
+<td>
+<p>Four-digit integer with first year to consider.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>end_year</code></td>
+<td>
+<p>Four-digit integer with last year to consider.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>event_type</code></td>
+<td>
+<p>Character string with the type of event to use to identify
+county exposures. Options include <code>"flood"</code>, <code>"tornado"</code>,
+<code>"wind"</code>, and <code>"tropical_storm"</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>Returns a dataframe with a row for each county-storm pair and with
+columns for:
+</p>
+
+<ul>
+<li>
+<p><code>fips</code>: County's 5-digit Federal Information Processing Standard
+(FIPS) code
+</p>
+</li>
+<li>
+<p><code>storm_id</code>: Unique storm identifier with the storm name and year,
+separated by a hyphen (e.g., "Alberto-1988",
+"Katrina-2005")
+</p>
+</li>
+<li>
+<p><code>usa_atcf_id</code>: United States Automated Tropical Cyclone Forecasting
+storm identifier
+</p>
+</li>
+<li>
+<p><code>closest_time_utc</code>: Time, in UTC, of the closest approach of the
+storm to the county's population mean center,
+based on storm tracks linearly interpolated to
+15-minute increments.
+</p>
+</li>
+<li>
+<p><code>storm_dist</code>: Minimum distance (in kilometers) between the storm's
+track and the county's population mean center.
+</p>
+</li>
+<li>
+<p><code>local_time</code>: Local time of the closest approach of the storm to the
+county's population mean center, based on storm tracks
+linearly interpolated to 15-minute increments.
+</p>
+</li>
+<li>
+<p><code>closest_date</code>: Date (based on local time) of the closest
+approach of the storm to the county's population
+mean center.
+</p>
+</li>
+</ul>
+<h3>Note</h3>
+
+<p>Of the event types that this function can pull, only "tornado" and
+"wind" are available for years before 1996. Therefore, this function will
+pull listed tornado events or wind events for all years, but for any other
+event type, you should not use a start year prior to 1996, as events of
+other types were not recorded in the database before 1996.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Ensure that data package is available before running the example.
+#  If it is not, see the `hurricaneexposure` package vignette for details
+# on installing the required data package.
+if (requireNamespace("hurricaneexposuredata", quietly = TRUE)) {
+
+county_events(counties = c("37031", "37053", "37055"),
+              start_year = 1996, end_year = 2018,
+              event_type = "flood")
+
+county_events(counties = c("37055"),
+              start_year = 1996, end_year = 2018,
+              event_type = "tropical_storm")
+}
+</code></pre>
+
+
+</div>

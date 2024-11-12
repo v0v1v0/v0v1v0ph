@@ -1,0 +1,83 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>rm_spike</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Remove spikes</h2>
+
+<h3>Description</h3>
+
+<p>Remove spikes and set their value as <code>NA_real_</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">rm_spike(x, col_name, out_name = NULL, tolerance)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>data frame or tibble with class Date or POSIX*
+in the first column.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>col_name</code></td>
+<td>
+<p>string with column(s) name(s) where to apply the function.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>out_name</code></td>
+<td>
+<p>optional. String with new column(s) name(s).
+If you set it as <code>NULL</code>, the function will overwrite the
+original table.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tolerance</code></td>
+<td>
+<p>numeric vector with the maximum tolerance between
+a number and its successor. If you provide a single value it will
+be recycled.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>The same table but with the peaks removed.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+# set path to file
+path_file &lt;- system.file('extdata', 'ianigla_cuevas.csv',
+             package = 'hydrotoolbox')
+
+# read with default names
+cuevas &lt;- read_ianigla(path = path_file,
+                       out_name = c('tair(°C)', 'rh(%)', 'patm(mbar)',
+                                    'p(mm)', 'wspd(km/hr)', 'wdir(°)',
+                                    'kin(kW/m2)', 'hsnow(cm)', 'tsoil(°C)') )
+
+# remove spikes in snow heigh series
+cuevas %&gt;%
+  rm_spike(col_name = 'hsnow(cm)',
+           out_name = 'hsnow',
+           tolerance = 50) # 50 cm of snow its OK for this zone
+
+
+</code></pre>
+
+
+</div>

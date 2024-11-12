@@ -1,0 +1,124 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>predict.HDtweedie</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>make predictions from a "HDtweedie" object.</h2>
+
+<h3>Description</h3>
+
+<p>Similar to other predict methods, this functions predicts fitted values  from a <code>HDtweedie</code> object.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">## S3 method for class 'HDtweedie'
+predict(object, newx, s = NULL,
+type=c("response","link"), ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>object</code></td>
+<td>
+<p>fitted <code>HDtweedie</code> model object.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>newx</code></td>
+<td>
+<p>matrix of new values for <code>x</code> at which predictions are
+to be made. Must be a matrix.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>s</code></td>
+<td>
+<p>value(s) of the penalty parameter <code>lambda</code> at which
+predictions are required. Default is the entire sequence used to
+create the model. </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>type</code></td>
+<td>
+
+<p>type of prediction required:
+</p>
+
+<ul>
+<li>
+<p> Type <code>"response"</code> gives the mean response estimate.
+</p>
+</li>
+<li>
+<p> Type <code>"link"</code> gives the estimate for log mean response.</p>
+</li>
+</ul>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Not used. Other arguments to predict. </p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p><code>s</code> is the new vector at which predictions are requested. If <code>s</code> is not in the lambda sequence used for fitting the model, the <code>predict</code> function will use linear interpolation to make predictions. The new values are interpolated using a fraction of predicted values from both left and right <code>lambda</code> indices. </p>
+
+
+<h3>Value</h3>
+
+<p>The object returned depends on type.</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Wei Qian, Yi Yang and Hui Zou<br>
+Maintainer: Wei Qian  &lt;weiqian@stat.umn.edu&gt;</p>
+
+
+<h3>References</h3>
+
+<p>Qian, W., Yang, Y., Yang, Y. and Zou, H. (2016), “Tweedie's Compound
+Poisson Model With Grouped Elastic Net,” <em>Journal of Computational and Graphical Statistics</em>, 25, 606-625.<br></p>
+
+
+<h3>See Also</h3>
+
+<p><code>coef</code> method</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># load HDtweedie library
+library(HDtweedie)
+
+# load auto data set
+data(auto)
+
+# fit the lasso
+m0 &lt;- HDtweedie(x=auto$x,y=auto$y,p=1.5)
+
+# predicted mean response at x[10,]
+print(predict(m0,type="response",newx=auto$x[10,]))
+
+# define group index
+group1 &lt;- c(rep(1,5),rep(2,7),rep(3,4),rep(4:14,each=3),15:21)
+
+# fit the grouped lasso
+m1 &lt;- HDtweedie(x=auto$x,y=auto$y,group=group1,p=1.5)
+
+# predicted the log mean response at x[1:5,]
+print(predict(m1,type="link",newx=auto$x[1:5,]))
+</code></pre>
+
+
+</div>

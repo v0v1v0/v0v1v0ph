@@ -1,0 +1,112 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>poleInaccessibility</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Find a binary pole of inaccessibility</h2>
+
+<h3>Description</h3>
+
+<p>Find a binary pole of inaccessibility
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">poleInaccessibility2(
+  x = NULL,
+  y = NULL,
+  DT = NULL,
+  x_range = NULL,
+  y_range = NULL,
+  copy_DT = TRUE
+)
+
+poleInaccessibility3(
+  x = NULL,
+  y = NULL,
+  DT = NULL,
+  x_range = NULL,
+  y_range = NULL,
+  copy_DT = TRUE,
+  test_both = TRUE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x, y</code></td>
+<td>
+<p>Coordinates.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>DT</code></td>
+<td>
+<p>A <code>data.table</code> containing <code>LONGITUDE</code> and <code>LATITUDE</code> to define
+the <code>x</code> and <code>y</code> coordinates.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x_range, y_range</code></td>
+<td>
+<p>Numeric vectors of length-2; the range of <code>x</code> and <code>y</code>.
+Use this rather than the default when the 'vicinity' of <code>x,y</code> is different from
+the minimum closed rectangle covering the points.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>copy_DT</code></td>
+<td>
+<p>(logical, default: <code>TRUE</code>) Run <code>copy</code> on <code>DT</code>
+before proceeding. If <code>FALSE</code>, <code>DT</code> have additional columns updated by reference.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>test_both</code></td>
+<td>
+<p>(logical, default: <code>TRUE</code>) For <code>3</code>, test both stretching vertically
+then horizontally and horizontally then vertically.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+
+<dl>
+<dt><code>poleInaccessibility2</code></dt>
+<dd>
+<p>A named vector containing the
+<code>xmin</code>, <code>xmax</code> and
+<code>ymin</code>, <code>ymax</code> coordinates of
+the largest rectangle of width an integer power of two that is empty.</p>
+</dd>
+<dt><code>poleInaccessibility3</code></dt>
+<dd>
+<p>Starting with the rectangle formed by <code>poleInaccessibility2</code>,
+the rectangle formed by stretching it out vertically and horizontally until
+the edges intersect the points <code>x,y</code>
+</p>
+</dd>
+</dl>
+<h3>Examples</h3>
+
+<pre><code class="language-R">library(data.table)
+library(hutils)
+# A square with a 10 by 10 square of the northeast corner removed
+x &lt;- runif(1e4, 0, 100)
+y &lt;- runif(1e4, 0, 100)
+DT &lt;- data.table(x, y)
+# remove the NE corner
+DT_NE &lt;- DT[implies(x &gt; 90, y &lt; 89)]
+DT_NE[, poleInaccessibility2(x, y)]
+DT_NE[, poleInaccessibility3(x, y)]
+
+</code></pre>
+
+
+</div>

@@ -1,0 +1,89 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>ellipseCoord</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Coordinate Points Of Hotelling Ellipse</h2>
+
+<h3>Description</h3>
+
+<p>Get the <em>x</em> and <em>y</em> coordinates of Hotelling ellipse.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">ellipseCoord(data, pcx = 1, pcy = 2, conf.limit = 0.95, pts = 200)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>Data frame or tibble of PCA, PLS, and ICA scores, or from other feature projection methods.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pcx</code></td>
+<td>
+<p>Integer specifying which component is on the x-axis (by default 1).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pcy</code></td>
+<td>
+<p>Integer specifying which component is on the y-axis (by default 2).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>conf.limit</code></td>
+<td>
+<p>Number between 0 and 1 specifying the confidence level (by default 0.95).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pts</code></td>
+<td>
+<p>Integer indicating the number of points for drawing the Hotelling ellipse (by default 200).</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>Data frame containing the <em>x</em> and <em>y</em> coordinate points of the Hotelling ellipse.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Christian L. Goueguel,
+christian.goueguel@gmail.com
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Principal components analysis (PCA)
+library(dplyr)
+set.seed(123)
+pca_mod &lt;- specData %&gt;%
+  dplyr::select(where(is.numeric)) %&gt;%
+  FactoMineR::PCA(scale.unit = FALSE, graph = FALSE)
+
+## Extract PCA scores
+pca_scores &lt;- pca_mod %&gt;%
+   purrr::pluck("ind", "coord") %&gt;%
+   tibble::as_tibble()
+
+## Get Hotelling ellipse coordinate points
+library(HotellingEllipse)
+xy_coord &lt;- ellipseCoord(data = pca_scores, pcx = 1, pcy = 2, conf.limit = 0.95, pts = 200)
+
+</code></pre>
+
+
+</div>

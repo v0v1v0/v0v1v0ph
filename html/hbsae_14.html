@@ -1,0 +1,269 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>fSAE.Unit</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Compute small area estimates based on the basic unit-level model.</h2>
+
+<h3>Description</h3>
+
+<p>This is the function that carries out most of the computational work. It computes small area estimates based on the basic unit-level model, also known as the
+Battese-Harter-Fuller model, although it is also called by <code>fSurvReg</code> and <code>fSAE.Area</code> to compute survey regression
+or area-level model small area estimates. By default, Hierarchical Bayes estimates are computed, using fast one-dimensional
+numerical integration to average over the posterior density for the ratio of between and within area variance. This way, the small area estimates
+and MSEs account for the uncertainty about this parameter. Besides hierarchical Bayes, REML and hybrid methods are supported.
+These methods use the REML estimate or posterior mean of the variance ratio, respectively, as a plug-in estimate. Both methods do not account for uncertainty about this
+parameter. Synthetic estimates are computed by setting the variance ratio to zero.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">fSAE.Unit(
+  y,
+  X,
+  area,
+  Narea = NULL,
+  Xpop = NULL,
+  fpc = TRUE,
+  v = NULL,
+  vpop = NULL,
+  w = NULL,
+  wpop = NULL,
+  method = "HB",
+  beta0 = rep(0, ncol(X)),
+  Omega0 = Diagonal(n = ncol(X), x = 0),
+  nu0 = 0,
+  s20 = 0,
+  prior = function(x) rep.int(1L, length(x)),
+  CV = prod(dim(X)) &lt; 1e+06,
+  CVweights = NULL,
+  silent = FALSE,
+  keep.data = FALSE,
+  full.cov = nrow(Xpop) &lt; 1000L,
+  lambda0 = NULL,
+  rel.int.tol = 0.01,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+<p>response vector of length n.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>X</code></td>
+<td>
+<p>n x p model matrix.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>area</code></td>
+<td>
+<p>n-vector of area codes, typically a factor variable with m levels, where m is the number of in-sample areas.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Narea</code></td>
+<td>
+<p>M-vector of area population sizes, where M is the number of areas for which estimates are required.
+There should be a one-to-one correspondence with the rows of <code>Xpop</code>.
+This argument is required unless <code>Xpop=NULL</code> or <code>fpc=FALSE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Xpop</code></td>
+<td>
+<p>M x p matrix of population means. If <code>Xpop</code> is not provided, only the model fit is returned.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fpc</code></td>
+<td>
+<p>whether a finite population correction should be used. Default is <code>TRUE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>v</code></td>
+<td>
+<p>unit-level variance structure, n-vector. Defaults to a vector of 1s. In some cases it might be useful
+to take v proportional to the sampling probabilities.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>vpop</code></td>
+<td>
+<p>population area means of v, M-vector. Defaults to a vector of 1s. Not used when <code>fpc</code> is <code>FALSE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>w</code></td>
+<td>
+<p>area-level variance structure, m-vector. Defaults to a vector of 1s.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>wpop</code></td>
+<td>
+<p>area-level variance structure, M-vector. Defaults to a vector of 1s.
+Only components of <code>wpop</code> corresponding to out-of-sample areas are actually used.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+<p>one of "HB", "hybrid", "REML", "synthetic", "survreg", "BLUP" where
+"HB" (default) does the full hierarchical Bayes computation, i.e. numerical integration over the posterior density for the between area variance parameter,
+"hybrid" computes the Best Linear Unbiased Predictor (BLUP) with the posterior mean for the variance parameter plugged in,
+"REML" computes the BLUP with the restricted maximum likelihood estimate of the variance parameter plugged in,
+"synthetic" computes synthetic estimates where the between area variance is set to 0, and
+"survreg" computes survey regression estimates where the between area variance approaches infinity.
+"BLUP" computes BLUP estimates with the value provided for <code>lambda0</code> as a fixed plug-in value for the ratio of between and within area variance.
+Only method "HB" takes uncertainty about the between-area variance into account.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>beta0</code></td>
+<td>
+<p>mean vector of normal prior for coefficient vector.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Omega0</code></td>
+<td>
+<p>inverse covariance matrix of normal prior for coefficient vector. Default prior
+corresponds to the (improper) uniform distribution.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nu0</code></td>
+<td>
+<p>degrees of freedom parameter for inverse gamma prior for residual (within-area) variance. Default is 0.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>s20</code></td>
+<td>
+<p>scale parameter for inverse gamma prior for residual (within-area) variance. Default is 0.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>prior</code></td>
+<td>
+<p>prior density for the ratio lambda = between-area-variance / within-area variance. This should be a (vectorized) function that takes
+a vector lambda and returns a vector of prior density values at lambda. The density does not have to be normalized. The default is
+the (improper) uniform prior. The within-area variance and lambda are assumed independent a priori.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>CV</code></td>
+<td>
+<p>whether (an approximation to the) leave-one-out cross-validation measure should be computed. As this
+requires the computation of a dense matrix the size of <code>X</code>, the
+default is to set <code>CV</code> to <code>FALSE</code> if the size of <code>X</code> is larger
+than a certain lower bound.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>CVweights</code></td>
+<td>
+<p>n-vector of weights to use for CV computation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>silent</code></td>
+<td>
+<p>if <code>FALSE</code>, plot the posterior density for the variance ratio.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>keep.data</code></td>
+<td>
+<p>if <code>TRUE</code> return the input data (y,X,area,Xpop).
+This is required input for the cross-validation function <code>CVArea</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>full.cov</code></td>
+<td>
+<p>if <code>TRUE</code> compute the full covariance matrix for the small area estimates.
+The computed correlations do not account for uncertainty about the variance ratio.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lambda0</code></td>
+<td>
+<p>optional starting value for the ratio of between and within-area variance used in the numerical routines.
+If <code>method="BLUP"</code> then this value will instead be used as a fixed plug-in value.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rel.int.tol</code></td>
+<td>
+<p>tolerance for the estimated relative integration error (default is 1 percent).
+A warning is issued if the estimated relative error exceeds this value.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>additional control parameters passed to function <code>integrate</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The default Hierarchical Bayes method uses numerical integration (as provided by function <code>integrate</code>) to compute
+small area estimates and MSEs. The model parameters returned, such as fixed and random effects, are currently not averaged over the
+posterior distribution for the variance ratio. They are evaluated at the posterior mean of the variance ratio.
+</p>
+
+
+<h3>Value</h3>
+
+<p>An object of class <code>sae</code> containing the small area estimates and MSEs, the model fit, and model selection measures.
+</p>
+
+
+<h3>References</h3>
+
+<p>G.E. Battese, R.M. Harter and W.A. Fuller (1988).
+An Error-Components Model for Prediction of County Crop Areas Using Survey and Satellite Data.
+Journal of the American Statistical Association, 83(401), 28-36.
+</p>
+<p>G.S. Datta and M. Ghosh (1991). Bayesian Prediction in Linear Models: Applications to Small Area Estimation.
+The Annals of Statistics 19(4), 1748-1770.
+</p>
+<p>J.N.K. Rao and I. Molina (2015). Small Area Estimation. Wiley.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>sae-class</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">d &lt;- generateFakeData()
+
+# generate design matrix, variable of interest, area indicator and population data
+dat &lt;- fSAE(y0 ~ x + area2, data=d$sam, area="area", popdata=d$Xpop,
+            type="data")
+
+# compute small area estimates based on the basic unit-level model
+sae &lt;- fSAE.Unit(dat$y, dat$X, dat$area, dat$Narea, dat$PopMeans)
+EST(sae)  # estimates
+RMSE(sae)  # standard errors
+</code></pre>
+
+
+</div>

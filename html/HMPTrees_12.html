@@ -1,0 +1,91 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>getMLEandLoglike</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Get MLE and Log Likelihood of a Data Set</h2>
+
+<h3>Description</h3>
+
+<p>This function takes a data set and computes the MLE and its Log-Likelihood value.</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">getMLEandLoglike(data, maxSteps = 50, weightCols = NULL, delta = 10^(-6), weight = NULL)</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>A data frame in which each column contains the rdp read counts for every taxa given in the row names.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>maxSteps</code></td>
+<td>
+<p>The maximum number of times to iterate though for the MLE.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>weightCols</code></td>
+<td>
+<p>A vector of weights for the subjects.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>delta</code></td>
+<td>
+<p>The minimum threshold of change in f to stop the search for the MLE.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>weight</code></td>
+<td>
+<p>Deprecated, use weightCols instead</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>A unimodal probability model for graph-valued random objects has been derived and applied previously to several types of graphs 
+(cluster trees, digraphs, and classification and regression trees) (For example, Banks and Constantine, 1998; Shannon and Banks, 1999). 
+Here we apply this model to HMP trees constructed from RDP matches.  Let <code class="reqn">G</code> be the finite set of taxonomic trees with elements 
+<code class="reqn">g</code>, and <code class="reqn">d: G \times G \to R^{+}</code> an arbitrary metric of distance on <code class="reqn">G</code>. We have the probability measure <code class="reqn">H(g^{*},\tau)</code> defined by 
+</p>
+<p style="text-align: center;"><code class="reqn">P(g;g^{*},\tau) = c(g^{*},\tau) \exp(-\tau d(g^{*},g) ), for all g \in G,</code>
+</p>
+
+<p>where <code class="reqn">g^{*}</code>  is the modal or central tree, <code class="reqn">\tau</code> is a concentration parameter, and <code class="reqn">c(g^{*},\tau)</code> is the normalization constant.  
+The distance measure between two trees is the Euclidean norm of the difference between their corresponding adjacency-vectors. To estimate the parameters 
+<code class="reqn">(g^{*},\tau)</code>, we use the maximum likelihood estimate (MLE) procedure described in La Rosa et al. (see reference 2)
+</p>
+
+
+<h3>Value</h3>
+
+<p>A list containing the MLE, log-likelihood, tau, the number of iterations it took to run, and some intermediate values</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Patricio S. La Rosa, Elena Deych, Berkley Shands, William D. Shannon</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">	data(saliva)
+	
+	### We use 1 for the maximum number of steps for computation time
+	### This value should be much higher to ensure an accurate result
+	numSteps &lt;- 1
+	
+	mle &lt;- getMLEandLoglike(saliva, numSteps)$mleTree
+</code></pre>
+
+
+</div>

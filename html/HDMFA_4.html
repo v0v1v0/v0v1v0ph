@@ -1,0 +1,120 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>KPE</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Estimating the Pair of Factor Numbers via Eigenvalue Ratios Corresponding to PE
+</h2>
+
+<h3>Description</h3>
+
+<p>The function is to estimate the pair of factor numbers via eigenvalue ratios corresponding to PE method. 
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">KPE(X, kmax, c = 0)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>X</code></td>
+<td>
+
+<p>Input an array with <code class="reqn">T \times p_1 \times p_2</code>, where <code class="reqn">T</code> is the sample size, <code class="reqn">p_1</code> is the the row dimension of each matrix observation and <code class="reqn">p_2</code> is the the column dimension of each matrix observation.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>kmax</code></td>
+<td>
+
+<p>The user-supplied maximum factor numbers. Here it means the upper bound of the number of row factors and column factors.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>c</code></td>
+<td>
+
+<p>A constant to avoid vanishing denominators. The default is 0.
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The function <code>KPE</code> uses the eigenvalue-ratio idea to estimate the number of factors. 
+First, obtain the initial estimators <code class="reqn">\hat{\bold{R}}</code> and <code class="reqn">\hat{\bold{C}}</code>. Second, define 
+</p>
+<p style="text-align: center;"><code class="reqn">\hat{\bold{Y}}_t=\frac{1}{p_2}\bold{X}_t\hat{\bold{C}}, \hat{\bold{Z}}_t=\frac{1}{p_1}\bold{X}_t^\top\hat{\bold{R}},</code>
+</p>
+<p> and 
+</p>
+<p style="text-align: center;"><code class="reqn">\tilde{\bold{M}}_1=\frac{1}{Tp_1}\hat{\bold{Y}}_t\hat{\bold{Y}}_t^\top, \tilde{\bold{M}}_2=\frac{1}{Tp_2}\sum_{t=1}^T\hat{\bold{Z}}_t\hat{\bold{Z}}_t^\top,</code>
+</p>
+<p> the number of factors <code class="reqn">k_1</code> is estimated by
+</p>
+<p style="text-align: center;"><code class="reqn">\hat{k}_1 = \arg \max_{j \leq k_{max}} \frac{\lambda_j (\tilde{\bold{M}}_1)}{\lambda _{j+1} (\tilde{\bold{M}}_1)},</code>
+</p>
+
+<p>where <code class="reqn">k_{max}</code> is a predetermined upper bound for <code class="reqn">k_1</code>. The estimation of <code class="reqn">k_2</code> is defined similarly with respect to <code class="reqn">\tilde{\bold{M}}_2</code>. 
+For details, see Yu et al. (2022).
+</p>
+
+
+<h3>Value</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code><code class="reqn">k_1</code></code></td>
+<td>
+<p>The estimated row factor number.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code><code class="reqn">k_2</code></code></td>
+<td>
+<p>The estimated column factor number.</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>Yong He, Changwei Zhao, Ran Zhao.
+</p>
+
+
+<h3>References</h3>
+
+<p>Yu, L., He, Y., Kong, X., &amp; Zhang, X. (2022). Projected estimation for large-dimensional matrix factor models. Journal of Econometrics, 229(1), 201-217.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">   set.seed(11111)
+   T=20;p1=20;p2=20;k1=3;k2=3
+   R=matrix(runif(p1*k1,min=-1,max=1),p1,k1)
+   C=matrix(runif(p2*k2,min=-1,max=1),p2,k2)
+   X=array(0,c(T,p1,p2))
+   Y=X;E=Y
+   F=array(0,c(T,k1,k2))
+   for(t in 1:T){
+     F[t,,]=matrix(rnorm(k1*k2),k1,k2)
+     E[t,,]=matrix(rnorm(p1*p2),p1,p2)
+     Y[t,,]=R%*%F[t,,]%*%t(C)
+   }
+   X=Y+E
+   
+   KPE(X, 8, c = 0)
+</code></pre>
+
+
+</div>

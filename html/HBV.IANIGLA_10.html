@@ -1,0 +1,188 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>Soil_HBV</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Empirical soil moisture routine</h2>
+
+<h3>Description</h3>
+
+<p>This module allows you to account for actual evapotranspiration,
+abstractions, antecedent conditions and effective runoff. The formulation enables
+non linear relationships between soil box water input (rainfall plus snowmelt) and
+the effective runoff. This effective value is the input series to the routine function
+(<code>Routing_HBV</code>).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">Soil_HBV(
+       model,
+       inputData,
+       initCond,
+       param
+       )
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>model</code></td>
+<td>
+<p>numeric integer suggesting one of the following options:
+</p>
+
+<ul>
+<li>
+<p> 1: Classical HBV soil moisture routine.
+</p>
+</li>
+<li>
+<p> 2: HBV soil moisture routine with varying area. This option should
+be used with <code>SnowGlacier_HBV</code>'s <strong><em>model 3</em></strong>.
+</p>
+</li>
+</ul>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>inputData</code></td>
+<td>
+<p>numeric matrix with the following series
+</p>
+<p><strong>Model 1</strong>
+</p>
+
+<ul>
+<li> <p><code>column_1</code>: <code>Total = Prain + Msnow</code> <code class="reqn">[mm/\Delta t]</code>. This
+series comes from the output of the <code>SnowGlacier_HBV</code> module.
+</p>
+</li>
+<li> <p><code>column_2</code>: potential evapotranspiration  <code class="reqn">[mm/\Delta t]</code>. Since
+the package has a simple model (<code>PET</code>) to obtain this
+series I strongly recommend using the
+<a href="https://CRAN.R-project.org/package=Evapotranspiration"><code>Evapotranspiration</code></a>
+package.
+</p>
+</li>
+</ul>
+<p><strong>Model 2</strong>
+</p>
+
+<ul>
+<li> <p><code>column_1</code>: as in <strong>model 1</strong>.
+</p>
+</li>
+<li> <p><code>column_2</code>: as in <strong>model 1</strong>.
+</p>
+</li>
+<li> <p><code>column_3</code> : relative soil area (ratio of soil surface over
+basin area). When the glacier area changes the soil does the same, so coherence
+between this two series should be seek.This value is used to scale the effective
+runoff accordingly (<code>Rech</code> column in the matrix output).
+</p>
+</li>
+</ul>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>initCond</code></td>
+<td>
+<p>numeric vector with the following values:
+</p>
+
+<ol>
+<li>
+<p> initial soil water content <code class="reqn">[mm]</code>. This is a model state variable
+and is internally used as first soil moisture value.
+</p>
+</li>
+<li>
+<p> relative area <code class="reqn">[-]</code>. Only needed when using <strong><code>model 1</code></strong>.
+This is the soil surface proportion relative to the catchment as a whole, so
+the values should never supersede one (1). This value is used to scale the effective
+runoff accordingly (<code>Rech</code> column in the matrix output).
+</p>
+</li>
+</ol>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>param</code></td>
+<td>
+<p>numeric vector with the following values:
+</p>
+
+<ol>
+<li> <p><code>FC</code>: fictitious soil field capacity <code class="reqn">[mm]</code>.
+</p>
+</li>
+<li> <p><code>LP</code>: parameter to get actual ET <code class="reqn">[-]</code>.
+</p>
+</li>
+<li> <p><code class="reqn">\beta</code>: exponential value that allows for non-linear relations between
+soil box water input (rainfall plus snowmelt) and the effective runoff <code class="reqn">[-]</code>.
+</p>
+</li>
+</ol>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>Numeric matrix with the following columns:
+</p>
+
+<ol>
+<li> <p><code>Rech</code>: recharge series <code class="reqn">[mm/\Delta t]</code>. This is the input to
+the <code>Routing_HBV</code> module.
+</p>
+</li>
+<li> <p><code>Eact</code>: actual evapotranspiration series <code class="reqn">[mm/\Delta t]</code>.
+</p>
+</li>
+<li> <p><code>SM</code>: soil moisture series <code class="reqn">[mm/\Delta t]</code>.
+</p>
+</li>
+</ol>
+<h3>References</h3>
+
+<p>Bergström, S., Lindström, G., 2015. Interpretation of runoff processes in hydrological
+modelling—experience from the HBV approach. Hydrol. Process. 29, 3535–3545.
+https://doi.org/10.1002/hyp.10510
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># The following is a toy example. I strongly recommend to see
+# the package vignettes in order to improve your skills on HBV.IANIGLA
+
+# HBV soil routine with variable area
+## Calder's model
+potEvap &lt;- PET(model = 1, hemis = 1, inputData = as.matrix(1:315), elev = c(1000, 1500),
+              param = c(4, 0.5))
+
+## Debris-covered ice
+ ObsTemp   &lt;- sin(x = seq(0, 10*pi, 0.1))
+ ObsPrecip &lt;- runif(n = 315, max = 50, min = 0)
+ ObsGCA    &lt;- seq(1, 0.8, -0.2/314)
+
+## Fine debris covered layer assumed. Note that the ice-melt factor is cumpulsory but harmless.
+DebrisCovGlac &lt;- SnowGlacier_HBV(model = 3, inputData = cbind(ObsTemp, ObsPrecip, ObsGCA),
+                                 initCond = c(10, 3, 1), param = c(1, 1, 0, 3, 1, 6))
+
+## Soil routine
+ObsSoCA     &lt;- 1 - ObsGCA
+inputMatrix &lt;- cbind(DebrisCovGlac[ , 9], potEvap, ObsSoCA)
+
+soil &lt;- Soil_HBV(model = 2, inputData = inputMatrix, initCond = c(50), param = c(200, 0.5, 2))
+
+</code></pre>
+
+
+</div>

@@ -1,0 +1,94 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>ReMeDI</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>ReMeDI</h2>
+
+<h3>Description</h3>
+
+<p>This function estimates the auto-covariance of market-microstructure noise
+</p>
+<p>Let the observed price <code class="reqn">Y_{t}</code> be given as <code class="reqn">Y_{t} = X_{t} + \varepsilon_{t}</code>, where <code class="reqn">X_{t}</code> is the efficient price and <code class="reqn">\varepsilon_t</code> is the market microstructure noise
+</p>
+<p>The estimator of the <code class="reqn">l</code>'th lag of the market microstructure is defined as:
+</p>
+<p style="text-align: center;"><code class="reqn">
+    \hat{R}^{n}_{t,l} = \frac{1}{n_{t}} \sum_{i=2k_{n}}^{n_{t}-k_{n}-l} \left(Y_{i+l}^n - Y_{i+l+k_{n}}^{n} \right) \left(Y_{i}^n - Y_{i- 2k_{n}}^{n} \right),
+</code>
+</p>
+
+<p>where <code class="reqn">k_{n}</code> is a tuning parameter. In the function <code>knChooseReMeDI</code>, we provide a function to estimate the optimal <code class="reqn">k_{n}</code> parameter.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">ReMeDI(pData, kn = 1, lags = 1, makeCorrelation = FALSE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>pData</code></td>
+<td>
+<p><code>xts</code> or <code>data.table</code> containing the log-prices of the asset</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>kn</code></td>
+<td>
+<p>numeric of length 1 determining the tuning parameter kn this controls the lengths of the non-overlapping interval in the ReMeDI estimation</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lags</code></td>
+<td>
+<p>numeric containing integer values indicating the lags for which to estimate the (co)variance</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>makeCorrelation</code></td>
+<td>
+<p>logical indicating whether to transform the autocovariances into autocorrelations. 
+The estimate of variance is imprecise and thus, constructing the correlation like this may show correlations that fall outside <code class="reqn">(-1,1)</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Note</h3>
+
+<p>We Thank Merrick Li for contributing his Matlab code for this estimator.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Emil Sjoerup.
+</p>
+
+
+<h3>References</h3>
+
+<p>Li, M. and Linton, O. (2021). A ReMeDI for microstructure noise. Econometrica, forthcoming
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+
+remed &lt;- ReMeDI(sampleTData[as.Date(DT) == "2018-01-02", ], kn = 2, lags = 1:8)
+# We can also use the algorithm for choosing the kn tuning parameter
+optimalKn &lt;- knChooseReMeDI(sampleTData[as.Date(DT) == "2018-01-02",],
+                            knMax = 10, tol = 0.05, size = 3,
+                            lower = 2, upper = 5, plot = TRUE)
+optimalKn
+remed &lt;- ReMeDI(sampleTData[as.Date(DT) == "2018-01-02", ], kn = optimalKn, lags = 1:8)
+
+</code></pre>
+
+
+</div>

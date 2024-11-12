@@ -1,0 +1,187 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hm_build</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Load native data files automatically</h2>
+
+<h3>Description</h3>
+
+<p>The method allows you to automatically load your native data
+inside the <code>hydromet_station</code> slots.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hm_build(
+  obj,
+  bureau,
+  path,
+  file_name,
+  slot_name,
+  by,
+  out_name = NULL,
+  sheet = NULL
+)
+
+## S4 method for signature 'hydromet_station'
+hm_build(
+  obj,
+  bureau,
+  path,
+  file_name,
+  slot_name,
+  by,
+  out_name = NULL,
+  sheet = NULL
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>obj</code></td>
+<td>
+<p>a valid <code>hydromet_station</code> class object.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>bureau</code></td>
+<td>
+<p>string value containing <b>one</b> of the available options:
+'aic', 'cr2', 'dgi', 'ianigla', 'mnemos' or 'snih'.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>path</code></td>
+<td>
+<p>string vector with the path(s) to the <code>file_name</code> argument.
+If you set a single string it will be recycled for all the files.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>file_name</code></td>
+<td>
+<p>string vector with the native file(s) name(s).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>slot_name</code></td>
+<td>
+<p>string vector with the slot(s) where to set the file(s) or sheet(s).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>by</code></td>
+<td>
+<p>string vector with the time step of the series (e.g.: 'month', 'day', '6 hour', '3 hour',
+'1 hour', '15 min' ). If you set it as 'none', the function will ignore automatic gap filling.
+If you set a single string it will be recycled for all the files.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>out_name</code></td>
+<td>
+<p>optional. String vector with user defined variable(s) column(s) name(s).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sheet</code></td>
+<td>
+<p>optional. Sheet to read. Either a string vector (the name of a sheet), or an integer
+vector (the position of the sheet). If neither argument specifies the sheet, defaults to the first
+sheet. This argument just make sense for:
+</p>
+
+<ul>
+<li>
+<p> 'aic': you must provide a single name or integer indicating the met-station to read.
+</p>
+</li>
+<li>
+<p> 'dgi': just keep it as <code>NULL</code>.
+</p>
+</li>
+<li>
+<p> 'mnemos': just keep it as <code>NULL</code>.
+</p>
+</li>
+</ul>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A <code>hydromet_station</code> object with the required data loaded inside.
+</p>
+
+
+<h3>Functions</h3>
+
+
+<ul><li> <p><code>hm_build(hydromet_station)</code>: build method for hydromet station object
+</p>
+</li></ul>
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+# path to all example files
+path &lt;- system.file('extdata', package = 'hydrotoolbox')
+
+# ianigla file
+hm_create() %&gt;%
+  hm_build(bureau = 'ianigla', path = path,
+           file_name = 'ianigla_cuevas.csv',
+           slot_name = c('tair', 'rh', 'patm',
+                         'precip', 'wspd', 'wdir',
+                         'kin', 'hsnow', 'tsoil'),
+           by = 'hour',
+           out_name = c('tair(°C)', 'rh(%)', 'patm(mbar)',
+                        'p(mm)', 'wspd(km/hr)', 'wdir(°)',
+                        'kin(kW/m2)', 'hsnow(cm)', 'tsoil(°C)' )
+          ) %&gt;%
+          hm_show()
+
+# cr2 file
+hm_create() %&gt;%
+  hm_build(bureau = 'cr2', path = path,
+           file_name = 'cr2_tmax_yeso_embalse.csv',
+           slot_name = c('tmax'),
+           by = 'day',
+           out_name = c('tair(°C)' )
+          )  %&gt;%
+          hm_show()
+
+# dgi file
+hm_create() %&gt;%
+  hm_build(bureau = 'dgi', path = path,
+           file_name = 'dgi_toscas.xlsx',
+           slot_name = c('swe', 'tmax',
+           'tmin', 'tmean', 'rh', 'patm'),
+           by = 'day' ) %&gt;%
+          hm_show()
+
+# snih file
+hm_create() %&gt;%
+  hm_build(bureau = 'snih', path = path,
+           file_name = c('snih_hq_guido.xlsx',
+           'snih_qd_guido.xlsx'),
+           slot_name = c('hq', 'qd'),
+           by = c('none', 'day') ) %&gt;%
+          hm_show()
+
+# aic    =&gt; you have to request for this files to AIC.
+
+# mnemos =&gt; the data are the same of snih but generated
+#           with MNEMOSIII software.
+
+## End(Not run)
+
+</code></pre>
+
+
+</div>

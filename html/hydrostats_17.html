@@ -1,0 +1,222 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>low.spells</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Calculate low flow spell statistics
+</h2>
+
+<h3>Description</h3>
+
+<p>Calculates a suite of statistics describing low-flow spell characteristics, such as the timing, frequency and duration of events below a threshold. The event threshold can be defined as a flow quantile (e.g. the 10th  percentile, which is flows exceeded 90% of the time, corresponding to Q10) or a specific threshold volume (e.g. ML/day).
+</p>
+<p>For the purpose of deriving annual low-flow spell statistics, the function can also be applied based on the hydrologic year. This is advisable where the low flow season spans calendar years, such that prolonged spells may be split at the transition from one calendar year to the next. This first requires the time series be processed using the hydro.year function. This adds an additional column indicating the hydrologic year to which each row belongs, which is used for deriving annual spell characteristics.
+</p>
+<p>It is possible for there to be multiple days with the same low flow value (especially zero flows). In estimating the average timing (and sd of timing) of minimum flows, the function calculates the average DOY (day of year) of minimum flows in each year first, before calculating the average across years. Circular functions are used to address the proximity between days toward the beginning and end of the year.
+</p>
+<p>Missing values are allowed for convenience (NA's are removed and the time-series is concatenated before functions are applied), but of course may lead to biased results. For the purpose of the annual statistics years with fewer than 350 days of available record are ignored.
+</p>
+<p>When used with ddply to compute outputs for multiple gauges or time periods simultaneously, results, icluding graphs are produced for each factor level, including graphs. Note however that the funtion will return warnings if annual stats are calculated when year is used as a factor.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">low.spells(flow.ts, quant = 0.1, threshold=NULL, 
+duration = T, volume = T, plot = T, ann.stats = T, ann.stats.only = F, 
+hydro.year=FALSE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>flow.ts</code></td>
+<td>
+
+<p>Dataframe with date and discharge data in columns named "Date" and "Q" respectively. Date must be in POSIX format (see ts.format). 
+</p>
+<p>If a third column exists then this is assumed to provide a vector of years for the purpose of calculating annual spell statistics based on a predetermined hydrologic year.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>quant</code></td>
+<td>
+
+<p>Percentile/quantile to use for defining event magnitude (default 0.1). A value of 0.1 is the lower 10th percentile (i.e. a volume exceeded 90% of the time).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>threshold</code></td>
+<td>
+
+<p>A user supplied threshold for defining spells. This would typically be derived from hydraulic models or similar knowledge pertaining to a gauge site.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>duration</code></td>
+<td>
+
+<p>logical. Should statistics describing spell duration be returned?</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>volume</code></td>
+<td>
+
+<p>logical. Should statistics describing spell volumes be returned?</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>plot</code></td>
+<td>
+
+<p>logical. Should the time-series be plotted? Data points considered 'within spell' are identifed using red circles and the threshold is identified with a horizontal line.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ann.stats</code></td>
+<td>
+
+<p>logical. If TRUE, the function returns results describing the annual series (i.e. the characteristics of the spells associated with the lowest annual daily flow). The duration of each annual low spell is defined as the number of days below the smallest annual minimum for the lowest (and longest) low flow event in each year.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ann.stats.only</code></td>
+<td>
+
+<p>logical. If TRUE, statistics describing the annual series only are returned.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>hydro.year</code></td>
+<td>
+
+<p>logical. If TRUE, each record is first assigned to a hydrologic year based on the timing of minimum flows. See <code>hydro.year</code> for further details.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A dataframe with the following columns.
+</p>
+<p>low flow indices
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>low.spell.threshold </code></td>
+<td>
+<p>The low spell threshold applied in the analysis</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>min.low.spell.duration </code></td>
+<td>
+<p>Minimum duration of spell events</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>avg.low.spell.duration </code></td>
+<td>
+<p>Average duration of spell events</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>med.low.spell.duration </code></td>
+<td>
+<p>Median duration of spell events</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>max.low.duration </code></td>
+<td>
+<p>Maximum duration of spell events</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>low.spell.freq</code></td>
+<td>
+<p>The frequency of spell events (no. per year)</p>
+</td>
+</tr>
+</table>
+<p>Annual low flow statistics
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>avg.min.ann</code></td>
+<td>
+<p>The average annual minimum flow</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cv.min.ann</code></td>
+<td>
+<p>The coefficient of variation of annual minimum flows</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ann.min.timing</code></td>
+<td>
+<p>The average day of the year (0-366) on which the minimum flow(s) occur.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ann.min.timing.sd</code></td>
+<td>
+<p>circular standard deviation of the average timing of annual minimum flows</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ann.min.min.dur</code></td>
+<td>
+<p>Minimum duration of the annual maximum spells (always equal to 1)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ann.min.avg.dur</code></td>
+<td>
+<p>Average duration of the annual maximum spells</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ann.min.max.dur</code></td>
+<td>
+<p>Maximum duration of the annual maximum spells</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>Nick Bond &lt;n.bond@latrobe.edu.au&gt;
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+data(Cooper)
+Cooper&lt;-ts.format(Cooper)
+
+low.spells(Cooper, quant=0.1)
+
+low.spells(Cooper, quant=0.1, hydro.year=TRUE)
+
+#generate results for each year
+Cooper$year&lt;-strftime(Cooper$Date, format="%Y")
+
+require(plyr)
+ddply(Cooper, .(year), function(x) low.spells(x, threshold=20, ann.stats=FALSE))
+
+#generate seperate results prior to 1980.
+Cooper$time.period&lt;-ifelse(Cooper$year&lt;1980,"pre_1980","post_1980")
+ddply(Cooper, .(time.period), function(x) low.spells(x, threshold=20, ann.stats=FALSE))
+
+</code></pre>
+
+
+</div>

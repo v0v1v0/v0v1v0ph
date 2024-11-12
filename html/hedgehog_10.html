@@ -1,0 +1,138 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>gen-monad</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Generators</h2>
+
+<h3>Description</h3>
+
+<p>A Hedgehog generator is a function, which, using R's
+random seed, will build a lazy rose tree given a size
+parameter, which represent a value to test, as well
+as possible shrinks to try in the event of a failure.
+Usually, one should compose the provided generators
+instead of dealing with the gen contructor itself.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">gen(t)
+
+gen.and_then(g, f)
+
+gen.bind(f, g)
+
+gen.pure(x)
+
+gen.impure(fg)
+
+gen.with(g, m)
+
+gen.map(m, g)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>t</code></td>
+<td>
+<p>a function producing a tree from a size parameter, usually
+an R function producing random values is used.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>g</code></td>
+<td>
+<p>a generator to map or bind over</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>f</code></td>
+<td>
+<p>a function from a value to new generator, used to
+build new generators monadically from a generator's
+output</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>a value to use as a generator</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fg</code></td>
+<td>
+<p>a function producing a single value from a size parameter</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>m</code></td>
+<td>
+<p>a function to apply to values produced the generator</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Hedgehog generators are functors and monads, allowing
+one to map over them and use their results to create
+more complex generators.
+</p>
+<p>A generator can use R's random seed when constructing
+its value, but all shrinks should be deterministic.
+</p>
+<p>In general, functions which accept a generator can also
+be provided with a list of generators nested arbitrarily.
+</p>
+<p>Generators which are created from impure values (i.e., have
+randomness), can be created with <code>gen.impure</code>,
+which takes a function from <code>size</code> to a value. When
+using this the function will not shrink, so it is best
+composed with <code>gen.shrink</code>.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>generate</code> for way an alternative, but
+equally expressive way to compose generators using R's
+"for" loop.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+# Create a generator which produces a number between
+# 1 and 30
+one_to_30 &lt;- gen.element(1:30)
+
+# Use this to create a simple vector of 6 numbers
+# between 1 and 30.
+vector_one_to_30 &lt;- gen.c(of = 6, one_to_30)
+
+# Create a matrix 2 by 3 matrix using said vector
+gen.map(function(x) matrix(x, ncol=3), vector_one_to_30)
+
+# To create a generator from a normal R random function
+# use gen.impure (this generator does not shrink).
+g &lt;- gen.impure(function(size) sample(1:10) )
+gen.example(g)
+# [1]  5  6  3  4  8 10  2  7  9  1
+
+# Composing generators with `gen.bind` and `gen.with` is
+# easy. Here we make a generator which first build a length,
+# then, elements of that length.
+g &lt;- gen.bind(function(x) gen.c(of = x, gen.element(1:10)), gen.element(2:100))
+gen.example ( g )
+# [1] 8 6 2 7 5 4 2 2 4 6 4 6 6 3 6 7 8 5 4 6
+</code></pre>
+
+
+</div>

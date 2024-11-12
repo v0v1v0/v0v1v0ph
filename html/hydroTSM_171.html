@@ -1,0 +1,159 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>subhourly2hourly</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Sub-hourly -&gt; Hourly
+</h2>
+
+<h3>Description</h3>
+
+<p>Generic function for transforming a sub-HOURLY time series into an HOURLY one
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">subhourly2hourly(x, ...)
+
+## Default S3 method:
+subhourly2hourly(x, FUN, na.rm=TRUE, na.rm.max=0, ...)
+
+## S3 method for class 'zoo'
+subhourly2hourly(x, FUN, na.rm=TRUE, na.rm.max=0, ...)
+
+## S3 method for class 'data.frame'
+subhourly2hourly(x, FUN, na.rm=TRUE, na.rm.max=0,
+           dates=1, date.fmt="%Y-%m-%d %H:%M:%S", out.fmt="zoo", 
+           verbose= TRUE, ...)
+
+## S3 method for class 'matrix'
+subhourly2hourly(x, FUN, na.rm=TRUE, na.rm.max=0,
+           dates=1, date.fmt="%Y-%m-%d %H:%M:%S", out.fmt="zoo", 
+           verbose= TRUE, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+
+<p>zoo, data.frame or matrix object, with sub-hourly time series. <br>
+Measurements at several gauging stations can be stored in a data.frame or matrix object, and in that case, each column of <code>x</code> represent the time series measured in each gauging station, and the column names of <code>x</code> represent the ID of each station.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>FUN</code></td>
+<td>
+
+<p>Function that have to be applied for transforming from sub-hourly to hourly time step. (e.g., for precipitation <code>FUN=sum</code> and for temperature and streamflow ts, <code>FUN=mean</code>). <br></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>na.rm</code></td>
+<td>
+
+<p>Logical. Should missing values be removed? <br>
+-) <kbd>TRUE</kbd> : the hourly values  are computed considering only those values different from NA <br>
+-) <kbd>FALSE</kbd>: if there is AT LEAST one NA sub-hourly value within a day, the corresponding hourly value(s) will be NA as well
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>na.rm.max</code></td>
+<td>
+
+<p>Numeric in [0, 1]. It is used to define the maximum percentage of missing values allowed in each hour to keep the hourly aggregated value in the output object of this function. In other words, if the percentage of missing values in a given hour is larger or equal than <code>na.rm.max</code> the corresponding hourly value will be <code>NA</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dates</code></td>
+<td>
+
+<p>numeric, factor, POSIXct or POSIXt object indicating how to obtain the dates and times for each column of <code>x</code> (e.g., gauging station) <br>
+If <code>dates</code> is a number, it indicates the index of the column in <code>x</code> that stores the date and times <br>
+If <code>dates</code> is a factor, it is converted into POSIXct class, using the date format specified by <code>date.fmt</code>  <br>
+If <code>dates</code> is already of POSIXct or POSIXt class, the code verifies that the number of elements on it be equal to the number of elements in <code>x</code>
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>date.fmt</code></td>
+<td>
+
+<p>character indicating the format in which the dates are stored in <code>dates</code>, By default <code>date.fmt=%Y-%m-%d %H:%M:%S</code>. See <code>format</code> in <code>as.Date</code>. <br>
+ONLY required when <code>class(dates)=="factor"</code> or <code>class(dates)=="numeric"</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>out.fmt</code></td>
+<td>
+
+<p>OPTIONAL. Only used when <code>x</code> is a matrix or data.frame object /cr
+character, for selecting if the result will be a matrix/data.frame or a zoo object. Valid values are: <kbd>numeric</kbd>, <kbd>zoo</kbd> (default)
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+
+<p>logical; if TRUE, progress messages are printed 
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+
+<p>further arguments passed to or from other methods.
+</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>a zoo object with hourly time series
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Mauricio Zambrano-Bigiarini, <a href="mailto:mzb.devel@gmail">mzb.devel@gmail</a>
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>subhourly2nminutes</code>,, <code>subdaily2daily</code>, <code>subdaily2monthly</code>, <code>subdaily2annual</code>, <code>subdaily2seasonal</code>, <code>as.POSIXct</code>, <code>dm2seasonal</code>, <code>monthlyfunction</code>, <code>seasonalfunction</code>, <code>hydroplot</code>, <code>vector2zoo</code>, <code>izoo2rzoo</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Creating a 15-min time sequence and counting its length
+dt  &lt;- seq( from=as.POSIXct("2021-06-30 00:15"), to=as.POSIXct("2021-06-30 23:45"), by="15 min" )
+ndt &lt;- length(dt)
+
+## Creating a dummy 15-min zoo object, with 1 as the only value in each time period
+x &lt;- zoo( rep(1, ndt), dt)
+
+
+## sub-hourly to hourly
+h1 &lt;- subhourly2hourly(x, FUN=sum, na.rm=TRUE)
+
+## Aggregation of 3 sub-hourly ts (i.e., a zoo matrix) into an hourly one
+X  &lt;- cbind(x, x, x)
+h2 &lt;- subhourly2hourly(X, FUN=sum, na.rm=TRUE)
+</code></pre>
+
+
+</div>

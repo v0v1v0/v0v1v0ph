@@ -1,0 +1,377 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>getLiquidityMeasures</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Compute Liquidity Measure</h2>
+
+<h3>Description</h3>
+
+<p>Function returns an <code>xts</code> or <code>data.table</code> object containing 23 liquidity measures. Please see details below.
+</p>
+<p>Note that this assumes a regular time grid.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">getLiquidityMeasures(tqData, win = 300)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>tqData</code></td>
+<td>
+<p>A <code>data.table</code> or <code>xts</code> object as in the <span class="pkg">highfrequency</span> merged
+trades and quotes data.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>win</code></td>
+<td>
+<p>A windows length for the forward-prices used for ‘realized’
+spread</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>NOTE: <code>xts</code> or <code>data.table</code> should only contain one day of observations
+Some markets have publish information about whether it was a buyer or a seller who initiated the trade. 
+This information can be passed in a column <code>DIRECTION</code> this column must only have 1 or -1 as values.
+</p>
+<p>The respective liquidity measures are defined as follows:
+</p>
+
+<ul>
+<li>
+<p>effectiveSpread
+</p>
+<p style="text-align: center;"><code class="reqn">
+     \mbox{effective spread}_t =  2*D_t*(\mbox{PRICE}_{t} - \frac{(\mbox{BID}_{t}+\mbox{OFR}_{t})}{2}),
+    </code>
+</p>
+
+<p>where <code class="reqn">D_t</code> is 1 (-1) if <code class="reqn">trade_t</code> was buy (sell) (see Boehmer (2005), Bessembinder (2003)). 
+Note that the input of this function consists of the matched trades and quotes,
+so this is were the time indication refers to (and thus not to the registered quote timestamp).
+ 
+</p>
+</li>
+<li>
+<p>realizedSpread: realized spread 
+</p>
+<p style="text-align: center;"><code class="reqn">
+     \mbox{realized spread}_t =  2*D_t*(\mbox{PRICE}_{t} - \frac{(\mbox{BID}_{t+300}+\mbox{OFR}_{t+300})}{2}),
+   </code>
+</p>
+
+<p>where <code class="reqn">D_t</code> is 1 (-1) if <code class="reqn">trade_t</code> was buy (sell) (see Boehmer (2005), Bessembinder (2003)). 
+Note that the time indication of <code class="reqn">\mbox{BID}</code> and <code class="reqn">\mbox{OFR}</code> refers 
+to the registered time of the quote in seconds.
+
+</p>
+</li>
+<li>
+<p>valueTrade: trade value 
+</p>
+<p style="text-align: center;"><code class="reqn">
+     \mbox{trade value}_t =  \mbox{SIZE}_{t}*\mbox{PRICE}_{t}.
+   </code>
+</p>
+
+ 
+</li>
+<li>
+<p>signedValueTrade: signed trade value
+</p>
+<p style="text-align: center;"><code class="reqn">
+     \mbox{signed trade value}_t =  D_t * (\mbox{SIZE}_{t}*\mbox{PRICE}_{t}),</code>
+</p>
+
+<p>where <code class="reqn">D_t</code> is 1 (-1) if <code class="reqn">trade_t</code> was buy (sell) 
+(see Boehmer (2005), Bessembinder (2003)).
+  
+</p>
+</li>
+<li>
+<p>depthImbalanceDifference: depth imbalance (as a difference)
+</p>
+<p style="text-align: center;"><code class="reqn">
+     \mbox{depth imbalance (as difference)}_t =  \frac{D_t *(\mbox{OFRSIZ}_{t}-\mbox{BIDSIZ}_{t})}{(\mbox{OFRSIZ}_{t}+\mbox{BIDSIZ}_{t})},
+   </code>
+</p>
+
+<p>where <code class="reqn">D_t</code> is 1 (-1) if <code class="reqn">trade_t</code> was buy (sell) (see Boehmer (2005), Bessembinder (2003)). 
+Note that the input of this function consists of the matched trades and quotes,
+so this is were the time indication refers to (and thus not to the registered quote timestamp).
+ 
+</p>
+</li>
+<li>
+<p>depthImbalanceRatio: depth imbalance (as ratio)
+</p>
+<p style="text-align: center;"><code class="reqn">
+     \mbox{depth imbalance (as ratio)}_t =  (\frac{\mbox{OFRSIZ}_{t}}{\mbox{BIDSIZ}_{t}})^{D_t},
+   </code>
+</p>
+
+<p>where <code class="reqn">D_t</code> is 1 (-1) if <code class="reqn">trade_t</code> was buy (sell) (see Boehmer (2005), Bessembinder (2003)). 
+Note that the input of this function consists of the matched trades and quotes,
+so this is were the time indication refers to (and thus not to the registered quote timestamp).
+ 
+</p>
+</li>
+<li>
+<p>proportionalEffectiveSpread: proportional effective spread
+</p>
+<p style="text-align: center;"><code class="reqn">
+     \mbox{proportional effective spread}_t =  \frac{\mbox{effective spread}_t}{(\mbox{OFR}_{t}+\mbox{BID}_{t})/2}
+   </code>
+</p>
+
+<p>(Venkataraman, 2001).
+</p>
+<p>Note that the input of this function consists of the matched trades and quotes,
+so this is were the time indication refers to (and thus not to the registered quote timestamp).
+ 
+</p>
+</li>
+<li>
+<p>proportionalRealizedSpread: proportional realized spread
+</p>
+<p style="text-align: center;"><code class="reqn">
+     \mbox{proportional realized spread}_t =  \frac{\mbox{realized spread}_t}{(\mbox{OFR}_{t}+\mbox{BID}_{t})/2}
+   </code>
+</p>
+
+<p>(Venkataraman, 2001).
+</p>
+<p>Note that the input of this function consists of the matched trades and quotes,
+so this is were the time indication refers to (and thus not to the registered 
+ 
+</p>
+</li>
+<li>
+<p>priceImpact: price impact
+</p>
+<p style="text-align: center;"><code class="reqn">
+     \mbox{price impact}_t =  \frac{\mbox{effective spread}_t - \mbox{realized spread}_t}{2}
+   </code>
+</p>
+
+<p>(see Boehmer (2005), Bessembinder (2003)). 
+
+</p>
+</li>
+<li>
+<p>proportionalPriceImpact: proportional price impact
+</p>
+<p style="text-align: center;"><code class="reqn">
+     \mbox{proportional price impact}_t =  \frac{\frac{(\mbox{effective spread}_t - \mbox{realized spread}_t)}{2}}{\frac{\mbox{OFR}_{t}+\mbox{BID}_{t}}{2}}
+   </code>
+</p>
+
+<p>(Venkataraman, 2001).
+Note that the input of this function consists of the matched trades and
+quotes, so this is where the time indication refers to (and thus not to the
+registered quote timestamp).
+  
+</p>
+</li>
+<li>
+<p>halfTradedSpread: half traded spread
+</p>
+<p style="text-align: center;"><code class="reqn">
+     \mbox{half traded spread}_t =  D_t*(\mbox{PRICE}_{t} - \frac{(\mbox{BID}_{t}+\mbox{OFR}_{t})}{2}),
+   </code>
+</p>
+
+<p>where <code class="reqn">D_t</code> is 1 (-1) if <code class="reqn">trade_t</code> was buy (sell) (see Boehmer (2005), Bessembinder (2003)). 
+Note that the input of this function consists of the matched trades and quotes,
+so this is were the time indication refers to (and thus not to the registered quote timestamp).
+ 
+</p>
+</li>
+<li>
+<p>proportionalHalfTradedSpread: proportional half traded spread 
+</p>
+<p style="text-align: center;"><code class="reqn">
+     \mbox{proportional half traded spread}_t =  \frac{\mbox{half traded spread}_t}{\frac{\mbox{OFR}_{t}+\mbox{BID}_{t}}{2}}.
+   </code>
+</p>
+
+<p>Note that the input of this function consists of the matched trades and quotes,
+so this is were the time indication refers to (and thus not to the registered quote timestamp).
+
+</p>
+</li>
+<li>
+<p>squaredLogReturn: squared log return on trade prices
+</p>
+<p style="text-align: center;"><code class="reqn">
+     \mbox{squared log return on Trade prices}_t =  (\log(\mbox{PRICE}_{t})-\log(\mbox{PRICE}_{t-1}))^2.
+   </code>
+</p>
+
+ 
+</li>
+<li>
+<p>absLogReturn: absolute log return on trade prices
+</p>
+<p style="text-align: center;"><code class="reqn">
+     \mbox{absolute log return on Trade prices}_t =  |\log(\mbox{PRICE}_{t})-\log(\mbox{PRICE}_{t-1})|.
+   </code>
+</p>
+
+ 
+</li>
+<li>
+<p>quotedSpread: quoted spread
+</p>
+<p style="text-align: center;"><code class="reqn">
+     \mbox{quoted spread}_t =  \mbox{OFR}_{t}-\mbox{BID}_{t}
+   </code>
+</p>
+
+<p>Note that the input of this function consists of the matched trades and
+quotes, so this is where the time indication refers to (and thus not to the
+registered quote timestamp).
+ 
+</p>
+</li>
+<li>
+<p>proportionalQuotedSpread: proportional quoted spread
+</p>
+<p style="text-align: center;"><code class="reqn">
+     \mbox{proportional quoted spread}_t =  \frac{\mbox{quoted spread}_t}{\frac{\mbox{OFR}_{t}+\mbox{BID}_{t}}{2}}
+   </code>
+</p>
+
+<p>(Venkataraman, 2001).
+Note that the input of this function consists of the matched trades and
+quotes, so this is where the time indication refers to (and thus not to the
+registered quote timestamp).
+  
+</p>
+</li>
+<li>
+<p>logQuotedSpread: log quoted spread
+</p>
+<p style="text-align: center;"><code class="reqn">
+     \mbox{log quoted spread}_t =  \log(\frac{\mbox{OFR}_{t}}{\mbox{BID}_{t}})
+   </code>
+</p>
+
+<p>(Hasbrouck and Seppi, 2001).
+Note that the input of this function consists of the matched trades and
+quotes, so this is where the time indication refers to (and thus not to the
+registered quote timestamp).
+</p>
+
+</li>
+<li>
+<p>logQuotedSize: log quoted size
+</p>
+<p style="text-align: center;"><code class="reqn">
+     \mbox{log quoted size}_t =  \log(\mbox{OFRSIZ}_{t})+\log(\mbox{BIDSIZ}_{t})
+   </code>
+</p>
+
+<p>(Hasbrouck and Seppi, 2001).
+Note that the input of this function consists of the matched trades and
+quotes, so this is where the time indication refers to (and thus not to the
+registered quote timestamp).
+ 
+</p>
+</li>
+<li>
+<p>quotedSlope: quoted slope
+</p>
+<p style="text-align: center;"><code class="reqn">
+     \mbox{quoted slope}_t =  \frac{\mbox{quoted spread}_t}{\mbox{log quoted size}_t}
+   </code>
+</p>
+
+<p>(Hasbrouck and Seppi, 2001).
+
+</p>
+</li>
+<li>
+<p>logQSlope: log quoted slope
+</p>
+<p style="text-align: center;"><code class="reqn">
+     \mbox{log quoted slope}_t =  \frac{\mbox{log quoted spread}_t}{\mbox{log quoted size}_t}.
+   </code>
+</p>
+
+ 
+</li>
+<li>
+<p>midQuoteSquaredReturn: midquote squared return
+</p>
+<p style="text-align: center;"><code class="reqn">
+     \mbox{midquote squared return}_t =  (\log(\mbox{midquote}_{t})-\log(\mbox{midquote}_{t-1}))^2,
+   </code>
+</p>
+
+<p>where <code class="reqn">\mbox{midquote}_{t} = \frac{\mbox{BID}_{t} + \mbox{OFR}_{t}}{2}</code>.
+
+</p>
+</li>
+<li>
+<p>midQuoteAbsReturn: midquote absolute return
+</p>
+<p style="text-align: center;"><code class="reqn">
+     \mbox{midquote absolute return}_t =  |\log(\mbox{midquote}_{t})-\log(\mbox{midquote}_{t-1})|,
+   </code>
+</p>
+
+<p>where <code class="reqn">\mbox{midquote}_{t} = \frac{\mbox{BID}_{t} + \mbox{OFR}_{t}}{2}</code>.
+
+</p>
+</li>
+<li>
+<p>signedTradeSize: signed trade size
+</p>
+<p style="text-align: center;"><code class="reqn">
+     \mbox{signed trade size}_t =  D_t * \mbox{SIZE}_{t},</code>
+</p>
+
+<p>where <code class="reqn">D_t</code> is 1 (-1) if <code class="reqn">trade_t</code> was buy (sell).
+
+</p>
+</li>
+</ul>
+<h3>Value</h3>
+
+<p>A modified (enlarged) <code>xts</code> or <code>data.table</code> with the new measures.
+</p>
+
+
+<h3>References</h3>
+
+<p>Bessembinder, H. (2003). Issues in assessing trade execution costs. <em>Journal of Financial Markets</em>, 223-257.
+</p>
+<p>Boehmer, E. (2005). Dimensions of execution quality: Recent evidence for US equity markets. <em>Journal of Financial Economics</em>, 78, 553-582.
+</p>
+<p>Hasbrouck, J. and Seppi, D. J. (2001). Common factors in prices, order flows and liquidity. <em>Journal of Financial Economics</em>, 59, 383-411.
+</p>
+<p>Venkataraman, K. (2001). Automated versus floor trading: An analysis of execution costs on the Paris and New York exchanges. <em>The Journal of Finance</em>, 56, 1445-1485.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">tqData &lt;- matchTradesQuotes(sampleTData[as.Date(DT) == "2018-01-02"], 
+                            sampleQData[as.Date(DT) == "2018-01-02"])
+res &lt;- getLiquidityMeasures(tqData)
+res
+</code></pre>
+
+
+</div>

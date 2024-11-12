@@ -1,0 +1,76 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>example_model</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Example of a hierarchical model</h2>
+
+<h3>Description</h3>
+
+<p>Example of a hierarchical model
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">example_model
+</code></pre>
+
+
+<h3>Format</h3>
+
+<p>A hierarchical model created by <code>fit_model</code> with a single chain of 100 MCMC iterations. It is a named
+list of 4 objects:
+</p>
+
+<dl>
+<dt>graph_measurements</dt>
+<dd>
+<p>A data frame of model training data that shows the writer, document name, cluster assignment,
+slope, principle component rotation angle, and wrapped principle component rotation angle for each training graph.</p>
+</dd>
+<dt>cluster_fill_counts</dt>
+<dd>
+<p>A data frame of the cluster fill counts for each model training document.</p>
+</dd>
+<dt>rjags_data</dt>
+<dd>
+<p>The model training information from <code>graph_measurements</code> and <code>cluster_fill_counts</code> formatted for RJAGS.</p>
+</dd>
+<dt>fitted_model</dt>
+<dd>
+<p>A model fit using the <code>rjags_data</code> and the RJAGS and coda packages. It is an MCMC list that contains a single
+MCMC object.</p>
+</dd>
+</dl>
+<h3>Examples</h3>
+
+<pre><code class="language-R"># convert to a data frame and view all variable names
+df &lt;- as.data.frame(coda::as.mcmc(example_model$fitted_model))
+colnames(df)
+
+# view a trace plot
+plot_trace(variable = "mu[1,1]", model = example_model)
+
+# drop the first 25 MCMC iterations for burn-in
+model &lt;- drop_burnin(model = example_model, burn_in = 25)
+
+## Not run: 
+# analyze questioned documents
+main_dir &lt;- /path/to/main_dir
+questioned_docs &lt;- /path/to/questioned_documents_directory
+analysis &lt;- analyze_questioned_documents(
+   main_dir = main_dir,
+   questioned_docs = questioned_docs
+   model = example_model
+   num_cores = 2
+)
+analysis$posterior_probabilities
+
+## End(Not run)
+
+</code></pre>
+
+
+</div>

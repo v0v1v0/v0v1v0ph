@@ -1,0 +1,110 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>cff_reader</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Citation File Format (cff) reader</h2>
+
+<h3>Description</h3>
+
+<p>Citation File Format (cff) reader
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">cff_reader(x)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table><tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>(character) a file path or a yaml string</p>
+</td>
+</tr></table>
+<h3>Details</h3>
+
+<p>CFF only supports one citation, so <code>many</code> will always be
+<code>FALSE</code>.
+</p>
+<p>Required fields: <code>cff-version</code>, <code>version</code>, <code>message</code>, <code>date-released</code>,
+<code>title</code>, <code>authors</code>. We'll stop with error if any of these are missing
+</p>
+<p>You can though have many references in your CFF file
+associated with the citation. <code>references</code> is an optional component in
+cff files. If included, we check the following:
+</p>
+
+<ul>
+<li>
+<p> each reference must have the 3 required fields: type, authors, title
+</p>
+</li>
+<li>
+<p> type must be in the allowed set, see cff_reference_types
+</p>
+</li>
+<li>
+<p> the elements within authors must each be an entity or person object
+https://github.com/citation-file-format/citation-file-format#entity-objects
+https://github.com/citation-file-format/citation-file-format#person-objects
+</p>
+</li>
+<li>
+<p> title must be a string
+</p>
+</li>
+</ul>
+<h3>Value</h3>
+
+<p>an object of class <code>handl</code>; see handl for more
+</p>
+
+
+<h3>References</h3>
+
+<p>CFF format:
+https://github.com/citation-file-format/citation-file-format
+</p>
+
+
+<h3>See Also</h3>
+
+<p>Other readers: 
+<code>bibtex_reader()</code>,
+<code>citeproc_reader()</code>,
+<code>codemeta_reader()</code>,
+<code>ris_reader()</code>
+</p>
+<p>Other cff: 
+<code>cff_writer()</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">(z &lt;- system.file('extdata/citation.cff', package = "handlr"))
+res &lt;- cff_reader(x = z)
+res
+res$cff_version
+res$software_version
+res$message
+res$id
+res$doi
+res$title
+res$author
+res$references
+
+# no references
+(z &lt;- system.file('extdata/citation-norefs.cff', package = "handlr"))
+out &lt;- cff_reader(x = z)
+out
+out$references
+</code></pre>
+
+
+</div>

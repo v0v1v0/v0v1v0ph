@@ -1,0 +1,171 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>pd_importance</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>PD Bases Importance (Experimental)</h2>
+
+<h3>Description</h3>
+
+<p>Experimental variable importance method based on partial dependence functions.
+While related to Greenwell et al., our suggestion measures not only main effect
+strength but also interaction effects. It is very closely related to <code class="reqn">H^2_j</code>,
+see Details. Use <code>plot()</code> to get a barplot.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">pd_importance(object, ...)
+
+## Default S3 method:
+pd_importance(object, ...)
+
+## S3 method for class 'hstats'
+pd_importance(
+  object,
+  normalize = TRUE,
+  squared = TRUE,
+  sort = TRUE,
+  zero = TRUE,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>object</code></td>
+<td>
+<p>Object of class "hstats".</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Currently unused.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>normalize</code></td>
+<td>
+<p>Should statistics be normalized? Default is <code>TRUE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>squared</code></td>
+<td>
+<p>Should <em>squared</em> statistics be returned? Default is <code>TRUE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sort</code></td>
+<td>
+<p>Should results be sorted? Default is <code>TRUE</code>.
+(Multi-output is sorted by row means.)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>zero</code></td>
+<td>
+<p>Should rows with all 0 be shown? Default is <code>TRUE</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>If <code class="reqn">x_j</code> has no effects, the (centered) prediction function <code class="reqn">F</code>
+equals the (centered) partial dependence <code class="reqn">F_{\setminus j}</code> on all other
+features <code class="reqn">\mathbf{x}_{\setminus j}</code>, i.e.,
+</p>
+<p style="text-align: center;"><code class="reqn">
+    F(\mathbf{x}) = F_{\setminus j}(\mathbf{x}_{\setminus j}).
+</code>
+</p>
+
+<p>Therefore, the following measure of variable importance follows:
+</p>
+<p style="text-align: center;"><code class="reqn">
+  \textrm{PDI}_j = \frac{\frac{1}{n} \sum_{i = 1}^n\big[F(\mathbf{x}_i) - 
+  \hat F_{\setminus j}(\mathbf{x}_{i\setminus j})\big]^2}{\frac{1}{n} \sum_{i = 1}^n
+  \big[F(\mathbf{x}_i)\big]^2}.
+</code>
+</p>
+
+<p>It differs from <code class="reqn">H^2_j</code> only by not subtracting the main effect of the <code class="reqn">j</code>-th
+feature in the numerator. It can be read as the proportion of prediction variability
+unexplained by all other features. As such, it measures variable importance of
+the <code class="reqn">j</code>-th feature, including its interaction effects (check <code>partial_dep()</code>
+for all definitions).
+</p>
+<p>Remarks 1 to 4 of <code>h2_overall()</code> also apply here.
+</p>
+
+
+<h3>Value</h3>
+
+<p>An object of class "hstats_matrix" containing these elements:
+</p>
+
+<ul>
+<li> <p><code>M</code>: Matrix of statistics (one column per prediction dimension), or <code>NULL</code>.
+</p>
+</li>
+<li> <p><code>SE</code>: Matrix with standard errors of <code>M</code>, or <code>NULL</code>.
+Multiply with <code>sqrt(m_rep)</code> to get <em>standard deviations</em> instead.
+Currently, supported only for <code>perm_importance()</code>.
+</p>
+</li>
+<li> <p><code>m_rep</code>: The number of repetitions behind standard errors <code>SE</code>, or <code>NULL</code>.
+Currently, supported only for <code>perm_importance()</code>.
+</p>
+</li>
+<li> <p><code>statistic</code>: Name of the function that generated the statistic.
+</p>
+</li>
+<li> <p><code>description</code>: Description of the statistic.
+</p>
+</li>
+</ul>
+<h3>Methods (by class)</h3>
+
+
+<ul>
+<li> <p><code>pd_importance(default)</code>: Default method of PD based feature importance.
+</p>
+</li>
+<li> <p><code>pd_importance(hstats)</code>: PD based feature importance from "hstats" object.
+</p>
+</li>
+</ul>
+<h3>References</h3>
+
+<p>Greenwell, Brandon M., Bradley C. Boehmke, and Andrew J. McCarthy.
+<em>A Simple and Effective Model-Based Variable Importance Measure.</em> Arxiv (2018).
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>hstats()</code>, <code>perm_importance()</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># MODEL 1: Linear regression
+fit &lt;- lm(Sepal.Length ~ . , data = iris)
+s &lt;- hstats(fit, X = iris[, -1])
+plot(pd_importance(s))
+
+# MODEL 2: Multi-response linear regression
+fit &lt;- lm(as.matrix(iris[, 1:2]) ~ Petal.Length + Petal.Width + Species, data = iris)
+s &lt;- hstats(fit, X = iris[, 3:5])
+plot(pd_importance(s))
+</code></pre>
+
+
+</div>

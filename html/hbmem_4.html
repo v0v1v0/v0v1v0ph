@@ -1,0 +1,289 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>dpsdSample</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Function to fit hierarchical DPSD model to data.</h2>
+
+<h3>Description</h3>
+
+<p>Runs MCMC estimation for the hierarchical DPSD model.</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">dpsdSample(dat, M = 5000, keep = (M/10):M, getDIC = TRUE,
+freeCrit=TRUE,Hier=TRUE, jump=.01)</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>dat</code></td>
+<td>
+<p>Data frame that must include variables
+Scond,cond,sub,item,lag,resp.  Scond indexes studied/new, whereas
+cond indexes conditions nested within the studied or new
+conditions.  Indexes for Scond,cond, sub, item, and respone must
+start at zero and have no gaps (i.e., no skipped subject numbers). Lags
+must be zero-centered.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>M</code></td>
+<td>
+<p>Number of MCMC iterations.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>keep</code></td>
+<td>
+<p>Which MCMC iterations should be included in estimates and
+returned.  Use keep to both get ride of burn-in, and thin chains if
+necessary.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>getDIC</code></td>
+<td>
+<p>Logical. Should the function compute DIC value?  This
+takes a while if M is large.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>freeCrit</code></td>
+<td>
+<p>Logical.  If true then criteria are estimated
+separately
+for each participant.  Should be set to false if analizing only one
+participant (e.g., if averaging over subjects).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Hier</code></td>
+<td>
+<p>Logical. If true then the variances of effects
+(e.g., item effects) are estimated from the data, i.e., effects are
+treated as random.  If false then these variances are fixed to
+2.0 (.5 for recollection effects), thus treating these effects as
+fixed.  This option is there to allow for compairson with more
+traditional approaches, and to see the effects of imposing
+hierarcical structure.  It should always be set to TRUE in real
+analysis, and is not even guaranteed to work if set to false.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>jump</code></td>
+<td>
+<p>The criteria and decorrelating steps utilize
+Matropolis-Hastings sampling routines, which require tuning.  All
+MCMC functions should self-tune during the burnin period (iterations
+before keep), and they will alert you to the success of tuning.  If
+acceptance rates are too low, "jump" should be decreased, if they
+are too hight, "jump" should be increased.  Alternatively, or in
+addition to adjusting "jump", simply increase the burnin period
+which will allow the function more time to self-tune.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>The function returns an internally defined "uvsd" structure that
+includes the following components
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>mu</code></td>
+<td>
+<p>Indexes which element of blocks contain mu</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alpha</code></td>
+<td>
+<p>Indexes which element of blocks contain participant
+effects, alpha</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>beta</code></td>
+<td>
+<p>Indexes which element of blocks contain item effects, beta</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>s2alpha</code></td>
+<td>
+<p>Indexes which element of blocks contain variance of
+participant effects (alpha).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>s2beta</code></td>
+<td>
+<p>Indexes which element of blocks contain variance of
+item effects (beta).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>theta</code></td>
+<td>
+<p>Indexes which element of blocks contain theta, the slope of
+the lag effect</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>estN</code></td>
+<td>
+<p>Posterior means of block parameters for new-item means</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>estS</code></td>
+<td>
+<p>Posterior means of block parameters for studied-item means</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>estR</code></td>
+<td>
+<p>Posterior means of block for Recollection means.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>estCrit</code></td>
+<td>
+<p>Posterior means of criteria</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>blockN</code></td>
+<td>
+<p>Each iteration for each parameter in the new-item mean
+block.  Rows index iteration, columns index parameter.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>blockS</code></td>
+<td>
+<p>Same as blockN, but for the studied-item means</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>blockR</code></td>
+<td>
+<p>Same as blockN, but for the recollection-parameter
+means.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>s.crit</code></td>
+<td>
+<p>Samples of each criteria.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pD</code></td>
+<td>
+<p>Number of effective parameters used in DIC.  Note that this
+should be smaller than the actual number of parameters, as
+constraint from the hierarchical structure decreases the number of
+effective parameters.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>DIC</code></td>
+<td>
+<p>DIC value.  Smaller values indicate better fits.  Note that
+DIC is notably biased toward complexity.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>M</code></td>
+<td>
+<p>Number of MCMC iterations run</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>keep</code></td>
+<td>
+<p>MCMC iterations that were used for estimation and
+returned</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>b0</code></td>
+<td>
+<p>Metropolis-Hastings acceptance rates for decorrelating
+steps.  These should be between .2 and .6.  If they are not, the M,
+keep, or jump arguments need to be adjusted.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>b0Crit</code></td>
+<td>
+<p>acceptance rates for criteria.</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>Michael S. Pratte</p>
+
+
+<h3>References</h3>
+
+<p>See Pratte, Rouder, &amp; Morey (2009)</p>
+
+
+<h3>See Also</h3>
+
+<p>hbmem</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">#In this example we generate data from EVSD, then fit it with both
+#hierarchical DPSD and DPSD assuming no participant or item effects.
+library(hbmem)
+sim=dpsdSim(I=30,J=200)
+dat=as.data.frame(cbind(sim@subj,sim@item,sim@cond,sim@Scond,sim@lag,sim@resp))
+colnames(dat)=c("sub","item","cond","Scond","lag","resp")
+dat$lag[dat$Scond==1]=dat$lag[dat$Scond==1]-mean(dat$lag[dat$Scond==1])
+
+M=10 #Too low for real analysis!
+keep=2:M
+DPSD=dpsdSample(dat,M=M)
+
+#Look at all parameters
+par(mfrow=c(3,3),pch=19,pty='s')
+
+matplot(DPSD@blockN[,DPSD@muN],t='l',
+ylab="muN")
+abline(h=sim@muN,col="blue")
+plot(DPSD@estN[DPSD@alphaN]~sim@alphaN)
+abline(0,1,col="blue")
+plot(DPSD@estN[DPSD@betaN]~sim@betaN)
+abline(0,1,col="blue")
+
+matplot(DPSD@blockS[,DPSD@muS],t='l',
+ylab="muS")
+abline(h=sim@muS,col="blue")
+plot(DPSD@estS[DPSD@alphaS]~sim@alphaS)
+abline(0,1,col="blue")
+plot(DPSD@estS[DPSD@betaS]~sim@betaS)
+abline(0,1,col="blue")
+
+matplot(pnorm(DPSD@blockR[,DPSD@muS]),t='l',
+ylab="P(recollection)")
+abline(h=pnorm(sim@muR),col="blue")
+plot(DPSD@estR[DPSD@alphaS]~sim@alphaR)
+abline(0,1,col="blue")
+plot(DPSD@estR[DPSD@betaS]~sim@betaR)
+abline(0,1,col="blue")
+</code></pre>
+
+
+</div>

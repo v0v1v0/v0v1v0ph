@@ -1,0 +1,111 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hm_subset</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Subset your data by dates</h2>
+
+<h3>Description</h3>
+
+<p>The method will subset the required slot.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hm_subset(obj, slot_name = "all", from = NULL, to = NULL)
+
+## S4 method for signature 'hydromet_station'
+hm_subset(obj, slot_name = "all", from = NULL, to = NULL)
+
+## S4 method for signature 'hydromet_compact'
+hm_subset(obj, slot_name = "all", from = NULL, to = NULL)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>obj</code></td>
+<td>
+<p>a valid <code>hydromet_XXX</code> class object.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>slot_name</code></td>
+<td>
+<p>string vector with the name(s) of the slot(s) to subset. If you use
+'all' as argument the method will subset all the variables with data.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>from</code></td>
+<td>
+<p>string <code>Date</code> or <code>POSIX*</code> value with the starting date. You can
+use <code>from</code> without <code>to</code>. In this case you will subset your data <code>from</code>
+till the end.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>to</code></td>
+<td>
+<p>string <code>Date</code> or <code>POSIX*</code> value with the starting date. You can
+use <code>to</code> without <code>from</code>. In this case you will subset your data from the
+beginning till <code>to</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>The same <code>hydromet_XXX</code> class object provided in <code>obj</code> but subsetted.
+</p>
+
+
+<h3>Functions</h3>
+
+
+<ul>
+<li> <p><code>hm_subset(hydromet_station)</code>: subset method for station class
+</p>
+</li>
+<li> <p><code>hm_subset(hydromet_compact)</code>: subset method for compact class
+</p>
+</li>
+</ul>
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+# cuevas station
+path &lt;- system.file('extdata', package = 'hydrotoolbox')
+
+# use the build method
+hm_cuevas &lt;-
+  hm_create() %&gt;%
+  hm_build(bureau = 'ianigla', path = path,
+           file_name = 'ianigla_cuevas.csv',
+           slot_name = c('tair', 'rh', 'patm',
+                         'precip', 'wspd', 'wdir',
+                         'kin', 'hsnow', 'tsoil'),
+           by = 'hour',
+           out_name = c('tair(°C)', 'rh(%)', 'patm(mbar)',
+                        'p(mm)', 'wspd(km/hr)', 'wdir(°)',
+                        'kin(kW/m2)', 'hsnow(cm)', 'tsoil(°C)' )
+          )
+
+# subset relative humidity and plot it
+hm_subset(obj = hm_cuevas, slot_name = 'rh',
+          from = ISOdate(2020, 2, 1),
+          to = ISOdate(2020, 4, 1) ) %&gt;%
+  hm_plot(slot_name = 'rh',
+          col_name = list('rh(%)'),
+          interactive = TRUE,
+          y_lab = 'RH(%)' )
+
+## End(Not run)
+
+</code></pre>
+
+
+</div>

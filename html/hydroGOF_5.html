@@ -1,0 +1,285 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>APFB</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Annual Peak Flow Bias
+</h2>
+
+<h3>Description</h3>
+
+<p>Annual peak flow bias between <code>sim</code> and <code>obs</code>, with treatment of missing values. 
+</p>
+<p>This function was prposed by Mizukami et al. (2019) to identify differences in high (streamflow) values. See Details.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">APFB(sim, obs, ...)
+
+## Default S3 method:
+APFB(sim, obs, na.rm=TRUE, start.month=1, out.PerYear=FALSE,
+             fun=NULL, ...,
+             epsilon.type=c("none", "Pushpalatha2012", "otherFactor", "otherValue"), 
+             epsilon.value=NA)
+
+## S3 method for class 'data.frame'
+APFB(sim, obs, na.rm=TRUE, start.month=1, out.PerYear=FALSE,
+             fun=NULL, ...,
+             epsilon.type=c("none", "Pushpalatha2012", "otherFactor", "otherValue"), 
+             epsilon.value=NA)
+
+## S3 method for class 'matrix'
+APFB(sim, obs, na.rm=TRUE, start.month=1, out.PerYear=FALSE,
+             fun=NULL, ...,
+             epsilon.type=c("none", "Pushpalatha2012", "otherFactor", "otherValue"), 
+             epsilon.value=NA)
+             
+## S3 method for class 'zoo'
+APFB(sim, obs, na.rm=TRUE, start.month=1, out.PerYear=FALSE,
+             fun=NULL, ...,
+             epsilon.type=c("none", "Pushpalatha2012", "otherFactor", "otherValue"), 
+             epsilon.value=NA)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>sim</code></td>
+<td>
+
+<p>numeric, zoo, matrix or data.frame with simulated values
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>obs</code></td>
+<td>
+
+<p>numeric, zoo, matrix or data.frame with observed values
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>na.rm</code></td>
+<td>
+
+<p>a logical value indicating whether 'NA' should be stripped before the computation proceeds. <br>
+When an 'NA' value is found at the i-th position in <code>obs</code> <b>OR</b> <code>sim</code>, the i-th value of <code>obs</code> <b>AND</b> <code>sim</code> are removed before the computation.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>start.month</code></td>
+<td>
+
+<p>[OPTIONAL]. Only used when the (hydrological) year of interest is different from the calendar year.
+</p>
+<p>numeric in [1:12] indicating the starting month of the (hydrological) year. Numeric values in [1, 12] represent months in [January, December]. By default <code>start.month=1</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>out.PerYear</code></td>
+<td>
+
+<p>logical, indicating whether the output of this function has to include the annual peak flow bias obtained for the individual years or not.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fun</code></td>
+<td>
+
+<p>function to be applied to <code>sim</code> and <code>obs</code> in order to obtain transformed values thereof before computing this goodness-of-fit index.
+</p>
+<p>The first argument MUST BE a numeric vector with any name (e.g., <code>x</code>), and additional arguments are passed using <code>...</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+
+<p>arguments passed to <code>fun</code>, in addition to the mandatory first numeric vector.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>epsilon.type</code></td>
+<td>
+
+<p>argument used to define a numeric value to be added to both <code>sim</code> and <code>obs</code> before applying <code>fun</code>. 
+</p>
+<p>It is was  designed to allow the use of logarithm and other similar functions that do not work with zero values.
+</p>
+<p>Valid values of <code>epsilon.type</code> are:
+</p>
+<p>1) <kbd>"none"</kbd>: <code>sim</code> and <code>obs</code> are used by <code>fun</code> without the addition of any numeric value. This is the default option.
+</p>
+<p>2) <kbd>"Pushpalatha2012"</kbd>: one hundredth (1/100) of the mean observed values is added to both <code>sim</code> and <code>obs</code> before applying <code>fun</code>, as described in Pushpalatha et al. (2012). 
+</p>
+<p>3) <kbd>"otherFactor"</kbd>: the numeric value defined in the <code>epsilon.value</code> argument is used to multiply the the mean observed values, instead of the one hundredth (1/100) described in Pushpalatha et al. (2012). The resulting value is then added to both <code>sim</code> and <code>obs</code>, before applying <code>fun</code>.
+</p>
+<p>4) <kbd>"otherValue"</kbd>: the numeric value defined in the <code>epsilon.value</code> argument is directly added to both <code>sim</code> and <code>obs</code>, before applying <code>fun</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>epsilon.value</code></td>
+<td>
+
+<p>-) when <code>epsilon.type="otherValue"</code> it represents the numeric value to be added to both <code>sim</code> and <code>obs</code> before applying <code>fun</code>. <br>
+-) when <code>epsilon.type="otherFactor"</code> it represents the numeric factor used to multiply the mean of the observed values, instead of the one hundredth (1/100) described in Pushpalatha et al. (2012). The resulting value is then added to both <code>sim</code> and <code>obs</code> before applying <code>fun</code>.
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The annual peak flow bias (APFB; Mizukami et al., 2019) is designed to drive the calibration of hydrological models focused in the reproduction of high-flow events.
+</p>
+<p>The high flow bias (APFB) ranges from 0 to Inf, with an optimal value of 0. Higher values of APFB indicate stronger differences between the high values of <code>sim</code> and <code>obs</code>. Essentially, the closer to 0, the more similar the high values of <code>sim</code> and <code>obs</code> are. <br></p>
+
+
+<h3>Value</h3>
+
+<p>If <code>out.PerYear=FALSE</code>: numeric with the mean annual peak flow bias between <code>sim</code> and <code>obs</code>. If <code>sim</code> and <code>obs</code> are matrices, the output value is a vector, with the  mean annual peak flow bias between each column of <code>sim</code> and <code>obs</code>.
+</p>
+<p>If <code>out.PerYear=TRUE</code>: a list of two elements:
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>APFB.value</code></td>
+<td>
+
+<p>numeric with the  mean annual peak flow bias between <code>sim</code> and <code>obs</code>. If <code>sim</code> and <code>obs</code> are matrices, the output value is a vector, with the mean annual peak flow bias  between each column of <code>sim</code> and <code>obs</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>APFB.PerYear</code></td>
+<td>
+
+<p>-) If <code>sim</code> and <code>obs</code> are not data.frame/matrix, the output is numeric, with the mean annual peak flow bias obtained for the individual years between <code>sim</code> and <code>obs</code>. 
+</p>
+<p>-) If <code>sim</code> and <code>obs</code> are data.frame/matrix, this output is a data.frame, with the  mean annual peak flow bias obtained for the individual years between <code>sim</code> and <code>obs</code>. 
+</p>
+</td>
+</tr>
+</table>
+<h3>Note</h3>
+
+<p><code>obs</code> and <code>sim</code> has to have the same length/dimension <br></p>
+<p>The missing values in <code>obs</code> and <code>sim</code> are removed before the computation proceeds, and only those positions with non-missing values in <code>obs</code> and <code>sim</code> are considered in the computation
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Mauricio Zambrano-Bigiarini &lt;mzb.devel@gmail.com&gt;
+</p>
+
+
+<h3>References</h3>
+
+<p><cite>Mizukami, N.; Rakovec, O.; Newman, A.J.; Clark, M.P.; Wood, A.W.; Gupta, H.V.; Kumar, R.: (2019). On the choice of calibration metrics for "high-flow" estimation using hydrologic models, Hydrology Earth System Sciences 23, 2601-2614, doi:10.5194/hess-23-2601-2019.</cite>
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>NSE</code>, <code>wNSE</code>, <code>wsNSE</code>, <code>HFB</code>, <code>gof</code>, <code>ggof</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">##################
+# Example 1: Looking at the difference between 'NSE', 'wNSE', and 'APFB'
+# Loading daily streamflows of the Ega River (Spain), from 1961 to 1970
+data(EgaEnEstellaQts)
+obs &lt;- EgaEnEstellaQts
+
+# Simulated daily time series, created equal to the observed values and then 
+# random noise is added only to high flows, i.e., those equal or higher than 
+# the quantile 0.9 of the observed values.
+sim      &lt;- obs
+hQ.thr   &lt;- quantile(obs, probs=0.9, na.rm=TRUE)
+hQ.index &lt;- which(obs &gt;= hQ.thr)
+hQ.n     &lt;- length(hQ.index)
+sim[hQ.index] &lt;- sim[hQ.index] + rnorm(hQ.n, mean=mean(sim[hQ.index], na.rm=TRUE))
+
+# Traditional Nash-Sutcliffe eficiency
+NSE(sim=sim, obs=obs)
+
+# Weighted Nash-Sutcliffe efficiency (Hundecha and Bardossy, 2004)
+wNSE(sim=sim, obs=obs)
+
+# APFB (Garcia et al., 2017):
+APFB(sim=sim, obs=obs)
+
+##################
+# Example 2: 
+# Loading daily streamflows of the Ega River (Spain), from 1961 to 1970
+data(EgaEnEstellaQts)
+obs &lt;- EgaEnEstellaQts
+
+# Generating a simulated daily time series, initially equal to the observed series
+sim &lt;- obs 
+
+# Computing the 'APFB' for the "best" (unattainable) case
+APFB(sim=sim, obs=obs)
+
+##################
+# Example 3: APFB for simulated values created equal to the observed values and then 
+#            random noise is added only to high flows, i.e., those equal or higher than 
+#            the quantile 0.9 of the observed values.
+
+sim           &lt;- obs
+hQ.thr        &lt;- quantile(obs, probs=0.9, na.rm=TRUE)
+hQ.index      &lt;- which(obs &gt;= hQ.thr)
+hQ.n          &lt;- length(hQ.index)
+sim[hQ.index] &lt;- sim[hQ.index] + rnorm(hQ.n, mean=mean(sim[hQ.index], na.rm=TRUE))
+ggof(sim, obs)
+
+APFB(sim=sim, obs=obs)
+
+##################
+# Example 4: APFB for simulated values created equal to the observed values and then 
+#            random noise is added only to high flows, i.e., those equal or higher than 
+#            the quantile 0.9 of the observed values and applying (natural) 
+#            logarithm to 'sim' and 'obs' during computations.
+
+APFB(sim=sim, obs=obs, fun=log)
+
+# Verifying the previous value:
+lsim &lt;- log(sim)
+lobs &lt;- log(obs)
+APFB(sim=lsim, obs=lobs)
+
+
+##################
+# Example 5: APFB for simulated values created equal to the observed values and then 
+#            random noise is added only to high flows, i.e., those equal or higher than 
+#            the quantile 0.9 of the observed values and applying a 
+#            user-defined function to 'sim' and 'obs' during computations
+
+fun1 &lt;- function(x) {sqrt(x+1)}
+
+APFB(sim=sim, obs=obs, fun=fun1)
+
+# Verifying the previous value, with the epsilon value following Pushpalatha2012
+sim1 &lt;- sqrt(sim+1)
+obs1 &lt;- sqrt(obs+1)
+APFB(sim=sim1, obs=obs1)
+
+</code></pre>
+
+
+</div>

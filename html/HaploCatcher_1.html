@@ -1,0 +1,195 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>auto_locus</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Auto Locus - An Automated Pipeline for Locus Prediction</h2>
+
+<h3>Description</h3>
+
+<p>This function takes all other functions of the HaploCatcher package and weaves them into one pipeline that performs locus prediction with minimal user intervention.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">auto_locus(
+  geno_mat,
+  gene_file,
+  gene_name,
+  marker_info,
+  chromosome,
+  training_genotypes,
+  testing_genotypes,
+  ncor_markers = 50,
+  n_neighbors = 50,
+  cv_percent_testing = 0.2,
+  cv_percent_training = 0.8,
+  n_perms = 30,
+  model_selection_parameter = "kappa",
+  n_votes = 30,
+  set_seed = NULL,
+  predict_by_vote = FALSE,
+  include_hets = FALSE,
+  include_models = FALSE,
+  verbose = TRUE,
+  parallel = FALSE,
+  n_cores = NULL,
+  plot_cv_results = TRUE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>geno_mat</code></td>
+<td>
+<p>An imputed, number-coded, genotypic matrix which has n rows of individuals and m columns of markers. Row names of the matrix should be representative of genotypic IDs and column names should be representative of marker IDs. Missing data is not allowed. Numeric coding of genotypes can vary as long as it remains consistant among markers.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>gene_file</code></td>
+<td>
+<p>A dataframe containing at least three columns labeled as follows: 'Gene', 'FullSampleName', and 'Call'. The 'Gene' column contains the name of the gene for which the observation belongs to. The 'FullSampleName' column contains the genotypic ID which corresponds exactly to the column name in the genotypic matrix. The 'Call' column contains the marker call which corresponds to the gene for that genotype. Other information may be present in this dataframe beyond these columns, but the three listed columns above are obligatory.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>gene_name</code></td>
+<td>
+<p>A character string which matches the name of the gene which you are trying to perform cross validation for. This character string must be present in your gene_file 'Gene' column.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>marker_info</code></td>
+<td>
+<p>A dataframe containing the following three columns: 'Marker', 'Chromosome', and 'BP_Position'. The 'Marker' column contains the names of the marker which are present in the genotypic matrix. The 'Chromosome' column contains the corresponding chromosome/linkage group to which the marker belongs. The 'Position' column contains the physical or centimorgan position of the marker. All markers present in the genotypic matrix must be listed in this dataframe. If physical or centimorgan positions are unavailable for the listed markers, a numeric dummy variable ranging from one to n number of markers may be provided instead.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>chromosome</code></td>
+<td>
+<p>A character string which matches the name of the chromosome upon which the gene resides. This chromosome name must be present in the marker_info file.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>training_genotypes</code></td>
+<td>
+<p>A character vector of fullsamplenames found in the geno_mat and gene_file. These are lines which will be used in cross validation and to train the model which will predict the lines which have no locus call available.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>testing_genotypes</code></td>
+<td>
+<p>A character vector of fullsamplenames found in the geno_mat. These are lines which will have predictions made for them.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ncor_markers</code></td>
+<td>
+<p>A numeric variable which represents the number of markers the user want to use in model training. Correlation among markers to the gene call is calculated and the top n markers specified are retained for training. The default setting is 50 markers.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n_neighbors</code></td>
+<td>
+<p>A numeric variable which represents the number of neighbors to use in KNN. Default is 50.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cv_percent_testing</code></td>
+<td>
+<p>A numeric variable which ranges such that x|0&lt;x&lt;1. This means that this number can be neither zero nor one. This number represents the percent of the total data available the user wants to retain to validate the model. The default setting is 0.20.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cv_percent_training</code></td>
+<td>
+<p>A numeric variable which ranges such that x|0&lt;x&lt;1. This means that the number can be neither zero nor one. This number represents the percent of the total data available the user wants to retain for training of the model.The default setting is 0.80.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n_perms</code></td>
+<td>
+<p>A numeric variable defining the number of permutations to perform. This value may range from one to infinity. Default is 30.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>model_selection_parameter</code></td>
+<td>
+<p>A character string which defines which model performance parameter the user wants to use to select the best performing model. Only two strings are accepted either "kappa" for selection on Cohen's kappa value or "accuracy" for selection on total accuracy. Default is "kappa".</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n_votes</code></td>
+<td>
+<p>A numeric variable defining the number of models to train and predict with. This method will take n number of predictions over multiple iterations, sum across those multiple iterations and provide a prediction which is based on majority rule. The default is 30.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>set_seed</code></td>
+<td>
+<p>A numeric variable that is used to set a seed for reproducible results if the user is running the "locus_trait" function once for use in the "locus_pred" function. If the user wishes to run the function many times with a random seed and decide the outcome by voting, set 'predict_by_vote' to TRUE instead. The default setting is NULL.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>predict_by_vote</code></td>
+<td>
+<p>A logical variable which defines if the user wants predictions generated by voting over several runs of machine models summarized into a majority rule call. Default is FALSE.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>include_hets</code></td>
+<td>
+<p>A logical variable which determines if the user wishes to include heterozygous calls or not. The default setting is FALSE.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>include_models</code></td>
+<td>
+<p>A logical variable which determines if the user wishes to include the trained models in the results object for further testing. Warning: the models are quite large and running this will result in a very large results object. The default setting is FALSE.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p>A logical variable which determines if the user wants plots displayed and text feedback from each permutation. Regardless of this parameter, the function will display the name of the gene which is being cross validated and the current progress of the permutations. Default setting is TRUE.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>parallel</code></td>
+<td>
+<p>A logical variable which determines if the user wants the cross validation and voting predictions to be performed in parallel. Default is FALSE. If the user defines that parallel is TRUE, all visual and textual feedback will not be rendered.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n_cores</code></td>
+<td>
+<p>A numeric variable that is used to set a seed for reproducible results if the user is running the function once for use in the "locus_pred" function. If the user wishes to run the function many times with a random seed and decide the outcome by voting, set 'predict_by_vote' to true instead. The default setting is NULL.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>plot_cv_results</code></td>
+<td>
+<p>A logical variable which determines if the user want the cross validation results to be printed as a 'ggplot' image. Default is TRUE</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>This function returns two types of list-of-list objects. If 'predict_by_vote' is set to FALSE (the default setting), then the list will contain four objects: method, cross_validation_results, prediction_model, and predictions. The method object is a character which denotes what method was used. The cross_validation_results object contains the results of the cross-validation. The prediction model contains the information about the prediction model, and predictions contains the predictions for the testing_genotypes. If 'predict_by_vote' is set to TRUE, then the list will contain four objects: method, cross_validation_results, predictions, and consensus_predictions. Both method and cross_validation_results are the same for this option. Predictions contains the prediction of each model ran to vote. The object consensus_predictions contains a consensus prediction of the alleleic state of a genotype based on majority rule and a tablular summary of how many votes were taken per catigory.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+#refer to vignette for an in depth look at the auto_locus function
+vignette("An_Intro_to_HaploCatcher", package = "HaploCatcher")
+
+</code></pre>
+
+
+</div>

@@ -1,0 +1,91 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>set_redactor</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Set a response redactor</h2>
+
+<h3>Description</h3>
+
+<p>A redactor is a function that alters the response content being written
+out in the <code>capture_requests()</code> context, allowing you to remove sensitive
+values, such as authentication tokens,
+as well as any other modification or truncation of the response body. By
+default, the <code>redact_cookies()</code> function will be used to purge standard
+auth methods, but <code>set_redactor()</code> allows you to provide a different one.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">set_redactor(FUN)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table><tr style="vertical-align: top;">
+<td><code>FUN</code></td>
+<td>
+<p>A function or expression that modifies <code>httr2_response</code> objects.
+Specifically, a valid input is one of:
+</p>
+
+<ul>
+<li>
+<p> A function taking a single argument, the <code>httr2_response</code>,
+and returning a valid <code>httr2_response</code> object.
+</p>
+</li>
+<li>
+<p> A formula as shorthand for an anonymous function with <code>.</code> as the
+"response" argument, as in the <code>purrr</code> package. That is, instead of
+<code>function (response) redact_headers(response, "X-Custom-Header")</code>, you can
+use <code>~ redact_headers(., "X-Custom-Header")</code>
+</p>
+</li>
+<li>
+<p> A list of redacting functions/formulas, which will be executed
+in sequence on the response
+</p>
+</li>
+<li> <p><code>NULL</code>, to override the default <code>redact_cookies()</code>.
+</p>
+</li>
+</ul>
+</td>
+</tr></table>
+<h3>Details</h3>
+
+<p>Alternatively, you can put a redacting function in <code>inst/httptest2/redact.R</code>
+in your package, and
+any time your package is loaded (as in when running tests or building
+vignettes), the function will be used automatically.
+</p>
+
+
+<h3>Value</h3>
+
+<p>Invisibly, the redacting function, validated and perhaps modified.
+Formulas and function lists are turned into proper functions. <code>NULL</code> as input
+returns the <code>force()</code> function.
+</p>
+
+
+<h3>See Also</h3>
+
+<p>For further details on how to redact responses, see <code>vignette("redacting", package = "httptest2")</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Shorten UUIDs in response body/URLs to their first 6 digits:
+set_redactor(function(resp) gsub_response(resp, "([0-9a-f]{6}[0-9a-f]{26}", "\\1"))
+# Restore the default
+set_redactor(redact_cookies)
+</code></pre>
+
+
+</div>

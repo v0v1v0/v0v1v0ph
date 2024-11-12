@@ -1,0 +1,101 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>mle</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Fitting Hawkes processes from continuous data</h2>
+
+<h3>Description</h3>
+
+<p>This function fits a Hawkes process to continuous data by minimizing the likelihood
+on the interval <code class="reqn">[0,\mathrm{end}]</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">mle(events, kern, end, init = NULL, opts = NULL, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>events</code></td>
+<td>
+<p>The locations of events (sorted in ascending order)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>kern</code></td>
+<td>
+<p>Either a string (partially) matching one of the kernels implemented (see Details), or an object of class Model</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>end</code></td>
+<td>
+<p>The time until which the process is observed.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>init</code></td>
+<td>
+<p>(Optional) Initial values of the optimisation algorithm</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>opts</code></td>
+<td>
+<p>(Optional) To be passed to <code>nloptr</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Additional arguments passed to <code>nloptr</code></p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The maximum likelihood estimation procedure has only been implemented for the
+exponential and the power law kernels.
+For the exponential kernel, the likelihood is computed in <code class="reqn">O(n)</code> complexity
+(as described in details in T. Ozaki and Y. Ogata, “Maximum likelihood
+estimation of Hawkes’ self-exciting point processes,” Ann. Inst. Stat. Math.,
+vol. 31, no. 1, pp. 145–155, Dec. 1979).
+For the power law kernel, the complexity is <code class="reqn">O(n^2)</code>.
+</p>
+
+
+<h3>Value</h3>
+
+<p>Returns a list containing the solution of the optimisation procedure, the object Model
+with its parameters updated to the solution, and the output produced by <code>nloptr</code>.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>hawkes()</code> for the simulation of Hawkes processes,
+Model for the abstract class, and Exponential for the specific
+reproduction kernels.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Simulate an exponential Hawkes process with baseline intensity 1,
+# reproduction mean 0.5 and exponential fertility function with rate 2.
+x = hawkes(100, fun = 1, repr = .5, family = "exp", rate = 1)
+# Estimate the parameters from the arrival times of `x` using MLE
+opt = mle(x$p, "Exponential", x$end)
+opt$par                          # Estimated parameters
+opt$model$ddloglik(x$p, x$end)     # Hessian matrix of the log-likelihood
+</code></pre>
+
+
+</div>

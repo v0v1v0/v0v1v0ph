@@ -1,0 +1,105 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>orxwide</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Wide-format baseline data for the ORX study
+</h2>
+
+<h3>Description</h3>
+
+<p>This data frame contains the wide-format data of the ORX study for baseline characteristics of the 
+individuals participating in the study. Some fields (Volume, PSA, High, BodyWeight, PSAChange) were 
+used to construct the distance matrix in the original matching-based random allocation of individuals
+at baseline, while other variables (Group, Submatch) contain these results.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">data("orxwide")</code></pre>
+
+
+<h3>Format</h3>
+
+<p>A data frame with 109 observations on the following 8 variables.
+</p>
+
+<dl>
+<dt><code>ID</code></dt>
+<dd>
+<p>A unique character indicator for the different individual(s)</p>
+</dd>
+<dt><code>Group</code></dt>
+<dd>
+<p>After identifying suitable submatches, the data were distributed to blinded intervention groups. These groups were later then annotated to actual treatments or non-intervention control groups.</p>
+</dd>
+<dt><code>Submatch</code></dt>
+<dd>
+<p>Submatches identified at baseline using the methodology presented in this package</p>
+</dd>
+<dt><code>Volume</code></dt>
+<dd>
+<p>Tumor volume at baseline in cubic millimeters</p>
+</dd>
+<dt><code>PSA</code></dt>
+<dd>
+<p>Raw baseline PSA measurement values in unit (ug/l)</p>
+</dd>
+<dt><code>High</code></dt>
+<dd>
+<p>The highest dimension in the tumor in millimeters, giving insight into the shape of the tumor</p>
+</dd>
+<dt><code>BodyWeight</code></dt>
+<dd>
+<p>Body weight at baseline in unit (g)</p>
+</dd>
+<dt><code>PSAChange</code></dt>
+<dd>
+<p>A fold-change like change in PSA from the prior measurement defined as: (PSA_current - PSA_last)/(PSA_last)</p>
+</dd>
+</dl>
+<h3>Details</h3>
+
+<p>Originally, 3-fold weighting of the baseline 'Volume' and 'PSA' was used in comparison to 
+'High', 'BodyWeight' and 'PSAChange' when computing the distance matrix. Furthermore, some 
+individuals were annotated prior to matching for exclusion based on outlierish behaviour.
+The exclusion criteria were applied before any interventions were given or the matching was 
+performed. The excluded tumors had either non-existant PSA, non-detectable tumor volume,
+or extremely large tumors (volume above 700 mm^3).
+</p>
+
+
+<h3>Note</h3>
+
+<p>Notice that while normally the submatches would be distributed equally to the experiment 
+groups, here rarely a single submatch may hold multiple instances from a single group. 
+This is due to practical constraints in the experiment, that animals had to be manually
+moved in order to fulfill groups and to reflect the amount of drug compounds available.
+Additionally, the original experiment was performed on 6 intervention groups, while here
+only 3 are further presented after the baseline ('ORX+Tx', 'ORX' and 'Intact').
+</p>
+
+
+<h3>Source</h3>
+
+<p>Laajala TD, Jumppanen M, Huhtaniemi R, Fey V, Kaur A, et al. (2016) Optimized design and analysis of preclinical intervention studies in vivo. Sci Rep. 2016 Aug 2;6:30723. doi: 10.1038/srep30723.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(orxwide)
+# Construct an example distance matrix based on conventional 
+# Euclidean distance and the baseline characteristics
+d.orx &lt;- dist(orxwide[,c("Volume", "PSA", "High", "BodyWeight", "PSAChange")])
+# Plot a hierarchical clustering of the individuals
+plot(hclust(d=d.orx))
+# This 'd.orx' may then be further processed by downstream experiment 
+# design functions such as match.ga, match.bb, etc.
+</code></pre>
+
+
+</div>

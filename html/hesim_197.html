@@ -1,0 +1,141 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>tpmatrix</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Transition probability matrix</h2>
+
+<h3>Description</h3>
+
+<p><code>tpmatrix()</code> both defines and evaluates a transition probability matrix in which
+elements are expressions. It can be used within <code>define_tparams()</code> to
+create a transition probability matrix or directly to create a <code>tparams_transprobs()</code>
+object. These are, in turn, ultimately used to create a CohortDtstmTrans object
+for simulating health state transitions.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">tpmatrix(..., complement = NULL, states = NULL, prefix = "", sep = "_")
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Named values of expressions defining elements of the matrix. Each
+element of <code>...</code> should either be a vector or a 2-dimensional tabular object
+such as a data frame. See "Details" and the examples below.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>complement</code></td>
+<td>
+<p>Either a character vector or a numeric vector denoting the
+transitions (i.e., the columns of the tabular object formed from <code>...</code>) that
+are complementary (see "Details" below). If a character vector, each element
+should be the name of a column in the tabular object; if a numeric vector,
+each element should be the index of a column in the tabular object.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>states, prefix, sep</code></td>
+<td>
+<p>Arguments passed to <code>tpmatrix_names()</code> for naming
+the columns. If <code>states = NULL</code> (the default), then the states are named
+<code>s1</code>, ..., <code>sh</code> where <code>h</code> is the number of health states.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>A <code>tpmatrix</code> is a 2-dimensional tabular object that stores flattened
+square transition probability matrices in each row. Each transition probability
+matrix is filled rowwise. The complementary probability (equal to <code class="reqn">1</code>
+minus the sum of the probabilities of all other elements in a row of a
+transition probability matrix) can be conveniently referred to as <code>C</code> or
+specified with the <code>complement</code> argument. There can only be one complement
+for each row in a transition probability matrix.
+</p>
+
+
+<h3>Value</h3>
+
+<p>Returns a <code>tpmatrix</code> object that inherits from <code>data.table</code>
+where each column is an element of the transition probability matrix with
+elements ordered rowwise.
+</p>
+
+
+<h3>See Also</h3>
+
+<p>A <code>tpmatrix</code> is useful because it provides a convenient
+way to construct a <code>tparams_transprobs</code> object, which is the object in
+<code>hesim</code> used to specify the transition probabilities required to simulate
+Markov chains with the <code>CohortDtstmTrans</code> class. See the
+<code>tparams_transprobs</code> documentation for more details.
+</p>
+<p>The <code>summary.tpmatrix()</code> method can be used to summarize a <code>tpmatrix</code>
+across parameter samples.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">p_12 &lt;- c(.7, .6)
+tpmatrix(
+  C, p_12,
+  0, 1
+)
+
+tpmatrix(
+  C, p_12,
+  C, 1
+)
+
+# Pass matrix
+pmat &lt;- matrix(c(.5, .5, .3, .7), byrow = TRUE, ncol = 4)
+tpmatrix(pmat)
+
+# Pass vectors and data frames
+p1 &lt;- data.frame(
+  p_12 = c(.7, .6),
+  p_13 = c(.1, .2)
+)
+
+p2 &lt;- data.frame(
+  p_21 = 0,
+  p_22 = c(.4, .45),
+  p_23 = c(.6, .55)
+)
+
+p3 &lt;- data.frame(
+  p_31 = c(0, 0),
+  p_32 = c(0, 0),
+  p_33 = c(1, 1)
+)
+
+tpmatrix(
+  C, p1,
+  p2,
+  p3
+)
+
+# Use the 'complement' argument
+pmat &lt;- data.frame(s1_s1 = 0, s1_s2 = .5, s2_s1 = .3, s2_s2 = 0)
+tpmatrix(pmat, complement = c("s1_s1", "s2_s2"))
+tpmatrix(pmat, complement = c(1, 4)) # Can also pass integers
+
+# Can control column names
+tpmatrix(pmat, complement = c(1, 4),
+         states = c("state1", "state2"), sep = ".")
+
+</code></pre>
+
+
+</div>

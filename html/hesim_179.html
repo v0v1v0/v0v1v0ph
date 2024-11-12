@@ -1,0 +1,125 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>summary.params</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Summarize parameter objects</h2>
+
+<h3>Description</h3>
+
+<p>Summarize the coefficients of a parameter object by computing the mean,
+standard deviation, and quantiles for each model term.
+This is a convenient way to check whether a parameter object has been specified
+correctly and sampling distributions of the coefficients are as expected.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">## S3 method for class 'params_lm'
+summary(object, probs = c(0.025, 0.975), ...)
+
+## S3 method for class 'params_mlogit'
+summary(object, probs = c(0.025, 0.975), ...)
+
+## S3 method for class 'params_mlogit_list'
+summary(object, probs = c(0.025, 0.975), ...)
+
+## S3 method for class 'params_surv'
+summary(object, probs = c(0.025, 0.975), ...)
+
+## S3 method for class 'params_surv_list'
+summary(object, probs = c(0.025, 0.975), ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>object</code></td>
+<td>
+<p>An object of the appropriate class.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>probs</code></td>
+<td>
+<p>A numeric vector of probabilities with values in <code style="white-space: pre;">⁠[0,1]⁠</code> used
+to compute quantiles. By default, the 2.5th and 97.5th percentiles are
+computed.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Additional arguments affecting the summary. Currently unused.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A <code>data.table::data.table</code> that always contains the following columns:
+</p>
+
+<dl>
+<dt>term</dt>
+<dd>
+<p>The regression term.</p>
+</dd>
+<dt>mean</dt>
+<dd>
+<p>The mean value of the regression term.</p>
+</dd>
+<dt>sd</dt>
+<dd>
+<p>The standard deviation of the values of the regression term.</p>
+</dd>
+</dl>
+<p>In addition, the <code>probs</code> argument determines the quantiles that are computed.
+By default, the columns <code style="white-space: pre;">⁠2.5%⁠</code> and <code style="white-space: pre;">⁠97.5%⁠</code> are returned corresponding to the
+2.5th and 97.5th percentiles.
+</p>
+<p>Finally, the following columns may also be present:
+</p>
+
+<dl>
+<dt>parameter</dt>
+<dd>
+<p>The name of the parameter of interest. This is relevant
+for any parametric model in which the underlying probability distribution
+has multiple parameters. For instance, both <code>params_surv</code> and <code>params_surv_list</code>
+store regression coefficients that are used to model the underlying parameters
+of the survival distribution (e.g., shape and scale for a Weibull model). Similarly,
+there are two parameters (<code>mean</code> and <code>sd</code>) for <code>params_lm</code> objects.</p>
+</dd>
+<dt>model</dt>
+<dd>
+<p>The name of the statistical model. This is used for a
+<code>params_surv_list</code> object, where each list element represents a separate model.
+In a state transition model, each model is a unique health state transition and
+in a partitioned survival model, there is a separate model for each curve.</p>
+</dd>
+<dt>to</dt>
+<dd>
+<p>The health state that is being transitioned to. In <code>params_mlogit</code>
+and <code>params_mlogit_list</code> objects, there are coefficients for each health
+state that can be transitioned to.</p>
+</dd>
+<dt>from</dt>
+<dd>
+<p>The health state that is being transitions from. This is used
+for a <code>params_mlogit_list</code> objects where a different multinomial
+logistic regression is used for each state that can be transitioned from.</p>
+</dd>
+</dl>
+<h3>See Also</h3>
+
+<p>For examples, see the the underlying parameter object functions:
+<code>params_lm()</code>, <code>params_surv()</code>, <code>params_surv_list()</code>, <code>params_mlogit()</code>, and
+<code>params_mlogit_list()</code>.
+</p>
+
+
+</div>

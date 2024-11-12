@@ -1,0 +1,116 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>matchTradesQuotes</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Match trade and quote data</h2>
+
+<h3>Description</h3>
+
+<p>Match the trades and quotes of the input data. All trades are retained and the latest bids and offers are retained,
+while 'old' quotes are discarded.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">matchTradesQuotes(
+  tData,
+  qData,
+  lagQuotes = 0,
+  BFM = FALSE,
+  backwardsWindow = 3600,
+  forwardsWindow = 0.5,
+  plot = FALSE,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>tData</code></td>
+<td>
+<p><code>data.table</code> or xts-object containing the trade data possibly with multiple symbols and over multiple days possible</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>qData</code></td>
+<td>
+<p><code>data.table</code> or xts-object containing the quote data possibly with multiple symbols and over multiple days possible</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lagQuotes</code></td>
+<td>
+<p>numeric, number of seconds the quotes are registered faster than
+the trades (should be round and positive). Default is 0. For older datasets, i.e. before 2010, it may be a good idea to set this to e.g. 2. See Vergote (2005)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>BFM</code></td>
+<td>
+<p>a logical determining whether to conduct 'Backwards - Forwards matching' of trades and quotes.
+The algorithm tries to match trades that fall outside the bid - ask and first tries to match a small window forwards and if this fails, it tries to match backwards in a bigger window.
+The small window is a tolerance for inaccuracies in the timestamps of bids and asks. The backwards window allow for matching of late reported trades. I.e. block trades.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>backwardsWindow</code></td>
+<td>
+<p>a numeric denoting the length of the backwards window used when <code>BFM = TRUE</code>. Default is 3600, corresponding to one hour.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>forwardsWindow</code></td>
+<td>
+<p>a numeric denoting the length of the forwards window used when <code>BFM = TRUE</code>. Default is 0.5, corresponding to one half second.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>plot</code></td>
+<td>
+<p>a logical denoting whether to visualize the forwards, backwards, and unmatched trades in a plot.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>used internally. Don't set this parameter</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>Depending on the input data type, we return either a <code>data.table</code> or an <code>xts</code> object containing the matched trade and quote data.
+When using the BFM algorithm, a report of the matched and unmatched trades are also returned (This is omitted when we call this function from the <code>tradesCleanupUsingQuotes</code> function).
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup.
+</p>
+
+
+<h3>References</h3>
+
+<p>Vergote, O. (2005). How to match trades and quotes for NYSE stocks? K.U.Leuven working paper.
+</p>
+<p>Christensen, K., Oomen, R. C. A., Podolskij, M. (2014): Fact or Friction: Jumps at ultra high frequency. <em>Journal of Financial Economics</em>, 144, 576-599
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Multi-day input allowed
+tqData &lt;- matchTradesQuotes(sampleTData, sampleQData)
+# Show output
+tqData
+</code></pre>
+
+
+</div>

@@ -1,0 +1,170 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>residuals.fittedloop</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Residuals, studentized residuals and fitted values for the hysteresis package. 
+</h2>
+
+<h3>Description</h3>
+
+<p>Extract input, output, geometric and algebraic residuals, studentized residuals and fitted values from fitted loops or ellipses.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">##S3 methods for classes 'ellipsefit', 'ellipsesummary', 'fittedloop',
+##'loopsummary','ellipsefitlist', 'ellipsesummarylist', 'fittedlooplist',
+##'loopsummarylist', 'loop2r', 'fittedlooplist2r',
+##'loopsummarylist2r' and 'loop2rsummary'.
+## S3 method for class 'ellipsefit'
+residuals(object,...)
+## S3 method for class 'ellipsefit'
+rstudent(model,...)
+## S3 method for class 'ellipsefit'
+fitted(object,...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>object</code></td>
+<td>
+
+<p>an object created by <code>fel</code> or <code>floop</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>model</code></td>
+<td>
+
+<p>an object created by <code>fel</code> or <code>floop</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+
+<p>other arguments.
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Geometric residuals are based on the straight line distance between predicted and true values along an x,y cartesian plane, and algebraic residuals are based on the method used to calculate the <code>ellipsefit</code> object. 
+If method="harmonic2" (which is always the case if this is a <code>fittedloop</code> object) or if bootstrapping has occurred, then, there are no algebraic residuals and <code>residuals.ellipsefit</code> replaces these with the geometric residuals.
+</p>
+<p>Studentization for the <code>rstudent</code> function is performed as if method="harmonic2" regardless of the method used for fitting the ellipse/loop. Therefore, unless method="harmonic2" and no bootstrapping is performed, these are pseudo-studentized residuals, not true studentized residuals. This is internal scaling studentization. Studentization for bootstrapping in the functions <code>summary.ellipsefit</code>/<code>summary.fittedloop</code> differs from the studentization performed by <code>rstudent</code> in that it only accounts for the influence matrix and does not divide by the standard deviation. 
+</p>
+
+
+<h3>Value</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>input</code></td>
+<td>
+<p>a numeric vector. Observed input - fitted input for residuals.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>output</code></td>
+<td>
+<p>a numeric vector. Observed output - fitted output for residuals.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>geometric</code></td>
+<td>
+<p>a numeric vector. Not available with rstudent. See details.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>algebraic</code></td>
+<td>
+<p>a numeric vector. Not available with rstudent or when the 'harmonic2' method is used. See details.</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>Spencer Maynes, Fan Yang, and Anne Parkhurst.
+</p>
+
+
+<h3>References</h3>
+
+<p>Yang, F. and A. Parkhurst, Estimating Elliptical Hysteresis: A Comparison of Analytic Methods. (submitted)
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>fel</code>, <code>floop</code>, <code>summary.ellipsefit</code> and <code>summary.fittedloop</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">##For multiple loops/ellipses
+data(HysteresisData)
+Mloopmodels.rep &lt;- floop.repeated(HysteresisData$X, HysteresisData$Y,
+n=5,m=3, subjects = HysteresisData$subjects,subjects.in=c("A","C"),
+repeated=HysteresisData$repeated)
+Mloopmodels.rep                #Gives estimates and delta standard errors
+residuals(Mloopmodels.rep)  #$input $output $geometric 
+fitted(Mloopmodels.rep)     #$input $output
+scatterplotMatrix(cbind(residuals(Mloopmodels.rep)$input,
+residuals(Mloopmodels.rep)$output,residuals(Mloopmodels.rep)$geometric,
+fitted(Mloopmodels.rep)$input,fitted(Mloopmodels.rep)$output),
+  main='Residuals for Multiple Hysteresis Loops',smooth=FALSE,
+  var.labels=c("Input Resid","Output Resid","Geometric Resid",
+  "Fitted Input", "Fitted Output"),
+  groups=residuals(Mloopmodels.rep)$repeated)
+rstudent(Mloopmodels.rep)  #$input $output
+scatterplotMatrix(cbind(rstudent(Mloopmodels.rep)$input,
+rstudent(Mloopmodels.rep)$output,fitted(Mloopmodels.rep)$input,
+fitted(Mloopmodels.rep)$output),main='Studentized Residuals 
+for Multiple Hysteresis Loops',smooth=FALSE,
+var.labels=c("Input Resid","Output Resid", "Fitted Input",
+"Fitted Output"),groups=residuals(Mloopmodels.rep)$repeated)
+
+##For single Ellipse
+ellipse1 &lt;- mel(sd.x=0.2,sd.y=0.04)
+ellipse1.fit &lt;- fel(ellipse1$x,ellipse1$y)
+residuals(ellipse1.fit)
+fitted(ellipse1.fit)
+scatterplotMatrix(cbind(residuals(ellipse1.fit)$input,
+residuals(ellipse1.fit)$output,residuals(ellipse1.fit)$geometric,
+fitted(ellipse1.fit)$input,fitted(ellipse1.fit)$output),
+main='Residuals for Simulated Ellipse',smooth=FALSE,
+var.labels=c("Input Resid","Output Resid","Geometric Resid", 
+"Fitted Input", "Fitted Output"))
+
+rstudent(ellipse1.fit) #for input and output variables
+scatterplotMatrix(cbind(rstudent(ellipse1.fit)$input,
+rstudent(ellipse1.fit)$output,fitted(ellipse1.fit)$input,
+fitted(ellipse1.fit)$output),main='Studentized Residuals
+for Simulated Ellipse',smooth=FALSE,
+var.labels=c("Input Resid","Output Resid","Fitted Input",
+"Fitted Output"))
+
+plot(ellipse1.fit$pred.y,rstudent(ellipse1.fit)$output,
+xlab="Fitted Output",ylab="Output Studentized Residuals",
+main="Studentized Residuals:Simulated Ellipse")
+abline(h = 0, lty = 2, col = "gray")
+qqnorm(rstudent(ellipse1.fit)$output,sub='Output Studentized
+Residuals Simulated Ellipse')
+qqline(rstudent(ellipse1.fit)$output,col="red") #q-q line
+</code></pre>
+
+
+</div>

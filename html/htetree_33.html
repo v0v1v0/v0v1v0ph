@@ -1,0 +1,398 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>init.causalForest</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Causal Effect Regression and Estimation Forests (Tree Ensembles)</h2>
+
+<h3>Description</h3>
+
+<p>Build a random causal forest by fitting a user selected number of
+<code>causalTree</code> models to get an ensemble of <code>rpart</code> objects.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">init.causalForest(
+  formula,
+  data,
+  treatment,
+  weights = FALSE,
+  cost = FALSE,
+  num.trees,
+  ncov_sample
+)
+
+## S3 method for class 'causalForest'
+predict(object, newdata, predict.all = FALSE, type = "vector", ...)
+
+causalForest(
+  formula,
+  data,
+  treatment,
+  na.action = na.causalTree,
+  split.Rule = "CT",
+  double.Sample = TRUE,
+  split.Honest = TRUE,
+  split.Bucket = FALSE,
+  bucketNum = 5,
+  bucketMax = 100,
+  cv.option = "CT",
+  cv.Honest = TRUE,
+  minsize = 2L,
+  propensity,
+  control,
+  split.alpha = 0.5,
+  cv.alpha = 0.5,
+  sample.size.total = floor(nrow(data)/10),
+  sample.size.train.frac = 0.5,
+  mtry = ceiling(ncol(data)/3),
+  nodesize = 1,
+  num.trees = nrow(data),
+  cost = FALSE,
+  weights = FALSE,
+  ncolx,
+  ncov_sample
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>formula</code></td>
+<td>
+<p>a formula, with a response and features but no
+interaction terms.  If this a a data frome, that is taken as the model frame
+(see <code>model.frame).</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>an optional data frame that includes the variables
+named in the formula.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>treatment</code></td>
+<td>
+<p>a vector that indicates the treatment status of
+each observation. 1 represents treated and 0 represents control.
+Only binary treatment supported in this version.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>weights</code></td>
+<td>
+<p>optional case weights.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cost</code></td>
+<td>
+<p>a vector of non-negative costs, one for each variable in
+the model. Defaults to one for all variables. These are scalings to
+be applied when considering splits, so the improvement on splitting
+on a variable is divided by its cost in deciding which split to
+choose.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>num.trees</code></td>
+<td>
+<p>Number of trees to be built in the causal forest</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ncov_sample</code></td>
+<td>
+<p>Number of covariates randomly sampled to
+build each tree in the forest</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>object</code></td>
+<td>
+<p>a <code>causalTree</code> object</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>newdata</code></td>
+<td>
+<p>new data to predict</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>predict.all</code></td>
+<td>
+<p>If TRUE, return predicted individual effect for
+each observations. Otherwise, return the average effect.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>type</code></td>
+<td>
+<p>the type of returned object</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>arguments to <code>rpart.control</code> may also be
+specified in the call to <code>causalForest</code>.  They are
+checked against the
+list of valid arguments.
+The parameter <code>minsize</code> is implemented differently in
+<code>causalTree</code> than in <code>rpart</code>; we require a minimum of <code>minsize</code>
+treated observations and a minimum of <code>minsize</code> control
+observations in each leaf.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>na.action</code></td>
+<td>
+<p>the default action deletes all observations for which
+<code>y</code> is missing, but keeps those in which one or more predictors
+are missing.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>split.Rule</code></td>
+<td>
+<p>causalTree splitting options, one of <code>"TOT"</code>,
+<code>"CT"</code>, <code>"fit"</code>, <code>"tstats"</code>, four splitting rules in
+<code>causalTree</code>.  Note that the <code>"tstats"</code> alternative does
+not have an associated cross-validation method <code>cv.option</code>;
+see Athey and Imbens (2016)
+for a discussion.  Note further that <code>split.Rule</code> and
+<code>cv.option</code> can mix and match.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>double.Sample</code></td>
+<td>
+<p>boolean option, <code>TRUE</code> or <code>FALSE</code>,
+if set to True, causalForest will build honest trees.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>split.Honest</code></td>
+<td>
+<p>boolean option, <code>TRUE</code> or <code>FALSE</code>, used
+to decide the splitting rule of the trees.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>split.Bucket</code></td>
+<td>
+<p>boolean option, <code>TRUE</code> or <code>FALSE</code>,
+used to specify whether to apply the discrete method in splitting the tree.
+If set as <code>TRUE</code>, in splitting a node, the observations in a leaf
+will be be partitioned into buckets, with each bucket containing
+<code>bucketNum</code> treated and <code>bucketNum</code> control units, and where
+observations are ordered prior to partitioning. Splitting will take
+place by bucket.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>bucketNum</code></td>
+<td>
+<p>number of observations in each bucket when set
+<code>split.Bucket</code> = <code>TRUE</code>.  However, the code will override
+this choice in order to guarantee that there are at least <code>minsize</code>
+and at most <code>bucketMax</code> buckets.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>bucketMax</code></td>
+<td>
+<p>Option to choose maximum number of buckets to use in
+splitting when set <code>split.Bucket</code> = <code>TRUE</code>, <code>bucketNum</code>
+can change by choice of <code>bucketMax</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cv.option</code></td>
+<td>
+<p>cross validation options, one of <code>"TOT"</code>,
+<code>"matching"</code>, <code>"CT"</code>, <code>"fit"</code>, four cross validation
+methods in <span class="pkg">causalTree</span>.  There is no <code>cv.option</code> for
+the <code>split.Rule</code> <code>"tstats"</code>; see Athey and Imbens (2016)
+for discussion.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cv.Honest</code></td>
+<td>
+<p>boolean option, <code>TRUE</code> or <code>FALSE</code>, only
+used for <code>cv.option</code> as <code>"CT"</code> or <code>"fit"</code>, to specify
+whether to apply honest risk evalation function in cross validation.
+If set <code>TRUE</code>, use honest risk function, otherwise use adaptive
+risk function in cross validation.  If set <code>FALSE</code>, the user
+choice of <code>cv.alpha</code> will be set to 1.  If set
+<code>TRUE</code>, <code>cv.alpha</code>
+will default to 0.5, but the user choice of <code>cv.alpha</code> will be
+respected.  Note that honest cv estimates within-leaf variances and
+may perform better with larger leaf sizes and/or small number of
+cross-validation sets.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>minsize</code></td>
+<td>
+<p>in order to split, each leaf must have at least
+<code>minsize</code> treated cases and <code>minsize</code> control cases.
+The default value is set as 2.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>propensity</code></td>
+<td>
+<p>propensity score used in <code>"TOT"</code> splitting
+and <code>"TOT"</code>, honest <code>"CT"</code> cross validation methods.
+The default value is the proportion of treated cases in all observations.
+In this implementation, the propensity score is a constant for the whole
+dataset.  Unit-specific propensity scores are not supported; however,
+the user may use inverse propensity scores as case weights if desired.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>control</code></td>
+<td>
+<p>a list of options that control details of the
+<code>rpart</code> algorithm.  See <code>rpart.control</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>split.alpha</code></td>
+<td>
+<p>scale parameter between 0 and 1, used in splitting
+risk evaluation function for <code>"CT"</code>. When <code>split.Honest = FALSE</code>,
+<code>split.alpha</code> will be set as 1.  For <code>split.Rule</code>=<code>"tstats"</code>,
+if <code>split.Honest</code>=<code>TRUE</code>, <code>split.alpha</code> is used in
+calculating the risk function, which determines the order of
+pruning in cross-validation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cv.alpha</code></td>
+<td>
+<p>scale paramter between 0 and 1, used in cross validation
+risk evaluation function for <code>"CT"</code> and <code>"fit"</code>.  When
+<code>cv.Honest = FALSE</code>, <code>cv.alpha</code> will be set as 1.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sample.size.total</code></td>
+<td>
+<p>Sample size used to build each tree in the
+forest (sampled randomly with replacement).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sample.size.train.frac</code></td>
+<td>
+<p>Fraction of the sample size used for
+building each tree (training). For eexample,  if the sample.size.total is
+1000 and frac =0.5 then, 500 samples will be used to build the tree and
+the other 500 samples will be used the evaluate the tree.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mtry</code></td>
+<td>
+<p>Number of data features used to build a tree
+(This variable is not used presently).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nodesize</code></td>
+<td>
+<p>Minimum number of observations for treated and
+control cases in one leaf node</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ncolx</code></td>
+<td>
+<p>Total number of covariates</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>CausalForest builds an ensemble of CausalTrees (See Athey and Imbens,
+<em>Recursive Partitioning for Heterogeneous Causal
+Effects</em> (2016)), by repeated random sampling of the data with replacement.
+Further, each tree is built using a randomly sampled subset of all available
+covariates. A causal forest object is a list of trees. To predict, call R's
+predict function with new test data and the causalForest object (estimated
+on the training data) obtained after calling the causalForest function.
+During the prediction phase, the average value over all tree predictions
+is returned as the final prediction by default.
+To return the predictions of each tree in the forest for each test
+observation, set the flag <code>predict.all=TRUE</code>
+CausalTree differs from <code>rpart</code> function from <span class="pkg">rpart</span> package in
+splitting rules and cross validation methods. Please check Athey
+and Imbens, <em>Recursive Partitioning for Heterogeneous Causal
+Effects</em> (2016) and Stefan Wager and Susan Athey, <em>Estimation and
+Inference of Heterogeneous Treatment Effects using Random Forests
+</em> for more details.
+</p>
+
+
+<h3>Value</h3>
+
+<p>An object of class <code>rpart</code>.  See <code>rpart.object</code>.
+</p>
+
+
+<h3>References</h3>
+
+<p>Breiman L., Friedman J. H., Olshen R. A., and Stone, C. J. (1984)
+<em>Classification and Regression Trees.</em>
+Wadsworth.
+</p>
+<p>Athey, S and G Imbens (2016)  <em>Recursive Partitioning for
+Heterogeneous Causal Effects</em>.  http://arxiv.org/abs/1504.01132
+</p>
+<p>Wager,S and Athey, S (2015) <em>Estimation and Inference of Heterogeneous
+Treatment Effects using Random Forests</em>
+http://arxiv.org/abs/1510.04342
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>causalTree</code>
+<code>honest.causalTree</code>,
+<code>rpart.control</code>, <code>rpart.object</code>,
+<code>summary.rpart</code>, <code>rpart.plot</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">library(rpart)
+library("htetree")
+cf &lt;- causalForest(y~x1+x2+x3+x4+x5+x6+x7+x8+x9+x10, data=simulation.1,
+  treatment=simulation.1$treatment,
+  split.Rule="CT", split.Honest=TRUE,
+  split.Bucket=FALSE, bucketNum = 5,
+  bucketMax = 100, cv.option="CT", cv.Honest=TRUE, minsize = 2L,
+  split.alpha = 0.5, cv.alpha = 0.5,
+  sample.size.total = floor(nrow(simulation.1) / 2),
+  sample.size.train.frac = .5,
+  mtry = ceiling(ncol(simulation.1)/3), nodesize = 3, num.trees= 5,
+  ncolx=10,ncov_sample=3)
+
+cfpredtest &lt;- predict.causalForest(cf, newdata=simulation.1[1:100,],
+  type="vector")
+</code></pre>
+
+
+</div>

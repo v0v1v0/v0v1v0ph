@@ -1,0 +1,335 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>parameterize_3comp</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Parameters for a three-compartment toxicokinetic model (dynamic)</h2>
+
+<h3>Description</h3>
+
+<p>This function generates the chemical- and species-specific parameters needed 
+for model '3compartment', for example <code>solve_3comp</code>. A call is 
+masde to <code>parameterize_pbtk</code> to use Schmitt (2008)'s method
+as modified by Pearce et al. (2017) to predict partition coefficients based
+on descriptions in <code>tissue.data</code>. Organ volumes and flows are
+retrieved from table <code>physiology.data</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">parameterize_3comp(
+  chem.cas = NULL,
+  chem.name = NULL,
+  dtxsid = NULL,
+  species = "Human",
+  default.to.human = FALSE,
+  force.human.clint.fup = FALSE,
+  clint.pvalue.threshold = 0.05,
+  adjusted.Funbound.plasma = TRUE,
+  adjusted.Clint = TRUE,
+  regression = TRUE,
+  suppress.messages = FALSE,
+  restrictive.clearance = TRUE,
+  minimum.Funbound.plasma = 1e-04,
+  Caco2.options = NULL
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>chem.cas</code></td>
+<td>
+<p>Chemical Abstract Services Registry Number (CAS-RN) – the 
+chemical must be identified by either CAS, name, or DTXISD</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>chem.name</code></td>
+<td>
+<p>Chemical name (spaces and capitalization ignored) –  the 
+chemical must be identified by either CAS, name, or DTXISD</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dtxsid</code></td>
+<td>
+<p>EPA's 'DSSTox Structure ID (https://comptox.epa.gov/dashboard)
+– the chemical must be identified by either CAS, name, or DTXSIDs</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>species</code></td>
+<td>
+<p>Species desired (either "Rat", "Rabbit", "Dog", "Mouse", or
+default "Human").</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>default.to.human</code></td>
+<td>
+<p>Substitutes missing animal values with human values
+if true.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>force.human.clint.fup</code></td>
+<td>
+<p>Forces use of human values for hepatic
+intrinsic clearance and fraction of unbound plasma if true.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>clint.pvalue.threshold</code></td>
+<td>
+<p>Hepatic clearances with clearance assays
+having p-values greater than the threshold are set to zero.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>adjusted.Funbound.plasma</code></td>
+<td>
+<p>Uses Pearce et al. (2017) lipid binding adjustment
+for Funbound.plasma (which impacts partition coefficients) when set to TRUE (Default).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>adjusted.Clint</code></td>
+<td>
+<p>Uses Kilford et al. (2008) hepatocyte incubation
+binding adjustment for Clint when set to TRUE (Default).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>regression</code></td>
+<td>
+<p>Whether or not to use the regressions in calculating
+partition coefficients.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>suppress.messages</code></td>
+<td>
+<p>Whether or not the output message is suppressed.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>restrictive.clearance</code></td>
+<td>
+<p>In calculating hepatic.bioavailability, protein
+binding is not taken into account (set to 1) in liver clearance if FALSE.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>minimum.Funbound.plasma</code></td>
+<td>
+<p>Monte Carlo draws less than this value are set 
+equal to this value (default is 0.0001 – half the lowest measured Fup in our
+dataset).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Caco2.options</code></td>
+<td>
+<p>A list of options to use when working with Caco2 apical to
+basolateral data <code>Caco2.Pab</code>, default is Caco2.options = list(Caco2.Pab.default = 1.6,
+Caco2.Fabs = TRUE, Caco2.Fgut = TRUE, overwrite.invivo = FALSE, keepit100 = FALSE). Caco2.Pab.default sets the default value for 
+Caco2.Pab if Caco2.Pab is unavailable. Caco2.Fabs = TRUE uses Caco2.Pab to calculate
+fabs.oral, otherwise fabs.oral = <code>Fabs</code>. Caco2.Fgut = TRUE uses Caco2.Pab to calculate 
+fgut.oral, otherwise fgut.oral = <code>Fgut</code>. overwrite.invivo = TRUE overwrites Fabs and Fgut in vivo values from literature with 
+Caco2 derived values if available. keepit100 = TRUE overwrites Fabs and Fgut with 1 (i.e. 100 percent) regardless of other settings.
+See <code>get_fbio</code> for further details.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>BW</code></td>
+<td>
+<p>Body Weight, kg.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Clmetabolismc</code></td>
+<td>
+<p>Hepatic Clearance, L/h/kg BW.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Fabsgut</code></td>
+<td>
+<p>Fraction of the oral dose absorbed, i.e. the 
+fraction of the dose that enters the gutlumen.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Funbound.plasma</code></td>
+<td>
+<p>Fraction of plasma that is not bound.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Fhep.assay.correction</code></td>
+<td>
+<p>The fraction of chemical unbound in hepatocyte 
+assay using the method of Kilford et al. (2008)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>hematocrit</code></td>
+<td>
+<p>Percent volume of red blood cells in the blood.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Kgut2pu</code></td>
+<td>
+<p>Ratio of concentration of chemical in gut tissue to unbound
+concentration in plasma.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Kliver2pu</code></td>
+<td>
+<p>Ratio of concentration of
+chemical in liver tissue to unbound concentration in plasma.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Krbc2pu</code></td>
+<td>
+<p>Ratio of concentration of chemical in red blood cells to
+unbound concentration in plasma.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Krest2pu</code></td>
+<td>
+<p>Ratio of concentration of
+chemical in rest of body tissue to unbound concentration in plasma.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>million.cells.per.gliver</code></td>
+<td>
+<p>Millions cells per gram of liver tissue.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>MW</code></td>
+<td>
+<p>Molecular Weight, g/mol.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Qcardiacc</code></td>
+<td>
+<p>Cardiac Output, L/h/kg
+BW^3/4.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Qgfrc</code></td>
+<td>
+<p>Glomerular Filtration Rate, L/h/kg BW^3/4, volume of
+fluid filtered from kidney and excreted.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Qgutf</code></td>
+<td>
+<p>Fraction of cardiac output flowing to the gut.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Qliverf</code></td>
+<td>
+<p>Fraction of cardiac output flowing to the liver.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Rblood2plasma</code></td>
+<td>
+<p>The ratio of the concentration
+of the chemical in the blood to the concentration in the plasma.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Vgutc</code></td>
+<td>
+<p>Volume of the gut per kg body weight, L/kg BW.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Vliverc</code></td>
+<td>
+<p>Volume of the liver per kg body weight, L/kg BW.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Vrestc</code></td>
+<td>
+<p> Volume of the rest of the body per kg body weight, L/kg BW.</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>Robert Pearce and John Wambaugh
+</p>
+
+
+<h3>References</h3>
+
+<p>Pearce RG, Setzer RW, Strope CL, Wambaugh JF, Sipes NS (2017).
+“Httk: R package for high-throughput toxicokinetics.”
+<em>Journal of Statistical Software</em>, <b>79</b>(4), 1.
+</p>
+<p>Schmitt W (2008).
+“General approach for the calculation of tissue to plasma partition coefficients.”
+<em>Toxicology in vitro</em>, <b>22</b>(2), 457–467.
+</p>
+<p>Pearce RG, Setzer RW, Davis JL, Wambaugh JF (2017).
+“Evaluation and calibration of high-throughput predictions of chemical distribution to tissues.”
+<em>Journal of pharmacokinetics and pharmacodynamics</em>, <b>44</b>, 549–565.
+</p>
+<p>Kilford PJ, Gertz M, Houston JB, Galetin A (2008).
+“Hepatocellular binding of drugs: correction for unbound fraction in hepatocyte incubations using microsomal binding or drug lipophilicity data.”
+<em>Drug Metabolism and Disposition</em>, <b>36</b>(7), 1194–1197.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>solve_3comp</code>
+</p>
+<p><code>calc_analytic_css_3comp</code>
+</p>
+<p><code>parameterize_pbtk</code>
+</p>
+<p><code>apply_clint_adjustment</code>
+</p>
+<p><code>tissue.data</code>
+</p>
+<p><code>physiology.data</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+ parameters &lt;- parameterize_3comp(chem.name='Bisphenol-A',species='Rat')
+ parameters &lt;- parameterize_3comp(chem.cas='80-05-7',
+                                  species='rabbit',default.to.human=TRUE)
+ out &lt;- solve_3comp(parameters=parameters,plots=TRUE)
+
+</code></pre>
+
+
+</div>

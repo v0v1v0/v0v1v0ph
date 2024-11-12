@@ -1,0 +1,110 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>summary.hal9001</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Summary Method for HAL fit objects</h2>
+
+<h3>Description</h3>
+
+<p>Summary Method for HAL fit objects
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">## S3 method for class 'hal9001'
+summary(
+  object,
+  lambda = NULL,
+  only_nonzero_coefs = TRUE,
+  include_redundant_terms = FALSE,
+  round_cutoffs = 3,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>object</code></td>
+<td>
+<p>An object of class <code>hal9001</code>, containing the results of
+fitting the Highly Adaptive Lasso, as produced by <code>fit_hal</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lambda</code></td>
+<td>
+<p>Optional <code>numeric</code> value of the lambda tuning
+parameter, for which corresponding coefficient values will be summarized.
+Defaults to <code>fit_hal</code>'s optimal value, <code>lambda_star</code>, or
+the minimum value of <code>lambda_star</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>only_nonzero_coefs</code></td>
+<td>
+<p>A <code>logical</code> specifying whether the summary
+should include only terms with non-zero coefficients.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>include_redundant_terms</code></td>
+<td>
+<p>A <code>logical</code> specifying whether the
+summary should remove so-called "redundant terms". We define a redundant
+term (say x1) as a term (1) with basis function corresponding to an
+existing basis function, a duplicate; and (2) the duplicate contains the
+x1 term as part of its term, so that x1 terms inclusion would be redundant.
+For example, say the same coefficient corresponds to these three terms:
+(1) "I(age &gt;= 50)*I(bmi &gt;= 18)", (2) "I(age &gt;= 50)", and (3)
+"I(education &gt;= 16)". When <code>include_redundant_terms</code> is
+<code>FALSE</code> (default), the second basis function is omitted.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>round_cutoffs</code></td>
+<td>
+<p>An <code>integer</code> indicating the number of decimal
+places to be used for rounding cutoff values in the term. For example, if
+"bmi" was numeric that was rounded to the third decimal, in the example
+above we would have needed to specify <code>round_cutoffs = 0</code> in order to
+yield a term like "I(bmi &gt;= 18)" opposed to something like
+"I(bmi &gt;= 18.111)". This rounding is intended to simplify the term-wise
+part of the output and only rounds the basis cutoffs, the <code>hal9001</code>
+model's coefficients are not rounded.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Additional arguments passed to <code>summary</code>, not supported.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Method for summarizing the coefficients of the Highly Adaptive
+Lasso estimator in terms of the basis functions corresponding to covariates
+and interactions of covariates, returned as a single S3 object of class
+<code>hal9001</code>.
+</p>
+<p>Due to the nature of the basis function terms, the summary tables can be
+extremely wide. The R environment might not be the optimal location to view
+the summary. Tables can be exported from R to LaTeX with <span class="pkg">xtable</span>
+package (or similar). Here's an example:
+<code>print(xtable(summary(fit)$table, type = "latex"), file = "dt.tex")</code>.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A list summarizing a <code>hal9001</code> object's coefficients.
+</p>
+
+
+</div>

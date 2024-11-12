@@ -1,0 +1,157 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hmm0norm</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Parameter Estimation of an HMM with Extra Zeros
+</h2>
+
+<h3>Description</h3>
+
+<p>Calculates the parameter estimates of a 1-D HMM with observations having extra zeros.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hmm0norm(R, Z, pie, gamma, mu, sig, delta, tol=1e-6, print.level=1, fortran = TRUE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>R</code></td>
+<td>
+<p>is the observed data. <code>R</code> is a <code class="reqn">T * 1</code> matrix, where <code class="reqn">T</code> is the number of observations.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Z</code></td>
+<td>
+<p>is the binary data with the value 1 indicating that an event was observed and 0 otherwise. <code>Z</code> is a vector of length <code class="reqn">T</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pie</code></td>
+<td>
+<p>is a vector of length <code class="reqn">m</code>, the <code class="reqn">j</code>th element of which is the probability of <code class="reqn">Z=1</code> when the process is in state <code class="reqn">j</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>gamma</code></td>
+<td>
+<p>is the transition probability matrix (<code class="reqn">m * m</code>) of the hidden Markov chain.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mu</code></td>
+<td>
+<p>is a <code class="reqn">1 * m</code> matrix, the <code class="reqn">j</code>th element of which is the mean of the (Gaussian) distribution of the observations in state <code class="reqn">j</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sig</code></td>
+<td>
+<p>is a <code class="reqn">1 * m</code> matrix, the <code class="reqn">j</code>th element of which is the standard deviation of the (Gaussian) distribution of the observations in state <code class="reqn">j</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>delta</code></td>
+<td>
+<p>is a vector of length <code class="reqn">m</code>, the initial distribution vector of the Markov chain.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tol</code></td>
+<td>
+<p>is the tolerance for testing convergence of the iterative estimation process. The default tolerance is 1e-6. For initial test of model fit to your data, a larger tolerance (e.g., 1e-3) should be used to save time.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>print.level</code></td>
+<td>
+<p>controls the amount of output being printed. Default is 1. If <code>print.level=1</code>, only the log likelihoods and the differences between the log likelihoods at each step of the iterative estimation process, and the final estimates are printed. If <code>print.level=2</code>, the log likelihoods, the differences between the log likelihoods, and the estimates at each step of the iterative estimation process are printed.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fortran</code></td>
+<td>
+<p>is logical, and determines whether Fortran code is used; default is <code>TRUE</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>pie</code></td>
+<td>
+<p>is the estimated probability of <code class="reqn">Z=1</code> when the process is in each state.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mu</code></td>
+<td>
+<p>is the estimated mean of the (Gaussian) distribution of the observations in each state.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sig</code></td>
+<td>
+<p>is the estimated standard deviation of the (Gaussian) distribution of the observations in each state.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>gamma</code></td>
+<td>
+<p>is the estimated transition probability matrix of the hidden Markov chain.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>delta</code></td>
+<td>
+<p>is the estimated initial distribution vector of the Markov chain.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>LL</code></td>
+<td>
+<p>is the log likelihood.</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>Ting Wang
+</p>
+
+
+<h3>References</h3>
+
+
+<p>Wang, T., Zhuang, J., Obara, K. and Tsuruoka, H. (2016) Hidden Markov Modeling of Sparse Time Series from Non-volcanic Tremor Observations. Journal of the Royal Statistical Society, Series C, Applied Statistics, 66, Part 4, 691-715.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">pie &lt;- c(0.002,0.2,0.4)
+gamma &lt;- matrix(c(0.99,0.007,0.003,
+                  0.02,0.97,0.01,
+                  0.04,0.01,0.95),byrow=TRUE, nrow=3)
+mu &lt;- matrix(c(0.3,0.7,0.2),nrow=1)
+sig &lt;- matrix(c(0.2,0.1,0.1),nrow=1)
+delta &lt;- c(1,0,0)
+y &lt;- sim.hmm0norm(mu,sig,pie,gamma,delta, nsim=5000)
+R &lt;- as.matrix(y$x,ncol=1)
+Z &lt;- y$z
+yn &lt;- hmm0norm(R, Z, pie, gamma, mu, sig, delta)
+yn
+</code></pre>
+
+
+</div>

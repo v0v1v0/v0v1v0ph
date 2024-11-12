@@ -1,0 +1,110 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>auc-methods</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Methods for Function <code>auc</code> in Package <span class="pkg">HandTill2001</span>
+</h2>
+
+<h3>Description</h3>
+
+<p>Calculate area under curve of the receiver operating characteristic for
+two or more prediction classes.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">## S4 method for signature 'bincap'
+auc(object)
+
+## S4 method for signature 'multcap'
+auc(object)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table><tr style="vertical-align: top;">
+<td><code>object</code></td>
+<td>
+<p>An object of <code>class</code> <em>bincap</em> or <em>multcap</em>.</p>
+</td>
+</tr></table>
+<h3>Details</h3>
+
+<p>Depending on whether <code>object</code> is of class <code>bincap</code> or of class
+<code>multcap</code>, a binary class or multiple class AUC is calculated.
+</p>
+
+
+<h3>Value</h3>
+
+<p>An object of class <code>"numeric"</code>.
+</p>
+
+
+<h3>Methods</h3>
+
+
+<dl>
+<dt>signature(object = "bincap")</dt>
+<dd>
+<p> calculates the AUC statistic
+for a binary class response following <cite>Hand and Till (2001)</cite>, Eq. (3). </p>
+</dd>
+<dt>signature(object = "multcap")</dt>
+<dd>
+<p> calculates the AUC statistic
+for a multiple class response following <cite>Hand and Till (2001)</cite>, Eq.
+(7). </p>
+</dd> </dl>
+<h3>References</h3>
+
+<p><cite>David J. Hand and Robert J. Till (2001). A Simple
+Generalisation of the Area Under the ROC Curve for Multiple Class
+Classification Problems. <em>Machine Learning</em> <b>45</b>(2), p. 171–186.
+DOI:
+<a href="http://dx.doi.org/10.1023/A:1010920819831">10.1023/A:1010920819831</a></cite>.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>class?bincap</code>,
+<code>class?multcap</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(ht01.twoclass, package = "HandTill2001")
+message(" == AUC for a binary class response")
+message(" == == HandTill2001 result:")
+HandTill2001::auc(HandTill2001::bincap(
+  response = as.factor(ht01.twoclass[["observed"]]),
+  predicted = ht01.twoclass[["predicted"]],
+  true = "1"
+))
+## Not run: 
+message(" == == ROCR result:")
+ROCR::performance(ROCR::prediction(
+  labels = ht01.twoclass[["observed"]],
+  predictions = ht01.twoclass[["predicted"]]
+),
+measure = "auc"
+)@y.values
+
+## End(Not run)
+data(ht01.multipleclass, package = "HandTill2001")
+message(" == AUC for a multiple class response")
+predicted &lt;- as.matrix(ht01.multipleclass[, levels(ht01.multipleclass[["observed"]])])
+HandTill2001::auc(HandTill2001::multcap(
+  response = ht01.multipleclass[["observed"]],
+  predicted = predicted
+))
+</code></pre>
+
+
+</div>

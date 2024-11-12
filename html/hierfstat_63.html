@@ -1,0 +1,79 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>read.fstat.data</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Reads data from a FSTAT file</h2>
+
+<h3>Description</h3>
+
+<p>Imports a <em>FSTAT</em> data file into R.
+The data frame created is made of <kbd>nl+1</kbd> columns, <kbd>nl</kbd> being the number of loci.
+The first column corresponds to the Population identifier,
+the following columns contains the genotypes of the individuals.</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">read.fstat.data(fname, na.s = c("0","00","000","0000","00000","000000","NA"))
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table><tr style="vertical-align: top;">
+<td><code>fname</code></td>
+<td>
+<p>a file in the FSTAT format (<a href="http://www.unil.ch/popgen/softwares/fstat.htm">http://www.unil.ch/popgen/softwares/fstat.htm</a>):
+The file must have the following format:
+</p>
+<p>The first line contains 4 numbers: the number of samples, <kbd>np</kbd> , the number of loci, <kbd>nl</kbd>,
+the highest number used to label an allele, <kbd>nu</kbd>, and a 1 if the code for alleles is a one digit
+number (1-9), a 2 if code for alleles is a 2 digit number (01-99) or a 3 if code for alleles is a 3
+digit number (001-999).  These 4 numbers need to be separated by any number of spaces.</p>
+</td>
+</tr></table>
+<p>The first line is immediately followed by <kbd>nl</kbd> lines, each containing the name of a locus,
+in the order they will appear in the rest of the file.
+</p>
+<p>On line <kbd>nl+2</kbd>, a series of numbers as follow:
+</p>
+<pre>1     0102   0103   0101  0203          0      0303</pre>
+<p>The first number identifies the sample to which the individual belongs,
+the second is the genotype of the individual at the first locus,
+coded with a 2 digits number for each allele,
+the third is the genotype at the second locus, until locus nl is entered
+(in the example above, <kbd>nl=6</kbd>).  Missing genotypes are encoded with 0, 00, 0000, 000000 or NA.
+Note that 0001 or 0100 are not a valid format, as both alleles at a locus have
+to be known, otherwise, the genotype is considered as missing.
+No empty lines are needed between samples.
+</p>
+<table><tr style="vertical-align: top;">
+<td><code>na.s</code></td>
+<td>
+<p>The strings that correspond to the missing value.
+<em>You should note have to change this</em></p>
+</td>
+</tr></table>
+<h3>Value</h3>
+
+<p>a data frame containing the desired data, in a format adequate to pass to <kbd>varcomp</kbd>
+</p>
+
+
+<h3>References</h3>
+
+<p>Goudet J. (1995). FSTAT (Version 1.2): A computer program to calculate F- statistics. Journal of Heredity 86:485-486
+</p>
+<p>Goudet J. (2005). Hierfstat, a package for R to compute and test variance components and F-statistics. Molecular Ecology Notes. 5:184-186
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">read.fstat.data(paste(path.package("hierfstat"),"/extdata/diploid.dat",sep="",collapse=""))
+</code></pre>
+
+
+</div>

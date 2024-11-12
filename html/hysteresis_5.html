@@ -1,0 +1,227 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>fel.repeated</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Methods for easily fitting multiple ellipses from repeated measures designs.
+</h2>
+
+<h3>Description</h3>
+
+<p>Fit a sinusoidal hysteretic process between an input and an output variable across multiple loops separated by subjects and repeated.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">fel.repeated(x,y=NULL,subjects=NULL,repeated=NULL,subjects.in="all",repeated.in="all",...)
+## S3 method for class 'ellipsefitlist'
+summary(object,N=1000,boot=TRUE,seed=NULL,...)
+
+
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+
+<p>numeric input vector.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+
+<p>numeric output vector.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>subjects</code></td>
+<td>
+
+<p>factor of the same length as x that represents experimental units.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>repeated</code></td>
+<td>
+
+<p>factor of the same length as x that represents the repeated measure.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>subjects.in</code></td>
+<td>
+
+<p>a vector of characters, the levels of <code>subjects</code> to be included. Default is "all".
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>repeated.in</code></td>
+<td>
+
+<p>a vector of characters, the levels of <code>repeated</code> to be included. Default is "all".
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>object</code></td>
+<td>
+
+<p>an <code>ellipsefitlist</code> object.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>N</code></td>
+<td>
+
+<p>Number of bootstrap replicates.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>boot</code></td>
+<td>
+
+<p>whether to use bootstrapping to obtain standard errors and less biased parameter estimates.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>seed</code></td>
+<td>
+
+<p>for generating random numbers. See <code>summary.fittedloop</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+
+<p>extra arguments to either <code>fel</code> or <code>summary.ellipsefitlist.</code>
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Fits multiple ellipses with one call, separated by the factors <code>subjects</code> and <code>repeated</code>. The arguments <code>subjects.in</code> and <code>repeated.in</code> are used to select subsets of the factors <code>subjects</code> and <code>repeated</code>.
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>fel.repeated</code> returns an object of class <code>ellipsefitlist</code>.
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>models</code></td>
+<td>
+<p>Separate model fits for each ellipse, see <code>fel</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Estimates</code></td>
+<td>
+<p>Parameter estimates for all ellipses in matrix form.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Std.Errors</code></td>
+<td>
+<p>Delta standard errors for all ellipses in matrix form.</p>
+</td>
+</tr>
+</table>
+<p>When <code>boot=TRUE</code> <code>fel.repeated</code> returns an object of class <code>ellipsesummarylist</code> which consists of
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>models</code></td>
+<td>
+<p> a vector of separate model summaries for each ellipse, see <code>summary.ellipsefit</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>values</code></td>
+<td>
+<p>Bootstrapped parameter estimates, standard errors, quantiles, and more for each ellipse.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Boot.Estimates</code></td>
+<td>
+<p>Bootstrapped parameter estimates with reduced bias.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Boot.Std.Errors</code></td>
+<td>
+<p>Standard errors provided by bootstrapping.</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>Spencer Maynes, Fan Yang, and Anne Parkhurst.
+</p>
+
+
+<h3>References</h3>
+
+<p>Yang, F. and A. Parkhurst, Efficient Estimation of Elliptical Hysteresis (submitted)
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>fel</code> for a more general way to fit multiple ellipses, or for fitting just one ellipse. <code>plot.ellipsefit</code> for plotting and <code>summary.ellipsefit</code> for summarizing and bootstrapping an <code>ellipsefitlist</code> object. Also <code>residuals.ellipsefitlist</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Select 2 subjects with 2 replications and fit 4 ellipses
+data(EllipseData) 
+emodels.rep &lt;- fel.repeated(EllipseData$X, EllipseData$Y, method = "harmonic2", 
+subjects = EllipseData$subjects,subjects.in=c("A","C"),
+repeated=EllipseData$repeated)
+emodels.rep                #Gives estimates and delta standard errors 
+emodels.rep$Estimates      #List estimates only
+emodels.rep$Std.Errors     #List delta standard errors 
+par(mfrow=c(2,2))
+plot(emodels.rep, main="Repeated Ellipses",xlab="X",ylab="Y")
+par(mfrow=c(1,1))
+
+### Bootstrap estimates and standard errors (Seed is necessary if want to reproduce results)
+boot.rep.ellipse&lt;-fel.repeated(EllipseData$X,EllipseData$Y,method = "harmonic2",
+subjects = EllipseData$subjects,subjects.in=c("A","C"),
+repeated=EllipseData$repeated,boot=TRUE,seed=123)
+boot.rep.ellipse  #Gives boot estimates, boot bias, boot SE and boot quartiles
+par(mfrow=c(2,2))
+plot(boot.rep.ellipse, main="Repeated Ellipses",xlab="X",ylab="Y",values="ellipse")
+par(mfrow=c(1,1))
+
+##Can write results to a file. First set your directory from the file tab.
+#Change file path in command below to coincide with where you want to store data files
+#setwd("C:/Users................")
+#write.table(boot.rep.ellipse$Boot.Estimates,"Ellipes.eg.repbootvalues.txt")
+#test.fel=read.table("Ellipes.eg.repbootvalues.txt",header=TRUE)
+#head(test.fel)
+</code></pre>
+
+
+</div>

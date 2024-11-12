@@ -1,0 +1,131 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>Mplus_psyn</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Generating Mplus syntax for empirical RIASEC angular locations with projected constructs</h2>
+
+<h3>Description</h3>
+
+<p>This function generates an extended executable Mplus syntax which is discussed in Nagy et. al. (2009).
+the resulting Mplus syntax estimates the angular locations of the six RIASEC dimensions, based on their correlations, in the asumed circumplex array within the theory of vocational choice by John Holland (1997). in contrast to the function <code>Mplus_esyn()</code> and the syntax discussed by Nagy et. al. (2009), additional constructs (correlated to RIASEC dimensions) are 'projeted' into the circular array of the six vocational interest dimensions.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">Mplus_psyn(
+  N,
+  Cor,
+  M,
+  mpluserg,
+  name = NULL,
+  dummyvorl = 1,
+  verbose = FALSE,
+  eol = "\r\n",
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>N</code></td>
+<td>
+<p>number of observations for correlations as numeric</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Cor</code></td>
+<td>
+<p>either an R matrix object with RIASEC and additional construct correlations or the name of a correlation matrix, stored as a .dat text file, as character (see details).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>M</code></td>
+<td>
+<p>number of additional construct dimensions to project into the RIASEC circumplex - e.g. <code>M=5</code> for big-five personality dimensions</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mpluserg</code></td>
+<td>
+<p>name of the Mplus output data (as character - e.g. "myoutput.out") from which the fixation RIASEC-parameters should be read - this is usaly the result of Mplus prosessing an input syntax generated with the function <code>Mplus_esyn()</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>name</code></td>
+<td>
+<p>optional a name (as character) for the Mplus syntax to be saved - default is the object name or the name given in paramter <code>Cor</code> as character (with ending changed to '.inp').</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dummyvorl</code></td>
+<td>
+<p>default is dummyvorl = 1, which results in the Mplus syntax given in Nagy et. al. (2009). !! don't change this !!
+if changed: <em>"Alternatively, the name of an external dummy template to be used can also be specified here, which is then read in and used. It is strongly recommended to use the internal syntax template, since the use of an external dummy template cannot be documented further here."</em>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p>logical with default set to <code>verbose=FALSE</code>; if set to <code>verbose=TRUE</code> the resulting Mplus syntax is <em>additionally</em> printed on the console.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>eol</code></td>
+<td>
+<p>character see <code>write.table</code> to control the generation of correct line endings in text files on different operating systems.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>additional parameters passed through</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>for execution of this function it is necessary that you have Mplus (version 6.11 or version 7) installed on your system. The function <code>Mplus_psyn</code> will read a Mplus output file, located in the current R workspace directory, which is a result of manualy runing an Mplus input file, generatetd by the function <code>Mplus_esyn()</code>. The name of the Mplus output data must be specified in the argument <code>mpluserg</code>.
+The structure of the correlation 'data' must follow the structure given in the data <code>example3</code> in this package - thus the correlation data must start with the additional construct dimensions which should be projected into the RIASEC circumplex.
+</p>
+
+
+<h3>Value</h3>
+
+<p>resulting Mplus syntax wil be saved in the current working directory
+</p>
+
+
+<h3>References</h3>
+
+<p>Holland, J.L. (1997). <em>Making vocational choices. A theory of vocational personalities and work environments</em>. Lutz, FL: Psychological Assessment Resources.
+</p>
+<p>Nagy, G., Marsh, H. W., Luedtke, O., &amp; Trautwein, U. (2009). Representing circles in our minds: Confirmatory factor analysis of circumplex structures and profiles. In T. Teo &amp; M. S. Khine (Hrsg.), <em>Structural Equation Modeling in Educational Research: Concepts and applications</em> (S. 287 - 315). Rotterdam Boston Taipei: Sense Publishers.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## first preparing an Mplus output data
+data(example1) # loading fictional example correlation matrix for fixing
+Mplus_esyn(N = 300, Cor = example1)
+## !!! now first open the 'example1.inp' with Mplus and click run !!! 
+##### not run until Mplus is installed on your system #####
+# generating an example Mplus syntax referring to a correlation data 
+# stored in the already existing file 'example3' 
+# for projection of 5 personality dimensions into the circumplex
+data(example3) # loading fictional example correlation matrix with add. constr.
+## Not run:  Mplus_psyn(N = 300, Cor = example3,M = 5, mpluserg = "example1.out") 
+################################################################
+### clean up work directory
+file.remove("example1.inp") # remove generated Mplus syntax from work dir.
+file.remove("example1.dat") # remove generated cor. data from work dir.
+</code></pre>
+
+
+</div>

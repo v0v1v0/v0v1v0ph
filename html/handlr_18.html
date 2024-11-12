@@ -1,0 +1,108 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>ris_writer</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>ris writer (Research Information Systems)</h2>
+
+<h3>Description</h3>
+
+<p>ris writer (Research Information Systems)
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">ris_writer(z)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table><tr style="vertical-align: top;">
+<td><code>z</code></td>
+<td>
+<p>an object of class <code>handl</code>; see handl for more</p>
+</td>
+</tr></table>
+<h3>Value</h3>
+
+<p>text if one RIS citation or list of many
+</p>
+
+
+<h3>References</h3>
+
+<p>RIS tags https://en.wikipedia.org/wiki/RIS_(file_format)
+</p>
+
+
+<h3>See Also</h3>
+
+<p>Other writers: 
+<code>bibtex_writer()</code>,
+<code>cff_writer()</code>,
+<code>citeproc_writer()</code>,
+<code>codemeta_writer()</code>,
+<code>rdf_xml_writer()</code>,
+<code>schema_org_writer()</code>
+</p>
+<p>Other ris: 
+<code>ris_reader()</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># from a RIS file
+z &lt;- system.file('extdata/crossref.ris', package = "handlr")
+tmp &lt;- ris_reader(z)
+cat(ris_writer(z = tmp))
+
+# peerj
+z &lt;- system.file('extdata/peerj.ris', package = "handlr")
+tmp &lt;- ris_reader(z)
+cat(ris_writer(z = tmp))
+
+# plos
+z &lt;- system.file('extdata/plos.ris', package = "handlr")
+tmp &lt;- ris_reader(z)
+cat(ris_writer(z = tmp))
+
+# elsevier
+z &lt;- system.file('extdata/elsevier.ris', package = "handlr")
+tmp &lt;- ris_reader(z)
+cat(ris_writer(z = tmp))
+
+z &lt;- system.file('extdata/citeproc.json', package = "handlr")
+res &lt;- citeproc_reader(z)
+cat(ris_writer(z = res))
+
+# many
+## combine many RIS in a handl object
+z &lt;- system.file('extdata/crossref.ris', package = "handlr")
+cr &lt;- ris_reader(z)
+z &lt;- system.file('extdata/peerj.ris', package = "handlr")
+prj &lt;- ris_reader(z)
+c(cr, prj)
+
+# many bibtex to ris via c method
+if (requireNamespace("bibtex", quietly=TRUE)) {
+a &lt;- system.file('extdata/bibtex.bib', package = "handlr")
+b &lt;- system.file('extdata/crossref.bib', package = "handlr")
+aa &lt;- bibtex_reader(a)
+bb &lt;- bibtex_reader(a)
+(res &lt;- c(aa, bb))
+cat(ris_writer(res), sep = "\n\n")
+}
+
+## manhy Citeproc to RIS
+z &lt;- system.file('extdata/citeproc-many.json', package = "handlr")
+w &lt;- citeproc_reader(x = z)
+ris_writer(w)
+cat(ris_writer(w), sep = "\n")
+</code></pre>
+
+
+</div>

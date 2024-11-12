@@ -1,0 +1,149 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hmmm.chibar</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>chi-bar statistic test for hmm models</h2>
+
+<h3>Description</h3>
+
+<p>Function to calculate weights and pvalues of a chi-bar-square distributed statistic
+for testing hypotheses of inequality constraints on parameters of hmm models.
+The models in input are objects inheriting from class <code>hmmmfit</code> or <code>mphfit</code>. 
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hmmm.chibar(nullfit, disfit, satfit, repli = 6000, 
+kudo = FALSE, TESTAB = FALSE, 
+alpha = c(0.02,0.03,0), pesi = NULL)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>nullfit</code></td>
+<td>
+<p>The estimated model with inequalities turned into equalities</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>disfit</code></td>
+<td>
+<p>The estimated model with inequalities</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>satfit</code></td>
+<td>
+<p>The estimated model without inequalities</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>repli</code></td>
+<td>
+<p>Number of simulations</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>kudo</code></td>
+<td>
+<p>If TRUE, the chi-bar weights are not simulated but  computed by the Kudo's method</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>TESTAB</code></td>
+<td>
+<p>If TRUE, the LR tuned testing procedure is performed (see Details)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alpha</code></td>
+<td>
+<p>Three significance levels c(alpha1, alpha2, alpha12) of the LR tuned testing procedure</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pesi</code></td>
+<td>
+<p>The chi-bar weights if they are known</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>All the 3 argument models must be obtained by ‘hmmm.mlfit’ or by ‘mphineq.fit’.
+The method "Simulation 2" described in Silvapulle and Sen, 2005, pg. 79 is used if <code>kudo = FALSE</code>, otherwise the Kudo's exact method is used
+as described by El Barmi and Dykstra (1999). The Kudo's method can be reasonably used with less than 10-15 inequalities.
+If TESTA is the LR statistics  for <code>nullfit</code>  against the <code>disfit</code> model
+while TESTB  is the LR statistics for <code>disfit</code> against the <code>satfit</code> model then 
+the LR tuned testing procedure (Colombi and Forcina, 2013) runs as follows:
+accept <code>nullfit</code> if TESTB &lt; y2 and TESTA &lt; y1,
+where 
+Pr(TESTB &gt; y2) = alpha2-alpha12 and  Pr(TESTA &lt; y1, TESTB &lt; y2) = 1-alpha1-alpha2,
+reject <code>nullfit</code>  in favour of <code>disfit</code>  if TESTA &gt; y1 and
+TESTB &lt; y12, where Pr(TESTA &gt; y1, TESTB &lt; y12) = alpha1,
+otherwise reject <code>nullfit</code> for <code>satfit</code>.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A list with the statistics test of type A and B (Silvapulle and Sen, 2005, pg. 61) 
+and their pvalues. If <code>TESTAB = TRUE</code> details on the LR tuned testing procedure (Colombi and Forcina, 2013) are reported.
+</p>
+
+
+<h3>References</h3>
+
+<p> Colombi R. Forcina A. (2013) Testing order restrictions in contingency tables. Submitted.
+</p>
+<p>El Barmi H, Dykstra R (1999) Likelihood ratio test against a set of inequality constraints. 
+Journal of Nonparametric Statistics, 11, 233-261. 
+</p>
+<p>Silvapulle MJ, Sen PK (2005) Constrained statistical
+inference, Wiley, New Jersey.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>summary.hmmmchibar</code>, <code>print.hmmmchibar</code></p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(polbirth)
+# 1 = Politics; 2 = Birthcontrol
+y&lt;-getnames(polbirth,st=12,sep=";")                     
+names&lt;-c("Pol","Birth")
+marglist&lt;-c("l-m","m-l","l-l")
+marginals&lt;-marg.list(marglist,mflag="m")
+ineq&lt;-list(marg=c(1,2),int=list(c(1,2)),types=c("l","l"))
+
+# definition of the model with inequalities on interactions in ineq
+model&lt;-hmmm.model(marg=marginals,dismarg=list(ineq),lev=c(7,4),names=names)
+
+# saturated model
+msat&lt;-hmmm.mlfit(y,model)
+
+# model with non-negative local log-odds ratios: "Likelihood ratio monotone dependence model"
+mlr&lt;-hmmm.mlfit(y,model,noineq=FALSE)
+
+# model with null local log-odds ratios: "Stochastic independence model"
+model0&lt;-hmmm.model(marg=marginals,lev=c(7,4),sel=c(10:27),names=names)
+mnull&lt;-hmmm.mlfit(y,model0)
+
+# HYPOTHESES TESTED:
+#     testA --&gt; H0=(mnull model) vs H1=(mlr model)
+#     testB --&gt; H0=(mlr model) vs H1=(msat model)
+
+P&lt;-hmmm.chibar(nullfit=mnull,disfit=mlr,satfit=msat)
+summary(P)</code></pre>
+
+
+</div>

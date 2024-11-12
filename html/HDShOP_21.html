@@ -1,0 +1,92 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>plot_frontier</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Plot the Bayesian efficient frontier (Bauder et al. 2021) and the
+provided portfolios.</h2>
+
+<h3>Description</h3>
+
+<p>The plotted  Bayesian efficient frontier is provided by
+Eq. (8) in Bauder et al. (2021).
+It is the set of optimal portfolios obtained
+by employing the posterior predictive distribution on the asset returns.
+This efficient frontier can be used to assess the mean-variance efficiency
+of various estimators of the portfolio weights. The standard deviation of
+the portfolio return is plotted in the <code class="reqn">x</code>-axis and the mean portfolio
+return in the <code class="reqn">y</code>-axis. The portfolios with the weights <code class="reqn">\rm{w}</code>
+are added to the plot by computing  <code class="reqn">\sqrt{\rm{w}^\prime  S  w} </code>
+and  <code class="reqn">\rm w^\prime \bar x</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">plot_frontier(x, weights.eff = rep(1/nrow(x), length = nrow(x)))
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>a p by n matrix or a data frame of asset returns. Rows represent
+different assets, columns – observations.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>weights.eff</code></td>
+<td>
+<p>matrix of portfolio weights. Each column contains
+p values of the weights for a given portfolio. Default: equally
+weighted portfolio.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>a ggplot object
+</p>
+
+
+<h3>References</h3>
+
+<p>Bauder D, Bodnar T, Parolya N, Schmid W (2021).
+“Bayesian mean–variance analysis: optimal portfolio selection under parameter uncertainty.”
+<em>Quantitative Finance</em>, <b>21</b>(2), 221–242.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">p &lt;- 150
+n &lt;- 300
+gamma &lt;- 10
+mu &lt;- seq(0.2,-0.2, length.out=p)
+Sigma &lt;- RandCovMtrx(p=p)
+
+x &lt;- t(MASS::mvrnorm(n=n , mu=mu, Sigma=Sigma))
+
+EW_port &lt;- rep(1/p, length=p)
+MV_shr_port &lt;- new_MV_portfolio_weights_BDOPS21(x=x, gamma=gamma,
+                                                b=EW_port, beta=0.05)$weights
+GMV_shr_port &lt;- new_MV_portfolio_weights_BDOPS21(x=x, gamma=Inf, b=EW_port,
+                                                 beta=0.05)$weights
+MV_trad_port &lt;- new_MV_portfolio_traditional(x=x, gamma=gamma)$weights
+GMV_trad_port &lt;- new_MV_portfolio_traditional(x=x, gamma=Inf)$weights
+
+weights.eff &lt;- cbind(EW_port, MV_shr_port, GMV_shr_port,
+                     MV_trad_port, GMV_trad_port)
+colnames(weights.eff) &lt;- c("EW", "MV_shr", "GMV_shr", "MV_trad", "GMV_trad")
+
+
+Fplot &lt;- plot_frontier(x, weights.eff)
+Fplot
+</code></pre>
+
+
+</div>

@@ -1,0 +1,611 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hpaSelection</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Perform semi-nonparametric selection model estimation</h2>
+
+<h3>Description</h3>
+
+<p>This function performs semi-nonparametric (SNP) maximum 
+likelihood estimation of sample selection model 
+using Hermite polynomial based approximating function proposed by Gallant 
+and Nychka in 1987. Please, see <code>dhpa</code> 'Details' section to 
+get more information concerning this approximating function.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hpaSelection(
+  selection,
+  outcome,
+  data,
+  selection_K = 1L,
+  outcome_K = 1L,
+  pol_elements = 3L,
+  is_Newey = FALSE,
+  x0 = numeric(0),
+  is_Newey_loocv = FALSE,
+  cov_type = "sandwich",
+  boot_iter = 100L,
+  is_parallel = FALSE,
+  opt_type = "optim",
+  opt_control = NULL,
+  is_validation = TRUE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>selection</code></td>
+<td>
+<p>an object of class "formula" 
+(or one that can be coerced to that class): a symbolic description of the 
+selection equation form. All variables in <code>selection</code> should be numeric 
+vectors of the same length.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>outcome</code></td>
+<td>
+<p>an object of class "formula" (or one that can be coerced 
+to that class): a symbolic description of the outcome equation form. 
+All variables in <code>outcome</code> should be numeric vectors of the 
+same length.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>data frame containing the variables in the model.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>selection_K</code></td>
+<td>
+<p>non-negative integer representing 
+polynomial degree related to selection equation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>outcome_K</code></td>
+<td>
+<p>non-negative integer representing polynomial 
+degree related to outcome equation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pol_elements</code></td>
+<td>
+<p>number of conditional expectation approximating terms 
+for Newey's method. If <code>is_Newey_loocv</code> is <code>TRUE</code> then determines 
+maximum number of these terms during leave-one-out cross-validation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>is_Newey</code></td>
+<td>
+<p>logical; if TRUE then returns only Newey's method 
+estimation results (default value is FALSE).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x0</code></td>
+<td>
+<p>numeric vector of optimization routine initial values.
+Note that <code>x0 = c(pol_coefficients[-1], mean, sd, z_coef, y_coef)</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>is_Newey_loocv</code></td>
+<td>
+<p>logical; if TRUE then number of conditional 
+expectation approximating terms for Newey's method will be selected
+based on leave-one-out cross-validation criteria iterating through 0 
+to pol_elements number of these terms.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cov_type</code></td>
+<td>
+<p>character determining the type of covariance matrix to be
+returned and used for summary. If <code>cov_type = "hessian"</code> then negative
+inverse of Hessian matrix will be applied. If <code>cov_type = "gop"</code> then
+inverse of Jacobian outer products will be used.
+If <code>cov_type = "sandwich"</code> (default) then sandwich covariance matrix
+estimator will be applied. If <code>cov_type = "bootstrap"</code> then bootstrap
+with <code>boot_iter</code> iterations will be used.
+If <code>cov_type = "hessianFD"</code> or <code>cov_type = "sandwichFD"</code> then
+(probably) more accurate but computationally demanding central difference 
+Hessian approximation will be calculated for the inverse Hessian and 
+sandwich estimators correspondingly. Central differences are computed via
+analytically provided gradient. This Hessian matrix estimation approach
+seems to be less accurate than BFGS approximation if polynomial order
+is high (usually greater then 5).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>boot_iter</code></td>
+<td>
+<p>the number of bootstrap iterations
+for <code>cov_type = "bootstrap"</code> covariance matrix estimator type.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>is_parallel</code></td>
+<td>
+<p>if <code>TRUE</code> then multiple cores will be
+used for some calculations. It usually provides speed advantage for
+large enough samples (about more than 1000 observations).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>opt_type</code></td>
+<td>
+<p>string value determining the type of the optimization
+routine to be applied. The default is <code>"optim"</code> meaning that BFGS method
+from the <code>optim</code> function will be applied.
+If <code>opt_type = "GA"</code> then <code>ga</code> function will be
+additionally applied.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>opt_control</code></td>
+<td>
+<p>a list containing arguments to be passed to the
+optimization routine depending on <code>opt_type</code> argument value.
+Please see details to get additional information.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>is_validation</code></td>
+<td>
+<p>logical value indicating whether function input 
+arguments should be validated.  Set it to <code>FALSE</code> for slight
+performance boost (default value is <code>TRUE</code>).</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Densities Hermite polynomial approximation approach has been
+proposed by A. Gallant and D. W. Nychka in 1987. The main idea is to
+approximate unknown distribution density with scaled Hermite polynomial.
+For more information please refer to the literature listed below.
+</p>
+<p>Let's use notations introduced in <code>dhpa</code> 'Details' 
+section. Function <code>hpaSelection</code> maximizes the following
+quasi log-likelihood function:
+</p>
+<p style="text-align: center;"><code class="reqn">\ln L(\gamma, \beta, \alpha, \mu, \sigma; x) = 
+\sum\limits_{i:z_{i}=1} 
+\ln\left(\overline{F}_{\left(\xi_{1}|\xi_{2}=y_{i}-x_{i}^{o}\beta\right)}
+\left(-\gamma x_{i}^{s}, \infty;\alpha, \mu, \sigma\right)\right)
+f_{\xi_{2}}\left(y_{i}-x_{i}^{o}\beta\right)+</code>
+</p>
+
+<p style="text-align: center;"><code class="reqn">
++\sum\limits_{i:z_{i}=0} 
+\ln\left(\overline{F}_{\xi}
+(-\infty, -x_{i}^{s}\gamma;\alpha, \mu, \sigma)\right),</code>
+</p>
+
+<p>where (in addition to previously defined notations):
+</p>
+<p><code class="reqn">x_{i}^{s}</code> - is row vector of selection equation regressors derived  
+from <code>data</code> according to <code>selection</code> formula.
+</p>
+<p><code class="reqn">x_{i}^{o}</code> - is row vector of outcome equation regressors derived  
+from <code>data</code> according to <code>outcome</code> formula.
+</p>
+<p><code class="reqn">\gamma</code> - is column vector of selection equation 
+regression coefficients (constant will not be added by default).
+</p>
+<p><code class="reqn">\beta</code> - is column vector of outcome equation 
+regression coefficients (constant will not be added by default).
+</p>
+<p><code class="reqn">z_{i}</code> - binary (0 or 1) dependent variable defined 
+in <code>selection</code> formula.
+</p>
+<p><code class="reqn">y_{i}</code> - continuous dependent variable defined 
+in <code>outcome</code> formula.
+</p>
+<p>Note that <code class="reqn">\xi</code> is two dimensional and <code>selection_K</code> corresponds
+to <code class="reqn">K_{1}</code> while <code>outcome_K</code> determines <code class="reqn">K_{2}</code>.
+</p>
+<p>The first polynomial coefficient (zero powers) 
+set to 1 for identification purposes i.e. <code class="reqn">\alpha_{0}=1</code>.
+</p>
+<p>Rows in <code>data</code> corresponding to variables mentioned in <code>selection</code>
+and <code>outcome</code> formulas which have at least one <code>NA</code>
+value will be ignored. The exception is continues dependent variable 
+<code class="reqn">y</code> which may have <code>NA</code> values for observation where <code class="reqn">z_{i}=0</code>.
+</p>
+<p>Note that coefficient for the first
+independent variable in <code>selection</code> will be fixed
+to 1 i.e. <code class="reqn">\gamma_{1}=1</code>.
+</p>
+<p>All variables mentioned in <code>selection</code> and 
+<code>outcome</code> should be numeric vectors.
+</p>
+<p>The function calculates standard errors via sandwich estimator
+and significance levels are reported taking into account quasi maximum
+likelihood estimator (QMLE) asymptotic normality. If one wants to switch
+from QMLE to semi-nonparametric estimator (SNPE) during hypothesis testing
+then covariance matrix should be estimated again using bootstrap.
+</p>
+<p>Initial values for optimization routine are obtained by Newey's 
+method (see the reference below). In order to obtain initial values
+via least squares please, set <code>pol_elements = 0</code>. Initial values for
+the outcome equation are obtained via <code>hpaBinary</code> function
+setting <code>K</code> to <code>selection_K</code>.
+</p>
+<p>Note that selection equation dependent variables should have 
+exactly two levels (0 and 1) where "0" states for the selection results 
+which leads to unobservable values of dependent variable in 
+outcome equation.
+</p>
+<p>This function maximizes (quasi) log-likelihood function 
+via <code>optim</code> function setting its <code>method</code> 
+argument to "BFGS". If <code>opt_type = "GA"</code> then genetic
+algorithm from <code>ga</code> function
+will be additionally (after <code>optim</code> putting its
+solution (<code>par</code>) into <code>suggestions</code> matrix) applied in order to 
+perform global optimization. Note that global optimization takes
+much more time (usually minutes but sometimes hours or even days). 
+The number of iterations and population size of the genetic algorithm
+will grow linearly along with the number of estimated parameters. 
+If it seems that global maximum has not been found then it
+is possible to continue the search restarting the function setting 
+its input argument <code>x0</code> to <code>x1</code> output value. Note that
+if <code>cov_type = "bootstrap"</code> then <code>ga</code>
+function will not be used for bootstrap iterations since it
+may be extremely time consuming.
+</p>
+<p>If <code>opt_type = "GA"</code> then <code>opt_control</code> should be the
+list containing the values to be passed to <code>ga</code>
+function. It is possible to pass arguments <code>lower</code>, <code>upper</code>,
+<code>popSize</code>, <code>pcrossover</code>, <code>pmutation</code>, <code>elitism</code>,
+<code>maxiter</code>, <code>suggestions</code>, <code>optim</code>, <code>optimArgs</code>,
+<code>seed</code> and <code>monitor</code>. 
+Note that it is possible to set <code>population</code>,
+<code>selection</code>, <code>crossover</code> and <code>mutation</code> arguments changing
+<code>ga</code> default parameters via <code>gaControl</code> 
+function. These arguments information reported in <code>ga</code>.
+In order to provide manual values for <code>lower</code> and <code>upper</code> bounds
+please follow parameters ordering mentioned above for the
+<code>x0</code> argument. If these bounds are not provided manually then
+they (except those related to the polynomial coefficients)
+will depend on the estimates obtained
+by local optimization via <code>optim</code> function
+(this estimates will be in the middle
+between <code>lower</code> and <code>upper</code>).
+Specifically for each sd parameter <code>lower</code> (<code>upper</code>) bound
+is 5 times lower (higher) than this
+parameter <code>optim</code> estimate.
+For each mean and regression coefficient parameter its lower and 
+upper bounds deviate from corresponding <code>optim</code> estimate
+by two absolute values of this estimate.
+Finally, lower and upper bounds for each polynomial
+coefficient are <code>-10</code> and <code>10</code> correspondingly (do not depend
+on their <code>optim</code> estimates).
+</p>
+<p>The following arguments are differ from their defaults in
+<code>ga</code>:
+</p>
+
+<ul>
+<li> <p><code>pmutation = 0.2</code>,
+</p>
+</li>
+<li> <p><code>optim = TRUE</code>,
+</p>
+</li>
+<li> <p><code>optimArgs =
+list("method" = "Nelder-Mead", "poptim" = 0.2, "pressel" = 0.5)</code>,
+</p>
+</li>
+<li> <p><code>seed = 8</code>,
+</p>
+</li>
+<li> <p><code>elitism = 2 + round(popSize * 0.1)</code>.</p>
+</li>
+</ul>
+<p>Let's denote by <code>n_reg</code> the number of regressors
+included into the <code>selection</code> and <code>outcome</code> formulas.
+The arguments <code>popSize</code> and <code>maxiter</code> of
+<code>ga</code> function have been set proportional to the number of
+estimated polynomial coefficients and independent variables:
+</p>
+
+<ul>
+<li> <p><code>popSize = 10 + 5 * (z_K + 1) * (y_K + 1) + 2 * n_reg</code>
+</p>
+</li>
+<li> <p><code>maxiter = 50 * (z_K + 1) * (y_K + 1) + 10 * n_reg</code></p>
+</li>
+</ul>
+<h3>Value</h3>
+
+<p>This function returns an object of class "hpaSelection".<br><br>
+An object of class "hpaSelection" is a list containing the 
+following components:
+</p>
+
+<ul>
+<li> <p><code>optim</code> - <code>optim</code> function output. 
+If <code>opt_type = "GA"</code> then it is the list containing 
+<code>optim</code> and <code>ga</code> functions outputs.
+</p>
+</li>
+<li> <p><code>x1</code> - numeric vector of distribution parameters estimates.
+</p>
+</li>
+<li> <p><code>Newey</code> - list containing information concerning Newey's 
+method estimation results.
+</p>
+</li>
+<li> <p><code>selection_mean</code> - estimate of the hermite polynomial mean 
+parameter related to selection equation random error marginal distribution.
+</p>
+</li>
+<li> <p><code>outcome_mean</code> - estimate of the hermite polynomial mean parameter 
+related to outcome equation random error marginal distribution.
+</p>
+</li>
+<li> <p><code>selection_sd</code> - estimate of sd parameter related to 
+selection equation random error marginal distribution.
+</p>
+</li>
+<li> <p><code>outcome_sd</code> - estimate of the hermite polynomial sd parameter related 
+to outcome equation random error marginal distribution.
+</p>
+</li>
+<li> <p><code>pol_coefficients</code> - polynomial coefficients estimates.
+</p>
+</li>
+<li> <p><code>pol_degrees</code> - numeric vector which first element is <code>selection_K</code> 
+and the second is <code>outcome_K</code>.
+</p>
+</li>
+<li> <p><code>selection_coef</code> - selection equation regression coefficients estimates.
+</p>
+</li>
+<li> <p><code>outcome_coef</code> - outcome equation regression coefficients estimates.
+</p>
+</li>
+<li> <p><code>cov_mat</code> - covariance matrix estimate.
+</p>
+</li>
+<li> <p><code>results</code> - numeric matrix representing estimation results.
+</p>
+</li>
+<li> <p><code>log-likelihood</code> - value of Log-Likelihood function.
+</p>
+</li>
+<li> <p><code>re_moments</code> - list which contains information about random 
+errors expectations, variances and correlation.
+</p>
+</li>
+<li> <p><code>data_List</code> - list containing model variables and their 
+partition according to outcome and selection equations.
+</p>
+</li>
+<li> <p><code>n_obs</code> - number of observations.
+</p>
+</li>
+<li> <p><code>ind_List</code> - list which contains information about parameters 
+indexes in <code>x1</code>.
+</p>
+</li>
+<li> <p><code>selection_formula</code> - the same as <code>selection</code> 
+input parameter.
+</p>
+</li>
+<li> <p><code>outcome_formula</code> - the same as <code>outcome</code> input parameter.</p>
+</li>
+</ul>
+<p>Abovementioned list <code>Newey</code> has class "hpaNewey" and contains 
+the following components:
+</p>
+
+<ul>
+<li> <p><code>outcome_coef</code> - regression coefficients estimates (except 
+constant term which is part of conditional expectation 
+approximating polynomial).
+</p>
+</li>
+<li> <p><code>selection_coef</code> - regression coefficients estimates related 
+to selection equation.
+</p>
+</li>
+<li> <p><code>constant_biased</code> - biased estimate of constant term.
+</p>
+</li>
+<li> <p><code>inv_mills</code> - inverse mills ratios estimates and their 
+powers (including constant).
+</p>
+</li>
+<li> <p><code>inv_mills_coef</code> - coefficients related to <code>inv_mills</code>.
+</p>
+</li>
+<li> <p><code>pol_elements</code> - the same as <code>pol_elements</code> 
+input parameter. However if <code>is_Newey_loocv</code> is <code>TRUE</code>
+then it will equal to the number of conditional expectation 
+approximating terms for Newey's method which minimize leave-one-out 
+cross-validation criteria.
+</p>
+</li>
+<li> <p><code>outcome_exp_cond</code> - dependent variable conditional 
+expectation estimates.
+</p>
+</li>
+<li> <p><code>selection_exp</code> - selection equation random error 
+expectation estimate.
+</p>
+</li>
+<li> <p><code>selection_var</code> - selection equation random error 
+variance estimate.
+</p>
+</li>
+<li> <p><code>hpaBinaryModel</code> - object of class "hpaBinary" which 
+contains selection equation estimation results.</p>
+</li>
+</ul>
+<p>Abovementioned list <code>re_moments</code> contains the following components:
+</p>
+
+<ul>
+<li> <p><code>selection_exp</code> - selection equation random errors 
+expectation estimate.
+</p>
+</li>
+<li> <p><code>selection_var</code> - selection equation random errors 
+variance estimate.
+</p>
+</li>
+<li> <p><code>outcome_exp</code> - outcome equation random errors 
+expectation estimate.
+</p>
+</li>
+<li> <p><code>outcome_var</code> - outcome equation random errors 
+variance estimate.
+</p>
+</li>
+<li> <p><code>errors_covariance</code> - outcome and selection equation 
+random errors covariance estimate.
+</p>
+</li>
+<li> <p><code>rho</code> - outcome and selection equation random errors 
+correlation estimate.
+</p>
+</li>
+<li> <p><code>rho_std</code> - outcome and selection equation random 
+errors correlation estimator standard error estimate.</p>
+</li>
+</ul>
+<h3>References</h3>
+
+<p>A. Gallant and D. W. Nychka (1987) &lt;doi:10.2307/1913241&gt;
+</p>
+<p>W. K. Newey (2009) &lt;https://doi.org/10.1111/j.1368-423X.2008.00263.x&gt;
+</p>
+<p>Mroz T. A. (1987) &lt;doi:10.2307/1911029&gt;
+</p>
+
+
+<h3>See Also</h3>
+
+<p>summary.hpaSelection, 
+predict.hpaSelection, plot.hpaSelection, 
+logLik.hpaSelection
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+## Let's estimate wage equation accounting for non-random selection.
+## See the reference to Mroz TA (1987) to get additional details about
+## the data this examples use
+
+# Prepare data
+library("sampleSelection")
+data("Mroz87")
+h = data.frame("kids" = as.numeric(Mroz87$kids5 + Mroz87$kids618 &gt; 0),
+	"age" = as.numeric(Mroz87$age),
+	"faminc" = as.numeric(Mroz87$faminc),
+	"educ" = as.numeric(Mroz87$educ),
+	"exper" = as.numeric(Mroz87$exper),
+	"city" = as.numeric(Mroz87$city),
+	"wage" = as.numeric(Mroz87$wage),
+	"lfp" = as.numeric(Mroz87$lfp))
+	
+# Estimate model parameters
+model &lt;- hpaSelection(selection = lfp ~ educ + age + I(age ^ 2) + 
+                                        kids + log(faminc),
+                      outcome = log(wage) ~ exper + I(exper ^ 2) + 
+                                            educ + city,
+                                  selection_K = 2, outcome_K = 3, 
+                                  data = h, 
+                                  pol_elements = 3, is_Newey_loocv = TRUE)
+summary(model)
+
+# Plot outcome equation random errors density
+plot(model, type = "outcome")
+# Plot selection equation random errors density
+plot(model, type = "selection")
+
+
+## Estimate semi-nonparametric sample selection model
+## parameters on simulated data given chi-squared random errors
+
+
+set.seed(100)
+library("mvtnorm")
+
+# Sample size
+
+n &lt;- 1000
+
+# Simulate independent variables
+X_rho &lt;- 0.5
+X_sigma &lt;- matrix(c(1, X_rho, X_rho,
+                    X_rho, 1, X_rho, 
+                    X_rho,X_rho,1), 
+                  ncol=3)
+X &lt;- rmvnorm(n=n, mean = c(0,0,0), 
+             sigma = X_sigma)
+
+# Simulate random errors
+epsilon &lt;- matrix(0, n, 2)
+epsilon_z_y &lt;- rchisq(n, 5)
+epsilon[, 1] &lt;- (rchisq(n, 5) + epsilon_z_y) * (sqrt(3/20)) - 3.8736
+epsilon[, 2] &lt;- (rchisq(n, 5) + epsilon_z_y) * (sqrt(3/20)) - 3.8736
+# Simulate selection equation
+z_star &lt;- 1 + 1 * X[,1] + 1 * X[,2] + epsilon[,1]
+z &lt;- as.numeric((z_star &gt; 0))
+
+# Simulate outcome equation
+y_star &lt;- 1 + 1 * X[,1] + 1 * X[,3] + epsilon[,2]
+z &lt;- as.numeric((z_star &gt; 0))
+y &lt;- y_star
+y[z==0] &lt;- NA
+h &lt;- as.data.frame(cbind(z, y, X))
+names(h) &lt;- c("z", "y", "x1", "x2", "x3")
+
+# Estimate parameters
+model &lt;- hpaSelection(selection = z ~ x1 + x2, 
+                      outcome = y ~ x1 + x3,
+                      data = h, 
+                      selection_K = 1, outcome_K = 3)
+summary(model)
+
+# Get conditional predictions for outcome equation
+model_pred_c &lt;- predict(model, is_cond = TRUE)
+# Conditional predictions y|z=1
+model_pred_c$y_1
+# Conditional predictions y|z=0
+model_pred_c$y_0
+
+# Get unconditional predictions for outcome equation
+model_pred_u &lt;- predict(model, is_cond = FALSE)
+model_pred_u$y
+
+# Get conditional predictions for selection equation
+# Note that for z=0 these predictions are NA
+predict(model, is_cond = TRUE, type = "selection")
+# Get unconditional predictions for selection equation
+predict(model, is_cond = FALSE, type = "selection")
+
+
+
+</code></pre>
+
+
+</div>

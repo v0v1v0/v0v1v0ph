@@ -1,0 +1,284 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>simulate_hindex</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Simulate h-index and h-alpha values</h2>
+
+<h3>Description</h3>
+
+<p>Simulate the effect of publishing, being cited, and (strategic)
+collaborating on the development of h-index and h-alpha values for a
+specified set of agents.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">simulate_hindex(
+  runs = 1,
+  n = 100,
+  periods = 20,
+  subgroups_distr = 1,
+  subgroup_advantage = 1,
+  subgroup_exchange = 0,
+  init_type = "fixage",
+  distr_initial_papers = "poisson",
+  max_age_scientists = 5,
+  dpapers_pois_lambda = 2,
+  dpapers_nbinom_dispersion = 1.1,
+  dpapers_nbinom_mean = 2,
+  productivity = 80,
+  distr_citations = "poisson",
+  dcitations_speed = 2,
+  dcitations_peak = 3,
+  dcitations_mean = 2,
+  dcitations_dispersion = 1.1,
+  coauthors = 5,
+  strategic_teams = FALSE,
+  diligence_share = 1,
+  diligence_corr = 0,
+  selfcitations = FALSE,
+  update_alpha_authors = FALSE,
+  boost = FALSE,
+  boost_size = 0.1,
+  alpha_share = 0.33
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>runs</code></td>
+<td>
+<p>Number of times the simulation is repeated.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n</code></td>
+<td>
+<p>Number of agents acting in each simulation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>periods</code></td>
+<td>
+<p>Number of periods the agents collaborate across in each period.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>subgroups_distr</code></td>
+<td>
+<p>Share of scientists in the first subgroup among all
+scientists</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>subgroup_advantage</code></td>
+<td>
+<p>Factor by which citations of papers
+published by agents of subgroup 2 exceed those of papers published by
+subgroup 1. This option is intended to reflect subdisciplines with
+different citation levels.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>subgroup_exchange</code></td>
+<td>
+<p>Share of agents publishing (alone or in collaboration)
+with the other subgroup in each period. For example, when specifying
+subgroup_exchange = .1, 10% of each subgroup join the other subgroup each period.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>init_type</code></td>
+<td>
+<p>Type of the initial setup. May be 'fixage' or 'varage'.
+For init_type = 'fixage', all initial papers have the same age (specified
+by max_age_scientists). For init_type = 'varage', papers get a random age
+which is less than or equal to max_age_scientists.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>distr_initial_papers</code></td>
+<td>
+<p>Distribution of the papers the scientists have
+already published at the start of the simulation. Currently, the poisson
+distribution ("poisson") and the negative binomial distribution ("nbinomial")
+are supported.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>max_age_scientists</code></td>
+<td>
+<p>Maximum age of scientists at the start of the
+simulation. For init_type = varage, a random age less than or equal to
+max_age_scientists is assigned to the initial papers. For init_type = fixage,
+all papers are max_age_scientists old.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dpapers_pois_lambda</code></td>
+<td>
+<p>The distribution parameter for a poisson
+distribution of initial papers.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dpapers_nbinom_dispersion</code></td>
+<td>
+<p>Dispersion parameter of a negative binomial
+distribution of initial papers.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dpapers_nbinom_mean</code></td>
+<td>
+<p>Expected value of a negative binomial
+distribution of initial papers.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>productivity</code></td>
+<td>
+<p>The share of papers published by the 20% most
+productive agents in percentage. This parameter is only used for init_type = 'varage'.
+For init_type = 'fixage', diligence_share and diligence_corr can be used to
+control the productivity of scientists.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>distr_citations</code></td>
+<td>
+<p>Distribution of citations the papers get. The expected
+value of this distribution follows a log-logistic function of time.
+Currently, the poisson distribution ("poisson") and the negative binomial
+distribution ("nbinomial") are supported.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dcitations_speed</code></td>
+<td>
+<p>The steepness (shape parameter) of the log-logistic
+time function of the expected citation values.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dcitations_peak</code></td>
+<td>
+<p>The period after publishing when the expected value
+of the citation distribution reaches its maximum.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dcitations_mean</code></td>
+<td>
+<p>The maximum expected value of the citation
+distribution (at period dcitations_peak after publishing, the citation
+distribution has dcitations_mean).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dcitations_dispersion</code></td>
+<td>
+<p>For a negative binomial citation distribution,
+dcitations_dispersion is a factor by which the variance exceeds the expected
+value.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>coauthors</code></td>
+<td>
+<p>Average number of coauthors publishing papers.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>strategic_teams</code></td>
+<td>
+<p>If this parameter is set to TRUE, agents with high
+h-index avoid co-authorships with agents who have equal or higher h-index
+values (they strategically select co-authors to improve their h-alpha index).
+This is implemented by assigning the agents with the highest h-index values
+to separate teams and randomly assigning the other agents to the teams.
+Otherwise, the collaborating agents are assigned to co-authorships at random.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>diligence_share</code></td>
+<td>
+<p>The share of agents publishing in each period. Only
+used for init_type = 'fixage'.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>diligence_corr</code></td>
+<td>
+<p>The correlation between the initial h-index value and
+the probability to publish in a given period. This parameter only has an
+effect if diligence_share &lt; 1. Only used for init_type = 'fixage'.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>selfcitations</code></td>
+<td>
+<p>If this parameter is set to TRUE, a paper gets one
+additional citation if at least one of its authors has a h-index value
+that exceeds the number of previous citations of the paper by one or two.
+This reflects agents strategically citing their own papers with citations
+just below their h-index to accelerate the growth of their h-index.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>update_alpha_authors</code></td>
+<td>
+<p>If this parameter is set to TRUE, the alpha
+author of newly written papers is determined every period based on the
+current h-index values of its authors. Without this option, the alpha
+author is determined when the paper is written and held constant from then on.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>boost</code></td>
+<td>
+<p>If this parameter is set to TRUE, papers of agents with a higher
+h-index are cited more frequently than papers of agents with lower h-index.
+For each team, this effect is based on the team's co-author with the
+highest h-index within this team.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>boost_size</code></td>
+<td>
+<p>Magnitude of the boost effect. For every additional h point
+of a paper's co-author who has the highest h-index among all of the paper's
+co-authors, citations of the paper are increased by boost_size, rounded to the next
+integer.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alpha_share</code></td>
+<td>
+<p>The share of previously published papers where the
+corresponding agent is alpha author.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>For each run, the h-index values and the h-alpha values for each
+period are stored in a list of lists.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">set.seed(123)
+simdata &lt;- simulate_hindex(runs = 2, n = 20, periods = 3)
+plot_hsim(simdata, plot_hindex = TRUE)
+</code></pre>
+
+
+</div>

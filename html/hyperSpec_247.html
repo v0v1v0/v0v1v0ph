@@ -1,0 +1,355 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>read.ENVI</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Import of ENVI data as hyperSpec object</h2>
+
+<h3>Description</h3>
+
+<p>This function allows ENVI data import as <code>hyperSpec</code> object.
+</p>
+<p><code>read.ENVI.Nicolet</code> should be a good starting point for writing custom
+wrappers for <code>read.ENVI</code> that take into account your manufacturer's
+special entries in the header file.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">read.ENVI(
+  file = stop("read.ENVI: file name needed"),
+  headerfile = NULL,
+  header = list(),
+  keys.hdr2data = FALSE,
+  x = 0:1,
+  y = x,
+  wavelength = NULL,
+  label = list(),
+  block.lines.skip = 0,
+  block.lines.size = NULL,
+  ...,
+  pull.header.lines = TRUE
+)
+
+read.ENVI.HySpex(
+  file = stop("read.ENVI.HySpex: file name needed"),
+  headerfile = NULL,
+  header = list(),
+  keys.hdr2data = NULL,
+  ...
+)
+
+read.ENVI.Nicolet(
+  file = stop("read.ENVI: file name needed"),
+  headerfile = NULL,
+  header = list(),
+  ...,
+  x = NA,
+  y = NA,
+  nicolet.correction = FALSE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>file</code></td>
+<td>
+<p>complete name of the binary file</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>headerfile</code></td>
+<td>
+<p>name of the ASCII header file. If <code>NULL</code>, the name
+of the header file is guessed by looking for a second file with the same
+basename as <code>file</code> but <code>hdr</code> or <code>HDR</code> suffix.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>header</code></td>
+<td>
+<p>list with header information, see details. Overwrites information extracted from the header file.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>keys.hdr2data</code></td>
+<td>
+<p>determines which fields of the header file should be
+put into the extra data. Defaults to none.
+</p>
+<p>To specify certain entries, give character vectors containing the lowercase
+names of the header file entries.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x, y</code></td>
+<td>
+<p>vectors of form c(offset, step size) for the position vectors,
+see details.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>wavelength, label</code></td>
+<td>
+<p>lists that overwrite the respective information
+from the ENVI header file. These data is then handed to
+<code>initialize</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>block.lines.skip, block.lines.size</code></td>
+<td>
+<p>BIL and BIP ENVI files may be read in blocks of lines:
+skip the first <code>block.lines.skip</code> lines, then read a block of <code>block.lines.size</code>
+lines. If <code>block.lines.NULL</code>, the whole file is read.
+Blocks are silently truncated at the end of the file (more precisely: to <code>header$lines</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>currently unused by <code>read.ENVI</code>,
+<code>read.ENVI.Nicolet</code> hands those arguements over to <code>read.ENVI</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pull.header.lines</code></td>
+<td>
+<p>(internal) flag whether multi-line header entries grouped by curly
+braces should be pulled into one line each.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nicolet.correction</code></td>
+<td>
+<p>see details</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>ENVI data usually consists of two files, an ASCII header and a binary data
+file. The header contains all information necessary for correctly reading
+the binary file.
+</p>
+<p>I experienced missing header files (or rather: header files without any
+contents) produced by Bruker Opus' ENVI export.
+</p>
+<p>In this case the necessary information can be given as a list in parameter
+<code>header</code> instead:
+</p>
+
+<table>
+<tr>
+<td style="text-align: left;">
+<code>header$</code>          </td>
+<td style="text-align: left;"> values        </td>
+<td style="text-align: left;"> meaning</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+<code>samples</code>          </td>
+<td style="text-align: left;"> integer       </td>
+<td style="text-align: left;"> no of columns / spectra in x direction</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+<code>lines</code>            </td>
+<td style="text-align: left;"> integer       </td>
+<td style="text-align: left;"> no of lines / spectra in y direction</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+<code>bands</code>            </td>
+<td style="text-align: left;"> integer       </td>
+<td style="text-align: left;"> no of wavelengths / data points per spectrum</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+<code>`data type`</code>      </td>
+<td style="text-align: left;">               </td>
+<td style="text-align: left;"> format of the binary file</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+                        </td>
+<td style="text-align: left;"> 1             </td>
+<td style="text-align: left;"> 1 byte unsigned integer </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+                        </td>
+<td style="text-align: left;"> 2             </td>
+<td style="text-align: left;"> 2 byte signed integer </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+                        </td>
+<td style="text-align: left;"> 3             </td>
+<td style="text-align: left;"> 4 byte signed integer </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+                        </td>
+<td style="text-align: left;"> 4             </td>
+<td style="text-align: left;"> 4 byte float </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+                        </td>
+<td style="text-align: left;"> 5             </td>
+<td style="text-align: left;"> 8 byte double </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+                        </td>
+<td style="text-align: left;"> 9             </td>
+<td style="text-align: left;"> 16 (2 x 8) byte complex double </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+                        </td>
+<td style="text-align: left;"> 12            </td>
+<td style="text-align: left;"> 2 byte unsigned integer </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+ <code>`header offset`</code> </td>
+<td style="text-align: left;"> integer       </td>
+<td style="text-align: left;"> number of bytes to skip before binary data starts</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+ <code>interleave</code>      </td>
+<td style="text-align: left;">               </td>
+<td style="text-align: left;"> directions of the data cube </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+                        </td>
+<td style="text-align: left;"> "BSQ"         </td>
+<td style="text-align: left;"> band sequential (indexing: [sample, line, band])</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+                        </td>
+<td style="text-align: left;"> "BIL"         </td>
+<td style="text-align: left;"> band interleave by line (indexing: [sample, line, band])</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+                        </td>
+<td style="text-align: left;"> "BIP"         </td>
+<td style="text-align: left;"> band interleave by pixel (indexing: [band, line, sample])</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+ <code>`byte order`</code>    </td>
+<td style="text-align: left;"> 0 or "little" </td>
+<td style="text-align: left;"> little endian </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+                        </td>
+<td style="text-align: left;"> 1 or "big"    </td>
+<td style="text-align: left;"> big endian </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+                        </td>
+<td style="text-align: left;"> "swap"        </td>
+<td style="text-align: left;"> swap byte order
+</td>
+</tr>
+</table>
+<p>Some more information that is not provided by the ENVI files may be given:
+</p>
+<p>Wavelength axis and axis labels in the respective parameters. For more
+information, see <code>initialize</code>.
+</p>
+<p>The spatial information is by default a sequence from 0 to
+<code>header$samples - 1</code> and <code>header$lines - 1</code>, respectively.
+<code>x</code> and <code>y</code> give offset of the first spectrum and step size.
+</p>
+<p>Thus, the object's <code>$x</code> colum is: <code>(0 : header$samples - 1) * x
+[2] + x [1]</code>.  The <code>$y</code> colum is calculated analogously.
+</p>
+<p>Nicolet uses some more keywords in their header file.
+They are interpreted as follows:
+</p>
+
+<table>
+<tr>
+<td style="text-align: left;">
+description   </td>
+<td style="text-align: left;"> giving the position of the first spectrum </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+z plot titles </td>
+<td style="text-align: left;"> wavelength and intensity axis units, comma separated </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+pixel size    </td>
+<td style="text-align: left;"> interpreted as x and y step size
+                   (specify <code>x = NA</code> and <code>y = NA</code>)
+</td>
+</tr>
+</table>
+<p>These parameters can be overwritten by giving a list with the respective
+elements in parameter <code>header</code>.
+</p>
+<p>The values in header line description seem to be microns while the pixel
+size seems to be in microns. If <code>nicolet.correction</code> is true, the
+pixel size values (i.e. the step sizes) are multiplied by 1000.
+</p>
+
+
+<h3>Value</h3>
+
+<p>a <code>hyperSpec</code> object
+</p>
+
+
+<h3>Functions</h3>
+
+
+<ul>
+<li> <p><code>read.ENVI.HySpex</code>: 
+</p>
+</li>
+<li> <p><code>read.ENVI.Nicolet</code>: 
+</p>
+</li>
+</ul>
+<h3>Author(s)</h3>
+
+<p>C. Beleites, testing for the Nicolet files C. Dicko
+</p>
+
+
+<h3>References</h3>
+
+<p>This function was adapted from
+<code>caTools::read.ENVI()</code>:
+</p>
+<p>Jarek Tuszynski (2008). caTools: Tools: moving window statistics, GIF,
+Base64, ROC AUC, etc.. R package version 1.9.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>caTools::read.ENVI()</code>
+</p>
+<p><code>textio</code>
+</p>
+
+
+</div>

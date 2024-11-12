@@ -1,0 +1,418 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>spregimes</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Estimation of spatial regimes models</h2>
+
+<h3>Description</h3>
+
+<p>The function <code>spregimes</code> deals
+with the estimation of spatial regimes models.
+This is a general function that allows the estimation
+of various spatial specifications, including the spatial lag regimes model,
+the spatial error regimes model, and the spatial SARAR regimes model.
+Since the estimation is based on generalized method of moments (GMM),
+endogenous variables can be included.
+For further information on estimation, see details.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">spregimes(
+  formula,
+  data = list(),
+  model = c("sarar", "lag", "error", "ols"),
+  listw,
+  wy_rg = FALSE,
+  weps_rg = FALSE,
+  initial.value = NULL,
+  rgv = NULL,
+  het = FALSE,
+  verbose = FALSE,
+  control = list()
+)
+
+## S3 method for class 'spregimes'
+coef(object, ...)
+
+## S3 method for class 'spregimes'
+vcov(object, ...)
+
+## S3 method for class 'spregimes'
+print(x, digits = max(3, getOption("digits") - 3), ...)
+
+## S3 method for class 'spregimes'
+summary(object, ...)
+
+## S3 method for class 'summary.spregimes'
+print(x, digits = max(5, getOption("digits") - 3), ...)
+
+## S3 method for class 'spregimes'
+residuals(object, ...)
+
+## S3 method for class 'spregimes'
+fitted(object, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>formula</code></td>
+<td>
+<p>a symbolic description of the model of
+the form <code>y ~ x_f | x_v | wx | h_f | h_v | wh</code>
+where <code>y</code> is the dependent variable,
+<code>x_f</code> are the regressors that do not vary by regimes,
+<code>x_v</code> are the regressors that vary by regimes,
+<code>wx</code> are the spatially lagged regressors,
+<code>h_f</code> are the instruments that do not vary by regimes,
+<code>h_v</code> are the instruments that vary by regimes,
+<code>wh</code> are the spatially lagged instruments.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>the data of class <code>data.frame</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>model</code></td>
+<td>
+<p>should be one of <code>c("sarar", "lag", "error", "ols")</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>listw</code></td>
+<td>
+<p>a spatial weighting matrix of class <code>listw</code>, <code>matrix</code> or <code>Matrix</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>wy_rg</code></td>
+<td>
+<p>default <code>wy_rg = FALSE</code>, the lagged dependent variable does not vary by regime (see details)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>weps_rg</code></td>
+<td>
+<p>default <code>weps_rg = FALSE</code>, if <code>TRUE</code> the spatial error term varies by regimes (see details)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>initial.value</code></td>
+<td>
+<p>initial value for the spatial error parameter</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rgv</code></td>
+<td>
+<p>an object of class <code>formula</code> to identify the regime variables</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>het</code></td>
+<td>
+<p>heteroskedastic variance-covariance matrix</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p>print a trace of the optimization</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>control</code></td>
+<td>
+<p>select arguments for the optimization</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>object</code></td>
+<td>
+<p>an object of class spregimes</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>additional arguments</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>an object of class spregimes</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>digits</code></td>
+<td>
+<p>number of digits</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The function <code>spregimes</code> is a wrapper that allows the
+estimation of a general
+spatial regimes model.
+For convenience and without loss of generality,
+we assume the presence of only two regimes.
+In this case the general model can be written as:
+</p>
+<p style="text-align: center;"><code class="reqn">
+\begin{aligned}
+y = &amp;	W\begin{bmatrix}
+y_1&amp; 0 \\
+0 &amp; y_2 \\
+\end{bmatrix}
+\begin{bmatrix}
+\lambda_1 \\
+\lambda_2 \\
+\end{bmatrix}
++
+ \begin{bmatrix}
+X_1&amp; 0 \\
+0 &amp; X_2 \\
+\end{bmatrix}
+\begin{bmatrix}
+\beta_1 \\
+\beta_2 \\
+\end{bmatrix}
++ X\beta +
+\begin{bmatrix}
+Y_1&amp; 0 \\
+0 &amp; Y_2 \\
+\end{bmatrix}
+\begin{bmatrix}
+\pi_1 \\
+\pi_2 \\
+\end{bmatrix}
++ Y\pi +  \\
+&amp;
+W\begin{bmatrix}
+X_1&amp; 0 \\
+0 &amp; X_2 \\
+\end{bmatrix}
+\begin{bmatrix}
+\delta_1 \\
+\delta_2 \\
+\end{bmatrix}+ WX\delta+
+ W
+\begin{bmatrix}
+Y_1&amp; 0 \\
+0 &amp; Y_2 \\
+\end{bmatrix}
+\begin{bmatrix}
+\theta_1 \\
+\theta_2 \\
+\end{bmatrix}
++ WY\theta
++
+\begin{bmatrix}
+\varepsilon_1 \\
+\varepsilon_2 \\
+\end{bmatrix}
+\end{aligned}
+</code>
+</p>
+
+<p>where
+</p>
+<p style="text-align: center;"><code class="reqn">
+\begin{bmatrix}
+\varepsilon_1 \\
+\varepsilon_2 \\
+\end{bmatrix}
+=W	\begin{bmatrix}
+\varepsilon_1&amp;0 \\
+0&amp;\varepsilon_2 \\
+\end{bmatrix}
+\begin{bmatrix}
+\rho_1 \\
+\rho_2 \\
+\end{bmatrix}
++u \nonumber
+</code>
+</p>
+
+<p>The model includes the spatial lag of the dependent variable,
+the spatial lag of the regressors,
+the spatial lag of the errors
+and, possibly, additional endogenous variables.
+The function
+<code>spregimes</code> estimates all of the nested
+specifications deriving from this model.
+There are, however, some restrictions.
+For example, if <code>weps_rg</code> is set to TRUE,
+all the regressors in the model should also vary by regimes.
+The estimation of the different models relies heavily
+on code available from the package <span class="pkg">sphet</span>.
+</p>
+
+<ol>
+<li>
+<p> For the spatial lag (or Durbin) regimes model (i.e, when <code class="reqn">\rho_1</code>
+and <code class="reqn">\rho_2</code> are zero), an instrumental variable
+procedure is adopted, where the matrix of instruments
+is formed by the spatial lags of the exogenous variables
+and the additional instruments included in the <code>formula</code>.
+A robust estimation
+of the variance-covariance matrix can be obtained
+by setting <code>het = TRUE</code>.
+</p>
+</li>
+<li>
+<p> For the spatial error regime models (i.e, when <code class="reqn">\lambda_1</code>
+and <code class="reqn">\lambda_2</code> are zero), the spatial
+coefficient(s)
+are estimated with the GMM procedure described
+in Kelejian and Prucha (2010) and Drukker et al., (2013).
+The difference between Kelejian and Prucha (2010) and Drukker et al., (2013),
+is that the former assume heteroskedastic innovations (<code>het = TRUE</code>),
+while the latter does not (<code>het = FALSE</code>).
+</p>
+</li>
+<li>
+<p> For the SARAR regimes model, the estimation procedure
+alternates a series of IV and GMM steps. The variance-covariance
+can be estimated assuming that the innovations are homoskedastic (<code>het = FALSE</code>)
+as well as heteroskedastic (<code>het = TRUE</code>).
+</p>
+</li>
+</ol>
+<h3>Value</h3>
+
+<p>An object of class “<code>spregimes</code>”
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Gianfranco Piras and Mauricio Sarrias
+</p>
+
+
+<h3>References</h3>
+
+<p>Arraiz, I. and Drukker, M.D. and Kelejian, H.H. and Prucha, I.R. (2010)
+A spatial Cliff-Ord-type Model with Heteroskedastic Innovations: Small and Large Sample Results,
+<em>Journal of Regional Sciences</em>, <b>50</b>, pages 592–614.
+</p>
+<p>Drukker, D.M. and Egger, P. and Prucha, I.R. (2013)
+On Two-step Estimation of a Spatial Auto regressive Model with Autoregressive
+Disturbances and Endogenous Regressors,
+<em>Econometric Review</em>, <b>32</b>, pages 686–733.
+</p>
+<p>Kelejian, H.H. and Prucha, I.R. (2010)
+Specification and Estimation of Spatial Autoregressive Models with Autoregressive and Heteroskedastic Disturbances,
+<em>Journal of Econometrics</em>, <b>157</b>, pages 53–67.
+</p>
+<p>Gianfranco Piras (2010). sphet: Spatial Models with Heteroskedastic Innovations in R. <em>Journal of Statistical Software</em>, 35(1), 1-21. <a href="https://doi.org/10.18637/jss.v035.i01">doi:10.18637/jss.v035.i01</a>.
+</p>
+<p>Roger Bivand, Gianfranco Piras (2015). Comparing Implementations of Estimation Methods for Spatial Econometrics. <em>Journal of Statistical Software</em>, 63(18), 1-36. <a href="https://doi.org/10.18637/jss.v063.i18">doi:10.18637/jss.v063.i18</a>.
+</p>
+<p>Gianfranco Piras, Paolo Postiglione (2022).  A deeper look at impacts in spatial Durbin model with sphet. <em>Geographical Analysis</em>, 54(3), 664-684. <a href="https://onlinelibrary.wiley.com/doi/10.1111/gean.12318">https://onlinelibrary.wiley.com/doi/10.1111/gean.12318</a>
+</p>
+<p>Luc Anselin, Sergio J. Rey (2014). <em>Modern Spatial Econometrics in Practice: A Guide to GeoDa, GeoDaSpace and PySal.</em> GeoDa Press LLC.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data("natreg")
+data("ws_6")
+
+form &lt;-  HR90  ~ 0 | MA90 + PS90 +
+RD90 + UE90 | 0 | 0 | MA90 + PS90 +
+RD90 + FH90 + FP89 + GI89 | 0
+
+form1 &lt;-  HR90  ~ MA90 -1 |  PS90 +
+RD90 + UE90 | 0 | MA90 -1 |  PS90 +
+RD90 + FH90 + FP89 + GI89 | 0
+
+form2 &lt;-  HR90  ~ MA90 -1 |  PS90 +
+RD90 + UE90 | MA90 | MA90 -1 |  PS90 +
+RD90 + FH90 + FP89 + GI89 | 0
+
+form3 &lt;-  HR90  ~ MA90 -1 |  PS90 +
+RD90 + UE90 | MA90 | MA90 -1 |  PS90 +
+RD90 + FH90 + FP89 + GI89 | GI89
+
+form4 &lt;-  HR90  ~ MA90 -1 |  PS90 +
+RD90 + UE90 | MA90 + RD90 | MA90 -1 |  PS90 +
+RD90 + FH90 + FP89 + GI89 | GI89
+
+
+split  &lt;- ~ REGIONS
+
+###################################################
+# Linear model with regimes and lagged regressors #
+###################################################
+mod &lt;- spregimes(formula = form2, data = natreg,
+rgv = split, listw = ws_6, model = "ols")
+summary(mod)
+
+mod1 &lt;- spregimes(formula = form3, data = natreg,
+rgv = split, listw = ws_6, model = "ols")
+summary(mod1)
+
+mod2 &lt;- spregimes(formula = form4, data = natreg,
+rgv = split, listw = ws_6, model = "ols")
+summary(mod2)
+
+
+###############################
+# Spatial Error regimes model #
+###############################
+mod &lt;- spregimes(formula = form, data = natreg,
+rgv = split, listw = ws_6, model = "error", het = TRUE)
+summary(mod)
+mod1 &lt;- spregimes(formula = form, data = natreg,
+rgv = split, listw = ws_6, model = "error",
+weps_rg = TRUE, het = TRUE)
+summary(mod1)
+mod2 &lt;- spregimes(formula = form1, data = natreg,
+rgv = split, listw = ws_6, model = "error", het = TRUE)
+summary(mod2)
+
+###############################
+#  Spatial Lag regimes model  #
+###############################
+mod4 &lt;- spregimes(formula = form, data = natreg,
+rgv = split, listw = ws_6, model = "lag",
+het = TRUE, wy_rg = TRUE)
+summary(mod4)
+mod5 &lt;- spregimes(formula = form1, data = natreg,
+rgv = split, listw = ws_6, model = "lag",
+het = TRUE, wy_rg = TRUE)
+summary(mod5)
+
+###############################
+# Spatial SARAR regimes model #
+###############################
+mod6 &lt;- spregimes(formula = form, data = natreg,
+rgv = split, listw = ws_6, model = "sarar",
+het = TRUE, wy_rg = TRUE, weps_rg = TRUE)
+summary(mod6)
+mod7 &lt;- spregimes(formula = form, data = natreg,
+rgv = split, listw = ws_6, model = "sarar",
+het = TRUE, wy_rg = FALSE, weps_rg = FALSE)
+summary(mod7)
+mod8 &lt;- spregimes(formula = form1, data = natreg,
+rgv = split, listw = ws_6, model = "sarar",
+het = TRUE, wy_rg = TRUE, weps_rg = FALSE)
+summary(mod8)
+</code></pre>
+
+
+</div>

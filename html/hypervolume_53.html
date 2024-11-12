@@ -1,0 +1,119 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hypervolume_svm</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Hypervolume construction via one-class support vector machine (SVM) learning model
+</h2>
+
+<h3>Description</h3>
+
+<p>Constructs a hypervolume by building a one-class support vector machine that classifies data points as 'in' and other locations as 'out'. This is accomplished by 1) transforming the input data into a high-dimensional nonlinear space in which the data points can be optimally separated from background by a single hyperplane, 2) back-transforming the hyperplane into the original space, 3) delineating an adaptive grid of random points near the original data points, and 4) using the SVM to predict if each of these points is in or out.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hypervolume_svm(data, name = NULL, 
+                  samples.per.point = ceiling((10^(3 + sqrt(ncol(data))))/nrow(data)), 
+                  svm.nu = 0.01, svm.gamma = 0.5, 
+                  scale.factor = 1,
+                  chunk.size = 1000, verbose = TRUE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+
+<p>A m x n matrix or data frame, where m is the number of observations and n is the dimensionality.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>name</code></td>
+<td>
+
+<p>A string to assign to the hypervolume for later output and plotting. Defaults to the name of the variable if NULL.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>samples.per.point</code></td>
+<td>
+
+<p>Number of random points to be evaluated per data point in <code>data</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>svm.nu</code></td>
+<td>
+
+<p>A SVM parameter determining an upper bound on the fraction of training errors and a lower bound of the fraction of support vectors. Lower values result in tighter wrapping of the shape to the data (see section 2.2. of https://www.csie.ntu.edu.tw/~cjlin/papers/libsvm.pdf). 
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>svm.gamma</code></td>
+<td>
+
+<p>A SVM parameter defining the inverse radius of influence of a single point. Low values yield large influences (smooth less complex wraps around the data) and high values yield small influences (tighter but potentially noiser wraps around the data) (see http://scikit-learn.org/stable/auto_examples/svm/plot_rbf_parameters.html).
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>scale.factor</code></td>
+<td>
+
+<p>A multiplicative factor used to determine the boundaries of the hyperelliptical sampling region. Larger values yield larger boundaries and can prevent clipping. Should not need to be changed in almost any situation.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>chunk.size</code></td>
+<td>
+
+<p>Number of random points to process per internal step. Larger values may have better performance on machines with large amounts of free memory. Changing this parameter does not change the output of the function; only how this output is internally assembled.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+
+<p>Logical value; print diagnostic output if <code>TRUE</code>.
+</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A <code>Hypervolume-class</code> object corresponding to the inferred hypervolume.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>hypervolume_threshold</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(penguins,package='palmerpenguins')
+penguins_no_na = as.data.frame(na.omit(penguins))
+penguins_adelie = penguins_no_na[penguins_no_na$species=="Adelie",
+                    c("bill_length_mm","bill_depth_mm","flipper_length_mm")]
+  
+hv = hypervolume_svm(penguins_adelie,name='Adelie')
+summary(hv)
+</code></pre>
+
+
+</div>

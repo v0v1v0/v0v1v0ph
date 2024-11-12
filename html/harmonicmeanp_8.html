@@ -1,0 +1,123 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>Asymptotically Exact Harmonic Mean p-Value</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Asymptotically Exact Harmonic Mean p-Value
+</h2>
+
+<h3>Description</h3>
+
+<p>Compute a combined <em>p</em>-value via the asymptotically exact harmonic mean <em>p</em>-value. The harmonic mean <em>p</em>-value (HMP) test combines <em>p</em>-values and corrects for multiple testing while controlling the strong-sense family-wise error rate. It is more powerful than common alternatives including Bonferroni and Simes procedures when combining large proportions of all the <em>p</em>-values, at the cost of slightly lower power when combining small proportions of all the <em>p</em>-values. It is more stringent than controlling the false discovery rate, and possesses theoretical robustness to positive correlations between tests and unequal weights. It is a multi-level test in the sense that a superset of one or more significant tests is certain to be significant and conversely when the superset is non-significant, the constituent tests are certain to be non-significant. It is based on MAMML (model averaging by mean maximum likelihood), a frequentist analogue to Bayesian model averaging, and is theoretically grounded in generalized central limit theorem.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">p.hmp(p, w = NULL, L = NULL, w.sum.tolerance = 1e-6, multilevel = TRUE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>p</code></td>
+<td>
+
+<p>A numeric vector of one or more <em>p</em>-values to be combined. Missing values (NAs) will cause a missing value to be returned.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>w</code></td>
+<td>
+
+<p>An optional numeric vector of weights that can be interpreted as incorporating information about prior model probabilities and power of the tests represented by the individual <em>p</em>-values. The sum of the weights cannot exceed one but may be less than one, which is interpreted as meaning that some of the <code>L</code> <em>p</em>-values have been excluded.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>L</code></td>
+<td>
+
+<p>The number of constituent <em>p</em>-values. This is mandatory when using <code>p.hmp</code> as part of a multilevel test procedure and needs to be set equal to the total number of individual <em>p</em>-values investigated, which may be (much) larger than the length of the argument <code>p</code>. If ignored, it defaults to the length of argument <code>p</code>, with a warning.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>w.sum.tolerance</code></td>
+<td>
+
+<p>Tolerance for checking that the weights do not exceed 1.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>multilevel</code></td>
+<td>
+
+<p>Logical, indicating whether the test is part of a multilevel procedure involving a total of <code>L</code> <em>p</em>-values intended to control the strong-sense familywise error rate (<code>TRUE</code>, default), or whether a stand-alone test is to be produced (<code>FALSE</code>), in which case <code>L</code> is ignored.
+</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>When <code>multilevel==TRUE</code> an asymptotically exact combined <em>p</em>-value is returned, equivalent to <code>sum(w)*pharmonicmeanp(hmp.stat(p,w)/sum(w),L)</code>. This <em>p</em>-value can be compared against threshold <code>sum(w)*alpha</code> to control the strong-sense familywise error rate at level <code>alpha</code>. A test based on this asymptotically exact harmonic mean <em>p</em>-value is equivalent to comparison of the ‘raw’ harmonic mean <em>p</em>-value calculated by <code>hmp.stat(p,w)</code> to a 'harmonic mean <em>p</em>-value threshold' <code>sum(w)*qharmonicmeanp(alpha,L)</code>.
+</p>
+<p>When <code>multilevel==FALSE</code> an asymptotically exact combined <em>p</em>-value is returned, equivalent to <code>pharmonicmeanp(hmp.stat(p,w),length(p))</code>. <code>L</code> is ignored and <code>w</code> is normalized to sum to 1. This <em>p</em>-value can be compared against threshold <code>alpha</code> to control the per-test error rate at level <code>alpha</code>. A test based on this asymptotically exact harmonic mean <em>p</em>-value is equivalent to comparison of the ‘raw’ harmonic mean <em>p</em>-value calculated by <code>hmp.stat(p,w)</code> to a 'harmonic mean <em>p</em>-value threshold' <code>qharmonicmeanp(alpha,L)</code>.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Daniel J. Wilson
+</p>
+
+
+<h3>References</h3>
+
+<p>Daniel J. Wilson (2019) The harmonic mean <em>p</em>-value for combining dependent tests. <em>Proceedings of the National Academy of Sciences USA</em> 116: 1195-1200.
+</p>
+
+
+<h3>See Also</h3>
+
+<p>hmp.stat
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># For detailed examples type vignette("harmonicmeanp")
+# Example: simulate from a non-uniform distribution mildly enriched for small \emph{p}-values. 
+# Compare the significance of the combined p-value for Bonferroni, Benjamini-Hochberg (i.e. Simes), 
+# HMP and (equivalently) MAMML with 2 degrees of freedom.
+L = 1000
+p = rbeta(L,1/1.8,1)
+min(p.adjust(p,"bonferroni"))
+min(p.adjust(p,"BH"))
+p.hmp(p,L=L)
+p.mamml(1/p,2,L=L)
+
+# Multilevel test: find significant subsets of the 1000 p-values by comparing overlapping
+# subsets of size 100 and 10 in addition to the top-level test of all 1000, while maintaining
+# the strong-sense family-wise error rate.
+p.100 = sapply(seq(1,L-100,by=10),function(beg) p.hmp(p[beg+0:99],L=L))
+plot(-log10(p.100),xlab="Test index",main="Moving average",
+  ylab="Asymptotically exact combined -log10 p-value",type="o")
+# The appropriate threshold is alpha (e.g. 0.05) times the proportion of tests in each p.100
+abline(h=-log10(0.05*100/1000),col=2,lty=2)
+
+p.10 = sapply(seq(1,L-10,by=5),function(beg) p.hmp(p[beg+0:9],L=L))
+plot(-log10(p.10),xlab="Test index",main="Moving average",
+  ylab="Asymptotically exact combined -log10 p-value",type="o")
+# The appropriate threshold is alpha (e.g. 0.05) times the proportion of tests in each p.10
+abline(h=-log10(0.05*10/1000),col=2,lty=2)
+</code></pre>
+
+
+</div>

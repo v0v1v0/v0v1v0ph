@@ -1,0 +1,130 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>epsilon_hypergraph</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Epsilon-Ball Hypergraph
+</h2>
+
+<h3>Description</h3>
+
+<p>Build a hypergraph by constructing hyperedges from balls around a set of points.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">epsilon_hypergraph(x, epsilon, method = "Euclidean", reduce=FALSE, 
+   as.graph=FALSE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+
+<p>a matrix of points.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>epsilon</code></td>
+<td>
+
+<p>radius of the balls. May be a vector.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+
+<p>passed to <code>dist</code> to define the distance function.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>reduce</code></td>
+<td>
+
+<p>logical. Whether to reduce the hypergraph by removing reduntant hyper-edges.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>as.graph</code></td>
+<td>
+
+<p>logical. Whether to return a graph instead of a hypergraph.
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Each point of <code>x</code> corresponds to a vertex in the hypergraph.
+For each point, a ball of radius <code>epsilon</code> is constructed,
+and all points in the ball form a hyper-edge in the graph.
+If epsilon is a vector, each ball may have a different radius, and
+if the length of epsilon is less than the number of points, they are
+repeated.
+</p>
+<p>If <code>reduce=TRUE</code> reduntant hyper-edges (those contained in other
+hyper-edges) are removed. If <code>as.graph==TRUE</code>, <code>reduce</code> is
+ignored an a graph is returned instead of a hypergraph.
+</p>
+
+
+<h3>Value</h3>
+
+<p>a hypergraph or graph.
+</p>
+
+
+<h3>Note</h3>
+
+<p>Because of symmetry (a is in the ball centered at b if and only if b is in the 
+ball centered at a), the incidence matrix of an epsilon hypergraph is
+square and symmetric. It can thus be interpreted as an adjacency matrix,
+and it is this graph that is returned if <code>as.graph==TRUE</code>.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>David J. Marchette <a href="mailto:dmarchette@gmail.com">dmarchette@gmail.com</a>.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>knn_hypergraph</code>,
+<code>sample_geom_hypergraph</code>,
+<code>dist</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">   set.seed(565)
+	x &lt;- matrix(rnorm(100),ncol=2)
+	h &lt;- epsilon_hypergraph(x,epsilon=.25)
+	
+	   plot(h)
+		plot(h,layout=x)
+	
+	epsilons &lt;- runif(nrow(x),0,.5)
+	k &lt;- epsilon_hypergraph(x,epsilon=epsilons)
+	
+	   plot(k)
+		plot(k,layout=x)
+	
+</code></pre>
+
+
+</div>

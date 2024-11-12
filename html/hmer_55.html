@@ -1,0 +1,184 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>wave_values</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Multiple Wave Output Plotting</h2>
+
+<h3>Description</h3>
+
+<p>Given multiple waves of points, produces pairs plots of the outputs.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">wave_values(
+  waves,
+  targets,
+  output_names = names(targets),
+  ems = NULL,
+  surround = FALSE,
+  restrict = FALSE,
+  p_size = 1.5,
+  l_wid = 1.5,
+  zero_in = TRUE,
+  wave_numbers = ifelse(zero_in, 0, 1):(length(waves) - ifelse(zero_in, 0, 1)),
+  which_wave = ifelse(zero_in, 0, 1),
+  upper_scale = 1,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>waves</code></td>
+<td>
+<p>The list of data.frames, one for each set of outputs at that wave.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>targets</code></td>
+<td>
+<p>The output targets.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>output_names</code></td>
+<td>
+<p>The outputs to plot.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ems</code></td>
+<td>
+<p>If provided, plots the emulator expectations and 3-standard deviations.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>surround</code></td>
+<td>
+<p>As in <code>wave_points</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>restrict</code></td>
+<td>
+<p>Should the plotting automatically restrict to failing target windows?</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>p_size</code></td>
+<td>
+<p>As in <code>wave_points</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>l_wid</code></td>
+<td>
+<p>The width of the lines that create the target boxes.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>zero_in</code></td>
+<td>
+<p>Is a wave 0 included in the waves list?</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>wave_numbers</code></td>
+<td>
+<p>Which waves to plot.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>which_wave</code></td>
+<td>
+<p>Scaling for lower plots (see description)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>upper_scale</code></td>
+<td>
+<p>Scaling for upper plots (ibid)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Optional parameters (not to be used directly)</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>This function operates in a similar fashion to <code>wave_points</code> - the main
+difference is that the output values are plotted. Consequently, the set of targets is required
+to overlay the region of interest onto the plot.
+</p>
+<p>To ensure that the wave numbers provided in the legend match, one should provide waves
+as a list of data.frames with the earliest wave at the start of the list.
+</p>
+<p>The parameters <code>which_wave</code> and <code>upper_scale</code> control the level of ‘zoom’ on
+each of the lower-triangular and upper-triangular plots, respectively. For the lower
+plots, <code>which_wave</code> determines which of the provided waves is to be used to determine
+the output ranges to plot with respect to: generally, higher <code>which_wave</code> values
+result in a more zoomed-in plot. For the upper plots, <code>upper_scale</code> determines the
+plot window via a multiple of the target bounds: higher values result in a more zoomed-out
+plot. If not provided, these default to <code>which_wave=0</code> (or 1 if no wave 0 is given)
+and <code>upper_scale = 1</code>. If the value provided to <code>which_wave</code> does not correspond
+to a provided wave (or one explicitly not included in <code>wave_numbers</code>), it defaults to
+the closest available wave to the value of <code>which_wave</code>.
+</p>
+<p>If <code>ems</code> is provided, it should follow the same structure as <code>waves</code>: at the very
+least, it should contain all emulators trained over the course of the waves. The emulator
+predictions for a target are made by the emulator for that target whose ranges are the
+smallest such that contain the point.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A ggplot object.
+</p>
+
+
+<h3>See Also</h3>
+
+<p>Other visualisation tools: 
+<code>behaviour_plot()</code>,
+<code>diagnostic_wrap()</code>,
+<code>effect_strength()</code>,
+<code>emulator_plot()</code>,
+<code>hit_by_wave()</code>,
+<code>output_plot()</code>,
+<code>plot_actives()</code>,
+<code>plot_lattice()</code>,
+<code>plot_wrap()</code>,
+<code>simulator_plot()</code>,
+<code>space_removed()</code>,
+<code>validation_pairs()</code>,
+<code>wave_dependencies()</code>,
+<code>wave_points()</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"> wave_values(SIRMultiWaveData, SIREmulators$targets, surround = TRUE, p_size = 1)
+ 
+   wave_values(SIRMultiWaveData, SIREmulators$targets, c('nS', 'nI'), l_wid = 0.8)
+     wave_values(SIRMultiWaveData, SIREmulators$targets, l_wid = 0.8,
+      wave_numbers = c(0, 1, 3), which_wave = 2, upper_scale =  1.5)
+     # For many plots, it may be helpful to manually modify the font size
+     wave_values(SIRMultiWaveData, SIREmulators$targets) +
+      ggplot2::theme(text = ggplot2::element_text(size = 5))
+ 
+</code></pre>
+
+
+</div>

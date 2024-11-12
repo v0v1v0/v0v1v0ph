@@ -1,0 +1,135 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>Exploratory.Phase</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Perform the Exploratory phase on the hypercube dimension reduction proposed by Cox, D. R. &amp; Battey, H. S. (2017)</h2>
+
+<h3>Description</h3>
+
+<p>This function performs the exploratory phase on the variables retained through the reduction phase, returning any significant squared and interaction terms.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">Exploratory.Phase(X, Y, list.reduction, family=gaussian,
+                  signif=0.01, silent=TRUE, Cox.Hazard = FALSE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>X</code></td>
+<td>
+<p>Design matrix.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Y</code></td>
+<td>
+<p>Response vector.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>list.reduction</code></td>
+<td>
+<p>Indices of retained variables from the reduction phase.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>family</code></td>
+<td>
+<p>A description of the error distribution and link function to be used in the model. For glm this can be a character string naming a family function, a family function or the result of a call to a family function. See <code>family</code> for more details.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>signif</code></td>
+<td>
+<p>Significance level for the assessment of squared and interaction terms. The default is 0.01.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>silent</code></td>
+<td>
+<p>By default, silent=TRUE. If silent=FALSE the user can decide upon the exclusion of individual interaction terms.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Cox.Hazard</code></td>
+<td>
+<p>If TRUE fits proportional hazards regression model. The family argument will be ignored if Cox.Hazard=TRUE.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>mat.select.SQ</code></td>
+<td>
+<p>Indices of variables with significant squared terms.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mat.select.INTER</code></td>
+<td>
+<p>Indices of the pairs of variables with significant interaction terms.</p>
+</td>
+</tr>
+</table>
+<h3>Acknowledgement</h3>
+
+<p>The work was supported by the UK Engineering and Physical Sciences Research Council under grant number EP/P002757/1.</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Hoeltgebaum, H. H.
+</p>
+
+
+<h3>References</h3>
+
+<p>Cox, D. R., and Battey, H. S. (2017). Large numbers of explanatory variables, a semi-descriptive analysis. <em>Proceedings of the National Academy of Sciences</em>, 114(32), 8592-8595.
+</p>
+<p>Battey, H. S. and Cox, D. R. (2018). Large numbers of explanatory variables: a probabilistic assessment. <em>Proceedings of the Royal Society of London, A.</em>, 474(2215), 20170631.
+</p>
+<p>Hoeltgebaum, H., &amp; Battey, H. S. (2019). HCmodelSets: An R Package for Specifying Sets of Well-fitting Models in High Dimensions. <em>The R Journal</em>, 11(2), 370-379.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>Reduction.Phase</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+## Generates a random DGP
+dgp = DGP(s=5, a=3, sigStrength=1, rho=0.9, n=100, intercept=5, noise=1,
+          var=1, d=1000, DGP.seed = 2018)
+
+#Reduction Phase using only the first 70 observations
+outcome.Reduction.Phase =  Reduction.Phase(X=dgp$X[1:70,],Y=dgp$Y[1:70],
+                                           family=gaussian, seed.HC = 1012)
+
+# Exploratory Phase using only the first 70 observations, choosing the variables which
+# were selected at least two times in the third dimension reduction
+
+idxs = outcome.Reduction.Phase$List.Selection$`Hypercube with dim 2`$numSelected1
+outcome.Exploratory.Phase =  Exploratory.Phase(X=dgp$X[1:70,],Y=dgp$Y[1:70],
+                                               list.reduction = idxs,
+                                               family=gaussian, signif=0.01)
+
+
+
+</code></pre>
+
+
+</div>

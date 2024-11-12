@@ -1,0 +1,126 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>rMPVar</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Realized multipower variation</h2>
+
+<h3>Description</h3>
+
+<p>Calculate the Realized Multipower Variation rMPVar, defined in Andersen et al. (2012).
+</p>
+<p>Assume there are <code class="reqn">N</code> equispaced returns <code class="reqn">r_{t,i}</code> in period <code class="reqn">t</code>, <code class="reqn">i=1, \ldots,N</code>. Then, the rMPVar is given by
+</p>
+<p style="text-align: center;"><code class="reqn">
+    \mbox{rMPVar}_{N}(m,p)= d_{m,p} \frac{N^{p/2}}{N-m+1} \sum_{i=1}^{N-m+1}|r_{t,i}|^{p/m} \ldots |r_{t,i+m-1}|^{p/m}
+  </code>
+</p>
+
+<p>in which
+</p>
+<p><code class="reqn">d_{m,p} = \mu_{p/m}^{-m}</code>:
+</p>
+<p><code class="reqn">m</code>: the window size of return blocks;
+</p>
+<p><code class="reqn">p</code>: the power of the variation;
+</p>
+<p>and <code class="reqn">m</code> &gt; <code class="reqn">p/2</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">rMPVar(
+  rData,
+  m = 2,
+  p = 2,
+  alignBy = NULL,
+  alignPeriod = NULL,
+  makeReturns = FALSE,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>rData</code></td>
+<td>
+<p>an <code>xts</code> or <code>data.table</code> object containing returns or prices, possibly for multiple assets over multiple days.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>m</code></td>
+<td>
+<p>the window size of return blocks. 2 by default.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>p</code></td>
+<td>
+<p>the power of the variation. 2 by default.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alignBy</code></td>
+<td>
+<p>character, indicating the time scale in which <code>alignPeriod</code> is expressed. 
+Possible values are: <code>"ticks"</code>, <code>"secs"</code>, <code>"seconds"</code>, <code>"mins"</code>, <code>"minutes"</code>, <code>"hours"</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alignPeriod</code></td>
+<td>
+<p>positive numeric, indicating the number of periods to aggregate over. For example, to aggregate
+based on a 5-minute frequency, set <code>alignPeriod = 5</code> and <code>alignBy = "minutes"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>makeReturns</code></td>
+<td>
+<p>boolean, should be <code>TRUE</code> when <code>rData</code> contains prices instead of returns. <code>FALSE</code> by default.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>used internally, do not change.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>numeric
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Giang Nguyen, Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup.
+</p>
+
+
+<h3>References</h3>
+
+<p>Andersen, T. G., Dobrev, D., and Schaumburg, E. (2012). Jump-robust volatility estimation using nearest neighbor truncation. <em>Journal of Econometrics</em>, 169, 75-93.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>IVar</code> for a list of implemented estimators of the integrated variance.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">mpv &lt;- rMPVar(sampleTData[, list(DT, PRICE)], m = 2, p = 3, alignBy = "minutes",
+            alignPeriod = 5, makeReturns = TRUE)
+mpv
+</code></pre>
+
+
+</div>

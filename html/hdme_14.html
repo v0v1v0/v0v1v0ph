@@ -1,0 +1,77 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>plot.corrected_lasso</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>plot.corrected_lasso</h2>
+
+<h3>Description</h3>
+
+<p>Plot the output of corrected_lasso
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">## S3 method for class 'corrected_lasso'
+plot(x, type = "nonzero", label = FALSE, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>Object of class corrected_lasso, returned from calling
+corrected_lasso()</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>type</code></td>
+<td>
+<p>Type of plot. Either "nonzero" or "path". Ignored if
+<code>length(x$radii) == 1</code>, in case of which all coefficient estimates are
+plotted at the given regularization parameter.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>label</code></td>
+<td>
+<p>Logical specifying whether to add labels to coefficient paths.
+Only used when <code>type = "path"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Other arguments to plot (not used)</p>
+</td>
+</tr>
+</table>
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Example with linear regression
+n &lt;- 100 # Number of samples
+p &lt;- 50 # Number of covariates
+# True (latent) variables
+X &lt;- matrix(rnorm(n * p), nrow = n)
+# Measurement error covariance matrix
+# (typically estimated by replicate measurements)
+sigmaUU &lt;- diag(x = 0.2, nrow = p, ncol = p)
+# Measurement matrix (this is the one we observe)
+W &lt;- X + rnorm(n, sd = sqrt(diag(sigmaUU)))
+# Coefficient
+beta &lt;- c(seq(from = 0.1, to = 1, length.out = 5), rep(0, p-5))
+# Response
+y &lt;- X %*% beta + rnorm(n, sd = 1)
+# Run the corrected lasso
+fit &lt;- corrected_lasso(W, y, sigmaUU, family = "gaussian")
+plot(fit)
+
+</code></pre>
+
+
+</div>

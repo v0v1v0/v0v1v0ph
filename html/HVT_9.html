@@ -1,0 +1,153 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>plotAnimatedFlowmap</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Generating flow maps and animations based on transition probabilities</h2>
+
+<h3>Description</h3>
+
+<p>This is the main function for generating flow maps and animations based on transition probabilities
+including self states and excluding self states.
+Flow maps are a type of data visualization used to represent the transition probability of different states. 
+Animations are the gifs used to represent the movement of data through the cells.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">plotAnimatedFlowmap(
+  hvt_model_output,
+  transition_probability_df,
+  df,
+  animation = NULL,
+  flow_map = NULL,
+  fps_time = 1,
+  fps_state = 1,
+  time_duration = 2,
+  state_duration = 2,
+  cellid_column,
+  time_column
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>hvt_model_output</code></td>
+<td>
+<p>List. Output from a trainHVT function.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>transition_probability_df</code></td>
+<td>
+<p>List. Output from getTransitionProbability function</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>df</code></td>
+<td>
+<p>Data frame. The input dataframe should contain two columns, 
+cell ID from scoreHVT function and time stamp of that dataset.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>animation</code></td>
+<td>
+<p>Character. Type of animation ('state_based', 'time_based', 'All' or  NULL)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>flow_map</code></td>
+<td>
+<p>Character. Type of flow map ('self_state', 'without_self_state', 'All' or NULL)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fps_time</code></td>
+<td>
+<p>Numeric. A numeric value for the frames per second of the time transition gif.
+(Must be a numeric value and a factor of 100). Default value is 1.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fps_state</code></td>
+<td>
+<p>Numeric. A numeric value for the frames per second of the state transition gif.
+(Must be a numeric value and a factor of 100). Default value is 1.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>time_duration</code></td>
+<td>
+<p>Numeric. A numeric value for the duration of the time transition gif.
+Default value is 2.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>state_duration</code></td>
+<td>
+<p>Numeric. A numeric value for the duration of the state transition gif.
+Default value is 2.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cellid_column</code></td>
+<td>
+<p>Character. Name of the column containing cell IDs.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>time_column</code></td>
+<td>
+<p>Character. Name of the column containing time stamps</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A list of flow maps and animation gifs.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>PonAnuReka Seenivasan &lt;ponanureka.s@mu-sigma.com&gt;, Vishwavani &lt;vishwavani@mu-sigma.com&gt;
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>trainHVT</code> <br><code>scoreHVT</code> <br><code>getTransitionProbability</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">dataset &lt;- data.frame(date = as.numeric(time(EuStockMarkets)),
+                      DAX = EuStockMarkets[, "DAX"],
+                      SMI = EuStockMarkets[, "SMI"],
+                      CAC = EuStockMarkets[, "CAC"],
+                      FTSE = EuStockMarkets[, "FTSE"])
+                      
+hvt.results&lt;- trainHVT(dataset,n_cells = 60, depth = 1, quant.err = 0.1,
+                       distance_metric = "L1_Norm", error_metric = "max",
+                       normalize = TRUE,quant_method = "kmeans")
+                       
+scoring &lt;- scoreHVT(dataset, hvt.results)
+cell_id &lt;- scoring$scoredPredictedData$Cell.ID
+time_stamp &lt;- dataset$date
+dataset &lt;- data.frame(cell_id, time_stamp)
+
+table &lt;- getTransitionProbability(dataset, cellid_column = "cell_id",time_column = "time_stamp")
+plots &lt;- plotAnimatedFlowmap(hvt_model_output = hvt.results, transition_probability_df = table,
+df = dataset, animation = 'All', flow_map = 'All',fps_time = 1,fps_state =  1,time_duration = 2,
+state_duration = 2,cellid_column = "cell_id", time_column = "time_stamp")
+</code></pre>
+
+
+</div>

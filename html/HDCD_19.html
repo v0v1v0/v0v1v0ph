@@ -1,0 +1,115 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>single_Inspect</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Inspect for single change-point estimation</h2>
+
+<h3>Description</h3>
+
+<p>R wrapper for C function for single change-point estimation using Inspect (Wang and Samworth 2018). Note that the algorithm is only implemented for <code class="reqn">\mathcal{S} = \mathcal{S}_2</code>, in the notation of Wang and Samworth (2018).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">single_Inspect(
+  X,
+  lambda = sqrt(log(p * log(n))/2),
+  eps = 1e-10,
+  rescale_variance = FALSE,
+  maxiter = 10000,
+  debug = FALSE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>X</code></td>
+<td>
+<p>Matrix of observations, where each row contains a time series</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lambda</code></td>
+<td>
+<p>Manually specified value of <code class="reqn">\lambda</code> (can be <code>NULL</code>, in which case <code class="reqn">\lambda \gets \sqrt{\log(p\log n)/2}</code>)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>eps</code></td>
+<td>
+<p>Threshold for declaring numerical convergence of the power method</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rescale_variance</code></td>
+<td>
+<p>If <code>TRUE</code>, each row of the data is re-scaled by a MAD estimate using <code>rescale_variance</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>maxiter</code></td>
+<td>
+<p>Maximum number of iterations for the power method</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>debug</code></td>
+<td>
+<p>If <code>TRUE</code>, diagnostic prints are provided during execution</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A list containing 
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>pos</code></td>
+<td>
+<p>estimated change-point location</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>CUSUMval</code></td>
+<td>
+<p>projected CUSUM value at the estimated change-point position</p>
+</td>
+</tr>
+</table>
+<h3>References</h3>
+
+<p>Wang T, Samworth RJ (2018).
+“High dimensional change point estimation via sparse projection.”
+<em>Journal of the Royal Statistical Society: Series B (Statistical Methodology)</em>, <b>80</b>(1), 57–83.
+ISSN 1467-9868, <a href="https://doi.org/10.1111/rssb.12243">doi:10.1111/rssb.12243</a>, <a href="https://rss.onlinelibrary.wiley.com/doi/abs/10.1111/rssb.12243">https://rss.onlinelibrary.wiley.com/doi/abs/10.1111/rssb.12243</a>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">library(HDCD)
+n = 500
+p = 500
+set.seed(101)
+# Generating data
+X = matrix(rnorm(n*p), ncol = n, nrow=p)
+# Adding a single sparse change-point:
+X[1:5, 201:500] = X[1:5, 201:500] +1
+
+res = single_Inspect(X,rescale_variance=TRUE)
+res$pos
+
+# Manually setting the value of \lambda:
+res = single_Inspect(X, lambda = 2*sqrt(log(p*log(n))/2))
+res$pos
+</code></pre>
+
+
+</div>

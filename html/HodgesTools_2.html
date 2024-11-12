@@ -1,0 +1,111 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>cpg_analysis</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>CpG Analysis</h2>
+
+<h3>Description</h3>
+
+<p>Compute observed/expected CpG ratio and GC% for regions of interest
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">cpg_analysis(
+  list = FALSE,
+  count,
+  cpg_file,
+  nuc_file,
+  palette = "Set3",
+  plot = "none"
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>list</code></td>
+<td>
+<p>"boolean of whether input is a list of groups. Default = FALSE."</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>count</code></td>
+<td>
+<p>"numeric value for the number of files included in your list</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cpg_file</code></td>
+<td>
+<p>"file names or list of files names for your CpGcount.txt files. This is defined in cpg_analysis.sh"</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nuc_file</code></td>
+<td>
+<p>"file names or list of files names for your nucOutput_gc.txt files. This is defined in cpg_analysis.sh"</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>palette</code></td>
+<td>
+<p>"if choosing to plot, the RColorBrewer palette you would like to be applied to your plot"</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>plot</code></td>
+<td>
+<p>"one of three choices depending on what output you would like: 'none' for no plot, 'ratio' for observed/expected ratios, 'gc_percent' for GC%"</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The function reads in a nucOutput_gc and CpGcount text file
+The function uses the nucOutput_gc and CpGcount file to calculates observed/expected ratio and GC%.
+The function allows the option to plot the distribution of these values in ggplot2
+</p>
+
+
+<h3>Value</h3>
+
+<p>ggplot object or tibble if plot="none"
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Lindsey Guerin
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">#load external data
+
+gain_6hr_CpG &lt;- system.file(package = "HodgesTools", "extdata",
+"cov5root_6hr_gain.CpGcount.txt")
+gain_12hr_CpG &lt;- system.file(package = "HodgesTools", "extdata",
+ "cov5root_12hr_gain.CpGcount.txt")
+gain_6hr_nuc &lt;- system.file(package = "HodgesTools", "extdata",
+ "cov5root_6hr_gain.nucOutput_gc.txt")
+gain_12hr_nuc &lt;- system.file(package = "HodgesTools", "extdata",
+"cov5root_12hr_gain.nucOutput_gc.txt")
+
+#Make a density plot of GC% values for a list of two region of interest files
+cpg_analysis(list = TRUE, count = 2, cpg_file = list(gain_6hr_CpG, gain_12hr_CpG),
+nuc_file= list(gain_6hr_nuc, gain_12hr_nuc), palette = "Set3", plot ="gc_percent")
+
+#Make a density plot of observed/expected values for a single set of regions of interest
+cpg_analysis(list = FALSE, cpg_file = gain_6hr_CpG,
+nuc_file = gain_6hr_nuc, palette = "Set3", plot ="ratio")
+</code></pre>
+
+
+</div>

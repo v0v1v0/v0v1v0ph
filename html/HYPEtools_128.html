@@ -1,0 +1,108 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>ScalePar</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Scale 'par.txt' files to different model time step</h2>
+
+<h3>Description</h3>
+
+<p><code>ScalePar</code> scales time step-dependent parameters and recession coefficients in an imported
+<a href="http://hype.smhi.net//wiki/doku.php?id=start:hype_file_reference:par.txt">HYPE 'par.txt'</a> parameter file to a
+new target time step. See HYPE wiki tutorial on <a href="http://hype.smhi.net//wiki/doku.php?id=start:hype_tutorials:subdaily_timesteps">sub-daily time steps</a>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">ScalePar(
+  x = NULL,
+  timestep.ratio = 1/24,
+  digits = 3,
+  verbose = TRUE,
+  print.par = FALSE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>List containing HYPE parameters. Typically imported with <code>ReadPar()</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>timestep.ratio</code></td>
+<td>
+<p>Numeric, time step scaling factor. Defaults to (1/24) to scale from daily to hourly time steps. To scale from hourly to daily time steps use 24.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>digits</code></td>
+<td>
+<p>Integer, number of significant digits in scaled parameter values to export. See <code>signif()</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p>Logical, if <code>TRUE</code>, then information will be printed.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>print.par</code></td>
+<td>
+<p>Logical, print known time-scale dependent parameters and recession coefficients instead of scaling a parameter list.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p><code>ScalePar</code> applies a user-specified scaling factor, <code>timestep.ratio</code>, to all time scale-dependent parameters and recession coefficients
+in a HYPE parameter list. Parameters are matched against an inbuilt set of parameter names. To see these parameters, call <code>ScalePar(print.par = TRUE)</code>.
+<em><a href="https://github.com/rcapell/HYPEtools/issues">Please notify us</a> if you find any missing parameters.</em>
+</p>
+<p>If parameters are not timestep-dependent recession coefficients, then scaling is performed using the ratio between the two time step lengths (e.g. 1/24 when scaling from daily to hourly time steps).
+If parameters are timestep-dependent recession coefficients, then scaling is performed using the relationship described in:
+Nalbantis, Ioannis (1995). “Use of multiple-time-step information in rainfall-runoff modelling”, Journal of Hydrology 165, 1-4, pp. 135–159.
+</p>
+<p><code>new_parameter_value = 1 - (1 - old_parameter_value)^time_step_ratio</code>
+</p>
+<p><code>ScalePar</code> does not scale the values for the "gratk", "ilratk", "olratk", or "wetrate" rating curve recession coefficients in par.txt because they are not limited to the range 0-1.
+Likewise, HYPEtools does not provide any scaling function for the "RATE" columns in DamData.txt and LakeData.txt because these values are not limited to the range 0-1.
+We recommend looking at the results from the lakes/wetlands and recalibrating these parameters and their related power coefficients as needed.
+</p>
+<p>Use the <code>ScaleAquiferData</code> and <code>ScaleFloodData</code> functions to scale the time-dependent recession coefficients in AquiferData.txt and FloodData.txt files, respectively.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A <code>list()</code> object as supplied in <code>x</code>, with re-scaled parameters and recession coefficients, or nothing if <code>print.par = TRUE</code>.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>ScaleAquiferData</code>
+<code>ScaleFloodData</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Import daily HYPE parameter file
+par &lt;- ReadPar(filename = system.file("demo_model", "par.txt", package = "HYPEtools"))
+# Scale to hourly time steps
+ScalePar(x = par)
+# Print all time scale-dependent parameters known to the function
+ScalePar(print.par = TRUE)
+
+</code></pre>
+
+
+</div>

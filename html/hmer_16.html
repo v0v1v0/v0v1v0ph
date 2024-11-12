@@ -1,0 +1,168 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>emulator_plot</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Plot Emulator Outputs</h2>
+
+<h3>Description</h3>
+
+<p>A function for plotting emulator expectations, variances, and implausibilities
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">emulator_plot(
+  ems,
+  plot_type = "exp",
+  ppd = 30,
+  targets = NULL,
+  cb = FALSE,
+  params = NULL,
+  fixed_vals = NULL,
+  nth = 1,
+  imp_breaks = NULL,
+  include_legend = TRUE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>ems</code></td>
+<td>
+<p>An <code>Emulator</code> object, or a list thereof.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>plot_type</code></td>
+<td>
+<p>The statistic to plot (see description or examples).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ppd</code></td>
+<td>
+<p>The number of points per plotting dimension</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>targets</code></td>
+<td>
+<p>If required, the targets from which to calculate implausibility</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cb</code></td>
+<td>
+<p>A boolean representing whether a colourblind-friendly plot is produced.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>params</code></td>
+<td>
+<p>Which two input parameters should be plotted?</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fixed_vals</code></td>
+<td>
+<p>For fixed input parameters, the values they are held at.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nth</code></td>
+<td>
+<p>If plotting nth maximum implausibility, which level maximum to plot.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>imp_breaks</code></td>
+<td>
+<p>If plotting nth maximum implausibility, defines the levels at
+which to draw contours.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>include_legend</code></td>
+<td>
+<p>For multiple plots, should a combined legend be appended?</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Given a single emulator, or a set of emulators, the emulator statistics can be plotted
+across a two-dimensional slice of the parameter space. Which statistic is plotted is
+determined by <code>plot_type</code>: options are ‘exp’, ‘var’, ‘sd’, ‘imp’, and ‘nimp’, which
+correspond to expectation, variance, standard deviation, implausibility, and nth-max
+implausibility.
+</p>
+<p>By default, the slice varies in the first two parameters of the emulators, and all other
+parameters are taken to be fixed at their mid-range values. This behaviour can be changed
+with the <code>params</code> and <code>fixed_vals</code> parameters (see examples).
+</p>
+<p>If the statistic is ‘exp’, ‘var’ or ‘sd’, then the minimal set of parameters to pass to this
+function are <code>ems</code> (which can be a list of emulators or a single one) and <code>plot_type</code>.
+If the statistic is ‘imp’ or ‘nimp’, then the <code>targets</code> must be supplied - it is not
+necessary to specify the individual target for a single emulator plot. If the statistic is
+‘nimp’, then the level of maximum implausibility can be chosen with the parameter <code>nth</code>.
+</p>
+<p>Implausibility plots are typically coloured from green (low implausibility) to red (high
+implausibility): a colourblind-friendly option is available and can be turned on by setting
+<code>cb = TRUE</code>.
+</p>
+<p>The granularity of the plot is controlled by the <code>ppd</code> parameter, determining the number
+of points per dimension in the grid. For higher detail, at the expense of longer computing
+time, increase this value. The default is 30.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A ggplot object, or collection thereof.
+</p>
+
+
+<h3>See Also</h3>
+
+<p>Other visualisation tools: 
+<code>behaviour_plot()</code>,
+<code>diagnostic_wrap()</code>,
+<code>effect_strength()</code>,
+<code>hit_by_wave()</code>,
+<code>output_plot()</code>,
+<code>plot_actives()</code>,
+<code>plot_lattice()</code>,
+<code>plot_wrap()</code>,
+<code>simulator_plot()</code>,
+<code>space_removed()</code>,
+<code>validation_pairs()</code>,
+<code>wave_dependencies()</code>,
+<code>wave_points()</code>,
+<code>wave_values()</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"> # Reducing ppd to 10 for speed.
+ emulator_plot(SIREmulators$ems, ppd = 10)
+ emulator_plot(SIREmulators$ems$nS, ppd = 10)
+ emulator_plot(SIREmulators$ems, plot_type = 'var', ppd = 10, params = c('aIR', 'aSR'))
+  # Excessive runtime
+    emulator_plot(SIREmulators$ems, plot_type = 'imp', ppd = 10,
+     targets = SIREmulators$targets,
+     fixed_vals = list(aSR = 0.02))
+    emulator_plot(SIREmulators$ems, plot_type = 'nimp', cb = TRUE,
+     targets = SIREmulators$targets, nth = 2, ppd = 10)
+ 
+
+</code></pre>
+
+
+</div>

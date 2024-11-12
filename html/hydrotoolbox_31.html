@@ -1,0 +1,142 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hm_melt</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Melt many objects into an <code>hydromet_compact</code> class object</h2>
+
+<h3>Description</h3>
+
+<p>This method allows you merge several tables (inside <code>hydromet_station</code> and/or
+<code>hydromet_compact</code> class objects) into a single one and set them into the compact slot
+(<code>hydromet_compact</code> class object).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hm_melt(obj, melt, slot_name, col_name, out_name = NULL)
+
+## S4 method for signature 'hydromet_compact'
+hm_melt(obj, melt, slot_name, col_name, out_name = NULL)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>obj</code></td>
+<td>
+<p>a valid <code>hydromet_compact</code> class object.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>melt</code></td>
+<td>
+<p>string vector containing the  <code>hydromet_xxx</code> class objects names (as you
+have in the <b>Global Environment</b>) that you want for melting.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>slot_name</code></td>
+<td>
+<p>list (one element per <code>melt</code> vector name) with the slot(s) to
+extract per every <code>hydromet_xxx</code> class object (as string vectors).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>col_name</code></td>
+<td>
+<p>string vector with the name of the variables to keep. You must comply
+the following name convention <code>'melt_slot_variable'</code> (e.g.: 'guido_qd_Q(m3/s)' - where
+<b>guido</b> is your object name, <b>qd</b> is the slot with daily mean river discharge
+and <b>Q(m3/s)</b> is the required column name inside that slot). Another option is to set
+this argument just with the string <code>'all'</code> and the method will preserve <b>all</b>
+the slot(s) columns. Other minimal option is to choose the string <code>'last'</code>: in this
+case you will get only the <b>last</b> column of each slot(s).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>out_name</code></td>
+<td>
+<p>optional. String vector with the output names of the final table. If you
+use the default value (<code>NULL</code>) the method will add the object and slot name
+(provided in <code>melt</code> and <code>slot_name</code> argument) at the beginning of every column
+(e.g.: <code>'guido_qd_q(m3/s)'</code>).</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>An <code>hydromet_compact</code> class object with a data frame inside the <code>compact</code>
+slot with all variables that you provided in <code>col_name</code>.
+</p>
+
+
+<h3>Functions</h3>
+
+
+<ul><li> <p><code>hm_melt(hydromet_compact)</code>: plot method for compact class
+</p>
+</li></ul>
+<h3>Note</h3>
+
+<p>Remember that all the chosen variables should have the same temporal resolution.
+The method itself will not warn you about bad entries.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+# lets say that we want to put together snow water equivalent from Toscas (dgi)
+# and daily streamflow discharge from Guido (snih)
+
+# path to all example files
+path &lt;- system.file('extdata', package = 'hydrotoolbox')
+
+# on the first place we build the stations
+# dgi file
+toscas &lt;-
+hm_create() %&gt;%
+  hm_build(bureau = 'dgi', path = path,
+           file_name = 'dgi_toscas.xlsx',
+           slot_name = c('swe', 'tmax',
+           'tmin', 'tmean', 'rh', 'patm'),
+           by = 'day',
+           out_name = c('swe', 'tmax',
+           'tmin', 'tmean', 'rh', 'patm') )
+
+# snih file
+guido &lt;-
+hm_create() %&gt;%
+  hm_build(bureau = 'snih', path = path,
+           file_name = c('snih_hq_guido.xlsx',
+           'snih_qd_guido.xlsx'),
+           slot_name = c('hq', 'qd'),
+           by = c('none', 'day') )
+
+# now we melt the requiered data
+hm_create(class_name = 'compact') %&gt;%
+     hm_melt(melt = c('toscas', 'guido'),
+             slot_name = list(toscas = 'swe', guido = 'qd'),
+             col_name = 'all',
+             out_name = c('swe(mm)', 'qd(m3/s)')
+             ) %&gt;%
+       hm_plot(slot_name = 'compact',
+               col_name = list( c('swe(mm)', 'qd(m3/s)') ),
+               interactive = TRUE,
+               line_color = c('dodgerblue', 'red'),
+               y_lab = c('q(m3/s)', 'swe(mm)'),
+               dual_yaxis = c('right', 'left')
+                )
+
+## End(Not run)
+
+
+</code></pre>
+
+
+</div>

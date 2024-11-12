@@ -1,0 +1,87 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>themodel</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Model fitting</h2>
+
+<h3>Description</h3>
+
+<p>Model-agnostic functions for model fitting (both linear and generalized linear models).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">themodel(formula, data, usebinary = 1, clean = TRUE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>formula</code></td>
+<td>
+<p>a formula for model-fitting, starting with outcome~.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>a data frame contains all the variables included in the formula.
+The outcome must be the first column with colnames(data)[1]="outcome".</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>usebinary</code></td>
+<td>
+<p>a non-negative number representing different models.
+Use linear model if <code>usebinary=0</code>,
+use logistic regression model via <code>fastglm</code> if <code>usebinary=1</code> (by default),
+and use logistic regression model via <code>glm</code> if <code>usebinary&gt;1</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>clean</code></td>
+<td>
+<p>logical. If <code>clean=TRUE</code> (by default), remove additional storages that
+the <code>predict</code> function, <code>"AIC"</code> and <code>"BIC"</code> criteria do not need.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>This function returns a fitted model (either linear model or logistic regression model).
+For logistic regression, we use function <code>fastglm</code> from <code>fastglm</code> package, which is much faster than <code>glm</code>.
+</p>
+
+
+<h3>Value</h3>
+
+<p>a fitted model.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## create the dataset for variables and outcome
+x=matrix(runif(100,-2,2),ncol=5)
+outcome=0.5*x[,2] - 0.8*x[,4] + 0.3*x[,5]
+data1=data.frame(outcome,x)
+
+## fit a linear model
+themodel(outcome~.,data1,usebinary=0)
+
+## create binary outcome
+outcome=outcome&gt;runif(100,-2,2)
+outcome[outcome]=1
+data2=data.frame(outcome,x)
+
+## fit a logistic regression model
+themodel(outcome~.,data2,usebinary=1)
+</code></pre>
+
+
+</div>

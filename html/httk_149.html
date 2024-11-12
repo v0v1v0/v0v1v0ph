@@ -1,0 +1,580 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>parameterize_gas_pbtk</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Parameters for a generic gas inhalation physiologically-based toxicokinetic model</h2>
+
+<h3>Description</h3>
+
+<p>This function initializes the parameters needed for the model 'gas_pbtk', for
+example <code>solve_gas_pbtk</code>. Chemical- and species-specific model 
+parameters are generated. These include tissue:plasma partition coefficients 
+via Schmitt (2008)'s method as modified by Pearce et al. (2017). Organ volumes 
+and flows are retrieved from table <code>physiology.data</code>). This model
+was first described by Linakis et al. (2020).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">parameterize_gas_pbtk(
+  chem.cas = NULL,
+  chem.name = NULL,
+  dtxsid = NULL,
+  species = "Human",
+  default.to.human = FALSE,
+  tissuelist = list(liver = c("liver"), kidney = c("kidney"), lung = c("lung"), gut =
+    c("gut")),
+  force.human.clint.fup = FALSE,
+  clint.pvalue.threshold = 0.05,
+  adjusted.Funbound.plasma = TRUE,
+  adjusted.Clint = TRUE,
+  regression = TRUE,
+  vmax = 0,
+  km = 1,
+  exercise = FALSE,
+  fR = 12,
+  VT = 0.75,
+  VD = 0.15,
+  suppress.messages = FALSE,
+  minimum.Funbound.plasma = 1e-04,
+  Caco2.options = NULL,
+  class.exclude = TRUE,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>chem.cas</code></td>
+<td>
+<p>Either the chemical name or the CAS number must be
+specified.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>chem.name</code></td>
+<td>
+<p>Either the chemical name or the CAS number must be
+specified.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dtxsid</code></td>
+<td>
+<p>EPA's DSSTox Structure ID (<a href="https://comptox.epa.gov/dashboard">https://comptox.epa.gov/dashboard</a>)
+the chemical must be identified by either CAS, name, or DTXSIDs</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>species</code></td>
+<td>
+<p>Species desired (either "Rat", "Rabbit", "Dog", "Mouse", or
+default "Human").</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>default.to.human</code></td>
+<td>
+<p>Substitutes missing animal values with human values
+if true (hepatic intrinsic clearance or fraction of unbound plasma).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tissuelist</code></td>
+<td>
+<p>Specifies compartment names and tissues groupings.
+Remaining tissues in tissue.data are lumped in the rest of the body.
+However, solve_pbtk only works with the default parameters.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>force.human.clint.fup</code></td>
+<td>
+<p>Forces use of human values for hepatic
+intrinsic clearance and fraction of unbound plasma if true.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>clint.pvalue.threshold</code></td>
+<td>
+<p>Hepatic clearance for chemicals where the in
+vitro clearance assay result has a p-values greater than the threshold are
+set to zero.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>adjusted.Funbound.plasma</code></td>
+<td>
+<p>Uses Pearce et al. (2017) lipid binding adjustment
+for Funbound.plasma (which impacts partition coefficients) when set to TRUE (Default).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>adjusted.Clint</code></td>
+<td>
+<p>Uses Kilford et al. (2008) hepatocyte incubation
+binding adjustment for Clint when set to TRUE (Default).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>regression</code></td>
+<td>
+<p>Whether or not to use the regressions in calculating
+partition coefficients.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>vmax</code></td>
+<td>
+<p>Michaelis-Menten vmax value in reactions/min</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>km</code></td>
+<td>
+<p>Michaelis-Menten concentration of half-maximal reaction velocity
+in desired output concentration units.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>exercise</code></td>
+<td>
+<p>Logical indicator of whether to simulate an exercise-induced
+heightened respiration rate</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fR</code></td>
+<td>
+<p>Respiratory frequency (breaths/minute), used especially to adjust
+breathing rate in the case of exercise. This parameter, along with VT and VD
+(below) gives another option for calculating Qalv (Alveolar ventilation) 
+in case pulmonary ventilation rate is not known</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>VT</code></td>
+<td>
+<p>Tidal volume (L), to be modulated especially as part of simulating
+the state of exercise</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>VD</code></td>
+<td>
+<p>Anatomical dead space (L), to be modulated especially as part of
+simulating the state of exercise</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>suppress.messages</code></td>
+<td>
+<p>Whether or not the output messages are suppressed.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>minimum.Funbound.plasma</code></td>
+<td>
+<p>Monte Carlo draws less than this value are set 
+equal to this value (default is 0.0001 – half the lowest measured Fup in our
+dataset).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Caco2.options</code></td>
+<td>
+<p>A list of options to use when working with Caco2 apical to
+basolateral data <code>Caco2.Pab</code>, default is Caco2.options = list(Caco2.Pab.default = 1.6,
+Caco2.Fabs = TRUE, Caco2.Fgut = TRUE, overwrite.invivo = FALSE, keepit100 = FALSE). Caco2.Pab.default sets the default value for 
+Caco2.Pab if Caco2.Pab is unavailable. Caco2.Fabs = TRUE uses Caco2.Pab to calculate
+fabs.oral, otherwise fabs.oral = <code>Fabs</code>. Caco2.Fgut = TRUE uses Caco2.Pab to calculate 
+fgut.oral, otherwise fgut.oral = <code>Fgut</code>. overwrite.invivo = TRUE overwrites Fabs and Fgut in vivo values from literature with 
+Caco2 derived values if available. keepit100 = TRUE overwrites Fabs and Fgut with 1 (i.e. 100 percent) regardless of other settings.
+See <code>get_fbio</code> for further details.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>class.exclude</code></td>
+<td>
+<p>Exclude chemical classes identified as outside of 
+domain of applicability by relevant modelinfo_[MODEL] file (default TRUE).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Other parameters</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>BW</code></td>
+<td>
+<p>Body Weight, kg.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Clint</code></td>
+<td>
+<p>Hepatic intrinsic clearance, uL/min/10^6 cells</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Clint.dist</code></td>
+<td>
+<p>Distribution of hepatic intrinsic clearance values
+(median, lower 95th, upper 95th, p value)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Clmetabolismc</code></td>
+<td>
+<p>Hepatic Clearance, L/h/kg BW.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Fabsgut</code></td>
+<td>
+<p>Fraction of the oral dose absorbed, i.e. the fraction of the
+dose that enters the gut lumen.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Fhep.assay.correction</code></td>
+<td>
+<p>The fraction of chemical unbound in hepatocyte
+assay using the method of Kilford et al. (2008)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Funbound.plasma</code></td>
+<td>
+<p>Fraction of chemical unbound to plasma.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Funbound.plasma.adjustment</code></td>
+<td>
+<p>Fraction unbound to plasma adjusted as
+described in Pearce et al. 2017</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Funbound.plasma.dist</code></td>
+<td>
+<p>Distribution of fraction unbound to plasma
+(median, lower 95th, upper 95th)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>hematocrit</code></td>
+<td>
+<p>Percent volume of red blood cells in the blood.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Kblood2air</code></td>
+<td>
+<p>Ratio of concentration of chemical in blood to air</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Kgut2pu</code></td>
+<td>
+<p>Ratio of concentration of chemical in gut tissue to unbound
+concentration in plasma.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>kgutabs</code></td>
+<td>
+<p>Rate that chemical enters the gut from gutlumen, 1/h.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Kkidney2pu</code></td>
+<td>
+<p>Ratio of concentration of chemical in kidney tissue to
+unbound concentration in plasma.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Kliver2pu</code></td>
+<td>
+<p>Ratio of concentration of chemical in liver tissue to
+unbound concentration in plasma.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Klung2pu</code></td>
+<td>
+<p>Ratio of concentration of chemical in lung tissue
+to unbound concentration in plasma.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>km</code></td>
+<td>
+<p>Michaelis-Menten concentration of half-maximal activity</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Kmuc2air</code></td>
+<td>
+<p>Mucus to air partition coefficient</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Krbc2pu</code></td>
+<td>
+<p>Ratio of concentration of chemical in red blood cells to
+unbound concentration in plasma.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Krest2pu</code></td>
+<td>
+<p>Ratio of concentration of chemical in rest of body tissue to
+unbound concentration in plasma.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>kUrtc</code></td>
+<td>
+<p>Unscaled upper respiratory tract uptake parameter (L/h/kg^0.75)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>liver.density</code></td>
+<td>
+<p>Density of liver in g/mL</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>MA</code></td>
+<td>
+<p>phospholipid:water distribution coefficient, membrane affinity</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>million.cells.per.gliver</code></td>
+<td>
+<p>Millions cells per gram of liver tissue.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>MW</code></td>
+<td>
+<p>Molecular Weight, g/mol.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pKa_Accept</code></td>
+<td>
+<p>compound H association equilibrium constant(s)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pKa_Donor</code></td>
+<td>
+<p>compound H dissociation equilibirum constant(s)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Pow</code></td>
+<td>
+<p>octanol:water partition coefficient (not log transformed)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Qalvc</code></td>
+<td>
+<p>Unscaled alveolar ventilation rate (L/h/kg^0.75)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Qcardiacc</code></td>
+<td>
+<p>Cardiac Output, L/h/kg BW^3/4.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Qgfrc</code></td>
+<td>
+<p>Glomerular Filtration Rate, L/h/kg BW^0.75, volume of fluid
+filtered from kidney and excreted.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Qgutf</code></td>
+<td>
+<p>Fraction of cardiac output flowing to the gut.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Qkidneyf</code></td>
+<td>
+<p>Fraction of cardiac output flowing to the kidneys.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Qliverf</code></td>
+<td>
+<p>Fraction of cardiac output flowing to the liver.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Qlungf</code></td>
+<td>
+<p>Fraction of cardiac output flowing to lung tissue.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Qrestf</code></td>
+<td>
+<p>Fraction of blood flow to rest of body</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Rblood2plasma</code></td>
+<td>
+<p>The ratio of the concentration of the chemical in the
+blood to the concentration in the plasma from available_rblood2plasma.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Vartc</code></td>
+<td>
+<p>Volume of the arteries per kg body weight, L/kg BW.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Vgutc</code></td>
+<td>
+<p>Volume of the gut per kg body weight, L/kg BW.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Vkidneyc</code></td>
+<td>
+<p>Volume of the kidneys per kg body weight, L/kg BW.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Vliverc</code></td>
+<td>
+<p>Volume of the liver per kg body weight, L/kg BW.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Vlungc</code></td>
+<td>
+<p>Volume of the lungs per kg body weight, L/kg BW.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>vmax</code></td>
+<td>
+<p>Michaelis-Menten maximum reaction velocity (1/min)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Vmucc</code></td>
+<td>
+<p>Unscaled mucosal volume (L/kg BW^0.75</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Vrestc</code></td>
+<td>
+<p> Volume of the rest of the body per kg body weight, L/kg BW.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Vvenc</code></td>
+<td>
+<p>Volume of the veins per kg body weight, L/kg BW.</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>Matt Linakis, Robert Pearce, John Wambaugh
+</p>
+
+
+<h3>References</h3>
+
+<p>Linakis MW, Sayre RR, Pearce RG, Sfeir MA, Sipes NS, Pangburn HA, Gearhart JM, Wambaugh JF (2020).
+“Development and evaluation of a high-throughput inhalation model for organic chemicals.”
+<em>Journal of exposure science &amp; environmental epidemiology</em>, <b>30</b>(5), 866–877.
+</p>
+<p>Schmitt W (2008).
+“General approach for the calculation of tissue to plasma partition coefficients.”
+<em>Toxicology in vitro</em>, <b>22</b>(2), 457–467.
+</p>
+<p>Pearce RG, Setzer RW, Davis JL, Wambaugh JF (2017).
+“Evaluation and calibration of high-throughput predictions of chemical distribution to tissues.”
+<em>Journal of pharmacokinetics and pharmacodynamics</em>, <b>44</b>, 549–565.
+</p>
+<p>Kilford PJ, Gertz M, Houston JB, Galetin A (2008).
+“Hepatocellular binding of drugs: correction for unbound fraction in hepatocyte incubations using microsomal binding or drug lipophilicity data.”
+<em>Drug Metabolism and Disposition</em>, <b>36</b>(7), 1194–1197.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>solve_gas_pbtk</code>
+</p>
+<p><code>apply_clint_adjustment</code>
+</p>
+<p><code>predict_partitioning_schmitt</code>
+</p>
+<p><code>available_rblood2plasma</code>
+</p>
+<p><code>calc_kair</code>
+</p>
+<p><code>tissue.data</code>
+</p>
+<p><code>physiology.data</code>
+</p>
+<p><code>get_clint</code>
+</p>
+<p><code>get_fup</code>
+</p>
+<p><code>get_physchem_param</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">parameters &lt;- parameterize_gas_pbtk(chem.cas='129-00-0')
+
+
+parameters &lt;- parameterize_gas_pbtk(chem.name='pyrene',species='Rat')
+
+parameterize_gas_pbtk(chem.cas = '56-23-5')
+
+parameters &lt;- parameterize_gas_pbtk(chem.name='Carbon tetrachloride',species='Rat')
+
+# Change the tissue lumping:
+compartments &lt;- list(liver=c("liver"),fast=c("heart","brain","muscle","kidney"),
+                      lung=c("lung"),gut=c("gut"),slow=c("bone"))
+parameterize_gas_pbtk(chem.name="Bisphenol a",species="Rat",default.to.human=TRUE,
+                   tissuelist=compartments) 
+
+
+</code></pre>
+
+
+</div>

@@ -1,0 +1,110 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>Campbel</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Campbell water retention model
+</h2>
+
+<h3>Description</h3>
+
+<p>This is a three-parameter function to determine water retention hydraulic parameters contained in the Campbell water retention model
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">Campbel(x, ths, alp, nscal)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+
+<p>Suction potential/head as contained in the x-column of the xy water retention table or data
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ths</code></td>
+<td>
+
+<p>This is the saturated moisture content. It's the moisture content when suction potential is very low (almost at the saturation point)
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alp</code></td>
+<td>
+
+<p>It's the inverse of air-entry potential or bubbling pressure
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nscal</code></td>
+<td>
+
+<p>This is a parameter or index for the pore-size distribution. nscal=1/b, where b is empirical parameter in the original Campbel model
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>A Campbell model is a type of nonlinear curve fitting model for fitting water retention characteristics using experimental data. It requires initial parameter estimates for the model to work. This can be obtained using Dstart function (e.g. thr=Dstart(data)[1]). If warnings are given during the estimation process, try to increase the iteration limit using control function. Sometimes the warnings can be suppressed using (warn=-1)/ignored since they do not terminate the process
+</p>
+
+
+<h3>Value</h3>
+
+<p>A list of objects returned by standard R regression functions such as nls and lm
+</p>
+
+
+<h3>Note</h3>
+
+<p>Warnings: Choice of starting values for Campbel function parameter estimation needs a careful thought. Sometimes it may be necessary to use alp=1/Dstart(data)[3] or Dstart(data)[3] and nscal=Dstart(data)[4]-1 or nscal=Dstart(data)[4]. One has to try the starting variables that will work for the given data
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Christian Thine Omuto
+</p>
+
+
+<h3>References</h3>
+
+<p>Campbell GS. 1974. A simple method for determining unsaturated conductivity from
+moisture retention data. Soil Science 117: 311-314
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>Brook</code>, <code>SSvgm</code>, <code>SSfredlund</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(isric)
+pf &lt;- subset(isric, Sample=="Nicaragua38")
+library(minpack.lm)
+campbel.ns &lt;- nlsLM(y ~ Campbel(x,ths,alp,nscal), data=pf,
+                  control = nls.lm.control(maxiter=200),
+                  start = c(ths = Dstart(pf)[2],
+                            alp=Dstart(pf)[3], nscal=-1*(Dstart(pf)[4]-1)))
+plot(fitted(campbel.ns),pf$y)
+coef(campbel.ns)
+</code></pre>
+
+
+</div>

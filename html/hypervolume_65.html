@@ -1,0 +1,359 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>plot.HypervolumeList</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Plot a hypervolume or list of hypervolumes
+</h2>
+
+<h3>Description</h3>
+
+<p>Plots a single hypervolume or multiple hypervolumes as either a pairs plot (all axes) or a 3D plot (a subset of axes). The hypervolume is drawn as a uniformly random set of points guaranteed to be in the hypervolume.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">## S3 method for class 'HypervolumeList'
+plot(x, 
+   show.3d=FALSE,plot.3d.axes.id=NULL,
+   show.axes=TRUE, show.frame=TRUE,
+   show.random=TRUE, show.density=TRUE,show.data=TRUE,
+   names=NULL, show.legend=TRUE, limits=NULL, 
+   show.contour=TRUE, contour.lwd=1.5, 
+    contour.type='kde', 
+    contour.alphahull.alpha=0.25,
+    contour.ball.radius.factor=1, 
+    contour.kde.level=1e-04,
+    contour.raster.resolution=20,
+   show.centroid=TRUE, cex.centroid=2,
+   colors=rainbow(floor(length(x@HVList)*1.5),alpha=0.8), 
+   point.alpha.min=0.2, point.dark.factor=0.5,
+   cex.random=0.5,cex.data=0.75,cex.axis=0.75,cex.names=1.0,cex.legend=0.75,
+   num.points.max.data = 1000, num.points.max.random = 2000, reshuffle=TRUE,
+   plot.function.additional=NULL,
+   verbose=FALSE,
+   ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+
+<p>A Hypervolume or HypervolumeList object. The objects to be plotted.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>show.3d</code></td>
+<td>
+
+<p>If <code>TRUE</code>, makes a three-dimensional plot of a subset of axes determined by <code>plot.3d.axes.id</code>; otherwise, a pairs plot of all axes. Requires that the <code>rgl</code> library is installed.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>plot.3d.axes.id</code></td>
+<td>
+
+<p>Numeric identities of axes to plot in three dimensions. Defaults to 1:3 if set to <code>NULL</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>show.axes</code></td>
+<td>
+
+<p>If <code>TRUE</code>, draws axes on the plot.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>show.frame</code></td>
+<td>
+
+<p>If <code>TRUE</code>, frames the plot with a box.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>show.random</code></td>
+<td>
+
+<p>If <code>TRUE</code>, shows random points from the hypervolume.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>show.density</code></td>
+<td>
+
+<p>If <code>TRUE</code>, draws random points with alpha level proportional to their unit-scaled probability density. Note that this has no effect when probability density is not relevant, i.e. for hypervolumes that are the output of set operations.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>show.data</code></td>
+<td>
+
+<p>If <code>TRUE</code>, draws data points from the hypervolume. Note that this has no effect if the hypervolume is not associated with data points, e.g. for those that are the output of set operations.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>names</code></td>
+<td>
+
+<p>A vector of strings in the same order as the input hypervolumes. Used to draw the axes labels.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>show.legend</code></td>
+<td>
+
+<p>If <code>TRUE</code>, draws a color legend.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>limits</code></td>
+<td>
+
+<p>A list of two-element vectors corresponding to the axes limits for each dimension. If a single two-element vector is provided it is re-used for all axes.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>show.contour</code></td>
+<td>
+
+<p>If <code>TRUE</code>, draws a boundary line saround each two-dimensional projection. Ignored if <code>show.3d=TRUE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>contour.lwd</code></td>
+<td>
+
+<p>Line width used for contour lines. Ignored if <code>show.contour=FALSE</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>contour.type</code></td>
+<td>
+
+<p>Type of contour boundary: any of <code>"alphahull"</code> (alpha hull), <code>"ball"</code> (experimental ball covering), <code>"kde"</code> (2D KDE smoothing), or <code>"raster"</code> (grid-based rasterization).
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>contour.alphahull.alpha</code></td>
+<td>
+
+<p>Value of the alpha parameter for a  <code>"alphahull"</code> contour. Can be increased to provide smoother contours.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>contour.ball.radius.factor</code></td>
+<td>
+
+<p>Factor used to multiply radius of ball surrounding each random point for a <code>"ball"</code> contour.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>contour.kde.level</code></td>
+<td>
+
+<p>Probability level used to delineate edges for a <code>"kde"</code> contour.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>contour.raster.resolution</code></td>
+<td>
+
+<p>Grid resolution for a <code>"raster"</code> contour.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>show.centroid</code></td>
+<td>
+
+<p>If <code>TRUE</code>, draws a colored point indicating the centroid for each hypervolume.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cex.centroid</code></td>
+<td>
+
+<p>Expansion factor for the centroid symbol.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>colors</code></td>
+<td>
+
+<p>A vector of colors to be used to plot each hypervolume, in the same order as the input hypervolumes.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>point.alpha.min</code></td>
+<td>
+
+<p>Fractional value corresponding to the most transparent value for plotting random points. 0 corresponds to full transparency.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>point.dark.factor</code></td>
+<td>
+
+<p>Fractional value corresponding to the darkening factor for plotting data points. 0 corresponds to fully black.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cex.random</code></td>
+<td>
+
+<p>cex value for uniformly random points.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cex.data</code></td>
+<td>
+
+<p>cex value for data points.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cex.axis</code></td>
+<td>
+
+<p>cex value for axes, if pair=T.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cex.names</code></td>
+<td>
+
+<p>cex value for variable names printed on the diagonal, if pair=T.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cex.legend</code></td>
+<td>
+
+<p>cex value for the legend text
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>num.points.max.data</code></td>
+<td>
+
+<p>An integer indicating the maximum number of data points to be sampled from each hypervolume. Lower values result in faster plotting and smaller file sizes but less accuracy.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>num.points.max.random</code></td>
+<td>
+
+<p>An integer indicating the maximum number of random points to be sampled from each hypervolume. Lower values result in faster plotting and smaller file sizes but less accuracy.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>reshuffle</code></td>
+<td>
+
+<p>A logical value relevant when pair=TRUE. If false, each hypervolume is drawn on top of the previous hypervolume; if true, all points of all hypervolumes are randomly shuffled so no hypervolume is given visual preference during plotting.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>plot.function.additional</code></td>
+<td>
+
+<p>Any <code>function(i,j)</code> that will add additional plotting commands for column <code>i</code> and row <code>j</code> of the pairs plot. Should not create new plots or change <code>par()</code> settings. Has no effect if <code>show.3d=TRUE</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+
+<p>If <code>TRUE</code>, prints diagnostic information about the number of points being plotted
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+
+<p>Additional arguments to be passed to <code>rgl::plot3d</code>. 
+</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>None; used for the side-effect of producing a plot.
+</p>
+
+
+<h3>Note</h3>
+
+<p>Contour line plotting with <code>alphahull</code> requires the non-FOSS <code>alphahull</code> package to be installed. Please do so in order to use this functionality!
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>hypervolume_save_animated_gif</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+# low parameter values for speed
+data(penguins,package='palmerpenguins')
+penguins_no_na = as.data.frame(na.omit(penguins))
+penguins_adelie = penguins_no_na[penguins_no_na$species=="Adelie",
+                    c("bill_length_mm","bill_depth_mm","flipper_length_mm")]
+
+hv = hypervolume_gaussian(penguins_adelie,name='Adelie')
+
+# 2d plot
+plot(hv, show.3d=FALSE)
+
+# 3d plot
+if(interactive()) 
+{
+  plot(hv, show.3d=TRUE)
+}
+
+## End(Not run)
+</code></pre>
+
+
+</div>

@@ -1,0 +1,128 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>clustHVT</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Performing Hierarchical Clustering Analysis</h2>
+
+<h3>Description</h3>
+
+<p>This is the main function to perform hierarchical clustering
+analysis which determines optimal number of clusters, perform AGNES clustering
+and plot the 2D cluster hvt plot.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">clustHVT(
+  data,
+  trainHVT_results,
+  scoreHVT_results,
+  clustering_method = "ward.D2",
+  indices,
+  clusters_k = "champion"
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>Data frame. A data frame intended for performing hierarchical clustering analysis.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>trainHVT_results</code></td>
+<td>
+<p>List.  A list object which is obtained as a result of trainHVT function.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>scoreHVT_results</code></td>
+<td>
+<p>List. A list object which is obtained as a result of scoreHVT function.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>clustering_method</code></td>
+<td>
+<p>Character. The method used for clustering in both NbClust and hclust function. Defaults to ‘ward.D2’.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>indices</code></td>
+<td>
+<p>Character. The indices used for determining the optimal number of clusters in NbClust function.
+By default it uses 20 different indices.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>clusters_k</code></td>
+<td>
+<p>Character.  A parameter that specifies the number of clusters for the provided data. 
+The options include “champion,” “challenger,” or any integer between 1 and 20. 
+Selecting “champion” will use the highest number of clusters recommended by the ‘NbClust’ function,
+while “challenger” will use the second-highest recommendation. If a numerical value from 1 to 20
+is provided, that exact number will be used as the number of clusters.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A list object that contains the hierarchical clustering results.
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>[[1]] </code></td>
+<td>
+<p>Summary of k suggested by all indices with plots</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>[[2]] </code></td>
+<td>
+<p>A dendogram plot with the selected number of clusters</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>[[3]] </code></td>
+<td>
+<p>A 2D Cluster HVT Plotly visualization that colors cells according to clusters derived from AGNES clustering results. 
+It is interactive, allowing users to view cell contents by hovering over them</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>Vishwavani &lt;vishwavani@mu-sigma.com&gt;
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data("EuStockMarkets")
+dataset &lt;- data.frame(date = as.numeric(time(EuStockMarkets)),
+                     DAX = EuStockMarkets[, "DAX"],
+                   SMI = EuStockMarkets[, "SMI"],
+                     CAC = EuStockMarkets[, "CAC"],
+                     FTSE = EuStockMarkets[, "FTSE"])
+rownames(EuStockMarkets) &lt;- dataset$date
+hvt.results&lt;- trainHVT(dataset,n_cells = 60, depth = 1, quant.err = 0.1,
+                      distance_metric = "L1_Norm", error_metric = "max",
+                      normalize = TRUE,quant_method = "kmeans")
+scoring &lt;- scoreHVT(dataset, hvt.results, analysis.plots = TRUE, names.column = dataset[,1])
+centroid_data &lt;- scoring$centroidData
+hclust_data_1 &lt;- centroid_data[,2:3]
+clust.results &lt;- clustHVT(data = hclust_data_1, 
+                         trainHVT_results = hvt.results,
+                         scoreHVT_results = scoring, 
+                         clusters_k = 'challenger', indices = 'hartigan')
+</code></pre>
+
+
+</div>

@@ -1,0 +1,200 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>w80ToSFP</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Function to convert w80-files to <code>sfc_POINT</code>.</h2>
+
+<h3>Description</h3>
+
+<p>This function converts w80-files, an asci-format with 80
+characters per line for spatial point data used by the German Waterways and
+Shipping Administration (WSV). Every single row codes for one point:
+</p>
+<p><code>|_1_|2_|_3______|4|____________5______________|_______6_______|_____7___|_8_|</code> <br></p>
+<p><code>W0701 55 2594611   1330938065557502425901108035 5795591108035         Bu.15   01</code> <br></p>
+<p><code>W0701 57 2594611   7330932961457502484041108035 5538181108035         Bu.15   01</code> <br></p>
+<p>Within each row very specific sections code for specific attributes:</p>
+
+<table>
+<tr>
+<td style="text-align: center;">
+   <strong>section</strong> </td>
+<td style="text-align: left;"> <strong>column(s)</strong> </td>
+<td style="text-align: left;"> <strong>attribute</strong> </td>
+<td style="text-align: right;"> <strong>column name in result</strong> </td>
+</tr>
+<tr>
+<td style="text-align: center;">
+   1 </td>
+<td style="text-align: left;"> 1 </td>
+<td style="text-align: left;"> state id, here W=WSV </td>
+<td style="text-align: right;"> sid </td>
+</tr>
+<tr>
+<td style="text-align: center;">
+   1 </td>
+<td style="text-align: left;"> 2-5 </td>
+<td style="text-align: left;"> Federal Waterway ID </td>
+<td style="text-align: right;"> fwid </td>
+</tr>
+<tr>
+<td style="text-align: center;">
+   2 </td>
+<td style="text-align: left;"> 6-8 </td>
+<td style="text-align: left;"> WSV point type </td>
+<td style="text-align: right;"> wsvpt </td>
+</tr>
+<tr>
+<td style="text-align: center;">
+   3 </td>
+<td style="text-align: left;"> 9 </td>
+<td style="text-align: left;"> blank </td>
+<td style="text-align: right;"> - </td>
+</tr>
+<tr>
+<td style="text-align: center;">
+   3 </td>
+<td style="text-align: left;"> 10-15 </td>
+<td style="text-align: left;"> river station (km) </td>
+<td style="text-align: right;"> station </td>
+</tr>
+<tr>
+<td style="text-align: center;">
+   4 </td>
+<td style="text-align: left;"> 16 </td>
+<td style="text-align: left;"> bank: 1 left, 2 right </td>
+<td style="text-align: right;"> bank </td>
+</tr>
+<tr>
+<td style="text-align: center;">
+   4 </td>
+<td style="text-align: left;"> 17-20 </td>
+<td style="text-align: left;"> continuous id </td>
+<td style="text-align: right;"> id </td>
+</tr>
+<tr>
+<td style="text-align: center;">
+   5 </td>
+<td style="text-align: left;"> 21-30 </td>
+<td style="text-align: left;"> easting in GK-coordinates </td>
+<td style="text-align: right;"> x </td>
+</tr>
+<tr>
+<td style="text-align: center;">
+   5 </td>
+<td style="text-align: left;"> 31-40 </td>
+<td style="text-align: left;"> northing in GK-coordinates </td>
+<td style="text-align: right;"> y </td>
+</tr>
+<tr>
+<td style="text-align: center;">
+   6 </td>
+<td style="text-align: left;"> 41-46 </td>
+<td style="text-align: left;"> datum of measurement </td>
+<td style="text-align: right;"> date_coor </td>
+</tr>
+<tr>
+<td style="text-align: center;">
+   6 </td>
+<td style="text-align: left;"> 47 </td>
+<td style="text-align: left;"> accuracy </td>
+<td style="text-align: right;"> acc_coor </td>
+</tr>
+<tr>
+<td style="text-align: center;">
+   6 </td>
+<td style="text-align: left;"> 48-54 </td>
+<td style="text-align: left;"> elevation </td>
+<td style="text-align: right;"> z </td>
+</tr>
+<tr>
+<td style="text-align: center;">
+   6 </td>
+<td style="text-align: left;"> 55-60 </td>
+<td style="text-align: left;"> date of the elevation measurement </td>
+<td style="text-align: right;"> date_z </td>
+</tr>
+<tr>
+<td style="text-align: center;">
+   6 </td>
+<td style="text-align: left;"> 61 </td>
+<td style="text-align: left;"> accuracy of the elevation measurement </td>
+<td style="text-align: right;"> acc_z </td>
+</tr>
+<tr>
+<td style="text-align: center;">
+   6 </td>
+<td style="text-align: left;"> 62-64 </td>
+<td style="text-align: left;"> type of measurement </td>
+<td style="text-align: right;"> tom </td>
+</tr>
+<tr>
+<td style="text-align: center;">
+   7 </td>
+<td style="text-align: left;"> 65-84 </td>
+<td style="text-align: left;"> comment </td>
+<td style="text-align: right;"> comment </td>
+</tr>
+<tr>
+<td style="text-align: center;">
+   8 </td>
+<td style="text-align: left;"> 85-86 </td>
+<td style="text-align: left;"> point status </td>
+<td style="text-align: right;"> status </td>
+</tr>
+<tr>
+<td style="text-align: center;">
+</td>
+</tr>
+</table>
+<h3>Usage</h3>
+
+<pre><code class="language-R">w80ToSFP(filename, crs)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>filename</code></td>
+<td>
+<p>argument of length 1 and type <code>character</code> specifying
+an existing w80-file.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>crs</code></td>
+<td>
+<p>argument of type <code>crs</code> or <code>crs</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p><code>sfc_POINT</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">  options("hydflood.datadir" = tempdir())
+  library(hydflood)
+  c &lt;- st_crs("EPSG:25833")
+  filename &lt;- tempfile(fileext = ".w80")
+  
+  # write temporary w80 file
+  cat("W0701 55 2594611   1330938065557502425901108035 5795591108035         Bu.15   01\n",
+      file = filename)
+  cat("W0701 57 2594611   7330932961457502484041108035 5538181108035         Bu.15   01\n",
+      file = filename, append = TRUE)
+  
+  # import temporary w80 file as sf POINT
+  sf &lt;- w80ToSFP(filename, c)
+
+</code></pre>
+
+
+</div>

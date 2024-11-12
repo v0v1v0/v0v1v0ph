@@ -1,0 +1,95 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>Metropolis_OAAT</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>One-At-A-Time Metropolis sampler</h2>
+
+<h3>Description</h3>
+
+<p>Performs nsim iterations of the OAAT Metropolis sampler
+(simulated vector is updated one component at a time).
+a.k.a block Metropolis sampler with blocks of length one.
+Sometimes also called 'Metropolis-within-Gibbs'.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">Metropolis_OAAT(f, x0, nsim, sdjump, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>f</code></td>
+<td>
+<p>function, log-pdf of the target distribution</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x0</code></td>
+<td>
+<p>numeric vector, starting point</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nsim</code></td>
+<td>
+<p>integer, number of simulations</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sdjump</code></td>
+<td>
+<p>numeric vector, standard deviation of the Gaussian jump for each component</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>other arguments passed to f</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A list with the following components:
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>numeric matrix nsim*length(x0), MCMC simulations</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fx</code></td>
+<td>
+<p>numeric vector, corresponding values f(x)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>moverate</code></td>
+<td>
+<p>numeric vector, move rate associated with each component</p>
+</td>
+</tr>
+</table>
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Bivariate target distribution: beta(0.8,0.4) X exp(1)
+f=function(x){stats::dbeta(x[1],0.8,0.4,log=TRUE)+stats::dexp(x[2],log=TRUE)}
+x0=c(0.5,2)
+sdjump=c(0.5,1)
+mcmc=Metropolis_OAAT(f,x0,1000,sdjump)
+graphicalpar=par(mfrow=c(1,3))
+plot(mcmc$x);hist(mcmc$x[,1]); hist(mcmc$x[,2])
+par(graphicalpar)
+</code></pre>
+
+
+</div>

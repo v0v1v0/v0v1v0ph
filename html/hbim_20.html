@@ -1,0 +1,116 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hbrr</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Calculate expected relative risk or percent protected from Hill model with Bliss Independence</h2>
+
+<h3>Description</h3>
+
+<p>Assuming that the log10 transformed doses are normally distributed, we calculate the 
+expected relative risk (using <code>hbrr</code>) or percent protected (using <code>hbpp</code>) 
+from the Hill model using Bliss Independence. Numeric integration 
+is the default for up to three components for <code>hbrr</code>, while simulation is the default for 
+two or three components for <code>hbpp</code>. </p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hbrr(mu, v, a = rep(1, length(mu)), simulate = FALSE, nsim = 10^4, ...)
+hbpp(mu, v, a = rep(1, length(mu)), rp = 0.1, simulate = FALSE, nsim = 10^5, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>mu</code></td>
+<td>
+<p>mean vector of the log10 dose</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>v</code></td>
+<td>
+<p>variance matrix of the log10 dose</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>a</code></td>
+<td>
+<p>vector of slope parameters in the Hill model, one for each component</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>simulate</code></td>
+<td>
+<p>estimation by simulation (TRUE) or numeric integration (FALSE)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nsim</code></td>
+<td>
+<p>number of simulations, ignored if simulate=FALSE</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rp</code></td>
+<td>
+<p>protection bound, an individual is protected if relative risk is greater than rp</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>additional parameters to pass to the <code>integrate</code> function</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Although the package <code>adapt</code> can do multidimensional integration, we have written 
+specific functions to do this for up to 3 dimensions. This allows faster and more accurate integration.
+The integration is done by repeated calls to the <code>integrate</code> function. The functions which do the 
+actual integration or simulation are internal functions which are not intended to be called by the user. 
+These internal functions are: for <code>hbrr</code>, when 
+simulate=FALSE, the function
+calls one of either <code>hbrr.integrate1</code>, <code>hbrr.integrate2</code>, <code>hbrr.integrate2.rhoeq1</code>, <code>hbrr.integrate3</code>,
+or <code>hbrr.integrate3.rhoeq1</code>
+(for 1,2, or 3 component, with or without rho=1, taken from the size of the mu vector and dimension of the v matrix) 
+and when simulation=TRUE it calls <code>hbrr.simulate</code>. Similar functions exist for <code>hbpp</code>; however, 
+the <code>hbpp.integrate2</code> and  <code>hbpp.integrate3</code> may have problems because of the discontinuity 
+in the integration function. That is why for two or three component models <code>hbpp.simulate</code> is used by default. 
+</p>
+
+
+<h3>Value</h3>
+
+<p>a numeric value of the expected relative risk or percent protected.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>M.P. Fay</p>
+
+
+<h3>References</h3>
+
+<p> Saul A, Fay MP (2007).  Human Immunity and the Design of Multi-Component, Single Target Vaccines. PLoS ONE 2(9): e850. doi:10.1371/jounal.pone.0000850
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"> 
+## example of two dimensional integral
+hbrr(c(.123,.432),matrix(c(1,.5,.5,1),2,2))
+## faster but less accurate estimation by simulatin
+hbrr(c(.123,.432),matrix(c(1,.5,.5,1),2,2),simulate=TRUE,nsim=10^4)
+
+</code></pre>
+
+
+</div>

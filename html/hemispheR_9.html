@@ -1,0 +1,137 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>gapfrac_fisheye</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Derive angular gap fraction from a classified fisheye image</h2>
+
+<h3>Description</h3>
+
+<p>The function calculates the gap fraction for a number of zenith annuli (rings) and azimuth sectors (segments).
+A list of lens is available for correcting for lens distorsion. Type 'list.lenses'.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">gapfrac_fisheye(
+  img.bw,
+  maxVZA = 90,
+  lens = "equidistant",
+  startVZA = 0,
+  endVZA = 70,
+  nrings = 7,
+  nseg = 8,
+  message = FALSE,
+  display = FALSE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>img.bw</code></td>
+<td>
+<p>SpatLayer. A binary, single-layer fisheye image generated from <code>binarize_fisheye()</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>maxVZA</code></td>
+<td>
+<p>Numeric. The maximum Zenith angle (in degrees) corresponding to the image radius. Default= 90.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lens</code></td>
+<td>
+<p>Character. The lens type for fisheye-lens correction. A list of lenses is available by typing <em>list.lenses</em>. If missing, it is assumed equidistant.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>startVZA</code></td>
+<td>
+<p>Numeric. The minimum Zenith angle (in degrees) considered in the analysis. Default is 0.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>endVZA</code></td>
+<td>
+<p>Numeric. The maximum Zenith angle (in degrees) considered in the analysis. Default is 70.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nrings</code></td>
+<td>
+<p>Numeric. The number of equiangular zenith rings considered in the analysis. Default is 7.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nseg</code></td>
+<td>
+<p>Numeric. The number of azimuth segments considered in the analysis. Default is 8.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>message</code></td>
+<td>
+<p>Logical. If set to TRUE, it reports the circular mask used in the analysis.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>display</code></td>
+<td>
+<p>Logical. If set to TRUE, it desplays the zenith rings and azimuth segments overlaid on the fisheye image.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A dataframe of gap fraction (GF) for zenith rings (rows) and azimuth segments (columns).
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Francesco Chianucci
+</p>
+
+
+<h3>See Also</h3>
+
+<p>Lens correction functions have been retrieved from the following sources:
+</p>
+<p>Pekin and Macfarlane 2009: <a href="https://doi.org/10.3390/rs1041298">doi:10.3390/rs1041298</a>
+</p>
+<p>Paul Bourke:<a href="http://www.paulbourke.net/dome/fisheyecorrect/">http://www.paulbourke.net/dome/fisheyecorrect/</a>
+</p>
+<p>Hemisfer: <a href="https://www.schleppi.ch/patrick/hemisfer/index.php">https://www.schleppi.ch/patrick/hemisfer/index.php</a>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+c.im&lt;-system.file('extdata/circular_coolpix4500+FC-E8_chestnut.jpg',package='hemispheR')
+
+#List of lenses for fisheye projection correction:
+list.lenses
+
+#Zenith rings similar to LAI-2000/2200:
+c.im |&gt;
+ import_fisheye(circ.mask=camera_fisheye('Coolpix4500+FC-E8')) |&gt;
+  binarize_fisheye() |&gt;
+  gapfrac_fisheye(lens='FC-E8',nrings=5,nseg=8,endVZA=75,display=TRUE)
+
+#The hinge angle method close to 1 radian (57):
+c.im |&gt;
+ import_fisheye(circ.mask=camera_fisheye('Coolpix4500+FC-E8')) |&gt;
+  binarize_fisheye() |&gt;
+  gapfrac_fisheye(lens='FC-E8',nrings=1,nseg=8,startVZA=55,endVZA=60,display=TRUE)
+
+</code></pre>
+
+
+</div>

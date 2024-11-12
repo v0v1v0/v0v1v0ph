@@ -1,0 +1,293 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>haplo.cc</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Haplotype Association Analysis in a Case-Control design
+</h2>
+
+<h3>Description</h3>
+
+<p>Combine results from haplo.score, haplo.group, and haplo.glm for
+case-control study designs.  Analyze the association between the 
+binary (case-control) trait and the haplotypes relevant to the
+unrelated individuals' genotypes.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">haplo.cc(y, geno, x.adj=NA, locus.label=NA, ci.prob=0.95,
+         miss.val=c(0,NA), weights=NULL, eps.svd=1e-5, simulate=FALSE,
+         sim.control=score.sim.control(), control=haplo.glm.control())
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+
+<p>Vector of trait values, must be 1 for cases and 0 for controls.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>geno</code></td>
+<td>
+
+<p>Matrix of alleles, such that each locus has a pair of
+adjacent columns of alleles, and the order of columns
+corresponds to the order of loci on a chromosome.  If
+there are K loci, then ncol(geno) = 2*K. Rows represent
+alleles for each subject.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x.adj</code></td>
+<td>
+
+<p>Matrix of non-genetic covariates used to adjust the score 
+statistics.  Note that intercept should not be included, 
+as it will be added in this function.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ci.prob </code></td>
+<td>
+
+<p>Probability level for confidence interval on the Odds Ratios of
+each haplotype to span the true value. 
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>locus.label </code></td>
+<td>
+
+<p>Vector of labels for loci, of length K (see definition of geno matrix)
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>miss.val </code></td>
+<td>
+
+<p>Vector of codes for missing values of alleles
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>weights</code></td>
+<td>
+
+<p>the weights for observations (rows of the data frame). By default, all
+observations are weighted equally.  One use is to correct for
+over-sampling of cases in a case-control sample.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>eps.svd</code></td>
+<td>
+
+<p>epsilon value for singular value cutoff; to be used in the generalized
+inverse calculation on the variance matrix of the score vector.  The
+degrees of freedom for the global score test is 1 less than the number of
+haplotypes that are scored (k-1).  The degrees of freedom is
+calculated from the rank of the variance matrix for the score vector.
+In some instances of numeric instability, the singular value
+decomposition indicates full rank (k).  One remedy has been to give a
+larger epsilon value.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>simulate</code></td>
+<td>
+
+<p>Logical:  if [F]alse, no empirical p-values are computed; if [T]rue,
+simulations are performed within haplo.score. Specific simulation parameters
+can be controlled in the sim.control parameter list.  
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sim.control </code></td>
+<td>
+
+<p>A list of control parameters to determine how simulations are
+performed for simulated p-values.  The list is created by the function
+score.sim.control and the default values of this function can be
+changed as desired.  See score.sim.control for details.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>control</code></td>
+<td>
+
+<p>A list of control parameters for managing the execution of
+haplo.cc. The list is created by the function haplo.glm.control, which
+also manages control parameters for the execution of haplo.em.
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>All function calls within haplo.cc are for the analysis of association
+between haplotypes and the case-control status (binomial trait).  No 
+additional covariates may be modeled with this function.  Odd Ratios
+are in reference to the baseline haplotype.  Odds Ratios will change
+if a different baseline is chosen using haplo.glm.control.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A list including the haplo.score object (score.lst), vector of subject
+counts by case and control group (group.count), haplo.glm object (fit.lst), 
+confidence interval probability (ci.prob), and a data frame (cc.df) with the 
+following components:
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>haplotypes</code></td>
+<td>
+
+<p>The first K columns contain the haplotypes used in the analysis.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Hap-Score</code></td>
+<td>
+
+<p>Score statistic for association of haplotype with the binary trait.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>p-val</code></td>
+<td>
+
+<p>P-value for the haplotype score statistic, based on a chi-square
+distribution with 1 degree of freedom.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sim.p.val</code></td>
+<td>
+
+<p>Vector of p-values for score.haplo, based on simulations in
+haplo.score (omitted when simulations not performed).
+P-value of score.global based on simulations
+(set equal to NA when simulate=F).
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pool.hf</code></td>
+<td>
+
+<p>Estimated haplotype frequency for cases and controls pooled together.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>control.hf</code></td>
+<td>
+
+<p>Estimated haplotype frequency for control group subjects.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>case.hf</code></td>
+<td>
+
+<p>Estimated haplotype frequency for case group subjects.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>glm.eff</code></td>
+<td>
+
+<p>The haplo.glm function modeled the haplotype effects as: baseline (Base),
+additive haplotype effect (Eff), or rare haplotypes pooled into a
+single group (R).
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>OR.lower</code></td>
+<td>
+
+<p>Lower limit of the Odds Ratio Confidence Interval.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code> OR </code></td>
+<td>
+
+<p>Odds Ratio based on haplo.glm model estimated coefficient for the haplotype.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>OR.upper</code></td>
+<td>
+
+<p>Upper limit of the Odds Ratio Confidence Interval.
+</p>
+</td>
+</tr>
+</table>
+<h3>References</h3>
+
+
+<dl>
+<dt>Schaid et al</dt>
+<dd>
+<p>Schaid DJ, Rowland CM, Tines DE, Jacobson RM,
+Poland  GA. Score tests for association of traits with haplotypes
+when linkage phase is ambiguous. Amer J Hum Genet. 70 (2002): 425-434.</p>
+</dd>
+<dt>Lake et al</dt>
+<dd>
+<p>Lake S, LH, Silverman E, Weiss S, Laird N, Schaid DJ.  Estimation and
+tests of haplotype-environment interaction when linkage phase is
+ambiguous. Human Heredity. 55 (2003):  56-65</p>
+</dd>
+</dl>
+<h3>See Also</h3>
+
+<p><code>haplo.em</code>,
+<code>haplo.score</code>,
+<code>haplo.group</code>,
+<code>haplo.score.merge</code>,
+<code>haplo.glm</code>
+<code>print.haplo.cc</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">#  For a genotype matrix geno.test, case/control vector y.test
+#  The function call will be like this
+#  cc.test &lt;- haplo.cc(y.test, geno.test, locus.label=locus.label, haplo.min.count=3, ci.prob=0.95)
+#
+</code></pre>
+
+
+</div>

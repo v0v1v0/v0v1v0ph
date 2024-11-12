@@ -1,0 +1,105 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>plotStateTransition</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Creating State Transition Plot</h2>
+
+<h3>Description</h3>
+
+<p>This is the main function to create a state transition plot from a data frame.
+A state transition plot is a type of data visualization used to represent 
+the changes or transitions in states over time for a given system. 
+State refers to a particular condition or status of a cell at a specific point in time. 
+Transition refers to the change of state for a cell from one condition to another over time.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">plotStateTransition(
+  df,
+  sample_size = NULL,
+  line_plot = NULL,
+  cellid_column,
+  time_column
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>df</code></td>
+<td>
+<p>Data frame. The Input data frame should contain two columns. 
+Cell ID from scoreHVT function and time stamp of that dataset.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sample_size</code></td>
+<td>
+<p>Numeric. An integer indicating the fraction of the data frame to visualize in the plot.
+Default value is 0.2</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>line_plot</code></td>
+<td>
+<p>Logical. A logical value indicating to create a line plot. Default value is NULL.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cellid_column</code></td>
+<td>
+<p>Character. Name of the column containing cell IDs.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>time_column</code></td>
+<td>
+<p>Character. Name of the column containing time stamps.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A plotly object representing the state transition plot for the given data frame.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>PonAnuReka Seenivasan &lt;ponanureka.s@mu-sigma.com&gt;
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>trainHVT</code> <br><code>scoreHVT</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">dataset &lt;- data.frame(date = as.numeric(time(EuStockMarkets)),
+DAX = EuStockMarkets[, "DAX"],
+SMI = EuStockMarkets[, "SMI"],
+CAC = EuStockMarkets[, "CAC"],
+FTSE = EuStockMarkets[, "FTSE"])
+
+hvt.results&lt;- trainHVT(dataset,n_cells = 60, depth = 1, quant.err = 0.1,
+                       distance_metric = "L1_Norm", error_metric = "max",
+                       normalize = TRUE,quant_method = "kmeans")
+scoring &lt;- scoreHVT(dataset, hvt.results)
+cell_id &lt;- scoring$scoredPredictedData$Cell.ID
+time_stamp &lt;- dataset$date
+dataset &lt;- data.frame(cell_id, time_stamp)
+
+plotStateTransition(dataset, sample_size = 1, cellid_column = "cell_id",time_column = "time_stamp")
+</code></pre>
+
+
+</div>

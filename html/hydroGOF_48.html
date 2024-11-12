@@ -1,0 +1,457 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>KGEkm</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Kling-Gupta Efficiency with knowable-moments
+</h2>
+
+<h3>Description</h3>
+
+<p>Kling-Gupta efficiency between <code>sim</code> and <code>obs</code>, with use of knowable moments and treatment of missing values.
+</p>
+<p>This goodness-of-fit measure was developed by Pizarro and Jorquera (2024), as a modification to the original Kling-Gupta efficiency (KGE) proposed by Gupta et al. (2009). See Details.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">KGEkm(sim, obs, ...)
+
+## Default S3 method:
+KGEkm(sim, obs, s=c(1,1,1), na.rm=TRUE, method=c("2012", "2009", "2021"), 
+             out.type=c("single", "full"), fun=NULL, ...,
+             epsilon.type=c("none", "Pushpalatha2012", "otherFactor", "otherValue"), 
+             epsilon.value=NA)
+
+## S3 method for class 'data.frame'
+KGEkm(sim, obs, s=c(1,1,1), na.rm=TRUE, method=c("2012", "2009", "2021"), 
+             out.type=c("single", "full"), fun=NULL, ...,
+             epsilon.type=c("none", "Pushpalatha2012", "otherFactor", "otherValue"), 
+             epsilon.value=NA)
+
+## S3 method for class 'matrix'
+KGEkm(sim, obs, s=c(1,1,1), na.rm=TRUE, method=c("2012", "2009", "2021"), 
+             out.type=c("single", "full"), fun=NULL, ...,
+             epsilon.type=c("none", "Pushpalatha2012", "otherFactor", "otherValue"), 
+             epsilon.value=NA)
+             
+## S3 method for class 'zoo'
+KGEkm(sim, obs, s=c(1,1,1), na.rm=TRUE, method=c("2012", "2009", "2021"), 
+             out.type=c("single", "full"), fun=NULL, ...,
+             epsilon.type=c("none", "Pushpalatha2012", "otherFactor", "otherValue"), 
+             epsilon.value=NA)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>sim</code></td>
+<td>
+
+<p>numeric, zoo, matrix or data.frame with simulated values
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>obs</code></td>
+<td>
+
+<p>numeric, zoo, matrix or data.frame with observed values
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>s</code></td>
+<td>
+
+<p>numeric of length 3, representing the scaling factors to be used for re-scaling the criteria space before computing the Euclidean distance from the ideal point c(1,1,1), i.e., <code>s</code> elements are used for adjusting the emphasis on different components.
+The first elements is used for rescaling the Pearson product-moment correlation coefficient (<code>r</code>), the second element is used for rescaling <code>Alpha</code> and the third element is used for re-scaling <code>Beta</code>
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>na.rm</code></td>
+<td>
+
+<p>a logical value indicating whether 'NA' should be stripped before the computation proceeds. <br>
+When an 'NA' value is found at the i-th position in <code>obs</code> <b>OR</b> <code>sim</code>, the i-th value of <code>obs</code> <b>AND</b> <code>sim</code> are removed before the computation.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+
+<p>character, indicating the formula used to compute the variability ratio in the Kling-Gupta efficiency. Valid values are:
+</p>
+<p>-) <kbd>2012</kbd>: the variability is defined as ‘Gamma’, the ratio of the coefficient of variation of <code>sim</code> values to the coefficient of variation of <code>obs</code>. See Pizarro and Jorquera (2024) and Kling et al. (2012). 
+</p>
+<p>-) <kbd>2009</kbd>: the variability is defined as ‘Alpha’, the ratio of the standard deviation of <code>sim</code> values to the standard deviation of <code>obs</code>. This is the default option. See Gupta et al. (2009).
+</p>
+<p>-) <kbd>2021</kbd>: the bias is defined as ‘Beta’, the ratio of <code>mean(sim)</code> minus <code>mean(obs)</code> to the standard deviation of <code>obs</code>. The variability is defined as ‘Alpha’, the ratio of the standard deviation of <code>sim</code> values to the standard deviation of <code>obs</code>. See Tang et al. (2021). 
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>out.type</code></td>
+<td>
+
+<p>character, indicating the whether the output of the function has to include each one of the three terms used in the computation of the Kling-Gupta efficiency or not. Valid values are:
+</p>
+<p>-) <kbd>single</kbd>: the output is a numeric with the Kling-Gupta efficiency only.
+</p>
+<p>-) <kbd>full</kbd>: the output is a list of two elements: the first one with the Kling-Gupta efficiency, and the second is a numeric with 3 elements: the Pearson product-moment correlation coefficient (‘r’), the ratio between the mean of the simulated values to the mean of observations (‘Beta’), and the variability measure (‘Gamma’ or ‘Alpha’, depending on the value of <code>method</code>).
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fun</code></td>
+<td>
+
+<p>function to be applied to <code>sim</code> and <code>obs</code> in order to obtain transformed values thereof before computing the Kling-Gupta efficiency.
+</p>
+<p>The first argument MUST BE a numeric vector with any name (e.g., <code>x</code>), and additional arguments are passed using <code>...</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+
+<p>arguments passed to <code>fun</code>, in addition to the mandatory first numeric vector.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>epsilon.type</code></td>
+<td>
+
+<p>argument used to define a numeric value to be added to both <code>sim</code> and <code>obs</code> before applying <code>fun</code>. 
+</p>
+<p>It is was  designed to allow the use of logarithm and other similar functions that do not work with zero values.
+</p>
+<p>Valid values of <code>epsilon.type</code> are:
+</p>
+<p>1) <kbd>"none"</kbd>: <code>sim</code> and <code>obs</code> are used by <code>fun</code> without the addition of any nummeric value.
+</p>
+<p>2) <kbd>"Pushpalatha2012"</kbd>: one hundredth (1/100) of the mean observed values is added to both <code>sim</code> and <code>obs</code> before applying <code>fun</code>, as described in Pushpalatha et al. (2012). 
+</p>
+<p>3) <kbd>"otherFactor"</kbd>: the numeric value defined in the <code>epsilon.value</code> argument is used to multiply the the mean observed values, instead of the one hundredth (1/100) described in Pushpalatha et al. (2012). The resulting value is then added to both <code>sim</code> and <code>obs</code>, before applying <code>fun</code>.
+</p>
+<p>4) <kbd>"otherValue"</kbd>: the numeric value defined in the <code>epsilon.value</code> argument is directly added to both <code>sim</code> and <code>obs</code>, before applying <code>fun</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>epsilon.value</code></td>
+<td>
+
+<p>-) when <code>epsilon.type="otherValue"</code> it represents the numeric value to be added to both <code>sim</code> and <code>obs</code> before applying <code>fun</code>. <br>
+-) when <code>epsilon.type="otherFactor"</code> it represents the numeric factor used to multiply the mean of the observed values, instead of the one hundredth (1/100) described in Pushpalatha et al. (2012). The resulting value is then added to both <code>sim</code> and <code>obs</code> before applying <code>fun</code>.
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Traditional objective functions, such as Nash-Sutcliffe Efficiency (NSE) and Kling-Gupta Efficiency (KGE), often make assumptions about data distribution and are sensitive to outliers. The Kling-Gupta Efficiency with knowable-moments (KGEkm) goodness-of-fit measure was developed by Pizarro and Jorquera (2024) to provide a reliable estimation and effective description of high-order statistics from typical hydrological samples and, therefore, reducing uncertainty in their estimation and computation of the KGE.
+</p>
+<p>In the same line that the traditional Kling-Gupta efficiency,  the KGEkm ranges from -Inf to 1. Essentially, the closer to 1, the more similar <code>sim</code> and <code>obs</code> are. 
+</p>
+<p>In the computation of this index, there are three main components involved: 
+</p>
+<p>1) <kbd>r</kbd>    : the Pearson product-moment correlation coefficient. Ideal value is r=1.
+</p>
+<p>2) <kbd>Beta</kbd> : the ratio between the mean of the simulated values and the mean of the observed ones. Ideal value is Beta=1.
+</p>
+<p>3) <kbd>vr</kbd>   : variability ratio, which could be computed using the standard deviation (<kbd>Alpha</kbd>) or the coefficient of variation (<kbd>Gamma</kbd>) of <code>sim</code> and <code>obs</code>, depending on the value of <code>method</code>:
+</p>
+<p>3.1) <kbd>Alpha</kbd>: the ratio between the standard deviation of the simulated values and the standard deviation of the observed ones. Its ideal value is <kbd>Alpha=1</kbd>.
+</p>
+<p>3.2) <kbd>Gamma</kbd>: the ratio between the coefficient of variation (<kbd>CV</kbd>) of the simulated values to the coefficient of variation of the observed ones. Its ideal value is <kbd>Gamma=1</kbd>.
+</p>
+<p style="text-align: center;"><code class="reqn">KGEkm = 1 - ED</code>
+</p>
+
+<p style="text-align: center;"><code class="reqn"> ED =  \sqrt{ (s[1]*(r-1))^2 +(s[2]*(vr-1))^2 + (s[3]*(\beta-1))^2 } </code>
+</p>
+
+<p style="text-align: center;"><code class="reqn">r=Pearson product-moment correlation coefficient</code>
+</p>
+
+<p style="text-align: center;"><code class="reqn">vr=  \left\{
+  \begin{array}{cc}
+    \alpha &amp; , \: method=2009 \\
+    \gamma &amp; , \: method=2012
+  \end{array}
+\right.</code>
+</p>
+
+<p style="text-align: center;"><code class="reqn">\beta=\mu_s/\mu_o</code>
+</p>
+
+<p style="text-align: center;"><code class="reqn">\alpha=\sigma_s/\sigma_o</code>
+</p>
+
+<p style="text-align: center;"><code class="reqn">\gamma=\frac{CV_s}{CV_o} = \frac{\sigma_s/\mu_s}{\sigma_o/\mu_o}</code>
+</p>
+
+
+
+<h3>Value</h3>
+
+<p>If <code>out.type=single</code>: numeric with the Kling-Gupta efficiency between <code>sim</code> and <code>obs</code>. If <code>sim</code> and <code>obs</code> are matrices, the output value is a vector, with the Kling-Gupta efficiency between each column of <code>sim</code> and <code>obs</code>
+</p>
+<p>If <code>out.type=full</code>: a list of two elements:
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>KGEkm.value</code></td>
+<td>
+
+<p>numeric with the Kling-Gupta efficiency. If <code>sim</code> and <code>obs</code> are matrices, the output value is a vector, with the Kling-Gupta efficiency between each column of <code>sim</code> and <code>obs</code>
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>KGEkm.elements</code></td>
+<td>
+
+<p>numeric with 3 elements: the Pearson product-moment correlation coefficient (‘r’), the ratio between the mean of the simulated values to the mean of observations (‘Beta’), and the variability measure (‘Gamma’ or ‘Alpha’, depending on the value of <code>method</code>). If <code>sim</code> and <code>obs</code> are matrices, the output value is a matrix, with the previous three elements computed for each column of <code>sim</code> and <code>obs</code><br></p>
+</td>
+</tr>
+</table>
+<h3>Note</h3>
+
+<p><code>obs</code> and <code>sim</code> has to have the same length/dimension <br></p>
+<p>The missing values in <code>obs</code> and <code>sim</code> are removed before the computation proceeds, and only those positions with non-missing values in <code>obs</code> and <code>sim</code> are considered in the computation
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Mauricio Zambrano-Bigiarini &lt;mzb.devel@gmail.com&gt;
+</p>
+
+
+<h3>References</h3>
+
+<p><cite>Pizarro, A.; Jorquera, J. (2024). Advancing objective functions in hydrological modelling: Integrating knowable moments for improved simulation accuracy. Journal of Hydrology, 634, 131071. doi:10.1016/j.jhydrol.2024.131071.</cite>
+</p>
+<p><cite>Kling, H.; Fuchs, M.; Paulin, M. (2012). Runoff conditions in the upper Danube basin under an ensemble of climate change scenarios. Journal of Hydrology, 424, 264-277, doi:10.1016/j.jhydrol.2012.01.011.</cite>
+</p>
+<p><cite>Gupta, H. V.; Kling, H.; Yilmaz, K. K.; Martinez, G. F. (2009). Decomposition of the mean squared error and NSE performance criteria: Implications for improving hydrological modelling. Journal of hydrology, 377(1-2), 80-91. doi:10.1016/j.jhydrol.2009.08.003. ISSN 0022-1694.</cite>
+</p>
+<p><cite>Tang, G.; Clark, M. P.; Papalexiou, S. M. (2021). SC-earth: a station-based serially complete earth dataset from 1950 to 2019. Journal of Climate, 34(16), 6493-6511. doi:10.1175/JCLI-D-21-0067.1.</cite>
+</p>
+<p><cite>Santos, L.; Thirel, G.; Perrin, C. (2018). Pitfalls in using log-transformed flows within the KGEkm criterion. doi:10.5194/hess-22-4583-2018.</cite>
+</p>
+<p><cite>Knoben, W.J.; Freer, J.E.; Woods, R.A. (2019). Inherent benchmark or not? Comparing Nash-Sutcliffe and Kling-Gupta efficiency scores. Hydrology and Earth System Sciences, 23(10), 4323-4331. doi:10.5194/hess-23-4323-2019.</cite>
+</p>
+<p><cite>Cinkus, G., Mazzilli, N., Jourde, H., Wunsch, A., Liesch, T., Ravbar, N., Chen, Z., and Goldscheider, N. (2023). When best is the enemy of good - critical evaluation of performance criteria in hydrological models. Hydrology and Earth System Sciences 27, 2397-2411, doi:10.5194/hess-27-2397-2023</cite>
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>KGE</code>, <code>KGElf</code>, <code>sKGE</code>, <code>KGEnp</code>, <code>gof</code>, <code>ggof</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Example1: basic ideal case
+obs &lt;- 1:10
+sim &lt;- 1:10
+KGEkm(sim, obs)
+
+obs &lt;- 1:10
+sim &lt;- 2:11
+KGEkm(sim, obs)
+
+##################
+# Example2: Looking at the difference between 'method=2009' and 'method=2012'
+
+# Loading daily streamflows of the Ega River (Spain), from 1961 to 1970
+data(EgaEnEstellaQts)
+obs &lt;- EgaEnEstellaQts
+
+# Simulated daily time series, initially equal to twice the observed values
+sim &lt;- 2*obs 
+
+# KGEkm 2012 (method="2012" is the default option for KGEkm)
+KGEkm(sim=sim, obs=obs, method="2012", out.type="full")
+
+# KGEkm 2009
+KGEkm(sim=sim, obs=obs, method="2009", out.type="full")
+
+
+##################
+# Example 2: Looking at the difference between 'KGEkm', KGE', 'NSE', 'wNSE', 
+#            'wsNSE' and 'APFB' for detecting differences in high flows
+
+# Loading daily streamflows of the Ega River (Spain), from 1961 to 1970
+data(EgaEnEstellaQts)
+obs &lt;- EgaEnEstellaQts
+
+# Simulated daily time series, created equal to the observed values and then 
+# random noise is added only to high flows, i.e., those equal or higher than 
+# the quantile 0.9 of the observed values.
+sim      &lt;- obs
+hQ.thr   &lt;- quantile(obs, probs=0.9, na.rm=TRUE)
+hQ.index &lt;- which(obs &gt;= hQ.thr)
+hQ.n     &lt;- length(hQ.index)
+sim[hQ.index] &lt;- sim[hQ.index] + rnorm(hQ.n, mean=mean(sim[hQ.index], na.rm=TRUE))
+
+# KGEkm (Pizarro and Jorquera, 2024; method='2012')
+KGEkm(sim=sim, obs=obs)
+
+# KGE': Kling-Gupta eficiency 2012 (Kling et al.,2012) 
+KGE(sim=sim, obs=obs, method="2012")
+
+# Traditional Kling-Gupta eficiency (Gupta and Kling, 2009)
+KGE(sim=sim, obs=obs)
+
+# KGE'': Kling-Gupta eficiency 2021 (Tang et al.,2021) 
+KGE(sim=sim, obs=obs, method="2021")
+
+# Traditional Nash-Sutcliffe eficiency (Nash and Sutcliffe, 1970)
+NSE(sim=sim, obs=obs)
+
+# Weighted Nash-Sutcliffe efficiency (Hundecha and Bardossy, 2004)
+wNSE(sim=sim, obs=obs)
+
+# wsNSE (Zambrano-Bigiarini and Bellin, 2012):
+wsNSE(sim=sim, obs=obs)
+
+# APFB (Mizukami et al., 2019):
+APFB(sim=sim, obs=obs)
+
+
+##################
+# Example 4: Looking at the difference between 'KGE', 'NSE', 'wsNSE',
+#            'dr', 'rd', 'md', and 'KGElf' for detecting 
+#            differences in low flows
+
+# Loading daily streamflows of the Ega River (Spain), from 1961 to 1970
+data(EgaEnEstellaQts)
+obs &lt;- EgaEnEstellaQts
+
+# Simulated daily time series, created equal to the observed values and then 
+# random noise is added only to low flows, i.e., those equal or lower than 
+# the quantile 0.4 of the observed values.
+sim      &lt;- obs
+lQ.thr   &lt;- quantile(obs, probs=0.4, na.rm=TRUE)
+lQ.index &lt;- which(obs &lt;= lQ.thr)
+lQ.n     &lt;- length(lQ.index)
+sim[lQ.index] &lt;- sim[lQ.index] + rnorm(lQ.n, mean=mean(sim[lQ.index], na.rm=TRUE))
+
+# KGEkm (Pizarro and Jorquera, 2024; method='2012')
+KGEkm(sim=sim, obs=obs)
+
+# KGE': Kling-Gupta eficiency 2012 (Kling et al.,2012) 
+KGE(sim=sim, obs=obs, method="2012")
+
+# Traditional Kling-Gupta eficiency (Gupta and Kling, 2009)
+KGE(sim=sim, obs=obs)
+
+# KGE'': Kling-Gupta eficiency 2021 (Tang et al.,2021) 
+KGE(sim=sim, obs=obs, method="2021")
+
+# Traditional Nash-Sutcliffe eficiency (Nash and Sutcliffe, 1970)
+NSE(sim=sim, obs=obs)
+
+# Weighted seasonal Nash-Sutcliffe efficiency (Zambrano-Bigiarini and Bellin, 2012):
+wsNSE(sim=sim, obs=obs, lambda=0.05, j=1/2)
+
+# Refined Index of Agreement (Willmott et al., 2012):
+dr(sim=sim, obs=obs)
+
+# Relative Index of Agreement (Krause et al., 2005):
+rd(sim=sim, obs=obs)
+
+# Modified Index of Agreement (Krause et al., 2005):
+md(sim=sim, obs=obs)
+
+# KGElf (Garcia et al., 2017):
+KGElf(sim=sim, obs=obs)
+
+
+##################
+# Example 5: KGEkm for simulated values equal to observations plus random noise 
+#            on the first half of the observed values and applying (natural) 
+#            logarithm to 'sim' and 'obs' during computations.
+
+KGEkm(sim=sim, obs=obs, fun=log)
+
+# Verifying the previous value:
+lsim &lt;- log(sim)
+lobs &lt;- log(obs)
+KGEkm(sim=lsim, obs=lobs)
+
+##################
+# Example 6: KGEkm for simulated values equal to observations plus random noise 
+#            on the first half of the observed values and applying (natural) 
+#            logarithm to 'sim' and 'obs' and adding the Pushpalatha2012 constant
+#            during computations
+
+KGEkm(sim=sim, obs=obs, fun=log, epsilon.type="Pushpalatha2012")
+
+# Verifying the previous value, with the epsilon value following Pushpalatha2012
+eps  &lt;- mean(obs, na.rm=TRUE)/100
+lsim &lt;- log(sim+eps)
+lobs &lt;- log(obs+eps)
+KGEkm(sim=lsim, obs=lobs)
+
+##################
+# Example 7: KGEkm for simulated values equal to observations plus random noise 
+#            on the first half of the observed values and applying (natural) 
+#            logarithm to 'sim' and 'obs' and adding a user-defined constant
+#            during computations
+
+eps &lt;- 0.01
+KGEkm(sim=sim, obs=obs, fun=log, epsilon.type="otherValue", epsilon.value=eps)
+
+# Verifying the previous value:
+lsim &lt;- log(sim+eps)
+lobs &lt;- log(obs+eps)
+KGEkm(sim=lsim, obs=lobs)
+
+##################
+# Example 8: KGEkm for simulated values equal to observations plus random noise 
+#            on the first half of the observed values and applying (natural) 
+#            logarithm to 'sim' and 'obs' and using a user-defined factor
+#            to multiply the mean of the observed values to obtain the constant
+#            to be added to 'sim' and 'obs' during computations
+
+fact &lt;- 1/50
+KGEkm(sim=sim, obs=obs, fun=log, epsilon.type="otherFactor", epsilon.value=fact)
+
+# Verifying the previous value:
+eps  &lt;- fact*mean(obs, na.rm=TRUE)
+lsim &lt;- log(sim+eps)
+lobs &lt;- log(obs+eps)
+KGEkm(sim=lsim, obs=lobs)
+
+##################
+# Example 9: KGEkm for simulated values equal to observations plus random noise 
+#            on the first half of the observed values and applying a 
+#            user-defined function to 'sim' and 'obs' during computations
+
+fun1 &lt;- function(x) {sqrt(x+1)}
+
+KGEkm(sim=sim, obs=obs, fun=fun1)
+
+# Verifying the previous value, with the epsilon value following Pushpalatha2012
+sim1 &lt;- sqrt(sim+1)
+obs1 &lt;- sqrt(obs+1)
+KGEkm(sim=sim1, obs=obs1)
+</code></pre>
+
+
+</div>

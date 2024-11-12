@@ -1,0 +1,298 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>[,hyperSpec-method</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Extract and Replace parts of hyperSpec objects</h2>
+
+<h3>Description</h3>
+
+<p>These Methods allow to extract and replace parts of the <code>hyperSpec</code> object.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">## S4 method for signature 'hyperSpec'
+x[i, j, l, ..., wl.index = FALSE, drop = FALSE]
+
+## S4 method for signature 'hyperSpec'
+x[[i, j, l, ..., wl.index = FALSE, drop = FALSE]]
+
+## S4 method for signature 'hyperSpec'
+x$name
+
+## S4 replacement method for signature 'hyperSpec'
+x[i, j, ...] &lt;- value
+
+## S4 replacement method for signature 'hyperSpec'
+x[[i, j, l, wl.index = FALSE, ...]] &lt;- value
+
+## S4 replacement method for signature 'hyperSpec'
+x$name &lt;- value
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>a <code>hyperSpec</code> Object</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>i</code></td>
+<td>
+<p>row index: selects spectra
+</p>
+<p><code>[[</code> and <code>[[&lt;-</code> accept indexing with logical matrix or a n by 2
+integer index matrix. In this case the indexing is done inside the
+spectra matrix. See the examples below.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>j</code></td>
+<td>
+<p>selecting columns of <code>x@data</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>l</code></td>
+<td>
+<p>selecting columns of the spectra matrix. If <code>l</code> is numeric,
+the default behaviour is treating <code>l</code> as wavelengths, <em>not</em> as
+indices.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>ignored</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>wl.index</code></td>
+<td>
+<p>If <code>TRUE</code> (default), the value(s) in <code>l</code> are
+treated as column indices for the spectral matrix. Otherwise, the numbers
+in <code>l</code> are treated as wavelengths and the corresponding column
+indices are looked up first via <code>wl2i</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>drop</code></td>
+<td>
+<p>For <code>[[</code>: drop unnecessary dimensions, see
+<code>drop</code> and <code>Extract</code>. Ignored for
+<code>[</code>, as otherwise invalid <code>hyperSpec</code> objects might result.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>name</code></td>
+<td>
+<p>name of the data column to extract. <code>$spc</code> yields the spectra matrix.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>value</code></td>
+<td>
+<p>the replacement value</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>They work with respect to the spectra (rows of <code>x</code>), the columns of the data matrix, and the
+wavelengths (columns of the spectra matrix).
+</p>
+<p>Thus, they can be used for selecting/deleting spectra, cutting the spectral range, and extracting
+or setting the data belonging to the spectra.
+</p>
+<p>Convenient shortcuts for access of the spectra matrix and the <code>data.frame</code> in slot
+<code>data</code> are provided.
+</p>
+<p><em>Extracting: <code>[</code>, <code>[[</code>, and <code>$</code></em>.
+</p>
+<p>The version with single square brackets (<code>[</code>) returns the resulting <code>hyperSpec</code> object.
+</p>
+<p><code>[[</code> yields <code>data.frame</code> of slot <code>@data</code> of that corresponding <code>hyperSpec</code>
+object returned with the same arguments by <code>[</code> if columns were selected (i.e. <code>j</code> is
+given), otherwise the spectra <code>matrix</code> <code>x@data$spc</code>.
+</p>
+<p><code>$</code> returns the selected column of the <code>data.frame</code> in slot <code>@data</code>.
+</p>
+<p><em>Shortcuts.</em> Three shortcuts to conveniently extract much needed parts of the object are
+defined:
+</p>
+<p><code>x[[]]</code> returns the spectra matrix.
+</p>
+<p><code>x$.</code> returns the complete slot <code>@data</code>, including the spectra matrix in column
+<code>$spc</code>, as a <code>data.frame</code>.
+</p>
+<p><code>x$..</code> returns a <code>data.frame</code> like <code>x$.</code> but without the spectra matrix.
+</p>
+<p><em>Replacing: <code>[&lt;-</code>, <code>[[&lt;-</code>, and <code>$&lt;-</code></em>.
+</p>
+<pre>
+## S4 method for signature 'hyperSpec':
+x [i, j, l, \dots] &lt;- value
+
+## S4 method for signature 'hyperSpec':
+x [[i, j, l, wl.index = FALSE, \dots]] &lt;- value
+
+## S4 method for signature 'hyperSpec':
+x$name &lt;- value
+</pre>
+<p><code>value</code> gives the values to be assigned.<br></p>
+<p>For <code>$</code>, this can also be a list of the form <code>list (value =
+value, label = label)</code>, with <code>label</code> containing the label for data
+column <code>name</code>.
+</p>
+<p><code>[[&lt;-</code> replaces parts of the spectra matrix.
+</p>
+<p><code>[&lt;-</code> replaces parts of the <code>data.frame</code> in slot <code>x@data</code>.
+</p>
+<p><code>$&lt;-</code> replaces a column of the <code>data.frame</code> in slot
+<code>x@data</code>.  The <code>value</code> may be a list with two elements,
+<code>value</code> and <code>label</code>.  In this case the label of the data column
+is changed accordingly.
+</p>
+<p><code>$..&lt;-</code> is again an abbreviation for the data.frame without the
+spectra matrix.
+</p>
+
+
+<h3>Value</h3>
+
+<p>For <code>[</code>, <code>[&lt;-</code>, <code>[[&lt;-</code>, and <code>$&lt;-</code> a <code>hyperSpec</code> object,
+</p>
+<p>for <code>[[</code> a matrix or <code>data.frame</code>, and
+</p>
+<p>for <code>$</code> the column of the <code>data.frame</code> <code>@data</code>.
+</p>
+<p><code>x[[]]</code> returns the complete spectra matrix.
+</p>
+<p><code>x$.</code> returns the complete slot <code>@data</code>,
+</p>
+<p><code>x$..</code> returns the <code>data.frame</code> in <code>@data</code> but without the column
+<code>@data$spc</code> containing the spectra matrix.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>wl2i</code> on conversion of wavelength ranges to indices.
+</p>
+<p><code>drop</code> and <code>Extract</code> on <code>drop</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+## index into the rows (spectra) -------------------------------------
+## make some "spectra"
+
+## numeric index
+plot (flu, "spc", lines.args = list (lty = 2))
+plot (flu[1:3], "spc", add = TRUE, col = "red")     # select spectra
+plot (flu[-(1:3)], "spc", add = TRUE, col = "blue") # delete spectra
+
+## logic index
+plot (flu, "spc", lines.args = list (lty = 2))
+index &lt;- rnorm (6) &gt; 0
+index
+plot (flu[index], "spc", add = TRUE, col = "red")   # select spectra
+plot (flu[!index], "spc", add = TRUE, col = "blue") # select spectra
+
+## index into the data columns ---------------------------------------
+range (chondro[[,"x"]])
+colnames (chondro[[,1]])
+dim (chondro[[,c(TRUE, FALSE, FALSE)]])
+chondro$x
+
+
+## the shortcut functions --------------------------------------------
+
+## extract the spectra matrix
+flu[[]]
+
+## indexing via logical matrix
+summary (flu [[flu &lt; 125]])
+
+## indexing the spectra matrix with index matrix n by 2
+ind &lt;- matrix (c (1, 2, 4, 406, 405.5, 409), ncol = 2)
+ind
+flu [[ind]]
+
+ind &lt;- matrix (c (1, 2, 4, 4:6), ncol = 2)
+ind
+flu [[ind, wl.index = TRUE]]
+
+pca &lt;- prcomp (flu[[]])
+
+## result is data.frame, if j is given:
+result &lt;- flu [[, 1:2, 405 ~ 410]]
+result
+class (result)
+colnames (result)
+
+## extract the data.frame including the spectra matrix
+flu$.
+dim(flu$.)
+colnames (flu$.)
+flu$.$spc
+
+calibration &lt;- lm (spc ~ c, data = flu[,,450]$.)
+calibration
+
+flu$..
+colnames (flu$..)
+
+## replacement functions
+spc &lt;- flu
+spc$.
+spc[, "c"] &lt;- 16 : 11
+## be careful:
+plot (spc)
+spc [] &lt;- 6 : 1
+spc$..
+plot (spc)
+
+spc &lt;- flu [,, 405 ~ 410]
+spc [[]]
+spc [[3]] &lt;- -spc[[3]]
+spc [[]]
+spc [[,,405 : 410]] &lt;- -spc[[,,405 : 410]]
+spc [[]]
+spc [[,,405 ~ 410]] &lt;- -spc[[,,405 ~ 410]]
+
+## indexing with logical matrix
+spc &lt;- flu [,, min ~ 410]
+spc &lt; 125
+spc [[spc &lt; 125]] &lt;- NA
+spc [[]]
+
+## indexing with n by 2 matrix
+ind &lt;- matrix (c (1, 2, 4, 406, 405.5, 409), ncol = 2)
+ind
+spc [[ind]] &lt;- 3
+spc [[]]
+
+ind &lt;- matrix (c (1, 2, 4, 4:6), ncol = 2)
+ind
+spc [[ind, wl.index = TRUE]] &lt;- 9999
+spc [[]]
+
+spc$.
+spc$z &lt;- 1 : 6
+spc
+spc$z &lt;- list (1 : 6, "z / a.u.")
+
+</code></pre>
+
+
+</div>

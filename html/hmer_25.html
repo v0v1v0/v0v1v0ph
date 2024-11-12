@@ -1,0 +1,206 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>idemc</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>IDEMC Point Generation</h2>
+
+<h3>Description</h3>
+
+<p>Performs Implausibility-driven Evolutionary Monte Carlo
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">idemc(
+  ems,
+  N,
+  targets,
+  cutoff = 3,
+  s = max(500, ceiling(N/5)),
+  sn = s,
+  p = 0.4,
+  thin = 1,
+  pm = 0.9,
+  w = 0.8,
+  M = 10,
+  detailed = FALSE,
+  verbose = interactive(),
+  get_burnt = FALSE,
+  burnt = NULL
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>ems</code></td>
+<td>
+<p>The emulators to evaluate implausibility on</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>N</code></td>
+<td>
+<p>The desired number of final points to generate</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>targets</code></td>
+<td>
+<p>The target values for the emulated outputs</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cutoff</code></td>
+<td>
+<p>The desired implausibility cutoff of the final proposal</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>s</code></td>
+<td>
+<p>The number of points to generate at intermediate burn-in steps</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sn</code></td>
+<td>
+<p>The number of points to generate at the final burn-in stage</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>p</code></td>
+<td>
+<p>The proportion of space that should remain between ladder rungs</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>thin</code></td>
+<td>
+<p>The thinning factor: a factor T means N*T points are generated to obtain N</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pm</code></td>
+<td>
+<p>The probability that an idemc step will use mutation moves</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>w</code></td>
+<td>
+<p>The probability of local random walks in the mutation step</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>M</code></td>
+<td>
+<p>The number of mutations to perform in an IDEMC step</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>detailed</code></td>
+<td>
+<p>If TRUE, points proposed at every rung will be returned</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p>Should information about burn-in be displayed during the process?</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>get_burnt</code></td>
+<td>
+<p>If TRUE, the procedure stops after burn-in, returning seeding for a full IDEMC proposal</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>burnt</code></td>
+<td>
+<p>If provided, this is assumed to be the result of a burn-in (or a priori analysis)</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>This method for generating points is focused on finding non-implausible
+regions that are either extremely small relative to the initial parameter
+domain, or have interesting structure (particularly disconnected structure)
+that would potentially be overlooked by more standard point generation methods.
+The method is robust but computationally intensive, compared to normal methods,
+and should not be used as a default - see <code>generate_new_design</code> for
+less computationally expensive methods.
+</p>
+<p>The IDEMC method operates on an 'implausibility ladder', in the vein of common
+annealing methods. Each rung of the ladder is characterised by the implausibility
+threshold, and determinations are made about the structure of the points in each
+rung using clustering. One step of the evolutionary algorithm can consist of the
+following steps:
+</p>
+<p>Mutation. A point is modified using a random-walk proposal, which can be a global
+move or a within-cluster move. Within-cluster moves are chosen with probability
+<code>w</code>. The move is retained if the new point satisfies the implausibility
+constraints of the rung.
+</p>
+<p>Crossover. Points are re-organised in descending order of how active each variable
+is for the emulated outputs, and two different rungs are selected randomly. The
+points are 'mixed' using one-point real crossover at a random crossover point,
+producing two new points. The move is retained if both new points satisfy the
+relevant implausibility constraints of their rung.
+</p>
+<p>Exchange. Two adjacent rungs are chosen and their points are swapped. The move
+is retained if the higher-implausibility rung is appropriate for being in the
+lower implausibility rung.
+</p>
+<p>At a given step, one of mutation or crossover is performed, with probability
+of mutation being chosen determined by <code>pm</code>. If mutation is chosen, then
+<code>M</code> mutation moves are performed; else <code>(n+1)/2</code> crossover moves are
+performed on the <code>n</code> rungs. Exchange is always performed and <code>n+1</code> such
+moves are performed.
+</p>
+<p>The choice of 'implausibility ladder' and clusters can be determined a priori,
+or else this function performs a burn-in phase to determine them. Points are
+generated using the idemc steps at the current rungs, and the next ladder rung
+implausibility is chosen by requiring that a proportion <code>p</code> of points from
+the previous rung are accepted in the new one. At each stage, <code>s</code> idemc
+steps are performed. Once the final rung has implausibility no larger than the
+desired <code>cutoff</code>, a final set of <code>sn</code> idemc steps are performed across
+all rungs to determine final clusters.
+</p>
+
+
+<h3>Value</h3>
+
+<p>Either a list of data.frames, one per rung, or a single data.frame of points.
+</p>
+
+
+<h3>References</h3>
+
+<p>Vernon &amp; Williamson (2013) <a href="https://doi.org/10.48550/arXiv.1309.3520">doi:10.48550/arXiv.1309.3520</a>
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>generate_new_design</code> for more standard point generation methods
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">  # Excessive runtime
+  idemc_res &lt;- idemc(SIREmulators$ems, 200, SIREmulators$targets, s = 100, p = 0.3)
+ 
+
+</code></pre>
+
+
+</div>

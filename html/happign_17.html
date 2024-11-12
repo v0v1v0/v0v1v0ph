@@ -1,0 +1,161 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>get_wfs</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Download WFS layer</h2>
+
+<h3>Description</h3>
+
+<p>Read simple features from IGN Web Feature Service (WFS) from location
+and name of layer.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">get_wfs(x = NULL,
+        layer = NULL,
+        filename = NULL,
+        spatial_filter = "bbox",
+        ecql_filter = NULL,
+        overwrite = FALSE,
+        interactive = FALSE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>Object of class <code>sf</code> or <code>sfc</code>. Needs to be located in
+France.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>layer</code></td>
+<td>
+<p><code>character</code>; name of the layer from <code>get_layers_metadata("wfs")</code>
+or directly from
+<a href="https://geoservices.ign.fr/services-web-experts">IGN website</a></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>filename</code></td>
+<td>
+<p><code>character</code>;Either a string naming a file or a connection open
+for writing. (ex : "test.shp" or "~/test.shp")</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>spatial_filter</code></td>
+<td>
+<p><code>character</code>; spatial predicate from ECQL language.
+See detail and examples for more info.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ecql_filter</code></td>
+<td>
+<p><code>character</code>; corresponding to an ECQL query.
+See detail and examples for more info.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>overwrite</code></td>
+<td>
+<p><code>logical</code>; if TRUE, file is overwrite.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>interactive</code></td>
+<td>
+<p><code>character</code>; if TRUE, no need to specify <code>layer</code>, you'll be ask.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+
+<ul>
+<li> <p><code>get_wfs</code> use ECQL language : a query language created by the OpenGeospatial Consortium.
+It provide multiple spatial filter : "intersects", "disjoint", "contains", "within", "touches",
+"crosses", "overlaps", "equals", "relate", "beyond", "dwithin". For "relate", "beyond",
+"dwithin", argument can be provide using vector like :
+spatial_filter = c("dwithin", distance, units). More info about ECQL language
+<a href="https://docs.geoserver.org/latest/en/user/filter/ecql_reference.html">here</a>.
+</p>
+</li>
+<li>
+<p> ECQL query can be provided to <code>ecql_filter</code>. This allows direct query of the IGN's WFS
+geoservers. If <code>x</code> is set, then the <code>ecql_filter</code> comes in addition to the
+<code>spatial_filter</code>. More info for writing ECQL
+<a href="https://docs.geoserver.org/latest/en/user/tutorials/cql/cql_tutorial.html">here</a>
+</p>
+</li>
+</ul>
+<h3>Value</h3>
+
+<p><code>sf</code> object from <code>sf</code> package or <code>NULL</code> if no data.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>get_layers_metadata()</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+library(sf)
+library(tmap)
+
+# Shape from the best town in France
+penmarch &lt;- read_sf(system.file("extdata/penmarch.shp", package = "happign"))
+
+# For quick testing, use interactive = TRUE
+shape &lt;- get_wfs(x = penmarch,
+                 interactive = TRUE)
+
+## Getting borders of best town in France
+metadata_table &lt;- get_layers_metadata("wfs", "administratif")
+layer &lt;- metadata_table[32,1] # LIMITES_ADMINISTRATIVES_EXPRESS.LATEST:commune
+
+# Downloading borders
+borders &lt;- get_wfs(penmarch, layer)
+
+# Plotting result
+qtm(borders, fill = NULL, borders = "firebrick") # easy map
+
+# Get forest_area of the best town in France
+forest_area &lt;- get_wfs(x = borders,
+                       layer = "LANDCOVER.FORESTINVENTORY.V1:resu_bdv1_shape")
+
+qtm(forest_area, fill = "nom_typn")
+
+# Using ECQL filters to query IGN server
+## First find attributes of the layer
+attrs &lt;- get_wfs_attributes(layer)
+
+## e.g. : find all commune's name starting by "plou"
+plou_borders &lt;- get_wfs(x = NULL, # When x is NULL, all France is query
+                        layer = "LIMITES_ADMINISTRATIVES_EXPRESS.LATEST:commune",
+                        ecql_filter = "nom_m LIKE 'PLOU%'")
+qtm(plou_borders)
+
+## Combining ecql_filters
+plou_borders_inf_2000 &lt;- get_wfs(x = NULL, # When x is NULL, all France is query
+                                 layer = "LIMITES_ADMINISTRATIVES_EXPRESS.LATEST:commune",
+                                 ecql_filter = "nom_m LIKE 'PLOU%' AND population &lt; 2000")
+qtm(plou_borders)+ qtm(plou_borders_inf_2000, fill = "red")
+
+## End(Not run)
+</code></pre>
+
+
+</div>

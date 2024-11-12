@@ -1,0 +1,278 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>validClimR</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Validation of Hierarchical Climate Regionalization</h2>
+
+<h3>Description</h3>
+
+<p><code>validClimR</code> computes indices for cluster validation, and an
+objective tree cut for <code>regional</code> linkage clustering method.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">validClimR(y = NULL, k = NULL, minSize = 1, alpha = 0.05, verbose = TRUE,
+    plot = FALSE, colPalette = NULL, pch = 15, cex = 1)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+<p>a dendrogram tree produced by <code>HiClimR</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>k</code></td>
+<td>
+<p><code>NULL</code> or a n integer <code>k &gt; 1</code> for the number of regions/clusters.
+Only for <code>regional</code> linkage method, <code>k = NULL</code> is supported, where the
+"optimal" number of regions will be used at a user specified significance
+level <code>alpha</code>. It is required to specify number of clusters <code>k</code>
+for the other methods, since they are not based on inter-cluster correlation.
+If <code>k = NULL</code> for these methods (except <code>regional</code>) linkage, the
+<code>validClimR</code> with be aborted. One can use <code>validClimR</code> function
+to compute inter-cluster correlation at different number of clusters to objectively
+cut the tree for the other methods, which could be computationally expensive to
+cover the entire merging history for large number of spatial elements.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>minSize</code></td>
+<td>
+<p>minimum cluster size. The <code>regional</code> linkage method tend to
+isolate noisy data in small clusters. The <code>minSize</code> can be used to
+exclude these very small clusters from the <code>statSum</code> statistical
+summary, because they are most likely noisy data that need to be checked
+in a quality control step. The analysis may be then repeated.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alpha</code></td>
+<td>
+<p>confidence level: the default is <code>alpha = 0.05</code> for
+95% confidence level.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p>logical to print processing information if <code>verbose = TRUE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>plot</code></td>
+<td>
+<p>logical to call the plotting method if <code>plot = TRUE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>colPalette</code></td>
+<td>
+<p>a color palette or a list of colors such as that generated
+by <code>rainbow</code>, <code>heat.colors</code>, <code>topo.colors</code>,
+<code>terrain.colors</code> or similar functions.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pch</code></td>
+<td>
+<p>Either an integer specifying a symbol or a single character to
+be used as the default in plotting points. See <code>points</code> for
+possible values.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cex</code></td>
+<td>
+<p>A numerical value giving the amount by which plotting symbols should
+be magnified relative to the <code>default = 1</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The <code>validClimR</code> function is used for validation of a dendrogram tree
+produced by <code>HiClimR</code>, by computing  detailed statistical information for
+each cluster about cluster means, sizes, intra- and inter-cluster correlations,
+and overall summary. It requires the preprocessed data matrix and the tree from
+<code>HiClimR</code> function as inputs. An optional parameter can be used to
+validate clustering for a selected number of clusters <code>k</code>. If <code>k = NULL</code>,
+the default which supports only the <code>regional</code> linkage method, objective cutting
+of the tree to find the optimal number of clusters will be applied based on a user
+specified significance level (<code>alpha</code> parameter). In <code>regional</code> linkage method,
+noisy spatial elements are isolated in very small-size clusters or individuals since
+they do not correlate well with any other elements. They can be excluded from the
+validation indices (<code>interCor</code>, <code>intraCor</code>, <code>diffCor</code>, and <code>statSum</code>),
+based on <code>minSize</code> minimum cluster size. The excluded clusters are identified in
+the output of <code>validClimR</code> in <code>clustFlag</code>, which takes a value of <code>1</code>
+for selected clusters or <code>0</code> for excluded clusters. The sum of <code>clustFlag</code>
+elements represents the selected number clusters.This should be followed by a quality
+control step before repeating the analysis.
+</p>
+
+
+<h3>Value</h3>
+
+<p>An object of class <code>HiClimR</code> which produces indices for validating
+the tree produced by the clustering process.
+The object is a list with the following components:
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>cutLevel</code></td>
+<td>
+<p>the minimum significant correlation used for objective
+tree cut together with the corresponding confidence level.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>clustMean</code></td>
+<td>
+<p>the cluster means which are the region's mean timeseries for
+all selected regions.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>clustSize</code></td>
+<td>
+<p>cluster sizes for all selected regions.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>clustFlag</code></td>
+<td>
+<p>a flag <code>0 or 1</code> to indicate the cluster used
+in <code>statSum</code> validation indices (<code>interCor</code>,
+<code>intraCor</code>, <code>diffCor</code>, and <code>statSum</code>), based on
+<code>minSize</code> minimum cluster size.
+If <code>clustFlag = 0</code>, the cluster has been excluded because its size
+is less than the <code>minSize</code> minimum cluster size. The sum of
+<code>clustFlag</code> elements represents the selected number clusters.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>interCor</code></td>
+<td>
+<p>inter-cluster correlations for all selected regions. It is
+the inter-cluster correlations between cluster means. The maximum inter-cluster
+correlation is a measure for separation or contiguity, and it is
+used for objective tree cut (to find the "optimal" number of clusters).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>intraCor</code></td>
+<td>
+<p>intra-cluster correlations for all selected regions. It is
+the intra-cluster correlations between the mean of each cluster and its
+members. The average intra-cluster correlation is a weighted average for
+all clusters, and it is a measure for homogeneity.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>diffCor</code></td>
+<td>
+<p>difference between intra-cluster correlation and maximum
+inter-cluster correlation for all selected regions.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>statSum</code></td>
+<td>
+<p>overall statistical summary for i<code>nterCluster</code>,
+<code>intraCor</code>, and <code>diffCor</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>region</code></td>
+<td>
+<p>ordered regions vector of size <code>N</code> number of spatial
+elements for the selected number of clusters, after excluding the
+small clusters defined by <code>minSize</code> argument.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>regionID</code></td>
+<td>
+<p>ordered regions ID vector of length equals the selected number
+of clusters, after excluding the small clusters defined by <code>minSize</code> argument.
+It helps in mapping ordered regions and their actual names before ordering.
+Only the <code>region</code> component uses ordered ID, while other components use
+the names used during the clustering process.</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>Hamada S. Badr &lt;badr@jhu.edu&gt;, Benjamin F. Zaitchik &lt;zaitchik@jhu.edu&gt;,
+and Amin K. Dezfuli &lt;amin.dezfuli@nasa.gov&gt;. <code>HiClimR</code> is
+a modification of <code>hclust</code> function, which is based on
+Fortran code contributed to STATLIB by F. Murtagh.
+</p>
+
+
+<h3>References</h3>
+
+<p>Hamada S. Badr, Zaitchik, B. F. and Dezfuli, A. K. (2015):
+A Tool for Hierarchical Climate Regionalization, <em>Earth Science Informatics</em>,
+<b>8</b>(4), 949-958, doi: <a href="https://doi.org/10.1007/s12145-015-0221-7">10.1007/s12145-015-0221-7</a>.
+</p>
+<p>Hamada S. Badr, Zaitchik, B. F. and Dezfuli, A. K. (2014):
+Hierarchical Climate Regionalization,
+<em>Comprehensive R Archive Network (CRAN)</em>,
+<a href="https://cran.r-project.org/package=HiClimR">https://cran.r-project.org/package=HiClimR</a>.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>HiClimR</code>, <code>HiClimR2nc</code>, <code>validClimR</code>,
+<code>geogMask</code>, <code>coarseR</code>, <code>fastCor</code>,
+<code>grid2D</code> and <code>minSigCor</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">require(HiClimR)
+
+## Load test case data
+x &lt;- TestCase$x
+
+## Generate longitude and latitude mesh vectors
+xGrid &lt;- grid2D(lon = unique(TestCase$lon), lat = unique(TestCase$lat))
+lon &lt;- c(xGrid$lon)
+lat &lt;- c(xGrid$lat)
+
+## Hierarchical Climate Regionalization
+y &lt;- HiClimR(x, lon = lon, lat = lat, lonStep = 1, latStep = 1, geogMask = FALSE,
+    continent = "Africa", meanThresh = 10, varThresh = 0, detrend = TRUE,
+    standardize = TRUE, nPC = NULL, method = "ward", hybrid = FALSE,
+    kH = NULL, members = NULL, validClimR = TRUE, k = 12, minSize = 1,
+    alpha = 0.01, plot = TRUE, colPalette = NULL, hang = -1, labels = FALSE)
+
+## Validtion of Hierarchical Climate Regionalization
+z &lt;- validClimR(y, k = 12, minSize = 1, alpha = 0.01, plot = TRUE)
+
+## Use a specified number of clusters (k = 12)
+z &lt;- validClimR(y, k = 12, minSize = 1, alpha = 0.01, plot = TRUE)
+
+## Apply minimum cluster size (minSize = 25)
+z &lt;- validClimR(y, k = 12, minSize = 25, alpha = 0.01, plot = TRUE)
+
+## The optimal number of clusters, including small clusters
+k &lt;- length(z$clustFlag)
+
+## The selected number of clusters, after excluding small clusters (if minSize &gt; 1)
+ks &lt;- sum(z$clustFlag)
+</code></pre>
+
+
+</div>

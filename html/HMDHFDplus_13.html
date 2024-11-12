@@ -1,0 +1,80 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>readCHMDweb</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>read data from the Canadian Human Mortality Database into R</h2>
+
+<h3>Description</h3>
+
+<p>CHMD data are formatted exactly as HMD data. This function simply parses the necessary url together given a province code and data item (same nomenclature as HMD). Data is parsed using <code>HMDparse()</code>, which converts columns into useful and intuitive classes, for ready-use. See <code>?HMDparse</code> for more information on type conversions. No authentication is required for this database. Only a single item/prefecture is downloaded. Loop for more complex calls (See examples). The provID is not appended as a column, so be mindful of this if appending several items together into a single <code>data.frame</code>. Note that at the time of this writing, the finest Lexis resolution for prefectural lifetables is 5x5 (5-year, 5-year age groups). Raw data are, however, provided in 1x1 format, and deaths are also available in triangles. Note that cohort data are not produced for Canada at this time (but you could produce such data by starting with the <code>Deaths\_Lexis</code> file...).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">readCHMDweb(provID = "can", item = "Deaths_1x1", fixup = TRUE, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>provID</code></td>
+<td>
+<p>a single provID 3 character string, as returned by <code>getCHMDprovinces()</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>item</code></td>
+<td>
+<p>the statistical product you want, e.g., <code>"fltper_5x5"</code>. Only 1.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fixup</code></td>
+<td>
+<p>logical. Should columns be made more user-friendly, e.g., forcing Age to be integer?</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>extra arguments ultimately passed to <code>read.table()</code>. Not likely needed.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>This database is curated independently from the HMD/HFD family, and so file types and locations may be subject to change. If this happens, please notify the package maintainer.
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>data.frame</code> of the data item is invisibly returned
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+library(HMDHFDplus)
+# grab province codes (including All Canada)
+provs &lt;- getCHMDprovinces()
+# grab all mltper_5x5  
+# and stick into long data.frame: 
+mltper &lt;- do.call(rbind, lapply(provs, function(provID){
+                   Dat        &lt;- readCHMDweb(provID = provID, item = "mltper_5x5", fixup = TRUE)
+                   Dat$provID &lt;- provID
+                   Dat
+}))
+
+## End(Not run)
+
+</code></pre>
+
+
+</div>

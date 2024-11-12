@@ -1,0 +1,101 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>profile.hopit</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Calculate the log likelihood profile for the fitted <code>hopit</code> model</h2>
+
+<h3>Description</h3>
+
+<p>Calculate the log likelihood profile for the fitted <code>hopit</code> model
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">## S3 method for class 'hopit'
+profile(fitted, ..., scope = 0.15, steps = 101)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>fitted</code></td>
+<td>
+<p>a <code>hopit</code> object (a fitted model).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>unused now.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>scope</code></td>
+<td>
+<p>a value (fraction) defining the plotting range for a coefficient.
+The range is <code>c(coef \* (1-scope), coef \* (1+scope))</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>steps</code></td>
+<td>
+<p>at how many equally spaced points the log likelihood
+function is calculated for each coefficient.</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>Maciej J. Danko
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>plot.profile.hopit</code>, <code>print.profile.hopit</code>,
+<code>hopit</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+# DATA
+data(healthsurvey)
+
+# the order of response levels decreases from the best health to
+# the worst health; hence the hopit() parameter decreasing.levels
+# is set to TRUE
+levels(healthsurvey$health)
+
+# Example 1 ---------------------
+
+# fitting the model:
+model1 &lt;- hopit(latent.formula = health ~ hypertension + high_cholesterol +
+                heart_attack_or_stroke + poor_mobility + very_poor_grip +
+                depression + respiratory_problems +
+                IADL_problems + obese + diabetes + other_diseases,
+              thresh.formula = ~ sex + ageclass + country,
+              decreasing.levels = TRUE,
+              control = list(trace = FALSE),
+              data = healthsurvey)
+
+# check the fit using the profile function (at 51 points)
+pr &lt;- profile(model1, steps = 51)
+print(pr, plotf = FALSE)
+
+# plot profile
+plot(pr, relative = FALSE)
+
+# alternative plot
+plot(pr, relative = TRUE)
+
+</code></pre>
+
+
+</div>

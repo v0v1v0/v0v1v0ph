@@ -1,0 +1,146 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>HextractoR</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>HextractoR: Integrated Tool for Hairping Extraction of RNA Sequences</h2>
+
+<h3>Description</h3>
+
+<p>To preprocess a genome, you need a file containing the raw genome in fasta
+format. To run HExtractor, simply call the main function. This function
+creates 2 files in the "out" folder and automatically names them.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">HextractoR(input_file, min_valid_nucleotides = 500, window_size = 160,
+  window_step = 30, only_sloop = T, min_length = 60, min_bp = 16,
+  trim_sequences = T, margin_bp = 6, blast_evalue = 1,
+  identity_threshold = 90, nthreads = 4, nworks = 4,
+  filter_files = { })
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>input_file</code></td>
+<td>
+<p>filename of the fasta file to proccess</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>min_valid_nucleotides</code></td>
+<td>
+<p>Each input sequence must have this quantity of
+valid nucleotides (not 'N') to be processed.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>window_size</code></td>
+<td>
+<p>Number of bases in the windows.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>window_step</code></td>
+<td>
+<p>Window step. This number defines indirectly the overlap:
+window_overlap=window_size-window_step</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>only_sloop</code></td>
+<td>
+<p>Only extract single loop sequence.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>min_length</code></td>
+<td>
+<p>Minimum sequence length. Shorter sequences are discarded.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>min_bp</code></td>
+<td>
+<p>Minimum number of base-pairs that must form a sequence.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>trim_sequences</code></td>
+<td>
+<p>Use some heuristics to trim the hairpins.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>margin_bp</code></td>
+<td>
+<p>When the sequence is trimmed, at least min_bp+margin_bp
+base-pairs are left.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>blast_evalue</code></td>
+<td>
+<p>e-value used in blast to match the extracted sequences
+with the sequences from the filter files.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>identity_threshold</code></td>
+<td>
+<p>Identity threshold used to match sequences with the
+sequences from the filter files.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nthreads</code></td>
+<td>
+<p>Allows using more than one thread in the execution.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nworks</code></td>
+<td>
+<p>Split each sequence in nworks to use less RAM memory.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>filter_files</code></td>
+<td>
+<p>Fasta files with known sequences to separate the output
+stems.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A list with the path of the output files and the result of the
+proccessing of each sequence (if it was succesful or failed)
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Small example without filter files
+library(HextractoR)
+# First we get the path of the example FASTA file
+fpath &lt;- system.file("Example_tiny.fasta", package="HextractoR")
+# To run HextractoR, simply call the main function
+HextractoR(input_file = fpath)
+# Other example with filter files and bigger input file
+fpath1 &lt;- system.file("Example_human.fasta", package="HextractoR")
+fpath2 &lt;- system.file("Example_pre-miRNA.fasta", package="HextractoR")
+HextractoR(input_file = fpath1, filter_files = {fpath2})
+# This function creates 2 files in the working directory and automatically
+# names them.
+
+</code></pre>
+
+
+</div>

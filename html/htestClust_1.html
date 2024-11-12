@@ -1,0 +1,154 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>chisqtestClust</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Chi-squared Test for Clustered Count Data</h2>
+
+<h3>Description</h3>
+
+<p><code>chisqtestClust</code> performs chi-squared contingency table tests and goodness-of-fit tests for
+clustered data with potentially informative cluster size.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">chisqtestClust(x, y = NULL, id, p = NULL,
+             variance = c("MoM", "sand.null", "sand.est", "emp"))
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>a numeric vector or factor. Can also be a table or data frame.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+<p>a numeric vector or factor of the same length as <code>x</code>. Ignored if <code>x</code> is a table or data frame.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>id</code></td>
+<td>
+<p>a numeric vector or factor which identifies the clusters; ignored if <code>x</code> is a table or data frame.
+The length of <code>id</code> must be the same as the length of <code>x</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>p</code></td>
+<td>
+<p>a vector of probabilities with length equal to the number of unique categories of <code>x</code>
+if <code>x</code> is a vector, or equal to the number of columns of <code>x</code> if <code>x</code> is a table or data frame.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>variance</code></td>
+<td>
+<p>character string specifying the method of variance estimation. Must be one of "<code>sand.null</code>",
+"<code>sand.est</code>", "<code>emp</code>", or "<code>MoM</code>".</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>If <code>x</code> is 2-dimensional table or data frame, or if <code>x</code> is a vector or factor and <code>y</code>
+is not given, then the cluster-weighted <em>goodness-of-fit test</em> is performed. When <code>x</code> is a table
+or data frame, the rows of <code>x</code> must give the aggregate category counts across the clusters. In this case,
+the hypothesis tested is whether the marginal population probabilities equal those in <code>p</code>, or are all
+equal if <code>p</code> is not given.
+</p>
+<p>When <code>x</code>, <code>y</code>, and <code>id</code> are all given as vectors or factors, the cluster-weighted
+<em>chi-squared test of independence</em> is performed. The lengths of <code>x</code>, <code>y</code>, and <code>id</code>
+must be equal. In this case, the hypothesis tested is that the joint probabilities of <code>x</code> and <code>y</code> are
+equal to the product of the marginal probabilities.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A list with class "<code>htest</code>" containing the following components:
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>statistic</code></td>
+<td>
+<p>the value of the test statistic.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>parameter</code></td>
+<td>
+<p>the degrees of freedom of the approximate chi-squared distribution of the test statistic.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>p.value</code></td>
+<td>
+<p>the p-value of the test.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+<p>a character string indicating the test performed, and which variance estimation method was used.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>data.name</code></td>
+<td>
+<p>a character string giving the name(s) of the data and the total number of clusters.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>M</code></td>
+<td>
+<p>the number of clusters.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>observed</code></td>
+<td>
+<p>the observed reweighted proportions.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>expected</code></td>
+<td>
+<p>the expected proportions under the null hypothesis.</p>
+</td>
+</tr>
+</table>
+<h3>References</h3>
+
+<p>Gregg, M., Datta, S., Lorenz, D. (2020) Variance estimation in tests of clustered categorical data
+with informative cluster size.
+<em>Statistical Methods in Medical Research</em>, doi:10.1177/0962280220928572.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(screen8)
+## is the marginal extracurricular activity participation evenly distributed across categories?
+## Goodness of Fit test using vectors.
+chisqtestClust(x=screen8$activity, id=screen8$sch.id)
+
+## Goodness of Fit test using table.
+act.table &lt;- table(screen8$sch.id, screen8$activity)
+chisqtestClust(act.table)
+
+## test if extracurricular activity participation and gender are independent
+chisqtestClust(screen8$gender, screen8$activity, screen8$sch.id)
+
+</code></pre>
+
+
+</div>

@@ -1,0 +1,114 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>setupGeno</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Create a group of locus objects from a genotype matrix, assign to
+'model.matrix' class.  
+</h2>
+
+<h3>Description</h3>
+
+<p>The function makes each pair of columns a locus object, which
+recodes alleles to numeric and saves the original alleles as an
+attribute of the model.matrix. 
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">setupGeno(geno, miss.val=c(0,NA), locus.label=NULL)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>geno</code></td>
+<td>
+
+<p>Matrix of alleles, such that each locus has a pair of adjacent
+columns of alleles, and the order of columns corresponds to the
+order of loci on a chromosome. If there are K loci, then
+ncol(geno) = 2*K. Rows represent alleles for each subject.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>miss.val </code></td>
+<td>
+
+<p>A vector of codes denoting missing values for allele1 and
+allele2. Note that NA will always be treated as a missing value, even
+if not specified in miss.val.  Also note that if multiple missing
+value codes are specified, the original missing value code for a
+specific individual can not be retrieved from the loci object.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>locus.label</code></td>
+<td>
+
+<p>vector of labels for the loci
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>This function contains the essential parts of the loci function,
+which is no longer within haplo.stats
+</p>
+
+
+<h3>Value</h3>
+
+<p>A 'model.matrix' object with the alleles recoded to numeric values,
+and the original values are stored in the 'unique.alleles' attribute.
+The ith item of the unique.alleles list is a vector of unique alleles
+for the ith locus.
+</p>
+
+
+<h3>Note</h3>
+
+<p>A matrix that contains all elements of mode character will be sorted
+in alphabetic order. This order may differ across platforms according
+to your setting of LC_COLLATE.  See the note in <code>haplo.em</code> about
+how this sort order affects results.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>locus</code>,
+<code>haplo.glm</code>,
+<code>haplo.em</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Create some loci to work with
+a1 &lt;- 1:6
+a2 &lt;- 7:12
+
+b1 &lt;- c("A","A","B","C","E","D")
+b2 &lt;-c("A","A","C","E","F","G")
+
+c1 &lt;- c("101","10","115","132","21","112")
+c2 &lt;- c("100","101","0","100","21","110")
+
+myGeno &lt;- data.frame(a1,a2,b1,b2,c1,c2)
+myGeno &lt;- setupGeno(myGeno)
+myGeno
+
+attributes(myGeno)$unique.alleles
+</code></pre>
+
+
+</div>

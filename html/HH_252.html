@@ -1,0 +1,236 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>likertColor</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Selection of colors for Likert plots.</h2>
+
+<h3>Description</h3>
+
+<p>Selection of colors for Likert plots.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">ColorSet(nc, ReferenceZero=NULL)
+likertColor(nc, ReferenceZero=NULL,
+                colorFunction=c("diverge_hcl","sequential_hcl"),
+                colorFunctionOption=c("lighter","flatter","default"),
+                colorFunctionArgs=
+                  likertColorFunctionArgs[[colorFunctionOption, colorFunction]],
+                ...)
+likertColorBrewer(nc, ReferenceZero=NULL,
+                  BrewerPaletteName="RdBu", middle.color="gray90")
+
+brewer.pal.likert(n, name, middle.color)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>n, nc</code></td>
+<td>
+<p>Number of colors in the palette.
+If there are more levels than <code>RColorBrewer</code> normally handles, we
+automatically interpolate with
+<code>colorRampPalette</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ReferenceZero</code></td>
+<td>
+<p>Numeric scalar or <code>NULL</code>.  The position in
+the range<br><code>seq(0, attr(x, "nlevels")+.5, .5)</code> where the
+reference line at 0 will be placed.  <code>attr(x, "nlevels")</code> is the
+number of columns of the original argument <code>x</code>, <em>before</em> it
+has been coerced to a <code>"likert"</code> object.  The default
+<code>NULL</code> corresponds to the middle level if there are an odd
+number of levels, and to half-way between the two middle levels if
+there are an even number of levels.  This argument is used when the
+number of positive levels and the number of negative levels are not
+the same.  For example, with 4 levels<br><code>c("Disagee", "Neutral", "Weak Agree", "Strong Agree")</code>, the
+argument would be specified <code>ReferenceZero=2</code> indicating that
+the graphical split would be in the middle of the second group with
+label <code>"Neutral"</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>colorFunction</code></td>
+<td>
+<p>Function name from the <span class="pkg">colorspace</span> package,
+either <code>"diverge_hcl"</code> or<br><code>"sequential_hcl"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>colorFunctionOption</code></td>
+<td>
+<p>Name of a list item defined inside the
+<code>likertColor</code>
+function.  The item contains a list of parameters to the function
+identified in the <code>colorFunction</code> argument.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>colorFunctionArgs</code></td>
+<td>
+<p>list of arguments to the <span class="pkg">colorspace</span>
+function.
+The default selects the values by indexing into a list defined in the
+<code>likertColor</code> function using the values of the two arguments
+<code>colorFunction</code> and  <code>colorFunctionOption</code></p>
+</td>
+</tr>
+</table>
+<p>.  For
+non-default usage, see the BlueOrange example in this help page.
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Other arguments are ignored.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>BrewerPaletteName, name</code></td>
+<td>
+<p><code>RColorBrewer</code>
+palette names. We default to the diverging palette <code>RdBu</code>.
+Diverging palettes are usually appropriate for two-directional
+scales (Agree–Disagree).  Sequential palettes are often appropriate
+for one-directional scales (Age Ranges).  Qualitative palettes are
+usually not appropriate for likert plots.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>middle.color</code></td>
+<td>
+<p>Darker middle color than the default
+<code>"#F7F7F7"</code> in the <code>RdBu</code> scheme.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>These are support functions for the <code>plot.likert</code> function.
+Please see <code>plot.likert</code> for details.
+</p>
+<p><code>likertColor</code> uses by default the <code>diverge_hcl</code>
+diverging palette defined by the argument<br><code>colorFunctionOption="lighter"</code>.
+</p>
+<p><code>likertColorBrewer</code> by default uses the <code>"RdBu"</code>
+diverging palette from <code>RColorBrewer</code>.
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>ColorSet</code> returns a vector of integers, one per each level,
+corresponding to the strength of the levels from Disagree to Agree.
+For balanced levels, such as<br><code>c("Disagree Strongly", "Disagree Weakly", "Agree
+    Weakly", "Agree Strongly")</code>,<br>
+corresponding to <code>nc=4,
+  ReferenceZero=2.5</code>, it returns <code>-2 -1  1  2</code>.
+For unbalanced levels, such as <code>c("Disagree", "Neutral", "Agree
+  Weakly", "Agree Strongly")</code>, corresponding to <code>nc=4,
+  ReferenceZero=2</code>, it returns <code>-1 0  1  2</code>.
+</p>
+<p><code>likertColor</code> returns a subset of a palette constructed by
+either <code>diverge_hcl</code> or
+<code>sequential_hcl</code> in the
+<span class="pkg">colorspace</span> package.
+The subset corresponds to the levels specified by <code>ColorSet</code>.
+</p>
+<p><code>brewer.pal.likert</code> returns a
+<code>RColorBrewer</code> palette.
+</p>
+<p><code>likertColorBrewer</code> returns a subset of a palette constructed by
+<code>brewer.pal.likert</code>.
+The subset corresponds to the levels specified by <code>ColorSet</code>.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Richard M. Heiberger,
+with contributions from Naomi B. Robbins &lt;naomi@nbr-graphs.com&gt;.
+</p>
+<p>Maintainer: Richard M. Heiberger &lt;rmh@temple.edu&gt;
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>plot.likert</code></p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">brewer.pal.likert(4, "RdBu")
+brewer.pal.likert(5, "RdBu")
+ColorSet(4)
+ColorSet(4, 2)
+likertColor(4)
+likertColor(4, 2.5) ## same as above
+likertColor(4, 2)   ## one negative level and two positive levels: default
+likertColor(5, 3)[-2] ## one negative level and two positive levels: stronger negative
+
+## Not run: 
+  ## Examples illustrating the six predefined likertColor palettes, and how
+  ## to define additional hcl color palettes for use with the likert functions.
+
+  data(ProfDiv)
+  ProfDiv.df &lt;- data.frame(ProfDiv)
+
+  likert( ~ . , ProfDiv.df, horizontal=FALSE, positive.order=FALSE)
+  likert( ~ . , ProfDiv.df, horizontal=FALSE, positive.order=FALSE,
+         colorFunctionOption="default")
+  likert( ~ . , ProfDiv.df, horizontal=FALSE, positive.order=FALSE,
+         colorFunctionOption="flatter")
+  likert( ~ . , ProfDiv.df, horizontal=FALSE, positive.order=FALSE,
+         colorFunction="sequential_hcl")
+  likert( ~ . , ProfDiv.df, horizontal=FALSE, positive.order=FALSE,
+         colorFunction="sequential_hcl", colorFunctionOption="default")
+  likert( ~ . , ProfDiv.df, horizontal=FALSE, positive.order=FALSE,
+         colorFunction="sequential_hcl", colorFunctionOption="flatter")
+
+  likert(ProfDiv, horizontal=FALSE, positive.order=FALSE)
+  likert(ProfDiv, horizontal=FALSE, positive.order=FALSE,
+         colorFunctionOption="default")
+  likert(ProfDiv, horizontal=FALSE, positive.order=FALSE,
+         colorFunctionOption="flatter")
+  likert(ProfDiv, horizontal=FALSE, positive.order=FALSE,
+         colorFunction="sequential_hcl")
+  likert(ProfDiv, horizontal=FALSE, positive.order=FALSE,
+         colorFunction="sequential_hcl", colorFunctionOption="default")
+  likert(ProfDiv, horizontal=FALSE, positive.order=FALSE,
+         colorFunction="sequential_hcl", colorFunctionOption="flatter")
+
+  likertMosaic(ProfDiv.df)
+  likertMosaic(ProfDiv.df, colorFunctionOption="default")
+  likertMosaic(ProfDiv.df, colorFunctionOption="flatter")
+  likertMosaic(ProfDiv.df, colorFunction="sequential_hcl")
+  likertMosaic(ProfDiv.df, colorFunction="sequential_hcl",
+               colorFunctionOption="default")
+  likertMosaic(ProfDiv.df, colorFunction="sequential_hcl",
+               colorFunctionOption="flatter")
+
+  ## specify an hcl palette for use with the likert functions.
+  BlueOrange &lt;- likertColor(nc=4, ReferenceZero=NULL,
+                            colorFunction="diverge_hcl",
+                            colorFunctionArgs=
+                              list(h=c(246, 40), c=96, l=c(65,90), power=1.5))
+  likert( ~ . , ProfDiv.df, horizontal=FALSE, positive.order=FALSE, col=BlueOrange)
+
+## End(Not run)
+</code></pre>
+
+
+</div>

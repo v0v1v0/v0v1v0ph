@@ -1,0 +1,183 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>subhourly2nminutes</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Sub-hourly -&gt; n-minutes
+</h2>
+
+<h3>Description</h3>
+
+<p>Generic function for aggregating a sub-hourly time series into a "n-minutes' one.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">subhourly2nminutes(x, ...)
+
+## Default S3 method:
+subhourly2nminutes(x, nminutes, FUN, na.rm=TRUE, 
+                                     from=start(x), to=end(x), ...)
+
+## S3 method for class 'zoo'
+subhourly2nminutes(x, nminutes, FUN, na.rm=TRUE, 
+                                 from=start(x), to=end(x), ...)
+
+## S3 method for class 'data.frame'
+subhourly2nminutes(x, nminutes, FUN, na.rm=TRUE, 
+        from=start(x), to=end(x), dates=1, date.fmt="%Y-%m-%d %H:%M:%S", 
+        out.fmt="zoo", verbose= TRUE, ...)
+
+## S3 method for class 'matrix'
+subhourly2nminutes(x, nminutes, FUN, na.rm=TRUE, 
+        from=start(x), to=end(x), dates=1, date.fmt="%Y-%m-%d %H:%M:%S", 
+        out.fmt="zoo", verbose= TRUE, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+
+<p>zoo, data.frame or matrix object, with sub-hourly time series. <br>
+Measurements at several gauging stations can be stored in a data.frame or matrix object, and in that case, each column of <code>x</code> represent the time series measured in each gauging station, and the column names of <code>x</code> represent the ID of each station.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nminutes</code></td>
+<td>
+
+<p>numeric, defining the amount of minutes to be used for aggregating <code>x</code>.
+<code>nminutes</code> must be larger than the amount of minutes between each <code>x</code> value (computed as <code>time(x)[2]-time(x)[1]</code>).
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>FUN</code></td>
+<td>
+
+<p>Function that have to be applied for aggregating from sub-hourly into n-minutes time step. (e.g., for precipitation <code>FUN=sum</code> and for temperature and streamflow ts, <code>FUN=mean</code>). <br></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>na.rm</code></td>
+<td>
+
+<p>Logical. Should missing values be removed? <br>
+-) <kbd>TRUE</kbd> : the hourly values  are computed considering only those values different from NA <br>
+-) <kbd>FALSE</kbd>: if there is AT LEAST one NA sub-hourly value within a day, the corresponding hourly value(s) will be NA as well
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>from</code></td>
+<td>
+
+<p>POSIX object indicating the starting time used to carry out the temporal aggregation.  <br>
+When <code>from &gt; start(x)</code> then <code>x</code> is cut in time to the starting DateTime defined by <code>from</code>. <br>
+When <code>from &lt; start(x)</code> then <code>x</code> is extended backward with NAs to the starting DateTime defined by <code>from</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>to</code></td>
+<td>
+
+<p>POSIX object indicating the ending time used to carry out the temporal aggregation.  <br>
+When <code>to &lt; end(x)</code> then <code>x</code> is cut in time to the ending DateTime defined by <code>to</code>. <br>
+When <code>to &gt; end(x)</code> then <code>x</code> is extended forward with NAs to the ending DateTime defined by <code>from</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dates</code></td>
+<td>
+
+<p>numeric, factor, POSIXct or POSIXt object indicating how to obtain the dates and times for each column of <code>x</code> (e.g., gauging station) <br>
+If <code>dates</code> is a number, it indicates the index of the column in <code>x</code> that stores the date and times <br>
+If <code>dates</code> is a factor, it is converted into POSIXct class, using the date format specified by <code>date.fmt</code>  <br>
+If <code>dates</code> is already of POSIXct or POSIXt class, the code verifies that the number of elements on it be equal to the number of elements in <code>x</code>
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>date.fmt</code></td>
+<td>
+
+<p>character indicating the format in which the dates are stored in <code>dates</code>, By default <code>date.fmt=%Y-%m-%d %H:%M:%S</code>. See <code>format</code> in <code>as.Date</code>. <br>
+ONLY required when <code>class(dates)=="factor"</code> or <code>class(dates)=="numeric"</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>out.fmt</code></td>
+<td>
+
+<p>OPTIONAL. Only used when <code>x</code> is a matrix or data.frame object /cr
+character, for selecting if the result will be a matrix/data.frame or a zoo object. Valid values are: <kbd>numeric</kbd>, <kbd>zoo</kbd> (default)
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+
+<p>logical; if TRUE, progress messages are printed 
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+
+<p>further arguments passed to or from other methods.
+</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>a zoo object with hourly time series
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Mauricio Zambrano-Bigiarini, <a href="mailto:mzb.devel@gmail">mzb.devel@gmail</a>
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>subhourly2hourly</code>, <code>subdaily2daily</code>, <code>subdaily2monthly</code>, <code>subdaily2annual</code>, <code>subdaily2seasonal</code>, <code>as.POSIXct</code>, <code>dm2seasonal</code>, <code>monthlyfunction</code>, <code>seasonalfunction</code>, <code>hydroplot</code>, <code>vector2zoo</code>, <code>izoo2rzoo</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Creating a 5-min time sequence and counting its length
+dt  &lt;- seq( from=as.POSIXct("2021-06-30 00:00"), to=as.POSIXct("2021-06-30 23:55"), by="5 min" )
+ndt &lt;- length(dt)
+
+## Creating a dummy 5-min zoo object, with 1 as the only value in each time period
+x &lt;- zoo( rep(1, ndt), dt)
+
+
+## Aggregation from 5-minute single ts into 10-minute ts
+h1 &lt;- subhourly2nminutes(x, nminutes= 10, FUN=sum, na.rm=TRUE)
+
+## Aggregation of 3 ts with 5-minute time frequency (i.e., a zoo matrix) 
+## into a 30-minute zoo object.
+X  &lt;- cbind(x, x, x)
+h2 &lt;- subhourly2nminutes(X, nminutes= 30, FUN=sum, na.rm=TRUE)
+</code></pre>
+
+
+</div>

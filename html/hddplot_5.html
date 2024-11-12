@@ -1,0 +1,216 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>defectiveCVdisc</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>defective accuracy assessments from linear discriminant calculations</h2>
+
+<h3>Description</h3>
+
+<p>Determine cross-validated accuracy, for each of a number of features in
+a specified range, in each case with a set of features that have been
+selected using the total data. The "accuracy" assessment are provided
+only for comparative purposes
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">defectiveCVdisc(x, cl, nfold = NULL, FUN = aovFbyrow, nfeatures = 2, seed = 31,
+         funda = lda, foldids = NULL, subset = NULL, print.progress = TRUE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>Matrix; rows are features, and columns are observations
+('samples')</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cl</code></td>
+<td>
+<p>Factor that classifies columns into groups</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nfold</code></td>
+<td>
+<p>Number of folds for the cross-validation. Optionally, a second
+number species the number of repeats of the cross-validation</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>FUN</code></td>
+<td>
+<p>function used to calculate a measure, for each row, of
+separation into groups</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nfeatures</code></td>
+<td>
+<p>Specifies the different numbers of features (e.g., 1:10)
+that will be tried, to determine cross-validation accuracy in each
+instance</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>seed</code></td>
+<td>
+<p>This can be used to specify a starting value for the random
+number generator, in order to make calculations repeatable</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>funda</code></td>
+<td>
+<p>Function that will be used for discrimination.  Currently
+<code>lda</code> is the only option</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>foldids</code></td>
+<td>
+<p>Fold information, as output from <code>cvdisc()</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>subset</code></td>
+<td>
+<p>Allows the use of a subset of the samples (observations)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>print.progress</code></td>
+<td>
+<p>Set to <code>TRUE</code> (default) for printing out,
+as calculations proceed, the number of the current fold</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>acc.resub</code></td>
+<td>
+<p>resubstitution measure of 'accuracy'</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>acc.sel1</code></td>
+<td>
+<p>'accuracy' from cross-validation, with the initially
+selected features</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>John Maindonald</p>
+
+
+<h3>See Also</h3>
+
+<p><code>cvdisc</code></p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">mat &lt;- matrix(rnorm(1000), ncol=20)
+cl &lt;- factor(rep(1:3, c(7,9,4)))
+badaccs &lt;- defectiveCVdisc(mat, cl, nfold=c(3,1), nfeatures=1:5)
+## Note the list elements acc.resub and acc.sel1
+
+
+## The function is currently defined as
+function(x, cl, nfold=NULL, FUN=aovFbyrow,
+           nfeatures=2, seed=31, funda=lda, foldids=NULL,
+           subset=NULL, print.progress=TRUE){
+    ## Option to omit one or more points
+    if(!is.null(subset)) cl[!is.na(cl)][!subset] &lt;- NA
+    if(any(is.na(cl))){x &lt;- x[,!is.na(cl)]
+                       cl &lt;- cl[!is.na(cl)]
+                     }
+    nobs &lt;- dim(x)[2]
+    ## Get fold information from foldids, if specified,
+    ## else if nfold is not specified, use leave-one-out CV
+    if(!is.null(foldids))
+      nfold &lt;- c(length(unique(foldids)), dim(foldids)[2])
+    if(is.null(nfold)&amp;is.null(foldids))nfold &lt;- sum(!is.na(cl))
+    else if(nfold[1]==nobs)foldids &lt;- sample(1:nfold[1])
+    else foldids &lt;- sapply(1:nfold[2], function(x)
+                     divideUp(cl, nset=nfold[1]))
+    if(length(nfold)==1)nfold &lt;- c(nfold,1)
+    cl &lt;- factor(cl)
+    ngp &lt;- length(levels(cl))
+    genes &lt;- rownames(x)
+     if(is.null(genes)){
+      genes &lt;- paste(1:dim(x)[1])
+      print("Input rows (features) are not named. Names")
+      print(paste(1,":", dim(x)[1], " will be assigned.", sep=""))
+      rownames(x) &lt;- genes
+    }
+    require(MASS)
+    if(!is.null(seed))set.seed(seed)
+    Fcut &lt;- NULL
+    maxgenes &lt;- max(nfeatures)
+
+    stat &lt;- FUN(x=x, cl)
+    Fcut &lt;- list(F=sort(stat, decreasing=TRUE)[nfeatures],
+                 df=c(ngp-1, nobs-ngp))
+    ord &lt;- order(-abs(stat))[1:maxgenes]
+    genes.ord &lt;- genes[ord]
+    selectonce.df &lt;- data.frame(t(x[ord, , drop=FALSE]))
+    acc.resub &lt;- acc.sel1 &lt;- numeric(maxgenes)
+    if(nfold[1]==0)acc.sel1 &lt;- NULL
+
+    for(ng in nfeatures){
+      resub.xda &lt;- funda(cl~., data=selectonce.df[,1:ng,drop=FALSE])
+      hat.rsb &lt;- predict(resub.xda)$class
+      tab.rsb &lt;- table(hat.rsb, cl)
+      acc.resub[ng] &lt;- sum(tab.rsb[row(tab.rsb)==col(tab.rsb)])/sum(tab.rsb)
+      if(nfold[1]==0)next
+      if(nfold[1]==nobs){
+        hat.sel1 &lt;- funda(cl~., data=selectonce.df[,1:ng,drop=FALSE],
+                          CV=TRUE)$class
+        tab.one &lt;- table(hat.sel1, cl)
+        acc.sel1[ng] &lt;- sum(tab.one[row(tab.one)==col(tab.one)])/sum(tab.one)
+      } else
+      {
+      hat &lt;- cl
+      if(print.progress)cat(paste(ng,":",sep=""))
+      for(k in 1:nfold[2])
+      {
+        foldk &lt;- foldids[,k]
+        ufold &lt;- sort(unique(foldk))
+        for(i in ufold){
+          testset &lt;- (1:nobs)[foldk==i]
+          trainset &lt;- (1:nobs)[foldk!=i]
+          dfi &lt;- selectonce.df[-testset, 1:ng, drop=FALSE]
+          newdfi &lt;- selectonce.df[testset, 1:ng, drop=FALSE]
+          cli &lt;- cl[-testset]
+          xy.xda &lt;- funda(cli~., data=dfi)
+          subs &lt;- match(colnames(dfi), rownames(df))
+          newpred.xda &lt;- predict(xy.xda, newdata=newdfi, method="debiased")
+          hat[testset] &lt;- newpred.xda$class
+        }
+        tabk &lt;- table(hat,cl)
+        if(k==1)tab &lt;- tabk else tab &lt;- tab+tabk
+      }
+      acc.sel1[ng] &lt;- sum(tab[row(tab)==col(tab)])/sum(tab)
+      }
+    }
+    if(print.progress)cat("\n")
+    invisible(list(acc.resub=acc.resub, acc.sel1=acc.sel1, genes=genes.ord))
+  }
+</code></pre>
+
+
+</div>

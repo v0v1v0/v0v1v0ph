@@ -1,0 +1,257 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>spotDrift</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Spot Drift Estimation</h2>
+
+<h3>Description</h3>
+
+<p>Function used to estimate the spot drift of intraday (tick) stock prices/returns
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">spotDrift(
+  data,
+  method = "mean",
+  alignBy = "minutes",
+  alignPeriod = 5,
+  marketOpen = "09:30:00",
+  marketClose = "16:00:00",
+  tz = NULL,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>Can be one of two input types, <code>xts</code> or <code>data.table</code>. It is assumed that the input comprises prices in levels.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+<p>Which method to be used to estimate the spot-drift. Currently, three methods are available, 
+rolling mean and median as well as the kernel method of Christensen et al. (2018).
+The kernel is a left hand exponential kernel that will weigh newer observations more heavily than older observations.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alignBy</code></td>
+<td>
+<p>character, indicating the time scale in which <code>alignPeriod</code> is expressed. 
+Possible values are: <code>"ticks"</code>, <code>"secs"</code>, <code>"seconds"</code>, <code>"mins"</code>, <code>"minutes"</code>, <code>"hours"</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alignPeriod</code></td>
+<td>
+<p>How often should the estimation take place? If <code>alignPeriod</code> is 5 the estimation will be done every fifth unit of <code>alignBy</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>marketOpen</code></td>
+<td>
+<p>Opening time of the market, standard is "09:30:00".</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>marketClose</code></td>
+<td>
+<p>Closing time of the market, standard is "16:00:00".</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tz</code></td>
+<td>
+<p>fallback time zone used in case we we are unable to identify the timezone of the data, by default: <code>tz = NULL</code>. 
+We attempt to extract the timezone from the <code>DT</code> column (or index) of the data, which may fail. 
+In case of failure we use <code>tz</code> if specified, and if it is not specified, we use <code>"UTC"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Additional arguments for the individual methods. See ‘Details’.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The additional arguments for the mean and median methods are: 
+</p>
+
+<ul>
+<li> <p><code>periods</code> for the rolling window length which is 5 by default.
+</p>
+</li>
+<li> <p><code>align</code> controls the alignment. The default is <code>"right"</code>. 
+</p>
+</li>
+</ul>
+<p>For the kernel mean estimator, the arguments <code>meanBandwidth</code> can be used to control the bandwidth of the 
+drift estimator and the <code>preAverage</code> argument, which can be used to control the pre-averaging horizon. 
+These arguments default to 300 and 5 respectively.
+</p>
+<p>The following estimation methods can be specified in <code>method</code>:
+</p>
+<p><strong>Rolling window mean (<code>"mean"</code>)</strong>
+</p>
+<p>Estimates the spot drift by applying a rolling mean over returns.
+</p>
+<p style="text-align: center;"><code class="reqn">
+    \hat{\mu_{t}} = \sum_{t = k}^{T} \textrm{mean} \left(r_{t-k : t} \right),
+</code>
+</p>
+
+<p>where <code class="reqn">k</code> is the argument <code>periods</code>.
+Parameters:
+</p>
+
+<ul>
+<li>
+<p><code>periods</code> how big the window for the estimation should be. The estimator will have <code>periods</code> <code>NA</code>s at the beginning of each trading day.
+</p>
+</li>
+<li>
+<p><code>align</code> alignment method for returns. Defaults to <code>"left"</code>, which includes only past data, but other choices, <code>"center"</code> and <code>"right"</code> are available.
+Warning: These values includes future data.
+</p>
+</li>
+</ul>
+<p>Outputs:
+</p>
+
+<ul><li>
+<p><code>mu</code> a matrix containing the spot drift estimates
+</p>
+</li></ul>
+<p><strong>Rolling window median (<code>"median"</code>)</strong>
+</p>
+<p>Estimates the spot drift by applying a rolling mean over returns.
+</p>
+<p style="text-align: center;"><code class="reqn">
+    \hat{\mu_{t}} = \sum_{t = k}^{T} \textrm{median} \left(r_{t-k : t} \right),
+</code>
+</p>
+
+<p>where <code class="reqn">k</code> is the argument <code>periods</code>.
+Parameters:
+</p>
+
+<ul>
+<li>
+<p><code>periods</code> How big the window for the estimation should be. The estimator will have <code>periods</code> <code>NA</code>s at the beginning of each trading day.
+</p>
+</li>
+<li>
+<p><code>align</code> Alignment method for returns. Defaults to <code>"left"</code>, which includes only past data, but other choices, <code>"center"</code> and <code>"right"</code> are available.
+These values includes FUTURE DATA, so beware!
+</p>
+</li>
+</ul>
+<p>Outputs:
+</p>
+
+<ul><li>
+<p><code>mu</code> a matrix containing the spot drift estimates
+</p>
+</li></ul>
+<p><strong>kernel spot drift estimator (<code>"kernel"</code>)</strong>
+</p>
+<p style="text-align: center;"><code class="reqn">
+    dX_{t} = \mu_{t}dt + \sigma_{t}dW_{t} + dJ_{t},
+</code>
+</p>
+
+<p>where <code class="reqn">\mu_{t}</code>, <code class="reqn">\sigma_{t}</code>, and <code class="reqn">J_{t}</code> are the spot drift, the spot volatility, and a jump process respectively.
+However, due to microstructure noise, the observed log-price is 
+</p>
+<p style="text-align: center;"><code class="reqn">
+    Y_{t} = X_{t} + \varepsilon_{t}
+</code>
+</p>
+
+<p>In order robustify the results to the presence of market microstructure noise, the pre-averaged returns are used:
+</p>
+<p style="text-align: center;"><code class="reqn">
+    \Delta_{i}^{n}\overline{Y} = \sum_{j=1}^{k_{n}-1}g_{j}^{n}\Delta_{i+j}^{n}Y,
+</code>
+</p>
+
+<p>where <code class="reqn">g(\cdot)</code> is a weighting function, <code class="reqn">min(x, 1-x)</code>, and <code class="reqn">k_{n}</code> is the pre-averaging horizon.
+The spot drift estimator is then:
+</p>
+<p style="text-align: center;"><code class="reqn">
+    \hat{\bar{\mu}}_{t}^{n} = \sum_{i=1}^{n-k_{n}+2}K\left(\frac{t_{i-1}-t}{h_{n}}\right)\Delta_{i-1}^{n}\overline{Y},
+</code>
+</p>
+
+<p>The kernel estimation method has the following parameters:
+</p>
+
+<ul>
+<li>
+<p><code>preAverage</code> a positive <code>integer</code> denoting the length of pre-averaging window for the log-prices. Default is 5
+</p>
+</li>
+<li>
+<p><code>meanBandwidth</code> an <code>integer</code> denoting the bandwidth for the left-sided exponential kernel for the mean. Default is <code>300L</code>
+</p>
+</li>
+</ul>
+<p>Outputs:
+</p>
+
+<ul><li>
+<p><code>mu</code> a matrix containing the spot drift estimates
+</p>
+</li></ul>
+<h3>Value</h3>
+
+<p>An object of class <code>"spotDrift"</code> containing at least the estimated spot drift process. 
+Input on what this class should contain and methods for it is welcome.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Emil Sjoerup.
+</p>
+
+
+<h3>References</h3>
+
+<p>Christensen, K., Oomen, R., and Reno, R. (2020) The drift burst hypothesis. Journal of Econometrics. Forthcoming.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Example 1: Rolling mean and median estimators for 2 days
+meandrift &lt;- spotDrift(data = sampleTData, alignPeriod = 1)
+mediandrift &lt;- spotDrift(data = sampleTData, method = "median", 
+                         alignBy = "seconds", alignPeriod = 30, tz = "EST")
+plot(meandrift)
+plot(mediandrift)
+## Not run: 
+# Example 2: Kernel based estimator for one day with data.table format
+price &lt;- sampleTData[as.Date(DT) == "2018-01-02", list(DT, PRICE)]
+kerneldrift &lt;- spotDrift(sampleTDataEurope, method = "driftKernel",
+                         alignBy = "minutes", alignPeriod = 1)
+plot(kerneldrift)
+
+## End(Not run)
+
+</code></pre>
+
+
+</div>

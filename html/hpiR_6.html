@@ -1,0 +1,149 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>calcForecastError</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Calculate the forecast accuracy of series of indexes</h2>
+
+<h3>Description</h3>
+
+<p>Estimate the index accuracy with forecasting for a (progressive) series of indexes
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">calcForecastError(is_obj, pred_df, return_forecasts = FALSE,
+  forecast_length = 1, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>is_obj</code></td>
+<td>
+<p>Object of class 'hpiseries'</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pred_df</code></td>
+<td>
+<p>Set of sales to be used for predictive quality of index</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>return_forecasts</code></td>
+<td>
+<p>default = FALSE; return the forecasted indexes</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>forecast_length</code></td>
+<td>
+<p>default = 1; Length of period(s) in time to forecast</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Additional Arguments</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>object of class 'hpiaccuracy' inheriting from class 'data.frame' containing
+the following fields:
+</p>
+
+<dl>
+<dt>prop_id</dt>
+<dd>
+<p>Property Identification number</p>
+</dd>
+<dt>price</dt>
+<dd>
+<p>Transaction Price</p>
+</dd>
+<dt>pred_price</dt>
+<dd>
+<p>Predicted price</p>
+</dd>
+<dt>error</dt>
+<dd>
+<p>(Prediction - Actual) / Actual</p>
+</dd>
+<dt>log_error</dt>
+<dd>
+<p>log(prediction) - log(actual)</p>
+</dd>
+<dt>pred_period</dt>
+<dd>
+<p>Period of the prediction</p>
+</dd>
+<dt>series</dt>
+<dd>
+<p>Series position from which the prediction was generated</p>
+</dd>
+</dl>
+<h3>Further Details</h3>
+
+<p>If you set 'return_forecasts' = TRUE, the forecasted indexes for each period will be
+returned in the 'forecasts' attribute of the 'hpiaccuracy' object. (attr(accr_obj,
+'forecasts')
+</p>
+<p>For now, the 'pred_df' object must be a set of repeat transactions with the class 'rt',
+inheriting from 'hpidata'
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+ # Load example sales
+ data(ex_sales)
+
+ # Create Index
+ hed_index &lt;- hedIndex(trans_df = ex_sales,
+                       periodicity = 'monthly',
+                       max_date = '2011-12-31',
+                       adj_type = 'clip',
+                       date = 'sale_date',
+                       price = 'sale_price',
+                       trans_id = 'sale_id',
+                       prop_id = 'pinx',
+                       estimator = 'robust',
+                       log_dep = TRUE,
+                       trim_model = TRUE,
+                       max_period = 24,
+                       dep_var = 'price',
+                       ind_var = c('tot_sf', 'beds', 'baths'),
+                       smooth = FALSE)
+
+ # Create Series (Suppressing messages do to small sample size of this example)
+  suppressMessages(
+    hpi_series &lt;- createSeries(hpi_obj = hed_index,
+                               train_period = 12))
+
+ # Create Prediction data
+ rt_data &lt;- rtCreateTrans(trans_df = ex_sales,
+                          prop_id = 'pinx',
+                          max_date = '2011-12-31',
+                          trans_id = 'sale_id',
+                          price = 'sale_price',
+                          periodicity = 'monthly',
+                          date = 'sale_date',
+                          min_period_dist = 12)
+
+
+ # Calculate forecast accuracty
+ fc_accr &lt;- calcForecastError(is_obj = hpi_series,
+                              pred_df = rt_data)
+
+</code></pre>
+
+
+</div>

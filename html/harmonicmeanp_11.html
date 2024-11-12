@@ -1,0 +1,138 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>Landau Distribution</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+The Landau Distribution
+</h2>
+
+<h3>Description</h3>
+
+<p>Density, distribution function, quantile function and random number generation for the Landau distribution with location parameter mu and scale parameter sigma.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">dLandau(x, mu=log(pi/2), sigma=pi/2, log=FALSE)
+pLandau(x, mu=log(pi/2), sigma=pi/2, log=FALSE, lower.tail=TRUE)
+qLandau(p, mu=log(pi/2), sigma=pi/2, log=FALSE, lower.tail=TRUE)
+rLandau(n, mu=log(pi/2), sigma=pi/2)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+
+<p>The value or vector of values of the Landau-distributed random variable.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mu</code></td>
+<td>
+
+<p>The location parameter of the Landau distribution. Defaults to log(pi/2) to give Landau's original distribution.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sigma</code></td>
+<td>
+
+<p>The scale parameter of the Landau distribution. Defaults to pi/2 to give Landau's original distribution.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>log</code></td>
+<td>
+
+<p>If true the log probability is output.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lower.tail</code></td>
+<td>
+
+<p>If true (the default) the lower tail probability is returned. Otherwise the upper tail probability.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>p</code></td>
+<td>
+
+<p>The value or vector of values, between 0 and 1, of the probability specifying the quantile for which to return the Landau random variable <code>x</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n</code></td>
+<td>
+
+<p>The number of values to simulate.
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The density of the Landau distribution can be written
+</p>
+<p style="text-align: center;"><code class="reqn">f(x)=\frac{1}{\pi\,\sigma}\int_0^\infty \exp\left(-t\frac{(x-\mu)}{\sigma}-\frac{2}{\pi}t\log(t)\right)\,\sin\left(2t\right)\textrm{d}t</code>
+</p>
+
+
+
+<h3>Value</h3>
+
+<p><code>dLandau</code> produces the density, <code>pLandau</code> the tail probability, <code>qLandau</code> the quantile and <code>rLandau</code> random variates for the Landau distribution.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Daniel J. Wilson
+</p>
+
+
+<h3>References</h3>
+
+<p>Landau LD (1944) On the energy loss of fast particles by ionization. <em>J Phys USSR</em> 8:201-205.
+</p>
+<p>Daniel J. Wilson (2019) The harmonic mean <em>p</em>-value for combining dependent tests. <em>Proceedings of the National Academy of Sciences USA</em> 116: 1195-1200.
+</p>
+
+
+<h3>See Also</h3>
+
+<p>p.hmp
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># For detailed examples type vignette("harmonicmeanp")
+# Example: simulate from a non-uniform distribution mildly enriched for small \emph{p}-values. 
+# Compare the significance of the combined p-value for Bonferroni, Benjamini-Hochberg (i.e. Simes), 
+# HMP and (equivalently) MAMML with 2 degrees of freedom.
+L = 1000
+p = rbeta(L,1/1.5,1)
+min(p.adjust(p,"bonferroni"))
+min(p.adjust(p,"BH"))
+x = hmp.stat(p)
+pLandau(1/x,log(length(p))+(1 + digamma(1) - log(2/pi)),pi/2,lower.tail=FALSE)
+p.hmp(p,L=L)
+p.mamml(1/p,2,L=L)
+</code></pre>
+
+
+</div>

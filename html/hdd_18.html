@@ -1,0 +1,241 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>txt2hdd</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Transforms text data into a HDD file</h2>
+
+<h3>Description</h3>
+
+<p>Imports text data and saves it into a HDD file. It uses <code>read_delim_chunked</code>
+to extract the data. It also allows to preprocess the data.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">txt2hdd(
+  path,
+  dirDest,
+  chunkMB = 500,
+  rowsPerChunk,
+  col_names,
+  col_types,
+  nb_skip,
+  delim,
+  preprocessfun,
+  replace = FALSE,
+  encoding = "UTF-8",
+  verbose = 0,
+  locale = NULL,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>path</code></td>
+<td>
+<p>Character vector that represents the path to the data. Note that
+it can be equal to patterns if multiple files with the same name are to be imported
+(if so it must be a fixed pattern, NOT a regular expression).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dirDest</code></td>
+<td>
+<p>The destination directory, where the new HDD data should be saved.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>chunkMB</code></td>
+<td>
+<p>The chunk sizes in MB, defaults to 500MB. Instead of using this
+argument, you can alternatively use the argument <code>rowsPerChunk</code> which decides
+the size of chunks in terms of lines.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rowsPerChunk</code></td>
+<td>
+<p>Number of rows per chunk. By default it is missing: its value
+is deduced from argument <code>chunkMB</code> and the size of the file. If provided,
+replaces any value provided in <code>chunkMB</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>col_names</code></td>
+<td>
+<p>The column names, by default is uses the ones of the data set.
+If the data set lacks column names, you must provide them.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>col_types</code></td>
+<td>
+<p>The column types, in the <code>readr</code> fashion. You can use <code>guess_col_types</code>
+to find them.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nb_skip</code></td>
+<td>
+<p>Number of lines to skip.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>delim</code></td>
+<td>
+<p>The delimiter. By default the function tries to find the delimiter, but sometimes it fails.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>preprocessfun</code></td>
+<td>
+<p>A function that is applied to the data before saving. Default
+is missing. Note that if a function is provided, it MUST return a data.frame,
+anything other than data.frame is ignored.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>replace</code></td>
+<td>
+<p>If the destination directory already exists, you need to set the
+argument <code>replace=TRUE</code> to overwrite all the HDD files in it.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>encoding</code></td>
+<td>
+<p>Character scalar containing the encoding of the file to be read.
+By default it is "UTF-8" and is passed to the <code>readr</code> function <code>locale</code> which is used
+in <code>read_delim_chunked</code> (the reading function). A common encoding in Western Europe is
+"ISO-8859-1" (simply use "file filename" in a non-Windows console to get the encoding).
+</p>
+<p>Note that this argument is ignored if the argument <code>locale</code> is not NULL.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p>Logical scalar or <code>NULL</code> (default). If <code>TRUE</code>, then the evolution of
+the importing process as well as the time to import are reported.
+If <code>NULL</code>, it becomes <code>TRUE</code> when the data to import is greater than 5GB or there are
+more than one chunk.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>locale</code></td>
+<td>
+<p>Either <code>NULL</code> (default), either an object created with <code>locale</code>.
+This object will be passed to the reading function <code>read_delim_chunked</code> and handles
+how the data is imported.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Other arguments to be passed to <code>read_delim_chunked</code>,
+<code>quote = ""</code> can be interesting sometimes.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>This function uses <code>read_delim_chunked</code> from <code>readr</code>
+to read a large text file per chunk, and generate a HDD data set.
+</p>
+<p>Since the main function for importation uses <code>readr</code>, the column specification
+must also be in readr's style (namely <code>cols</code> or <code>cols_only</code>).
+</p>
+<p>By default a guess of the column types is made on the first 10,000 rows. The
+guess is the application of <code>guess_col_types</code> on these rows.
+</p>
+<p>Note that by default, columns that are found to be integers are imported as double
+(in want of integer64 type in readr). Note that for large data sets, sometimes
+integer-like identifiers can be larger than 16 digits: in these case you must
+import them as character not to lose information.
+</p>
+<p>The delimiter is found with the function <code>guess_delim</code>, which
+uses the guessing from <code>fread</code>. Note that fixed width
+delimited files are not supported.
+</p>
+
+
+<h3>Value</h3>
+
+<p>This function does not return anything in R. Instead it creates a folder
+on disk containing <code>.fst</code> files. These files represent the data that has been
+imported and converted to the <code>hdd</code> format.
+</p>
+<p>You can then read the created data with the function <code>hdd()</code>.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Laurent Berge
+</p>
+
+
+<h3>See Also</h3>
+
+<p>See <code>hdd</code>, <code>sub-.hdd</code> and <code>cash-.hdd</code>
+for the extraction and manipulation of out of memory data. For importation of
+HDD data sets from text files: see <code>txt2hdd</code>.
+</p>
+<p>See <code>hdd_slice</code> to apply functions to chunks of data (and create
+HDD objects) and <code>hdd_merge</code> to merge large files.
+</p>
+<p>To create/reshape HDD objects from memory or from other HDD objects, see
+<code>write_hdd</code>.
+</p>
+<p>To display general information from HDD objects: <code>origin</code>,
+<code>summary.hdd</code>, <code>print.hdd</code>,
+<code>dim.hdd</code> and <code>names.hdd</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+# Toy example with iris data
+
+# we create a text file on disk
+iris_path = tempfile()
+fwrite(iris, iris_path)
+
+# destination path
+hdd_path = tempfile()
+# reading the text file with HDD, with approx. 50 rows per chunk:
+txt2hdd(iris_path, dirDest = hdd_path, rowsPerChunk = 50)
+
+base_hdd = hdd(hdd_path)
+summary(base_hdd)
+
+# Same example with preprocessing
+sl_keep = sort(unique(sample(iris$Sepal.Length, 40)))
+fun = function(x){
+	# we keep only some observations &amp; vars + renaming
+	res = x[Sepal.Length %in% sl_keep, .(sl = Sepal.Length, Species)]
+	# we create some variables
+	res[, sl2 := sl**2]
+	res
+}
+# reading with preprocessing
+hdd_path_preprocess = tempfile()
+txt2hdd(iris_path, hdd_path_preprocess,
+		preprocessfun = fun, rowsPerChunk = 50)
+
+base_hdd_preprocess = hdd(hdd_path_preprocess)
+summary(base_hdd_preprocess)
+
+
+</code></pre>
+
+
+</div>

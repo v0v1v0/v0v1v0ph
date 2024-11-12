@@ -1,0 +1,216 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>LD50_MHmcmc</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Metropolis-Hastings algorithm for LD50</h2>
+
+<h3>Description</h3>
+
+<p>Run the Metropolis-Hastings algorithm for tsd.<br>
+Deeply modified from a MCMC script by Olivier Martin (INRA, Paris-Grignon).<br>
+The number of iterations is n.iter+n.adapt+1 because the initial likelihood is also displayed.<br>
+I recommend that thin=1 because the method to estimate SE uses resampling.<br>
+If initial point is maximum likelihood, n.adapt = 0 is a good solution.<br>
+To get the SE from result_mcmc &lt;- tsd_MHmcmc(result=try), use:<br>
+result_mcmc$BatchSE or result_mcmc$TimeSeriesSE<br>
+The batch standard error procedure is usually thought to be not as accurate as the time series methods.<br>
+Based on Jones, Haran, Caffo and Neath (2005), the batch size should be equal to sqrt(n.iter).<br>
+Jones, G.L., Haran, M., Caffo, B.S. and Neath, R. (2006) Fixed Width Output Analysis for Markov chain Monte Carlo , Journal of the American Statistical Association, 101:1537-1547.<br>
+coda package is necessary for this function.<br>
+The parameters intermediate and filename are used to save intermediate results every 'intermediate' iterations (for example 1000). Results are saved in a file of name filename.<br>
+The parameter previous is used to indicate the list that has been save using the parameters intermediate and filename. It permits to continue a mcmc search.<br>
+These options are used to prevent the consequences of computer crash or if the run is very very long and processes at time limited.<br></p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">LD50_MHmcmc(
+  result = stop("A result of LD50() fit must be provided"),
+  n.iter = 10000,
+  parametersMCMC = NULL,
+  n.chains = 1,
+  n.adapt = 0,
+  thin = 1,
+  trace = FALSE,
+  batchSize = sqrt(n.iter),
+  adaptive = FALSE,
+  adaptive.lag = 500,
+  adaptive.fun = function(x) {
+     ifelse(x &gt; 0.234, 1.3, 0.7)
+ },
+  intermediate = NULL,
+  filename = "intermediate.Rdata",
+  previous = NULL
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>result</code></td>
+<td>
+<p>An object obtained after a SearchR fit</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n.iter</code></td>
+<td>
+<p>Number of iterations for each step</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>parametersMCMC</code></td>
+<td>
+<p>A set of parameters used as initial point for searching with information on priors</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n.chains</code></td>
+<td>
+<p>Number of replicates</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n.adapt</code></td>
+<td>
+<p>Number of iterations before to store outputs</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>thin</code></td>
+<td>
+<p>Number of iterations between each stored output</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>trace</code></td>
+<td>
+<p>True or False, shows progress</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>batchSize</code></td>
+<td>
+<p>Number of observations to include in each batch fo SE estimation</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>adaptive</code></td>
+<td>
+<p>Should an adaptive process for SDProp be used</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>adaptive.lag</code></td>
+<td>
+<p>Lag to analyze the SDProp value in an adaptive content</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>adaptive.fun</code></td>
+<td>
+<p>Function used to change the SDProp</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>intermediate</code></td>
+<td>
+<p>Period for saving intermediate result, NULL for no save</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>filename</code></td>
+<td>
+<p>If intermediate is not NULL, save intermediate result in this file</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>previous</code></td>
+<td>
+<p>Previous result to be continued. Can be the filename in which intermediate results are saved.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>LD50_MHmcmc runs the Metropolis-Hastings algorithm for LD50 (Bayesian MCMC)
+</p>
+
+
+<h3>Value</h3>
+
+<p>A list with resultMCMC being mcmc.list object, resultLnL being likelihoods and parametersMCMC being the parameters used
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Marc Girondot <a href="mailto:marc.girondot@gmail.com">marc.girondot@gmail.com</a>
+</p>
+
+
+<h3>See Also</h3>
+
+<p>Other LD50 functions: 
+<code>LD50()</code>,
+<code>LD50_MHmcmc_p()</code>,
+<code>logLik.LD50()</code>,
+<code>plot.LD50()</code>,
+<code>predict.LD50()</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+library("HelpersMG")
+data &lt;- data.frame(Doses=c(80, 120, 150, 150, 180, 200),
+Alive=c(10, 12, 8, 6, 2, 1),
+Dead=c(0, 1, 5, 6, 9, 15))
+LD50_logistic &lt;- LD50(data, equation="logistic")
+pMCMC &lt;- LD50_MHmcmc_p(LD50_logistic, accept=TRUE)
+# Take care, it can be very long
+result_mcmc_LD50 &lt;- LD50_MHmcmc(result=LD50_logistic, 
+		parametersMCMC=pMCMC, n.iter=10000, n.chains = 1,  
+		n.adapt = 0, thin=1, trace=1000, adaptive=TRUE, )
+# summary() permits to get rapidly the standard errors for parameters
+summary(result_mcmc_LD50)
+plot(x=result_mcmc_LD50, parameters="S", scale.prior=TRUE, las=1)
+plot(result_mcmc_LD50, parameters="S", scale.prior=TRUE, las=1, xlim=c(-20, 20))
+plot(result_mcmc_LD50, parameters="P", scale.prior=TRUE, las=1)
+1-rejectionRate(as.mcmc(result_mcmc_LD50))
+raftery.diag(as.mcmc(result_mcmc_LD50))
+heidel.diag(as.mcmc(result_mcmc_LD50))
+
+#### Example with Uniforms priors
+
+pMCMC &lt;- structure(list(Density = c("dunif", "dunif"), 
+Prior1 = c(77.6216005852911, -31.0438095277258), 
+Prior2 = c(310.486402341165, 31.0438095277258), 
+SDProp = c(2, 0.5), 
+Min = c(77.6216005852911, -31.0438095277258), 
+Max = c(310.486402341165, 31.0438095277258), 
+Init = c(155.243201170582, -15.5219047638629)), 
+row.names = c("P", "S"), class = "data.frame")
+result_mcmc_LD50 &lt;- LD50_MHmcmc(result=LD50_logistic, 
+		parametersMCMC=pMCMC, n.iter=10000, n.chains = 1,  
+		n.adapt = 0, thin=1, trace=1000, adaptive=TRUE, )
+# summary() permits to get rapidly the standard errors for parameters
+summary(result_mcmc_LD50)
+plot(x=result_mcmc_LD50, parameters="S", scale.prior=TRUE, las=1)
+plot(result_mcmc_LD50, parameters="S", scale.prior=TRUE, las=1, xlim=c(-40, 40))
+plot(result_mcmc_LD50, parameters="P", scale.prior=TRUE, las=1)
+1-rejectionRate(as.mcmc(result_mcmc_LD50))
+raftery.diag(as.mcmc(result_mcmc_LD50))
+heidel.diag(as.mcmc(result_mcmc_LD50))
+
+
+## End(Not run)
+</code></pre>
+
+
+</div>

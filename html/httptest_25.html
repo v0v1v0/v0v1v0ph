@@ -1,0 +1,58 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>public</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Test that functions are exported</h2>
+
+<h3>Description</h3>
+
+<p>It's easy to forget to document and export a new function. Using <code>testthat</code>
+for your test suite makes it even easier to forget because it evaluates your
+test code inside the package's namespace, so internal, non-exported functions
+can be accessed. So you might write a new function, get passing tests, and
+then tell your package users about the function, but when they try to run it,
+they get <code style="white-space: pre;">⁠Error: object 'coolNewFunction' not found⁠</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">public(...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table><tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Code to evaluate</p>
+</td>
+</tr></table>
+<h3>Details</h3>
+
+<p>Wrap <code>public()</code> around test blocks to assert that the functions they call
+are exported (and thus fail if you haven't documented them with <code style="white-space: pre;">⁠@export⁠</code>
+or otherwise added them to your package NAMESPACE file).
+</p>
+<p>An alternative way to test that your functions are exported from the package
+namespace is with examples in the documentation, which <code style="white-space: pre;">⁠R CMD check⁠</code> runs
+in the global namespace and would thus fail if the functions aren't exported.
+However, code that calls remote APIs, potentially requiring specific server
+state and authentication, may not be viable to run in examples in
+<code style="white-space: pre;">⁠R CMD check⁠</code>. <code>public()</code> provides a solution that works for these cases
+because you can test your namespace exports in the same place where you are
+testing the code with API mocks or other safe testing contexts.
+</p>
+
+
+<h3>Value</h3>
+
+<p>The result of <code>...</code> evaluated in the global environment (and not
+the package environment).
+</p>
+
+
+</div>

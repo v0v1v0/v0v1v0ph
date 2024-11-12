@@ -1,0 +1,128 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>g_xt</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Computation of a key component for wild bootstrap</h2>
+
+<h3>Description</h3>
+
+<p>Implements a key part for the wild bootstrap of the hqm estimator.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">g_xt(br_X, br_s, size_s_grid, int_X, x, t, b, Yi, Y, n)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>br_X</code></td>
+<td>
+<p>Marker value grid points that will be used in the evaluatiuon.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>br_s</code></td>
+<td>
+<p>Time value grid points that will be used in the evaluatiuon.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>size_s_grid</code></td>
+<td>
+<p>Size of the time grid.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>int_X</code></td>
+<td>
+<p>Position of the linear interpolated marker values on the marker grid.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>Numeric value of the last observed marker value.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>t</code></td>
+<td>
+<p>Numeric value of the time the function should be evaluated.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>b</code></td>
+<td>
+<p>Bandwidth.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Yi</code></td>
+<td>
+<p>A matrix made by <code>make_Yi</code> indicating the exposure. </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Y</code></td>
+<td>
+<p>A matrix made by <code>make_Y</code> indicating the exposure. </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n</code></td>
+<td>
+<p>Number of individuals.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The function implements
+</p>
+<p style="text-align: center;"><code class="reqn">\hat{g}_{t,x}(z) =  \frac{1}{n}  \sum_{ j = 1}^n \int^{T-t}_0 \hat{E}(X_j(t+s))^{-1} K_b(z,X_j(t+s)) Z_j(t+s)Z_j(s)K_b(x,X_j(s))ds,</code>
+</p>
+
+<p>for every value <code class="reqn">z</code> on the marker grid, where <code class="reqn">\hat{E}(x) = \frac{1}{n} \sum_{j=1}^n \int_0^T K_b(x,X_j(s))Z_j(s)ds</code>, <code class="reqn">Z</code> the exposure and <code class="reqn">X</code> the marker.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A vector of <code class="reqn">\hat{g}_{t,x}(z)</code> for all values <code class="reqn">z</code> on the marker grid.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">pbc2_id = to_id(pbc2)
+size_s_grid &lt;- size_X_grid &lt;- 100
+n = max(as.numeric(pbc2$id))
+X = pbc2$serBilir
+s = pbc2$year
+br_s = seq(0, max(s), max(s)/( size_s_grid-1))
+br_X = seq(min(X), max(X), (max(X)-min(X))/( size_X_grid-1))
+
+X_lin = lin_interpolate(br_s, pbc2_id$id, pbc2$id, X, s)
+
+int_X &lt;- findInterval(X_lin, br_X)
+int_s = rep(1:length(br_s), n)
+
+Yi&lt;-make_Yi(pbc2, pbc2_id, X_lin, br_X, br_s, size_s_grid, size_X_grid, int_s, int_X, 'years', n)
+Y&lt;-make_Y(pbc2, pbc2_id, X_lin, br_X, br_s,size_s_grid,size_X_grid, int_s,int_X, 'years', n)
+
+t = 2
+x = 2
+b = 10
+
+g_xt(br_X, br_s, size_s_grid, int_X, x, t, b, Yi, Y, n)
+</code></pre>
+
+
+</div>

@@ -1,0 +1,138 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>vif</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2> Calculate the Variance Inflation Factor </h2>
+
+<h3>Description</h3>
+
+<p>The VIF for predictor <code class="reqn">i</code> is <code class="reqn">1/(1-R_i^2)</code>, where <code class="reqn">R_i^2</code> is the
+<code class="reqn">R^2</code> from a regression of predictor <code class="reqn">i</code> against the remaining
+predictors.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">vif(xx, ...)
+
+## Default S3 method:
+vif(xx, y.name, na.action = na.exclude, ...) ## xx is a data.frame
+
+## S3 method for class 'formula'
+vif(xx, data, na.action = na.exclude, ...)   ## xx is a formula
+
+## S3 method for class 'lm'
+vif(xx, na.action = na.exclude, ...)  ## xx is a "lm" object computed with x=TRUE
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>xx</code></td>
+<td>
+<p><code>data.frame</code>, or <code>formula</code>, or <code>lm</code> object
+computed with <code>x=TRUE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>na.action</code></td>
+<td>
+<p>See
+<code>na.action</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>additional arguments. </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>y.name</code></td>
+<td>
+<p>Name of Y-variable to be excluded from the computations.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>A data frame in which the variables specified in the
+formula will be found. If missing, the variables are searched for in
+the standard way. </p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>A simple diagnostic of collinearity is the
+<em>variance inflation factor, VIF</em>
+one for each regression coefficient (other than the intercept).
+Since the condition of collinearity involves the predictors but not
+the response, this measure is a function of the <code class="reqn">X</code>'s but not of <code class="reqn">Y</code>.
+The VIF for predictor <code class="reqn">i</code> is <code class="reqn">1/(1-R_i^2)</code>, where <code class="reqn">R_i^2</code> is the
+<code class="reqn">R^2</code> from a regression of predictor <code class="reqn">i</code> against the remaining
+predictors.  If <code class="reqn">R_i^2</code> is close to 1, this means that predictor <code class="reqn">i</code>
+is well explained by a linear function of the remaining predictors,
+and, therefore, the presence of predictor <code class="reqn">i</code> in the model is
+redundant.  Values of VIF exceeding 5 are considered evidence of
+collinearity: The information carried by a predictor having such a VIF
+is contained in a subset of the remaining predictors.  If, however,
+all of a model's regression coefficients differ significantly from 0
+(<code class="reqn">p</code>-value <code class="reqn">&lt;</code> .05), a somewhat larger VIF may be tolerable.
+</p>
+
+
+<h3>Value</h3>
+
+<p>Vector of VIF values, one for each X-variable.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p> Richard M. Heiberger &lt;rmh@temple.edu&gt; </p>
+
+
+<h3>References</h3>
+
+<p>Heiberger, Richard M. and Holland, Burt (2015).
+<em>Statistical Analysis and Data Display: An Intermediate Course with Examples in R</em>.
+Second Edition.
+Springer-Verlag, New York.
+<a href="https://link.springer.com/book/10.1007/978-1-4939-2122-5">https://link.springer.com/book/10.1007/978-1-4939-2122-5</a>
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>lm</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(usair)
+
+usair$lnSO2 &lt;- log(usair$SO2)
+usair$lnmfg &lt;- log(usair$mfgfirms)
+usair$lnpopn &lt;- log(usair$popn)
+
+usair.lm &lt;- lm(lnSO2 ~ temp + lnmfg + wind + precip, data=usair, x=TRUE)
+
+vif(usair.lm)  ## the lm object must be computed with x=TRUE
+
+vif(lnSO2 ~ temp + lnmfg + wind + precip, data=usair)
+
+vif(usair)
+
+vif(usair, y.name="lnSO2")
+</code></pre>
+
+
+</div>

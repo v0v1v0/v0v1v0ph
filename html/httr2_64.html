@@ -1,0 +1,112 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>req_oauth_refresh</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>OAuth with a refresh token</h2>
+
+<h3>Description</h3>
+
+<p>Authenticate using a <strong>refresh token</strong>, following the process described in
+<a href="https://datatracker.ietf.org/doc/html/rfc6749#section-6">Section 6 of RFC 6749</a>.
+</p>
+<p>This technique is primarily useful for testing: you can manually retrieve
+a OAuth token using another OAuth flow (e.g. with <code>oauth_flow_auth_code()</code>),
+extract the refresh token from the result, and then save in an environment
+variable for use in automated tests.
+</p>
+<p>When requesting an access token, the server may also return a new refresh
+token. If this happens, <code>oauth_flow_refresh()</code> will warn, and you'll have
+retrieve a new update refresh token and update the stored value. If you find
+this happening a lot, it's a sign that you should be using a different flow
+in your automated tests.
+</p>
+<p>Learn more about the overall OAuth authentication flow in
+<a href="https://httr2.r-lib.org/articles/oauth.html">https://httr2.r-lib.org/articles/oauth.html</a>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">req_oauth_refresh(
+  req,
+  client,
+  refresh_token = Sys.getenv("HTTR2_REFRESH_TOKEN"),
+  scope = NULL,
+  token_params = list()
+)
+
+oauth_flow_refresh(
+  client,
+  refresh_token = Sys.getenv("HTTR2_REFRESH_TOKEN"),
+  scope = NULL,
+  token_params = list()
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>req</code></td>
+<td>
+<p>A httr2 request object.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>client</code></td>
+<td>
+<p>An <code>oauth_client()</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>refresh_token</code></td>
+<td>
+<p>A refresh token. This is equivalent to a password
+so shouldn't be typed into the console or stored in a script. Instead,
+we recommend placing in an environment variable; the default behaviour
+is to look in <code>HTTR2_REFRESH_TOKEN</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>scope</code></td>
+<td>
+<p>Scopes to be requested from the resource owner.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>token_params</code></td>
+<td>
+<p>List containing additional parameters passed to the
+<code>token_url</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p><code>req_oauth_refresh()</code> returns a modified HTTP request that will
+use OAuth; <code>oauth_flow_refresh()</code> returns an oauth_token.
+</p>
+
+
+<h3>See Also</h3>
+
+<p>Other OAuth flows: 
+<code>req_oauth_auth_code()</code>,
+<code>req_oauth_bearer_jwt()</code>,
+<code>req_oauth_client_credentials()</code>,
+<code>req_oauth_password()</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">client &lt;- oauth_client("example", "https://example.com/get_token")
+req &lt;- request("https://example.com")
+req |&gt; req_oauth_refresh(client)
+</code></pre>
+
+
+</div>

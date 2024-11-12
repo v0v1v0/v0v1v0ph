@@ -1,0 +1,152 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hc_boost</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Boost options for highcharter objects</h2>
+
+<h3>Description</h3>
+
+<p>Options for the Boost module. The Boost module allows certain series types
+to be rendered by WebGL instead of the default SVG. This allows hundreds of
+thousands of data points to be rendered in milliseconds. In addition to the
+WebGL rendering it saves time by skipping processing and inspection of the
+data wherever possible. This introduces some limitations to what features are
+available in boost mode. See the docs for
+details.
+In addition to the global boost option, each series has a
+boostThreshold that defines when the
+boost should kick in.
+Requires the modules/boost.js module.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hc_boost(hc, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>hc</code></td>
+<td>
+<p>A <code>highchart</code> <code>htmlwidget</code> object.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Arguments defined in <a href="https://api.highcharts.com/highcharts/boost">https://api.highcharts.com/highcharts/boost</a>.</p>
+</td>
+</tr>
+</table>
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+#  Ex 1
+options(highcharter.rjson = FALSE)
+
+n &lt;- 50000
+
+x &lt;- sin(4 * 2 * pi * seq(n) / n) + rnorm(n) / 10
+
+x &lt;- round(x, 3)
+
+plot(x)
+
+hc1 &lt;- highchart() %&gt;%
+  hc_chart(zoomType = "x") %&gt;%
+  hc_add_series(data = x) %&gt;%
+  hc_title(text = "No boost") %&gt;%
+  hc_boost(
+    enabled = FALSE # Default
+  )
+
+hc1
+
+# Boost is a stripped-down renderer-in-a-module for Highcharts. It bypasses
+# some of the standard Highcharts features (such as animation), and focuses
+# on pushing as many points as possible as quickly as possible.
+
+hc2 &lt;- highchart() %&gt;%
+  hc_chart(zoomType = "x") %&gt;%
+  hc_add_series(data = x) %&gt;%
+  hc_title(text = "With boost") %&gt;%
+  hc_boost(enabled = TRUE)
+
+hc2
+
+
+# # Ex 2
+# library(MASS)
+#
+# n &lt;- 20000
+#
+# sigma &lt;- matrix(c(10,3,3,2),2,2)
+# sigma
+#
+# mvr &lt;- round(mvrnorm(n, rep(c(0, 0)), sigma), 2)
+#
+# vx &lt;- ceiling(1+abs(max(mvr[, 1])))
+# vy &lt;- ceiling(1+abs(max(mvr[, 2])))
+#
+# # unnamed list
+# ds &lt;- list_parse2(as.data.frame(mvr))
+#
+# highchart() %&gt;%
+#   hc_chart(zoomType = "xy") %&gt;%
+#   hc_xAxis(min = -vx, max = vx) %&gt;%
+#   hc_yAxis(min = -vy, max = vy) %&gt;%
+#   hc_add_series(
+#     data = ds, #list
+#     type = "scatter",
+#     name = "A lot of points!",
+#     color = 'rgba(0,0,0,0.1)',
+#     marker = list(radius = 2)
+#     ) %&gt;%
+#   hc_boost(
+#     enabled = TRUE
+#   )
+#
+# dat &lt;- as.data.frame(mvr)
+# names(dat) &lt;- c("x", "y")
+#
+# highchart() %&gt;%
+#   hc_chart(zoomType = "xy") %&gt;%
+#   hc_xAxis(min = -vx, max = vx) %&gt;%
+#   hc_yAxis(min = -vy, max = vy) %&gt;%
+#   hc_add_series(
+#     data = dat,
+#     type = "scatter",
+#     hcaes(x, y),
+#     name = "A lot of points!",
+#     color = 'rgba(0,0,0,0.1)',
+#     marker = list(radius = 2)
+#   ) %&gt;%
+#   hc_boost(enabled = TRUE)
+#
+# # Ex3
+# N &lt;- 1000000
+# n &lt;- 5
+# s &lt;- seq(n)
+# s &lt;- s/(max(s) + min(s))
+# s &lt;- round(s, 2)
+#
+# series &lt;- s %&gt;%
+#   purrr::map(~ stats::arima.sim(round(N/n), model = list(ar = .x)) + .x * n * 20) %&gt;%
+#   purrr::map(as.vector) %&gt;%
+#   purrr::map(round, 2) %&gt;%
+#   purrr::map(~ list(data = .x))
+#
+# highchart() %&gt;%
+#   hc_add_series_list(series) %&gt;%
+#   hc_chart(zoomType = "x") %&gt;%
+#   hc_boost(enabled = TRUE)
+</code></pre>
+
+
+</div>

@@ -1,0 +1,130 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>glhtbf_zgz2017</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Test proposed by Zhou et al. (2017)</h2>
+
+<h3>Description</h3>
+
+<p>Zhou et al. (2017)'s test for general linear hypothesis testing (GLHT) problem for high-dimensional data under heteroscedasticity.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">glhtbf_zgz2017(Y,G,n,p)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>Y</code></td>
+<td>
+<p>A list of <code class="reqn">k</code> data matrices.  The <code class="reqn">i</code>th element represents the data matrix (<code class="reqn">p\times n_i</code>) from the <code class="reqn">i</code>th population with each column representing a <code class="reqn">p</code>-dimensional observation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>G</code></td>
+<td>
+<p>A known full-rank coefficient matrix (<code class="reqn">q\times k</code>) with <code class="reqn">\operatorname{rank}(\boldsymbol{G})&lt; k</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n</code></td>
+<td>
+<p>A vector of <code class="reqn">k</code> sample sizes. The <code class="reqn">i</code>th element represents the sample size of group <code class="reqn">i</code>, <code class="reqn">n_i</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>p</code></td>
+<td>
+<p>The dimension of data.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Suppose we have the following <code class="reqn">k</code> independent high-dimensional samples:
+</p>
+<p style="text-align: center;"><code class="reqn">
+\boldsymbol{y}_{i1},\ldots,\boldsymbol{y}_{in_i}, \;\operatorname{are \; i.i.d. \; with}\; \operatorname{E}(\boldsymbol{y}_{i1})=\boldsymbol{\mu}_i,\; \operatorname{Cov}(\boldsymbol{y}_{i1})=\boldsymbol{\Sigma}_i,i=1,\ldots,k.
+</code>
+</p>
+
+<p>It is of interest to test the following GLHT problem:
+</p>
+<p style="text-align: center;"><code class="reqn">H_0: \boldsymbol{G M}=\boldsymbol{0}, \quad \text { vs. } H_1: \boldsymbol{G M} \neq \boldsymbol{0},</code>
+</p>
+
+<p>where
+<code class="reqn">\boldsymbol{M}=(\boldsymbol{\mu}_1,\ldots,\boldsymbol{\mu}_k)^\top</code> is a <code class="reqn">k\times p</code> matrix collecting <code class="reqn">k</code> mean vectors and <code class="reqn">\boldsymbol{G}:q\times k</code> is a known full-rank coefficient matrix with <code class="reqn">\operatorname{rank}(\boldsymbol{G})&lt;k</code>.
+</p>
+<p>Let  <code class="reqn">\bar{\boldsymbol{y}}_{i},i=1,\ldots,k</code> be the sample mean vectors and <code class="reqn">\hat{\boldsymbol{\Sigma}}_i,i=1,\ldots,k</code> be the sample covariance matrices.
+</p>
+<p>Zhou et al. (2017) proposed the following U-statistic based test statistic:
+</p>
+<p style="text-align: center;"><code class="reqn">
+T_{ZGZ}=\|\boldsymbol{C \hat{\mu}}\|^2-\sum_{i=1}^k h_{ii}\operatorname{tr}(\hat{\boldsymbol{\Sigma}}_i)/n_i,
+</code>
+</p>
+
+<p>where <code class="reqn">\boldsymbol{C}=[(\boldsymbol{G D G}^\top)^{-1/2}\boldsymbol{G}]\otimes\boldsymbol{I}_p</code>, <code class="reqn">\boldsymbol{D}=\operatorname{diag}(1/n_1,\ldots,1/n_k)</code>, and <code class="reqn">h_{ij}</code> is the <code class="reqn">(i,j)</code>th entry of the <code class="reqn">k\times k</code> matrix <code class="reqn">\boldsymbol{H}=\boldsymbol{G}^\top(\boldsymbol{G}\boldsymbol{D}\boldsymbol{G}^\top)^{-1}\boldsymbol{G}</code>.
+</p>
+<p>They showed that under the null hypothesis, <code class="reqn">T_{ZGZ}</code> is asymptotically normally distributed.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A  (list) object of  <code>S3</code> class <code>htest</code>  containing the following elements:
+</p>
+
+<dl>
+<dt>statistic</dt>
+<dd>
+<p>the test statistic proposed by Zhou et al. (2017).</p>
+</dd>
+<dt>p.value</dt>
+<dd>
+<p>the <code class="reqn">p</code>-value of the test proposed by Zhou et al. (2017).</p>
+</dd>
+</dl>
+<h3>References</h3>
+
+<p>Zhou B, Guo J, Zhang J (2017).
+“High-dimensional general linear hypothesis testing under heteroscedasticity.”
+<em>Journal of Statistical Planning and Inference</em>, <b>188</b>, 36–54.
+<a href="https://doi.org/10.1016/j.jspi.2017.03.005">doi:10.1016/j.jspi.2017.03.005</a>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">set.seed(1234)
+k &lt;- 3
+p &lt;- 50
+n &lt;- c(25, 30, 40)
+rho &lt;- 0.1
+M &lt;- matrix(rep(0, k * p), nrow = k, ncol = p)
+avec &lt;- seq(1, k)
+Y &lt;- list()
+for (g in 1:k) {
+  a &lt;- avec[g]
+  y &lt;- (-2 * sqrt(a * (1 - rho)) + sqrt(4 * a * (1 - rho) + 4 * p * a * rho)) / (2 * p)
+  x &lt;- y + sqrt(a * (1 - rho))
+  Gamma &lt;- matrix(rep(y, p * p), nrow = p)
+  diag(Gamma) &lt;- rep(x, p)
+  Z &lt;- matrix(rnorm(n[g] * p, mean = 0, sd = 1), p, n[g])
+  Y[[g]] &lt;- Gamma %*% Z + t(t(M[g, ])) %*% (rep(1, n[g]))
+}
+G &lt;- cbind(diag(k - 1), rep(-1, k - 1))
+glhtbf_zgz2017(Y, G, n, p)
+
+</code></pre>
+
+
+</div>

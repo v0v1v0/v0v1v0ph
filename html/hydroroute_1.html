@@ -1,0 +1,176 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>estimate_AE</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Estimate Associated Events</h2>
+
+<h3>Description</h3>
+
+<p>For two neighboring stations, potential associated
+events (AEs) are determined according to the time lag and
+metric (amplitude) difference allowed. For all potential AEs,
+parabolas are fitted to the histogram obtained for the relative
+difference in amplitude binned into intervals from -1 to 1 of
+width 0.1 by fixing the vertex at the inner maximum of the
+histogram and the width is determined by minimizing the average
+squared distances between the parabola and the histogram data
+along arbitrary symmetric ranges from the inner maximum.  Based
+on the fitted parabola, cut points with the x-axis are
+determined such that only those potential AEs are retained
+where the relative difference is within these cut points. If
+this automatic scheme does not succeed to determine suitable
+cut points, e.g., because the estimated cut points are outside
+-1 and 1, then a strict criterion for the relative difference
+in amplitude is imposed to identify AEs considering only
+deviations of at most 10%.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">estimate_AE(
+  Sx,
+  Sy,
+  relation,
+  timeLag = c(1, 1, 1),
+  metricLag = c(1, 1),
+  unique = c("time", "metric"),
+  TimeFormat = "%Y-%m-%d %H:%M",
+  tz = "Etc/GMT-1",
+  settings = NULL
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>Sx</code></td>
+<td>
+<p>Data frame that consists of flow fluctuation events and
+computed metrics (see
+<code>hydropeak::get_events()</code>) of
+an upstream hydrograph <code class="reqn">S_{x}</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Sy</code></td>
+<td>
+<p>Data frame that consists of flow fluctuation events and
+computed metrics (see
+<code>hydropeak::get_events()</code>) of
+a downstream hydrograph <code class="reqn">S_{y}</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>relation</code></td>
+<td>
+<p>Data frame that contains the relation between
+upstream and downstream hydrograph. Must only contain two rows
+(one for each hydrograph) in order of their location in
+downstream direction.  See the appended example data
+<code>relation.csv</code> or the vignette for details on the
+structure. See <code>get_lag()</code> for further
+information about the relation and the lag between the
+hydrographs.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>timeLag</code></td>
+<td>
+<p>Numeric vector specifying factors to alter the
+interval to capture events from the downstream hydrograph. By
+default it is <code>timeLag = c(1, 1, 1)</code>, this refers to
+matches within a time slot <code class="reqn">\pm</code> the mean translation time
+from <code>relation</code>. For exact time matches, <code>timeLag =
+c(0, 1, 0)</code> must be specified.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>metricLag</code></td>
+<td>
+<p>Numeric vector specifying factors to alter the
+interval of relative metric deviations to capture events from
+the downstream hydrograph. By default. it is <code>metricLag =
+c(1, 1)</code>, such that events are filtered where the amplitude at
+<code class="reqn">S_{y}</code> is at least 0, i.e., amplitude at <code class="reqn">S_{x} -
+1 \cdot</code> amplitude at <code class="reqn">S_{x}</code>, and at most two times
+the amplitude at <code class="reqn">S_{x}</code>, i.e., <code class="reqn">S_{x} + 1 \cdot</code>
+amplitude at <code class="reqn">S_{x}</code>.  For exact matches,
+<code>metricLag = c(0, 0)</code> must be specified.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>unique</code></td>
+<td>
+<p>Character string specifying if the potential AEs which
+meet the <code>timeLag</code> and <code>metricLag</code> condition should
+be filtered to contain only unique events using <code>"time"</code>,
+i.e., by selecting those where the time difference is smallest
+compared to the specified factor of the mean translation time, or using
+<code>"metric"</code>, i.e., by selecting those where the relative
+difference in amplitude is smallest (default: <code>"time"</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>TimeFormat</code></td>
+<td>
+<p>Character string giving the date-time format of
+the date-time column in the input data frame (default:
+"%Y-%m-%d %H:%M").</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tz</code></td>
+<td>
+<p>Character string specifying the time zone to be used for
+the conversion (default: "Etc/GMT-1").</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>settings</code></td>
+<td>
+<p>Data.frame with 3 rows and columns
+<code>station.x</code>, <code>station.y</code>, <code>bound</code>, <code>lag</code>,
+<code>metric</code>. <code>lag</code> needs to correspond to the unique
+value specified in argument <code>timeLag</code> and <code>bound</code>
+needs to contain <code>"lower"</code>, <code>"inner"</code>,
+<code>"upper"</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A nested list containing the estimated settings, the
+histogram obtained for the relative difference data with
+estimated cut points, and the obtained “real” AEs.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># file paths
+Sx &lt;- system.file("testdata", "Events", "100000_2_2014-01-01_2014-02-28.csv",
+                  package = "hydroroute")
+Sy &lt;- system.file("testdata", "Events", "200000_2_2014-01-01_2014-02-28.csv",
+                  package = "hydroroute")
+relation &lt;- system.file("testdata", "relation.csv", package = "hydroroute")
+
+# read data
+Sx &lt;- utils::read.csv(Sx)
+Sy &lt;- utils::read.csv(Sy)
+relation &lt;- utils::read.csv(relation)
+relation &lt;- relation[1:2, ]
+
+# estimate AE, exact time matches
+results &lt;- estimate_AE(Sx, Sy, relation, timeLag = c(0, 1, 0))
+results$settings
+results$plot_threshold
+results$real_AE
+</code></pre>
+
+
+</div>

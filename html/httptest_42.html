@@ -1,0 +1,66 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>with_fake_http</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Make all HTTP requests return a fake response</h2>
+
+<h3>Description</h3>
+
+<p>In this context, HTTP verb functions raise a 'message' so that test code can
+assert that the requests are made. As in <code>without_internet()</code>, the message
+raised has a well-defined shape, made of three
+elements, separated by space: (1) the request
+method (e.g. "GET" or "POST"); (2) the request URL; and
+(3) the request body, if present. The verb-expectation functions,
+such as <code>expect_GET</code> and <code>expect_POST</code>, look for this shape.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">with_fake_http(expr)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table><tr style="vertical-align: top;">
+<td><code>expr</code></td>
+<td>
+<p>Code to run inside the fake context</p>
+</td>
+</tr></table>
+<h3>Details</h3>
+
+<p>Unlike <code>without_internet</code>,
+the HTTP functions do not error and halt execution, instead returning a
+<code>response</code>-class object so that code calling the HTTP functions can
+proceed with its response handling logic and itself be tested. The response
+it returns echoes back most of the request itself, similar to how some
+endpoints on <a href="http://httpbin.org">http://httpbin.org</a> do.
+</p>
+
+
+<h3>Value</h3>
+
+<p>The result of <code>expr</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">with_fake_http({
+  expect_GET(req1 &lt;- httr::GET("http://example.com"), "http://example.com")
+  req1$url
+  expect_POST(
+    req2 &lt;- httr::POST("http://example.com", body = '{"a":1}'),
+    "http://example.com"
+  )
+  httr::content(req2)
+})
+</code></pre>
+
+
+</div>

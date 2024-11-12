@@ -1,0 +1,130 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hypr</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Create a hypr object</h2>
+
+<h3>Description</h3>
+
+<p>Use this function to create hypr objects from null hypothesis equations. Each argument should be one equation. For example, a null hypothesis for the grand mean (GM), often used as the intercept, is usually coded as <code>mu~0</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hypr(
+  ...,
+  levels = NULL,
+  add_intercept = FALSE,
+  remove_intercept = FALSE,
+  order_levels = missing(levels)
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>A list of null hypothesis equations</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>levels</code></td>
+<td>
+<p>(Optional) A list of terms/levels to use. If supplied, matrix rows/columns will be in this order. An error will be thrown if an equation contains a level that is not in this vector.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>add_intercept</code></td>
+<td>
+<p>If <code>TRUE</code>, an intercept will be added</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>remove_intercept</code></td>
+<td>
+<p>If <code>TRUE</code>, an intercept will be dropped</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>order_levels</code></td>
+<td>
+<p>(Optional) Whether to order the rows/columns of the hypothesis/contrast matrices alphabetically. Default is <code>TRUE</code> if <code>levels</code> were not explicitly provided.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>You may call the function without any arguments. In that case, an empty hypr object is returned. This is useful if you want to derive equations from a known hypothesis matrix or contrast matrix.
+</p>
+<p>Basic specification of contrasts in R is accomplished with basic R functions <code>stats::contrasts()</code> and <code>stats::C()</code> (Chambers &amp; Hastie, 1992). Other relevant packages for this topic are <code>multcomp</code> (Bretz et al., 2010), <code>contrast</code> (Kuhn et al., 2016), and, including also various vignettes, <code>emmeans</code> (Lenth, 2019).
+</p>
+
+
+<h3>Value</h3>
+
+<p>A <code>hypr</code> object
+</p>
+
+
+<h3>References</h3>
+
+<p>Chambers, J. M. and Hastie, T. J. (1992) <em>Statistical models</em>. Chapter 2 of <em>Statistical Models</em> in S eds J. M. Chambers and T. J. Hastie, Wadsworth &amp; Brooks/Cole.
+</p>
+<p>Frank Bretz, Torsten Hothorn and Peter Westfall (2010), <em>Multiple Comparisons Using R</em>, CRC Press, Boca Raton.
+</p>
+<p>Max Kuhn, contributions from Steve Weston, Jed Wing, James Forester and Thorn Thaler (2016). <em>contrast: A Collection of Contrast Methods</em>. R package version 0.21. <a href="https://CRAN.R-project.org/package=contrast">https://CRAN.R-project.org/package=contrast</a>
+</p>
+<p>Lenth, R. (2019). <em>emmeans: Estimated Marginal Means, aka Least-Squares Means</em>. R package version 1.4.1. <a href="https://CRAN.R-project.org/package=emmeans">https://CRAN.R-project.org/package=emmeans</a>
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>contrasts</code> and <code>C</code> for basic specification of contrasts in R, S4 class <code>hypr</code>, <code>cmat</code>, <code>contr.hypothesis</code> for retrieval of contrast matrices from <code>hypr</code> objects
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+# Create an empty hypr object (no hypotheses):
+h &lt;- hypr()
+
+# Treatment contrast:
+h &lt;- hypr(mu1~0, mu2~mu1, mu3~mu1, mu4~mu1)
+
+# Identical version:
+h &lt;- hypr(~mu1, ~mu2-mu1, ~mu3-mu1, ~mu4-mu1)
+
+contr.hypothesis(h)
+
+
+# Generate a dataset
+set.seed(123)
+M &lt;- c(mu1 = 10, mu2 = 20, mu3 = 10, mu4 = 40) # condition means
+N &lt;- 5 # number of observations per condition
+SD &lt;- 10 # residual SD
+simdat &lt;- do.call(rbind, lapply(names(M), function(x) {
+  data.frame(X = x, DV = as.numeric(MASS::mvrnorm(N, unname(M[x]), SD^2, empirical = TRUE)))
+}))
+simdat$X &lt;- factor(simdat$X, levels=levels(h))
+simdat
+
+# Check agreement of hypothesis levels and factor levels
+stopifnot(levels(h) == levels(simdat$X))
+
+# Linear regression
+contrasts(simdat$X) &lt;- contr.hypothesis(h)
+
+round(coef(summary(lm(DV ~ X, data=simdat))),3)
+
+</code></pre>
+
+
+</div>

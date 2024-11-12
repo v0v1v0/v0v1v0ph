@@ -1,0 +1,91 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>weight_data</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Abundance weighting and prior  of data for hypervolume input
+</h2>
+
+<h3>Description</h3>
+
+<p>Resamples input data for hypervolume construction, so that some data points can be weighted more strongly than others in kernel density estimation. Also allows a multidimensional normal prior distribution to be placed on each data point to enable simulation of uncertainty or variation within each observed data point. 
+</p>
+<p>Note that this algorithm will change the number of data points and may thus lead to changes in the inferred hypervolume if the selected algorithm (e.g. for bandwidth selection) depends on sample size.
+</p>
+<p>A direct weighting approach (which does not artificially change the sample size, and thus the kernel bandwidth estimate) is available for Gaussian hypervolumes within <code>hypervolume_gaussian</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">weight_data(data, weights, jitter.sd = matrix(0, nrow = nrow(data), ncol = ncol(data)))
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+
+<p>A data frame or matrix of unweighted data. Must only contain numeric values.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>weights</code></td>
+<td>
+
+<p>A vector of weights with the same length as the number of rows in <code>data</code>. All values must take positive integer values.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>jitter.sd</code></td>
+<td>
+
+<p>A matrix of the same size as <code>data</code> corresponding to the standard deviation of a normal distribution with mean equal to that of the observed data. If a vector of length equal to 1 or the number of columns of <code>data</code>, is repeated for all observations.
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Each data point is jittered a single time. To sample many points from a distribution around each observed data point, multiply all weights by a large number.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A data frame with the rows of <code>data</code> repeated by <code>weights</code>, potentially with noise added. The output has the same columns as the input but <code>sum(weights)</code> total rows.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>hypervolume_gaussian</code></p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(penguins,package='palmerpenguins')
+penguins_no_na = as.data.frame(na.omit(penguins))
+penguins_adelie = penguins_no_na[penguins_no_na$species=="Adelie",
+                    c("bill_length_mm","bill_depth_mm","flipper_length_mm")]
+
+weighted_data &lt;- weight_data(penguins_adelie,
+  weights=1+rpois(n=nrow(penguins_adelie),lambda=3))
+# color points by alpha to show overlaps
+pairs(weighted_data,col=rgb(1,0,0,alpha=0.15)) 
+
+weighted_noisy_data &lt;- weight_data(penguins_adelie,
+  weights=1+rpois(n=nrow(penguins_adelie),lambda=3),jitter.sd=0.5)
+# color points by alpha to show overlaps
+pairs(weighted_noisy_data,col=rgb(1,0,0,alpha=0.15)) 
+</code></pre>
+
+
+</div>

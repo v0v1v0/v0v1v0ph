@@ -1,0 +1,147 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>calcAccuracy</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Calculate the accuracy of an index</h2>
+
+<h3>Description</h3>
+
+<p>Estimate index accuracy using one of a variety of approaches
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">calcAccuracy(hpi_obj, test_method = "insample", test_type = "rt",
+  pred_df = NULL, smooth = FALSE, in_place = FALSE,
+  in_place_name = "accuracy", ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>hpi_obj</code></td>
+<td>
+<p>Object of class 'hpi'</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>test_method</code></td>
+<td>
+<p>default = 'insample'; Also 'kfold'</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>test_type</code></td>
+<td>
+<p>default = 'rt'; Type of data to use for test.  See details.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pred_df</code></td>
+<td>
+<p>default = NULL; Extra data if the test_type doesn't match data in hpi_obj</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>smooth</code></td>
+<td>
+<p>default = FALSE; calculated on the smoothed index(es)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>in_place</code></td>
+<td>
+<p>default = FALSE; Should the result be returned into an existing 'hpi' object</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>in_place_name</code></td>
+<td>
+<p>default = 'accuracy'; Name for returning in place</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Additional Arguments</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>object of class 'hpiaccuracy' inheriting from class 'data.frame' containing
+the following fields:
+</p>
+
+<dl>
+<dt>prop_id</dt>
+<dd>
+<p>Property Identification number</p>
+</dd>
+<dt>price</dt>
+<dd>
+<p>Transaction Price</p>
+</dd>
+<dt>pred_price</dt>
+<dd>
+<p>Predicted price</p>
+</dd>
+<dt>error</dt>
+<dd>
+<p>(Prediction - Actual) / Actual</p>
+</dd>
+<dt>log_error</dt>
+<dd>
+<p>log(prediction) - log(actual)</p>
+</dd>
+<dt>pred_period</dt>
+<dd>
+<p>Period of the prediction</p>
+</dd>
+</dl>
+<h3>Further Details</h3>
+
+<p>'rt' test type tests the ability of the index to correctly predict the second value in
+a repeat transaction pair
+FUTURE: 'hed' test type tests the ability of the index to improve an OLS model that
+doesn't account for time.
+(This approach is not ready yet).
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+ # Load Data
+ data(ex_sales)
+
+ # Create Index
+ rt_index &lt;- rtIndex(trans_df = ex_sales,
+                     periodicity = 'monthly',
+                     min_date = '2010-06-01',
+                     max_date = '2015-11-30',
+                     adj_type = 'clip',
+                     date = 'sale_date',
+                     price = 'sale_price',
+                     trans_id = 'sale_id',
+                     prop_id = 'pinx',
+                     estimator = 'robust',
+                     log_dep = TRUE,
+                     trim_model = TRUE,
+                     max_period = 48,
+                     smooth = FALSE)
+
+ # Calculate insample accuracy
+ hpi_accr &lt;- calcAccuracy(hpi_obj = rt_index,
+                          test_type = 'rt',
+                          test_method = 'insample')
+
+</code></pre>
+
+
+</div>

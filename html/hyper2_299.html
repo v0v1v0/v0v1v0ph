@@ -1,0 +1,124 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>ordertable</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Order tables</h2>
+
+<h3>Description</h3>
+
+<p>Order tables</p>
+
+
+<h3>Details</h3>
+
+<p>The package makes extensive use of order tables and these are discussed
+here together with a list of order tables available in the package as
+data.  See also <code>ranktable.Rd</code>.
+</p>
+<p>Consider <code>pentathlon_table</code>:
+</p>
+<pre>
+ &gt; pentathlon_table
+              shooting fencing swimming riding running
+Moiseev              5       1        1      6       5
+Zadneprovskis        6       2        5      5       1
+Capalini             4       6        2      3       4
+Cerkovskis           3       3        7      7       2
+Meliakh              1       7        4      1       6
+Michalik             2       4        6      2       7
+Walther              7       5        3      4       3
+</pre>
+<p>Although <code>pentathlon_table</code> is a dataset in the package, the source
+dataset is also included in the <code>inst/</code> directory as file
+<code>pentathlon.txt</code>; use idiom like
+<code>read.table("inst/pentathlon.txt")</code> to load the order table.
+</p>
+<p>Object <code>pentathlon_table</code> is a representative example of an
+ordertable.  Each row is a competitor, each column an event (venue,
+judge, ...).  The first row shows Moiseev's ranking in shooting
+(5th), fencing (1st), and so on.  The first column shows the ranks of
+the competitors in shooting.  Thus Moiseev came fifth, Zadneprovskis
+came 6th, and so on.
+</p>
+<p>However, to create a likelihood function we need ranks, not orders.  We
+need to know, for a given event, who came first, who came second, and so
+on (an extended discussion on the difference between rank and order is
+given at rrank).  We can convert from an order table to a rank
+table using <code>ordertable_to_ranktable()</code> (see also
+<code>ranktable.Rd</code>):
+</p>
+<pre>
+&gt; ordertable_to_ranktable(pentathlon_table)
+         c1            c2            c3         c4       c5           
+shooting Meliakh       Michalik      Cerkovskis Capalini Moiseev      
+fencing  Moiseev       Zadneprovskis Cerkovskis Michalik Walther      
+swimming Moiseev       Capalini      Walther    Meliakh  Zadneprovskis
+riding   Meliakh       Michalik      Capalini   Walther  Zadneprovskis
+running  Zadneprovskis Cerkovskis    Walther    Capalini Moiseev      
+         c6            c7        
+shooting Zadneprovskis Walther   
+fencing  Capalini      Meliakh   
+swimming Michalik      Cerkovskis
+riding   Moiseev       Cerkovskis
+running  Meliakh       Michalik  
+</pre>
+<p>Above, we see the same data in a different format (an extended
+discussion on the difference between rank and order is given in
+rrank).
+</p>
+<p>Many of the order tables in the package include entries that correspond
+to some variation on “did not finish”.  Consider the volvo
+dataset:
+</p>
+<pre>
+&gt; volvo_table_2014
+           leg1 leg2 leg3 leg4 leg5 leg6 leg7 leg8 leg9
+AbuDhabi      1    3    2    2    1    2    5    3    5
+Brunel        3    1    5    5    4    3    1    5    2
+Dongfeng      2    2    1    3  DNF    1    4    7    4
+MAPFRE        7    4    4    1    2    4    2    4    3
+Alvimedica    5    5    3    4    3    5    3    6    1
+SCA           6    6    6    6    5    6    6    1    7
+Vestas        4  DNF  DNS  DNS  DNS  DNS  DNS    2    6
+</pre>
+<p>In the above order table, we have <code>DNF</code> for “did not finish”
+and <code>DNS</code> for “did not start”.  The <code>formula1</code> order
+table has other similar entries such as <code>DSQ</code> for
+“disqualified” and a discussion is given at
+<code>ordertable2supp.Rd</code>.
+</p>
+<p>Links are given below to all the order tables in the package.  Note that
+the table in <code>inst/eurovision.Rmd</code> (<code>wiki_matrix</code>) is not an
+order table because no country is allowed to vote for itself.
+</p>
+<p>To coerce a table like the Volvo dataset shown above into an order table
+[that is, replace <code>DNS</code> with zeros, and also force nonzero entries
+to be contiguous], use <code>as.ordertable()</code>.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Robin K. S Hankin</p>
+
+
+<h3>See Also</h3>
+
+<p><code>ordertable2supp</code>,<code>rrank</code>,
+<code>ranktable</code>,<code>as.ordertable</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+ordertable_to_ranktable(soling_table)
+ordertable2supp(soling_table) == soling  # should be TRUE
+
+
+</code></pre>
+
+
+</div>

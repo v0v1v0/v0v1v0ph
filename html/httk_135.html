@@ -1,0 +1,123 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>load_pradeep2020</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Load CLint and Fup QSPR predictions predictions from Pradeep et al. 2020.</h2>
+
+<h3>Description</h3>
+
+<p>This function returns an updated version of 
+<code>chem.physical_and_invitro.data</code>
+that includes quantitative 
+structure-property relationship (QSPR) predictions from
+Support Vector Machine and Random Forest 
+models developed and presented in Pradeep et al. 2020, included in
+<code>pradeep2020</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">load_pradeep2020(overwrite = FALSE, target.env = .GlobalEnv)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>overwrite</code></td>
+<td>
+<p>Only matters if load.image=FALSE. If overwrite=TRUE then
+existing data in chem.physical_and_invitro.data will be replaced by any
+predictions in Pradeep et al. (2020) that is for the same chemical and
+property. If overwrite=FALSE (DEFAULT) then new data for the same chemical
+and property are ignored.  Funbound.plasma values of 0 (below limit of
+detection) are overwritten either way.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>target.env</code></td>
+<td>
+<p>The environment where the new
+<code>chem.physical_and_invitro.data</code> is loaded. Defaults to global environment.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Because Clint and Fup are the only measurements required for many HTTK models,
+changing the number of chemicals for which a value is available will change 
+the number of chemicals which are listed with the <code>get_cheminfo</code>
+command. Use the command <code>reset_httk</code> to return to the initial 
+(measured only) <code>chem.physical_and_invitro.data</code> (for all
+parameters).
+</p>
+
+
+<h3>Value</h3>
+
+<table><tr style="vertical-align: top;">
+<td><code>data.frame</code></td>
+<td>
+<p>An updated version of
+<code>chem.physical_and_invitro.data</code>.</p>
+</td>
+</tr></table>
+<h3>Author(s)</h3>
+
+<p>Sarah E. Davidson
+</p>
+
+
+<h3>References</h3>
+
+<p>Pradeep P, Patlewicz G, Pearce R, Wambaugh J, Wetmore B, Judson R (2020).
+“Using chemical structure information to develop predictive models for in vitro toxicokinetic parameters to inform high-throughput risk-assessment.”
+<em>Computational Toxicology</em>, <b>16</b>, 100136.
+ISSN 2468-1113, <a href="https://doi.org/10.1016/j.comtox.2020.100136">doi:10.1016/j.comtox.2020.100136</a>, <a href="https://doi.org/https://doi.org/10.1016/j.comtox.2020.100136">https://doi.org/https://doi.org/10.1016/j.comtox.2020.100136</a>.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>reset_httk</code>
+</p>
+<p><code>get_cheminfo</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+
+# Count how many chemicals for which HTTK is available without the QSPR:
+num.chems &lt;- length(get_cheminfo())
+print(num.chems)
+
+# For chemicals with Pradeep et al. (2020) Clint and Fup QSPR predictions, 
+# add them to our chemical information wherever measured values are 
+# unavailable:
+load_pradeep2020()
+
+# Or, for chemicals with Pradeep et al. (2020) QSPR predictions, add them to
+# our chemical information but overwrite measured values where we had them:
+load_pradeep2020(overwrite=TRUE) 
+
+# Let's see how many chemicals we have now with the Pradeep et al. (2020)
+# predictions data loaded:
+length(get_cheminfo())
+
+# Now let us reset the chemical data to the initial version:
+reset_httk()
+
+# We should be back to our original number:
+num.chems == length(get_cheminfo())
+                        
+
+</code></pre>
+
+
+</div>

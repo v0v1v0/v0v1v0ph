@@ -1,0 +1,101 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>plot.ResScanOutput</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Schema or map of the clusters</h2>
+
+<h3>Description</h3>
+
+<p>This function plots a schema or a map of the sites and the clusters
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">## S3 method for class 'ResScanOutput'
+plot(
+  x,
+  type,
+  spobject = NULL,
+  system_conv = NULL,
+  colors = "red",
+  only.MLC = FALSE,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>ResScanOutput. Output of a scan function (UG, UNP, MG, MNP, PFSS, DFFSS, URBFSS, NPFSS, MPFSS, MDFFSS or MRBFSS)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>type</code></td>
+<td>
+<p>character. Type of plot: "schema", "map" (the clusters are represented by circles) or "map2" (the clusters are colored on the map)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>spobject</code></td>
+<td>
+<p>SpObject. SpatialObject with the same coordinates system the one used for the scan. Only considered if type is "map" or "map2"</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>system_conv</code></td>
+<td>
+<p>character. System to convert the coordinates for the plot. Only considered if the system used in the scan was "WGS84" and if type is "schema". Else it will be ignored. Must be entered as in the PROJ.4 documentation</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>colors</code></td>
+<td>
+<p>character. Colors of the clusters. If length(colors)=1 all the clusters will be in this color. Else it should be a vector of length the number of clusters to plot.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>only.MLC</code></td>
+<td>
+<p>logical. Should we plot only the MLC or all the significant clusters?</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Further arguments to be passed to or from methods.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>No value returned, plots a schema or a map of the sites and the clusters.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+library(sp)
+data("map_sites")
+data("funi_data")
+coords &lt;- coordinates(map_sites)
+
+res_npfss &lt;- SpatialScan(method = "NPFSS", data = funi_data, sites_coord = coords,
+system = "WGS84", mini = 1, maxi = nrow(coords)/2)$NPFSS
+
+plot(x = res_npfss, type = "schema", system_conv = "+init=epsg:2154")
+plot(x = res_npfss, type = "map", spobject = map_sites)
+plot(x = res_npfss, type = "map2", spobject = map_sites)
+
+
+</code></pre>
+
+
+</div>

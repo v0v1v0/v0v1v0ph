@@ -1,0 +1,111 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hai_kmeans_user_item_tbl</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>K-Means User Item Tibble</h2>
+
+<h3>Description</h3>
+
+<p>Takes in a data.frame/tibble and transforms it into an aggregated/normalized
+user-item tibble of proportions. The user will need to input the parameters
+for the rows/user and the columns/items.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hai_kmeans_user_item_tbl(.data, .row_input, .col_input, .record_input)
+
+kmeans_user_item_tbl(.data, .row_input, .col_input, .record_input)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>.data</code></td>
+<td>
+<p>The data that you want to transform</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.row_input</code></td>
+<td>
+<p>The column that is going to be the row (user)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.col_input</code></td>
+<td>
+<p>The column that is going to be the column (item)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.record_input</code></td>
+<td>
+<p>The column that is going to be summed up for the aggregation
+and normalization process.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>This function should be used before using a k-mean model. This is
+commonly referred to as a user-item matrix because "users" tend to be on the
+rows and "items" (e.g. orders) on the columns. You must supply a column that
+can be summed for the aggregation and normalization process to occur.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A aggregated/normalized user item tibble
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Steven P. Sanderson II, MPH
+</p>
+
+
+<h3>See Also</h3>
+
+<p>Other Kmeans: 
+<code>hai_kmeans_automl()</code>,
+<code>hai_kmeans_automl_predict()</code>,
+<code>hai_kmeans_mapped_tbl()</code>,
+<code>hai_kmeans_obj()</code>,
+<code>hai_kmeans_scree_data_tbl()</code>,
+<code>hai_kmeans_scree_plt()</code>,
+<code>hai_kmeans_tidy_tbl()</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">library(healthyR.data)
+library(dplyr)
+
+data_tbl &lt;- healthyR_data %&gt;%
+  filter(ip_op_flag == "I") %&gt;%
+  filter(payer_grouping != "Medicare B") %&gt;%
+  filter(payer_grouping != "?") %&gt;%
+  select(service_line, payer_grouping) %&gt;%
+  mutate(record = 1) %&gt;%
+  as_tibble()
+
+hai_kmeans_user_item_tbl(
+  .data = data_tbl,
+  .row_input = service_line,
+  .col_input = payer_grouping,
+  .record_input = record
+)
+
+</code></pre>
+
+
+</div>

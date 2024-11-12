@@ -1,0 +1,91 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>restrict_n</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Remove or flag groups with n less than some number</h2>
+
+<h3>Description</h3>
+
+<p>Remove or flags groups or clients that have less than some number of rows or some number of distinct values in a variable. For example, it can be used to remove clients that had less than n visits to some service on different dates from some administrative records. It offers filtering with <code>dplyr::n_distinct()</code> functionality for database input.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">restrict_n(
+  data,
+  clnt_id,
+  n_per_clnt,
+  count_by = NULL,
+  mode = c("flag", "filter"),
+  verbose = getOption("healthdb.verbose")
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>Data.frames or remote tables (e.g., from <code>dbplyr::tbl_sql()</code>)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>clnt_id</code></td>
+<td>
+<p>Grouping variable (quoted/unquoted).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n_per_clnt</code></td>
+<td>
+<p>A single number specifying the minimum number of group size.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>count_by</code></td>
+<td>
+<p>Another variable dictating the counting unit of <code>n_per_clnt.</code> The default is NULL meaning the inclusion criteria is the number of row, i.e., <code>dplyr::n() &gt;= n_per_clnt</code>. If it is not NULL, the criteria becomes equivalent to <code>dplyr::n_distinct(count_by) &gt;= n_per_clnt</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mode</code></td>
+<td>
+<p>Either "flag" - add a new column 'flag_restrict_n' indicating if the client met the condition (all rows from a qualified client would have flag = 1), or "filter" - remove clients that did not meet the condition from the data. Default is "flag".</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p>A logical for whether to explain the query and report how many groups were removed. Default is fetching from options. Use <code>options(healthdb.verbose = FALSE)</code> to suppress once and for all. Reporting is not for remote tables as the query is not executed immediately, thus no result is available for summary without adding an extra run (may be slow) of the query.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A subset of input data satisfied the group size requirement, or raw input data with an new flag column.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>dplyr::n()</code>, <code>dplyr::n_distinct()</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># flag cyl groups with less than 8 cars
+restrict_n(mtcars, clnt_id = cyl, n_per_clnt = 8, mode = "flag") %&gt;%
+head()
+
+#remove cyl groups with less than 2 types of gear boxes
+restrict_n(mtcars, clnt_id = cyl, n_per_clnt = 3, count_by = gear, mode = "filter")
+</code></pre>
+
+
+</div>

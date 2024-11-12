@@ -1,0 +1,218 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>Kii</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Tremor data in the Kii region in 2002 and 2003 for use in function hmm0norm2d
+</h2>
+
+<h3>Description</h3>
+
+<p>A data frame containing a subset (in years 2002 and 2003) of Kii tremor data used in Wang et al. (2018). The columns are named <code>"year"</code>, <code>"month"</code>, <code>"day"</code>, <code>"hour"</code>, <code>"lat"</code>, <code>"lon"</code>.
+</p>
+<p>We provide some R code in the Examples below for how to convert this dataset into the variables <code>R</code> and <code>Z</code> used in the function <code>hmm0norm2d</code>. This dataset can be obtained directly from the Slow Earthquake Database http://www-solid.eps.s.u-tokyo.ac.jp/~sloweq/.
+</p>
+<p>If you have your own way to convert the data into the variables <code>R</code> and <code>Z</code>, then you can go to the function <code>hmm0norm2d</code> directly. 
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">data(Kii)
+</code></pre>
+
+
+<h3>Format</h3>
+
+<p>A data frame with 1112 rows, each row representing the hour in which tremor events occurred. It contains the following variables:
+</p>
+
+<dl>
+<dt>year, month, day, hour</dt>
+<dd>
+<p>time of tremor occurrence.</p>
+</dd>
+<dt>lat</dt>
+<dd>
+<p>latitude of the tremor event in that hour.</p>
+</dd>
+<dt>lon</dt>
+<dd>
+<p>longitude of the tremor event in that hour.</p>
+</dd>
+</dl>
+<h3>References</h3>
+
+
+<p>Wang, T., Zhuang, J., Buckby, J., Obara, K. and Tsuruoka, H. (2018) Identifying the recurrence patterns of non-volcanic tremors using a 2D hidden Markov model with extra zeros. Journal of Geophysical Research, doi: <a href="https://doi.org/10.1029/2017JB015360">10.1029/2017JB015360</a>.
+Obara, K., Tanaka, S., Maeda, T., &amp; Matsuzawa, T. (2010) Depth-dependent activity of non-volcanic tremor in southwest Japan, Geophysical Research Letters, 37, L13306. doi: <a href="https://doi.org/10.1029/2010GL043679">10.1029/2010GL043679</a>.
+Maeda, T., &amp; Obara. K. (2009) Spatio-temporal distribution of seismic energy radiation from low-frequency tremor in western Shikoku, Japan, J. Geophys. Res., 114, B00A09, doi: <a href="https://doi.org/10.1029/2008JB006043">10.1029/2008JB006043</a>. 
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>hmm0norm2d</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(Kii)
+year &lt;- Kii$year
+month &lt;- Kii$month
+day &lt;- Kii$day
+hour &lt;- Kii$hour
+lat &lt;- Kii$lat
+lon &lt;- Kii$lon
+
+## Transform the time into days*100+hour. Can use other transformation.
+## The purpose is to make sure that each hour of a day has a unique number.
+xd &lt;- NULL
+for (i in 1:nrow(Kii))
+  xd[i] &lt;- julian(as.Date(paste(year[i],month[i],day[i],sep="-")))*100+hour[i]
+
+## Create a unique number for each hour in the years 2002 and 2003
+## This is to match with xd above, so that we can create the Z variable
+## which is 0 for the hours without any tremor occurrence and
+## 1 for the hours with tremor events.
+a &lt;- seq( julian(as.Date("2002-01-01")), julian(as.Date("2002-12-31")), 1 )*100
+b &lt;- seq( julian(as.Date("2003-01-01")), julian(as.Date("2003-12-31")), 1 )*100
+aa &lt;- rep(a,each=24)+rep(0:23,times=length(a))
+bb &lt;- rep(b,each=24)+rep(0:23,times=length(b))
+
+## Combine all the tremor events which occurred 
+## in the same hour to be one tremor cluster.
+## Kii has maximum 4 events in the same hour 
+## so we used the code below.
+## One can adjust the code for regions with more 
+## tremor events in the same hour.
+## indt: actual time as in each hour
+Time &lt;- c(aa,bb)
+lt &lt;- length(Time)
+indt &lt;- 1:lt
+
+Tim &lt;- Lat &lt;- Lon &lt;- NULL
+j &lt;- 1
+while (j &lt;= nrow(Kii)-3){
+  i &lt;- j
+  if (xd[i+3]==xd[i] &amp; xd[i+2]==xd[i] &amp; xd[i+1]==xd[i]){
+    Tim &lt;- append(Tim,xd[i])
+    Lat &lt;- append(Lat,mean(lat[i:(i+3)]))
+    Lon &lt;- append(Lon,mean(lon[i:(i+3)]))
+    j &lt;- i+4
+  }else{
+    if (xd[i+2]==xd[i] &amp; xd[i+1]==xd[i]){
+      Tim &lt;- append(Tim,xd[i])
+      Lat &lt;- append(Lat,mean(lat[i:(i+2)]))
+      Lon &lt;- append(Lon,mean(lon[i:(i+2)]))
+      j &lt;- i+3
+    }else{
+      if (xd[i+1]==xd[i]){
+        Tim &lt;- append(Tim,xd[i])
+        Lat &lt;- append(Lat,mean(lat[i:(i+1)]))
+        Lon &lt;- append(Lon,mean(lon[i:(i+1)]))
+        j &lt;- i+2
+      }else{
+        Tim &lt;- append(Tim,xd[i])
+        Lat &lt;- append(Lat,lat[i])
+        Lon &lt;- append(Lon,lon[i])
+        j &lt;- i+1
+      }
+    }
+  }
+}
+Tim &lt;- append(Tim,xd[(nrow(Kii)-1):nrow(Kii)])
+Lat &lt;- append(Lat,lat[(nrow(Kii)-1):nrow(Kii)])
+Lon &lt;- append(Lon,lon[(nrow(Kii)-1):nrow(Kii)])
+
+## Create a data frame in which each hour is a point
+## Those hours when there was no tremor, we set the 
+## number of tremors as 0
+
+data1 &lt;- array(0,dim=c(lt,3))
+Thour &lt;- NULL
+for (i in 1:length(Tim)){
+  use &lt;- Time==Tim[i]
+  idtem &lt;- (1:lt)[use]
+  Thour &lt;- append(Thour,idtem)
+  data1[idtem,2] &lt;- Lat[i]
+  data1[idtem,3] &lt;- Lon[i]
+}
+data1[,1] &lt;- indt ## Every hour is one time point
+
+###########################################################
+###########   Data for time series analysis   #############  
+###########################################################
+lt &lt;- length(indt)
+Z &lt;- rep(0,lt)
+Z[Thour] &lt;- 1
+R &lt;- data1[,2:3]
+
+
+###########################################################
+# Setting up initial values for analysing real-world data
+## nk is the number of states for the fitted model
+### In this example we use nk=3
+###########################################################
+
+LL &lt;- -10^200 ## A very small value to compare with
+## the log likelihood from the model
+
+nk = 3
+
+gamma &lt;- array(NA,dim=c(nk,nk))
+mu &lt;- array(NA,dim=c(nk,2))
+sig &lt;- array(NA,dim=c(2,2,nk))
+pie &lt;- array(NA,dim=c(1,nk))
+
+kk &lt;- 1
+N &lt;- 2
+while(kk&lt;N)
+{
+  temp &lt;- matrix(runif(nk*nk,0,1),ncol=nk)
+  diag(temp) = diag(temp) + rpois(1,6) * apply(temp, 1, sum)
+  temp &lt;- temp * matrix(rep(1/apply(temp, 1, sum), ncol(temp)), ncol=ncol(temp), byrow=FALSE)
+  gamma &lt;- temp
+  
+  R1min &lt;- min((R[,1])[R[,1]&gt;=1e-6])
+  R1max &lt;- max((R[,1])[R[,1]&gt;=1e-6])
+  R2min &lt;- min((R[,2])[R[,2]&gt;=1e-6])
+  R2max &lt;- max((R[,2])[R[,2]&gt;=1e-6])
+  temp &lt;- cbind(runif(nk,R1min,R1max),runif(nk,R2min,R2max))
+  temp &lt;- temp[order(temp[,2]),]
+  mu &lt;- temp
+  
+  sdR1 &lt;- sd((R[,1])[R[,1]&gt;=1e-6])
+  sdR2 &lt;- sd((R[,2])[R[,2]&gt;=1e-6])
+  for (j in 1:nk){
+    temp &lt;- matrix(runif(4,0.0001,max(sdR1,sdR2)), ncol=2)
+    temp[1,2] &lt;- temp[2,1] &lt;- runif(1,-1,1)* sqrt(prod(diag(temp)))
+    sig[, ,j] &lt;- temp
+  }
+  
+  pie &lt;- matrix(sort(c(runif(1, 0, 0.01),runif(nk-1, 0, 1))), nrow = 1, byrow = TRUE )
+  
+  delta &lt;- c(6,runif(nk-1, 0,1)) 
+  delta &lt;- delta/sum(delta)
+  
+  tryCatch({
+    temp &lt;- hmm0norm2d(R, Z, pie, gamma, mu, sig, delta)
+    kk&lt;-kk+1
+    if( LL &lt;= temp$LL){
+      HMMest &lt;- temp
+      LL =HMMest$LL
+      eval(parse(text=paste('HMM',kk,'est = HMMest',sep="")))
+#      eval(parse(text=paste('save(HMM',kk,'est, file="HMM',kk,'est.image")',sep='')))
+## Uncomment the line above if you would like to save the result into a .image file.
+    }
+  }, error=function(e){})
+  print(kk)
+}
+
+</code></pre>
+
+
+</div>

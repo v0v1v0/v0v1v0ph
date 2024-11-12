@@ -1,0 +1,191 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>define_model</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Define and evaluate model expression</h2>
+
+<h3>Description</h3>
+
+<p>A model expression is defined by specifying random number generation functions
+for a probabilistic sensitivity analysis (PSA) and transformations of the sampled
+parameters as a function of <code>input_data</code>. The unevaluated expressions
+are evaluated with <code>eval_model()</code> and used to generate the model inputs needed to
+create an economic model.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">define_model(tparams_def, rng_def, params = NULL, n_states = NULL)
+
+eval_model(x, input_data)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>tparams_def</code></td>
+<td>
+<p>A tparams_def object or a list of
+tparams_def objects. A list might be considered if time intervals
+specified with the <code>times</code> argument in <code>define_tparams()</code> vary across parameters.
+Parameters for a transition probability matrix (<code>tpmatrix</code>), utilities (<code>utility</code>),
+and/or cost categories (<code>costs</code>) are returned as a named list (see <code>define_tparams()</code>
+for more details).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rng_def</code></td>
+<td>
+<p>A rng_def object used to randomly draw samples
+of the parameters from suitable probability distributions.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>params</code></td>
+<td>
+<p>Either (i) a list containing the values of parameters for random
+number generation or (ii) parameter samples that have already been randomly
+generated using <code>eval_rng()</code>. In case (ii), <code>rng_def</code> should be <code>NULL</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n_states</code></td>
+<td>
+<p>The number of health states (inclusive of all health states
+including the the death state) in the model. If <code>tpmatrix</code> is
+an element returned by <code>tparams_def</code>, then it will be equal to the number of states
+in the transition probability matrix; otherwise it must be specified as an argument.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>An object of class <code>model_def</code> created with <code>define_model()</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>input_data</code></td>
+<td>
+<p>An object of class expanded_hesim_data
+expanded by patients and treatment strategies.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p><code>eval_model()</code> evaluates the expressions in an object of class
+<code>model_def</code> returned by <code>define_model()</code> and is, in turn, used within
+functions that instantiate economic models (e.g., <code>create_CohortDtstm()</code>).
+The direct output of <code>eval_model()</code> can also be useful for understanding and debugging
+model definitions, but it is not used directly for simulation.
+</p>
+<p>Economic models are constructed as a function of input data and parameters:
+</p>
+
+<ol>
+<li> <p><em>Input data</em>: Objects of class expanded_hesim_data
+consisting of the treatment strategies and patient population.
+</p>
+</li>
+<li> <p><em>Parameters</em>: The underlying parameter estimates from the literature
+are first stored in a list (<code>params</code> argument). Random number generation
+is then used to sample the parameters from suitable probability distributions
+for the PSA (<code>rng_def</code> argument). Finally, the sampled parameters are
+transformed as a function of the input data into values (e.g., elements of a
+transition probability matrix) used for the simulation (<code>tparams_def</code> argument).
+The <code>params</code> argument can be omitted if the underlying parameters values are
+defined inside a <code>define_rng()</code> block.
+</p>
+</li>
+</ol>
+<h3>Value</h3>
+
+<p><code>define_model()</code> returns an object of class <code>model_def</code>,
+which is a list containing the arguments to the function. <code>eval_model()</code> returns
+a list containing ID variables
+identifying parameter samples, treatment strategies, patient cohorts, and time
+intervals; the values of parameters of the transition probability matrix,
+utilities, and/or cost categories; the number of health states; and the number
+of random number generation samples for the PSA.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>define_tparams()</code>, <code>define_rng()</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+# Data
+library("data.table")
+strategies &lt;- data.table(strategy_id = 1:2,
+                         strategy_name = c("Monotherapy", "Combination therapy"))
+patients &lt;- data.table(patient_id = 1)
+hesim_dat &lt;- hesim_data(strategies = strategies,
+                       patients = patients)
+data &lt;- expand(hesim_dat)
+
+# Model parameters
+rng_def &lt;- define_rng({
+  alpha &lt;- matrix(c(1251, 350, 116, 17,
+                    0, 731, 512, 15,
+                    0, 0, 1312, 437,
+                    0, 0, 0, 469),
+                  nrow = 4, byrow = TRUE)
+  rownames(alpha) &lt;- colnames(alpha) &lt;- c("A", "B", "C", "D")
+  lrr_mean &lt;- log(.509)
+  lrr_se &lt;- (log(.710) - log(.365))/(2 * qnorm(.975))
+  
+  list(
+    p_mono = dirichlet_rng(alpha),
+    rr_comb = lognormal_rng(lrr_mean, lrr_se),
+    u = 1,
+    c_zido = 2278,
+    c_lam = 2086.50,
+    c_med = gamma_rng(mean = c(A = 2756, B = 3052, C = 9007),
+                      sd = c(A = 2756, B = 3052, C = 9007))
+  )
+}, n = 2)
+
+tparams_def &lt;- define_tparams({
+  rr = ifelse(strategy_name == "Monotherapy", 1, rr_comb)
+  list(
+    tpmatrix = tpmatrix(
+      C, p_mono$A_B * rr, p_mono$A_C * rr, p_mono$A_D * rr,
+      0, C, p_mono$B_C * rr, p_mono$B_D * rr,
+      0, 0, C, p_mono$C_D * rr,
+      0, 0, 0, 1),
+    utility = u,
+    costs = list(
+      drug = ifelse(strategy_name == "Monotherapy",
+                    c_zido, c_zido + c_lam),
+      medical = c_med
+    ) 
+  )
+})
+
+# Simulation
+## Define the economic model
+model_def &lt;- define_model(
+  tparams_def = tparams_def,
+  rng_def = rng_def)
+
+### Evaluate the model expression to generate model inputs
+### This can be useful for understanding the output of a model expression
+eval_model(model_def, data)
+
+## Create an economic model with a factory function
+econmod &lt;- create_CohortDtstm(model_def, data)
+
+</code></pre>
+
+
+</div>

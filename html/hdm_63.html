@@ -1,0 +1,139 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>p_adjust</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Multiple Testing Adjustment of p-values for S3 objects <code>rlassoEffects</code>
+and <code>lm</code>
+</h2>
+
+<h3>Description</h3>
+
+<p>Multiple hypotheses testing adjustment of p-values from a high-dimensional
+linear model.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">p_adjust(x, ...)
+
+## S3 method for class 'rlassoEffects'
+p_adjust(x, method = "RW", B = 1000, ...)
+
+## S3 method for class 'lm'
+p_adjust(x, method = "RW", B = 1000, test.index = NULL, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>an object of S3 class <code>rlassoEffects</code> or <code>lm</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>further arguments passed on to methods.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+<p>the method of p-value adjustment for multiple testing.
+Romano-Wolf stepdown ('<code>RW</code>') is chosen by default.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>B</code></td>
+<td>
+<p>number of bootstrap repetitions (default 1000).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>test.index</code></td>
+<td>
+<p>vector of integers, logicals or variables names indicating
+the position of coefficients (integer case), logical vector of length of the
+coefficients (TRUE or FALSE) or the coefficient names of x which should be
+tested simultaneously (only for S3 class <code>lm</code>). If missing, all
+coefficients are considered.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Multiple testing adjustment is performed for S3 objects of class
+<code>rlassoEffects</code> and <code>lm</code>. Implemented methods for multiple testing
+adjustment are Romano-Wolf stepdown '<code>RW</code>' (default) and the adjustment
+methods available in the <code>p.adjust</code> function of the <code>stats</code> package,
+including the Bonferroni, Bonferroni-Holm, and Benjamini-Hochberg corrections,
+see <code>p.adjust.methods</code>.
+</p>
+<p>Objects of class <code>rlassoEffects</code> are constructed by
+<code>rlassoEffects</code>.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A matrix with the estimated coefficients and the p-values that are
+adjusted according to the specified method.
+</p>
+
+
+<h3>Methods (by class)</h3>
+
+
+<ul>
+<li> <p><code>p_adjust(rlassoEffects)</code>: <code>rlassoEffects</code>.
+</p>
+</li>
+<li> <p><code>p_adjust(lm)</code>: <code>lm</code>.
+</p>
+</li>
+</ul>
+<h3>References</h3>
+
+<p>J.P. Romano, M. Wolf (2005). Exact and approximate stepdown
+methods for multiple hypothesis testing. Journal of the American Statistical
+Association, 100(469), 94-108.
+</p>
+<p>J.P. Romano, M. Wolf (2016). Efficient computation of adjusted
+p-values for resampling-based stepdown multiple testing. Statistics and
+Probability Letters, (113), 38-40.
+</p>
+<p>A. Belloni, V. Chernozhukov, K. Kato (2015). Uniform
+post-selection inference for least absolute deviation regression and other
+Z-estimation problems. Biometrika, 102(1), 77-94.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">library(hdm);
+set.seed(1)
+n = 100 #sample size
+p = 25 # number of variables
+s = 3 # nubmer of non-zero variables
+X = matrix(rnorm(n*p), ncol=p)
+colnames(X) &lt;- paste("X", 1:p, sep="")
+beta = c(rep(3,s), rep(0,p-s))
+y = 1 + X%*%beta + rnorm(n)
+data = data.frame(cbind(y,X))
+colnames(data)[1] &lt;- "y"
+lasso.effect = rlassoEffects(X, y, index=c(1:20))
+pvals.lasso.effect = p_adjust(lasso.effect, method = "RW", B = 1000)
+ols = lm(y ~ -1 + X, data)
+pvals.ols = p_adjust(ols, method = "RW", B = 1000)
+pvals.ols = p_adjust(ols, method = "RW", B = 1000, test.index = c(1,2,5))
+pvals.ols = p_adjust(ols, method = "RW", B = 1000, test.index = c(rep(TRUE, 5), rep(FALSE, p-5)))
+</code></pre>
+
+
+</div>

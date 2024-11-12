@@ -1,0 +1,123 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>wl</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Getting and Setting the Wavelength Axis
+<code>wl</code> returns the wavelength axis, <code>wl&lt;-</code> sets it.</h2>
+
+<h3>Description</h3>
+
+<p>The wavelength axis of a <code>hyperSpec</code> object can be retrieved and
+replaced with <code>wl</code> and <code>wl&lt;-</code>, respectively.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">wl(x)
+
+wl (x, label=NULL, digits=6) &lt;- value
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>a <code>hyperSpec</code> object</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>label</code></td>
+<td>
+<p>The label for the new wavelength axis. See initialize
+for details.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>digits</code></td>
+<td>
+<p>handed to <code>signif</code>. See details.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>value</code></td>
+<td>
+<p>either a numeric containing the new wavelength vector, or a
+list with <code>value$wl</code> containing the new wavelength vector and
+<code>value$label</code> holding the corresponding <code>label</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>When the wavelength axis is replaced, the colnames of <code>x@data$spc</code> are
+replaced by the rounded new wavelengths.  <code>digits</code> specifies the how
+many significant digits should be used.
+</p>
+<p>There are two ways to set the label of the new wavelength axis, see the
+examples.  If no label is given, a warning will be issued.
+</p>
+
+
+<h3>Value</h3>
+
+<p>a numeric vector
+</p>
+<p><code>hyperSpec</code> object
+</p>
+
+
+<h3>Note</h3>
+
+<p><code>wl&lt;-</code> always sets the complete wavelength axis, without
+changing the columns of the spectra matrix. If you rather want to cut the
+spectral range, use <code>[</code>, for
+interpolation along the spectral axis see
+<code>spc.loess</code> and for spectral binning
+<code>spc.bin</code>.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>C. Beleites
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>signif</code>
+</p>
+<p>cutting the spectral range: <code>[</code>
+</p>
+<p>interpolation along the spectral axis: <code>spc.loess</code>
+</p>
+<p>spectral binning: <code>spc.bin</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+	wl (laser)
+
+	# convert from wavelength to frequency
+	plot (laser)
+	wl (laser, "f / Hz") &lt;- 2.998e8 * wl (laser) * 1e9
+	plot (laser)
+
+	# convert from Raman shift to wavelength
+	# excitation was at 785 nm
+	plot (chondro [1])
+	wl (chondro) &lt;- list (wl = 1e7 / (1e7/785 - wl (chondro)), label = expression (lambda / nm))
+	plot (chondro [1])
+
+</code></pre>
+
+
+</div>

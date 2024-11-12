@@ -1,0 +1,113 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hyperbCalcRange</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Range of a Hyperbolic Distribution</h2>
+
+<h3>Description</h3>
+
+<p>Given the parameter vector Theta of a hyperbolic distribution,
+this function calculates the range outside of which the distribution
+has negligible probability, or the density function is negligible, to
+a specified tolerance. The parameterization used
+is the <code class="reqn">(\pi,\zeta)</code> one (see
+<code>dhyperb</code>). To use another parameterization, use
+<code>hyperbChangePars</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hyperbCalcRange(Theta, tol = 10^(-5), density = FALSE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>Theta</code></td>
+<td>
+<p>Value of parameter vector specifying the hyperbolic
+distribution.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tol</code></td>
+<td>
+<p>Tolerance.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>density</code></td>
+<td>
+<p>Logical. If <code>FALSE</code>, the bounds are for the probability
+distribution. If <code>TRUE</code>, they are for the density function.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The particular hyperbolic distribution being considered is specified
+by the value of the parameter value <code>Theta</code>.
+</p>
+<p>If <code>density = FALSE</code>, the function calculates
+the effective range of the distribution, which is used in calculating
+the distribution function and quantiles, and may be used in determining
+the range when plotting the distribution. By effective range is meant that
+the probability of an observation being greater than the upper end is
+less than the specified tolerance <code>tol</code>. Likewise for being smaller
+than the lower end of the range.
+</p>
+<p>If <code>density = TRUE</code>, the function gives a range, outside of which
+the density is less than the given tolerance. Useful for plotting the
+density.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A two-component vector giving the lower and upper ends of the range.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>David Scott <a href="mailto:d.scott@auckland.ac.nz">d.scott@auckland.ac.nz</a>,
+Jennifer Tso, Richard Trendall</p>
+
+
+<h3>References</h3>
+
+ 
+<p>Barndorff-Nielsen, O. and Blæsild, P (1983).
+Hyperbolic distributions. 
+In <em>Encyclopedia of Statistical Sciences</em>, 
+eds., Johnson, N. L., Kotz, S. and Read, C. B., Vol. 3,
+pp. 700–707. New York: Wiley. 
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>dhyperb</code>, <code>hyperbChangePars</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">par(mfrow = c(1,2))
+Theta &lt;- c(3,5,1,0)
+hyperbRange &lt;- hyperbCalcRange(Theta, tol = 10^(-3))
+hyperbRange
+curve(phyperb(x, Theta), hyperbRange[1], hyperbRange[2])
+maxDens &lt;- dhyperb(hyperbMode(Theta), Theta)
+hyperbRange &lt;- hyperbCalcRange(Theta, tol = 10^(-3)*maxDens, density = TRUE)
+hyperbRange
+curve(dhyperb(x, Theta), hyperbRange[1], hyperbRange[2])
+</code></pre>
+
+
+</div>

@@ -1,0 +1,133 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hai_polynomial_augment</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Augment Polynomial Features</h2>
+
+<h3>Description</h3>
+
+<p>This function takes in a data table and a predictor column. A user can either create
+their own formula using the <code>.formula</code> parameter or, if they leave the default of
+<code>NULL</code> then the user must enter a <code>.degree</code> <strong>AND</strong> <code>.pred_col</code> column.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hai_polynomial_augment(
+  .data,
+  .formula = NULL,
+  .pred_col = NULL,
+  .degree = 1,
+  .new_col_prefix = "nt_"
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>.data</code></td>
+<td>
+<p>The data being passed that will be augmented by the function.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.formula</code></td>
+<td>
+<p>This should be a valid formula like 'y ~ .^2' or NULL.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.pred_col</code></td>
+<td>
+<p>This is passed <code>rlang::enquo()</code> to capture the vector that you
+designate as the 'y' column.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.degree</code></td>
+<td>
+<p>This should be an integer and is used to set the degree in the
+poly function. The degree must be less than the unique data points or it will
+error out.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.new_col_prefix</code></td>
+<td>
+<p>The default is "nt_" which stands for "new_term". You can
+set this to whatever you like, as long as it is a quoted string.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>A valid data.frame/tibble must be passed to this function. It is required that
+a user either enter a <code>.formula</code> or a <code>.degree</code> <strong>AND</strong> <code>.pred_col</code> otherwise this
+function will stop and error out.
+</p>
+<p>Under the hood this function will create a <code>stats::poly()</code> function if the
+<code>.formula</code> is left as <code>NULL</code>. For example:
+</p>
+
+<ul>
+<li>
+<p> .formula = A ~ .^2
+</p>
+</li>
+<li>
+<p> OR .degree = 2, .pred_col = A
+</p>
+</li>
+</ul>
+<p>There is also a parameter <code>.new_col_prefix</code> which will add a character string
+to the column names so that they are easily identified further down the line.
+The default is 'nt_'
+</p>
+
+
+<h3>Value</h3>
+
+<p>An augmented tibble
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Steven P. Sanderson II, MPH
+</p>
+
+
+<h3>See Also</h3>
+
+<p>Other Augment Function: 
+<code>hai_fourier_augment()</code>,
+<code>hai_fourier_discrete_augment()</code>,
+<code>hai_hyperbolic_augment()</code>,
+<code>hai_scale_zero_one_augment()</code>,
+<code>hai_scale_zscore_augment()</code>,
+<code>hai_winsorized_move_augment()</code>,
+<code>hai_winsorized_truncate_augment()</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">suppressPackageStartupMessages(library(dplyr))
+data_tbl &lt;- data.frame(
+  A = c(0, 2, 4),
+  B = c(1, 3, 5),
+  C = c(2, 4, 6)
+)
+
+hai_polynomial_augment(.data = data_tbl, .pred_col = A, .degree = 2, .new_col_prefix = "n")
+hai_polynomial_augment(.data = data_tbl, .formula = A ~ .^2, .degree = 1)
+
+</code></pre>
+
+
+</div>

@@ -1,0 +1,115 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>ks_s2007</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Test proposed by Schott (2007)</h2>
+
+<h3>Description</h3>
+
+<p>Schott, J. R. (2007)'s test for one-way MANOVA problem for high-dimensional data with assuming that underlying covariance matrices are the same.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">ks_s2007(Y,n,p)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>Y</code></td>
+<td>
+<p>A list of <code class="reqn">k</code> data matrices.  The <code class="reqn">i</code>th element represents the data matrix (<code class="reqn">p\times n_i</code>) from the <code class="reqn">i</code>th population with each column representing a <code class="reqn">p</code>-dimensional observation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n</code></td>
+<td>
+<p>A vector of <code class="reqn">k</code> sample sizes. The <code class="reqn">i</code>th element represents the sample size of group <code class="reqn">i</code>, <code class="reqn">n_i</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>p</code></td>
+<td>
+<p>The dimension of data.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Suppose we have the following <code class="reqn">k</code> independent high-dimensional samples:
+</p>
+<p style="text-align: center;"><code class="reqn">
+\boldsymbol{y}_{i1},\ldots,\boldsymbol{y}_{in_i}, \;\operatorname{are \; i.i.d. \; with}\; \operatorname{E}(\boldsymbol{y}_{i1})=\boldsymbol{\mu}_i,\; \operatorname{Cov}(\boldsymbol{y}_{i1})=\boldsymbol{\Sigma},i=1,\ldots,k.
+</code>
+</p>
+
+<p>It is of interest to test the following one-way MANOVA problem:
+</p>
+<p style="text-align: center;"><code class="reqn">H_0: \boldsymbol{\mu}_1=\cdots=\boldsymbol{\mu}_k, \quad \text { vs. }\; H_1: H_0 \;\operatorname{is \; not\; ture}.</code>
+</p>
+
+<p>Schott (2007) proposed the following test statistic:
+</p>
+<p style="text-align: center;"><code class="reqn">
+ T_{S}=[\operatorname{tr}(\boldsymbol{H})/h-\operatorname{tr}(\boldsymbol{E})/e]/\sqrt{N-1},
+ </code>
+</p>
+
+<p>where <code class="reqn">\boldsymbol{H}=\sum_{i=1}^kn_i(\bar{\boldsymbol{y}}_i-\bar{\boldsymbol{y}})(\bar{\boldsymbol{y}}_i-\bar{\boldsymbol{y}})^\top</code>, <code class="reqn">\boldsymbol{E}=\sum_{i=1}^k\sum_{j=1}^{n_i}(\boldsymbol{y}_{ij}-\bar{\boldsymbol{y}}_{i})(\boldsymbol{y}_{ij}-\bar{\boldsymbol{y}}_{i})^\top</code>, <code class="reqn">h=k-1</code>, and <code class="reqn">e=N-k</code>, with <code class="reqn">N=n_1+\cdots+n_k</code>.
+They showed that under the null hypothesis, <code class="reqn">T_{S}</code> is asymptotically normally distributed.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A  (list) object of  <code>S3</code> class <code>htest</code>  containing the following elements:
+</p>
+
+<dl>
+<dt>statistic</dt>
+<dd>
+<p>the test statistic proposed by Schott (2007).</p>
+</dd>
+<dt>p.value</dt>
+<dd>
+<p>the <code class="reqn">p</code>-value of the test proposed by Schott (2007).</p>
+</dd>
+</dl>
+<h3>References</h3>
+
+<p>Schott JR (2007).
+“Some high-dimensional tests for a one-way MANOVA.”
+<em>Journal of Multivariate Analysis</em>, <b>98</b>(9), 1825–1839.
+<a href="https://doi.org/10.1016/j.jmva.2006.11.007">doi:10.1016/j.jmva.2006.11.007</a>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">set.seed(1234)
+k &lt;- 3
+p &lt;- 50
+n &lt;- c(25, 30, 40)
+rho &lt;- 0.1
+M &lt;- matrix(rep(0, k * p), nrow = k, ncol = p)
+y &lt;- (-2 * sqrt(1 - rho) + sqrt(4 * (1 - rho) + 4 * p * rho)) / (2 * p)
+x &lt;- y + sqrt((1 - rho))
+Gamma &lt;- matrix(rep(y, p * p), nrow = p)
+diag(Gamma) &lt;- rep(x, p)
+Y &lt;- list()
+for (g in 1:k) {
+  Z &lt;- matrix(rnorm(n[g] * p, mean = 0, sd = 1), p, n[g])
+  Y[[g]] &lt;- Gamma %*% Z + t(t(M[g, ])) %*% (rep(1, n[g]))
+}
+ks_s2007(Y, n, p)
+
+</code></pre>
+
+
+</div>

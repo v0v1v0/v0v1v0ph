@@ -1,0 +1,209 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>SelectV</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Variable Selection for High-Dimensional Supervised Classification.</h2>
+
+<h3>Description</h3>
+
+<p>Selects variables to be used in a Discriminant Analysis classification rule.</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">SelectV(data, grouping, 
+Selmethod=c("ExpHC","HC","Fdr","Fair","fixedp"),
+NullDist=c("locfdr","Theoretical"), uselocfdr=c("onlyHC","always"), 
+minlocfdrp=200, comvar=TRUE, Fdralpha=0.5, 
+ExpHCalpha=0.5, HCalpha0=0.1, maxp=ncol(data), tol=1E-12, ...)</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>Matrix or data frame of observations.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>grouping</code></td>
+<td>
+<p>Factor specifying the class for each observation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Selmethod</code></td>
+<td>
+<p>The method used to choose the number of variables selected. Current alternatives are:
+</p>
+<p>‘ExpHC’ (default) for the Expanded Higher Criticism scheme of Duarte Silva (2011)
+</p>
+<p>‘HC’ for the Higher Criticism (HC) approach of Donoho and Jin (2004, 2008)
+</p>
+<p>‘Fdr’ for the False Discovery Rate control approach of Benjamini and Hochberg (1995)
+</p>
+<p>‘Fair’ for the FAIR (Features Annealed Independence Rules) approach of Fan and Fan (2008). This option is only available for two-group classification problems. 
+</p>
+<p>‘fixedp’ for a constant chosen by the user.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>NullDist</code></td>
+<td>
+<p>The Null distribution used to compute pvalues from t-scores or F-scores. Current alternatives are “Theoretical” for the corresponding theoretical distributions, and “locfdr” for an empirical Null of z-scores estimated by the maximum likelihood approach of Efron (2004).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>uselocfdr</code></td>
+<td>
+<p>Flag indicating the statistics for which the Null empirical distribution estimated by the locfdr approach should be used. Current alternatives are “onlyHC” (default) and “always”.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>minlocfdrp</code></td>
+<td>
+<p>Minimum number of variables required to estimate empirical Null distributions by the locfdr method. When the number of variables is below ‘minlocfdrp’, theoretical Nulls are always employed.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>comvar</code></td>
+<td>
+<p>Boolean flag indicating if a common group variance is to be assumed (default) in the computation of the t-scores used for problems with two groups.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Fdralpha</code></td>
+<td>
+<p>Control level for variable selection based on False Discovery Rate Control (see Benjamini and Hochberg (1995)).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ExpHCalpha</code></td>
+<td>
+<p>Control level for the first step of the Extended Higher Criticism scheme (see Duarte Silva (2011)).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>HCalpha0</code></td>
+<td>
+<p>Proportion of pvalues used to compute the HC statistic (see Donoho and Jin (2004, 2008)).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>maxp</code></td>
+<td>
+<p>Maximum number of variables to be used in the discriminant rule.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tol</code></td>
+<td>
+<p>Numerical precision for distinguishing pvalues from 0 and 1. Computed pvalues below ‘tol’ are set to ‘tol’, and those above 1-‘tol’ are set to 1-‘tol’.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Arguments passed from other methods.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The function ‘SelectV’ selects variables to be used in a Discriminant classification rule by the 
+Higher Criticism (HC) approach of Donoho and Jin (2004, 2008), the Expanded Higher Criticism scheme 
+proposed by Duarte Silva (2011), False Discovery Rate (Fdr) control as suggested by 
+Benjamini and Hochberg (1995), the FAIR (Features Annealed Independence Rules) approach of Fan and Fan (2008),
+or simply by fixing the number of selected variables to some pre-defined constant.
+</p>
+<p>The Fdr method is, by default, based on simple p-values  derived from t-scores (problems with two groups) or ANOVA F-scores 
+(problems with more than two groups). 
+When the argument ‘NullDist’ is set to “Theoretical” these values are also used in the HC method. Otherwise, 
+the HC p-values are derived from an empirical Null of z-scores estimated by the maximum likelihood 
+approach of Efron (2004). 
+</p>
+<p>The variable rankings are based on absolute-value t-scores or ANOVA F-scores.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A list with two components: 
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>nvkpt</code></td>
+<td>
+<p>the number of variables to be used in the Discriminant rule</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>vkptInd</code></td>
+<td>
+<p> the indices of the variables to be used in the Discriminant rule</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>A. Pedro Duarte Silva</p>
+
+
+<h3>References</h3>
+
+<p>Benjamini, Y. and Hochberg, Y. (1995) “Controling the false discovery rate: A practical and powerful
+approach to multiple testing”, <em>Journal of the Royal Statistical Society</em> B, 57, 289-300.
+</p>
+<p>Donoho, D. and Jin, J. (2004) “Higher criticism for detecting sparse heterogeneous mixtures”,
+<em>Annals of Statistics</em> 32, 962-964.
+</p>
+<p>Donoho, D. and Jin, J. (2008) “Higher criticism thresholding: Optimal feature selection when useful
+features are rare and weak”, In: <em>Proceedings National Academy of Sciences</em>, USA 105, 14790-14795.
+</p>
+<p>Efron, B. (2004) “Large-scale simultaneous hypothesis testing: the choice of a null hypothesis”,
+<em>Journal of the American Statistical Association</em> 99, 96-104.
+</p>
+<p>Fan, J. and Fan, Y. (2008) “High-dimensional classification using features annealed independence rules”,
+<em>Annals of Statistics</em>, 36 (6), 2605-2637.
+</p>
+<p>Pedro Duarte Silva, A. (2011) “Two Group Classification with High-Dimensional Correlated Data: A Factor Model Approach”, 
+<em>Computational Statistics and Data Analysis</em>, 55 (1), 2975-2990.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>Dlda</code>, <code>Mlda</code>, <code>Slda</code>, <code>RFlda</code>, <code>AlonDS</code></p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+## Not run: 
+
+# Compare the number of variables selected by the four methods 
+# currently available  on Alon's Colon Cancer Data set 
+# after a logarithmic transformation. 
+
+log10genes &lt;- log10(AlonDS[,-1])
+
+Res &lt;- array(dim=4)
+names(Res) &lt;- c("ExpHC","HC","Fdr","Fair")
+Res[1] &lt;- SelectV(log10genes,AlonDS[,1])$nvkpt
+Res[2] &lt;- SelectV(log10genes,AlonDS[,1],Selmethod="HC")$nvkpt
+Res[3] &lt;- SelectV(log10genes,AlonDS[,1],Selmethod="Fdr")$nvkpt
+Res[4] &lt;- SelectV(log10genes,AlonDS[,1],Selmethod="Fair")$nvkpt
+
+print(Res)
+
+## End(Not run)
+
+</code></pre>
+
+
+</div>

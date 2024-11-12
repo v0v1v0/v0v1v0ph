@@ -1,0 +1,128 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>capture_requests</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Record API responses as mock files</h2>
+
+<h3>Description</h3>
+
+<p><code>capture_requests</code> is a context that collects the responses from requests
+you make and stores them as mock files. This enables you to perform a series
+of requests against a live server once and then build your test suite using
+those mocks, running your tests in <code>with_mock_api()</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">capture_requests(expr, path, ...)
+
+start_capturing(path = NULL, simplify = TRUE)
+
+stop_capturing()
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>expr</code></td>
+<td>
+<p>Code to run inside the context</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>path</code></td>
+<td>
+<p>Where to save the mock files. Default is the first directory in
+<code>.mockPaths()</code>, which if not otherwise specified is the current working
+directory. It is generally better to call <code>.mockPaths()</code> directly if you
+want to write to a different path, rather than using the <code>path</code> argument.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Arguments passed through <code>capture_requests</code> to <code>start_capturing</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>simplify</code></td>
+<td>
+<p>logical: if <code>TRUE</code> (default), JSON responses with status 200
+will be written as just the text of the response body. In all other cases,
+and when <code>simplify</code> is <code>FALSE</code>, the "response" object will be written out to
+a .R file using <code>base::dput()</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p><code>start_capturing</code> and <code>stop_capturing</code> allow you to turn on/off request
+recording for more convenient use in an interactive session.
+</p>
+<p>Recorded responses are written out as plain-text files. By storing fixtures
+as plain-text files, you can
+more easily confirm that your mocks look correct, and you can more easily
+maintain them without having to re-record them. If the API changes subtly,
+such as when adding an additional attribute to an object, you can just touch
+up the mocks.
+</p>
+<p>If the response has status <code style="white-space: pre;">⁠200 OK⁠</code> and the <code>Content-Type</code>
+maps to a supported file extension—currently <code>.json</code>,
+<code>.html</code>, <code>.xml</code>, <code>.txt</code>, <code>.csv</code>, and <code>.tsv</code>—just the response body will be
+written out, using the appropriate extension. <code style="white-space: pre;">⁠204 No Content⁠</code> status
+responses will be stored as an empty file with extension <code>.204</code>. Otherwise,
+the response will be written as a <code>.R</code> file containing syntax that, when
+executed, recreates the
+<code>httr</code> "response" object.
+</p>
+<p>If you have trouble when recording responses, or are unsure where the files
+are being written, set <code>options(httptest.verbose=TRUE)</code> to print a message
+for every file that is written containing the absolute path of the file.
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>capture_requests</code> returns the result of <code>expr</code>. <code>start_capturing</code>
+invisibly returns the <code>path</code> it is given. <code>stop_capturing</code> returns nothing;
+it is called for its side effects.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>build_mock_url()</code> for how requests are translated to file paths.
+And see <code>vignette("redacting")</code> for details on how to prune sensitive
+content from responses when recording.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+capture_requests({
+  GET("http://httpbin.org/get")
+  GET("http://httpbin.org")
+  GET("http://httpbin.org/response-headers",
+    query = list(`Content-Type` = "application/json")
+  )
+})
+# Or:
+start_capturing()
+GET("http://httpbin.org/get")
+GET("http://httpbin.org")
+GET("http://httpbin.org/response-headers",
+  query = list(`Content-Type` = "application/json")
+)
+stop_capturing()
+
+## End(Not run)
+</code></pre>
+
+
+</div>

@@ -1,0 +1,422 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>likertMosaic</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Diverging stacked barcharts for Likert, semantic
+differential, rating scale data, and population pyramids
+based on mosaic as the plotting style.
+</h2>
+
+<h3>Description</h3>
+
+<p>Constructs and plots diverging stacked barcharts for Likert, semantic
+differential, rating scale data, and population pyramids,
+.based on <code>mosaic</code> as the plotting style.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">likertMosaic(x, ...)
+
+## S3 method for class 'formula'
+likertMosaic(x, data, ReferenceZero = NULL, spacing=NULL,
+                   ..., between.y = c(1.2, 0.3))
+
+## S3 method for class 'array'
+likertMosaic(x, ReferenceZero = NULL, col = NULL, main = NULL,
+             ...,
+             as.percent = FALSE, variable.width = NULL, positive.order = FALSE,
+             Conditions = NULL,
+             x.legend = list(text = list(dimnames(x)[[ndim]]),
+                             columns = x.dim[ndim],
+                             space = "bottom",
+                             size = 2,
+                             cex = 0.8,
+                             between = 0.6,
+                             rect= list(col = col, border = "white")),
+             legend.y = 0.05,
+             spacing = spacing_highlighting,
+             split_vertical = c(TRUE, FALSE),
+             margins = c(3, 2, 4, 22),
+             keep_aspect = FALSE,
+             rot_labels = c(0, 0, 90, 0),
+             just_labels = c("center", "center", "center", "right"),
+             labels = c(TRUE, TRUE, FALSE, TRUE),
+             varnames = FALSE,
+             zero_size = 0,
+             gp = gpar(fill = col.extended, col = 0),
+             colorFunction="diverge_hcl",
+             colorFunctionOption="lighter")
+
+## S3 method for class 'data.frame'
+likertMosaic(x, ...)
+
+## Default S3 method:
+likertMosaic(x, ...) ## most likely for a vector
+
+## S3 method for class 'list'
+likertMosaic(x, ...)
+
+## S3 method for class 'matrix'
+likertMosaic(x, ...,
+ split_vertical = c(FALSE, TRUE),
+ rot_labels = c(90, 0, 0, 0),
+ just_labels = c("left", "center", "center", "right"),
+ labels = c(TRUE, FALSE))
+
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>For the formula method, a model formula.  Otherwise,
+any numeric object stored as a vector, matrix, array,
+data.frame, table, ftable,
+structable (as defined in the <code>vcd</code> package), or as a list of
+named two-dimensional objects.  This is the only required argument.
+See the Details section for restrictions on the form of data.frame,
+list, ftable, and structable arguments.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>For the formula method, a <code>data.frame</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ReferenceZero</code></td>
+<td>
+<p>Numeric scalar or <code>NULL</code>.  The position in
+the range<br><code>seq(0, attr(x, "nlevels")+.5, .5)</code> where the
+reference line at 0 will be placed.  <code>attr(x, "nlevels")</code> is the
+number of columns of the original argument <code>x</code>, <em>before</em> it
+has been coerced to a <code>"likert"</code> object.  The default
+<code>NULL</code> corresponds to the middle level if there are an odd
+number of levels, and to half-way between the two middle levels if
+there are an even number of levels.  This argument is used when the
+number of positive levels and the number of negative levels are not
+the same.  For example, with 4 levels<br><code>c("Disagee", "Neutral", "Weak Agree", "Strong Agree")</code>, the
+argument would be specified <code>ReferenceZero=2</code> indicating that
+the graphical split would be in the middle of the second group with
+label <code>"Neutral"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>positive.order</code></td>
+<td>
+<p>If <code>FALSE</code>, the default value, the original
+order of the rows is retained.  This is necessary for arrays,
+because each panel has the same rownames.  If <code>TRUE</code>, rows are
+ordered within each panel with the row whose bar goes farthest to
+the right at the top of a panel of horizontal bars or at the left of
+a panel of vertical bars.
+<code>positive.order</code> is frequently set to <code>TRUE</code> for lists.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>as.percent</code></td>
+<td>
+<p>When <code>as.percent==TRUE</code> or
+<code>as.percent=="noRightAxis"</code>, then the values in each row are rescaled
+to row percents.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>variable.width</code></td>
+<td>
+
+<p>When <code>TRUE</code> and <code>as.percent==TRUE</code>, then the area of the bars
+(percent along the length times the width) is proportional to the counts.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>col</code></td>
+<td>
+
+<p>Colors for the bars.  With the default value <code>NULL</code>, the colors are
+chosen from the default <code>diverge_hcl</code> diverging
+palette.  Any color specification that R understands can be used here.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>colorFunction, colorFunctionOption</code></td>
+<td>
+<p>See <code>likertColor</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>main</code></td>
+<td>
+
+<p><code>main</code> title for the plot.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+
+<p>Additional arguments, passed to the next method and possibly all the way
+to <code>strucplot</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Conditions</code></td>
+<td>
+
+<p>Factor used to divide the rows of the plot into sets of rows
+corresponding to levels of Condition. In the formula method, the
+conditions are the factors appearing after the <code>|</code> symbol.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>between.y</code></td>
+<td>
+
+<p>vertical spacing between bars.  <code>between.y[1]</code> is used between levels
+of conditioning factors, and <code>between.y[2]</code> is used between bars within the
+same level of the conditioning factor.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x.legend</code></td>
+<td>
+
+<p>Description of legend using the terminology and conventions of the
+<code>lattice</code> package.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>legend.y</code></td>
+<td>
+
+<p>Adjust vertical location of legend.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>spacing, split_vertical, margins, keep_aspect, rot_labels,
+just_labels, labels</code></td>
+<td>
+
+<p>Please see <code>strucplot</code> for details.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>varnames, zero_size, gp</code></td>
+<td>
+
+<p>Please see <code>strucplot</code> for details.
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The counts (or percentages) of respondents on each row who agree with
+the statement are shown to the right of the zero line; the counts (or
+percentages) who disagree are shown to the left. The counts (or
+percentages) for respondents who neither agree nor disagree are split
+down the middle and are shown in a neutral color. The neutral category
+is omitted when the scale has an even number of choices.
+It is difficult to compare
+lengths without a common baseline. In this situation, we are primarily
+interested in the total count (or percent) to the right or left of the
+zero line; the breakdown into strongly or not is of lesser interest so
+that the primary comparisons do have a common baseline of zero. The
+rows within each panel are displayed in their original order by
+default. If the argument <code>positive.order=TRUE</code> is specified, the rows
+are ordered by the counts (or percentages) who agree.
+</p>
+<p>Diverging stacked barcharts are also called "two-directional stacked
+barcharts".  Some authors use the term "floating barcharts" for
+vertical diverging stacked barcharts and the term "sliding barcharts"
+for horizontal diverging stacked barcharts.
+</p>
+<p>All items in a list of named two-dimensional objects must have the
+same number of columns.  If the items have different column names, the
+column names of the last item in the list will be used in the key.  If
+the dimnames of the matrices are named, the names will be used in the
+plot.  It is possible to produce a likert plot with a list of objects
+with different numbers of columns, but not with the
+<code>plot.likert.list</code> method.  These must be done manually by using
+the <code>ResizeEtc</code> function on each of the individual likert
+plots.  The difficulty is that the legend is based on the last item in
+the list and will have the wrong number of values for some of the
+panels.
+</p>
+<p>A single data.frame <code>x</code> will be plotted as <code>data.matrix(x)</code>;
+therefore factor columns will be converted to integers and character
+columns will become <code>NA</code> and will be plotted as if they had value
+0.  A data.frame with only numeric columns will work in a named list.
+A data.frame with factors or characters won't work in a named list.
+</p>
+<p>ftable and structable arguments <code>x</code> will be plotted as
+<code>as.table(x)</code>.  This changes the display sequence.
+Therefore the user will probably want to use <code>aperm</code> on the
+ftable or structable before using <code>plot.likert</code>.
+</p>
+
+
+<h3>Value</h3>
+
+<p>Please see <code>strucplot</code> for a description of the
+returned object.
+</p>
+
+
+<h3>Note</h3>
+
+<p>The functions described here are currently missing the following features:
+</p>
+
+<ol>
+<li>
+<p> no axis ticks, number, nor axis label for the x axis
+</p>
+</li>
+<li>
+<p> no zero reference line
+</p>
+</li>
+<li>
+<p> no right-axis labels for Row Count Totals
+</p>
+</li>
+<li>
+<p> no strip.left labels for grouping by Conditions
+</p>
+</li>
+<li>
+<p> In Figure 8 and 9 (<code>HH/demo/likertMosaic-paper.r</code>),
+no control of the thickness of the bars
+</p>
+</li>
+<li>
+<p> All bars are horizontal.
+</p>
+</li>
+<li>
+<p> No borders on the overall plot nor on the panels in plots with
+grouping by Conditions
+</p>
+</li>
+<li>
+<p> No control of <code>between=list(x=number)</code>
+</p>
+</li>
+<li> <p><code>cex</code> for labeling
+</p>
+</li>
+<li>
+<p> border on empty boxes
+</p>
+</li>
+<li>
+<p> I am using a lattice legend, not a native strucplot legend
+</p>
+</li>
+</ol>
+<h3>Author(s)</h3>
+
+<p>Richard M. Heiberger,
+with contributions from Naomi B. Robbins &lt;naomi@nbr-graphs.com&gt;.
+</p>
+<p>Maintainer: Richard M. Heiberger &lt;rmh@temple.edu&gt; </p>
+
+
+<h3>References</h3>
+
+<p>Richard M. Heiberger, Naomi B. Robbins (2014).,
+"Design of Diverging Stacked Bar Charts for Likert Scales and Other Applications",
+Journal of Statistical Software, 57(5), 1–32,
+
+<a href="https://doi.org/10.18637/jss.v057.i05">doi:10.18637/jss.v057.i05</a>.
+</p>
+<p>Richard Heiberger and Naomi Robbins (2011),
+"Alternative to Charles Blow's Figure in \"Newt's War on Poor Children\"",
+Forbes OnLine, December 20, 2011.
+<a href="https://www.forbes.com/sites/naomirobbins/2011/12/20/alternative-to-charles-blows-figure-in-newts-war-on-poor-children-2/">https://www.forbes.com/sites/naomirobbins/2011/12/20/alternative-to-charles-blows-figure-in-newts-war-on-poor-children-2/</a>
+</p>
+<p>Naomi Robbins (2011), "Visualizing Data: Challenges to
+Presentation of Quality Graphics—and Solutions", Amstat News,
+September 2011, 28–30.
+<code>http://magazine.amstat.org/blog/2011/09/01/visualizingdata/</code>
+</p>
+
+
+
+
+<p>Luo, Amy and Tim Keyes (2005). "Second Set of Results in from the Career
+Track Member Survey," Amstat News. Arlington, VA: American Statistical
+Association.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>likert</code>, <code>mosaic</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## See file HH/demo/likertMosaic-paper.r for a complete set of examples.
+## Not run: 
+  require(vcd)
+  data(ProfChal)
+  likertMosaic(Question ~ . | Subtable, ProfChal,
+               main="Is your job professionally challenging?")
+  likertMosaic(Question ~ . | Subtable, ProfChal,
+               main="Is your job professionally challenging?", as.percent=TRUE)
+  likertMosaic(Question ~ . | Subtable, ProfChal,
+               main="Is your job professionally challenging?", as.percent=TRUE,
+               positive.order=TRUE)
+  likertMosaic(Question ~ . | Subtable, ProfChal,
+               main="Is your job professionally challenging?", as.percent=TRUE,
+               variable.width=TRUE)
+
+  EmpRows &lt;- ProfChal$Subtable == "Employment sector"
+  ProfChal2 &lt;- ProfChal[EmpRows, 1:5]
+  rownames(ProfChal2) &lt;- substr(ProfChal[EmpRows, "Question"], 1, 5)
+
+  likertMosaic(ProfChal2)
+  likertMosaic(ProfChal2, main="Employment")
+  likertMosaic(ProfChal2, main="Employment", ReferenceZero=0)
+  likertMosaic(ProfChal2, main="Employment", ReferenceZero=3.5)
+  likertMosaic(ProfChal2, main="Employment", ReferenceZero=4)
+  likertMosaic(ProfChal2, main="Employment", ReferenceZero=6)
+  likertMosaic(ProfChal2, main="Employment", positive.order=TRUE)
+  likertMosaic(ProfChal2, main="Employment", variable.width=TRUE)
+
+  likertMosaic(~ ., data.frame(ProfChal2), main="Employment", positive.order=TRUE)
+
+  likertMosaic(~ ., data.frame(ProfChal2), main="Employment", variable.width=TRUE)
+  likert(~ ., data.frame(ProfChal2), main="Employment", variable.width=TRUE)
+
+  data(SFF8121)
+  likertMosaic(aperm(SFF8121, c(3,1,2)))
+
+
+## End(Not run)
+</code></pre>
+
+
+</div>

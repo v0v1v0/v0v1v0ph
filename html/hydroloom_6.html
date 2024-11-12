@@ -1,0 +1,154 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>add_divergence</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Add Divergence Attribute</h2>
+
+<h3>Description</h3>
+
+<p>Given a non-dendritic flow network and required attributes,
+adds a divergence attribute according to NHDPlus data model methods.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">add_divergence(
+  x,
+  coastal_outlet_ids,
+  inland_outlet_ids,
+  name_attr,
+  type_attr,
+  major_types
+)
+
+## S3 method for class 'data.frame'
+add_divergence(
+  x,
+  coastal_outlet_ids,
+  inland_outlet_ids,
+  name_attr,
+  type_attr,
+  major_types
+)
+
+## S3 method for class 'hy'
+add_divergence(
+  x,
+  coastal_outlet_ids,
+  inland_outlet_ids,
+  name_attr,
+  type_attr,
+  major_types
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>data.frame network compatible with hydroloom_names.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>coastal_outlet_ids</code></td>
+<td>
+<p>vector of identifiers for network outlets that
+terminate at the coast.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>inland_outlet_ids</code></td>
+<td>
+<p>vector of identifiers for network outlets that
+terminate inland.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>name_attr</code></td>
+<td>
+<p>character attribute name of attribute containing a feature
+name or name identifier.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>type_attr</code></td>
+<td>
+<p>character attribute name of attribute containing a feature
+type indicator.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>major_types</code></td>
+<td>
+<p>vector of values of <code>type_attr</code> that should be interpreted
+as being "major". e.g. river might be major and canal might be minor.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>When considering downstream connections with diversions, there are three
+factors considered to determine which is primary.<br>
+1a) same name<br>
+1b) is named<br>
+2) feature type (type_attr controls this)<br>
+3) flows to coast (has a coastal connection is preferred)<br></p>
+<p>The following list describes the order of precedence for tests<br>
+1: 1a, 2, 3<br>
+2: 1a, 2<br>
+3: The NHDPlus uses diverted fraction this is not used currently.<br>
+4: 1b, 2, 3<br>
+5: 2, 3<br>
+6: 1b, 3<br>
+7: 3,<br>
+8: 1b, 2<br>
+9: 2<br>
+10: 1b<br></p>
+<p>If all checks return and no primary connection has been identified, the
+connection with a smaller id is chosen.
+</p>
+<p>In the case that there are two or more upstream connections, the upstream
+name to use is chosen 1) if there is only one upstream flowline with a name
+2) if one of the upstream flowlines with a name matches the downstream line,
+3) if one of the upstream flowlines is of a "major" type and others are not,
+and, 4) if no criteria exist to select one, the smallest id value otherwise.
+</p>
+
+
+<h3>Value</h3>
+
+<p>returns x with a <code>divergence</code> attribute appended
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+f &lt;- system.file("extdata/coastal_example.gpkg", package = "hydroloom")
+
+g &lt;- sf::read_sf(f)
+g &lt;- g[g$FTYPE != "Coastline", ]
+
+outlets &lt;- g$COMID[!g$ToNode %in% g$FromNode]
+
+g &lt;- dplyr::select(g, COMID, gnis_id, FTYPE,
+                   FromNode, ToNode)
+
+add_divergence(g,
+               coastal_outlet_ids = outlets,
+               inland_outlet_ids = c(),
+               name_attr = "gnis_id",
+               type_attr = "FTYPE",
+               major_types = c("StreamRiver", "ArtificialPath", "Connector"))
+
+
+</code></pre>
+
+
+</div>

@@ -1,0 +1,117 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>gen_int_beta</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Hierarchical Heterogeneity Regression Analysis.</h2>
+
+<h3>Description</h3>
+
+<p>The main function for Transfer learning for tensor graphical models.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">gen_int_beta(n, p, q, whole.data, subgroup=c(2,4),
+                    ridge = FALSE, gr.init=10, lambda.min=0.0001)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>n</code></td>
+<td>
+<p>The sample size.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>p</code></td>
+<td>
+<p>The dimension of type 2 features.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>q</code></td>
+<td>
+<p>The dimension of type 1 features.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>whole.data</code></td>
+<td>
+<p>The input data analyzed (a list including the response and design matrix).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>subgroup</code></td>
+<td>
+<p>When using fmrs to generate initial value, the initial value parameter of fmrs is given. Randomly divide this number of groups into several groups.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ridge</code></td>
+<td>
+<p>The logical variable, whether or not to yield initial values using ridge regression.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>gr.init</code></td>
+<td>
+<p>The subgroup number of initial values using ridge regression.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lambda.min</code></td>
+<td>
+<p>The tuning parameter using ridge regression, the default is 0.0001.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A result list.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Mingyang Ren, Qingzhao Zhang, Sanguo Zhang, Tingyan Zhong, Jian Huang, Shuangge Ma. Maintainer: Mingyang Ren <a href="mailto:renmingyang17@mails.ucas.ac.cn">renmingyang17@mails.ucas.ac.cn</a>.
+</p>
+
+
+<h3>References</h3>
+
+<p>Mingyang Ren, Qingzhao Zhang, Sanguo Zhang, Tingyan Zhong, Jian Huang, Shuangge Ma. 2022. Hierarchical Cancer Heterogeneity Analysis Based On Histopathological Imaging Features. Biometrics, &lt;DOI: 10.1111/biom.13544&gt;.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+library(HhP)
+library(Matrix)
+library(MASS)
+library(fmrs)
+data(example.data.reg)
+n = example.data.reg$n
+q = example.data.reg$q
+p = example.data.reg$p
+
+beta.init.list  =  gen_int_beta(n, p, q, example.data.reg)
+beta.init  =  beta.init.list$beta.init
+lambda  =  genelambda.obo()
+result  =  HhP.reg(lambda, example.data.reg, n, q, p, beta.init)
+index.list  =  evaluation.sum(n,q,p, result$admmres, result$abic.n,
+               result$admmres2, example.data.reg$Beta0, result$bic.var)
+index.list$err.s
+
+
+
+</code></pre>
+
+
+</div>

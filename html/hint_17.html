@@ -1,0 +1,150 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>Hyperintersection</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>The Hypergeometric Intersection Family of Distributions</h2>
+
+<h3>Description</h3>
+
+<p>The Hypergeometric Intersection Family of Distributions
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">dhint(n, A, q = 0, range = NULL, approx = FALSE, log = FALSE, verbose = TRUE)
+
+phint(n, A, q = 0, vals, upper.tail = TRUE, log.p = FALSE)
+
+qhint(p, n, A, q = 0, upper.tail = TRUE, log.p = FALSE)
+
+rhint(num = 5, n, A, q = 0)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>n</code></td>
+<td>
+<p>An integer specifying the number of categories in the urns.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>A</code></td>
+<td>
+<p>A vector of integers specifying the numbers of balls drawn from each urn. The length of the vector equals the number of urns.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>q</code></td>
+<td>
+<p>An integer specifying the number of categories in the second urn which have duplicate members. If q is 0 (default) then the symmetrical, singleton case is computed, otherwise the asymmetrical, duplicates case is computed (see Details).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>range</code></td>
+<td>
+<p>A vector of integers specifying the intersection sizes for which probabilities (dhint) or cumulative probabilites (phint) should be computed (can be a single number). If range is NULL (default) then probabilities will be returned over the entire range of possible values.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>approx</code></td>
+<td>
+<p>Logical. If TRUE, a binomial approximation will be used to generate the distribution.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>log</code></td>
+<td>
+<p>Logical. If TRUE, probabilities p are given as log(p). Defaults to FALSE.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p>Logical. If TRUE, progress of calculation in the asymmetric, duplicates case is printed to the screen.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>vals</code></td>
+<td>
+<p>A vector of integers specifying the intersection sizes for which probabilities (dhint) or cumulative probabilites (phint) should be computed (can be a single number). If range is NULL (default) then probabilities will be returned over the entire range of possible values.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>upper.tail</code></td>
+<td>
+<p>Logical. If TRUE, probabilities are P(X &gt;= c), else P(X &lt;= c). Defaults to TRUE.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>log.p</code></td>
+<td>
+<p>Logical. If TRUE, probabilities p are given as log(p). Defaults to FALSE.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>p</code></td>
+<td>
+<p>A probability between 0 and 1.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>num</code></td>
+<td>
+<p>An integer specifying the number of random numbers to generate. Defaults to 5.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The hypergeometric intersection distributions describe the distribution of intersection sizes when sampling without replacement from two separate urns in which reside balls belonging to the same n object categories. In the simplest case when there is exactly one ball in each category in each urn (symmetrical, singleton case), then the distribution is hypergeometric: </p>
+<p style="text-align: center;"><code class="reqn">P(X=v)=\frac{{a \choose v}{n-a \choose b-v}}{{n \choose b}}</code>
+</p>
+<p> When there are three urns, the distribution is given by </p>
+<p style="text-align: center;"><code class="reqn">P(X=v) = \frac{ {a \choose v} \sum_{i} {a-v \choose i} {n-a \choose b-v-i} {n-v-i \choose c-v} }{ {n \choose b} {n \choose c} } </code>
+</p>
+<p> If, however, we allow duplicates in <code class="reqn">q \leq n</code> of the categories in the second urn, then the distribution of intersection sizes is described by the following variant of the hypergeometric: </p>
+<p style="text-align: center;"><code class="reqn">P(X=v) = \sum_{m=0}^{\alpha} \sum_{l=0}^{\beta} \sum_{j=0}^{l} {n-q \choose v-l} {q \choose l} {q-l \choose m} {n-v-q+l \choose a-v-m}  {l \choose j} {n+q-a-m-j \choose b-v} / {n \choose a}{n+q \choose b}</code>
+</p>
+
+
+
+<h3>Value</h3>
+
+<p>'dhint', 'phint', and 'qhint' return a data frame with two columns: v, the intersection size, and p, the associated p-values. 'rhint' returns an integer vector of random samples based on the hypergeometric intersection distribution.
+</p>
+
+
+<h3>References</h3>
+
+<p>Kalinka, A. T. (2013). The probability of drawing intersections: extending the hypergeometric distribution. <a href="https://arxiv.org/abs/1305.0717">arXiv.1305.0717</a>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Generate the distribution of intersections sizes without duplicates:
+dd &lt;- dhint(20, c(10, 12))
+## Restrict the range of intersections.
+dd &lt;- dhint(20, c(10, 12), range = 0:5)
+## Allow duplicates in q of the categories in the second urn:
+dd &lt;- dhint(35, c(15, 11), 22, verbose = FALSE)
+## Generate cumulative probabilities.
+pp &lt;- phint(29, c(15, 8), vals = 5)
+pp &lt;- phint(29, c(15, 8), vals = 2, upper.tail = FALSE)
+pp &lt;- phint(29, c(15, 8), 23, vals = 2)
+## Extract quantiles:
+qq &lt;- qhint(0.15, 23, c(12, 10))
+qq &lt;- qhint(0.15, 23, c(12, 10), 18)
+## Generate random samples from Hypergeometric intersection distributions.
+rr &lt;- rhint(num = 10, 18, c(9, 14))
+rr &lt;- rhint(num = 10, 22, c(11, 17), 12)
+</code></pre>
+
+
+</div>

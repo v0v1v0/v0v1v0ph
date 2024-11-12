@@ -1,0 +1,164 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>identify_row</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Identify rows with a match</h2>
+
+<h3>Description</h3>
+
+<p>Filter rows which values satisfy the specified conditions. The functionality is identical to <code>dplyr::filter()</code> combined with <code>dplyr::if_any()</code> or <code>dplyr::if_all()</code>, but it used the 'data.table' package <code>vignette("datatable-intro", package = "data.table")</code> for data.frame method, and has regular regular expression support for remote database tables. The motivation is to take away some pain when working with databases which often do not support regular expression and 'LIKE' operator with multiple string patterns.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">identify_row(
+  data,
+  vars,
+  match = c("in", "start", "regex", "like", "between", "glue_sql"),
+  vals,
+  if_all = FALSE,
+  verbose = getOption("healthdb.verbose"),
+  query_only = TRUE,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>Data.frames or remote tables (e.g., from <code>dbplyr::tbl_sql()</code>)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>vars</code></td>
+<td>
+<p>An expression passing to <code>dplyr::select()</code>. It can be quoted/unquoted column names, or helper functions, such as <code>dplyr::starts_with()</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>match</code></td>
+<td>
+<p>One of "in", "start", "regex", "like", "between", and "glue_sql". It determines how values would be matched. The operations under each type:
+</p>
+
+<ul>
+<li>
+<p> "in": var %in% vals (This is default)
+</p>
+</li>
+<li>
+<p> "regex": stringr::str_detect(var, vals). For remote tables, unique values in vars are collected locally before matching (may be slow).
+</p>
+</li>
+<li>
+<p> "like": stringr::str_like(var, vals). For remote tables, WHERE var LIKE val.
+</p>
+</li>
+<li>
+<p> "start": same as regex or LIKE with modified vals, e.g., "^val1|^val2" or "va1%|val2%"
+</p>
+</li>
+<li>
+<p> "between": dplyr::between(var, val1, val2)
+</p>
+</li>
+<li>
+<p> "glue_sql": For remote table only, this gives full control of the WHERE clause using dplyr::filter(dbplyr::sql(glue::glue_sql(...)))
+</p>
+</li>
+</ul>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>vals</code></td>
+<td>
+<p>Depending on <code>match</code>, it takes different input:
+</p>
+
+<ul>
+<li>
+<p> "in": a vector of values (numeric/character/Date)
+</p>
+</li>
+<li>
+<p> "start": a vector of numeric/character that would be modified into a regex or LIKE pattern string by adding "^" in front or "%" at the end
+</p>
+</li>
+<li>
+<p> "regex"/"like": a string of the expression
+</p>
+</li>
+<li>
+<p> "between": a vector of numeric or date with exactly two elements, e.g., c(lower, upper)
+</p>
+</li>
+<li>
+<p> "glue_sql": a string of a SQL WHERE clause, which will be passed to <code>glue::glue_sql()</code>. See examples for detail.
+</p>
+</li>
+</ul>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>if_all</code></td>
+<td>
+<p>A logical for whether combining the predicates (if multiple columns were selected by vars) with AND instead of OR. Default is FALSE, e.g., var1 in vals OR var2 in vals.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p>A logical for whether printing explanation and result overview for the query. Default is fetching from options. Use <code>options(healthdb.verbose = FALSE)</code> to suppress once and for all. Result overview is not for remote tables as the query is not executed immediately, thus no result is available for summary without adding an extra run (may be slow) of the query.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>query_only</code></td>
+<td>
+<p>A logical for whether keeping the output as remote table (Default TRUE) or downloading the query result as a tibble (FALSE). The argument is ignored when the input data is a data.frame/tibble.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>For remote table method only. Additional arguments passing to <code>glue::glue_sql()</code> for parameterized queries.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A data.frame or tbl_sql object depending on the input.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">#applying to data.frame; both sepal length and width in range 3-5
+identify_row(iris, starts_with("Sepal"), "between", c(3, 5), if_all = TRUE)
+
+#applying to remote table; species starts with se or ends with ca
+iris_db &lt;- dbplyr::memdb_frame(iris)
+identify_row(iris_db, Species, "like", c("se%", "%ca"))
+
+#using glue_sql to write the WHERE clause
+#use {`vars`} to refer to the variables selected by vars
+#supply additional values required in the query through '...'
+#note that if you use LIKE here, you cannot supply multiple patterns in what
+identify_row(iris_db, Species, "glue_sql",
+ "{`vars`} LIKE {what}",
+  what = "se%")
+
+#add * after a vector
+identify_row(iris_db, Species, "glue_sql",
+ "{`vars`} IN ({what*})",
+ what = c("setosa", "virginica"))
+</code></pre>
+
+
+</div>

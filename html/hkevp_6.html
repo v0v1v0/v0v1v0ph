@@ -1,0 +1,158 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hkevp.predict</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Predictive distribution of the max-stable process at target positions.</h2>
+
+<h3>Description</h3>
+
+<p>Computes the predictive distribution of <code class="reqn">Y(\cdot)</code> at a set of ungauged positions <code class="reqn">(s_1^*, ..., s_k^*)</code>, given data at gauged positions <code class="reqn">(s_1, ..., s_n)</code>, by using the output of <cite>latent.fit</cite> or <code>hkevp.fit</code>.
+</p>
+<p>Two types of prediction are available for the HKEVP, as described in <cite>Shaby and Reich (2012)</cite>. See details.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hkevp.predict(fit, targets, targets.covariates, predict.type = "kriging")
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>fit</code></td>
+<td>
+<p>Output from the <code>hkevp.fit</code> procedure.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>targets</code></td>
+<td>
+<p>A matrix of real values giving the spatial coordinates of the ungauged positions. Each row corresponds to an ungauged position.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>targets.covariates</code></td>
+<td>
+<p>A matrix of real values giving the spatial covariates of the ungauged positions. Must match with the covariates used in <code>hkevp.fit</code> or <code>latent.fit</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>predict.type</code></td>
+<td>
+<p>Character string specifying the type of prediction. Must be one of "<code>kriging</code>" (default) or "<code>climat</code>". See details.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The spatial prediction of <code class="reqn">Y_t(s^*)</code> for a target site <code class="reqn">s^*</code> and a realisation <code class="reqn">t</code> of the process is described in <cite>Shaby and Reich (2012)</cite>. This method involves a three-step procedure:
+</p>
+
+<ol>
+<li>
+<p> Computation of the residual dependence process <code class="reqn">\theta(\cdot)</code> at the target positions.
+</p>
+</li>
+<li>
+<p> Computation of the conditional GEV parameters <code class="reqn">(\mu^*,\sigma^*,\xi^*)</code> at the target sites. See the definition of the HKEVP in <cite>Reich and Shaby (2012)</cite>.
+</p>
+</li>
+<li>
+<p> Generation of <code class="reqn">Y_t(s^*)</code> from an independent GEV distribution with parameters <code class="reqn">(\mu^*,\sigma^*,\xi^*)</code>.
+</p>
+</li>
+</ol>
+<p>As sketched in <cite>Shaby and Reich (2012)</cite>, two types of prediction are possible: the kriging-type and the climatological-type. These two types differ when the residual dependence process <code class="reqn">\theta</code> is computed (first step of the prediction):
+</p>
+
+<ul>
+<li>
+<p> The kriging-type takes the actual value of <code class="reqn">A</code> in the MCMC algorithm to compute the residual dependence process. The prediction will be the distribution of the maximum recorded at the specified targets.
+</p>
+</li>
+<li>
+<p> The climatological-type generates <code class="reqn">A</code> by sampling from the positive stable distribution with characteristic exponent <code class="reqn">\alpha</code>, where <code class="reqn">\alpha</code> is the actual value of the MCMC step. The prediction in climatological-type will be the distribution of what could happen in the conditions of the HKEVP dependence structure.
+</p>
+</li>
+</ul>
+<p>Posterior distribution for each realisation <code class="reqn">t</code> of the process and each target position <code class="reqn">s^*</code> is represented with a sample where each element corresponds to a step of the MCMC procedure.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A three-dimensional array where:
+</p>
+
+<ul>
+<li>
+<p> Each row corresponds to a different realisation of the process (a block).
+</p>
+</li>
+<li>
+<p> Each column corresponds to a target position.
+</p>
+</li>
+<li>
+<p> Each slice corresponds to a MCMC step.</p>
+</li>
+</ul>
+<h3>Author(s)</h3>
+
+<p>Quentin Sebille
+</p>
+
+
+<h3>References</h3>
+
+<p>Reich, B. J., &amp; Shaby, B. A. (2012). A hierarchical max-stable spatial model for extreme precipitation. The annals of applied statistics, 6(4), 1430. &lt;DOI:10.1214/12-AOAS591&gt;
+</p>
+<p>Shaby, B. A., &amp; Reich, B. J. (2012). Bayesian spatial extreme value analysis to assess the changing risk of concurrent high temperatures across large portions of European cropland. Environmetrics, 23(8), 638-648. &lt;DOI:10.1002/env.2178&gt;
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+# Simulation of HKEVP:
+sites &lt;- as.matrix(expand.grid(1:3,1:3))
+targets &lt;- as.matrix(expand.grid(1.5:2.5,1.5:2.5))
+all.pos &lt;- rbind(sites, targets)
+knots &lt;- sites
+loc &lt;- all.pos[,1]*10
+scale &lt;- 3
+shape &lt;- 0
+alpha &lt;- .4
+tau &lt;- 1
+ysim &lt;- hkevp.rand(10, all.pos, knots, loc, scale, shape, alpha, tau)
+yobs &lt;- ysim[,1:9]
+
+# HKEVP fit (omitting first site, used as target):
+fit &lt;- hkevp.fit(yobs, sites, niter = 1000)
+
+# Extrapolation:
+ypred &lt;- hkevp.predict(fit, targets, predict.type = "kriging")
+
+# Plot of the density and the true value for 4 first realizations:
+# par(mfrow = c(2, 2))
+# plot(density(ypred[1,1,]), main = "Target 1 / Year 1")
+# abline(v = ysim[1,10], col = 2, lwd = 2)
+# plot(density(ypred[2,1,]), main = "Target 1 / Year 2")
+# abline(v = ysim[2,10], col = 2, lwd = 2)
+# plot(density(ypred[1,2,]), main = "Target 2 / Year 1")
+# abline(v = ysim[1,11], col = 2, lwd = 2)
+# plot(density(ypred[2,2,]), main = "Target 2 / Year 2")
+# abline(v = ysim[2,11], col = 2, lwd = 2)
+
+
+
+
+</code></pre>
+
+
+</div>

@@ -1,0 +1,145 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>GetEstimate_BAY</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Bayesian estimation of a distribution</h2>
+
+<h3>Description</h3>
+
+<p>Returns MCMC samples from the posterior distribution.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">GetEstimate_BAY(
+  y,
+  dist,
+  prior,
+  par0,
+  mult = 0.1,
+  eps = 0.1,
+  batch.length = 100,
+  batch.n = 100,
+  moverate.min = 0.1,
+  moverate.max = 0.5,
+  mult.down = 0.9,
+  mult.up = 1.1
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+<p>numeric vector, data</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dist</code></td>
+<td>
+<p>character, distribution name</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>prior</code></td>
+<td>
+<p>list of lists, prior distributions. For each parameter to be estimated, the prior
+is a list of the form pr=list(dist=..., par=...). See example below.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>par0</code></td>
+<td>
+<p>numeric vector, initial parameter guess. You may use GetEstimate_ROUGH().</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mult</code></td>
+<td>
+<p>numeric, initial jump standard deviations are set to mult * abs(par0)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>eps</code></td>
+<td>
+<p>numeric, where par0 is zero, initial jump standard deviations are set to eps (to avoid jumps of size zero)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>batch.length</code></td>
+<td>
+<p>integer, MCMC parameter: length of each non-adaptive batch</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>batch.n</code></td>
+<td>
+<p>integer, MCMC parameter: number of batches (= adaptation period). Total number of simulations is nsim=batch.n*batch.length</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>moverate.min</code></td>
+<td>
+<p>numeric in (0;1), MCMC parameter: lower bound for the desired move rate interval</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>moverate.max</code></td>
+<td>
+<p>numeric in (0;1), MCMC parameter: upper bound for the desired move rate interval</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mult.down</code></td>
+<td>
+<p>numeric in (0;1), MCMC parameter: multiplication factor used to decrease jump size when move rate is too low.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mult.up</code></td>
+<td>
+<p>numeric (&gt;1, avoid 1/mult.down), MCMC parameter: multiplication factor used to increase jump size when move rate is too high.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A list with the following components:
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>numeric matrix nsim*length(par0), MCMC simulations</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fx</code></td>
+<td>
+<p>numeric vector, corresponding values f(x)</p>
+</td>
+</tr>
+</table>
+<h3>Examples</h3>
+
+<pre><code class="language-R">y=c(9.2,9.5,11.4,9.5,9.4,9.6,10.5,11.1,10.5,10.4)
+prior1=list(dist='FlatPrior',par=NULL)
+prior2=list(dist='LogNormal',par=c(1,1))
+prior3=list(dist='Normal',par=c(0,0.25))
+prior=list(prior1,prior2,prior3)
+par0=GetEstimate_ROUGH(y,'GEV')$par
+mcmc=GetEstimate_BAY(y,'GEV',prior,par0,batch.length=50,batch.n=50)
+graphicalpar=par(mfrow=c(2,3))
+plot(mcmc$x[,1],type='l'); plot(mcmc$x[,2],type='l'); plot(mcmc$x[,3],type='l')
+hist(mcmc$x[,1]); hist(mcmc$x[,2]); hist(mcmc$x[,3])
+par(graphicalpar)
+</code></pre>
+
+
+</div>

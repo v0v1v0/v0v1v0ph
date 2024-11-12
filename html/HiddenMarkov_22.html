@@ -1,0 +1,122 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>Estep</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>E-Step of EM Algorithm for DTHMM</h2>
+
+<h3>Description</h3>
+
+<p>Performs the <em>expectation</em> step of the EM algorithm for a <code>dthmm</code> process. This function is called by the <code>BaumWelch</code> function. The Baum-Welch algorithm referred to in the HMM literature is a version of the EM algorithm.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">Estep(x, Pi, delta, distn, pm, pn = NULL)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>is a vector of length <code class="reqn">n</code> containing the observed process.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Pi</code></td>
+<td>
+<p>is the current estimate of the <code class="reqn">m \times m</code> transition probability matrix of the hidden Markov chain.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>distn</code></td>
+<td>
+<p>is a character string with the distribution name, e.g. <code>"norm"</code> or <code>"pois"</code>. If the distribution is specified as <code>"wxyz"</code> then a probability (or density) function called <code>"dwxyz"</code> should be available, in the standard <span style="font-family: Courier New, Courier; color: #666666;"><b>R</b></span> format (e.g. <code>dnorm</code> or <code>dpois</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pm</code></td>
+<td>
+<p>is a list object containing the current (Markov dependent) parameter estimates associated with the distribution of the observed process (see <code>dthmm</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pn</code></td>
+<td>
+<p>is a list object containing the observation dependent parameter values associated with the distribution of the observed process (see <code>dthmm</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>delta</code></td>
+<td>
+<p>is the current estimate of the marginal probability distribution of the <code class="reqn">m</code> hidden states.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Let <code class="reqn">u_{ij}</code> be one if <code class="reqn">C_i=j</code> and zero otherwise. Further, let <code class="reqn">v_{ijk}</code> be one if <code class="reqn">C_{i-1}=j</code> and <code class="reqn">C_i=k</code>, and zero otherwise. Let <code class="reqn">X^{(n)}</code> contain the complete observed process. Then, given the current model parameter estimates, the returned value <code>u[i,j]</code> is
+</p>
+<p style="text-align: center;"><code class="reqn">
+\widehat{u}_{ij} = \mbox{E}[u_{ij} \, | \, X^{(n)}] = \Pr\{C_i=j \, | \, X^{(n)} = x^{(n)} \} \,,
+</code>
+</p>
+
+<p>and <code>v[i,j,k]</code> is
+</p>
+<p style="text-align: center;"><code class="reqn">
+\widehat{v}_{ijk} = \mbox{E}[v_{ijk} \, | \, X^{(n)}] = \Pr\{C_{i-1}=j, C_i=k \, | \, X^{(n)} = x^{(n)} \}\,,
+</code>
+</p>
+
+<p>where <code class="reqn">j,k = 1, \cdots, m</code> and <code class="reqn">i = 1, \cdots, n</code>.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A <code>list</code> object is returned with the following components.
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>u</code></td>
+<td>
+<p>an <code class="reqn">n \times m</code> matrix containing estimates of the conditional expectations. See “Details”.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>v</code></td>
+<td>
+<p>an <code class="reqn">n \times m \times m</code> array containing estimates of the conditional expectations. See “Details”.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>LL</code></td>
+<td>
+<p>the current value of the log-likelihood.</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>The algorithm has been taken from Zucchini (2005).</p>
+
+
+<h3>References</h3>
+
+<p>Cited references are listed on the HiddenMarkov manual page.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>BaumWelch</code>, <code>Mstep</code>
+</p>
+
+
+</div>

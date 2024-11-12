@@ -1,0 +1,189 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>EEMDResift</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Resift averaged IMFs from EEMD</h2>
+
+<h3>Description</h3>
+
+<p>Averaged IMFs produced by EEMD may not satisfy the strict definition of an IMF, and therefore they may not have meaningful Hilbert spectrograms.
+Huang and Wu (2008) suggest another round of sifting to ensure that the averaged IMFs are made to satisfy the IMF definition.
+This function resifts the averaged IMF set and saves the results based on rules described in the input <code>resift.rule</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">EEMDResift(EEMD.result, resift.rule, spectral.method = "arctan", 
+    diff.lag = 1, tol = 5, max.sift = 200, stop.rule = "type5", 
+    boundary = "wave", sm = "none", smlevels = c(1), 
+    spar = NULL, max.imf = 100, interm = NULL)  
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>EEMD.result</code></td>
+<td>
+<p>The averaged IMF set and individual Hilbert spectra of EMD trials generated through EEMD.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>resift.rule</code></td>
+<td>
+<p>How the resifting algorithm chooses which IMF to save
+</p>
+
+<ul>
+<li>
+<p>Integer - Which IMF in the resifted set will be saved (so if resift.rule=1, the first IMF will be saved, the rest will be discarded)
+</p>
+</li>
+<li>
+<p>“last” - The last IMF will be saved (not terribly useful)
+</p>
+</li>
+<li>
+<p>“max.var” - The IMF with the most variance will be saved.  This will get the most “significant” IMF out of each resifted set.
+</p>
+</li>
+<li>
+<p>“all” - Every single new IMF generated from resifting the averaged IMFs will be saved.  There may be a lot of them!</p>
+</li>
+</ul>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>spectral.method</code></td>
+<td>
+<p>See <code>Sig2IMF</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>diff.lag</code></td>
+<td>
+<p>See <code>Sig2IMF</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tol</code></td>
+<td>
+<p>See <code>Sig2IMF</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>max.sift</code></td>
+<td>
+<p>See <code>Sig2IMF</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>stop.rule</code></td>
+<td>
+<p>See <code>Sig2IMF</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>boundary</code></td>
+<td>
+<p>See <code>Sig2IMF</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sm</code></td>
+<td>
+<p>See <code>Sig2IMF</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>smlevels</code></td>
+<td>
+<p>See <code>Sig2IMF</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>spar</code></td>
+<td>
+<p>See <code>Sig2IMF</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>max.imf</code></td>
+<td>
+<p>See <code>Sig2IMF</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>interm</code></td>
+<td>
+<p>See <code>Sig2IMF</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The function <code>EEMDCompile</code> generates a list of averaged IMFs from EEMD trials.
+These averaged IMFs often do not satisfy the definition of an IMF, usually because some of them are mixtures of different time scales.
+This is a consequence of the noise perturbation method of EEMD, but it complicates the attempt to create a meaningful Hilbert spectrogram from the averaged IMF set.
+The resifting algorithm takes each averaged IMF and performs EMD, thereby splitting each one into multiple “sub-IMFs”, each of which satisfy the strict definition of an IMF.
+The question then is: which of these sub-IMFs best represent the averaged IMF?
+The most rigorous solution is to set <code>resift.rule</code> to <code>"all"</code>, but that tends to make a large number of sub-IMFs, many with very low amplitude.
+Another solution is to accept the sub-IMF with the most variance, as that probably represents the fundamental information content of the original averaged IMF.
+</p>
+
+
+<h3>Value</h3>
+
+ 
+<table><tr style="vertical-align: top;">
+<td><code>resift.result</code></td>
+<td>
+<p>The resifted results of the averaged IMF set and the individual Hilbert spectra of each resifted IMF.</p>
+</td>
+</tr></table>
+<h3>Author(s)</h3>
+
+<p>Daniel Bowman <a href="mailto:danny.c.bowman@gmail.com">danny.c.bowman@gmail.com</a></p>
+
+
+<h3>See Also</h3>
+
+<p><code>EEMD</code>, <code>EEMDCompile</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(PortFosterEvent)
+
+trials=10
+nimf=10
+noise.amp=6.4e-07
+trials.dir="test"
+
+set.seed(628)
+
+#Run EEMD (this may take some time)
+## Not run: EEMD(sig, tt, noise.amp, trials, nimf, noise.amp, trials.dir = trials.dir)
+
+#Compile the results
+## Not run: EEMD.result &lt;- EEMDCompile(trials.dir, trials, nimf)
+
+
+resift.rule="max.var"
+## Not run: resift.result &lt;- EEMDResift(EEMD.result, resift.rule)
+
+#Plot the IMFs
+time.span=c(5, 10)
+imf.list=1:3
+os=TRUE
+res=TRUE
+## Not run: PlotIMFs(resift.result, time.span, imf.list, os, res)
+</code></pre>
+
+
+</div>

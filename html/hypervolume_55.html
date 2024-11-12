@@ -1,0 +1,135 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hypervolume_threshold</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Thresholds hypervolume and calculates volume quantile statistics (empirical cumulative distribution function)
+</h2>
+
+<h3>Description</h3>
+
+<p>Thresholds a hypervolume at a given value that can correspond to a quantile of the hypervolume. All random points below the threshold value are removed and the volume is adjusted accordingly. Provides threshold-quantile plots if multiple thresholds are specified (as by default). 
+</p>
+<p>Quantiles can be specified to be either of the total volume enclosed by the hypervolume p(proportional to <code>nrow(hv@RandomPoints)</code>), or of the total probability density (proportional to <code>sum(hv@ValueAtRandomPoints)</code>).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hypervolume_threshold(hv, 
+                        thresholds = NULL, 
+                        num.thresholds = 20, 
+                        quantile.requested = NULL,
+                        quantile.requested.type = "volume", 
+                        uniform.density = TRUE,
+                        plot = TRUE, verbose = TRUE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>hv</code></td>
+<td>
+
+<p>An input hypervolume
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>thresholds</code></td>
+<td>
+
+<p>A sequence of probability threshold values. If <code>NULL</code>, defaults to a sequence of length <code>num.thresholds</code> spanning the minimum and maximum probability values in the hypervolume.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>num.thresholds</code></td>
+<td>
+
+<p>The number of threshold values to use if <code>thresholds=NULL</code>. Otherwise ignored.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>quantile.requested</code></td>
+<td>
+
+<p>If not <code>NULL</code>, selects a single hypervolume correspondong to the threshold value that comes closest to enclosing the requested quantile fraction of the type <code>quantile.requested.type</code>. Using high values of <code>num.thresholds</code> enables more accurate threshold and quantile selection.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>quantile.requested.type</code></td>
+<td>
+
+<p>Determines the quantile type: either <code>"volume"</code> or <code>"probability"</code>. 
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>uniform.density</code></td>
+<td>
+
+<p>Logical value. If <code>TRUE</code>, sets all <code>@ValueAtRandomPoints</code> values to 1 in order to represent thresholded hypervolume as a solid geometrical shape. 
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>plot</code></td>
+<td>
+
+<p>Plots a threshold-quantile plot if <code>TRUE</code>. Quantiles are shown for both volume and probability density. This plot is similar to an empirical cumulative distribution function.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+
+<p>If <code>TRUE</code>, prints diagnostic progress messages.
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Hypervolumes constructed using the <code>hypervolume_box</code> method may not always yield quantiles close to the requested value because of the flat shape of the kernel. 
+</p>
+
+
+<h3>Value</h3>
+
+<p>A list containing two elements: a <code>HypervolumeList</code> or <code>Hypervolume</code> object corresponding to the hypervolumes at each threshold value, and a dataframe <code>Statistics</code> corresponding to the relevant quantiles and thresholds.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+data(penguins,package='palmerpenguins')
+penguins_no_na = as.data.frame(na.omit(penguins))
+penguins_adelie = penguins_no_na[penguins_no_na$species=="Adelie",
+                    c("bill_length_mm","bill_depth_mm","flipper_length_mm")]
+  
+hv = hypervolume_box(penguins_adelie,name='Adelie')
+
+# get hypervolumes at multiple thresholds
+hvlist = hypervolume_threshold(hv, plot=TRUE)
+head(hvlist$Statistics)
+plot(hvlist$HypervolumesThresholded[[c(1,5,10,15,20)]],
+  show.random=TRUE, show.data=FALSE,show.centroid=FALSE)
+
+# get hypervolume for a single low quantile value
+plot(hypervolume_threshold(hv, plot=FALSE, verbose=FALSE,
+  quantile.requested=0.1,quantile.requested.type="volume")[[1]])
+
+## End(Not run)
+</code></pre>
+
+
+</div>

@@ -1,0 +1,95 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>createSeries</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Create a series of indexes</h2>
+
+<h3>Description</h3>
+
+<p>Generate a series of progressive indexes
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">createSeries(hpi_obj, train_period = 12, max_period = NULL, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>hpi_obj</code></td>
+<td>
+<p>Object of class 'hpi'</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>train_period</code></td>
+<td>
+<p>default = 12; Number of periods to use as purely training before creating indexes</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>max_period</code></td>
+<td>
+<p>default = NULL; Maximum number of periods to create the index up to</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Additional Arguments</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>An 'serieshpi' object – a list of 'hpi' objects.
+</p>
+
+
+<h3>Further Details</h3>
+
+<p>'train_period' Represents the shortest index that you will create. For certain
+approaches, such as a repeat transaction model, indexes shorter than 10 will likely
+be highly unstable.
+</p>
+<p>If 'max_period“ is left NULL, then it will forecast up to the end of the data.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+  # Load example sales
+ data(ex_sales)
+
+ # Create Index
+ rt_index &lt;- rtIndex(trans_df = ex_sales,
+                     periodicity = 'monthly',
+                     min_date = '2010-06-01',
+                     max_date = '2015-11-30',
+                     adj_type = 'clip',
+                     date = 'sale_date',
+                     price = 'sale_price',
+                     trans_id = 'sale_id',
+                     prop_id = 'pinx',
+                     estimator = 'robust',
+                     log_dep = TRUE,
+                     trim_model = TRUE,
+                     max_period = 48,
+                     smooth = FALSE)
+
+ # Create Series (Suppressing messages do to small sample size of this example)
+  suppressMessages(
+    hpi_series &lt;- createSeries(hpi_obj = rt_index,
+                               train_period = 12))
+
+</code></pre>
+
+
+</div>

@@ -1,0 +1,276 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>multi.split</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Calculate P-values Based on Multi-Splitting Approach</h2>
+
+<h3>Description</h3>
+
+<p>Calculate p-values and confidence intervals based on the
+multi-splitting approach
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">multi.split(x, y, B = 100, fraction = 0.5, ci = TRUE, ci.level = 0.95,
+            model.selector = lasso.cv,
+            classical.fit = lm.pval, classical.ci = lm.ci,
+            parallel = FALSE, ncores = getOption("mc.cores", 2L),
+            gamma = seq(ceiling(0.05 * B) / B, 1 - 1 / B, by = 1 / B),
+            args.model.selector = NULL, args.classical.fit = NULL,
+            args.classical.ci = NULL,
+            return.nonaggr = FALSE, return.selmodels = FALSE,
+            repeat.max = 20,
+            verbose = FALSE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>numeric design matrix (without intercept).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+<p>numeric response vector.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>B</code></td>
+<td>
+<p>the number of sample-splits, a positive integer.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fraction</code></td>
+<td>
+<p>a number in <code class="reqn">(0,1)</code>, the fraction of data used at
+each sample split for the model selection process.  The remaining
+data is used for calculating the p-values.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ci</code></td>
+<td>
+<p>logical indicating if a confidence interval should be
+calculated for each parameter.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ci.level</code></td>
+<td>
+<p>(if <code>ci</code> is true:) a number in <code class="reqn">(0,1)</code>,
+typically close to 1, the desired coverage level of the confidence
+intervals.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>model.selector</code></td>
+<td>
+<p>a <code>function</code> to perform model
+selection, with default <code>lasso.cv</code>.  The function must have at
+least two arguments, <code>x</code> (the design matrix) and <code>y</code> (the
+response vector).  Return value is the index vector of selected columns.  See
+<code>lasso.cv</code> and <code>lasso.firstq</code> for an
+example.  Additional arguments can be passed via <code>args.model.selector</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>classical.fit</code></td>
+<td>
+<p>a <code>function</code> to calculate (classical)
+p-values.  Default is <code>lm.pval</code>.  The function must have
+at least two arguments, <code>x</code> (the design matrix) and <code>y</code>
+(the response vector), and return the vector of p-values.  See
+<code>lm.pval</code> for an example.  Additional arguments can be
+passed through <code>args.classical.fit</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>classical.ci</code></td>
+<td>
+<p>a <code>function</code> to calculate (classical)
+confidence intervals.  Default is <code>lm.ci</code>.  The function
+must have at least 3 arguments, <code>x</code> (the design matrix),
+<code>y</code> (the response vector) and <code>level</code> (the coverage
+level), and return the matrix of confidence intervals.  See
+<code>lm.ci</code> for an example.  Additional arguments can be
+passed through <code>args.classical.ci</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>parallel</code></td>
+<td>
+<p>logical indicating if parallelization via
+<code>mclapply</code> should be used.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ncores</code></td>
+<td>
+<p>number of cores used for parallelization as
+<code>mc.cores</code> in <code>mclapply()</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>gamma</code></td>
+<td>
+<p>vector of gamma-values.  In case gamma is a scalar, the
+value <code class="reqn">Q_j</code> instead of <code class="reqn">P_j</code> is being calculated (see
+reference below).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>args.model.selector</code></td>
+<td>
+<p>named <code>list</code> of further arguments for
+function <code>model.selector</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>args.classical.fit</code></td>
+<td>
+<p>named <code>list</code> of further
+arguments for function <code>classical.fit</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>args.classical.ci</code></td>
+<td>
+<p>named <code>list</code> of further arguments
+for function <code>classical.ci</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>return.nonaggr</code></td>
+<td>
+<p><code>logical</code> indicating if the
+unadjusted p-values be returned.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>return.selmodels</code></td>
+<td>
+<p><code>logical</code> indicating if the
+selected models (at each split) should be returned.  Necessary for
+the <code>clusterGroupTest()</code> part of the result.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>repeat.max</code></td>
+<td>
+<p>positive integer indicating the maximal number of
+split trials.   Should not matter in regular cases, but necessary to
+prevent infinite loops in borderline cases.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p>should information be printed out while computing? (logical).</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>pval.corr</code></td>
+<td>
+<p>Vector of multiple testing corrected p-values.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>gamma.min</code></td>
+<td>
+<p>Value of gamma where minimal p-values was attained.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>clusterGroupTest</code></td>
+<td>
+<p>Function to perform groupwise tests based on
+hierarchical clustering.  You can either provide a distance matrix
+and clustering method or the output of hierarchical clustering from
+the function <code>hclust</code> as for
+<code>clusterGroupBound</code>. P-values are adjusted for multiple
+testing.</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>Lukas Meier, Ruben Dezeure, Jacopo Mandozzi</p>
+
+
+<h3>References</h3>
+
+<p>Meinshausen, N., Meier, L. and Bühlmann, P. (2009)
+P-values for high-dimensional regression.
+<em>Journal of the American Statistical Association</em> <b>104</b>,
+1671–1681.
+</p>
+<p>Mandozzi, J. and Bühlmann, P. (2015)
+A sequential rejection testing method for high-dimensional regression
+with correlated variables. To appear in the International Journal of
+Biostatistics. Preprint arXiv:1502.03300
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>lasso.cv</code>, <code>lasso.firstq</code>;
+<code>lm.pval</code>, <code>lm.ci</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">n &lt;-  40 # a bit small, to keep example "fast"
+p &lt;- 256
+x &lt;- matrix(rnorm(n * p), nrow = n, ncol = p)
+y &lt;- x[,1] * 2 + x[,2] * 2.5 + rnorm(n)
+
+## Multi-splitting with lasso.firstq as model selector function
+## 'q' must be specified
+fit.multi &lt;- multi.split(x, y, model.selector = lasso.firstq,
+                         args.model.selector = list(q = 10))
+fit.multi
+head(fit.multi$pval.corr, 10) ## the first 10 p-values
+ci. &lt;- confint(fit.multi)
+head(ci.) # the first 6
+stopifnot(all.equal(ci.,
+     with(fit.multi, cbind(lci, uci)), check.attributes=FALSE))
+
+
+## Use default 'lasso.cv' (slower!!) -- incl cluster group testing:
+system.time(fit.m2 &lt;- multi.split(x, y, return.selmodels = TRUE))# 9 sec (on "i7")
+head(fit.m2$pval.corr) ## the first  6  p-values
+head(confint(fit.m2))  ## the first  6  95% conf.intervals
+
+## Now do clustergroup testing
+clGTst &lt;- fit.m2$clusterGroupTest
+names(envGT &lt;- environment(clGTst))# about 14
+if(!interactive()) # if you are curious (and advanced):
+  print(ls.str(envGT), max = 0)
+stopifnot(identical(clGTst, envGT$clusterGroupTest))
+ccc &lt;- clGTst()
+str(ccc)
+ccc$hh   # the clustering
+has.1.or.2 &lt;- sapply(ccc$clusters,
+                function(j.set) any(c(1,2) %in% j.set))
+ccc$pval[ has.1.or.2] ## all very small
+ccc$pval[!has.1.or.2] ## all 1
+
+</code></pre>
+
+
+</div>

@@ -1,0 +1,80 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>sirEval</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>SIR test problem</h2>
+
+<h3>Description</h3>
+
+<p>Epidemiology problem, initial and rescaled to [0,1]^2 versions.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">sirEval(x)
+
+sirSimulate(S0 = 1990, I0 = 10, M = S0 + I0, beta = 0.75, gamma = 0.5, imm = 0)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>vector of size two</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>S0</code></td>
+<td>
+<p>initial nunber of susceptibles</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>I0</code></td>
+<td>
+<p>initial number of infected</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>M</code></td>
+<td>
+<p>total population</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>beta, gamma, imm</code></td>
+<td>
+<p>control rates</p>
+</td>
+</tr>
+</table>
+<h3>References</h3>
+
+<p>R. Hu, M. Ludkovski (2017), Sequential Design for Ranking Response Surfaces, SIAM/ASA Journal on Uncertainty Quantification, 5(1), 212-239.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## SIR test problem illustration
+ngrid &lt;- 10 # increase
+xgrid &lt;- seq(0, 1, length.out = ngrid)
+Xgrid &lt;- as.matrix(expand.grid(xgrid, xgrid))
+
+nrep &lt;- 5 # increase
+X &lt;- Xgrid[rep(1:nrow(Xgrid), nrep),]
+Y &lt;- apply(X, 1, sirEval)
+dataSIR &lt;- find_reps(X, Y)
+filled.contour(xgrid, xgrid, matrix(lapply(dataSIR$Zlist, sd), ngrid),
+               xlab = "Susceptibles", ylab = "Infecteds", color.palette = terrain.colors)
+
+</code></pre>
+
+
+</div>

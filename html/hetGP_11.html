@@ -1,0 +1,127 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>crit_EI</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Expected Improvement criterion</h2>
+
+<h3>Description</h3>
+
+<p>Computes EI for minimization
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">crit_EI(x, model, cst = NULL, preds = NULL)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>matrix of new designs, one point per row (size n x d)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>model</code></td>
+<td>
+<p><code>homGP</code> or <code>hetGP</code> model, or their TP equivalents, including inverse matrices</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cst</code></td>
+<td>
+<p>optional plugin value used in the EI, see details</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>preds</code></td>
+<td>
+<p>optional predictions at <code>x</code> to avoid recomputing if already done</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p><code>cst</code> is classically the observed minimum in the deterministic case. 
+In the noisy case, the min of the predictive mean works fine.
+</p>
+
+
+<h3>Note</h3>
+
+<p>This is a beta version at this point.
+</p>
+
+
+<h3>References</h3>
+
+<p>Mockus, J.; Tiesis, V. &amp; Zilinskas, A. (1978).
+The application of Bayesian methods for seeking the extremum Towards Global Optimization, Amsterdam: Elsevier, 2, 2.<br><br></p>
+<p>Vazquez E, Villemonteix J, Sidorkiewicz M, Walter E (2008). 
+Global Optimization Based on Noisy Evaluations: An Empirical Study of Two Statistical Approaches, 
+Journal of Physics: Conference Series, 135, IOP Publishing.<br><br></p>
+<p>A. Shah, A. Wilson, Z. Ghahramani (2014), Student-t processes as alternatives to Gaussian processes, Artificial Intelligence and Statistics, 877–885.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Optimization example
+set.seed(42)
+
+
+## Noise field via standard deviation
+noiseFun &lt;- function(x, coef = 1.1, scale = 1){
+if(is.null(nrow(x)))
+ x &lt;- matrix(x, nrow = 1)
+   return(scale*(coef + cos(x * 2 * pi)))
+}
+
+## Test function defined in [0,1]
+ftest &lt;- function(x){
+if(is.null(nrow(x)))
+x &lt;- matrix(x, ncol = 1)
+return(f1d(x) + rnorm(nrow(x), mean = 0, sd = noiseFun(x)))
+}
+
+n_init &lt;- 10 # number of unique designs
+N_init &lt;- 100 # total number of points
+X &lt;- seq(0, 1, length.out = n_init)
+X &lt;- matrix(X[sample(1:n_init, N_init, replace = TRUE)], ncol = 1)
+Z &lt;- ftest(X)
+
+## Predictive grid
+ngrid &lt;- 51
+xgrid &lt;- seq(0,1, length.out = ngrid)
+Xgrid &lt;- matrix(xgrid, ncol = 1)
+
+model &lt;- mleHetGP(X = X, Z = Z, lower = 0.001, upper = 1)
+
+EIgrid &lt;- crit_EI(Xgrid, model)
+preds &lt;- predict(x = Xgrid, model)
+
+par(mar = c(3,3,2,3)+0.1)
+plot(xgrid, f1d(xgrid), type = 'l', lwd = 1, col = "blue", lty = 3,
+xlab = '', ylab = '', ylim = c(-8,16))
+points(X, Z)
+lines(Xgrid, preds$mean, col = 'red', lwd = 2)
+lines(Xgrid, qnorm(0.05, preds$mean, sqrt(preds$sd2)), col = 2, lty = 2)
+lines(Xgrid, qnorm(0.95, preds$mean, sqrt(preds$sd2)), col = 2, lty = 2)
+lines(Xgrid, qnorm(0.05, preds$mean, sqrt(preds$sd2 + preds$nugs)), col = 3, lty = 2)
+lines(Xgrid, qnorm(0.95, preds$mean, sqrt(preds$sd2 + preds$nugs)), col = 3, lty = 2)
+par(new = TRUE)
+plot(NA, NA, xlim = c(0, 1), ylim = c(0,max(EIgrid)), axes = FALSE, ylab = "", xlab = "")
+lines(xgrid, EIgrid, lwd = 2, col = 'cyan')
+axis(side = 4)
+mtext(side = 4, line = 2, expression(EI(x)), cex = 0.8)
+mtext(side = 2, line = 2, expression(f(x)), cex = 0.8)
+</code></pre>
+
+
+</div>

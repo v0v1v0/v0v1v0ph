@@ -1,0 +1,165 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>ts_compare_data</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Compare data over time periods</h2>
+
+<h3>Description</h3>
+
+<p>Given a tibble/data.frame, you can get date from two different but comparative
+date ranges. Lets say you want to compare visits in one year to visits from 2
+years before without also seeing the previous 1 year. You can do that with
+this function.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">ts_compare_data(.data, .date_col, .start_date, .end_date, .periods_back)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>.data</code></td>
+<td>
+<p>The date.frame/tibble that holds the data</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.date_col</code></td>
+<td>
+<p>The column with the date value</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.start_date</code></td>
+<td>
+<p>The start of the period you want to analyze</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.end_date</code></td>
+<td>
+<p>The end of the period you want to analyze</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.periods_back</code></td>
+<td>
+<p>How long ago do you want to compare data too. Time units
+are collapsed using <code>lubridate::floor_date()</code>. The value can be:
+</p>
+
+<ul>
+<li>
+<p> second
+</p>
+</li>
+<li>
+<p> minute
+</p>
+</li>
+<li>
+<p> hour
+</p>
+</li>
+<li>
+<p> day
+</p>
+</li>
+<li>
+<p> week
+</p>
+</li>
+<li>
+<p> month
+</p>
+</li>
+<li>
+<p> bimonth
+</p>
+</li>
+<li>
+<p> quarter
+</p>
+</li>
+<li>
+<p> season
+</p>
+</li>
+<li>
+<p> halfyear
+</p>
+</li>
+<li>
+<p> year
+</p>
+</li>
+</ul>
+<p>Arbitrary unique English abbreviations as in the <code>lubridate::period()</code> constructor are allowed.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+
+<ul>
+<li>
+<p> Uses the <code>timetk::filter_by_time()</code> function in order to filter the date
+column.
+</p>
+</li>
+<li>
+<p> Uses the <code>timetk::subtract_time()</code> function to subtract time from the start date.
+</p>
+</li>
+</ul>
+<h3>Value</h3>
+
+<p>A tibble.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Steven P. Sanderson II, MPH
+</p>
+
+
+<h3>See Also</h3>
+
+<p>Other Time_Filtering: 
+<code>ts_time_event_analysis_tbl()</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">suppressPackageStartupMessages(library(dplyr))
+suppressPackageStartupMessages(library(timetk))
+
+data_tbl &lt;- ts_to_tbl(AirPassengers) %&gt;%
+  select(-index)
+
+ts_compare_data(
+  .data           = data_tbl
+  , .date_col     = date_col
+  , .start_date   = "1955-01-01"
+  , .end_date     = "1955-12-31"
+  , .periods_back = "2 years"
+  ) %&gt;%
+  summarise_by_time(
+    .date_var = date_col
+    , .by     = "year"
+    , visits  = sum(value)
+  )
+
+</code></pre>
+
+
+</div>

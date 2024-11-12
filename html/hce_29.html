@@ -1,0 +1,203 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>simADHCE</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Simulate <code>adhce</code> object with given event rates of time-to-event outcomes (Weibull), mean and SD of the continuous outcome (normal or log-normal) by treatment group</h2>
+
+<h3>Description</h3>
+
+<p>Simulate <code>adhce</code> object with given event rates of time-to-event outcomes (Weibull), mean and SD of the continuous outcome (normal or log-normal) by treatment group
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">simADHCE(
+  n,
+  n0 = n,
+  TTE_A,
+  TTE_P,
+  CM_A,
+  CM_P,
+  CSD_A = 1,
+  CSD_P = CSD_A,
+  fixedfy = 1,
+  yeardays = 360,
+  pat = 100,
+  shape = 1,
+  logC = FALSE,
+  seed = NULL,
+  dec = 2
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>n</code></td>
+<td>
+<p>sample size in the active treatment group.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n0</code></td>
+<td>
+<p>sample size in the placebo group.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>TTE_A</code></td>
+<td>
+<p>event rates per year in the active group for the time-to-event outcomes.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>TTE_P</code></td>
+<td>
+<p>event rates per year in the placebo group for the time-to-event outcomes. Should have the same length as <code>TTE_A</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>CM_A</code></td>
+<td>
+<p>mean value for the continuous outcome of the active group.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>CM_P</code></td>
+<td>
+<p>mean value for the continuous outcome of the placebo group.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>CSD_A</code></td>
+<td>
+<p>standard deviation for the continuous outcome of the active group.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>CSD_P</code></td>
+<td>
+<p>standard deviation for the continuous outcome of the placebo group.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fixedfy</code></td>
+<td>
+<p>length of follow-up in years.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>yeardays</code></td>
+<td>
+<p>number of days in a year.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pat</code></td>
+<td>
+<p>scale of provided event rates (per <code>pat</code>-years).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>shape</code></td>
+<td>
+<p>shape of the Weibull distribution for time-to-event outcomes. Default is exponential distribution with <code>shape = 1</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>logC</code></td>
+<td>
+<p>logical, whether to use log-normal distribution for the continuous outcome.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>seed</code></td>
+<td>
+<p>for generating random numbers.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dec</code></td>
+<td>
+<p>decimal places for the continuous outcome used for rounding. The default is <code>dec = 2</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>an object of class <code>adhce</code> containing an <code>hce</code> object with its source datasets <code>ADET</code> (event-time dataset for all time-to-event outcomes per patient)
+and <code>BDS</code> (basic data structure for the continuous outcome for all patients). The <code>hce</code> object has the following columns:
+</p>
+
+<ul>
+<li>
+<p> ID subject identifier.
+</p>
+</li>
+<li>
+<p> TRTP planned treatment group - "A" for active, "P" for Placebo.
+</p>
+</li>
+<li>
+<p> GROUP type of the outcome, either "TTE" for time-to-event outcomes or "C" for continuous.
+Only one continuous outcome is possible, but no restriction on the number of "TTE" outcomes.
+</p>
+</li>
+<li>
+<p> GROUPN order of outcomes in <code>GROUP</code>, with a higher value signifying a better outcome.
+</p>
+</li>
+<li>
+<p> AVALT the timing of the time-to-event outcomes.
+</p>
+</li>
+<li>
+<p> AVAL0 numeric values of the continuous outcome and the timing of "TTE" outcomes.
+</p>
+</li>
+<li>
+<p> AVAL analysis values derived as <code>AVAL0 + GROUPN</code>. For the continuous outcome the values of <code>AVAL0</code> are shifted to start always from 0.
+</p>
+</li>
+<li>
+<p> seed the seed of the random sample. If not specified in <code>seed</code> argument will be selected based on system time.
+</p>
+</li>
+<li>
+<p> PADY primary analysis day, the length of fixed follow-up in days calculated as <code>yeardays</code> multiplied by <code>fixedfy</code>.
+</p>
+</li>
+</ul>
+<h3>See Also</h3>
+
+<p><code>simHCE()</code> for directly simulating <code>hce</code> objects.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Example 1
+Rates_A &lt;- c(1.72, 1.74, 0.58, 1.5, 1)
+Rates_P &lt;- c(2.47, 2.24, 2.9, 4, 6)
+l &lt;- simADHCE(n = 2500, TTE_A = Rates_A, TTE_P = Rates_P,
+              CM_A = -3, CM_P = -6, CSD_A = 16, CSD_P = 15, fixedfy = 3, seed = 2024)
+names(l)
+head(l$HCE)
+head(l$ADET)
+head(l$BDS)
+
+# Example 2
+Rates_A &lt;- 10
+Rates_P &lt;- 15
+l &lt;- simADHCE(n = 1000, n0 = 500, TTE_A = Rates_A, TTE_P = Rates_P, 
+CM_A = 0.1, CM_P = 0, seed = 5, shape = 0.2, logC = TRUE, dec = 0)
+summaryWO(l$HCE)
+</code></pre>
+
+
+</div>

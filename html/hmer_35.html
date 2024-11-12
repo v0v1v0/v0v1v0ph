@@ -1,0 +1,136 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>Proto_emulator</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Prototype Class for Emulator-like Objects</h2>
+
+<h3>Description</h3>
+
+<p>Converts a prediction object into a form useable in hmer.
+</p>
+<p>The history matching process can be used for objects that are not
+created by the <code>hmer</code> package: most notably Gaussian Process
+(GP) emulators but even for simple linear models. This R6 class
+converts such an object into a form that can be called directly and
+reliably by the methods of the package, including for visualisation
+and diagnostics.
+</p>
+
+
+<h3>Constructor</h3>
+
+<p><code>Proto_emulator$new(ranges, output_name,
+    predict_func, variance_func, ...)</code>
+</p>
+
+
+<h3>Arguments</h3>
+
+<p>Required:
+</p>
+<p><code>ranges</code> A list of ranges for the inputs to the model.
+</p>
+<p><code>output_name</code> The name of the output modelled.
+</p>
+<p><code>predict_func</code> The function that provides the predictions at
+a new point or points. The first argument of this function should be
+<code>x</code>, where <code>x</code> is a <code>data.frame</code> of points. Additional
+arguments can be specified as long as they match additional objects
+passed via <code>...</code> (see below for details).
+</p>
+<p><code>variance_func</code> The function that encodes the prediction error
+due to the model of choice. This, too, takes an argument <code>x</code> as
+above as its first argument. Additional arguments can be specified as
+long as they match additional objects passed via <code>...</code>
+(see below for details).
+</p>
+<p>Optional:
+</p>
+<p><code>implausibility_func</code> A function that takes points <code>x</code> and a
+target <code>z</code> (and potentially a cutoff value <code>cutoff</code> and additional
+arguments) and returns a measure of closeness of the predicted value to the target (or
+a boolean representing whether the prediction is within the specified
+cutoff). Any custom implausibility should satisfy the definition: that is,
+a point that is unlikely to match to the observation should have higher
+implausibility than a point likely to match to the observation. If, for
+example, a likelihood to be maximised is used as a surrogate for an
+implausibility function, then one should transform it accordingly.
+</p>
+<p>If this argument is not provided, the standard implausibility is used:
+namely, the absolute value of the difference between prediction and
+observation, divided by the square root of the sum in quadrature of
+the errors.
+</p>
+<p>Additional arguments can be specified as long as they match additional
+objects passed via <code>...</code> (see below for details).
+</p>
+<p><code>print_func</code> If the prediction object has a suitable print function
+that one wishes to transfer to the R6 class (e.g. <code>summary.lm</code>), it
+is specified here.
+</p>
+<p><code>...</code> Additional objects to pass to <code>predict_func</code>, <code>variance_func</code>,
+<code>implausibility_func</code> or <code>print_func</code>. The names of these objects
+must match the additional argument names in the corresponding functions.
+</p>
+
+
+<h3>Constructor Details</h3>
+
+<p>The constructor must take, as a minimum, the first four arguments (input
+ranges, output name, and the prediction and variance functions). Default
+behaviour exists if the implausibility function and print function are not
+specified. The output of the constructor is an R6 object with the classes
+"Emulator" and "EmProto".
+</p>
+
+
+<h3>Accessor Methods</h3>
+
+<p>Note that these have the same external structure as those in <code>Emulator</code>.
+</p>
+<p><code>get_exp(x)</code> Returns the prediction.
+</p>
+<p><code>get_cov(x)</code> Returns the prediction error.
+</p>
+<p><code>implausibility(x, z, cutoff = NULL)</code> Returns the 'implausibility'.
+</p>
+<p><code>print()</code> Prints relevant details of the object.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">    # Use linear regression with an "error" on the SIR dataset.
+    ranges &lt;- list(aSI = c(0.1, 0.8), aIR = c(0, 0.5), aSR = c(0, 0.05))
+    targets &lt;- SIREmulators$targets
+    lms &lt;- purrr::map(names(targets),
+     ~step(lm(data = SIRSample$training[,c(names(ranges), .)],
+      formula = as.formula(paste0(., "~(",
+       paste0(names(ranges), collapse = "+"),
+       ")^2"
+      ))
+    ), trace = 0))
+    # Set up the proto emulators
+    proto_ems &lt;- purrr::map(seq_along(lms), function(l) {
+      Proto_emulator$new(
+         ranges,
+         names(targets)[l],
+         function(x) predict(lms[[l]], x),
+         function(x) predict(lms[[l]], x, se.fit = TRUE)$se.fit^2 +
+            predict(lms[[l]], x, se.fit = TRUE)$residual.scale^2,
+         print_func = function() print(summary(lms[[l]]))
+      )
+    }) |&gt; setNames(names(targets))
+    # Test with some hmer functions
+    nth_implausible(proto_ems, SIRSample$validation, targets)
+    emulator_plot(proto_ems)
+    emulator_plot(proto_ems, 'imp', targets = targets)
+    validation_diagnostics(proto_ems, targets, SIRSample$validation)
+    new_points &lt;- generate_new_design(proto_ems, 100, targets)
+
+</code></pre>
+
+
+</div>

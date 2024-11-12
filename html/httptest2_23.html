@@ -1,0 +1,79 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>redact</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Remove sensitive content from HTTP responses</h2>
+
+<h3>Description</h3>
+
+<p>When recording requests for use as test fixtures, you don't want to include
+secrets like authentication tokens and personal ids. These functions provide
+a means for redacting this kind of content, or anything you want, from
+responses that <code>capture_requests()</code> saves.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">redact_cookies(response)
+
+redact_headers(response, headers = c())
+
+within_body_text(response, FUN)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>response</code></td>
+<td>
+<p>An <code>httr2_response</code> or <code>httr2_request</code> object to sanitize.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>headers</code></td>
+<td>
+<p>For <code>redact_headers()</code>, a character vector of header names to
+sanitize.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>FUN</code></td>
+<td>
+<p>For <code>within_body_text()</code>, a function that takes as its argument a
+character vector and returns a modified version of that. This function will
+be applied to the text of the response's body.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p><code>redact_cookies()</code> removes cookies from <code>httr2_response</code> objects
+and is the default redactor in <code>capture_requests()</code>.
+<code>redact_headers()</code> lets you target selected request and response headers for
+redaction.
+<code>within_body_text()</code> lets you manipulate the text of the response body
+and manages the parsing of the raw (binary) data in the <code>httr_response</code> object.
+</p>
+<p>Note that if you set a redacting function, it will also be applied to requests when loading mocks. This allows you to sanitize and/or shorten URLs in your mock files.
+</p>
+
+
+<h3>Value</h3>
+
+<p>All redacting functions return a well-formed <code>httr2_response</code>
+or <code>httr2_request</code> object.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>vignette("redacting", package = "httptest2")</code> for a detailed discussion of what these functions do and how to customize them. <code>gsub_response()</code> is another redactor.
+</p>
+
+
+</div>

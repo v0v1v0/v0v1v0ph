@@ -1,0 +1,482 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>Psm</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>N-state partitioned survival model</h2>
+
+<h3>Description</h3>
+
+<p>Simulate outcomes from an N-state partitioned survival model.
+</p>
+
+
+<h3>Format</h3>
+
+<p>An R6::R6Class object.
+</p>
+
+
+<h3>Public fields</h3>
+
+<div class="r6-fields">
+
+<dl>
+<dt><code>survival_models</code></dt>
+<dd>
+<p>The survival models used to predict survival curves. Must be
+an object of class <code>PsmCurves</code>.</p>
+</dd>
+<dt><code>utility_model</code></dt>
+<dd>
+<p>The model for health state utility. Must be an object of
+class <code>StateVals</code>.</p>
+</dd>
+<dt><code>cost_models</code></dt>
+<dd>
+<p>The models used to predict costs by health state.
+Must be a list of objects of class <code>StateVals</code>, where each element of the
+list represents a different cost category.</p>
+</dd>
+<dt><code>n_states</code></dt>
+<dd>
+<p>Number of states in the partitioned survival model.</p>
+</dd>
+<dt><code>t_</code></dt>
+<dd>
+<p>A numeric vector of times at which survival curves were predicted. Determined
+by the argument <code>t</code> in <code style="white-space: pre;">⁠$sim_curves()⁠</code>.</p>
+</dd>
+<dt><code>survival_</code></dt>
+<dd>
+<p>An object of class survival simulated using <code>sim_survival()</code>.</p>
+</dd>
+<dt><code>stateprobs_</code></dt>
+<dd>
+<p>An object of class stateprobs simulated using <code style="white-space: pre;">⁠$sim_stateprobs()⁠</code>.</p>
+</dd>
+<dt><code>qalys_</code></dt>
+<dd>
+<p>An object of class qalys simulated using <code style="white-space: pre;">⁠$sim_qalys()⁠</code>.</p>
+</dd>
+<dt><code>costs_</code></dt>
+<dd>
+<p>An object of class costs simulated using <code style="white-space: pre;">⁠$sim_costs()⁠</code>.</p>
+</dd>
+</dl>
+</div>
+
+
+<h3>Methods</h3>
+
+
+
+<h4>Public methods</h4>
+
+
+<ul>
+<li> <p><a href="#method-Psm-new"><code>Psm$new()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-Psm-sim_survival"><code>Psm$sim_survival()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-Psm-sim_stateprobs"><code>Psm$sim_stateprobs()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-Psm-sim_qalys"><code>Psm$sim_qalys()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-Psm-sim_costs"><code>Psm$sim_costs()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-Psm-summarize"><code>Psm$summarize()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-Psm-clone"><code>Psm$clone()</code></a>
+</p>
+</li>
+</ul>
+<hr>
+<a id="method-Psm-new"></a>
+
+
+
+<h4>Method <code>new()</code>
+</h4>
+
+<p>Create a new <code>Psm</code> object.
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>Psm$new(survival_models = NULL, utility_model = NULL, cost_models = NULL)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>survival_models</code></dt>
+<dd>
+<p>The <code>survival_models</code> field.</p>
+</dd>
+<dt><code>utility_model</code></dt>
+<dd>
+<p>The <code>utility_model</code> field.</p>
+</dd>
+<dt><code>cost_models</code></dt>
+<dd>
+<p>The <code>cost_models</code> field.</p>
+</dd>
+</dl>
+</div>
+
+
+
+<h5>Details</h5>
+
+<p><code>n_states</code> is set equal to the number of survival models plus one.
+</p>
+
+
+
+<h5>Returns</h5>
+
+<p>A new <code>Psm</code> object.
+</p>
+
+
+<hr>
+<a id="method-Psm-sim_survival"></a>
+
+
+
+<h4>Method <code>sim_survival()</code>
+</h4>
+
+<p>Simulate survival curves as a function of time using <code>PsmCurves$survival()</code>.
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>Psm$sim_survival(t)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>t</code></dt>
+<dd>
+<p>A numeric vector of times. The first element must be <code>0</code>.</p>
+</dd>
+</dl>
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>An instance of <code>self</code> with simulated output from <code>PsmCurves$survival()</code>
+stored in <code>survival_</code>.
+</p>
+
+
+<hr>
+<a id="method-Psm-sim_stateprobs"></a>
+
+
+
+<h4>Method <code>sim_stateprobs()</code>
+</h4>
+
+<p>Simulate health state probabilities from <code>survival_</code> using a partitioned
+survival analysis.
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>Psm$sim_stateprobs()</pre></div>
+
+
+
+<h5>Returns</h5>
+
+<p>An instance of <code>self</code> with simulated output of class stateprobs
+stored in <code>stateprobs_</code>.
+</p>
+
+
+<hr>
+<a id="method-Psm-sim_qalys"></a>
+
+
+
+<h4>Method <code>sim_qalys()</code>
+</h4>
+
+<p>Simulate quality-adjusted life-years (QALYs) as a function of <code>stateprobs_</code> and
+<code>utility_model</code>. See <code>sim_qalys()</code> for details.
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>Psm$sim_qalys(
+  dr = 0.03,
+  integrate_method = c("trapz", "riemann_left", "riemann_right"),
+  lys = TRUE
+)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>dr</code></dt>
+<dd>
+<p>Discount rate.</p>
+</dd>
+<dt><code>integrate_method</code></dt>
+<dd>
+<p>Method used to integrate state values when computing
+costs or QALYs. Options are <code>trapz</code> for the trapezoid rule,
+<code>riemann_left</code> for a left Riemann sum, and
+<code>riemann_right</code> for a right Riemann sum.</p>
+</dd>
+<dt><code>lys</code></dt>
+<dd>
+<p>If <code>TRUE</code>, then life-years are simulated in addition to QALYs.</p>
+</dd>
+</dl>
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>An instance of <code>self</code> with simulated output of class qalys stored
+in <code>qalys_</code>.
+</p>
+
+
+<hr>
+<a id="method-Psm-sim_costs"></a>
+
+
+
+<h4>Method <code>sim_costs()</code>
+</h4>
+
+<p>Simulate costs as a function of <code>stateprobs_</code> and <code>cost_models</code>.
+See <code>sim_costs()</code> for details.
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>Psm$sim_costs(
+  dr = 0.03,
+  integrate_method = c("trapz", "riemann_left", "riemann_right")
+)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>dr</code></dt>
+<dd>
+<p>Discount rate.</p>
+</dd>
+<dt><code>integrate_method</code></dt>
+<dd>
+<p>Method used to integrate state values when computing
+costs or QALYs. Options are <code>trapz</code> for the trapezoid rule,
+<code>riemann_left</code> for a left Riemann sum, and
+<code>riemann_right</code> for a right Riemann sum.</p>
+</dd>
+</dl>
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>An instance of <code>self</code> with simulated output of class costs stored
+in <code>costs_</code>.
+</p>
+
+
+<hr>
+<a id="method-Psm-summarize"></a>
+
+
+
+<h4>Method <code>summarize()</code>
+</h4>
+
+<p>Summarize costs and QALYs so that cost-effectiveness analysis can be performed.
+See <code>summarize_ce()</code>.
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>Psm$summarize(by_grp = FALSE)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>by_grp</code></dt>
+<dd>
+<p>If <code>TRUE</code>, then costs and QALYs are computed by subgroup. If
+<code>FALSE</code>, then costs and QALYs are aggregated across all patients (and subgroups).</p>
+</dd>
+</dl>
+</div>
+
+
+<hr>
+<a id="method-Psm-clone"></a>
+
+
+
+<h4>Method <code>clone()</code>
+</h4>
+
+<p>The objects of this class are cloneable with this method.
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>Psm$clone(deep = FALSE)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>deep</code></dt>
+<dd>
+<p>Whether to make a deep clone.</p>
+</dd>
+</dl>
+</div>
+
+
+
+
+<h3>References</h3>
+
+<p><a href="https://arxiv.org/abs/2102.09437">Incerti and Jansen (2021)</a>.
+See Section 2.3 for a mathematical description of a PSM and Section 4.2 for an
+example in oncology. The mathematical approach used to simulate costs and QALYs from
+state probabilities is described in Section 2.1.
+</p>
+
+
+<h3>See Also</h3>
+
+<p>The <code>PsmCurves</code> documentation
+describes the class for the survival models and the <code>StateVals</code> documentation
+describes the class for the cost and utility models. A <code>PsmCurves</code>
+object is typically created using <code>create_PsmCurves()</code>.
+The <code>PsmCurves</code> documentation provides an example in which the model
+is parameterized from parameter objects (i.e., without having the patient-level
+data required to fit a model with <code>R</code>). A longer example is provided in
+<code>vignette("psm")</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">library("flexsurv")
+library("ggplot2")
+theme_set(theme_bw())
+
+# Model setup
+strategies &lt;- data.frame(strategy_id = c(1, 2, 3),
+                         strategy_name = paste0("Strategy ", 1:3))
+patients &lt;- data.frame(patient_id = seq(1, 3),
+                       age = c(45, 50, 60),
+                       female = c(0, 0, 1))
+states &lt;- data.frame(state_id =  seq(1, 3),
+                     state_name = paste0("State ", seq(1, 3)))
+hesim_dat &lt;- hesim_data(strategies = strategies,
+                        patients = patients,
+                        states = states)
+labs &lt;- c(
+  get_labels(hesim_dat),
+  list(curve = c("Endpoint 1" = 1,
+                 "Endpoint 2" = 2,
+                 "Endpoint 3" = 3))
+)
+n_samples &lt;- 2
+
+# Survival models
+surv_est_data &lt;- psm4_exdata$survival
+fit1 &lt;- flexsurvreg(Surv(endpoint1_time, endpoint1_status) ~ factor(strategy_id),
+                    data = surv_est_data, dist = "exp")
+fit2 &lt;- flexsurvreg(Surv(endpoint2_time, endpoint2_status) ~ factor(strategy_id),
+                    data = surv_est_data, dist = "exp")
+fit3 &lt;- flexsurvreg(Surv(endpoint3_time, endpoint3_status) ~ factor(strategy_id),
+                    data = surv_est_data, dist = "exp")
+fits &lt;- flexsurvreg_list(fit1, fit2, fit3)
+
+surv_input_data &lt;- expand(hesim_dat, by = c("strategies", "patients"))
+psm_curves &lt;- create_PsmCurves(fits, input_data = surv_input_data,
+                               uncertainty = "bootstrap", est_data = surv_est_data,
+                               n = n_samples)
+
+# Cost model(s)
+cost_input_data &lt;- expand(hesim_dat, by = c("strategies", "patients", "states"))
+fit_costs_medical &lt;- lm(costs ~ female + state_name,
+                        data = psm4_exdata$costs$medical)
+psm_costs_medical &lt;- create_StateVals(fit_costs_medical,
+                                      input_data = cost_input_data,
+                                      n = n_samples)
+
+# Utility model
+utility_tbl &lt;- stateval_tbl(tbl = data.frame(state_id = states$state_id,
+                                             min = psm4_exdata$utility$lower,
+                                             max = psm4_exdata$utility$upper),
+                            dist = "unif")
+psm_utility &lt;- create_StateVals(utility_tbl, n = n_samples,
+                                hesim_data = hesim_dat)
+
+# Partitioned survival decision model
+psm &lt;- Psm$new(survival_models = psm_curves,
+               utility_model = psm_utility,
+               cost_models = list(medical = psm_costs_medical))
+psm$sim_survival(t = seq(0, 5, 1/12))
+autoplot(psm$survival_, labels = labs, ci = FALSE, ci_style = "ribbon")
+psm$sim_stateprobs()
+autoplot(psm$stateprobs_, labels = labs)
+psm$sim_costs(dr = .03)
+head(psm$costs_)
+head(psm$sim_qalys(dr = .03)$qalys_)
+</code></pre>
+
+
+</div>

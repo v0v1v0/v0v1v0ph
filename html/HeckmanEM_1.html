@@ -1,0 +1,89 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>CaseDeletion</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Case deletion analysis for Heckman selection model</h2>
+
+<h3>Description</h3>
+
+<p>This function performs case deletion analysis based on a HeckmanEM object (not available for the
+contaminated normal model).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">CaseDeletion(object)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table><tr style="vertical-align: top;">
+<td><code>object</code></td>
+<td>
+<p>A HeckmanEM object.</p>
+</td>
+</tr></table>
+<h3>Details</h3>
+
+<p>This function uses the case deletion approach to study
+the impact of deleting one or more observations from the dataset
+on the parameters estimates, using the ideas of Cook (1977) and Zhu et.al. (2001).
+The GD vector contains the generalized Cook distances
+</p>
+<p style="text-align: center;"><code class="reqn">\textrm{GD}^1_i = \dot{Q}_{[i]}(\widehat{\boldsymbol{\theta}} \mid \widehat{\boldsymbol{\theta}})^{\top} \left\{-\ddot{Q}(\widehat{\boldsymbol{\theta}} \mid \widehat{\boldsymbol{\theta}})\right\}^{-1}\dot{Q}_{[i]}(\widehat{\boldsymbol{\theta}} \mid \widehat{\boldsymbol{\theta}}),</code>
+</p>
+
+<p>where <code class="reqn">\dot{Q}_{[i]}(\widehat{\boldsymbol{\theta}}\mid \widehat{\boldsymbol{\theta}})</code> is the gradient vector after dropping the <code class="reqn">i</code>th observation, and
+<code class="reqn">\ddot{Q}(\widehat{\boldsymbol{\theta}} \mid \widehat{\boldsymbol{\theta}})</code> is the Hessian matrix. The benchmark was adapted using the suggestion of Barros et al. (2010). We use <code class="reqn">(2 \times \textrm{npar})/n</code> as the benchmark for the <code class="reqn">\textrm{GD}_i</code>, with <code class="reqn">\textrm{npar}</code> representing the number of estimated model parameters.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A list of class <code>HeckmanEM.deletion</code> with a vector GD of dimension <code class="reqn">n</code> (see details), and a benchmark value.
+</p>
+
+
+<h3>References</h3>
+
+<p>M. Barros, M. Galea, M. González, V. Leiva, Influence diagnostics in the Tobit censored response model, Statistical Methods &amp; Applications 19 (2010) 379–397.
+</p>
+<p>R. D. Cook, Detection of influential observation in linear regression, Technometrics 19 (1977) 15–18.
+</p>
+<p>H. Zhu, S. Lee, B. Wei, J. Zhou, Case-deletion measures for models with incomplete data, Biometrika 88 (2001) 727–737.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">n    &lt;- 100
+nu   &lt;- 3
+cens &lt;- 0.25
+
+set.seed(13)
+w &lt;- cbind(1, runif(n, -1, 1), rnorm(n))
+x &lt;- cbind(w[,1:2])
+c &lt;- qt(cens, df = nu)
+
+sigma2   &lt;- 1
+beta     &lt;- c(1, 0.5)
+gamma    &lt;- c(1, 0.3, -.5)
+gamma[1] &lt;- -c * sqrt(sigma2)
+
+datas &lt;- rHeckman(x, w, beta, gamma, sigma2, rho = 0.6, nu, family = "T")
+y     &lt;- datas$y
+cc    &lt;- datas$cc
+
+heckmodel &lt;- HeckmanEM(y, x, w, cc, family = "Normal", iter.max = 50)
+
+global &lt;- CaseDeletion(heckmodel)
+plot(global)
+
+</code></pre>
+
+
+</div>

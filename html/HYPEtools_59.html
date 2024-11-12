@@ -1,0 +1,234 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>MapRegionalSources</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Map regional irrigation source connection as spatial lines</h2>
+
+<h3>Description</h3>
+
+<p>By default, this function creates an <code>sf</code> object which contains regional irrigation connections between
+source and target HYPE sub-catchments. However, this function can also be used to create interactive Leaflet maps.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">MapRegionalSources(
+  data,
+  map,
+  map.subid.column = 1,
+  group.column = NULL,
+  group.colors = NULL,
+  digits = 3,
+  progbar = FALSE,
+  map.type = "default",
+  plot.scale = TRUE,
+  plot.searchbar = FALSE,
+  weight = 0.5,
+  opacity = 1,
+  fillColor = "#4d4d4d",
+  fillOpacity = 0.25,
+  line.weight = 5,
+  line.opacity = 1,
+  seed = NULL,
+  darken = 0,
+  font.size = 10,
+  file = "",
+  vwidth = 1424,
+  vheight = 1000,
+  html.name = ""
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>Dataframe, containing a column <code>SUBID</code> and a column <code>REGSRCID</code> (not case-sensitive), which identify
+irrigation target and source sub-catchments, respectively. Typically a HYPE 'MgmtData.txt' file, imported with <code>ReadMgmtData</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>map</code></td>
+<td>
+<p>A <code>sf</code>, <code>SpatialPointsDataFrame</code>, or <code>SpatialPolygonsDataFrame</code> object providing sub-catchment locations as points or polygons. Typically an imported SUBID
+center-point shape file or geopackage. If provided polygon data, then the polygon centroids will be calculated and used as the point locations (See <code>sf::st_centroid()</code>). Spatial data import requires additional packages, e.g. <code>sf</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>map.subid.column</code></td>
+<td>
+<p>Integer, index of the column in <code>map</code> holding SUBIDs (sub-catchment IDs).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>group.column</code></td>
+<td>
+<p>Integer, optional index of the column in <code>data</code> providing grouping of connections to allow toggling of groups in Leaflet maps. Default <code>NULL</code> will produce maps without
+grouping.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>group.colors</code></td>
+<td>
+<p>Named list providing colors for connection groups in Leaflet maps. List names represent the names of the groups in the <code>group.column</code> of <code>data</code>, and list values represent the colors.
+Example: <code>groups.colors = list("GROUP 1" = "black", "GROUP 2" = "red")</code>. If a group is not included in <code>group.colors</code>, then random colors will be assigned to the connections in the group.
+Default <code>NULL</code> will produce maps using random colors for all groups.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>digits</code></td>
+<td>
+<p>Integer, number of digits to which irrigation connection lengths are rounded to.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>progbar</code></td>
+<td>
+<p>Logical, display a progress bar while calculating.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>map.type</code></td>
+<td>
+<p>Map type keyword string. Choose either <code>"default"</code> for the default static plots or <code>"leaflet"</code> for interactive Leaflet maps.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>plot.scale</code></td>
+<td>
+<p>Logical, include a scale bar on Leaflet maps.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>plot.searchbar</code></td>
+<td>
+<p>Logical, if <code>TRUE</code>, then a search bar will be included on Leaflet maps. See <code>leaflet.extras::addSearchFeatures()</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>weight</code></td>
+<td>
+<p>Numeric, weight of subbasin boundary lines in Leaflet maps. Used if <code>map</code> contains polygon data. See <code>leaflet::addPolygons()</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>opacity</code></td>
+<td>
+<p>Numeric, opacity of subbasin boundary lines in Leaflet maps. Used if <code>map</code> contains polygon data. See <code>leaflet::addPolygons()</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fillColor</code></td>
+<td>
+<p>String, color of subbasin polygons in Leaflet maps. Used if <code>map</code> contains polygon data. See <code>leaflet::addPolygons()</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fillOpacity</code></td>
+<td>
+<p>Numeric, opacity of subbasin polygons in Leaflet maps. Used if <code>map</code> contains polygon data. See <code>leaflet::addPolygons()</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>line.weight</code></td>
+<td>
+<p>Numeric, weight of connection lines in Leaflet maps. See <code>leaflet::addPolylines()</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>line.opacity</code></td>
+<td>
+<p>Numeric, opacity of connection lines in Leaflet maps. See <code>leaflet::addPolylines()</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>seed</code></td>
+<td>
+<p>Integer, seed number to to produce repeatable color palette.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>darken</code></td>
+<td>
+<p>Numeric specifying the amount of darkening applied to the random color palette. Negative values will lighten the palette. See <code>distinctColorPalette</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>font.size</code></td>
+<td>
+<p>Numeric, font size (px) for subbasin labels in Leaflet maps.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>file</code></td>
+<td>
+<p>Save a Leaflet map to an image file by specifying the path to the desired output file using this argument. File extension must be specified.
+See <code>mapview::mapshot()</code>.
+You may need to run <code>webshot::install_phantomjs()</code> the first time you save a map to an image file.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>vwidth</code></td>
+<td>
+<p>Numeric, width of the exported Leaflet map image in pixels. See <code>webshot::webshot()</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>vheight</code></td>
+<td>
+<p>Numeric, height of the exported Leaflet map image in pixels. See <code>webshot::webshot()</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>html.name</code></td>
+<td>
+<p>Save a Leaflet map to an interactive HTML file by specifying the path to the desired output file using this argument. File extension must be specified.
+See <code>htmlwidgets::saveWidget()</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p><code>MapRegionalSources</code> can return static plots or interactive Leaflet maps depending on value provided for the argument <code>map.type</code>.
+By default, <code>MapRegionalSources</code> creates an <code>sf</code> object from HYPE SUBID centerpoints using a table of SUBID pairs. Regional
+irrigation sources in HYPE are transfers from outlet lakes or rivers in a source sub-catchment to the soil storage of irrigated SLC classes
+(Soil, Land use, Crop) in a target sub-catchment. If <code>map.type</code> is set to "leaflet", then  <code>MapRegionalSources</code> returns an object of class <code>leaflet</code>.
+</p>
+
+
+<h3>Value</h3>
+
+<p>For default static maps, <code>MapRegionalSources</code> returns an <code>sf</code> object containing columns <code>SUBID</code> (irrigation target
+sub-catchment),  <code>REGSRCID</code> (irrigation source sub-catchment), and  <code>Length_[unit]</code> (distance between sub-catchments) where
+'unit' is the actual length unit of the distances. The projection of the returned object is always identical to the projection of
+argument <code>map</code>. For interactive Leaflet maps, <code>PlotMapOutput</code> returns an object of class <code>leaflet</code>. If <code>map</code> contains
+polygon data, then the interactive map will include the polygons as a background layer.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Import subbasin centroids and subbasin polygons (to use as background)
+require(sf)
+te1 &lt;- st_read(dsn = system.file("demo_model", "gis",
+"Nytorp_centroids.gpkg", package = "HYPEtools"))
+te2 &lt;- st_read(dsn = system.file("demo_model", "gis",
+"Nytorp_map.gpkg", package = "HYPEtools"))
+# Create dummy MgmtData file with irrigation links
+te3 &lt;- data.frame(SUBID = c(3594, 63794), REGSRCID = c(40556, 3486))
+
+# Plot regional irrigation links between subbasins with subbasin outlines as background
+MapRegionalSources(data = te3, map = te1, map.subid.column = 25)
+plot(st_geometry(te2), add = TRUE, border = 2)
+
+
+</code></pre>
+
+
+</div>

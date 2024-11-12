@@ -1,0 +1,84 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>inv_GMI</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Function to compute a vector of joint probabilities from a vector of generalizedmarginal interactions (GMI)
+</h2>
+
+<h3>Description</h3>
+
+<p> Given an hmmm model and the vector of its  generalized interactions eta
+the vector of joint probabilities p is  computed by inverting
+eta=C*ln(M*p)
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">inv_GMI(etpar, mod, start = NULL)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>etpar</code></td>
+<td>
+
+<p>vector of GMI
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mod</code></td>
+<td>
+
+<p>hmmm model corresponding to etapar; an object of class hmmmod created by hmmm.model
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>start</code></td>
+<td>
+
+<p>starting values for log-liner parameters in the non linear equations problem
+</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>vector of joint probabilities
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Colombi R.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">p4&lt;-c(
+0.0895, 0.0351 ,0.0004, 0.0003, 0.0352, 0.2775, 0.0619, 0.0004, 0.0004, 0.0620, 0.2775,
+0.0351 ,0.0001,
+0.0004, 0.0352 ,0.089)
+
+marg&lt;-marg.list(c("l-m","m-l","l-l"), mflag="m") 
+labelrisp&lt;-c("R1","R2")
+modello&lt;-hmmm.model(marg=marg,lev=c(4,4),names=labelrisp)
+etpar&lt;-GMI(c(p4),c("l-m","m-l","l-l"),c(4,4),labelrisp,mflag="m")
+etpar$gmi
+p4rec&lt;-inv_GMI(etpar$gmi,modello)
+P&lt;-cbind(p4rec,c(p4),c(p4)-p4rec)
+colnames(P)&lt;-c("prob","prob from eta","check")
+P
+</code></pre>
+
+
+</div>

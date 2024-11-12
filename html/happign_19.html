@@ -1,0 +1,166 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>get_wms_raster</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Download WMS raster layer</h2>
+
+<h3>Description</h3>
+
+<p>Download a raster layer from the IGN Web Mapping Services (WMS).
+Specify a location using a shape and provide the layer name.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">get_wms_raster(x,
+               layer = "ORTHOIMAGERY.ORTHOPHOTOS",
+               res = 10,
+               crs = 2154,
+               rgb = TRUE,
+               filename = tempfile(fileext = ".tif"),
+               verbose = TRUE,
+               overwrite = FALSE,
+               interactive = FALSE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>Object of class <code>sf</code> or <code>sfc</code>, located in France.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>layer</code></td>
+<td>
+<p><code>character</code>; layer name obtained from
+<code>get_layers_metadata("wms-r")</code> or the
+<a href="https://geoservices.ign.fr/services-web-experts">IGN website</a>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>res</code></td>
+<td>
+<p><code>numeric</code>; resolution specified in the units of
+the coordinate system (e.g., meters for EPSG:2154, degrees for EPSG:4326).
+See details for more information.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>crs</code></td>
+<td>
+<p><code>numeric</code>, <code>character</code>, or object of class <code>sf</code> or <code>sfc</code>;
+defaults to EPSG:2154. See <code>sf::st_crs()</code> for more details.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rgb</code></td>
+<td>
+<p><code>boolean</code>; if set to <code>TRUE</code>, downloads an RGB image. If set
+to <code>FALSE</code>, downloads a single band with floating point values.
+See details for more information.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>filename</code></td>
+<td>
+<p><code>character</code> or <code>NULL</code>; specifies the filename or an
+open connection for writing (e.g., "test.tif" or "~/test.tif").
+If <code>NULL</code>, uses <code>layer</code> as the filename. The default format is ".tif",
+but all <a href="https://gdal.org/en/latest/drivers/raster/index.html">GDAL drivers</a>
+are supported.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p><code>boolean</code>; if TRUE, message are added.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>overwrite</code></td>
+<td>
+<p><code>boolean</code>; if TRUE, the existing raster will be overwritten.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>interactive</code></td>
+<td>
+<p><code>logical</code>; if TRUE, an interactive menu prompts for
+<code>apikey</code> and <code>layer</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+
+<ul>
+<li> <p><code>res</code>: Note that setting <code>res</code> higher than the default resolution
+of the layer will increase the number of pixels but not the precision
+of the image. For instance, downloading the BD Alti layer from IGN
+is optimal at a resolution of 25m.
+</p>
+</li>
+<li> <p><code>rgb</code>: Rasters are commonly used to download images such as orthophotos.
+In specific cases like DEMs, however, a value per pixel is essential.
+</p>
+</li>
+<li> <p><code>overwrite</code>: The function <code>get_wms_raster</code> first checks if
+<code>filename</code> already exists. If it does, the file is imported into
+R without downloading again, unless <code>overwrite</code> is set to <code>TRUE</code>.
+</p>
+</li>
+</ul>
+<h3>Value</h3>
+
+<p><code>SpatRaster</code> object from <code>terra</code> package.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>get_layers_metadata()</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+library(sf)
+library(tmap)
+
+# Shape from the best town in France
+penmarch &lt;- read_sf(system.file("extdata/penmarch.shp", package = "happign"))
+
+# For quick testing use interactive = TRUE
+raster &lt;- get_wms_raster(x = penmarch, res = 25, interactive = TRUE)
+
+# For specific data, choose apikey with get_apikey() and layer with get_layers_metadata()
+apikey &lt;- get_apikeys()[4]  # altimetrie
+metadata_table &lt;- get_layers_metadata("wms-r", apikey) # all layers for altimetrie wms
+layer &lt;- metadata_table[2,1] # ELEVATION.ELEVATIONGRIDCOVERAGE
+
+# Downloading digital elevation model values not image
+mnt_2154 &lt;- get_wms_raster(penmarch, layer, res = 1, crs = 2154, rgb = FALSE)
+
+# If crs is set to 4326, res is in degrees
+mnt_4326 &lt;- get_wms_raster(penmarch, layer, res = 0.0001, crs = 4326, rgb = FALSE)
+
+# Plotting result
+tm_shape(mnt_4326)+
+   tm_raster()+
+tm_shape(penmarch)+
+   tm_borders(col = "blue", lwd  = 3)
+
+## End(Not run)
+
+</code></pre>
+
+
+</div>

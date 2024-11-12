@@ -1,0 +1,167 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>covratio.default</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Influence on precision of fixed effects in HLMs</h2>
+
+<h3>Description</h3>
+
+<p>These functions calculate measures of the change in the covariance
+matrices for the fixed effects based on the deletion of an
+observation, or group of observations, for a hierarchical 
+linear model fit using <code>lmer</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">## Default S3 method:
+covratio(object, ...)
+
+## Default S3 method:
+covtrace(object, ...)
+
+## S3 method for class 'mer'
+covratio(object, level = 1, delete = NULL, ...)
+
+## S3 method for class 'lmerMod'
+covratio(object, level = 1, delete = NULL, ...)
+
+## S3 method for class 'lme'
+covratio(object, level = 1, delete = NULL, ...)
+
+## S3 method for class 'mer'
+covtrace(object, level = 1, delete = NULL, ...)
+
+## S3 method for class 'lmerMod'
+covtrace(object, level = 1, delete = NULL, ...)
+
+## S3 method for class 'lme'
+covtrace(object, level = 1, delete = NULL, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>object</code></td>
+<td>
+<p>fitted object of class <code>mer</code> or <code>lmerMod</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>do not use</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>level</code></td>
+<td>
+<p>variable used to define the group for which cases will be
+deleted.  If <code>level = 1</code> (default), then individual cases will be deleted.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>delete</code></td>
+<td>
+<p>index of individual cases to be deleted. To delete specific 
+observations the row number must be specified. To delete higher level
+units the group ID and <code>group</code> parameter must be specified.
+If <code>delete = NULL</code> then all cases are iteratively deleted.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Both the covariance ratio (<code>covratio</code>) and the covariance trace
+(<code>covtrace</code>) measure the change in the covariance matrix
+of the fixed effects based on the deletion of a subset of observations.
+The key difference is how the variance covariance matrices are compared:
+<code>covratio</code> compares the ratio of the determinants while <code>covtrace</code>
+compares the trace of the ratio.
+</p>
+
+
+<h3>Value</h3>
+
+<p>If <code>delete = NULL</code> then a vector corresponding to each deleted
+observation/group is returned.
+</p>
+<p>If <code>delete</code> is specified then a single value is returned corresponding
+to the deleted subset specified.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Adam Loy <a href="mailto:loyad01@gmail.com">loyad01@gmail.com</a>
+</p>
+
+
+<h3>References</h3>
+
+<p>Christensen, R., Pearson, L., &amp; Johnson, W. (1992) 
+Case-deletion diagnostics for mixed models. <em>Technometrics</em>, <b>34</b>(1), 
+38–45.
+</p>
+<p>Schabenberger, O. (2004) Mixed Model Influence Diagnostics,
+in <em>Proceedings of the Twenty-Ninth SAS Users Group International Conference</em>,
+SAS Users Group International.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>leverage.mer</code>, <code>cooks.distance.mer</code>
+<code>mdffits.mer</code>, <code>rvc.mer</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+data(sleepstudy, package = 'lme4')
+ss &lt;- lme4::lmer(Reaction ~ Days + (Days | Subject), data = sleepstudy)
+
+# covratio for individual observations
+ss.cr1 &lt;- covratio(ss)
+
+# covratio for subject-level deletion
+ss.cr2 &lt;- covratio(ss, level = "Subject")
+
+## Not run: 
+## A larger example
+data(Exam, package = 'mlmRev')
+fm &lt;- lme4::lmer(normexam ~ standLRT * schavg + (standLRT | school), data = Exam)
+
+# covratio for individual observations
+cr1 &lt;- covratio(fm)
+
+# covratio for school-level deletion
+cr2 &lt;- covratio(fm, level = "school")
+
+## End(Not run)
+
+# covtrace for individual observations
+ss.ct1 &lt;- covtrace(ss)
+
+# covtrace for subject-level deletion
+ss.ct2 &lt;- covtrace(ss, level = "Subject")
+
+## Not run: 
+## Returning to the larger example
+# covtrace for individual observations
+ct1 &lt;- covtrace(fm)
+
+# covtrace for school-level deletion
+ct2 &lt;- covtrace(fm, level = "school")
+
+## End(Not run)
+</code></pre>
+
+
+</div>

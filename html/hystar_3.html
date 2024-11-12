@@ -1,0 +1,311 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hystar_fit</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Estimate the HysTAR model using conditional least squares estimation</h2>
+
+<h3>Description</h3>
+
+<p>This function allows you to estimate the parameters of the hysteretic threshold
+autoregressive (HysTAR) model.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hystar_fit(
+  data,
+  r = c(0.1, 0.9),
+  d = 0L,
+  p0 = 1L,
+  p1 = 1L,
+  p_select = "bic",
+  thin = FALSE,
+  tar = FALSE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>a vector, matrix or data.frame containing the outcome variable
+<code class="reqn">y</code> in the first column and the threshold variable <code class="reqn">z</code> in the second.
+Other columns are ignored.
+A vector, is taken to be both the outcome and control variable,
+so, in that case, a self-exciting HysTAR is fitted.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>r</code></td>
+<td>
+<p>A vector or a matrix with search values for <code class="reqn">\hat{r}_0, \hat{r}_1</code>.
+Defaults to <code>c(.1, .9)</code>.
+</p>
+
+<ul>
+<li>
+<p> A vector <code>r</code> must contain two values <code class="reqn">a</code> and <code class="reqn">b</code> in <code class="reqn">[0, 1]</code>.
+The search space for the thresholds will be observed values of <code>z</code>
+between its <code class="reqn">100a\%</code> and <code class="reqn">100b\%</code> percentiles.
+</p>
+</li>
+<li>
+<p> A matrix <code>r</code> allows for a custom search. It must have two columns,
+such that each row represents a pair <code class="reqn">r_0 \le r_1</code> to test.
+You can use a matrix with one row if you don't want to estimate
+the thresholds. Note that the values in these matrix should be
+on the scale of <code>z</code>.
+</p>
+</li>
+</ul>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>d</code></td>
+<td>
+<p>A numeric vector with one or more values for the search space
+of the delay parameter. Defaults to 1. Typically, d is not very large, so
+a reasonable search space might be 0, 1, 2, ..., 5.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>p0</code></td>
+<td>
+<p>A numeric vector with one or more values for the search space
+of the autoregressive order of Regime 0. Defaults to 1.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>p1</code></td>
+<td>
+<p>Same as <code>p0</code>, but for regime 1. Note that it does not need to be
+equal to <code>p0</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>p_select</code></td>
+<td>
+<p>The information criterion that should be minimized to select
+the orders <code class="reqn">p_0</code> and <code class="reqn">p_1</code>. Choices:
+</p>
+
+<ul>
+<li> <p><code>"aic"</code> (Akaike Information Criterion)
+</p>
+</li>
+<li> <p><code>"aicc"</code> (Corrected Akaike Information Criterion)
+</p>
+</li>
+<li> <p><code>"bic"</code> (default, Bayesian Information Criterion)
+</p>
+</li>
+</ul>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>thin</code></td>
+<td>
+<p><code>TRUE</code> (default) or <code>FALSE</code>. Only relevant when <code>r</code> is a vector.
+</p>
+
+<ul>
+<li>
+<p> If <code>TRUE</code> (default), the search space for the thresholds are the
+<code class="reqn">100a\%, 100(a+0.01)\%, \dots, 100b\%</code> percentiles of <code>z</code>.
+This drastically reduces computation costs while keeping a reasonably large
+search space for the thresholds. Note that this is a purely practical
+choice with no theoretical justification.
+</p>
+</li>
+<li>
+<p> If <code>FALSE</code>, all observed unique values of <code>z</code> between
+the <code class="reqn">100a\%</code> and <code class="reqn">100b\%</code> percentiles of <code>z</code> will be considered.
+</p>
+</li>
+</ul>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tar</code></td>
+<td>
+<p><code>TRUE</code> or <code>FALSE</code> (default). Choose <code>TRUE</code> if you want to fit a traditional
+2-regime threshold autoregressive (TAR) model. In this model,
+there is only one threshold (or equivalently, a HysTAR model with <code class="reqn">r_0 = r_1</code>).</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>In regime 0, <code class="reqn">y_{t}</code> is predicted by values up to <code class="reqn">y_{t - p_0}</code>.
+This implies that the first <code class="reqn">p_0</code> time points can not be predicted. E.g.,
+if <code class="reqn">p_0 = 2</code>, <code class="reqn">y_1</code> would miss a value from <code class="reqn">y_{-1}</code>. Similarly, the
+value of the delay parameter implies that the regime is unknown for the first
+<code class="reqn">d</code> time points. To ensure that the same data are used on all options for
+<code>d</code>, <code>p0</code> and <code>p1</code>, the first <code>max(d, p0, p1)</code> observations are discarded for
+estimation of the parameters.
+</p>
+
+
+<h3>Value</h3>
+
+<p>An object of S3 class <code>hystar_fit</code>, which is a <code>list</code> containing the following
+items:
+</p>
+
+<ul>
+<li> <p><code style="white-space: pre;">⁠$data⁠</code>. A <code>data.frame</code> containing
+</p>
+
+<ul>
+<li> <p><code>y</code>, the outcome variable
+</p>
+</li>
+<li> <p><code>z</code>, the threshold variable
+</p>
+</li>
+<li> <p><code>H</code>, a logical vector that indicates at which time points the hysteresis
+effect is happening. Note that this vector starts with <code>NA</code>(s), since not all
+values can be predicted in the HysTAR model. See Details.
+</p>
+</li>
+<li> <p><code>R</code>, the regime indicator vector. (Also starts with <code>NA</code>(s).)
+</p>
+</li>
+</ul>
+</li>
+<li> <p><code style="white-space: pre;">⁠$residuals⁠</code>. Also accessible with the <code>residuals()</code> S3 method.
+</p>
+</li>
+<li> <p><code style="white-space: pre;">⁠$coefficients⁠</code>, a vector with the estimated coefficients.
+With the <code>coef()</code> S3 method, the coefficients are represented in a matrix.
+Use the <code>confint()</code> method to get the confidence intervals of the estimates.
+</p>
+</li>
+<li> <p><code style="white-space: pre;">⁠$delay⁠</code>, a scalar with the estimate for the delay parameter.
+</p>
+</li>
+<li> <p><code style="white-space: pre;">⁠$thresholds⁠</code>, a vector with the estimates of the thresholds.
+</p>
+</li>
+<li> <p><code style="white-space: pre;">⁠$orders⁠</code>, a vector with the estimates of the orders.
+</p>
+</li>
+<li> <p><code style="white-space: pre;">⁠$resvar⁠</code>, a vector with the estimates of the residual variances.
+</p>
+</li>
+<li> <p><code style="white-space: pre;">⁠$rss⁠</code>, the minimized residual sum of squares.
+</p>
+</li>
+<li> <p><code style="white-space: pre;">⁠$ic⁠</code>, a vector with the aic, the corrected aic and the bic.
+</p>
+</li>
+<li> <p><code style="white-space: pre;">⁠$n⁠</code>, a vector with the total effective observations and the
+effective obeservations in regime 0 and regime 1.
+</p>
+</li>
+<li> <p><code style="white-space: pre;">⁠$eff⁠</code>, a vector with the time indicators of the effective observations.
+</p>
+</li>
+<li> <p><code style="white-space: pre;">⁠$equiv⁠</code>, a matrix containing equivalent estimates for the delay and thresholds,
+i.e., estimates that imply exactly the same regime indicator vector, and
+as a result the same minimal residual sum of squares.
+</p>
+</li>
+<li> <p><code style="white-space: pre;">⁠$r_search⁠</code>, a vector with the <code class="reqn">r</code>-values that were considered.
+</p>
+</li>
+<li> <p><code style="white-space: pre;">⁠$tar⁠</code>, Logical: <code>TRUE</code> if a TAR model was fitted.
+</p>
+</li>
+</ul>
+<p>Implemented generics for the <code>hystar_fit</code> class:
+</p>
+
+<ul>
+<li> <p><code>plot()</code> plots the <code>z</code> variable and the <code>y</code> variable above one another.
+Shading of the background visualizes the regimes. Thresholds are drawn as
+horizontal lines in the <code>z</code> plot. You can provide regime_names (char vector of 2),
+main (char vector of 1), xlab (char vector of 1) and ylab (char vector of 2).
+</p>
+</li>
+<li> <p><code>summary()</code>, this also provides the p-values and standard errors for the
+estimates of the coefficients.
+</p>
+</li>
+<li> <p><code>print()</code> prints the estimates within the mathematical representation of the model.
+Note that the scalar multiplied with <code>e[t]</code> is the standard deviation
+of the residuals, <em>not</em> the variance. See also the model definition above.
+</p>
+</li>
+<li> <p><code>coef()</code>
+</p>
+</li>
+<li> <p><code>confint()</code>
+</p>
+</li>
+<li> <p><code>residuals()</code>
+</p>
+</li>
+<li> <p><code>fitted()</code>
+</p>
+</li>
+<li> <p><code>nobs()</code>
+</p>
+</li>
+</ul>
+<h3>The HysTAR model</h3>
+
+<p>The HysTAR model is defined as:
+</p>
+<p><code class="reqn"> y_t = \begin{cases} \phi_{00} + \phi_{01} y_{t-1} + \cdots +
+  \phi_{0 p_0} y_{t-p_0} + \sigma_{0} \epsilon_{t} \quad \mathrm{if}~R_{t} = 0 \\
+  \phi_{10} + \phi_{11} y_{t-1} + \cdots + \phi_{1 p_1} y_{t-p_1} + \sigma_{1} \epsilon_{t}
+  \quad \mathrm{if}~R_{t} = 1, \\ \end{cases} </code>
+</p>
+<p>with <code class="reqn"> R_t = \begin{cases} 0 \quad \quad \mathrm{if} \, z_{t-d} \in (-\infty, r_{0}] \\
+  R_{t-1} \quad \mathrm{if} \, z_{t-d} \in (r_0, r_1] \\ 1 \quad \quad \mathrm{if} \, z_{t-d}
+  \in (r_1, \infty), \\ \end{cases} </code>
+</p>
+<p>where <code class="reqn">p_j</code> denotes the order of regime <code class="reqn">j \in \{0,1\}</code> with
+coefficients <code class="reqn">\phi_{j0}, \dots, \phi_{j p_j \in (-1, 1)}</code>,
+<code class="reqn">\sigma_{j}</code> is the standard deviation of the residuals, and <code class="reqn">d \in
+  \{0, 1, 2, \dots\}</code> is a delay parameter. The parameters of primary interest are
+the thresholds <code class="reqn">r_0 \le r_1</code>. We let <code class="reqn">t = 0, 1, 2, ..., T</code>, where <code class="reqn">T</code>
+is the number of observations.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Daan de Jong.
+</p>
+
+
+<h3>References</h3>
+
+<p>Li, Guodong, Bo Guan, Wai Keung Li, en Philip L. H. Yu.
+‘Hysteretic Autoregressive Time Series Models’. Biometrika 102, nr. 3
+(september 2015): 717–23.
+</p>
+<p>Zhu, Ke, Philip L H Yu, en Wai Keung Li. ‘Testing for the Buffered
+Autoregressive Process’. Munich Personal RePEc Archive, (november 2013).
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">z &lt;- z_sim(n_t = 200, n_switches = 5, start_regime = 1)
+sim &lt;- hystar_sim(z = z, r = c(-.5, .5), d = 2, phi_R0 = c(0, .6), phi_R1 = 1)
+plot(sim)
+fit &lt;- hystar_fit(sim$data)
+summary(fit)
+</code></pre>
+
+
+</div>

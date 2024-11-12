@@ -1,0 +1,118 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>rtCreateTrans</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Create transaction data for rt approach</h2>
+
+<h3>Description</h3>
+
+<p>Generate standardized object for rt estimate approach
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">rtCreateTrans(trans_df, prop_id, trans_id, price, date = NULL,
+  periodicity = NULL, seq_only = FALSE, min_period_dist = NULL, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>trans_df</code></td>
+<td>
+<p>transactions in either a data.frame or a 'hpidata“ class from
+dateToPeriod() function</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>prop_id</code></td>
+<td>
+<p>field contain the unique property identification</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>trans_id</code></td>
+<td>
+<p>field containing the unique transaction identification</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>price</code></td>
+<td>
+<p>field containing the transaction price</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>date</code></td>
+<td>
+<p>default=NULL, field containing the date of the sale.
+Only necessary if not passing an 'hpidata' object</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>periodicity</code></td>
+<td>
+<p>default=NULL, field containing the desired periodicity of analysis.
+Only necessary if not passing a 'hpidata' object</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>seq_only</code></td>
+<td>
+<p>default=FALSE, indicating whether to only include sequential repeat observations
+1 to 2 and 2 to 3.  False returns 1 to 2, 1 to 3 and 2 to 3.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>min_period_dist</code></td>
+<td>
+<p>[12] Minimum number of period required between repeat sales</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Additional arguments</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>data.frame of repeat transactions. Note that a full data.frame of the possible
+periods, their values and names can be found in the attributes to the returned 'rtdata' object
+</p>
+
+
+<h3>Further Details</h3>
+
+<p>Properties with greater than two transactions during the period will make pairwise matches
+among all sales.  Any property transacting twice in the same period will remove the lower
+priced of the two transactions.
+If passing a raw data.frame (not a 'hpidata“ object) the "date" field should refer to
+a field containing a vector of class POSIXt or Date.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+ # Load data
+ data(ex_sales)
+
+ # With a raw transaction data.frame
+ rt_data &lt;- rtCreateTrans(trans_df = ex_sales,
+                          prop_id = 'pinx',
+                          trans_id = 'sale_id',
+                          price = 'sale_price',
+                          periodicity = 'monthly',
+                          date = 'sale_date')
+
+</code></pre>
+
+
+</div>

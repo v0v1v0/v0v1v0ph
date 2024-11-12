@@ -1,0 +1,104 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>aggregateQuotes</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Aggregate a <code>data.table</code> or <code>xts</code> object containing quote data</h2>
+
+<h3>Description</h3>
+
+<p>Aggregate tick-by-tick quote data and return a <code>data.table</code> or <code>xts</code> object containing the aggregated quote data.
+See <code>sampleQData</code> for an example of the argument qData. This function accepts arbitrary number of symbols over an arbitrary number of days.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">aggregateQuotes(
+  qData,
+  alignBy = "minutes",
+  alignPeriod = 5,
+  marketOpen = "09:30:00",
+  marketClose = "16:00:00",
+  tz = NULL
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>qData</code></td>
+<td>
+<p><code>data.table</code> or <code>xts</code> object to be aggregated, containing the intraday quote data of a stock for one day.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alignBy</code></td>
+<td>
+<p>character, indicating the time scale in which <code>alignPeriod</code> is expressed. Possible values are: "secs", "seconds", "mins", "minutes","hours", and "ticks".
+To aggregate based on a 5 minute frequency, set <code>alignPeriod</code> to 5 and <code>alignBy</code> to <code>"minutes"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alignPeriod</code></td>
+<td>
+<p>positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate
+based on a 5 minute frequency, set <code>alignPeriod</code> to 5 and <code>alignBy</code> to <code>"minutes"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>marketOpen</code></td>
+<td>
+<p>the market opening time, by default: <code>marketOpen = "09:30:00"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>marketClose</code></td>
+<td>
+<p>the market closing time, by default: <code>marketClose = "16:00:00"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tz</code></td>
+<td>
+<p>fallback time zone used in case we we are unable to identify the timezone of the data, by default: <code>tz = NULL</code>. We attempt to extract the timezone from the DT column (or index) of the data, which may fail. 
+In case of failure we use <code>tz</code> if specified, and if it is not specified, we use <code>"UTC"</code></p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The output "BID" and "OFR" columns are constructed using previous tick aggregation.
+</p>
+<p>The variables "BIDSIZ" and "OFRSIZ" are aggregated by taking the sum of the respective inputs over each interval.
+</p>
+<p>The timestamps of the new time series are the closing times of the intervals. 
+</p>
+<p>Please note: Returned objects always contain the first observation (i.e. opening quotes,...).
+</p>
+
+
+<h3>Value</h3>
+
+<p>A <code>data.table</code> or an <code>xts</code> object containing the aggregated quote data.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Aggregate quote data to the 30 second frequency
+qDataAggregated &lt;- aggregateQuotes(sampleQData, alignBy = "seconds", alignPeriod = 30)
+qDataAggregated # Show the aggregated data
+</code></pre>
+
+
+</div>

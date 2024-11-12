@@ -1,0 +1,116 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>sandcov</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Compute Sandwich Variance-Covariance Estimates</h2>
+
+<h3>Description</h3>
+
+<p>'sandcov' computes sandwich variance-covariance estimates for the
+coefficients of a fitted model. These estimates may be used to
+calculate robust standard error estimates.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">
+sandcov(model, id)
+
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>model</code></td>
+<td>
+<p>a fitted model of class '"lm"' or '"glm"'.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>id</code></td>
+<td>
+<p>the numeric vector used to identify subjects, expanded for
+each subject by the number of observations for that subject.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>For a model of class '"haplo.ccs"', the sandwich variance-covariance
+matrix is automatically provided as the object 'covariance', or may be
+extracted by 'vcov' (i.e., 'vcov.haplo.ccs'). See examples below.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A named matrix for the covariance of the regression coefficients
+specified in 'model', calculated using the sandwich method.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Benjamin French and Thomas Lumley, University of Washington
+</p>
+
+
+<h3>References</h3>
+
+<p>French B, Lumley T, Monks SA, Rice KM, Hindorff LA, Reiner AP, Psaty
+BM. Simple estimates of haplotype relative risks in case-control
+data. Genetic Epidemiology 2006; 30(6):485-494.
+</p>
+<p>Liang KY, Zeger SL. Longitudinal data analysis using generalized
+linear models. Biometrika 1986; 73(1):13-22.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>glm</code>,
+<code>haplo.ccs</code>,
+<code>lm</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+data(renin)
+
+## Fit a model for covariate effects.
+
+m1 &lt;- glm(case ~ age + factor(race) + gender, family=binomial(link=logit))
+
+## Obtain sandwich variance-covariance matrix.
+
+id &lt;- 1:length(case)
+v1 &lt;- sandcov(model = m1, id = id)
+
+## Calculate robust standard error estimates.
+
+se1 &lt;- sqrt(diag(v1))
+
+## Fit a model for haplotype and covariate effects.
+
+m2 &lt;- haplo.ccs(case ~ gender + age + factor(race) + haplo(geno))
+
+## Obtain sandwich variance-covariance matrix by one of two methods.
+
+v2 &lt;- m2$covariance
+v2 &lt;- vcov(m2)
+
+## Calculate robust standard error estimates.
+
+se2 &lt;- sqrt(diag(v2))
+
+</code></pre>
+
+
+</div>

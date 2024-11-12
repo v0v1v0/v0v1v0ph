@@ -1,0 +1,165 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>calibrate_and_plot</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Helper function - Calibrate and Plot</h2>
+
+<h3>Description</h3>
+
+<p>This function is a helper function. It will take in a set of workflows and then
+perform the <code>modeltime::modeltime_calibrate()</code> and <code>modeltime::plot_modeltime_forecast()</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">calibrate_and_plot(
+  ...,
+  .type = "testing",
+  .splits_obj,
+  .data,
+  .print_info = TRUE,
+  .interactive = FALSE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>The workflow(s) you want to add to the function.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.type</code></td>
+<td>
+<p>Either the training(splits) or testing(splits) data.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.splits_obj</code></td>
+<td>
+<p>The splits object.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.data</code></td>
+<td>
+<p>The full data set.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.print_info</code></td>
+<td>
+<p>The default is TRUE and will print out the calibration
+accuracy tibble and the resulting plotly plot.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.interactive</code></td>
+<td>
+<p>The defaults is FALSE. This controls if a forecast plot
+is interactive or not via plotly.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>This function expects to take in workflows fitted with training data.
+</p>
+
+
+<h3>Value</h3>
+
+<p>The original time series, the simulated values and a some plots
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Steven P. Sanderson II, MPH
+</p>
+
+
+<h3>See Also</h3>
+
+<p>Other Utility: 
+<code>auto_stationarize()</code>,
+<code>internal_ts_backward_event_tbl()</code>,
+<code>internal_ts_both_event_tbl()</code>,
+<code>internal_ts_forward_event_tbl()</code>,
+<code>model_extraction_helper()</code>,
+<code>ts_get_date_columns()</code>,
+<code>ts_info_tbl()</code>,
+<code>ts_is_date_class()</code>,
+<code>ts_lag_correlation()</code>,
+<code>ts_model_auto_tune()</code>,
+<code>ts_model_compare()</code>,
+<code>ts_model_rank_tbl()</code>,
+<code>ts_model_spec_tune_template()</code>,
+<code>ts_qq_plot()</code>,
+<code>ts_scedacity_scatter_plot()</code>,
+<code>ts_to_tbl()</code>,
+<code>util_difflog_ts()</code>,
+<code>util_doublediff_ts()</code>,
+<code>util_doubledifflog_ts()</code>,
+<code>util_log_ts()</code>,
+<code>util_singlediff_ts()</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+suppressPackageStartupMessages(library(timetk))
+suppressPackageStartupMessages(library(dplyr))
+suppressPackageStartupMessages(library(recipes))
+suppressPackageStartupMessages(library(rsample))
+suppressPackageStartupMessages(library(parsnip))
+suppressPackageStartupMessages(library(workflows))
+
+data &lt;- ts_to_tbl(AirPassengers) %&gt;%
+  select(-index)
+
+splits &lt;- timetk::time_series_split(
+   data
+  , date_col
+  , assess = 12
+  , skip = 3
+  , cumulative = TRUE
+)
+
+rec_obj &lt;- recipe(value ~ ., data = training(splits))
+
+model_spec &lt;- linear_reg(
+   mode = "regression"
+   , penalty = 0.1
+   , mixture = 0.5
+) %&gt;%
+   set_engine("lm")
+
+wflw &lt;- workflow() %&gt;%
+   add_recipe(rec_obj) %&gt;%
+   add_model(model_spec) %&gt;%
+   fit(training(splits))
+
+output &lt;- calibrate_and_plot(
+  wflw
+  , .type = "training"
+  , .splits_obj = splits
+  , .data = data
+  , .print_info = FALSE
+  , .interactive = FALSE
+ )
+
+## End(Not run)
+
+</code></pre>
+
+
+</div>

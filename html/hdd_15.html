@@ -1,0 +1,119 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>readfst</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Read fst or HDD files as DT</h2>
+
+<h3>Description</h3>
+
+<p>This is the function <code>read_fst</code> but with automatic conversion
+to data.table. It also allows to read <code>hdd</code> data.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">readfst(path, columns = NULL, from = 1, to = NULL, confirm = FALSE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>path</code></td>
+<td>
+<p>Path to <code>fst</code> file – or path to <code>hdd</code> data. For hdd files,
+there is a</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>columns</code></td>
+<td>
+<p>Column names to read. The default is to read all columns. Ignored
+for <code>hdd</code> files.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>from</code></td>
+<td>
+<p>Read data starting from this row number. Ignored for <code>hdd</code> files.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>to</code></td>
+<td>
+<p>Read data up until this row number. The default is to read to the last
+row of the stored data set. Ignored for <code>hdd</code> files.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>confirm</code></td>
+<td>
+<p>If the HDD file is larger than ten times the variable <code>getHdd_extract.cap()</code>,
+then by default an error is raised. To anyway read the data, use <code>confirm = TRUE</code>.
+You can set the data cap with the function <code>setHdd_extract.cap</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>This function reads one or several <code>.fst</code> files and place them in a single
+data table.
+</p>
+
+
+<h3>Value</h3>
+
+<p>This function returns a data table located in memory. It allows to read in memory
+the <code>hdd</code> data saved on disk.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Laurent Berge
+</p>
+
+
+<h3>See Also</h3>
+
+<p>See <code>hdd</code>, <code>sub-.hdd</code> and <code>cash-.hdd</code>
+for the extraction and manipulation of out of memory data. For importation of
+HDD data sets from text files: see <code>txt2hdd</code>.
+</p>
+<p>See <code>hdd_slice</code> to apply functions to chunks of data (and create
+HDD objects) and <code>hdd_merge</code> to merge large files.
+</p>
+<p>To create/reshape HDD objects from memory or from other HDD objects, see
+<code>write_hdd</code>.
+</p>
+<p>To display general information from HDD objects: <code>origin</code>,
+<code>summary.hdd</code>, <code>print.hdd</code>,
+<code>dim.hdd</code> and <code>names.hdd</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+# Toy example with the iris data set
+
+# writing a hdd file
+hdd_path = tempfile()
+write_hdd(iris, hdd_path, rowsPerChunk = 30)
+
+# reading the full data in memory
+base_mem = readfst(hdd_path)
+
+# is equivalent to:
+base_hdd = hdd(hdd_path)
+base_mem_bis = base_hdd[]
+
+
+</code></pre>
+
+
+</div>

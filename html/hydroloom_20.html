@@ -1,0 +1,84 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>add_streamlevel</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Add Streamlevel</h2>
+
+<h3>Description</h3>
+
+<p>Applies a topological sort and calculates stream level.
+Algorithm: Terminal level paths are assigned level 1 (see note 1).
+Paths that terminate at a level 1 are assigned level 2. This pattern is
+repeated until no paths remain.
+</p>
+<p>If a TRUE/FALSE coastal attribute is included, coastal terminal paths
+begin at 1 and internal terminal paths begin at 4 as is implemented by
+the NHD stream leveling rules.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">add_streamlevel(x, coastal = NULL)
+
+## S3 method for class 'data.frame'
+add_streamlevel(x, coastal = NULL)
+
+## S3 method for class 'hy'
+add_streamlevel(x, coastal = NULL)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>data.frame network compatible with hydroloom_names.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>coastal</code></td>
+<td>
+<p>character attribute name containing a logical flag
+indicating if a given terminal catchment flows to the coast of is an
+inland sink. If no coastal flag is included, all terminal paths are
+assumed to be coastal.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>data,frame containing added <code>stream_level</code> attribute
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">x &lt;- sf::read_sf(system.file("extdata/new_hope.gpkg", package = "hydroloom"))
+
+x &lt;- add_toids(x)
+
+y &lt;- add_streamlevel(x)
+
+plot(sf::st_geometry(y), lwd = y$streamlevel, col = "blue")
+
+x$coastal &lt;- rep(FALSE, nrow(x))
+
+y &lt;- add_streamlevel(x, coastal = "coastal")
+
+unique(y$streamlevel)
+
+x$coastal[!x$Hydroseq == min(x$Hydroseq)] &lt;- TRUE
+
+y &lt;- add_streamlevel(x)
+
+unique(y$streamlevel)
+
+</code></pre>
+
+
+</div>

@@ -1,0 +1,231 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>plotmap</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Plot a Map and Identify/Select Spectra in the Map
+<code>levelplot</code> functions for hyperSpec objects.  An image or map of a summary
+value of each spectrum is plotted. Spectra may be identified by mouse click.</h2>
+
+<h3>Description</h3>
+
+<p>The <code>model</code> can contain the special column name <code>.wavelength</code> to specify the wavelength
+axis.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">plotmap(object, model = spc ~ x * y, func = mean, func.args = list(), ...)
+
+## S4 method for signature 'hyperSpec,missing'
+levelplot(x, data, ...)
+
+## S4 method for signature 'formula,hyperSpec'
+levelplot(
+  x,
+  data,
+  transform.factor = TRUE,
+  ...,
+  contour = FALSE,
+  useRaster = !contour
+)
+
+map.identify(
+  object,
+  model = spc ~ x * y,
+  voronoi = FALSE,
+  ...,
+  tol = 0.02,
+  warn = TRUE
+)
+
+plotvoronoi(object, model = spc ~ x * y, use.tripack = FALSE, mix = FALSE, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>object, data</code></td>
+<td>
+<p>the <code>hyperSpec</code> object</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>model, x</code></td>
+<td>
+<p>formula specifying the columns of object that are to be
+displayed by <code>levelplot</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>func, func.args</code></td>
+<td>
+<p>Before plotting, <code>plotmap</code> applies function
+<code>func</code> with the arguments given in the list <code>func.args</code> to each
+of the spectra. Thus a single summary value is displayed for each of the
+spectra.
+</p>
+<p>This can be suppressed manually by setting <code>func</code> to NULL. It is automatically suppressed if
+<code>.wavelength</code> appears in the formula.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>further arguments are passed down the call chain, and finally
+to <code>levelplot</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>transform.factor</code></td>
+<td>
+<p>If the color-coded variable is a factor, should
+<code>trellis.factor.key</code> be used to compute the color coding and
+legend?</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>contour, useRaster</code></td>
+<td>
+<p>see  <code>levelplot</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>voronoi</code></td>
+<td>
+<p>Should the plot for identifying spectra by mouse click be
+produced by <code>plotmap</code> (default) or <code>plotvoronoi</code>?</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tol</code></td>
+<td>
+<p>tolerance for <code>map.identify</code> as fraction of the viewport
+(i.e. in "npc" units)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>warn</code></td>
+<td>
+<p>should a warning be issued if no point is within the specified
+tolerance? See also details.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>use.tripack</code></td>
+<td>
+<p>Whether package tripack should be used for calculating
+the voronoi polygons. If <code>FALSE</code>, package deldir is used instead.
+See details.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mix</code></td>
+<td>
+<p>For Voronoi plots using package tripack, I experienced errors if
+the data was spatially ordered. Randomly rearrangig the rows of the
+hyperSpec object circumvents this problem.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p><code>plotmap</code>, <code>map.identify</code>, and the <code>levelplot</code> methods internally use the same
+gateway function to <code>levelplot</code>. Thus <code>transform.factor</code> can be used
+with all of them and the panel function defaults to <code>panel.levelplot.raster</code>
+for all three. Two special column names, <code>.rownames</code> and <code>.wavelength</code> may be used.
+</p>
+<p><code>levelplot</code> plots the spectra matrix.
+</p>
+<p><code>plotvoronoi</code> calls <code>plotmap</code> with different default settings, namely the panel
+function defaults to <code>panel.voronoi</code>.
+<code>panel.voronoi</code> depends on either of the packages 'tripack' or 'deldir'
+being installed. For further information, please consult the help page of
+<code>panel.voronoi</code>.  On the <code>chondro</code> data set, <code>plotmap</code>
+is roughly 5 times faster than <code>plotvoronoi</code> using tripack, and ca. 15 times faster than
+<code>plotvoronoi</code> using deldir. Package tripack, however, is free only for non-commercial
+use. Also, it seems that tripack version hang (R running at full CPU power, but not responding
+nor finishing the calculation) for certain data sets. In this case, <code>mix = TRUE</code> may help.
+</p>
+<p><code>map.identify</code> calls <code>plotmap</code> and <code>plotvoronoi</code>, respectively and waits for
+(left) mouse clicks on points. Other mouse clicks end the input.
+</p>
+<p>Unlike <code>panel.identify</code>, the indices returned by <code>map.identify</code> are in
+the same order as the points were clicked. Also, multiple clicks on the same point are returned
+as multiple entries with the same index.
+</p>
+<p><code>map.identify</code> uses option <code>debuglevel</code> similar to <code>spc.identify</code>:
+<code>debuglevel == 1</code> will plot the tolerance window if no data point was inside (and
+additionally labels the point) while <code>debuglevel == 2</code> will always plot the tolerance
+window.
+</p>
+<p>The <code>map.sel.*</code> functions offer further interactive selection, see
+<code>map.sel.poly</code>.
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>map.identify</code> returns a vector of row indices into
+<code>object</code> of the clicked points.
+</p>
+<p>The other functions return a lattice object.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>C. Beleites
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>vignette (plotting)</code>, <code>vignette (hyperspec)</code>
+</p>
+<p><code>plot</code>
+</p>
+<p><code>levelplot</code>
+</p>
+<p><code>trellis.factor.key</code> for improved color coding of factors
+</p>
+<p><code>hyperSpec options</code> <code>spc.identify</code>
+<code>map.sel.poly</code>
+</p>
+<p><code>panel.voronoi</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+## Not run: 
+vignette (plotting)
+vignette (hyperspec)
+
+## End(Not run)
+
+levelplot (spc ~ y * x, chondro [,,1003]) # properly rotated
+plotmap (chondro [,,1003])
+
+# plot spectra matrix
+levelplot (spc ~ .wavelength * t, laser, contour = TRUE, col = "#00000080")
+# see also plotmat
+
+plotmap (chondro, clusters ~ x * y)
+
+# Voronoi plots
+smpl &lt;- sample (chondro, 300)
+plotmap (smpl, clusters ~ x * y)
+if (require (deldir))
+    plotvoronoi (smpl, clusters ~ x * y,
+                 use.tripack = FALSE)
+
+</code></pre>
+
+
+</div>

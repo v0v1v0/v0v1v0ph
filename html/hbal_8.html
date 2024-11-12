@@ -1,0 +1,285 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hbal</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Hierarchically Regularized Entropy Balancing</h2>
+
+<h3>Description</h3>
+
+<p><code>hbal</code> performs hierarchically regularized entropy balancing 
+such that the covariate distributions of the control group match those of the 
+treatment group. <code>hbal</code> automatically expands the covariate space to include
+higher order terms and uses cross-validation to select variable penalties for the 
+balancing conditions.
+</p>
+<p>hbal performs hierarchically regularized entropy balancing such that the covariate distributions of the control group match those of the treatment group. hbal automatically expands the covariate space to include higher order terms and uses cross-validation to select variable penalties for the balancing conditions.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hbal(data, Treat, X, Y = NULL, w = NULL, 
+     X.expand = NULL, X.keep = NULL, expand.degree = 1,
+     coefs = NULL, max.iterations = 200, cv = NULL, folds = 4,
+     ds = FALSE, group.exact = NULL, group.alpha = NULL,
+     term.alpha = NULL, constraint.tolerance = 1e-3, print.level = 0,
+     grouping = NULL, group.labs = NULL, linear.exact = TRUE, shuffle.treat = TRUE,
+     exclude = NULL,force = FALSE, seed = 94035)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>a dataframe that contains the treatment, outcome, and covariates.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Treat</code></td>
+<td>
+<p>a character string of the treatment variable.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>X</code></td>
+<td>
+<p>a character vector of covariate names to balance on.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Y</code></td>
+<td>
+<p>a character string of the outcome variable.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>w</code></td>
+<td>
+<p>a character string of the weighting variable for base weights</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>X.expand</code></td>
+<td>
+<p>a character vector of covariate names for serial expansion.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>X.keep</code></td>
+<td>
+<p>a character vector of covariate names to keep regardless of whether they are selected in double selection.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>expand.degree</code></td>
+<td>
+<p>degree of series expansion. 1 means no expansion. Default is 1.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>coefs</code></td>
+<td>
+<p>initial coefficients for the reweighting algorithm (lambdas).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>max.iterations</code></td>
+<td>
+<p>maximum number of iterations. Default is 200.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cv</code></td>
+<td>
+<p>whether to use cross validation. Default is <code>TRUE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>folds</code></td>
+<td>
+<p>number of folds for cross validation. Only used when cv is <code>TRUE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ds</code></td>
+<td>
+<p>whether to perform double selection prior to balancing. Default is <code>FALSE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>group.exact</code></td>
+<td>
+<p>binary indicator of whether each covariate group should be exact balanced.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>group.alpha</code></td>
+<td>
+<p>penalty for each covariate group</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>term.alpha</code></td>
+<td>
+<p>named vector of ridge penalties, only takes 0 or 1.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>constraint.tolerance</code></td>
+<td>
+<p>tolerance level for overall imbalance. Default is 1e-3.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>print.level</code></td>
+<td>
+<p>details of printed output.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>grouping</code></td>
+<td>
+<p>different groupings of the covariates. Must be specified if expand is <code>FALSE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>group.labs</code></td>
+<td>
+<p>labels for user-supplied groups</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>linear.exact</code></td>
+<td>
+<p>seek exact balance on the level terms</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>shuffle.treat</code></td>
+<td>
+<p>whether to use cross-validation on the treated units. Default is <code>TRUE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>exclude</code></td>
+<td>
+<p>list of covariate name pairs or triplets to be excluded.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>force</code></td>
+<td>
+<p>binary indicator of whether to expand covariates when there are too many</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>seed</code></td>
+<td>
+<p>random seed to be set. Set random seed when cv=<code>TRUE</code> for reproducibility.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>In the simplest set-up, user can just pass in {Treatment, X, Y}. The default settings will serially expand
+X to include higher order terms, hierarchically residualize these terms, perform double selection to only keep the relevant
+variables and use cross-validation to select penalities for different groupings of the covariates.
+</p>
+
+
+<h3>Value</h3>
+
+<p>An list object of class <code>hbal</code> with the following elements:
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>coefs</code></td>
+<td>
+<p>vector that contains coefficients from the reweighting algorithm.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mat</code></td>
+<td>
+<p>matrix of serially expanded covariates if expand=<code>TRUE</code>. Otherwise, the original covariate matrix is returned.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>penalty</code></td>
+<td>
+<p>vector of ridge penalties used for each covariate</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>weights</code></td>
+<td>
+<p>vector that contains the control group weights assigned by hbal.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>W</code></td>
+<td>
+<p>vector of treatment status</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Y</code></td>
+<td>
+<p>vector of outcome</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>Yiqing Xu, Eddie Yang
+</p>
+<p>Yiqing Xu &lt;yiqingxu@stanford.edu&gt;, Eddie Yang &lt;z5yang@ucsd.edu&gt;
+</p>
+
+
+<h3>References</h3>
+
+<p>Xu, Y., &amp; Yang, E. (2022). Hierarchically Regularized Entropy Balancing. Political Analysis, 1-8. doi:10.1017/pan.2022.12
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Example 1
+set.seed(1984)
+N &lt;- 500
+X1 &lt;- rnorm(N)
+X2 &lt;- rbinom(N,size=1,prob=.5)
+X &lt;- cbind(X1, X2)
+treat &lt;- rbinom(N, 1, prob=0.5) # Treatment indicator
+y &lt;- 0.5 * treat + X[,1] + X[,2] + rnorm(N) # Outcome
+dat &lt;- data.frame(treat=treat, X, Y=y)
+out &lt;- hbal(Treat = 'treat', X = c('X1', 'X2'), Y = 'Y', data=dat)
+summary(hbal::att(out))
+
+# Example 2
+## Simulation from Kang and Shafer (2007).
+library(MASS)
+set.seed(1984)
+n &lt;- 500
+X &lt;- mvrnorm(n, mu = rep(0, 4), Sigma = diag(4))
+prop &lt;- 1 / (1 + exp(X[,1] - 0.5 * X[,2] + 0.25*X[,3] + 0.1 * X[,4]))
+# Treatment indicator
+treat &lt;- rbinom(n, 1, prop)
+# Outcome
+y &lt;- 210 + 27.4*X[,1] + 13.7*X[,2] + 13.7*X[,3] + 13.7*X[,4] + rnorm(n)
+# Observed covariates
+X.mis &lt;- cbind(exp(X[,1]/2), X[,2]*(1+exp(X[,1]))^(-1)+10, 
+    (X[,1]*X[,3]/25+.6)^3, (X[,2]+X[,4]+20)^2)
+dat &lt;- data.frame(treat=treat, X.mis, Y=y)
+out &lt;- hbal(Treat = 'treat', X = c('X1', 'X2', 'X3', 'X4'), Y='Y', data=dat)
+summary(att(out))
+</code></pre>
+
+
+</div>

@@ -1,0 +1,148 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hmcdm</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Gibbs sampler for learning models</h2>
+
+<h3>Description</h3>
+
+<p>Runs MCMC to estimate parameters of any of the listed learning models.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hmcdm(
+  Response,
+  Q_matrix,
+  model,
+  Design_array = NULL,
+  Test_order = NULL,
+  Test_versions = NULL,
+  chain_length = 100L,
+  burn_in = 50L,
+  G_version = NA_integer_,
+  theta_propose = 0,
+  Latency_array = NULL,
+  deltas_propose = NULL,
+  R = NULL
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>Response</code></td>
+<td>
+<p>An <code>array</code> of dichotomous item responses. t-th slice is an N-by-J matrix of responses at time t.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Q_matrix</code></td>
+<td>
+<p>A J-by-K Q-matrix.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>model</code></td>
+<td>
+<p>A <code>charactor</code> of the type of model fitted with the MCMC sampler, possible selections are
+"DINA_HO": Higher-Order Hidden Markov Diagnostic Classification Model with DINA responses;
+"DINA_HO_RT_joint": Higher-Order Hidden Markov DCM with DINA responses, log-Normal response times, and joint modeling of latent
+speed and learning ability;
+"DINA_HO_RT_sep": Higher-Order Hidden Markov DCM with DINA responses, log-Normal response times, and separate modeling of latent
+speed and learning ability;
+"rRUM_indept": Simple independent transition probability model with rRUM responses
+"NIDA_indept": Simple independent transition probability model with NIDA responses
+"DINA_FOHM": First Order Hidden Markov model with DINA responses</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Design_array</code></td>
+<td>
+<p>An <code>array</code> of dimension N-by-J-by-L indicating the items assigned (1/0) to each subject at each time point.
+Either 'Design_array' or both 'Test_order' &amp; 'Test_versions' need to be provided to run HMCDM.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Test_order</code></td>
+<td>
+<p>Optional. A <code>matrix</code> of the order of item blocks for each test version.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Test_versions</code></td>
+<td>
+<p>Optional. A <code>vector</code> of the test version of each learner.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>chain_length</code></td>
+<td>
+<p>An <code>int</code> of the MCMC chain length.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>burn_in</code></td>
+<td>
+<p>An <code>int</code> of the MCMC burn-in chain length.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>G_version</code></td>
+<td>
+<p>Optional. An <code>int</code> of the type of covariate for increased fluency (1: G is dichotomous depending on whether all skills required for
+current item are mastered; 2: G cumulates practice effect on previous items using mastered skills; 3: G is a time block effect invariant across
+subjects with different attribute trajectories)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>theta_propose</code></td>
+<td>
+<p>Optional. A <code>scalar</code> for the standard deviation of theta's proposal distribution in the MH sampling step.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Latency_array</code></td>
+<td>
+<p>Optional. A <code>array</code> of the response times. t-th slice is an N-by-J matrix of response times at time t.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>deltas_propose</code></td>
+<td>
+<p>Optional. A <code>vector</code> for the band widths of each lambda's proposal distribution in the MH sampling step.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>R</code></td>
+<td>
+<p>Optional. A reachability <code>matrix</code> for the hierarchical relationship between attributes.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A <code>list</code> of parameter samples and Metropolis-Hastings acceptance rates (if applicable).
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Susu Zhang
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+output_FOHM = hmcdm(Y_real_array, Q_matrix, "DINA_FOHM", Design_array, 100, 30)
+
+</code></pre>
+
+
+</div>

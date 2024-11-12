@@ -1,0 +1,96 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>mmcPruneIsomeans</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+MMC plots in lattice—suppress isomeans grid lines for specified levels
+of the factor.
+</h2>
+
+<h3>Description</h3>
+
+<p>MMC plots in lattice—suppress isomeans grid lines for specified levels
+of the factor.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">mmcPruneIsomeans(mmc, keep=NULL)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>mmc</code></td>
+<td>
+
+<p>An <code>"mmc.multicomp"</code> object.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>keep</code></td>
+<td>
+
+<p>Index vector of rows of <code>mmc$none$table</code> that will be kept in the display.
+</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A modified <code>"mmc.multicomp"</code> object.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>mmc</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## needed
+## Not run: 
+## See file hh/scripts/hh2/tway.R for the complete example.
+## A better example is needed for the .Rd documentation.
+## possibly based on filmcoat temperature | pressure example.
+data(rhiz.clover)
+c(1,2,5,10,11,12)
+rhiz.clover$cs &lt;- with(rhiz.clover, interaction(comb, strain))
+rhiz.clover.cs.aov &lt;- aov(Npg ~ cs, data=rhiz.clover)
+rhiz.clover.cs.aov
+cs.mmc &lt;- mmc(rhiz.clover.cs.aov, linfct=mcp(cs="Tukey"),
+              calpha=qtukey( .95, 6,  48)/sqrt(2))
+dlmat2 &lt;- dimnames(cs.mmc$mca$lmat)[[2]]
+cl.index &lt;- grep("clover\\.[[:print:]]*clover\\.", dlmat2, value=TRUE)
+
+cl.index
+clover.lmat &lt;- cs.mmc$mca$lmat[, cl.index] ## suppress "clover+alfalfa" contrasts
+dimnames(clover.lmat)[[1]]
+dimnames(clover.lmat)[[1]] &lt;- levels(rhiz.clover$cs)
+clover.lmat[1,] &lt;- -colSums(clover.lmat[-1, ])
+clover.lmat
+csc.mmc &lt;- mmc(rhiz.clover.cs.aov, linfct=mcp(cs="Tukey"),
+               focus.lmat=clover.lmat,
+               calpha=qtukey( .95, 6,  48)/sqrt(2))
+## this example needs a window 11 inches high and 14 inches wide
+mmcplot(csc.mmc, type="lmat", style="both")
+
+## suppress "clover+alfalfa" means
+csc.mmc.clover &lt;- mmcPruneIsomeans(csc.mmc, keep = c(1,2,5,10,11,12))
+csc.mmc.clover
+## this example needs a window 11 inches high and 14 inches wide
+mmcplot(csc.mmc.clover, type="lmat", style="both")
+
+## End(Not run)
+</code></pre>
+
+
+</div>

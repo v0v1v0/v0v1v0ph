@@ -1,0 +1,163 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hts</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Create a hierarchical time series</h2>
+
+<h3>Description</h3>
+
+<p>Method for creating hierarchical time series.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hts(y, nodes, bnames = colnames(y), characters)
+
+is.hts(xts)
+
+## S3 method for class 'hts'
+print(x, ...)
+
+## S3 method for class 'hts'
+summary(object, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+<p>A matrix or multivariate time series contain the bottom level
+series.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nodes</code></td>
+<td>
+<p>A list contains the number of child nodes associated with each
+level, which indicates the hierarchical structure. The default is a simple
+hierarchy with only 2 levels (i.e. total and bottom). If the argument
+<code>characters</code> is used, <code>nodes</code> will be automatically generated
+within the function.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>bnames</code></td>
+<td>
+<p>The names of the bottom time series.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>characters</code></td>
+<td>
+<p>Integers indicate the segments in which the bottom level
+names can be read in order to construct the corresponding node structure and
+its labels.  For instance, suppose one of the bottom series is named
+"VICMelb" referring to the city of Melbourne within the state of Victoria.
+Then <code>characters</code> would be specified as <code>c(3, 4)</code> referring to
+states of 3 characters (e.g., "VIC") and cities of 4 characters (e.g.,
+"Melb") All the bottom names must be of the same length, with number of
+characters for each segment the same for all series.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>xts</code></td>
+<td>
+<p><code>hts</code> object.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p><code>hts</code> object.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Extra arguments passed to <code>print</code> and <code>summary</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>object</code></td>
+<td>
+<p><code>hts</code> object.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>bts</code></td>
+<td>
+<p>Multivariate time series containing the bottom level
+series</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nodes</code></td>
+<td>
+<p>Information about the nodes of a hierarchical time
+series</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>labels</code></td>
+<td>
+<p>Information about the labels that are used for
+plotting.</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>Earo Wang and Rob J Hyndman
+</p>
+
+
+<h3>References</h3>
+
+<p>Hyndman, R. J., Ahmed, R. A., Athanasopoulos, G., &amp; Shang, H. L.
+(2011). Optimal combination forecasts for hierarchical time series.
+<em>Computational Statistics and Data Analysis</em>, <b>55</b>(9), 2579–2589.
+<a href="https://robjhyndman.com/publications/hierarchical/">https://robjhyndman.com/publications/hierarchical/</a>
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>gts</code>, <code>accuracy.gts</code>,
+<code>forecast.gts</code>, <code>plot.gts</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+# Example 1
+# The hierarchical structure looks like 2 child nodes associated with level 1,
+# which are followed by 3 and 2 sub-child nodes respectively at level 2.
+nodes &lt;- list(2, c(3, 2))
+abc &lt;- ts(5 + matrix(sort(rnorm(500)), ncol = 5, nrow = 100))
+x &lt;- hts(abc, nodes)
+
+# Example 2
+# Suppose we've got the bottom names that can be useful for constructing the node
+# structure and the labels at higher levels. We need to specify how to split them
+# in the argument "characters".
+library(hts)
+abc &lt;- ts(5 + matrix(sort(rnorm(1000)), ncol = 10, nrow = 100))
+colnames(abc) &lt;- c("A10A", "A10B", "A10C", "A20A", "A20B",
+                   "B30A", "B30B", "B30C", "B40A", "B40B")
+y &lt;- hts(abc, characters = c(1, 2, 1))
+
+</code></pre>
+
+
+</div>

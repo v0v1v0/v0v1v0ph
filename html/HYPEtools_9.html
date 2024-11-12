@@ -1,0 +1,176 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>BoxplotSLCClasses</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Box plots of SLC distributions</h2>
+
+<h3>Description</h3>
+
+<p><code>BoxplotSLCClasses</code> plots SLC class distributions for all SUBIDs in a GeoData data frame as boxplots. Boxes can represent distributions
+of area fractions
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">BoxplotSLCClasses(
+  gd,
+  gcl,
+  col.landuse = "rainbow",
+  col.group = NULL,
+  lab.legend = NULL,
+  pos.legend = 1,
+  abs.area = FALSE,
+  log = "",
+  ylim = NULL,
+  range = 0,
+  mar = c(3, 3, 1, 7) + 0.1,
+  mgp = c(1.5, 0.2, 0),
+  tcl = 0.1,
+  xaxs = "i",
+  xpd = TRUE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>gd</code></td>
+<td>
+<p>Data frame containing columns with SLC fractions, typically a 'GeoData.txt' file imported with <code>ReadGeoData</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>gcl</code></td>
+<td>
+<p>Data frame containing columns with SLCs and corresponding land use and soil class IDs, typically a 'GeoClass.txt'
+file imported with <code>ReadGeoClass</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>col.landuse</code></td>
+<td>
+<p>Specification of colors for box outlines, to represent land use classes. Either a keyword character string, or a vector of
+colors with one element for each land use class as given in argument <code>gcl</code> in ascending order. Possible keywords are <code>'rainbow'</code> (default)
+or <code>'auto'</code>. <code>'rainbow'</code> triggers a generation of land use class colors using the <code>rainbow</code> palette. <code>'auto'</code> triggers
+generation of a pretty color palette with similar colors for land use groups. This option requires specification of land use groups in argument
+<code>col.group</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>col.group</code></td>
+<td>
+<p>Integer vector of the same length as the number of land use classes given in <code>gcl</code>. Specifies a land use group ID for
+each land use class ID, in ascending order. Groups and group IDs to use (in parentheses):
+</p>
+
+<ul>
+<li>
+<p> Water, snow, and ice (1)
+</p>
+</li>
+<li>
+<p> Urban (2)
+</p>
+</li>
+<li>
+<p> Forests (3)
+</p>
+</li>
+<li>
+<p> Agriculture and pastures (4)
+</p>
+</li>
+<li>
+<p> Natural non-forested (5)
+</p>
+</li>
+</ul>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lab.legend</code></td>
+<td>
+<p>Character string giving optional land use and soil class names to label the legend. Land use classes first, then soil classes.
+Both following class IDs as given in <code>gcl</code> in ascending order.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pos.legend</code></td>
+<td>
+<p>Numeric, legend position in x direction. Given as position on the right hand outside of the plot area in x-axis units.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>abs.area</code></td>
+<td>
+<p>Logical, if <code>TRUE</code>, boxes will be plotted for absolute areas instead of area fractions.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>log</code></td>
+<td>
+<p>Character string, passed to <code>boxplot</code>. Empty string for linearly scaled axes, <code>'y'</code> for log scaled y-axis
+(particularly in combination with <code>abs.area = TRUE</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ylim</code></td>
+<td>
+<p>Numeric vector of length 2, y-axis minimum and maximum. Set automatically if not specified.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>range</code></td>
+<td>
+<p>Argument to <code>boxplot</code> with changed default. See documentation in there.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mar, mgp, tcl, xaxs, xpd</code></td>
+<td>
+<p>Arguments passed to <code>par</code>. See documentation in there.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p><code>BoxplotSLCClasses</code> allows to analyze the occurrence of individual SLCs in a given model set-up. both in terms of area fractions (SLC values)
+and absolute areas. The function uses <code>boxplot</code> to plot distributions of SLCs of all SUBIDs in a GeoData data frame. Land use classes
+are color-coded, and soil classes marked by a point symbol below each box. Box whiskers extend to the data extremes.
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>BoxplotSLCClasses</code> returns a plot to the currently active plot device, and invisibly a data frame of SLC class fractions with <code>0</code>
+values replaced by <code>NA</code>s. If absolute areas are plotted, these are returned in the data frame.
+</p>
+
+
+<h3>Note</h3>
+
+<p>There is a maximum of 26 symbols available for marking soil classes. <code>BoxplotSLCClasses</code> can be quite crowded, depending on the number of SLCs
+in a model set-up. Tested and recommended plot device dimensions are 14 x 7 inches (width x height), e.g.:
+</p>
+<p><kbd>&gt; x11(width = 14, height = 7)</kbd>
+</p>
+<p><kbd>&gt; png("mySLCdistri.png", width = 14, height = 7, units = "in", res = 600)</kbd>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Import source data
+te1 &lt;- ReadGeoData(filename = system.file("demo_model", "GeoData.txt", package = "HYPEtools"))
+te2 &lt;- ReadGeoClass(filename = system.file("demo_model", "GeoClass.txt", package = "HYPEtools"))
+BoxplotSLCClasses(gd = te1, gcl = te2)
+
+</code></pre>
+
+
+</div>

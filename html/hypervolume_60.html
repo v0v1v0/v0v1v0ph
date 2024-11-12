@@ -1,0 +1,111 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>occupancy_filter</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Subset occupancy hypervolumes
+</h2>
+
+<h3>Description</h3>
+
+<p>The <code>occupancy_filter()</code> function is used to subset an hypervolume generated with <code>hypervolume_n_occupancy()</code> or <code>hypervolume_n_occupancy_test()</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">occupancy_filter(hv, operator = NULL, filter = NULL, tol = 1e-10)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>hv</code></td>
+<td>
+
+<p>A <code>Hypervolume</code> or <code>HypervolumeList</code> object generated with <code>hypervolume_n_occupancy()</code> or <code>hypervolume_n_occupancy_test()</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>operator</code></td>
+<td>
+
+<p>Binary operator which allow the comparison.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>filter</code></td>
+<td>
+
+<p>Threshold value to perform the operation.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tol</code></td>
+<td>
+
+<p>Set the tolerance for reconstructing whole volume. See details.
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The <code>occupancy_filter()</code> function set the occupancy values to 0 based on the user-provided operation. Volume of the hypervolumes are changed accordingly.<br>
+When <code>hv</code> is an <code>HypervolumeList</code>, the <code>occupancy_filter()</code> function attempts to reconstruct the volume of the union of hypervolumes from <code>hv_list</code>. At first, the volume of the union of hypervolumes is calculated for each element of <code>hv</code> as the the ratio between the total number of random points and the number of random points of the ith element of <code>hv</code>, multiplied by the volume of the ith element <code>hv</code>. This step results in a number of reconstructed volumes equal to the number of hypervolumes in the jth bootstrapped occupancy_object. Reconstructed volumes are then compared among each other to ensure the consistency of the reconstruction. To do this, the distance among reconstructed volumes is calculated with the <code>dist()</code> function of the <code>stats</code> package. If at least one of the distances is greater than <code>tol</code> the computation is stopped and some suggestions are returned.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A <code>Hypervolume-class</code> or <code>HypervolumeList-class</code> object.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>hypervolume_n_occupancy</code>, <code>hypervolume_n_occupancy_test</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+data(penguins,package='palmerpenguins')
+penguins_no_na = as.data.frame(na.omit(penguins))
+
+# split the dataset on species and sex
+penguins_no_na_split = split(penguins_no_na, 
+paste(penguins_no_na$species, penguins_no_na$sex, sep = "_"))
+
+# calculate the hypervolume for each element of the splitted dataset
+hv_list = mapply(function(x, y) 
+  hypervolume_gaussian(x[, c("bill_length_mm","bill_depth_mm","flipper_length_mm")],
+                       samples.per.point=100, name = y), 
+                       x = penguins_no_na_split, 
+                       y = names(penguins_no_na_split))
+
+
+# transform the list into an HypervolumeList
+hv_list = hypervolume_join(hv_list)
+
+# calculate occupancy based on sex
+hv_occupancy_list_sex = hypervolume_n_occupancy(hv_list, 
+                          classification = rep(c("female", "male"), 3))
+
+
+# set to 0 values lower than 0.35
+occupancy_filter(hv_occupancy_list_sex, operator = "&lt;", filter = "0.35")
+
+## End(Not run)
+</code></pre>
+
+
+</div>

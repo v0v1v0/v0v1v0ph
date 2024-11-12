@@ -1,0 +1,81 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>make_template</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Linearly combine template elements into templates</h2>
+
+<h3>Description</h3>
+
+<p>Applying heddle can leave your template pieces stored as either string
+objects, vectors (standalone or in a dataframe), or nested vectors
+(if applied using map()). This function takes those elements and combines
+them into a single exportable template.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">make_template(data, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>The dataframe containing variables to be combined.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>The variables to be combined into a template object.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>Returns the collapsed template as a character string.
+</p>
+
+
+<h3>See Also</h3>
+
+<p>Other manipulation functions: 
+<code>create_yaml_header()</code>,
+<code>heddle()</code>,
+<code>provide_parameters()</code>,
+<code>use_parameters()</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+# When passed vectors, make_template flattens each vector into a single
+# string and then combines its arguments from left to right
+spList &lt;- data.frame(Species = c(unique(iris$Species), "test string"))
+make_template(
+  heddle(spList, "SPECIES CODE GWAR ", "GWAR" = Species),
+  heddle(spList, "SPECIES CODE GWAR ", "GWAR" = Species)
+)
+
+# When passed variables in a dataframe, make_template collapses each column
+# in turn, then combines the output strings from left to right
+spList &lt;- data.frame(Species = c(unique(iris$Species), "test string"))
+spList$template &lt;- heddle(spList, "SPECIES CODE GWAR ", "GWAR" = Species)
+make_template(spList, template)
+make_template(spList, template, template)
+
+# When passed nested columns, heddlr collapses each cell into a string,
+# then collapses each column into a string, and then combines the outputs
+# from left to right
+make_template(tidyr::nest(spList, nested = template), nested)
+</code></pre>
+
+
+</div>

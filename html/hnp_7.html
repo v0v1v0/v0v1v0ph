@@ -1,0 +1,676 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hnp</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Half-Normal Plots with Simulation Envelopes</h2>
+
+<h3>Description</h3>
+
+<p>Produces a (half-)normal plot from a fitted model object for a range of different models. Extendable to non-implemented model classes.</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hnp(object, sim = 99, conf = 0.95, resid.type, maxit,
+    halfnormal = T, scale = F, plot.sim = T, verb.sim = F,
+    warn = F, how.many.out = F, print.on = F, paint.out = F,
+    col.paint.out, newclass = F, diagfun, simfun, fitfun, ...)</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>object </code></td>
+<td>
+<p>fitted model object or numeric vector.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sim </code></td>
+<td>
+<p>number of simulations used to compute envelope. Default is 99.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>conf </code></td>
+<td>
+<p>confidence level of the simulated envelope. Default is 0.95.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>resid.type </code></td>
+<td>
+<p>type of residuals to be used; must be one of "deviance", "pearson", "response", "working", "simple", "student", or "standard". Not all model type and residual type combinations are allowed. Defaults are "student" for <code>aov</code> and <code>lm</code> objects, "deviance" for <code>glm</code>, <code>glm.nb</code>, <code>lmer</code>, <code>glmer</code> and <code>aodml</code> objects, "simple" for <code>gamlss</code> objects, "response" for <code>glmmadmb</code> and <code>vglm</code> objects, "pearson" for <code>zeroinfl</code> and <code>hurdle</code> objects.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>maxit </code></td>
+<td>
+<p>maximum number of iterations of the estimation algorithm. Defaults are 25 for <code>glm</code>, <code>glm.nb</code>, <code>gamlss</code> and <code>vglm</code> objects, 300 for <code>glmmadmb</code>, <code>lmer</code> and <code>glmer</code> objects, 3000 for <code>aodml</code> objects, 10000 for <code>zeroinfl</code> and <code>hurdle</code> objects.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>halfnormal </code></td>
+<td>
+<p>logical. If <code>TRUE</code>, a half-normal plot is produced. If <code>FALSE</code>, a normal plot is produced. Default is <code>TRUE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>scale </code></td>
+<td>
+<p>logical. If <code>TRUE</code> and if <code>object</code> is a numeric vector, simulates from a normal distribution with mean and variance estimated from <code>object</code>. If <code>FALSE</code>, uses a standard normal distribution to simulate from. Default is <code>FALSE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>plot.sim </code></td>
+<td>
+<p>logical. Should the (half-)normal plot be plotted? Default is <code>TRUE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verb.sim </code></td>
+<td>
+<p>logical. If <code>TRUE</code>, prints each step of the simulation procedure. Default is <code>FALSE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>warn </code></td>
+<td>
+<p>logical. If <code>TRUE</code>, shows warning messages in the simulation process. Default is <code>FALSE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>how.many.out </code></td>
+<td>
+<p>logical. If <code>TRUE</code>, the number of points out of the envelope is printed. Default is <code>FALSE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>print.on </code></td>
+<td>
+<p>logical. If <code>TRUE</code>, the number of points out of the envelope is printed on the plot. Default is <code>FALSE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>paint.out </code></td>
+<td>
+<p>logical. If <code>TRUE</code>, points out of the simulation envelope are plotted in a different color. Default is <code>FALSE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>col.paint.out </code></td>
+<td>
+<p>If <code>paint.out=TRUE</code>, sets the color of points out of the envelope. Default is <code>"red"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>newclass </code></td>
+<td>
+<p>logical. If <code>TRUE</code>, use <code>diagfun</code>, <code>simfun</code>, and <code>fitfun</code> to extract diagnostics (typically residuals), generate simulated data using fitted model parameters, and fit the desired model. Default is <code>FALSE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>diagfun </code></td>
+<td>
+<p>user-defined function used to obtain the diagnostic measures from the fitted model object (only used when <code>newclass=TRUE</code>). Default is <code>resid</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>simfun </code></td>
+<td>
+<p>user-defined function used to simulate a random sample from the model estimated parameters (only used when <code>newclass=TRUE</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fitfun </code></td>
+<td>
+<p>user-defined function used to re-fit the model to simulated data (only used when <code>newclass=TRUE</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>... </code></td>
+<td>
+<p>extra graphical arguments passed to <code>plot.hnp</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>A relatively easy way to assess goodness-of-fit of a fitted model is to use (half-)normal plots of a model diagnostic, e.g., different types of residuals, Cook's distance, leverage. These plots are obtained by plotting the ordered absolute values of a model diagnostic versus the expected order statistic of a half-normal distribution, </p>
+<p style="text-align: center;"><code class="reqn">\Phi^{-1}(\frac{i+n-1/8}{2*n+1/2})</code>
+</p>
+<p> (for a half-normal plot) or the normal distribution, </p>
+<p style="text-align: center;"><code class="reqn">\Phi^{-1}(\frac{i+3/8}{n+1/4})</code>
+</p>
+<p> (for a normal plot).
+</p>
+<p>Atkinson (1985) proposed the addition of a simulated envelope, which is such that under the correct model the plot for the observed data is likely to fall within the envelope. The objective is not to provide a region of acceptance, but some sort of guidance to what kind of shape to expect.
+</p>
+<p>Obtaining the simulated envelope is simple and consists of (1) fitting a model; (2) extracting model diagnostics and calculating sorted absolute values; (3) simulating 99 (or more) response variables using the same model matrix, error distribution and fitted parameters; (4) fitting the same model to each simulated response variable and obtaining the same model diagnostics, again sorted absolute values; (5) computing the desired percentiles (e.g., 2.5 and 97.5) at each value of the expected order statistic to form the envelope.
+</p>
+<p>This function handles different model classes and more will be implemented as time goes by. So far, the following models are included:
+</p>
+
+<table>
+<tr>
+<td style="text-align: left;">
+<strong>Continuous data</strong>:</td>
+</tr>
+<tr>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">
+Normal:</td>
+<td style="text-align: left;"> functions <code>lm</code>, <code>aov</code> and <code>glm</code> with <code>family=gaussian</code>
+</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+Gamma:</td>
+<td style="text-align: left;"> function <code>glm</code> with <code>family=Gamma</code>
+</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+Inverse gaussian:</td>
+<td style="text-align: left;"> function <code>glm</code> with <code>family=inverse.gaussian</code>
+</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+<b>Proportion data</b>:</td>
+</tr>
+<tr>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">
+Binomial:</td>
+<td style="text-align: left;"> function <code>glm</code> with <code>family=binomial</code>
+</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+Quasi-binomial:</td>
+<td style="text-align: left;"> function <code>glm</code> with <code>family=quasibinomial</code>
+</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+Beta-binomial:</td>
+<td style="text-align: left;"> package <code>VGAM</code> - function <code>vglm</code>, with <code>family=betabinomial</code>;</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+</td>
+<td style="text-align: left;"> package <code>aods3</code> - function <code>aodml</code>, with <code>family="bb"</code>;</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+</td>
+<td style="text-align: left;"> package <code>gamlss</code> - function <code>gamlss</code>, with <code>family=BB</code>;</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+</td>
+<td style="text-align: left;"> package <code>glmmADMB</code> - function <code>glmmadmb</code>, with <code>family="betabinomial"</code>
+</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+Zero-inflated binomial:</td>
+<td style="text-align: left;"> package <code>VGAM</code> - function <code>vglm</code>, with <code>family=zibinomial</code>;</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+</td>
+<td style="text-align: left;"> package <code>gamlss</code> - function <code>gamlss</code>, with <code>family=ZIBI</code>;</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+</td>
+<td style="text-align: left;"> package <code>glmmADMB</code> - function <code>glmmadmb</code>, with <code>family="binomial"</code>
+</td>
+</tr>
+<tr>
+<td style="text-align: left;"> </td>
+<td style="text-align: left;"> and <code>zeroInfl=TRUE</code>
+</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+Zero-inflated beta-binomial: </td>
+<td style="text-align: left;"> package <code>gamlss</code> - function <code>gamlss</code>, with <code>family=ZIBB</code>;</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+</td>
+<td style="text-align: left;"> package <code>glmmADMB</code> - function <code>glmmadmb</code>, with <code>family="betabinomial"</code>
+</td>
+</tr>
+<tr>
+<td style="text-align: left;"> </td>
+<td style="text-align: left;"> and <code>zeroInfl=TRUE</code>
+</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+Multinomial: </td>
+<td style="text-align: left;"> package <code>nnet</code> - function <code>multinom</code>
+</td>
+</tr>
+<tr>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">
+
+<strong>Count data</strong>:</td>
+</tr>
+<tr>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">
+Poisson: </td>
+<td style="text-align: left;"> function <code>glm</code> with <code>family=poisson</code>
+</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+Quasi-Poisson: </td>
+<td style="text-align: left;"> function <code>glm</code> with <code>family=quasipoisson</code>
+</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+Negative binomial: </td>
+<td style="text-align: left;"> package <code>MASS</code> - function <code>glm.nb</code>;</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+</td>
+<td style="text-align: left;"> package <code>aods3</code> - function <code>aodml</code>, with <code>family="nb"</code>
+</td>
+</tr>
+<tr>
+<td style="text-align: left;"> </td>
+<td style="text-align: left;"> and <code>phi.scale="inverse"</code>
+</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+Zero-inflated Poisson:</td>
+<td style="text-align: left;"> package <code>pscl</code> - function <code>zeroinfl</code>, with <code>dist="poisson"</code>
+</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+Zero-inflated negative binomial: </td>
+<td style="text-align: left;"> package <code>pscl</code> - function <code>zeroinfl</code>, with <code>dist="negbin"</code>
+</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+Hurdle Poisson:</td>
+<td style="text-align: left;"> package <code>pscl</code> - function <code>hurdle</code>, with <code>dist="poisson"</code>
+</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+Hurdle negative binomial:</td>
+<td style="text-align: left;"> package <code>pscl</code> - function <code>hurdle</code>, with <code>dist="negbin"</code>
+</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+<strong>Mixed models</strong>:</td>
+</tr>
+<tr>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">
+
+Linear mixed models: </td>
+<td style="text-align: left;"> package <code>lme4</code>, function <code>lmer</code>
+</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+Generalized linear mixed models: </td>
+<td style="text-align: left;"> package <code>lme4</code>, function <code>glmer</code> with <code>family=poisson</code> or <code>binomial</code>
+</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+</td>
+</tr>
+</table>
+<p>Users can also use a numeric vector as <code>object</code> and <code>hnp</code> will generate the (half-)normal plot with a simulated envelope using the standard normal distribution (<code>scale=F</code>) or <code class="reqn">N(\mu, \sigma^2)</code> (<code>scale=T</code>).
+</p>
+<p>Implementing a new model class is done by providing three functions to <code>hnp</code>: <code>diagfun</code> - to obtain model diagnostics, <code>simfun</code> - to simulate random variables and <code>fitfun</code> - to refit the model to simulated variables. The way these functions must be written is shown in the Examples section.
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>hnp</code> returns an object of class <code>"hnp"</code>, which is a list containing the following components:
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>x </code></td>
+<td>
+<p>quantiles of the (half-)normal distribution</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lower </code></td>
+<td>
+<p>lower envelope band</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>median </code></td>
+<td>
+<p>median envelope band</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>upper </code></td>
+<td>
+<p>upper envelope band</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>residuals </code></td>
+<td>
+<p>diagnostic measures in absolute value and in order</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>out.index </code></td>
+<td>
+<p>vector indicating which points are out of the envelope</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>col.paint.out </code></td>
+<td>
+<p>color of points which are outside of the envelope (used if <code>paint.out=TRUE</code>)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>how.many.out </code></td>
+<td>
+<p>logical. Equals <code>TRUE</code> if <code>how.many.out=TRUE</code> in the <code>hnp</code> call</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>total </code></td>
+<td>
+<p>length of the diagnostic measure vector</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>out </code></td>
+<td>
+<p>number of points out of the envelope</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>print.on </code></td>
+<td>
+<p>logical. Equals <code>TRUE</code> if <code>print.on=TRUE</code> in the <code>hnp</code> call</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>paint.out </code></td>
+<td>
+<p>logical. Equals <code>TRUE</code> if <code>paint.out=TRUE</code> in the <code>hnp</code> call</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>all.sim </code></td>
+<td>
+<p>matrix with all diagnostics obtained in the simulations. Each column represents one simulation</p>
+</td>
+</tr>
+</table>
+<h3>Note</h3>
+
+<p>See documentation on example data sets for simple analyses and goodness-of-fit checking using <code>hnp</code>.</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Rafael A. Moral &lt;rafael_moral@yahoo.com.br&gt;, John Hinde and Clarice G. B. Demétrio
+</p>
+
+
+<h3>References</h3>
+
+<p>Moral, R. A., Hinde, J. and Demétrio, C. G. B. (2017) Half-normal plots and overdispersed models in R: the hnp package. Journal of Statistical Software 81(10):1-23.
+</p>
+<p>Atkinson, A. C. (1985) Plots, transformations and regression, Clarendon Press, Oxford.
+</p>
+<p>Demétrio, C. G. B. and Hinde, J. (1997) Half-normal plots and overdispersion. GLIM Newsletter 27:19-26.
+</p>
+<p>Hinde, J. and Demétrio, C. G. B. (1998) Overdispersion: models and estimation. Computational Statistics and Data Analysis 27:151-170.
+</p>
+<p>Demétrio, C. G. B., Hinde, J. and Moral, R. A. (2014) Models for overdispersed data in entomology. In Godoy, W. A. C. and Ferreira, C. P. (Eds.) Ecological modelling applied to entomology. Springer.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>plot.hnp</code>, <code>cbb</code>, <code>chryso</code>, <code>corn</code>, <code>fungi</code>, <code>oil</code>, <code>progeny</code>, <code>wolbachia</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Simple Poisson regression
+set.seed(100)
+counts &lt;- c(rpois(5, 2), rpois(5, 4), rpois(5, 6), rpois(5, 8))
+treatment &lt;- gl(4, 5)
+fit &lt;- glm(counts ~ treatment, family=poisson)
+anova(fit, test="Chisq")
+
+## half-normal plot
+hnp(fit)
+
+## or save it in an object and then use the plot method
+my.hnp &lt;- hnp(fit, print.on=TRUE, plot=FALSE)
+plot(my.hnp)
+
+## changing graphical parameters
+plot(my.hnp, lty=2, pch=4, cex=1.2)
+plot(my.hnp, lty=c(2,3,2), pch=4, cex=1.2, col=c(2,2,2,1))
+plot(my.hnp, main="Half-normal plot", xlab="Half-normal scores",
+     ylab="Deviance residuals", legpos="bottomright")
+
+## Using a numeric vector
+my.vec &lt;- rnorm(20, 4, 4)
+hnp(my.vec) # using N(0,1)
+hnp(my.vec, scale=TRUE) # using N(mu, sigma^2)
+
+## Implementing new classes
+## Users provide three functions - diagfun, simfun and fitfun,
+## in the following way:
+##
+## diagfun &lt;- function(obj) {
+##   userfunction(obj, other_argumens)
+##     # e.g., resid(obj, type="pearson")
+##   }
+##
+## simfun &lt;- function(n, obj) {
+##   userfunction(n, other_arguments) # e.g., rpois(n, fitted(obj))
+##   }
+##
+## fitfun &lt;- function(y.) {
+##  userfunction(y. ~ linear_predictor, other_arguments, data=data)
+##    # e.g., glm(y. ~ block + factor1 * factor2, family=poisson,
+##    #           data=mydata)
+##  }
+##
+## when response is binary:
+## fitfun &lt;- function(y.) {
+##  userfunction(cbind(y., m-y.) ~ linear_predictor,
+##               other_arguments, data=data)
+##    #e.g., glm(cbind(y., m-y.) ~ treatment - 1,
+##    #          family=binomial, data=data)
+##  }
+
+## Not run: 
+## Example no. 1: Using Cook's distance as a diagnostic measure
+y &lt;- rpois(30, lambda=rep(c(.5, 1.5, 5), each=10))
+tr &lt;- gl(3, 10)
+fit1 &lt;- glm(y ~ tr, family=poisson)
+
+# diagfun
+d.fun &lt;- function(obj) cooks.distance(obj)
+
+# simfun
+s.fun &lt;- function(n, obj) {
+  lam &lt;- fitted(obj)
+  rpois(n, lambda=lam)
+}
+
+# fitfun
+my.data &lt;- data.frame(y, tr)
+f.fun &lt;- function(y.) glm(y. ~ tr, family=poisson, data=my.data)
+
+# hnp call
+hnp(fit1, newclass=TRUE, diagfun=d.fun, simfun=s.fun, fitfun=f.fun)
+
+## Example no. 2: Implementing gamma model using package gamlss
+# load package
+require(gamlss)
+
+# model fitting
+y &lt;- rGA(30, mu=rep(c(.5, 1.5, 5), each=10), sigma=.5)
+tr &lt;- gl(3, 10)
+fit2 &lt;- gamlss(y ~ tr, family=GA)
+
+# diagfun
+d.fun &lt;- function(obj) resid(obj) # this is the default if no
+                                  # diagfun is provided
+
+# simfun
+s.fun &lt;- function(n, obj) {
+  mu &lt;- obj$mu.fv
+  sig &lt;- obj$sigma.fv
+  rGA(n, mu=mu, sigma=sig)
+}
+
+# fitfun
+my.data &lt;- data.frame(y, tr)
+f.fun &lt;- function(y.) gamlss(y. ~ tr, family=GA, data=my.data)
+
+# hnp call
+hnp(fit2, newclass=TRUE, diagfun=d.fun, simfun=s.fun,
+    fitfun=f.fun, data=data.frame(y, tr))
+
+## Example no. 3: Implementing binomial model in gamlss
+# model fitting
+y &lt;- rBI(30, bd=50, mu=rep(c(.2, .5, .9), each=10))
+m &lt;- 50
+tr &lt;- gl(3, 10)
+fit3 &lt;- gamlss(cbind(y, m-y) ~ tr, family=BI)
+
+# diagfun
+d.fun &lt;- function(obj) resid(obj)
+
+# simfun
+s.fun &lt;- function(n, obj) {
+  mu &lt;- obj$mu.fv
+  bd &lt;- obj$bd
+  rBI(n, bd=bd, mu=mu)
+}
+
+# fitfun
+my.data &lt;- data.frame(y, tr, m)
+f.fun &lt;- function(y.) gamlss(cbind(y., m-y.) ~ tr,
+                               family=BI, data=my.data)
+
+# hnp call
+hnp(fit3, newclass=TRUE, diagfun=d.fun, simfun=s.fun, fitfun=f.fun)
+
+## End(Not run)
+</code></pre>
+
+
+</div>

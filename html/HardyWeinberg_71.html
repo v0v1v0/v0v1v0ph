@@ -1,0 +1,110 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>MakeCounts</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Create genotype counts from bi-allelic marker data</h2>
+
+<h3>Description</h3>
+
+<p><code>MakeCounts</code> creates a matrix of genotype counts, with one row for
+each bi-allelic marker, containing 4 columns with the counts AA, AB, BB
+and NA (missings) respectively
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">MakeCounts(X, alleles, pos1 = 1, pos2 = 3, coding = c(AA=0,AB=1,BB=2), sep = "")
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>X</code></td>
+<td>
+<p>A matrix or dataframe with bi-allelic genotyping information,
+markers in columns, individuals in rows</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alleles</code></td>
+<td>
+<p>a vector of alleles for each marker
+(e.g. c("A/T","A/G",...)). Only relevanit if <code>X</code> is a matrix
+with text entries.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pos1</code></td>
+<td>
+<p>position of the first allele in the allele string (1 by default)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pos2</code></td>
+<td>
+<p>position of the second allele in the allele string (3 by
+default)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>coding</code></td>
+<td>
+<p>indicates how homozygotes and heterozygote are coded as
+numbers. Only relevant if <code>X</code> is a matrix with numeric
+entries.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sep</code></td>
+<td>
+<p>allele separator character for genotype data in text format ("" for AA; "/" for "A/A")</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p><code>MakeCounts</code> is thought for bi-allelic marker data only. Missings
+are should be coded by NA. It produces the right input for
+<code>HWTernaryPlot</code>.
+</p>
+<p>Heterozygotes may be coded in the data as "AB" or "BA". Both entries
+will be counted as a heterozygote. 
+</p>
+
+
+<h3>Value</h3>
+
+<p>A matrix of 4 columns</p>
+
+
+<h3>Author(s)</h3>
+
+<p> Jan Graffelman <a href="mailto:jan.graffelman@upc.edu">jan.graffelman@upc.edu</a> </p>
+
+
+<h3>See Also</h3>
+
+<p><code>HWTernaryPlot</code></p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">SNP1 &lt;- c("GG","GG","GG","GG","GG","GG","GG","GG","GG")
+SNP2 &lt;- c("CG","GG","CC","GG","GG","CG","CG","CG","CG")
+SNP3 &lt;- c("AA","AA","AA","AG","AA","AG","AA","AA","AA")
+SNP4 &lt;- c("GG","GG","GG","GG","GG","GG","GG","GG","GG")
+SNP5 &lt;- c("CC","CC","CC","CC","CC","CC","CT","CT","CT")
+X &lt;- cbind(SNP1,SNP2,SNP3,SNP4,SNP5)
+Y &lt;- MakeCounts(X,c("A/G","C/G","A/G","A/G","C/T"))
+print(Y)
+W &lt;- matrix(sample(c(0,1,2,NA),100,replace=TRUE),ncol=5)
+Z &lt;- MakeCounts(W,coding=c(0,1,2))
+</code></pre>
+
+
+</div>

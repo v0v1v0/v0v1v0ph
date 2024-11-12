@@ -1,0 +1,124 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>define_tparams</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Define and evaluate transformed parameter expressions</h2>
+
+<h3>Description</h3>
+
+<p>Transformed parameter expressions are used to transform the parameter
+values sampled with <code>eval_rng()</code> as a function of input data
+(treatment strategies and patients) and time
+intervals. These functions are used when evaluating an object of class
+<code>model_def</code> defined using <code>define_model()</code>. The transformed parameters
+are ultimately converted into tparams objects and used to simulate outcomes with an
+economic model.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">define_tparams(expr, times = NULL, ...)
+
+eval_tparams(x, input_data, rng_params)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>expr</code></td>
+<td>
+<p>Expressions used to transform parameters. As with <code>define_rng()</code>,
+braces should be used so that the result
+of the last expression within the braces is evaluated. The expression
+must return a named list with the following possible elements:
+</p>
+
+<ul>
+<li> <p><em>tpmatrix</em>: The transition probability matrix used to simulate transition
+probabilities in the economic model. This should either be the output of
+<code>tpmatrix()</code> or a 3-dimensional array as in <code>tparams_transprobs()</code>.
+</p>
+</li>
+<li> <p><em>utility</em>: The utility values to attach to states and used to simulate
+quality-adjusted life-years in the economic model. Either a vector (in
+which case utility is the same in each health state) or a
+<code>data.table</code>/<code>data.frame</code>/<code>matrix</code> with a column for each (non-death)
+health state.
+</p>
+</li>
+<li> <p><em>costs</em>:  A named list of costs for each category used to simulate
+costs in the economic model. Each element of the
+list must be in the same format as <code>utility</code>.
+</p>
+</li>
+</ul>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>times</code></td>
+<td>
+<p>Distinct times denoting the stopping time of time intervals.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Additional arguments to pass to the environment used to evaluate
+<code>expr</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>An object of class <code>tparams_def</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>input_data</code></td>
+<td>
+<p>An object of class expanded_hesim_data (as
+in <code>eval_model()</code>) expanded by the distinct times in <code>times</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rng_params</code></td>
+<td>
+<p>Random samples of the parameters returned by <code>eval_rng()</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p><code>define_tparams()</code> is evaluated when creating economic models as a
+function of <code>model_def</code> objects defined with <code>define_model()</code>. Operations
+are "vectorized" in the sense that they are performed for each unique combination
+of <code>input_data</code> and <code>params</code>. <code>expr</code> is evaluated in an environment including
+each variable from <code>input_data</code>, all elements of <code>rng_params</code>, and a variable
+<code>time</code> containing the values from <code>times</code>. The <code>time</code> variable can be used
+to create models where parameters vary as a function of time.
+<code>eval_tparams()</code> is not exported and is only meant for use within <code>eval_model()</code>.
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>define_tparams()</code> returns an object of class <code>tparams_def</code>,
+which is a list containing the unevaluated "transformation" expressions
+passed  to <code>expr</code>, <code>times</code>, and any additional arguments passed to
+<code>...</code> . <code>eval_tparams()</code> evaluates the <code>tparams_def</code> object
+and should return a list of transformed parameter objects.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>define_model()</code>, <code>define_rng()</code>
+</p>
+
+
+</div>

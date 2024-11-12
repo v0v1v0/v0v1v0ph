@@ -1,0 +1,69 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>report_n</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Report number of distinct value in a column across data frames</h2>
+
+<h3>Description</h3>
+
+<p>This function is intended to mimic <code>dplyr::n_distinct()</code> for multiple inputs. It is useful to report the number of clients through out a series of inclusion or exclusion steps. An use case could be getting the Ns for the sample definition flowchart in an epidemiological study. It is also useful for inline reporting of Ns in a Rmarkdown document.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">report_n(..., on, force_proceed = getOption("healthdb.force_proceed"))
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Data frames or remote tables (e.g., from 'dbplyr')</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>on</code></td>
+<td>
+<p>The column to report on. It must be present in all data sources.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>force_proceed</code></td>
+<td>
+<p>A logical for whether to ask for user input in order to proceed when the data is not local data.frames, and a query needs to be executed before reporting. The default is fetching from options (FALSE). Use <code>options(healthdb.force_proceed = TRUE)</code> to suppress the prompt once and for all.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A sequence of the number of distinct <code>on</code> for each data frames
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># some exclusions
+iris_1 &lt;- subset(iris, Petal.Length &gt; 1)
+iris_2 &lt;- subset(iris, Petal.Length &gt; 2)
+
+# get n at each operation
+n &lt;- report_n(iris, iris_1, iris_2, on = Species)
+n
+
+# get the difference at each step
+diff(n)
+# data in a list
+iris_list &lt;- list(iris_1, iris_2)
+report_n(rlang::splice(iris_list), on = Species)
+# if you loaded tidyverse, this will also work
+# report_n(!!!iris_list, on = Species)
+</code></pre>
+
+
+</div>

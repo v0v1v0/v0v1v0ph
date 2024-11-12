@@ -1,0 +1,109 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>single_ESAC</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Efficient Sparsity Adaptive Change-point estimator for a single change-point</h2>
+
+<h3>Description</h3>
+
+<p>R wrapper for C function implementing ESAC for single change-point estimation, as described in section 3.1 in Moen et al. (2023)
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">single_ESAC(
+  X,
+  threshold_d = 1.5,
+  threshold_s = 1,
+  rescale_variance = FALSE,
+  debug = FALSE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>X</code></td>
+<td>
+<p>Matrix of observations, where each row contains a time series</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>threshold_d</code></td>
+<td>
+<p>Leading constant for <code class="reqn">\lambda(t) \propto r(t)</code> for <code class="reqn">t= p</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>threshold_s</code></td>
+<td>
+<p>Leading constant for <code class="reqn">\lambda(t) \propto r(t)</code> for <code class="reqn">t\leq \sqrt{p\log n}</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rescale_variance</code></td>
+<td>
+<p>If <code>TRUE</code>, each row of the data is re-scaled by a MAD estimate using <code>rescale_variance</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>debug</code></td>
+<td>
+<p>If <code>TRUE</code>, diagnostic prints are provided during execution</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A list containing 
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>pos</code></td>
+<td>
+<p>estimated change-point location</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>s</code></td>
+<td>
+<p>the value of <code class="reqn">t \in \mathcal{T}</code> at which the sparsity specific score is maximized</p>
+</td>
+</tr>
+</table>
+<h3>References</h3>
+
+<p>Moen PAJ, Glad IK, Tveten M (2023).
+“Efficient sparsity adaptive changepoint estimation.”
+Arxiv preprint, 2306.04702, <a href="https://doi.org/10.48550/arXiv.2306.04702">https://doi.org/10.48550/arXiv.2306.04702</a>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">library(HDCD)
+n = 500
+p = 500
+set.seed(101)
+# Generating data
+X = matrix(rnorm(n*p), ncol = n, nrow=p)
+# Adding a single sparse change-point:
+X[1:5, 201:500] = X[1:5, 201:500] +1
+
+res = single_ESAC(X,rescale_variance=TRUE)
+res$pos
+
+# Manually setting the leading constants for \lambda(t):
+# here \lambda(t) = 2 (\sqrt{p \log(n^4)}  + \log (n^4)) for t=p
+# and             = 2 (t \log (ep\log n^4 / t^2) + \log(n^4))
+res = single_ESAC(X, threshold_d = 2, threshold_s = 2)
+res$pos
+</code></pre>
+
+
+</div>

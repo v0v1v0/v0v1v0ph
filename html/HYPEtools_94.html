@@ -1,0 +1,112 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>ReadBasinOutput</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Read a Basin Output File</h2>
+
+<h3>Description</h3>
+
+<p>This is a convenience wrapper function to import a basin output file as data frame or matrix into R.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">ReadBasinOutput(
+  filename,
+  dt.format = "%Y-%m-%d",
+  type = c("df", "dt", "hmv"),
+  id = NULL,
+  warn.nan = FALSE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>filename</code></td>
+<td>
+<p>Path to and file name of the basin output file to import. Windows users: Note that
+Paths are separated by '/', not '\'.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dt.format</code></td>
+<td>
+<p>Date-time <code>format</code> string as in <code>strptime</code>. Incomplete format strings for monthly
+and annual values allowed, e.g. '\
+be imported as <code>character</code>, applicable e.g. for files containing just one row of summary values over the model period.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>type</code></td>
+<td>
+<p>Character, keyword for data type to return. <code>"df"</code> to return a standard data frame, <code>"dt"</code> to
+return a <code>data.table</code> object, or <code>"hmv"</code> to return a <code>HypeMultiVar</code> array.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>id</code></td>
+<td>
+<p>Integer, SUBID or OUTREGID of the imported sub-basin or outregion results. If <code>NULL</code> (default), the function attempts to read this
+from the imported file's name, which only works for standard HYPE basin output file names or any where the first 7 digits
+give the SUBID or OUTREGID with leading zeros. See details.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>warn.nan</code></td>
+<td>
+<p>Logical, check if imported results contain any <code>NaN</code> values. If <code>TRUE</code> and <code>NaN</code>s are found,
+a warning is thrown and affected SUBIDs saved in an attribute <code>subid.nan</code>. Adds noticeable overhead to import time for large files.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p><code>ReadBasinOutput</code> is a convenience wrapper function of <code>fread</code> from package
+data.table::data.table, with conversion of date-time strings to
+POSIX time representations. Monthly and annual time steps are returned as first day of the time step period.
+</p>
+<p>HYPE basin output files can contain results for a single sub-basin or for a user-defined output region. <code>ReadBasinOutput</code> checks HYPE
+variable names (column headers in imported file) for an "RG"-prefix. If it is found, the ID read from either file name or argument
+<code>id</code> is saved to attribute <code>outregid</code>, otherwise to attribute <code>subid</code>.
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>ReadBasinOutput</code> returns a <code>data.frame</code>, data.table::data.table, or a <code>HypeMultiVar</code> array.
+Data frames and data tables contain additional <code>attributes</code>: <code>hypeunit</code>, a vector of HYPE variable units,
+<code>subid</code> and <code>outregid</code>, the HYPE SUBID/OUTREGID to which the time series belong (both attributes always created and assigned <code>NA</code>
+if not applicable to data contents), <code>timestep</code> with a time step keyword attribute, and <code>comment</code> with contents of an optional
+first-row comment (<code>NA</code> otherwise). An additional attribute <code>subid.nan</code> might be returned, see argument <code>warn.nan</code>.
+</p>
+
+
+<h3>Note</h3>
+
+<p>For the conversion of date/time strings, time zone "UTC" is assumed. This is done to avoid potential daylight saving time
+side effects when working with the imported data (and possibly converting to string representations during the process).
+</p>
+<p>HYPE results are printed to files using a user-specified accuracy. This accuracy is specified in 'info.txt' as a number of
+decimals to print. If large numbers are printed, this can result in a total number of digits which is too large to print.
+Results will then contain values of '****************'. <code>ReadBasinOutput</code> will convert those cases to 'NA' entries.
+</p>
+<p>Current versions of HYPE allow for defining significant numbers of digits instead of fixed ones, which should prevent this
+issue from arising.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">te &lt;- ReadBasinOutput(filename = system.file("demo_model",
+"results", "0003587.txt", package = "HYPEtools"))
+
+</code></pre>
+
+
+</div>

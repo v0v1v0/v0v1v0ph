@@ -1,0 +1,100 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>stratified.cross.validation</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Stratified cross validation</h2>
+
+<h3>Description</h3>
+
+<p>Generate data for the stratified cross-validation.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">stratified.cv.data.single.class(examples, positives, kk = 5, seed = NULL)
+
+stratified.cv.data.over.classes(labels, examples, kk = 5, seed = NULL)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>examples</code></td>
+<td>
+<p>indices or names of the examples. Can be either a vector of integers or a vector of names.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>positives</code></td>
+<td>
+<p>vector of integers or vector of names. The indices (or names) refer to the indices (or names) of 'positive' examples.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>kk</code></td>
+<td>
+<p>number of folds (<code>def. kk=5</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>seed</code></td>
+<td>
+<p>seed of the random generator (<code>def. seed=NULL</code>). If is set to <code>NULL</code> no initialization is performed.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>labels</code></td>
+<td>
+<p>labels matrix. Rows are genes and columns are classes. Let's denote <code class="reqn">M</code> the labels matrix.
+If <code class="reqn">M[i,j]=1</code>, means that the gene <code class="reqn">i</code> is annotated with the class <code class="reqn">j</code>, otherwise <code class="reqn">M[i,j]=0</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Folds are <em>stratified</em>, i.e. contain the same amount of positive and negative examples.
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>stratified.cv.data.single.class</code> returns a list with 2 two component:
+</p>
+
+<ul>
+<li>
+<p> fold.non.positives: a list with <code class="reqn">k</code> components. Each component is a vector with the indices (or names) of the non-positive elements.
+Indexes (or names) refer to row numbers (or names) of a data matrix;
+</p>
+</li>
+<li>
+<p> fold.positives: a list with <code class="reqn">k</code> components. Each component is a vector with the indices (or names) of the positive elements.
+Indexes (or names) refer to row numbers (or names) of a data matrix;
+</p>
+</li>
+</ul>
+<p><code>stratified.cv.data.over.classes</code> returns a list with <code class="reqn">n</code> components, where <code class="reqn">n</code> is the number of classes of the labels matrix.
+Each component <code class="reqn">n</code> is in turn a list with <code class="reqn">k</code> elements, where <code class="reqn">k</code> is the number of folds.
+Each fold contains an equal amount of positives and negatives examples.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(labels);
+examples.index &lt;- 1:nrow(L);
+examples.name &lt;- rownames(L);
+positives &lt;- which(L[,3]==1);
+x &lt;- stratified.cv.data.single.class(examples.index, positives, kk=5, seed=23);
+y &lt;- stratified.cv.data.single.class(examples.name, positives, kk=5, seed=23);
+z &lt;- stratified.cv.data.over.classes(L, examples.index, kk=5, seed=23);
+k &lt;- stratified.cv.data.over.classes(L, examples.name, kk=5, seed=23);
+</code></pre>
+
+
+</div>

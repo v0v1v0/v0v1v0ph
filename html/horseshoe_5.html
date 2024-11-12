@@ -1,0 +1,116 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>HS.MMLE</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>MMLE for the horseshoe prior for the sparse normal means problem.</h2>
+
+<h3>Description</h3>
+
+<p>Compute the marginal maximum likelihood estimator (MMLE) of tau for the
+horseshoe for the normal means problem (i.e. linear regression with the
+design matrix equal to the identity matrix). The MMLE is explained and
+studied in Van der Pas et al. (2016).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">HS.MMLE(y, Sigma2)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+<p>The data, a <code class="reqn">n*1</code> vector.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Sigma2</code></td>
+<td>
+<p>The variance of the data.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The normal means model is:
+</p>
+<p style="text-align: center;"><code class="reqn">y_i=\beta_i+\epsilon_i, \epsilon_i \sim N(0,\sigma^2)</code>
+</p>
+
+<p>And the horseshoe prior:
+</p>
+<p style="text-align: center;"><code class="reqn">\beta_j \sim N(0,\sigma^2 \lambda_j^2 \tau^2)</code>
+</p>
+
+<p style="text-align: center;"><code class="reqn">\lambda_j \sim Half-Cauchy(0,1).</code>
+</p>
+
+<p>This function estimates <code class="reqn">\tau</code>. A plug-in value of <code class="reqn">\sigma^2</code> is used.
+</p>
+
+
+<h3>Value</h3>
+
+<p>The MMLE for the parameter tau of the horseshoe.
+</p>
+
+
+<h3>Note</h3>
+
+<p>Requires a minimum of 2 observations. May return an error for
+vectors of length larger than 400 if the truth  is very sparse. In that
+case, try <code>HS.normal.means</code>.
+</p>
+
+
+<h3>References</h3>
+
+<p>van der Pas, S.L., Szabo, B., and van der Vaart, A. (2017), Uncertainty
+quantification for the horseshoe (with discussion). Bayesian Analysis
+12(4), 1221-1274.
+</p>
+<p>van der Pas, S.L., Szabo, B., and van der Vaart A. (2017), Adaptive
+posterior contraction rates for the horseshoe. Electronic Journal of
+Statistics 10(1), 3196-3225.
+</p>
+
+
+<h3>See Also</h3>
+
+<p>The estimated value of <code class="reqn">\tau</code> can be plugged into <code>HS.post.mean</code>
+to obtain the posterior mean, and into <code>HS.post.var</code> to obtain the posterior
+variance. These functions are all for empirical Bayes; if a full Bayes version with a hyperprior
+on <code class="reqn">\tau</code> is preferred, see <code>HS.normal.means</code> for the normal means problem, or
+<code>horseshoe</code> for linear regression.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: #Example with 5 signals, rest is noise
+truth &lt;- c(rep(0, 95), rep(8, 5))
+y &lt;-  truth + rnorm(100)
+(tau.hat &lt;- HS.MMLE(y, 1)) #returns estimate of tau
+plot(y, HS.post.mean(y, tau.hat, 1)) #plot estimates against the data
+
+## End(Not run)
+## Not run: #Example where the data variance is estimated first
+truth &lt;- c(rep(0, 950), rep(8, 50))
+y &lt;-  truth + rnorm(100, mean = 0, sd = sqrt(2))
+sigma2.hat &lt;- var(y)
+(tau.hat &lt;- HS.MMLE(y, sigma2.hat)) #returns estimate of tau
+plot(y, HS.post.mean(y, tau.hat, sigma2.hat)) #plot estimates against the data
+
+## End(Not run)
+
+</code></pre>
+
+
+</div>

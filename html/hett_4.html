@@ -1,0 +1,286 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>tlm</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Maximum likelihood estimation for heteroscedastic t regression
+</h2>
+
+<h3>Description</h3>
+
+<p>Fits a heteroscedastic t regression to given data for known and unknown
+degrees of freedom.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">tlm(lform, sform =  ~ 1, data = NULL, subset = NULL, contrasts =
+    NULL, na.action = na.fail, start = NULL, control = tlm.control(...),
+    obs = FALSE, estDof = FALSE, ... )
+
+## S3 method for class 'tlm'
+print(x, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+
+<p>an object of class "<code>tlm</code>"
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lform</code></td>
+<td>
+
+<p>a formula of the type <code>response ~ terms</code>, where <code>terms</code> can
+be of the form, for example, <code>first + second</code> or
+<code>first*second</code>(see <code>lm</code> for details)
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sform</code></td>
+<td>
+
+<p>a formula of the type <code>~ terms</code>, where <code>terms</code> can
+be of the form, for example, <code>first + second</code> or
+<code>first*second</code>(see <code>lm</code> for details).
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+
+<p>the data in the form of a <code>data.frame</code> where the column names can
+be matched to the variable names supplied in <code>lform</code> and <code>sform</code>
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>subset</code></td>
+<td>
+
+<p>numerical vector to subset the <code>data</code> argument
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>contrasts</code></td>
+<td>
+
+<p>set of contrasts for the location model (see <code>contrasts.arg</code> for details)
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>na.action</code></td>
+<td>
+
+<p>the action to proceed with in the event of <code>NA</code>'s in the
+response. Currently <code>NA</code>'s are not allowed and therefore
+<code>na.fail</code> is the sole argument.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>start</code></td>
+<td>
+
+<p>is a list of possibly four named components, ("<code>beta</code>",
+"<code>lambda</code>", "<code>dof</code>", "<code>omega</code>"), for the location, scale,
+degrees of freedom parameters and random scale effects
+respectively. Each component must be of the appropriate
+length.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>control</code></td>
+<td>
+
+<p>is an argument to a function that maintains the control of the
+algorithm. The <code>tlm.control()</code>function contains the arguments,
+<code>epsilon</code> to determine how small the relative difference of
+likelihoods should be for convergence (default is 1e-07), <code>maxit</code>
+to determine the maximum iterations required (default = 50),
+<code>trace</code> if the user requires printing of estimates etc. as
+algorithm runs (default = <code>FALSE</code>), <code>verboseLev</code> to determine
+the amount of verbose printing to the screen as the algorithm runs
+(<code>verboseLev = 1</code> displays location scale and dof estimates and the
+likelihood, <code>verboseLev = 2</code> displays all of 1 plus the random scale effects)
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>obs</code></td>
+<td>
+
+<p>should the location parameters be calculated using the observed or
+expected information(default = <code>FALSE</code>). (Note: using the observed
+information does not calculate the appropriate standard errors, see DETAILS)
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>estDof</code></td>
+<td>
+
+<p>should the degrees of freedom parameter be estimated or not. If <code>FALSE</code>
+then the value given for <code>dof</code> in the <code>start</code> argument
+will be the fixed value used for the algorithm. If <code>TRUE</code> then the
+value given for <code>dof</code> in the <code>start</code> argument supplies an
+initial value only.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+
+<p>arguments passed to <code>tlm.control()</code> or to the <code>print</code> method
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>When the degrees of freedom is unknown the code uses the non-linear optimiser
+<code>nlm</code>. If the response (and therefore the errors) is tending toward
+a Gaussian this optimisation will still converge but with with very high degrees of freedom.
+</p>
+<p>To obtain the appropriate standard errors from <code>summary</code> the user
+must specify the argument <code>obs = F</code> to ensure that the location
+parameter is calculated using the expected information.
+</p>
+
+
+<h3>Value</h3>
+
+<p>a list containing the following components:
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>loc.fit</code></td>
+<td>
+
+<p>an object containing the estimated location parameters and other
+elements associated with the location parameter model
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>scale.fit</code></td>
+<td>
+
+<p>an object containing the estimated scale parameters and other
+elements associated with the scale parameter model
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>random</code></td>
+<td>
+
+<p>the random scale effects
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dof</code></td>
+<td>
+
+<p>fixed or estimated degrees of freedom
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dofse</code></td>
+<td>
+
+<p>the standard error associated with the degrees of freedom
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>iter</code></td>
+<td>
+
+<p>the number of iterations of the algorithm
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>logLik</code></td>
+<td>
+
+<p>the maximised log-likelihood
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>endTime</code></td>
+<td>
+
+<p>the time taken for the algorithm to converge
+</p>
+</td>
+</tr>
+</table>
+<h3>Background</h3>
+
+<p>The theoretical background for this function can be found in Taylor and Verbyla (2004).
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Julian Taylor</p>
+
+
+<h3>References</h3>
+
+<p>Taylor, J. D. &amp; Verbyla, A. P (2004).
+Joint modelling of the location and scale parameters of the <em>t</em>-distribution.
+<em>Statistical Modelling</em>
+<b>4</b>, 91-112.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>summary.tlm</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+data(mm, package = "hett")
+attach(mm)
+
+## fit a model with no heteroscedasticity and fixed degrees of freedom
+
+tfit &lt;- tlm(m.marietta ~ CRSP, data = mm, start = list(dof = 3))
+
+## fit a model with heteroscedasticity and fixed degrees of freedom
+
+tfit1 &lt;- tlm(m.marietta ~ CRSP, ~ CRSP, data = mm, start = list(dof = 3))
+
+## fit a model with heteroscedasticity and estimating the degrees of freedom
+
+tfit2 &lt;- tlm(m.marietta ~ CRSP, ~ CRSP, data = mm,
+start = list(dof = 3), estDof = TRUE)
+</code></pre>
+
+
+</div>

@@ -1,0 +1,95 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>sort_network</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Sort Network</h2>
+
+<h3>Description</h3>
+
+<p>given a network with an id and and toid, returns a sorted
+and potentially split set of output.
+</p>
+<p>Can also be used as a very fast implementation of upstream
+with tributaries navigation. The full network from each
+outlet is returned in sorted order.
+</p>
+<p>If a network includes diversions, all flowlines downstream of
+the diversion are visited prior to continuing upstream. See
+note on the <code>outlets</code> parameter for implications of this
+implementation detail.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">sort_network(x, split = FALSE, outlets = NULL)
+
+## S3 method for class 'data.frame'
+sort_network(x, split = FALSE, outlets = NULL)
+
+## S3 method for class 'hy'
+sort_network(x, split = FALSE, outlets = NULL)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>data.frame network compatible with hydroloom_names.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>split</code></td>
+<td>
+<p>logical if TRUE, the result will be split into
+independent networks identified by the id of their outlet. The
+outlet id of each independent network is added as a "terminalid"
+attribute.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>outlets</code></td>
+<td>
+<p>same as id in x. if specified, only the network
+emanating from these outlets will be considered and returned.
+NOTE: If outlets does not include all outlets from a given
+network containing diversions, a partial network may be returned.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>data.frame containing a topologically sorted version
+of the requested network and optionally a terminal id.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">x &lt;- sf::read_sf(system.file("extdata/new_hope.gpkg", package = "hydroloom"))
+
+g &lt;- add_toids(x)
+
+head(g &lt;- sort_network(g))
+
+g$topo_sort &lt;- nrow(g):1
+
+plot(g['topo_sort'])
+
+g &lt;- add_toids(x, return_dendritic = FALSE)
+
+g &lt;- sort_network(g)
+
+g$topo_sort &lt;- nrow(g):1
+
+plot(g['topo_sort'])
+
+</code></pre>
+
+
+</div>

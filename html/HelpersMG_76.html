@@ -1,0 +1,175 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>rcutter</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Random values of unobserved values of cut distribution.</h2>
+
+<h3>Description</h3>
+
+<p>Return n random numbers.<br>
+It can be used to get the posterior predictive distribution; see example.<br>
+If random_method is "ML", the parameter values obtained using maximum likelihood are used.<br>
+If random_method is "medianMCMC", the parameter values obtained using median of posterior distribution are used.<br>
+If random_method is "MCMC", the parameter values are one sample of the MCMC posterior distribution.<br>
+if observed_detection_limit is set to TRUE, the number of random number is equal to the number of observations; n is not used.<br>
+rcutter is the abbreviation for random-cutter.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">rcutter(
+  cutter = stop("A result of cutter() must be provided"),
+  n = 1,
+  lower_detection_limit = NULL,
+  upper_detection_limit = NULL,
+  method_cut = c("censored", "truncated"),
+  observed_detection_limit = FALSE,
+  random_method = c("medianMCMC", "MCMC", "ML"),
+  index_mcmc = NULL
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>cutter</code></td>
+<td>
+<p>The fitted model obtained with cutter()</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n</code></td>
+<td>
+<p>number of random numbers</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lower_detection_limit</code></td>
+<td>
+<p>The lower detection limit</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>upper_detection_limit</code></td>
+<td>
+<p>The upper detection limit</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method_cut</code></td>
+<td>
+<p>What method is used to cut the distribution: "censored", "truncated"?</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>observed_detection_limit</code></td>
+<td>
+<p>If TRUE, will use the pattern of detection limit as in observations</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>random_method</code></td>
+<td>
+<p>How to get parameters; it can be "ML", "medianMCMC", or "MCMC"</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>index_mcmc</code></td>
+<td>
+<p>For MCMC random_method, the index of data to be used.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>rcutter returns random values based on fitted distribution with cut.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A vector with the random numbers.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Marc Girondot <a href="mailto:marc.girondot@gmail.com">marc.girondot@gmail.com</a>
+</p>
+
+
+<h3>See Also</h3>
+
+<p>Other Distributions: 
+<code>cutter()</code>,
+<code>dSnbinom()</code>,
+<code>dbeta_new()</code>,
+<code>dcutter()</code>,
+<code>dggamma()</code>,
+<code>logLik.cutter()</code>,
+<code>plot.cutter()</code>,
+<code>print.cutter()</code>,
+<code>r2norm()</code>,
+<code>rmnorm()</code>,
+<code>rnbinom_new()</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+library(HelpersMG)
+# _______________________________________________________________
+# right censored distribution with gamma distribution
+# _______________________________________________________________
+# Detection limit
+DL &lt;- 100
+# Generate 100 random data from a gamma distribution
+obc &lt;- rgamma(100, scale=20, shape=2)
+# remove the data below the detection limit
+obc[obc&gt;DL] &lt;- +Inf
+# search for the parameters the best fit these censored data
+result &lt;- cutter(observations=obc, upper_detection_limit=DL, 
+                           cut_method="censored")
+result
+# Posterior predictive distribution
+r &lt;- rcutter(cutter=result, upper_detection_limit=DL, n=100)
+hist(r)
+# _______________________________________________________________
+# left censored distribution with gamma distribution
+# _______________________________________________________________
+# Detection limit
+DL &lt;- 10
+# Generate 100 random data from a gamma distribution
+obc &lt;- rgamma(100, scale=20, shape=2)
+# remove the data below the detection limit
+obc[obc&lt;DL] &lt;- -Inf
+# search for the parameters the best fit these truncated data
+result &lt;- cutter(observations=obc, lower_detection_limit=DL, 
+                          cut_method="censored")
+result
+plot(result, breaks=seq(from=0, to=200, by=10))
+r &lt;- rcutter(cutter=result, n=100)
+hist(r, breaks=seq(from=0, to=200, by=10))
+r &lt;- rcutter(cutter=result, lower_detection_limit=DL, n=100)
+hist(r, breaks=seq(from=0, to=250, by=10))
+# With censored method, some values are replaced with +Inf or -Inf
+any(is.infinite(r))
+r &lt;- rcutter(cutter=result, upper_detection_limit=DL, n=100, 
+             method_cut="truncated")
+# With truncated method, the values below LDL or upper UDL are not present
+any(is.infinite(r))
+hist(r, breaks=seq(from=0, to=10, by=0.25))
+r &lt;- rcutter(cutter=result, observed_detection_limit=TRUE)
+hist(r, breaks=seq(from=0, to=300, by=10))
+
+## End(Not run)
+</code></pre>
+
+
+</div>

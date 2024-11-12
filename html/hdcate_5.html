@@ -1,0 +1,126 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>HDCATE.plot</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Plot HDCATE function and the uniform confidence bands</h2>
+
+<h3>Description</h3>
+
+<p>Plot HDCATE function and the uniform confidence bands
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">HDCATE.plot(
+  HDCATE_model,
+  output_pdf = FALSE,
+  pdf_name = "hdcate_plot.pdf",
+  include_band = TRUE,
+  test_side = "both",
+  y_axis_min = "auto",
+  y_axis_max = "auto",
+  display.hdcate = "HDCATEF",
+  display.ate = "ATE",
+  display.siglevel = "sig_level"
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>HDCATE_model</code></td>
+<td>
+<p>an object created via HDCATE</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>output_pdf</code></td>
+<td>
+<p>if <code>TRUE</code>, the plot will be saved as a PDF file, the default is <code>FALSE</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pdf_name</code></td>
+<td>
+<p>file name when <code>output_pdf=TRUE</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>include_band</code></td>
+<td>
+<p>if <code>TRUE</code>, plot the uniform confidence bands (need: HDCATE.inference was called before)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>test_side</code></td>
+<td>
+<p><code>'both'</code>, <code>'left'</code> or <code>'right'</code>, i.e. 2-side test or one-side test</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>y_axis_min</code></td>
+<td>
+<p>minimum value of the Y axis to plot in the graph, the default is <code>auto</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>y_axis_max</code></td>
+<td>
+<p>maximum value of the Y axis to plot in the graph, the default is <code>auto</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>display.hdcate</code></td>
+<td>
+<p>the name of HDCATE function in the legend, the default is 'HDCATEF'</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>display.ate</code></td>
+<td>
+<p>the name of average treatment effect in the legend, the default is 'ATE'</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>display.siglevel</code></td>
+<td>
+<p>the name of the significant level for confidence bands in the legend, the default is 'sig_level'</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>None. A plot will be shown or saved as PDF.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># get simulation data
+n_obs &lt;- 500  # Num of observations
+n_var &lt;- 100  # Num of observed variables
+n_rel_var &lt;- 4  # Num of relevant variables
+data &lt;- HDCATE.get_sim_data(n_obs, n_var, n_rel_var)
+# conditional expectation model is misspecified
+x_formula &lt;- paste(paste0('X', c(2:n_var)), collapse ='+')
+# propensity score model is misspecified
+# x_formula &lt;- paste(paste0('X', c(1:(n_var-1))), collapse ='+')
+
+# create a new HDCATE model
+model &lt;- HDCATE(data=data, y_name='Y', d_name='D', x_formula=x_formula)
+
+HDCATE.set_condition_var(model, 'X2', min=-1, max=1, step=0.01)
+
+HDCATE.fit(model)
+HDCATE.inference(model)
+HDCATE.plot(model)
+
+</code></pre>
+
+
+</div>

@@ -1,0 +1,194 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>noroBE</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Create <code>"sts"</code> Objects from the Berlin Norovirus Data</h2>
+
+<h3>Description</h3>
+
+<p>The function <code>noroBE()</code> creates an <code>"sts"</code> object
+based on the array of norovirus surveillance <code>counts</code>, the <code>map</code>
+of Berlin's city district, and the <code>pop2011</code> data stored in the
+package. This is the data analysed by Meyer and Held (2017).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">noroBE(
+  by = c("districts", "agegroups", "all", "none"),
+  agegroups = c(1, 2, 2, 4, 4, 2),
+  timeRange = c("2011-w27", "2015-w26"),
+  flatten = FALSE
+)
+
+counts
+
+map
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>by</code></td>
+<td>
+<p>character string determining the stratification, i.e., which units
+the resulting <code>"sts"</code> object should represent: </p>
+
+<dl>
+<dt>"districts":</dt>
+<dd>
+<p>aggregates <code>counts</code> and <code>pop2011</code> over the
+age groups and stores the matrix of adjacency orders from the <code>map</code>
+in the <code>neighbourhood</code> slot. The latter is obtained via
+<code>nbOrder(poly2adjmat(map), maxlag = 5)</code>.</p>
+</dd>
+<dt>"agegroups":</dt>
+<dd>
+<p>aggregates <code>counts</code> and <code>pop2011</code> over the
+districts and stores the <code>contactmatrix()</code> in the
+<code>neighbourhood</code> slot, potentially also combining some age groups
+via the <code>agegroups</code> argument.</p>
+</dd>
+<dt>"all":</dt>
+<dd>
+<p>retains both dimensions, either as a list of spatial
+<code>"sts"</code> objects per age group, or in a single <code>"sts"</code> object
+(see <code>flatten</code> below).</p>
+</dd>
+<dt>"none":</dt>
+<dd>
+<p>creates the overall (univariate) time series of
+<code>rowSums(counts)</code>.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>agegroups</code></td>
+<td>
+<p>how the age groups in <code>counts</code> (and <code>pop2011</code>)
+should be aggregated. Will be used as the <code>grouping</code> argument in
+<code>aggregateCountsArray</code> and <code>contactmatrix</code>.
+The default setting uses the six age groups of Meyer and Held (2017).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>timeRange</code></td>
+<td>
+<p>character vector of length two determining the time range
+of the <code>"sts"</code> object to generate. The two strings are matched
+against <code>dimnames(counts)[[1]]</code>, which ranges from
+<code>"2011-w01"</code> until <code>"2016-w30"</code>. The default value extracts
+four seasons (years) starting at <code>"2011-w27"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>flatten</code></td>
+<td>
+<p>logical indicating whether for <code>by = "all"</code> a single
+<code>"sts"</code> object should be returned where the observation unit is the
+interaction of district and age group (“flattened” <code>counts</code>
+array, see <code>as.data.frame.array</code>). By default (<code>flatten
+= FALSE</code>), a list of district-based <code>"sts"</code> objects is returned,
+one for each age group.</p>
+</td>
+</tr>
+</table>
+<h3>Format</h3>
+
+
+<dl>
+<dt>counts:</dt>
+<dd>
+<p>an integer-valued array of norovirus surveillance counts
+with labelled dimensions of size
+290 (<code>"week"</code>) x 12 (<code>"district"</code>) x 15 (<code>"agegroup"</code>).</p>
+</dd>
+<dt>map:</dt>
+<dd>
+<p>a <code>"SpatialPolygonsDataFrame"</code>
+of length 12 with <code>row.names(map)</code> matching <code>colnames(counts)</code>,
+representing Berlin's city districts in longlat coordinates (WGS84).
+The data slot contains the full <code>"NAME"</code>s of the city districts
+as well as their <code>"POPULATION"</code>, i.e., <code>rowSums(pop2011)</code>.</p>
+</dd>
+</dl>
+<p>The function <code>noroBE()</code> returns an <code>"sts"</code> object
+generated from these data (and <code>pop2011</code>).
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Sebastian Meyer
+</p>
+
+
+<h3>Source</h3>
+
+
+<dl>
+<dt>counts:</dt>
+<dd>
+<p>based on norovirus surveillance counts retrieved from
+the SurvStat@RKI 2.0 online service (<a href="https://survstat.rki.de">https://survstat.rki.de</a>)
+of Germany's public health institute, the Robert Koch Institute,
+as of 2016-09-08.</p>
+</dd>
+<dt>map:</dt>
+<dd>
+<p>based on a KML file of Berlin's 97 local centres
+(“Ortsteile”) downloaded from the Berlin Open Data repository at
+<a href="https://daten.berlin.de/datensaetze/geometrien-der-ortsteile-von-berlin-juli-2012">https://daten.berlin.de/datensaetze/geometrien-der-ortsteile-von-berlin-juli-2012</a>
+as of 2014-11-12, published by
+<em>Amt fuer Statistik Berlin-Brandenburg</em>
+(Statistical Office of Berlin-Brandenburg)
+under the ‘CC BY 3.0 DE’ license
+(<a href="https://creativecommons.org/licenses/by/3.0/de/">https://creativecommons.org/licenses/by/3.0/de/</a>).
+The <code>map</code> included here aggregates
+these local centres by city district.</p>
+</dd>
+</dl>
+<h3>References</h3>
+
+<p>Meyer S and Held L (2017): Incorporating social contact data in
+spatio-temporal models for infectious disease spread.
+<em>Biostatistics</em>, <b>18</b> (2), 338-351.
+<a href="https://doi.org/10.1093/biostatistics/kxw051">doi:10.1093/biostatistics/kxw051</a>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## the raw data
+str(counts)
+summary(map)
+
+## district-specific time series
+noroBEr &lt;- noroBE(by = "districts")
+plot(noroBEr)
+
+## age group-specific time series
+noroBEg &lt;- noroBE(by = "agegroups")
+plot(noroBEg)
+
+## list of spatio-temporal surveillance counts, one for each age group
+noroBErbyg &lt;- noroBE(by = "all", flatten = FALSE)
+plot(noroBErbyg[[1L]], par.list = list(oma=c(0,0,2,0)))
+title(main = names(noroBErbyg)[1], outer = TRUE, line = -1)
+
+## flattened "sts" object (the 'neighbourhood' only reflects spatial info)
+noroBEall &lt;- noroBE(by = "all", flatten = TRUE)
+dev.new(width = 16, height = 7)
+plot(noroBEall, par.list = list(
+    xaxt = "n", mar = c(1,4,1,1), mfrow = c(ncol(noroBEg), ncol(noroBEr))
+))
+</code></pre>
+
+
+</div>

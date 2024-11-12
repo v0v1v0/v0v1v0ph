@@ -1,0 +1,175 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>ggol</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Order statistics</h2>
+
+<h3>Description</h3>
+
+<p>Various functions for calculating the likelihood function for order
+statistics
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">ggrl(H, ...)
+general_grouped_rank_likelihood(H, ...)
+goodbad(winners,losers)
+elimination(all_players)
+rank_likelihood(M,times=1)
+rankvec_likelihood(v)
+race(v)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>H</code></td>
+<td>
+<p>Object of class <code>hyper2</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Numeric or character vectors specifying groups of
+players with  equal rank, with higher-ranking groups coming earlier
+in the argument list</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>all_players,winners,losers</code></td>
+<td>
+<p>Numeric or character vectors
+specifying competitors.  See details</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>M</code></td>
+<td>
+<p>In function <code>rank_likelihood()</code>, a matrix with each
+row corresponding to a race (or judge).  The columns
+correspond to the finishing order; thus <code>a=M[i,j]</code> means that
+competitor <code>a</code> finished in place <code>j</code> in race <code>i</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>times</code></td>
+<td>
+<p>Vector specifying the number of times each row is
+observed</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>v</code></td>
+<td>
+<p>A character vector specifying ranks.  Thus
+<code>c("b","c","a")</code> means that <code>b</code> came first, <code>c</code> second,
+and <code>a</code> third</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>These functions are designed to return likelihood functions, in the
+form of lists of <code>hyper2()</code> objects, for typical order statistics
+such as the results of rowing heats or MasterChef tournaments.
+</p>
+<p>Function <code>ggrl()</code> is an easily-typed alias for
+<code>general_grouped_rank_likelihood()</code>.
+</p>
+<p>Function <code>goodbad()</code> is a convenience function for <code>ggrl()</code>
+in which a bunch of contestants is judged.  It returns a likelihood
+function for the observation that the members of one subset were
+better than those of another.  Thus
+<code>goodbad(letters[1:3],letters[4:5])</code> corresponds to the
+observation that <code>d</code> and <code>e</code> were put into an elimination
+trial (and <code>abc</code> were not).
+</p>
+<p>Function <code>elimination()</code> gives a likelihood function for situations
+where the <em>weakest</em> player is identified at each stage and
+subsequently eliminated from the competition.  It is intended for
+situations like the Great British Bake-off and Masterchef in which the
+observation is which player was chosen to leave the show.  In this
+function, argument <code>all_players</code> is sensitive to order, unlike
+<code>choose_winners()</code> and <code>choose_losers()</code> (an integer
+<code>n</code> is interpreted as <code>letters[seq_len(n)]</code>).  Element
+<code>i</code> of <code>all_players</code> is the <code class="reqn">i^\mathrm{th}</code> player
+to be eliminated.  Thus the first element of <code>all_players</code> is the
+first player to be eliminated (and would be expected to have the
+lowest strength).  The final element of <code>all_players</code> is the last
+player to be eliminated (or alternatively the only player not to be
+eliminated).
+</p>
+<p>Function <code>rank_likelihood()</code> takes a matrix <code>M</code> with rows
+corresponding to a judge (or race); column names are interpreted as
+competitor names.  A named vector is coerced to a one-row matrix.
+Each row of <code>M</code> is an order statistic: thus <code>c(3,4,2,1)</code>
+means that person 3 came first, person 4 came second, person 2 came
+third and person 1 came last.  Note that in data frames like
+<code>F1_table_2017</code>, each <em>column</em> is a race.
+</p>
+<p>Function <code>rankvec_likelihood()</code> takes a character vector of
+competitors with the order of elements corresponding to the finishing
+order; a Plackett-Luce likelihood function is returned.  Thus
+<code>v=c("d","b","c","a")</code> corresponds to <code>d</code> coming first,
+<code>b</code> second, <code>c</code> third, and <code>a</code> fourth.  Function
+<code>race()</code> is an arguably more memorable synonym.
+</p>
+<p>An example of <code>race()</code> is given in <code>inst/rowing.Rmd</code>, and
+examples of <code>ggrl()</code> are given in <code>inst/loser.Rmd</code> and
+<code>inst/masterchef.Rmd</code>.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Robin K. S. Hankin</p>
+
+
+<h3>See Also</h3>
+
+<p><code>rrank</code>,<code>ordertable2supp</code>,<code>race3</code></p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+W &lt;- hyper2(pnames=letters[1:5])
+W1 &lt;- ggrl(W, 'a', letters[2:4],'e')  # 6-element list
+W2 &lt;- ggrl(W, 'b', letters[3:5],'a')  # 6-element list
+
+like_single_list(equalp(W1),W1)
+like_series(equalp(W1),list(W1,W2))
+
+if(FALSE){  # takes too long
+# run 10 races:
+r1 &lt;- rrank(10,p=(7:1)/28)
+colnames(r1) &lt;- letters[1:7]
+
+# Likelihood function for r1:
+W &lt;- rank_likelihood(r1)
+
+# convert a rank table to a support function:
+rank_likelihood(wikitable_to_ranktable(volvo_table))
+
+H &lt;- hyper2()
+for(i in 1:20){
+  H &lt;- H + race(sample(letters[1:5],sample(3,1),replace=FALSE))
+}
+equalp.test(H) # should not be significant (null is true)
+
+H1 &lt;- hyper2(pnames=letters[1:5])
+H2 &lt;- choose_losers(H1,letters[1:4],letters[1:2])   # {a,b} vs {c,d}; {a,b} lost
+maxplist(H2,control=list(maxit=1))  # control set to save time
+}
+
+</code></pre>
+
+
+</div>

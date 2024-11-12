@@ -1,0 +1,168 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>corrected_lasso</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Corrected Lasso</h2>
+
+<h3>Description</h3>
+
+<p>Lasso (L1-regularization) for generalized linear models with
+measurement error.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">corrected_lasso(
+  W,
+  y,
+  sigmaUU,
+  family = c("gaussian", "binomial", "poisson"),
+  radii = NULL,
+  no_radii = NULL,
+  alpha = 0.1,
+  maxits = 5000,
+  tol = 1e-12
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>W</code></td>
+<td>
+<p>Design matrix, measured with error. Must be a numeric matrix.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+<p>Vector of responses.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sigmaUU</code></td>
+<td>
+<p>Covariance matrix of the measurement error.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>family</code></td>
+<td>
+<p>Response type. Character string of length 1. Possible values are
+"gaussian", "binomial" and "poisson".</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>radii</code></td>
+<td>
+<p>Vector containing the set of radii of the l1-ball onto which the
+solution is projected. If not provided, the algorithm will select an evenly
+spaced vector of 20 radii.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>no_radii</code></td>
+<td>
+<p>Length of vector radii, i.e., the number of regularization
+parameters to fit the corrected lasso for.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alpha</code></td>
+<td>
+<p>Step size of the projected gradient descent algorithm. Default is
+0.1.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>maxits</code></td>
+<td>
+<p>Maximum number of iterations of the project gradient descent
+algorithm for each radius. Default is 5000.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tol</code></td>
+<td>
+<p>Iteration tolerance for change in sum of squares of beta. Defaults
+. to 1e-12.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Corrected version of the lasso for generalized linear models. The
+method does require an estimate of the measurement error covariance matrix.
+The Poisson regression option might sensitive to numerical overflow, please
+file a GitHub issue in the source repository if you experience this.
+</p>
+
+
+<h3>Value</h3>
+
+<p>An object of class "corrected_lasso".
+</p>
+
+
+<h3>References</h3>
+
+<p>Loh P, Wainwright MJ (2012).
+“High-dimensional regression with noisy and missing data: Provable guarantees with nonconvexity.”
+<em>Ann. Statist.</em>, <b>40</b>(3), 1637–1664.
+</p>
+<p>Sorensen O, Frigessi A, Thoresen M (2015).
+“Measurement error in lasso: Impact and likelihood bias correction.”
+<em>Statistica Sinica</em>, <b>25</b>(2), 809-829.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Example with linear regression
+# Number of samples
+n &lt;- 100
+# Number of covariates
+p &lt;- 50
+# True (latent) variables
+X &lt;- matrix(rnorm(n * p), nrow = n)
+# Measurement error covariance matrix
+# (typically estimated by replicate measurements)
+sigmaUU &lt;- diag(x = 0.2, nrow = p, ncol = p)
+# Measurement matrix (this is the one we observe)
+W &lt;- X + rnorm(n, sd = sqrt(diag(sigmaUU)))
+# Coefficient
+beta &lt;- c(seq(from = 0.1, to = 1, length.out = 5), rep(0, p-5))
+# Response
+y &lt;- X %*% beta + rnorm(n, sd = 1)
+# Run the corrected lasso
+fit &lt;- corrected_lasso(W, y, sigmaUU, family = "gaussian")
+coef(fit)
+plot(fit)
+plot(fit, type = "path")
+
+# Binomial, logistic regression
+# Number of samples
+n &lt;- 1000
+# Number of covariates
+p &lt;- 50
+# True (latent) variables
+X &lt;- matrix(rnorm(n * p), nrow = n)
+# Measurement error covariance matrix
+sigmaUU &lt;- diag(x = 0.2, nrow = p, ncol = p)
+# Measurement matrix (this is the one we observe)
+W &lt;- X + rnorm(n, sd = sqrt(diag(sigmaUU)))
+# Response
+y &lt;- rbinom(n, size = 1, prob = plogis(X %*% c(rep(5, 5), rep(0, p-5))))
+fit &lt;- corrected_lasso(W, y, sigmaUU, family = "binomial")
+plot(fit)
+coef(fit)
+
+</code></pre>
+
+
+</div>

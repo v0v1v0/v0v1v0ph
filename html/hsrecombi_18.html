@@ -1,0 +1,109 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>makehappm</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Make list of imputed haplotypes and estimate recombination rate</h2>
+
+<h3>Description</h3>
+
+<p>List of sire haplotypes is set up in the format required for
+hsrecombi. Sire haplotypes are imputed from progeny genotypes using R
+package <code>hsphase</code>. Furthermore, recombination rate estimates between
+adjacent SNPs from hsphase are reported.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">makehappm(sireID, daughterSire, genotype.chr, nmin = 30, exclude = NULL)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>sireID</code></td>
+<td>
+<p>vector (LEN N) of IDs of all sires</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>daughterSire</code></td>
+<td>
+<p>vector (LEN n) of sire ID for each progeny</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>genotype.chr</code></td>
+<td>
+<p>matrix (DIM n x p) of progeny genotypes (0, 1, 2) on a
+single chromosome with p SNPs; 9 indicates missing genotype</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nmin</code></td>
+<td>
+<p>scalar, minimum required number of progeny for proper imputation,
+default 30</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>exclude</code></td>
+<td>
+<p>vector (LEN &lt; p) of SNP IDs (for filtering column names of
+<code>genotype.chr)</code> to be excluded from analysis</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>list (LEN 2) of lists. For each sire:
+</p>
+
+<dl>
+<dt><code>famID</code></dt>
+<dd>
+<p>list (LEN N) of vectors (LEN n.progeny) of progeny
+indices relating to lines in genotype matrix</p>
+</dd>
+<dt><code>sireHap</code></dt>
+<dd>
+<p>list (LEN N) of matrices (DIM 2 x p) of sire
+haplotypes (0, 1) on investigated chromosome</p>
+</dd>
+<dt>probRec</dt>
+<dd>
+<p>vector (LEN p - 1) of proportion of recombinant progeny over
+all families between adjacent SNPs</p>
+</dd>
+<dt>numberRec</dt>
+<dd>
+<p>list (LEN N) of vectors (LEN n.progeny) of number of
+recombination events per animal</p>
+</dd>
+<dt>gen</dt>
+<dd>
+<p>vector (LEN p) of genetic positions of SNPs (in cM)</p>
+</dd>
+</dl>
+<h3>References</h3>
+
+<p>Ferdosi, M., Kinghorn, B., van der Werf, J., Lee, S. &amp; Gondro, C. (2014)
+hsphase: an R package for pedigree reconstruction, detection of
+recombination events, phasing and imputation of half-sib family groups
+BMC Bioinformatics 15:172.
+<a href="https://CRAN.R-project.org/package=hsphase">https://CRAN.R-project.org/package=hsphase</a>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">  data(targetregion)
+  hap &lt;- makehappm(unique(daughterSire), daughterSire, genotype.chr, exclude = paste0('V', 301:310))
+</code></pre>
+
+
+</div>

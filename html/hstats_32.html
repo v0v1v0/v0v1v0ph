@@ -1,0 +1,317 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>partial_dep</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Partial Dependence Plot</h2>
+
+<h3>Description</h3>
+
+<p>Estimates the partial dependence function of feature(s) <code>v</code> over a
+grid of values. Both multivariate and multivariable situations are supported.
+The resulting object can be plotted via <code>plot()</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">partial_dep(object, ...)
+
+## Default S3 method:
+partial_dep(
+  object,
+  v,
+  X,
+  pred_fun = stats::predict,
+  BY = NULL,
+  by_size = 4L,
+  grid = NULL,
+  grid_size = 49L,
+  trim = c(0.01, 0.99),
+  strategy = c("uniform", "quantile"),
+  na.rm = TRUE,
+  n_max = 1000L,
+  w = NULL,
+  ...
+)
+
+## S3 method for class 'ranger'
+partial_dep(
+  object,
+  v,
+  X,
+  pred_fun = NULL,
+  BY = NULL,
+  by_size = 4L,
+  grid = NULL,
+  grid_size = 49L,
+  trim = c(0.01, 0.99),
+  strategy = c("uniform", "quantile"),
+  na.rm = TRUE,
+  n_max = 1000L,
+  w = NULL,
+  survival = c("chf", "prob"),
+  ...
+)
+
+## S3 method for class 'explainer'
+partial_dep(
+  object,
+  v,
+  X = object[["data"]],
+  pred_fun = object[["predict_function"]],
+  BY = NULL,
+  by_size = 4L,
+  grid = NULL,
+  grid_size = 49L,
+  trim = c(0.01, 0.99),
+  strategy = c("uniform", "quantile"),
+  na.rm = TRUE,
+  n_max = 1000L,
+  w = object[["weights"]],
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>object</code></td>
+<td>
+<p>Fitted model object.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Additional arguments passed to <code>pred_fun(object, X, ...)</code>,
+for instance <code>type = "response"</code> in a <code>glm()</code> model, or <code>reshape = TRUE</code> in a
+multiclass XGBoost model.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>v</code></td>
+<td>
+<p>One or more column names over which you want to calculate the partial
+dependence.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>X</code></td>
+<td>
+<p>A data.frame or matrix serving as background dataset.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pred_fun</code></td>
+<td>
+<p>Prediction function of the form <code style="white-space: pre;">⁠function(object, X, ...)⁠</code>,
+providing <code class="reqn">K \ge 1</code> predictions per row. Its first argument represents the
+model <code>object</code>, its second argument a data structure like <code>X</code>. Additional arguments
+(such as <code>type = "response"</code> in a GLM, or <code>reshape = TRUE</code> in a multiclass XGBoost
+model) can be passed via <code>...</code>. The default, <code>stats::predict()</code>, will work in
+most cases.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>BY</code></td>
+<td>
+<p>Optional grouping vector or column name. The partial dependence
+function is calculated per <code>BY</code> group. Each <code>BY</code> group
+uses the same evaluation grid to improve assessment of (non-)additivity.
+Numeric <code>BY</code> variables with more than <code>by_size</code> disjoint values will be
+binned into <code>by_size</code> quantile groups of similar size. To improve robustness,
+subsampling of <code>X</code> is done within group. This only applies to <code>BY</code> groups with
+more than <code>n_max</code> rows.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>by_size</code></td>
+<td>
+<p>Numeric <code>BY</code> variables with more than <code>by_size</code> unique values will
+be binned into quantile groups. Only relevant if <code>BY</code> is not <code>NULL</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>grid</code></td>
+<td>
+<p>Evaluation grid. A vector (if <code>length(v) == 1L</code>), or a matrix/data.frame
+otherwise. If <code>NULL</code>, calculated via <code>multivariate_grid()</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>grid_size</code></td>
+<td>
+<p>Controls the approximate grid size. If <code>x</code> has p columns, then each
+(non-discrete) column will be reduced to about the p-th root of <code>grid_size</code> values.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>trim</code></td>
+<td>
+<p>The default <code>c(0.01, 0.99)</code> means that values outside the
+1% and 99% quantiles of non-discrete numeric columns are removed before calculation
+of grid values. Set to <code>0:1</code> for no trimming.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>strategy</code></td>
+<td>
+<p>How to find grid values of non-discrete numeric columns?
+Either "uniform" or "quantile", see description of <code>univariate_grid()</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>na.rm</code></td>
+<td>
+<p>Should missing values be dropped from the grid? Default is <code>TRUE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n_max</code></td>
+<td>
+<p>If <code>X</code> has more than <code>n_max</code> rows, a random sample of <code>n_max</code> rows is
+selected from <code>X</code>. In this case, set a random seed for reproducibility.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>w</code></td>
+<td>
+<p>Optional vector of case weights. Can also be a column name of <code>X</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>survival</code></td>
+<td>
+<p>Should cumulative hazards ("chf", default) or survival
+probabilities ("prob") per time be predicted? Only in <code>ranger()</code> survival models.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>An object of class "partial_dep" containing these elements:
+</p>
+
+<ul>
+<li> <p><code>data</code>: data.frame containing the partial dependencies.
+</p>
+</li>
+<li> <p><code>v</code>: Same as input <code>v</code>.
+</p>
+</li>
+<li> <p><code>K</code>: Number of columns of prediction matrix.
+</p>
+</li>
+<li> <p><code>pred_names</code>: Column names of prediction matrix.
+</p>
+</li>
+<li> <p><code>by_name</code>: Column name of grouping variable (or <code>NULL</code>).
+</p>
+</li>
+</ul>
+<h3>Methods (by class)</h3>
+
+
+<ul>
+<li> <p><code>partial_dep(default)</code>: Default method.
+</p>
+</li>
+<li> <p><code>partial_dep(ranger)</code>: Method for "ranger" models.
+</p>
+</li>
+<li> <p><code>partial_dep(explainer)</code>: Method for DALEX "explainer".
+</p>
+</li>
+</ul>
+<h3>Partial Dependence Functions</h3>
+
+<p>Let <code class="reqn">F: R^p \to R</code> denote the prediction function that maps the
+<code class="reqn">p</code>-dimensional feature vector <code class="reqn">\mathbf{x} = (x_1, \dots, x_p)</code>
+to its prediction. Furthermore, let
+</p>
+<p style="text-align: center;"><code class="reqn">
+  F_s(\mathbf{x}_s) = E_{\mathbf{x}_{\setminus s}}(F(\mathbf{x}_s, \mathbf{x}_{\setminus s}))
+</code>
+</p>
+
+<p>be the partial dependence function of <code class="reqn">F</code> on the feature subset
+<code class="reqn">\mathbf{x}_s</code>, where <code class="reqn">s \subseteq \{1, \dots, p\}</code>, as introduced in
+Friedman (2001). Here, the expectation runs over the joint marginal distribution
+of features <code class="reqn">\mathbf{x}_{\setminus s}</code> not in <code class="reqn">\mathbf{x}_s</code>.
+</p>
+<p>Given data, <code class="reqn">F_s(\mathbf{x}_s)</code> can be estimated by the empirical partial
+dependence function
+</p>
+<p style="text-align: center;"><code class="reqn">
+  \hat F_s(\mathbf{x}_s) = \frac{1}{n} \sum_{i = 1}^n F(\mathbf{x}_s, \mathbf{x}_{i\setminus s}),
+</code>
+</p>
+
+<p>where <code class="reqn">\mathbf{x}_{i\setminus s}</code> <code class="reqn">i = 1, \dots, n</code>, are the observed values
+of <code class="reqn">\mathbf{x}_{\setminus s}</code>.
+</p>
+<p>A partial dependence plot (PDP) plots the values of <code class="reqn">\hat F_s(\mathbf{x}_s)</code>
+over a grid of evaluation points <code class="reqn">\mathbf{x}_s</code>.
+</p>
+
+
+<h3>References</h3>
+
+<p>Friedman, Jerome H. <em>"Greedy Function Approximation: A Gradient Boosting Machine."</em>
+Annals of Statistics 29, no. 5 (2001): 1189-1232.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># MODEL 1: Linear regression
+fit &lt;- lm(Sepal.Length ~ . + Species * Petal.Length, data = iris)
+(pd &lt;- partial_dep(fit, v = "Species", X = iris))
+plot(pd)
+
+## Not run: 
+# Stratified by BY variable (numerics are automatically binned)
+pd &lt;- partial_dep(fit, v = "Species", X = iris, BY = "Petal.Length")
+plot(pd)
+
+# Multivariable input
+v &lt;- c("Species", "Petal.Length")
+pd &lt;- partial_dep(fit, v = v, X = iris, grid_size = 100L)
+plot(pd, rotate_x = TRUE)
+plot(pd, d2_geom = "line")  # often better to read
+
+# With grouping
+pd &lt;- partial_dep(fit, v = v, X = iris, grid_size = 100L, BY = "Petal.Width")
+plot(pd, rotate_x = TRUE)
+plot(pd, rotate_x = TRUE, d2_geom = "line")
+plot(pd, rotate_x = TRUE, d2_geom = "line", swap_dim = TRUE)
+
+# MODEL 2: Multi-response linear regression
+fit &lt;- lm(as.matrix(iris[, 1:2]) ~ Petal.Length + Petal.Width * Species, data = iris)
+pd &lt;- partial_dep(fit, v = "Petal.Width", X = iris, BY = "Species")
+plot(pd, show_points = FALSE)
+pd &lt;- partial_dep(fit, v = c("Species", "Petal.Width"), X = iris)
+plot(pd, rotate_x = TRUE)
+plot(pd, d2_geom = "line", rotate_x = TRUE)
+plot(pd, d2_geom = "line", rotate_x = TRUE, swap_dim = TRUE)
+
+# Multivariate, multivariable, and BY (no plot available)
+pd &lt;- partial_dep(
+  fit, v = c("Petal.Width", "Petal.Length"), X = iris, BY = "Species"
+)
+pd
+
+## End(Not run)
+
+# MODEL 3: Gamma GLM -&gt; pass options to predict() via ...
+fit &lt;- glm(Sepal.Length ~ ., data = iris, family = Gamma(link = log))
+plot(partial_dep(fit, v = "Petal.Length", X = iris), show_points = FALSE)
+plot(partial_dep(fit, v = "Petal.Length", X = iris, type = "response"))
+</code></pre>
+
+
+</div>

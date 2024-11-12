@@ -1,0 +1,95 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hai_kmeans_obj</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>K-Means Object</h2>
+
+<h3>Description</h3>
+
+<p>Takes the output of the <code>hai_kmeans_user_item_tbl()</code> function and applies the
+k-means algorithm to it using <code>stats::kmeans()</code>
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hai_kmeans_obj(.data, .centers = 5)
+
+kmeans_obj(.data, .centers = 5)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>.data</code></td>
+<td>
+<p>The data that gets passed from <code>hai_kmeans_user_item_tbl()</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.centers</code></td>
+<td>
+<p>How many initial centers to start with</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Uses the <code>stats::kmeans()</code> function and creates a wrapper around it.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A stats k-means object
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Steven P. Sanderson II, MPH
+</p>
+
+
+<h3>See Also</h3>
+
+<p>Other Kmeans: 
+<code>hai_kmeans_automl()</code>,
+<code>hai_kmeans_automl_predict()</code>,
+<code>hai_kmeans_mapped_tbl()</code>,
+<code>hai_kmeans_scree_data_tbl()</code>,
+<code>hai_kmeans_scree_plt()</code>,
+<code>hai_kmeans_tidy_tbl()</code>,
+<code>hai_kmeans_user_item_tbl()</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">library(healthyR.data)
+library(dplyr)
+
+data_tbl &lt;- healthyR_data %&gt;%
+  filter(ip_op_flag == "I") %&gt;%
+  filter(payer_grouping != "Medicare B") %&gt;%
+  filter(payer_grouping != "?") %&gt;%
+  select(service_line, payer_grouping) %&gt;%
+  mutate(record = 1) %&gt;%
+  as_tibble()
+
+hai_kmeans_user_item_tbl(
+  .data = data_tbl,
+  .row_input = service_line,
+  .col_input = payer_grouping,
+  .record_input = record
+) %&gt;%
+  hai_kmeans_obj()
+
+</code></pre>
+
+
+</div>

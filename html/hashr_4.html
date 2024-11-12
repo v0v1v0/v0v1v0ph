@@ -1,0 +1,138 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hash</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Hash R objects to 32bit integers</h2>
+
+<h3>Description</h3>
+
+<p>Hash R objects to 32bit integers
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hash(x, ...)
+
+## Default S3 method:
+hash(x, ...)
+
+## S3 method for class 'character'
+hash(
+  x,
+  recursive = TRUE,
+  what = c("string", "pointer"),
+  nthread = getOption("hashr_num_thread"),
+  ...
+)
+
+## S3 method for class 'list'
+hash(x, recursive = TRUE, nthread = getOption("hashr_num_thread"), ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>Object to hash</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Arguments to be passed to other methods. In particular, for the default method, 
+these arguments are passed to <code>serialize</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>recursive</code></td>
+<td>
+<p>hash each element separately?</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>what</code></td>
+<td>
+<p>Hash the string or the pointer to the string (faster, but not reproducible
+over R sessions)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nthread</code></td>
+<td>
+<p>maximum number of threads used.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The default method <code>serialize</code>s the input to a single
+<code>raw</code> vector which is then hashed to a single signed
+integer. This is also true for <code>character</code> vectors when
+<code>recursive=FALSE</code>. When <code>recursive=TRUE</code> each element of a
+<code>character</code> vector is hashed separately, based on the underlying
+<code>char</code> representation in <code>C</code>.
+</p>
+
+
+<h3>Parallelization</h3>
+
+<p>On systems supporting openMP, this function is able to use multiple cores.
+By default, a sensible number of cores is chosen. See the entry on
+<a href="https://cran.r-project.org/doc/manuals/r-release/R-exts.html#OpenMP-support">OpenMP Support</a> in the writing R extensions manual to check whether your system supports it.
+</p>
+
+
+<h3>Hash function</h3>
+
+<p>The hash function used is Paul Hsieh's' <code>SuperFastHash</code> function which is
+described on his <a href="http://www.azillionmonkeys.com/qed/hash.html">website</a>.
+As the title of the algorithm suggests, this hashing algorithm is not aimed to
+be used as a secure hash, and it is probably a bad idea to use it for that purpose.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+# hash some complicated R object (not a list).
+m &lt;- lm(height ~ weight, data=women)
+hash(m)
+
+# hash a character vector element by element:
+x &lt;- c("Call any vegetable"
+     , "and the chances are good"
+     , "that the vegetable will respond to you")
+hash(x)
+
+# hash a character vector as one object:
+hash(x, recursive=FALSE)
+
+# hash a list recursively
+L &lt;- strsplit(x," ")
+hash(L)
+
+# recursive really means recursive, so nested lists are recursed over:
+L &lt;- list(
+  x = 10
+  , y = list(
+    foo = "bob"
+    , bar = lm(Sepal.Width ~ Sepal.Length, data=iris)
+  )
+)
+
+hash(L)
+hash(L,recursive=FALSE)
+
+
+
+
+</code></pre>
+
+
+</div>

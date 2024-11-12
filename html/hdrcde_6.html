@@ -1,0 +1,227 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hdr.2d</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Bivariate Highest Density Regions</h2>
+
+<h3>Description</h3>
+
+<p>Calculates and plots highest density regions in two dimensions, including
+the bivariate HDR boxplot.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hdr.2d(
+  x,
+  y,
+  prob = c(50, 95, 99),
+  den = NULL,
+  kde.package = c("ash", "ks"),
+  h = NULL,
+  xextend = 0.15,
+  yextend = 0.15
+)
+
+hdr.boxplot.2d(
+  x,
+  y,
+  prob = c(50, 99),
+  kde.package = c("ash", "ks"),
+  h = NULL,
+  xextend = 0.15,
+  yextend = 0.15,
+  xlab = "",
+  ylab = "",
+  shadecols = "darkgray",
+  pointcol = 1,
+  outside.points = TRUE,
+  ...
+)
+
+## S3 method for class 'hdr2d'
+plot(
+  x,
+  shaded = TRUE,
+  show.points = FALSE,
+  outside.points = FALSE,
+  pch = 20,
+  shadecols = gray((length(x$alpha):1)/(length(x$alpha) + 1)),
+  pointcol = 1,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>Numeric vector</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+<p>Numeric vector of same length as <code>x</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>prob</code></td>
+<td>
+<p>Probability coverage required for HDRs</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>den</code></td>
+<td>
+<p>Bivariate density estimate (a list with elements x, y and z where
+x and y are grid values and z is a matrix of density values). If
+<code>NULL</code>, the density is estimated.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>kde.package</code></td>
+<td>
+<p>Package to be used in calculating the kernel density
+estimate when <code>den=NULL</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>h</code></td>
+<td>
+<p>Pair of bandwidths passed to either <code>ash2</code> or
+<code>kde</code>. If NULL, a reasonable default is used. Ignored if
+<code>den</code> is not <code>NULL</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>xextend</code></td>
+<td>
+<p>Proportion of range of <code>x</code>. The density is estimated on
+a grid extended by <code>xextend</code> beyond the range of <code>x</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>yextend</code></td>
+<td>
+<p>Proportion of range of <code>y</code>. The density is estimated on
+a grid extended by <code>yextend</code> beyond the range of <code>y</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>xlab</code></td>
+<td>
+<p>Label for x-axis.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ylab</code></td>
+<td>
+<p>Label for y-axis.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>shadecols</code></td>
+<td>
+<p>Colors for shaded regions</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pointcol</code></td>
+<td>
+<p>Color for outliers and mode</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>outside.points</code></td>
+<td>
+<p>If <code>TRUE</code>, the observations lying outside the
+largest HDR are shown.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Other arguments to be passed to plot.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>shaded</code></td>
+<td>
+<p>If <code>TRUE</code>, the HDR contours are shown as shaded regions.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>show.points</code></td>
+<td>
+<p>If <code>TRUE</code>, the observations are plotted over the top
+of the HDR contours.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pch</code></td>
+<td>
+<p>The plotting character used for observations.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The density is estimated using kernel density estimation. Either
+<code>ash2</code> or <code>kde</code> is used to do the
+calculations. Then Hyndman's (1996) density quantile algorithm is used to
+compute the HDRs.
+</p>
+<p><code>hdr.2d</code> returns an object of class <code>hdr2d</code> containing all the
+information needed to compute the HDR contours. This object can be plotted
+using <code>plot.hdr2d</code>.
+</p>
+<p><code>hdr.boxplot.2d</code> produces a bivariate HDR boxplot. This is a special
+case of applying <code>plot.hdr2d</code> to an object computed using
+<code>hdr.2d</code>.
+</p>
+
+
+<h3>Value</h3>
+
+<p>Some information about the HDRs is returned. See code for details.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Rob J Hyndman
+</p>
+
+
+<h3>References</h3>
+
+<p>Hyndman, R.J. (1996) Computing and graphing highest density
+regions <em>American Statistician</em>, <b>50</b>, 120-126.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>hdr.boxplot</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">x &lt;- c(rnorm(200,0,1),rnorm(200,4,1))
+y &lt;- c(rnorm(200,0,1),rnorm(200,4,1))
+hdr.boxplot.2d(x,y)
+
+hdrinfo &lt;- hdr.2d(x,y)
+plot(hdrinfo, pointcol="red", show.points=TRUE, pch=3)
+</code></pre>
+
+
+</div>

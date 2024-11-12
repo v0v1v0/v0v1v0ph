@@ -1,0 +1,85 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>directional_deriv</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Derivative inner product</h2>
+
+<h3>Description</h3>
+
+<p>Find the (uncertainty modified) inner product between the derivative at a point <code>x</code>
+and a proposed direction <code>v</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">directional_deriv(em, x, v, sd = NULL, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>em</code></td>
+<td>
+<p>The emulator in question</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>The point in input space to evaluate at</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>v</code></td>
+<td>
+<p>The direction to assess</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sd</code></td>
+<td>
+<p>How many standard deviations to consider.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Additional arguments to pass through (eg local.var to the emulator functions)</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Given a point <code>x</code> and a direction <code>v</code>, we find the overlap between E[f'(x)] and
+<code>v</code>. The emulated derivative has uncertainty associated with it: the variance is taken
+into account using <code class="reqn">v^{T} Var[f'(x)] v</code>.
+</p>
+<p>If <code>sd == NULL</code>, then only the (normed) overlap between the derivative and the direction
+vector is returned. Otherwise a pair of values are returned: these are the normed overlap plus
+or minus <code>sd</code> times the uncertainty.
+</p>
+<p>This function is concerned with ascertaining whether a direction is oriented in the direction
+of the emulator gradient, subject to the uncertainty around the estimate of the derivative.
+It allows for a consideration of "emulated gradient descent".
+</p>
+
+
+<h3>Value</h3>
+
+<p>Either a single numeric or a pair of numerics (see description)
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"> directional_deriv(SIREmulators$ems[[1]], SIRSample$validation[1,], c(1,1,1))
+
+</code></pre>
+
+
+</div>

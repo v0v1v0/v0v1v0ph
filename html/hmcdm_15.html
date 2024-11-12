@@ -1,0 +1,136 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>sim_hmcdm</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Simulate responses from the specified model (entire cube)</h2>
+
+<h3>Description</h3>
+
+<p>Simulate a cube of responses from the specified model for all persons on items across all time points.
+Currently available models are <code>DINA</code>, <code>rRUM</code>, and <code>NIDA</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">sim_hmcdm(
+  model,
+  alphas,
+  Q_matrix,
+  Design_array,
+  itempars = NULL,
+  r_stars = NULL,
+  pi_stars = NULL,
+  Svec = NULL,
+  Gvec = NULL
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>model</code></td>
+<td>
+<p>The cognitive diagnostic model under which the item responses are generated</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alphas</code></td>
+<td>
+<p>An N-by-K-by-L <code>array</code> of attribute patterns of all persons across L time points</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Q_matrix</code></td>
+<td>
+<p>A J-by-K of Q-matrix</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Design_array</code></td>
+<td>
+<p>A N-by-J-by-L array indicating whether item j is administered to examinee i at l time point.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>itempars</code></td>
+<td>
+<p>A J-by-2 <code>mat</code> of item parameters (slipping: 1st col, guessing: 2nd col).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>r_stars</code></td>
+<td>
+<p>A J-by-K <code>mat</code> of item penalty parameters for missing skills.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pi_stars</code></td>
+<td>
+<p>A length J <code>vector</code> of item correct response probability with all requisite skills.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Svec</code></td>
+<td>
+<p>A length K <code>vector</code> of slipping probability in applying mastered skills</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Gvec</code></td>
+<td>
+<p>A length K <code>vector</code> of guessing probability in applying mastered skills</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>An <code>array</code> of item responses from the specified model of examinees across all time points.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+## DINA ##
+N = nrow(Design_array)
+J = nrow(Q_matrix)
+thetas_true = rnorm(N, 0, 1.8)
+lambdas_true &lt;- c(-2, .4, .055)
+Alphas &lt;- sim_alphas(model="HO_joint", 
+                    lambdas=lambdas_true, 
+                    thetas=thetas_true, 
+                    Q_matrix=Q_matrix, 
+                    Design_array=Design_array)
+itempars_true &lt;- matrix(runif(J*2,.1,.2), ncol=2)
+
+Y_sim &lt;- sim_hmcdm(model="DINA",Alphas,Q_matrix,Design_array,
+                   itempars=itempars_true)
+                   
+## rRUM ##
+J = nrow(Q_matrix)
+K = ncol(Q_matrix)
+Smats &lt;- matrix(runif(J*K,.1,.3),c(J,K))
+Gmats &lt;- matrix(runif(J*K,.1,.3),c(J,K))
+r_stars &lt;- Gmats / (1-Smats)
+pi_stars &lt;- apply((1-Smats)^Q_matrix, 1, prod)
+
+Y_sim &lt;- sim_hmcdm(model="rRUM",Alphas,Q_matrix,Design_array,
+                   r_stars=r_stars,pi_stars=pi_stars)
+
+## NIDA ##
+K = ncol(Q_matrix)
+Svec &lt;- runif(K,.1,.3)
+Gvec &lt;- runif(K,.1,.3)
+
+Y_sim &lt;- sim_hmcdm(model="NIDA",Alphas,Q_matrix,Design_array,
+                   Svec=Svec,Gvec=Gvec)
+
+</code></pre>
+
+
+</div>

@@ -1,0 +1,252 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>ice</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Individual Conditional Expectations</h2>
+
+<h3>Description</h3>
+
+<p>Disaggregated partial dependencies, see reference. The plot method supports
+up to two grouping variables via <code>BY</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">ice(object, ...)
+
+## Default S3 method:
+ice(
+  object,
+  v,
+  X,
+  pred_fun = stats::predict,
+  BY = NULL,
+  grid = NULL,
+  grid_size = 49L,
+  trim = c(0.01, 0.99),
+  strategy = c("uniform", "quantile"),
+  na.rm = TRUE,
+  n_max = 100L,
+  ...
+)
+
+## S3 method for class 'ranger'
+ice(
+  object,
+  v,
+  X,
+  pred_fun = NULL,
+  BY = NULL,
+  grid = NULL,
+  grid_size = 49L,
+  trim = c(0.01, 0.99),
+  strategy = c("uniform", "quantile"),
+  na.rm = TRUE,
+  n_max = 100L,
+  survival = c("chf", "prob"),
+  ...
+)
+
+## S3 method for class 'explainer'
+ice(
+  object,
+  v = v,
+  X = object[["data"]],
+  pred_fun = object[["predict_function"]],
+  BY = NULL,
+  grid = NULL,
+  grid_size = 49L,
+  trim = c(0.01, 0.99),
+  strategy = c("uniform", "quantile"),
+  na.rm = TRUE,
+  n_max = 100L,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>object</code></td>
+<td>
+<p>Fitted model object.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Additional arguments passed to <code>pred_fun(object, X, ...)</code>,
+for instance <code>type = "response"</code> in a <code>glm()</code> model, or <code>reshape = TRUE</code> in a
+multiclass XGBoost model.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>v</code></td>
+<td>
+<p>One or more column names over which you want to calculate the ICE.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>X</code></td>
+<td>
+<p>A data.frame or matrix serving as background dataset.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pred_fun</code></td>
+<td>
+<p>Prediction function of the form <code style="white-space: pre;">⁠function(object, X, ...)⁠</code>,
+providing <code class="reqn">K \ge 1</code> predictions per row. Its first argument represents the
+model <code>object</code>, its second argument a data structure like <code>X</code>. Additional arguments
+(such as <code>type = "response"</code> in a GLM, or <code>reshape = TRUE</code> in a multiclass XGBoost
+model) can be passed via <code>...</code>. The default, <code>stats::predict()</code>, will work in
+most cases.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>BY</code></td>
+<td>
+<p>Optional grouping vector/matrix/data.frame (up to two columns),
+or up to two column names. Unlike with <code>partial_dep()</code>, these variables are not
+binned. The first variable is visualized on the color scale, while the second
+one goes into a <code>facet_wrap()</code>. Thus, make sure that the second variable is
+discrete.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>grid</code></td>
+<td>
+<p>Evaluation grid. A vector (if <code>length(v) == 1L</code>), or a matrix/data.frame
+otherwise. If <code>NULL</code>, calculated via <code>multivariate_grid()</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>grid_size</code></td>
+<td>
+<p>Controls the approximate grid size. If <code>x</code> has p columns, then each
+(non-discrete) column will be reduced to about the p-th root of <code>grid_size</code> values.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>trim</code></td>
+<td>
+<p>The default <code>c(0.01, 0.99)</code> means that values outside the
+1% and 99% quantiles of non-discrete numeric columns are removed before calculation
+of grid values. Set to <code>0:1</code> for no trimming.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>strategy</code></td>
+<td>
+<p>How to find grid values of non-discrete numeric columns?
+Either "uniform" or "quantile", see description of <code>univariate_grid()</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>na.rm</code></td>
+<td>
+<p>Should missing values be dropped from the grid? Default is <code>TRUE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n_max</code></td>
+<td>
+<p>If <code>X</code> has more than <code>n_max</code> rows, a random sample of <code>n_max</code> rows is
+selected from <code>X</code>. In this case, set a random seed for reproducibility.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>survival</code></td>
+<td>
+<p>Should cumulative hazards ("chf", default) or survival
+probabilities ("prob") per time be predicted? Only in <code>ranger()</code> survival models.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>An object of class "ice" containing these elements:
+</p>
+
+<ul>
+<li> <p><code>data</code>: data.frame containing the ice values.
+</p>
+</li>
+<li> <p><code>grid</code>: Vector, matrix or data.frame of grid values.
+</p>
+</li>
+<li> <p><code>v</code>: Same as input <code>v</code>.
+</p>
+</li>
+<li> <p><code>K</code>: Number of columns of prediction matrix.
+</p>
+</li>
+<li> <p><code>pred_names</code>: Column names of prediction matrix.
+</p>
+</li>
+<li> <p><code>by_names</code>: Column name(s) of grouping variable(s) (or <code>NULL</code>).
+</p>
+</li>
+</ul>
+<h3>Methods (by class)</h3>
+
+
+<ul>
+<li> <p><code>ice(default)</code>: Default method.
+</p>
+</li>
+<li> <p><code>ice(ranger)</code>: Method for "ranger" models.
+</p>
+</li>
+<li> <p><code>ice(explainer)</code>: Method for DALEX "explainer".
+</p>
+</li>
+</ul>
+<h3>References</h3>
+
+<p>Goldstein, Alex, and Adam Kapelner and Justin Bleich and Emil Pitkin.
+<em>Peeking inside the black box: Visualizing statistical learning with plots of individual conditional expectation.</em>
+Journal of Computational and Graphical Statistics, 24, no. 1 (2015): 44-65.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># MODEL 1: Linear regression
+fit &lt;- lm(Sepal.Length ~ . + Species * Petal.Length, data = iris)
+plot(ice(fit, v = "Sepal.Width", X = iris))
+
+# Stratified by one variable
+ic &lt;- ice(fit, v = "Petal.Length", X = iris, BY = "Species")
+ic
+plot(ic)
+plot(ic, center = TRUE)
+
+## Not run: 
+# Stratified by two variables (the second one goes into facets)
+ic &lt;- ice(fit, v = "Petal.Length", X = iris, BY = c("Petal.Width", "Species"))
+plot(ic)
+plot(ic, center = TRUE)
+
+# MODEL 2: Multi-response linear regression
+fit &lt;- lm(as.matrix(iris[, 1:2]) ~ Petal.Length + Petal.Width * Species, data = iris)
+ic &lt;- ice(fit, v = "Petal.Width", X = iris, BY = iris$Species)
+plot(ic)
+plot(ic, center = TRUE)
+plot(ic, swap_dim = TRUE)
+
+## End(Not run)
+
+# MODEL 3: Gamma GLM -&gt; pass options to predict() via ...
+fit &lt;- glm(Sepal.Length ~ ., data = iris, family = Gamma(link = log))
+plot(ice(fit, v = "Petal.Length", X = iris, BY = "Species"))
+plot(ice(fit, v = "Petal.Length", X = iris, type = "response", BY = "Species"))
+</code></pre>
+
+
+</div>

@@ -1,0 +1,123 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>single_SBS</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Sparsified Binary Segmentation for single change-point estimation</h2>
+
+<h3>Description</h3>
+
+<p>R wrapper for C function for single change-point estimation using Sparsified Binary Segmentation Cho and Fryzlewicz (2015).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">single_SBS(
+  X,
+  threshold = NULL,
+  rescale_variance = TRUE,
+  empirical = FALSE,
+  N = 100,
+  tol = 1/100,
+  debug = FALSE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>X</code></td>
+<td>
+<p>Matrix of observations, where each row contains a time series</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>threshold</code></td>
+<td>
+<p>Manually specified value of the threshold <code class="reqn">\pi_T</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rescale_variance</code></td>
+<td>
+<p>If <code>TRUE</code>, each row of the data is re-scaled by a MAD estimate using <code>rescale_variance</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>empirical</code></td>
+<td>
+<p>If <code>TRUE</code>, the threshold is based on Monte Carlo simulation</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>N</code></td>
+<td>
+<p>If <code>empirical=TRUE</code>, <code>N</code> is the number of Monte Carlo samples used</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tol</code></td>
+<td>
+<p>If <code>empirical=TRUE</code>, <code>tol</code> is the false error probability tolerance</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>debug</code></td>
+<td>
+<p>If <code>TRUE</code>, diagnostic prints are provided during execution</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A list containing 
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>pos</code></td>
+<td>
+<p>estimated change-point location</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>maxval</code></td>
+<td>
+<p>maximum thresholded and aggregated CUSUM at the estimated change-point position</p>
+</td>
+</tr>
+</table>
+<h3>References</h3>
+
+<p>Cho H, Fryzlewicz P (2015).
+“Multiple-change-point detection for high dimensional time series via sparsified binary segmentation.”
+<em>Journal of the Royal Statistical Society. Series B (Statistical Methodology)</em>, <b>77</b>(2), 475–507.
+ISSN 1369-7412, Publisher: [Royal Statistical Society, Wiley], <a href="https://www.jstor.org/stable/24774746">https://www.jstor.org/stable/24774746</a>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Single SBS
+library(HDCD)
+n = 50
+p = 50
+set.seed(101)
+# Generating data
+X = matrix(rnorm(n*p), ncol = n, nrow=p)
+# Adding a single sparse change-point:
+X[1:5, 26:n] = X[1:5, 26:n] +1
+
+res = single_SBS(X,threshold=7,rescale_variance=TRUE)
+res$pos
+
+# Choose threhsold by Monte Carlo:
+res = single_SBS(X,empirical=TRUE,rescale_variance=TRUE)
+res$pos
+</code></pre>
+
+
+</div>

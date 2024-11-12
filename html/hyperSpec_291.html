@@ -1,0 +1,157 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>scan.txt.Renishaw</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>import Raman measurements from Renishaw ASCII-files</h2>
+
+<h3>Description</h3>
+
+<p>import Raman measurements from Renishaw (possibly compressed) .txt file.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">scan.txt.Renishaw(...)
+
+scan.zip.Renishaw(...)
+
+read.txt.Renishaw(
+  file = stop("file is required"),
+  data = "xyspc",
+  nlines = 0,
+  nspc = NULL
+)
+
+read.zip.Renishaw(
+  file = stop("filename is required"),
+  txt.file = sub("[.]zip", ".txt", basename(file)),
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Arguments for <code>read.txt.Renishaw</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>file</code></td>
+<td>
+<p>file name or connection</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>type of file, one of "spc", "xyspc", "zspc", "depth", "ts", see
+details.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nlines</code></td>
+<td>
+<p>number of lines to read in each chunk, if 0 or less read
+whole file at once.
+</p>
+<p><code>nlines</code> must cover at least one complete spectrum,i.e. <code>nlines</code>
+must be at least the number of data points per spectrum. Reasonable
+values start at <code>1e6</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nspc</code></td>
+<td>
+<p>number of spectra in the file</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>txt.file</code></td>
+<td>
+<p>name of the .txt file in the .zip archive. Defaults to zip
+file's name with suffix .txt instead of .zip</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The file may be of any file type that can be read by
+<code>gzfile</code> (i.e. text, or zipped by gzip, bzip2, xz or
+lzma). .zip zipped files need to be read using <code>read.zip.Renishaw</code>.
+</p>
+<p>Renishaw .wxd files are converted to .txt ASCII files by their batch
+converter. They come in a "long" format with columns (y x | time | z)?
+wavelength intensity.  The first columns depend on the data type.
+</p>
+<p>The corresponding possibilities for the <code>data</code> argument are:
+</p>
+
+<table>
+<tr>
+<td style="text-align: left;"> <code>data</code> </td>
+<td style="text-align: left;"> columns </td>
+<td style="text-align: left;"> </td>
+</tr>
+<tr>
+<td style="text-align: left;"> <code>"spc"</code> </td>
+<td style="text-align: left;"> wl int
+</td>
+<td style="text-align: left;"> single spectrum </td>
+</tr>
+<tr>
+<td style="text-align: left;"> <code>"zspc"</code>, <code>"depth"</code> </td>
+<td style="text-align: left;"> z wl int </td>
+<td style="text-align: left;">
+depth profile</td>
+</tr>
+<tr>
+<td style="text-align: left;"> <code>"ts"</code> </td>
+<td style="text-align: left;"> t wl int </td>
+<td style="text-align: left;"> time series</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+<code>"xyspc"</code> </td>
+<td style="text-align: left;"> y x wl int </td>
+<td style="text-align: left;"> 2d map</td>
+</tr>
+<tr>
+<td style="text-align: left;"> </td>
+</tr>
+</table>
+<p>This function allows reading very large ASCII files, but it does not work
+on files with missing values (<code>NA</code>s are allowed).
+</p>
+<p>If the file is so large that it sould be read in chunks and <code>nspc</code> is
+not given, <code>read.txt.Renishaw</code> tries to guess it by using <code>wc</code>
+(if installed).
+</p>
+
+
+<h3>Value</h3>
+
+<p>the <code>hyperSpec</code> object
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>C. Beleites
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>read.txt.long</code>, <code>read.txt.wide</code>,
+<code>scan</code>
+</p>
+
+
+</div>

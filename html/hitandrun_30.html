@@ -1,0 +1,97 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>solution.basis</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Calculate the basis for the solution space of a system of linear equations
+</h2>
+
+<h3>Description</h3>
+
+<p>Given a set of linear equality constraints, determine a translation and a basis for its solution space.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">solution.basis(constr)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table><tr style="vertical-align: top;">
+<td><code>constr</code></td>
+<td>
+<p>Linear equality constraints</p>
+</td>
+</tr></table>
+<h3>Details</h3>
+
+<p>For a system of linear equations, <code class="reqn">Ax = b</code>, the solution space is given by
+</p>
+<p style="text-align: center;"><code class="reqn">x = A^\dagger b + (I - A^\dagger A) y</code>
+</p>
+
+<p>where <code class="reqn">A^\dagger</code> is the Moore-Penrose pseudoinverse of <code class="reqn">A</code>.
+The QR decomposition of <code class="reqn">I - A^\dagger A</code> enables us to determine the dimension of the solution space and derive a basis for that space.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A list, consisting of 
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>translate</code></td>
+<td>
+<p>A point in the solution space</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>basis</code></td>
+<td>
+<p>A basis rooted in that point</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>Gert van Valkenhoef
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>createTransform</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># A 3-dimensional original space
+n &lt;- 3
+
+# x_1 + x_2 + x_3 = 1
+eq.constr &lt;- list(constr = t(rep(1, n)), dir = '=', rhs = 1)
+basis &lt;- solution.basis(eq.constr)
+stopifnot(ncol(basis$basis) == 2) # Dimension reduced to 2
+y &lt;- rbind(rnorm(100, 0, 100), rnorm(100, 0, 100))
+x &lt;- basis$basis %*% y + basis$translate
+stopifnot(all.equal(apply(x, 2, sum), rep(1, 100)))
+
+# 2 x_2 = x_1; 2 x_3 = x_2
+eq.constr &lt;- mergeConstraints(
+  eq.constr,
+  list(constr = c(-1, 2, 0), dir = '=', rhs = 0),
+  list(constr = c(0, -1, 2), dir = '=', rhs = 0))
+basis &lt;- solution.basis(eq.constr)
+stopifnot(ncol(basis$basis) == 0) # Dimension reduced to 0
+stopifnot(all.equal(basis$translate, c(4/7, 2/7, 1/7)))
+</code></pre>
+
+
+</div>

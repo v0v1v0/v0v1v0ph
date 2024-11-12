@@ -1,0 +1,129 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>make_route_grid</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Make lat-long grid for route finding</h2>
+
+<h3>Description</h3>
+
+<p><code>make_route_grid</code> creates, and optionally classifies, a lat-long route grid
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">make_route_grid(
+  fat_map,
+  name,
+  target_km = 800,
+  lat_min = -60,
+  lat_max = 86,
+  long_min = -180,
+  long_max = 179.95,
+  classify = FALSE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>fat_map</code></td>
+<td>
+<p>MULTIPOLYGON map defining land regions</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>name</code></td>
+<td>
+<p>String assigned to the name slot of the result</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>target_km</code></td>
+<td>
+<p>Target length. Default 800km
+only to avoid accidentally starting heavy compute.
+30-50km would be more useful.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lat_min, lat_max</code></td>
+<td>
+<p>Latitude extent of grid</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>long_min, long_max</code></td>
+<td>
+<p>Longitude extend of grid.
+Two allow small grids crossing the 180 boundary, the function
+accepts values outside [-180,180), then rounds to within this
+range.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>classify</code></td>
+<td>
+<p>Whether to classify each link. Defaults to
+FALSE only to avoid accidentally starting heavy compute.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>This function creates a GridLat object that contains
+a set of point on a lat long grid (ie all the points are on
+lines of latitude). It also joins these points into a lattice.
+Optionally, but required later, it classifies each link as land, sea,
+or transition, with reference to a given map (typically including a
+coastal buffer).
+</p>
+<p>The definitions are
+</p>
+
+<ul>
+<li>
+<p> land: both ends of the link are on land
+</p>
+</li>
+<li>
+<p> sea: both ends are on sea, and the link does not intersect the land
+</p>
+</li>
+<li>
+<p> transition: otherwise
+</p>
+</li>
+</ul>
+<p>The length of the links will be around <code>target_km</code> or 50pct longer
+for the diagonal links.
+</p>
+<p>For more details see the help vignette:
+<code>vignette("Supersonic Routing", package = "himach")</code>
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>gridLat</code> object containing points and lattice.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">NZ_buffer &lt;- hm_get_test("buffer")
+system.time(
+  p_grid &lt;- make_route_grid(NZ_buffer,"NZ lat-long at 300km",
+                           target_km = 300, classify = TRUE,
+                           lat_min = -49, lat_max = -32,
+                           long_min = 162, long_max = 182)
+)
+
+</code></pre>
+
+
+</div>

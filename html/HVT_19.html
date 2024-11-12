@@ -1,0 +1,292 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>trainHVT</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Constructing Hierarchical Voronoi Tessellations</h2>
+
+<h3>Description</h3>
+
+<p>This is the main function to construct hierarchical voronoi tessellations.
+This is done using hierarchical vector quantization(hvq). The data is represented in 2D
+coordinates and the tessellations are plotted using these coordinates as
+centroids. For subsequent levels, transformation is performed on the 2D
+coordinates to get all the points within its parent tile. Tessellations are
+plotted using these transformed points as centroids.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">trainHVT(
+  dataset,
+  min_compression_perc = NA,
+  n_cells = NA,
+  depth = 1,
+  quant.err = 0.2,
+  normalize = FALSE,
+  distance_metric = c("L1_Norm", "L2_Norm"),
+  error_metric = c("mean", "max"),
+  quant_method = c("kmeans", "kmedoids"),
+  scale_summary = NA,
+  projection.scale = 10,
+  diagnose = FALSE,
+  hvt_validation = FALSE,
+  train_validation_split_ratio = 0.8,
+  dim_reduction_method = "sammon",
+  tsne_theta = 0.2,
+  tsne_eta = 200,
+  tsne_perplexity = 30,
+  tsne_verbose = TRUE,
+  tsne_max_iter = 500,
+  umap_n_neighbors = 60,
+  umap_n_components = 2,
+  umap_min_dist = 0.1
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>dataset</code></td>
+<td>
+<p>Data frame. A data frame, with numeric columns (features) will be used for training the model.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>min_compression_perc</code></td>
+<td>
+<p>Numeric. An integer, indicating the minimum compression percentage to be achieved for the dataset. 
+It indicates the desired level of reduction in dataset size compared to its original size.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n_cells</code></td>
+<td>
+<p>Numeric. An integer, indicating the number of cells per hierarchy (level).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>depth</code></td>
+<td>
+<p>Numeric. An integer, indicating the number of levels. A depth of 1 means no hierarchy (single level), 
+while higher values indicate multiple levels (hierarchy).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>quant.err</code></td>
+<td>
+<p>Numeric. A number indicating the quantization error threshold.
+A cell will only breakdown into further cells if the quantization error of the cell is 
+above the defined quantization error threshold.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>normalize</code></td>
+<td>
+<p>Logical. A logical value indicating if the dataset should be normalized. When set to TRUE, 
+scales the values of all features to have a mean of 0 and a standard deviation of 1 (Z-score).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>distance_metric</code></td>
+<td>
+<p>Character. The distance metric can be L1_Norm(Manhattan) or L2_Norm(Eucledian). L1_Norm is selected by default.
+The distance metric is used to calculate the distance between an n dimensional point and centroid.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>error_metric</code></td>
+<td>
+<p>Character. The error metric can be mean or max. max is selected by default. 
+max will return the max of m values and mean will take mean of m values where
+each value is a distance between a point and centroid of the cell.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>quant_method</code></td>
+<td>
+<p>Character. The quantization method can be kmeans or kmedoids. Kmeans uses means (centroids) as cluster centers
+while Kmedoids uses actual data points (medoids) as cluster centers. kmeans is selected by default.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>scale_summary</code></td>
+<td>
+<p>List. A list with user-defined mean and standard deviation values for all the features in the dataset. 
+Pass the scale summary when normalize is set to FALSE.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>projection.scale</code></td>
+<td>
+<p>Numeric. A number indicating the scale factor for the tessellations to visualize the sub-tessellations
+well enough. It helps in adjusting the visual representation of the hierarchy to make the sub-tessellations more visible.
+Default is 10.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>diagnose</code></td>
+<td>
+<p>Logical. A logical value indicating whether user wants to perform diagnostics on the model. 
+Default value is FALSE.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>hvt_validation</code></td>
+<td>
+<p>Logical. A logical value indicating whether user wants to holdout a validation set and find 
+mean absolute deviation of the validation points from the centroid. Default value is FALSE.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>train_validation_split_ratio</code></td>
+<td>
+<p>Numeric. A numeric value indicating train validation split ratio. 
+This argument is only used when hvt_validation has been set to TRUE. Default value for the argument is 0.8.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dim_reduction_method</code></td>
+<td>
+<p>Character.The dim_reduction_method can be one of "tsne", "umap", "sammon".</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tsne_theta</code></td>
+<td>
+<p>Numeric.The tsne_theta is only used when dim_reduction_method is set to "tsne".
+Default value is 0.5 and common values are between 0.2 and 0.5.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tsne_eta</code></td>
+<td>
+<p>Numeric.The tsne_eta are used only when dim_reduction method is set to "tsne".
+Default value is 200.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tsne_perplexity</code></td>
+<td>
+<p>Numeric.The tsne_perplexity is only used when dim_reduction_method is set to "tsne".
+Default value is 30 and common values are between between 30 and 50.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tsne_verbose</code></td>
+<td>
+<p>Logical. A logical value which indicates the t-SNE algorithm to print 
+detailed information about its progress to the console.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tsne_max_iter</code></td>
+<td>
+<p>Numeric.The tsne_max_iter is used only when dim_reduction_method is set to "tsne".
+Default value is 1000.More iterations can improve results but increase computation time.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>umap_n_neighbors</code></td>
+<td>
+<p>Integer.The umap_n_neighbors is used only when dim_reduction_method is set to "umap".
+Default value is 15.Controls the balance between local and global structure in data.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>umap_n_components</code></td>
+<td>
+<p>Integer.The umap_n_components is used only when dim_reduction_method is set to "umap".
+Default value is 2.Indicates the number of dimensions for embedding.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>umap_min_dist</code></td>
+<td>
+<p>Numeric.The umap_map_dist is used only when dim_reduction_method is set to "umap".
+Default value is 0.1.Controls how tightly UMAP packs points together.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A Nested list that contains the hierarchical tessellation information. This
+list has to be given as input argument to plot the tessellations.
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>[[1]] </code></td>
+<td>
+<p>A list containing information related to plotting tessellations. 
+This information will include coordinates, boundaries, and other details necessary for visualizing the tessellations</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>[[2]] </code></td>
+<td>
+<p>A list containing information related to Sammon’s projection coordinates of the data points
+in the reduced-dimensional space.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>[[3]] </code></td>
+<td>
+<p>A list containing detailed information about the hierarchical vector quantized data along with 
+a summary section containing no of points, Quantization Error and the centroids for each cell.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>[[4]] </code></td>
+<td>
+<p>A list that contains all the diagnostics information of the model when diagnose is set to TRUE. 
+Otherwise NA.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>[[5]] </code></td>
+<td>
+<p>A list that contains all the information required to generates a Mean Absolute Deviation (MAD) plot, 
+if hvt_validation is set to TRUE. Otherwise NA</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>[[6]]</code></td>
+<td>
+<p>A list containing detailed information about the hierarchical vector quantized data along with a
+summary section containing no of points, Quantization Error and the centroids for each cell which is the output of 'hvq'</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>[[7]]</code></td>
+<td>
+<p>model info: A list that contains model-generated timestamp, input parameters passed to the model ,
+the validation results and the dimensionality reduction evaluation metrics table.</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>Shubhra Prakash &lt;shubhra.prakash@mu-sigma.com&gt;, Sangeet Moy Das &lt;sangeet.das@mu-sigma.com&gt;, Shantanu Vaidya &lt;shantanu.vaidya@mu-sigma.com&gt;,Bidesh Ghosh &lt;bidesh.gosh@mu-sigma.com&gt;,Alimpan Dey &lt;alimpan.dey@mu-sigma.com&gt;
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>plotHVT</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data("EuStockMarkets")
+hvt.results &lt;- trainHVT(EuStockMarkets, n_cells = 60, depth = 1, quant.err = 0.1, 
+                       distance_metric = "L1_Norm", error_metric = "max",
+                       normalize = TRUE,quant_method="kmeans")
+</code></pre>
+
+
+</div>

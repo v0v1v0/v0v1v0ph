@@ -1,0 +1,81 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>interpolate</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Interpolation</h2>
+
+<h3>Description</h3>
+
+<p>This functions applies interpolation to fill in missing (or non-recorded) values.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">interpolate(df, miss_table, threshold, method = "linear")
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>df</code></td>
+<td>
+<p>data frame with two columns: 'Date' or 'POSIXct' class in the first column and a numeric variable in the second one.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>miss_table</code></td>
+<td>
+<p>data frame with three columns: first and last date of interpolation (first and second column respectively). The last and third column, is a numeric with the number of steps to interpolate. See report_miss_data.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>threshold</code></td>
+<td>
+<p>numeric variable with the maximum number of dates in which to apply the interpolation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+<p>string with the interpolation method. In this version only 'linear' method is allowed.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A data frame with date and the interpolated numeric variable.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Create BDHI hydro-met station
+guido &lt;- create_hydroMet(class_name = 'BDHI')
+
+# List with meteorological variables (slots in BDHI's object)
+cargar &lt;- list('precip', 'Qmd', 'Qmm')
+
+# Now assign as names the files
+hydro_files   &lt;- list.files( system.file('extdata', package = "hydroToolkit"), pattern = 'Guido' )
+names(cargar) &lt;- hydro_files
+
+# Build the object with the met records
+guido &lt;- build_hydroMet(obj = guido, slot_list = cargar, 
+               path = system.file('extdata', package = "hydroToolkit") )
+               
+# Get mean daily discharge and report miss data
+Qmd  &lt;- get_hydroMet(obj = guido, name = 'Qmd')[[1]]
+miss &lt;- report_miss_data(df = Qmd)
+
+# Now interpolate miss values 
+Qmd_fill &lt;- interpolate(df = Qmd, miss_table = miss, threshold = 5, method = "linear")
+
+</code></pre>
+
+
+</div>

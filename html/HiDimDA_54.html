@@ -1,0 +1,117 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>FrobSigAp</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Approximation of Covariance Matrices from q-factor models</h2>
+
+<h3>Description</h3>
+
+<p>‘FrobSigAp’ finds the parameters of a q-factor model whose covariance is closest to the matrix argument ‘Sigma’, according to the Frobenius norm.
+</p>
+<p>‘FrobSigAp1’ finds the parameters of a q-factor model whose covariance is closest to the matrix square <code>SigmaSr %*% t(SigmaSr)</code> of the argument ‘SigmaSr’, according to the Frobenius norm. 
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">
+FrobSigAp(Sigma, q, nstarts = 1, k0 = NULL, penF = NULL, 
+atol = 1e-20, rtol = sqrt(.Machine$double.eps))
+
+FrobSigAp1(SigmaSr, SigmaRank, q, nstarts = 1, k0=NULL, penF=NULL, 
+atol = 1e-20, rtol = 100 * sqrt(.Machine$double.eps))
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>Sigma</code></td>
+<td>
+<p>Square, symmetric and positive-definite matrix to be approximated</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>q</code></td>
+<td>
+<p>Number of factors in the assumed factor model.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nstarts</code></td>
+<td>
+<p>Number of different randomly generated starting points used in the optimization.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>k0</code></td>
+<td>
+<p>Lower bound for the elements of the specific variances. When NULL (default), k0 is set to 0.01 times the minimum diagonal element of ‘Sigma’.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>penF</code></td>
+<td>
+<p>Penalty factor, used to forbid specific variances below the k0 bound. When set to NULL (default), a penalty equal to 100 times the maximum diagonal element of ‘Sigma’ is used.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>atol</code></td>
+<td>
+<p>The absolute convergence tolerance of the local optimizer.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rtol</code></td>
+<td>
+<p>The relative convergence tolerance of the local optimizer. The local optimizer stops if it is unable to reduce the approximation error (err) by a factor of ‘reltol *(abs(err) + reltol)’ at a step.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>SigmaSr</code></td>
+<td>
+<p>Matrix square root of the covariance to be approximated.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>SigmaRank</code></td>
+<td>
+<p>Rank of the covariance matrix to be approximated.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The minimization of the error Frobenius norm is performed by the ‘nlminb’ PORT optimization routine. The actual computations of the errors, and their analytical gradients and hessians, are coded in C in order to speed up the algorithm.<br> The minimization procedure takes the loadings (B) of the factor model as arguments, computes the optimal specific variances by the analytical formula <code>D = diag(Sigma) - diag(B %*% t(B))</code>, and uses the first q eigenvectors of ‘Sigma’ as starting points of the optimization.<br>
+For small values of q (1 or 2), this procedure seems to quickly converge to the global minimum of the approximation error. 
+For larger values of q, the computational time can be much higher and multiple random starting points (that can be specified by the argument ‘nstarts’) may be required in order to escape local optima.
+</p>
+
+
+<h3>Value</h3>
+
+<p> An object of class ‘SigFq’ representing the covariance assumed by the closest q-factor model.
+‘SigFq’ objects have specialized methods for matrix inversion, multiplication, and element-wise arithmetic operations.</p>
+
+
+<h3>Author(s)</h3>
+
+<p>A. Pedro Duarte Silva</p>
+
+
+<h3>References</h3>
+
+<p>Pedro Duarte Silva, A. (2011) “Two Group Classification with High-Dimensional Correlated Data: A Factor Model Approach”, 
+<em>Computational Statistics and Data Analysis</em>, 55 (1), 2975-2990.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>RFlda</code>, <code>SigFq</code>, <code>SigFqInv</code>, <code>solve.SigFq</code>, <code>solve.SigFqInv</code></p>
+
+
+</div>

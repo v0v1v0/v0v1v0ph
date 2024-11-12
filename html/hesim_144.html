@@ -1,0 +1,270 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>params_surv</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Parameters of a survival model</h2>
+
+<h3>Description</h3>
+
+<p>Create a list containing the parameters of a single fitted parametric or
+flexible parametric survival model.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">params_surv(coefs, dist, aux = NULL)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>coefs</code></td>
+<td>
+<p>A list of length equal to the number of parameters in the
+survival distribution. Each element of the list is a matrix of samples
+of the regression coefficients under sampling uncertainty used to predict
+a given parameter. All parameters are expressed on the real line (e.g.,
+after log transformation if they are defined as positive). Each element
+of the list may also be an object coercible to a matrix such as a
+<code>data.frame</code> or <code>data.table</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dist</code></td>
+<td>
+<p>Character vector denoting the parametric distribution. See "Details".</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>aux</code></td>
+<td>
+<p>Auxiliary arguments used with splines, fractional polynomial,
+or piecewise exponential models. See "Details".</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Survival is modeled as a function of <code class="reqn">L</code> parameters <code class="reqn">\alpha_l</code>.
+Letting <code class="reqn">F(t)</code> be the cumulative distribution function, survival at time <code class="reqn">t</code>
+is given by
+</p>
+<p style="text-align: center;"><code class="reqn">1 - F(t | \alpha_1(x_{1}), \ldots, \alpha_L(x_{L})).</code>
+</p>
+
+<p>The parameters are modeled as a function of covariates, <code class="reqn">x_l</code>, with an
+inverse transformation function <code class="reqn">g^{-1}()</code>,
+</p>
+<p style="text-align: center;"><code class="reqn">\alpha_l =  g^{-1}(x_{l}^T \beta_l).</code>
+</p>
+
+<p><code class="reqn">g^{-1}()</code> is typically <code class="reqn">exp()</code> if a parameter is strictly positive
+and the identity function if the parameter space is unrestricted.
+</p>
+<p>The types of distributions that can be specified are:
+</p>
+
+<dl>
+<dt>
+<code>exponential</code> or <code>exp</code>
+</dt>
+<dd>
+<p> Exponential distribution. <code>coef</code>
+must contain the <code>rate</code> parameter on the log scale and the same parameterization as in
+<code>stats::Exponential</code>.</p>
+</dd>
+<dt>
+<code>weibull</code> or <code>weibull.quiet</code>
+</dt>
+<dd>
+<p> Weibull distribution. The first
+element of <code>coef</code> is the <code>shape</code> parameter (on the log scale) and the second
+element is the <code>scale</code> parameter (also on the log scale). The parameterization is
+that same as in <code>stats::Weibull</code>.</p>
+</dd>
+<dt><code>weibullPH</code></dt>
+<dd>
+<p> Weibull distribution with a proportional hazards
+parameterization. The first element of <code>coef</code> is the <code>shape</code> parameter
+(on the log scale) and the second element is the <code>scale</code> parameter
+(also on the log scale). The parameterization is
+that same as in <code>flexsurv::WeibullPH</code>.</p>
+</dd>
+<dt><code>gamma</code></dt>
+<dd>
+<p> Gamma distribution. The first
+element of <code>coef</code> is the <code>shape</code> parameter (on the log scale) and the second
+element is the <code>rate</code> parameter (also on the log scale). The parameterization is
+that same as in <code>stats::GammaDist</code>.</p>
+</dd>
+<dt><code>lnorm</code></dt>
+<dd>
+<p> Lognormal distribution. The first
+element of <code>coef</code> is the <code>meanlog</code> parameter (i.e., the mean of survival on
+the log scale) and the second element is the <code>sdlog</code> parameter (i.e.,
+the standard deviation of survival on the log scale). The parameterization is
+that same as in <code>stats::Lognormal</code>. The coefficients predicting the <code>meanlog</code>
+parameter are untransformed whereas the coefficients predicting the <code>sdlog</code>
+parameter are defined on the log scale.</p>
+</dd>
+<dt><code>gompertz</code></dt>
+<dd>
+<p> Gompertz distribution. The first
+element of <code>coef</code> is the <code>shape</code> parameter and the second
+element is the <code>rate</code> parameter (on the log scale). The parameterization is
+that same as in <code>flexsurv::Gompertz</code>.</p>
+</dd>
+<dt><code>llogis</code></dt>
+<dd>
+<p> Log-logistic distribution. The first
+element of <code>coef</code> is the <code>shape</code> parameter (on the log scale) and the second
+element is the <code>scale</code> parameter (also on the log scale). The parameterization is
+that same as in <code>flexsurv::Llogis</code>.</p>
+</dd>
+<dt><code>gengamma</code></dt>
+<dd>
+<p> Generalized gamma distribution. The first
+element of <code>coef</code> is the location parameter <code>mu</code>, the second
+element is the scale parameter <code>sigma</code> (on the log scale), and the
+third element is the shape parameter <code>Q</code>. The parameterization is
+that same as in <code>flexsurv::GenGamma</code>.</p>
+</dd>
+<dt><code>survspline</code></dt>
+<dd>
+<p> Survival splines. Each element of <code>coef</code> is a parameter of the
+spline model (i.e. <code>gamma_0</code>, <code>gamma_1</code>, <code class="reqn">\ldots</code>) with length equal
+to the number of knots (including the boundary knots). See below for details on the
+auxiliary arguments. The parameterization is that same as in <code>flexsurv::Survspline</code>.</p>
+</dd>
+<dt><code>fracpoly</code></dt>
+<dd>
+<p> Fractional polynomials. Each element of <code>coef</code> is a parameter of the
+fractional polynomial model (i.e. <code>gamma_0</code>, <code>gamma_1</code>, <code class="reqn">\ldots</code>) with length equal
+to the number of powers plus 1. See below for details on the auxiliary arguments
+(i.e., <code>powers</code>).</p>
+</dd>
+<dt><code>pwexp</code></dt>
+<dd>
+<p> Piecewise exponential distribution. Each element of <code>coef</code> is
+rate parameter for a distinct time interval. The times at which the rates
+change should be specified with the auxiliary argument <code>time</code> (see below
+for more details)</p>
+</dd>
+</dl>
+<p>.
+</p>
+<dl>
+<dt><code>fixed</code></dt>
+<dd>
+<p> A fixed survival time. Can be used for "non-random" number
+generation. <code>coef</code> should contain a single parameter, <code>est</code>, of the fixed
+survival times.</p>
+</dd>
+</dl>
+<p>Auxiliary arguments for spline models should be specified as a list containing the elements:
+</p>
+
+<dl>
+<dt><code>knots</code></dt>
+<dd>
+<p>A numeric vector of knots.</p>
+</dd>
+<dt><code>scale</code></dt>
+<dd>
+<p>The survival outcome to be modeled
+as a spline function. Options are <code>"log_cumhazard"</code> for the log cumulative hazard;
+<code>"log_hazard"</code> for the log hazard rate; <code>"log_cumodds"</code> for the log cumulative odds;
+and <code>"inv_normal"</code> for the inverse normal distribution function.</p>
+</dd>
+<dt><code>timescale</code></dt>
+<dd>
+<p>If <code>"log"</code> (the default), then survival is modeled as a spline function
+of log time; if <code>"identity"</code>, then it is modeled as a spline function of time.</p>
+</dd>
+</dl>
+<p>Auxiliary arguments for fractional polynomial models should be specified as a list containing the elements:
+</p>
+
+<dl>
+<dt><code>powers</code></dt>
+<dd>
+<p> A vector of the powers of the fractional polynomial with each element
+chosen from the following set: -2. -1, -0.5, 0, 0.5, 1, 2, 3.</p>
+</dd>
+</dl>
+<p>Auxiliary arguments for piecewise exponential models should be specified as
+a list containing the element:
+</p>
+
+<dl>
+<dt><code>time</code></dt>
+<dd>
+<p> A vector equal to the number of rate parameters giving the
+times at which the rate changes.</p>
+</dd>
+</dl>
+<p>Furthermore, when splines (with <code>scale = "log_hazard"</code>) or fractional
+polynomials are used, numerical methods must be used to compute the cumulative
+hazard and for random number generation. The following additional auxiliary arguments
+can therefore be specified:
+</p>
+
+<dl>
+<dt><code>cumhaz_method</code></dt>
+<dd>
+<p>Numerical method used to compute cumulative hazard
+(i.e., to integrate the hazard function). Always used for fractional polynomials
+but only used for splines if <code>scale = "log_hazard"</code>.
+Options are <code>"quad"</code> for adaptive quadrature and <code>"riemann"</code> for Riemann sum.</p>
+</dd>
+<dt><code>random_method</code></dt>
+<dd>
+<p>Method used to randomly draw from
+an arbitrary survival function. Options are <code>"invcdf"</code> for the inverse CDF and
+<code>"discrete"</code> for a discrete time approximation that randomly samples
+events from a Bernoulli distribution at discrete times.</p>
+</dd>
+<dt><code>step</code></dt>
+<dd>
+<p>Step size for computation of cumulative hazard with
+numerical integration. Only required when using <code>"riemann"</code> to compute the
+cumulative hazard or using <code>"discrete"</code> for random number generation.</p>
+</dd>
+</dl>
+<h3>Value</h3>
+
+<p>An object of class <code>params_surv</code>, which is a list containing <code>coefs</code>,
+<code>dist</code>, and <code>n_samples</code>. <code>n_samples</code> is equal to the
+number of rows in each element of <code>coefs</code>, which must be the same. The <code>coefs</code>
+element is always converted into a list of matrices. The list may also contain
+<code>aux</code> if a spline, fractional polynomial, or piecewise exponential model is
+used.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">n &lt;- 10
+params &lt;- params_surv(
+  coefs = list(
+    shape = data.frame(
+      intercept = rnorm(n, .5, .23)
+    ),
+    scale = data.frame(
+      intercept = rnorm(n, 12.39, 1.49),
+      age = rnorm(n, -.09, .023)
+   )
+  ),
+  dist = "weibull"
+)
+summary(params)
+params
+</code></pre>
+
+
+</div>

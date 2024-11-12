@@ -1,0 +1,244 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>Mstep</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>M-Step of EM Algorithm for DTHMM</h2>
+
+<h3>Description</h3>
+
+<p>Performs the <em>maximisation</em> step of the EM algorithm for a <code>dthmm</code> process. This function is called by the <code>BaumWelch</code> function. The Baum-Welch algorithm used in the HMM literature is a version of the EM algorithm.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">Mstep.beta(x, cond, pm, pn, maxiter = 200)
+Mstep.binom(x, cond, pm, pn)
+Mstep.exp(x, cond, pm, pn)
+Mstep.gamma(x, cond, pm, pn, maxiter = 200)
+Mstep.glm(x, cond, pm, pn, family, link)
+Mstep.lnorm(x, cond, pm, pn)
+Mstep.logis(x, cond, pm, pn, maxiter = 200)
+Mstep.norm(x, cond, pm, pn)
+Mstep.pois(x, cond, pm, pn)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>is a vector of length <code class="reqn">n</code> containing the observed process.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cond</code></td>
+<td>
+<p>is an object created by <code>Estep</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>family</code></td>
+<td>
+<p>character string, the GLM family, one of <code>"gaussian"</code>, <code>"poisson"</code>, <code>"Gamma"</code> or <code>"binomial"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>link</code></td>
+<td>
+<p>character string, the link function. If <code>family == "Binomial"</code>, then one of <code>"logit"</code>, <code>"probit"</code> or <code>"cloglog"</code>; else one of <code>"identity"</code>, <code>"inverse"</code> or <code>"log"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pm</code></td>
+<td>
+<p>is a list object containing the current (Markov dependent) parameter estimates associated with the distribution of the observed process (see <code>dthmm</code>). These are only used as initial values if the algorithm within the <code>Mstep</code> is iterative.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pn</code></td>
+<td>
+<p>is a list object containing the observation dependent parameter values associated with the distribution of the observed process (see <code>dthmm</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>maxiter</code></td>
+<td>
+<p>maximum number of Newton-Raphson iterations.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The functions <code>Mstep.beta</code>, <code>Mstep.binom</code>, <code>Mstep.exp</code>, <code>Mstep.gamma</code>, <code>Mstep.lnorm</code>, <code>Mstep.logis</code>, <code>Mstep.norm</code> and <code>Mstep.pois</code> perform the maximisation step for the Beta, Binomial, Exponential, Gamma, Log Normal, Logistic, Normal and Poisson distributions, respectively. Each function has the same argument list, even if specific arguments are redundant, because the functions are called from within other functions in a generic like manner. Specific notes for some follow.
+</p>
+
+<dl>
+<dt><code>Mstep.beta</code></dt>
+<dd>
+<p>The <span style="font-family: Courier New, Courier; color: #666666;"><b>R</b></span> functions for the <code>Beta</code> Distribution have arguments <code>shape1</code>, <code>shape2</code> and <code>ncp</code>. We only use <code>shape1</code> and <code>shape2</code>, i.e. <code>ncp</code> is assumed to be zero. Different combinations of <code>"shape1"</code> and <code>"shape2"</code> can be “time” dependent (specified in <code>pn</code>) and Markov dependent (specified in <code>pm</code>). However, each should only be specified in one (see topic <code>dthmm</code>).
+</p>
+</dd>
+<dt><code>Mstep.binom</code></dt>
+<dd>
+<p>The <span style="font-family: Courier New, Courier; color: #666666;"><b>R</b></span> functions for the <code>Binomial</code> Distribution have arguments <code>size</code> and <code>prob</code>. The <code>size</code> argument of the <code>Binomial</code> Distribution should always be specified in the <code>pn</code> argument (see topic <code>dthmm</code>).
+</p>
+</dd>
+<dt><code>Mstep.gamma</code></dt>
+<dd>
+<p>The <span style="font-family: Courier New, Courier; color: #666666;"><b>R</b></span> functions for the <code>GammaDist</code> have arguments <code>shape</code>, <code>rate</code> and <code>scale</code>. Since <code>scale</code> is redundant, we only use <code>shape</code> and <code>rate</code>. Different combinations of <code>"shape"</code> and <code>"rate"</code> can be “time” dependent (specified in <code>pn</code>) and Markov dependent (specified in <code>pm</code>). However, each should only be specified in one (see topic <code>dthmm</code>).
+</p>
+</dd>
+<dt><code>Mstep.lnorm</code></dt>
+<dd>
+<p>The <span style="font-family: Courier New, Courier; color: #666666;"><b>R</b></span> functions for the <code>Lognormal</code> Distribution have arguments <code>meanlog</code> and <code>sdlog</code>. Different combinations of <code>"meanlog"</code> and <code>"sdlog"</code> can be “time” dependent (specified in <code>pn</code>) and Markov dependent (specified in <code>pm</code>). However, each should only be specified in one (see topic <code>dthmm</code>).
+</p>
+</dd>
+<dt><code>Mstep.logis</code></dt>
+<dd>
+<p>The <span style="font-family: Courier New, Courier; color: #666666;"><b>R</b></span> functions for the <code>Logistic</code> Distribution have arguments <code>location</code> and <code>scale</code>. Different combinations of <code>"location"</code> and <code>"scale"</code> can be “time” dependent (specified in <code>pn</code>) and Markov dependent (specified in <code>pm</code>). However, each should only be specified in one (see topic <code>dthmm</code>).
+</p>
+</dd>
+<dt><code>Mstep.norm</code></dt>
+<dd>
+<p>The <span style="font-family: Courier New, Courier; color: #666666;"><b>R</b></span> functions for the <code>Normal</code> Distribution have arguments <code>mean</code> and <code>sd</code>. Different combinations of <code>"mean"</code> and <code>"sd"</code> can be “time” dependent (specified in <code>pn</code>) and Markov dependent (specified in <code>pm</code>). However, each should only be specified in one (see topic <code>dthmm</code>).
+</p>
+</dd>
+</dl>
+<h3>Value</h3>
+
+<p>A list object with the same structure as <code>pm</code> (see topic <code>dthmm</code>).
+</p>
+
+
+<h3>Modifications and Extensions</h3>
+
+<p>The <span class="pkg">HiddenMarkov</span> package calls the associated functions belonging to the specified probability distribution in a generic way. For example, if the argument <code>distn</code> in <code>dthmm</code> is <code>"xyz"</code>, it will expect to find functions <code>pxyz</code>, <code>dxyz</code>, and <code>Mstep.xyz</code>. And if simulations are to be performed, it will require <code>rxyz</code>. In this section we describe the required format for the distribution related functions <code>pxyz</code>, <code>dxyz</code>, and <code>rxyz</code>; and for the function <code>Mstep.xyz</code> required for the M-step in the EM algorithm.
+</p>
+<p>Consider the examples below of distribution related functions and their arguments. Note that the probability functions all have a first argument of <code>q</code>, and the last two arguments are all the same, with the same default values. Similarly, the density functions have a first argument of <code>x</code>, and the last argument is the same, with the same defaults. The arguments in the middle are peculiar to the given distribution, <em>one argument for each distribution parameter</em>. Note that the observed process <code>x</code> is <em>univariate</em>.
+</p>
+<pre>
+pnorm(q, mean = 0, sd = 1, lower.tail = TRUE, log.p = FALSE)
+pbeta(q, shape1, shape2, ncp = 0, lower.tail = TRUE, log.p = FALSE)
+ppois(q, lambda, lower.tail = TRUE, log.p = FALSE)
+pbinom(q, size, prob, lower.tail = TRUE, log.p = FALSE)
+
+dnorm(x, mean = 0, sd = 1, log = FALSE)
+dbeta(x, shape1, shape2, ncp = 0, log = FALSE)
+dpois(x, lambda, log = FALSE)
+dbinom(x, size, prob, log = FALSE)
+
+rnorm(n, mean = 0, sd = 1)
+rbeta(n, shape1, shape2, ncp = 0)
+rpois(n, lambda)
+rbinom(n, size, prob)
+
+</pre>
+<p>The functions <code>pxyz</code> (distribution function), <code>dxyz</code> (density) and <code>rxyz</code> (random number generator) must be consistent with the conventions used in the above examples. The software will deduce the distribution argument names from what is specified in <code>pm</code> and <code>pn</code>, and it will call these functions assuming that their argument list is consistent with those described above. The functions <code>pxyz</code> and <code>dxyz</code> are used in the forward and backward equations.
+<br></p>
+<p>The functions <code>dxyz</code>, <code>pxyz</code> and <code>rxyz</code> <em>must</em> also behave in the same vectorised way as <code>dnorm</code>. For example, if <code>x</code> is a vector, and <code>mean</code> and <code>sd</code> are scalars, then <code>dnorm(x, mean, sd)</code> calculates the density for each element in <code>x</code> using the scalar values of <code>mean</code> and <code>sd</code>; thus the returned value is the same length as <code>x</code>. Alternatively, if <code>x</code> is a scalar and <code>mean</code> and <code>sd</code> are vectors, both of the same length, then the returned value is the same length as <code>mean</code> and is the density of <code>x</code> evaluated at the corresponding pairs of values of <code>mean</code> and <code>sd</code>. The third possibility is that <code>x</code> and one of the distribution parameters, say <code>sd</code>, are vectors of the same length, and <code>mu</code> is a scalar. Then the returned vector will be of the same length as <code>x</code>, where the <code class="reqn">i</code>th value is the density at <code>x[i]</code> with mean <code>mean</code> and standard deviation <code>sd[i]</code>. Note that the functions for the <code>Multinomial</code> distribution do not have this behaviour. Here the vector <code>x</code> contains the counts for <em>one</em> multinomial experiment, so the vector is used to characterise the multivariate character of the random variable rather than multiple univariate realisations. Further, the distribution parameters (i.e. category probabilities) are characterised as one vector rather than a sequence of separate function arguments.
+<br></p>
+<p>The other calculation, that is specific to the chosen distribution, is the maximisation in the M-step. If we have <code>distn="xyz"</code>, then there should be a function called <code>Mstep.xyz</code>. Further, it should have arguments <code>(x, cond, pm, pn)</code>; see for example <code>Mstep.norm</code>. The parameters that are estimated within this function are named in a consistent way with those that are defined within the <code>dthmm</code> arguments <code>pm</code> and <code>pn</code>. Notice that the estimates of <code>mean</code> and <code>sd</code> in <code>Mstep.norm</code> are weighted by <code>cond$u</code>. The calculations for <code>cond$u</code> are performed in the E-step, and utilise the distribution related functions <code>"dxyz"</code> and <code>"pxyz"</code>. The values of <code>cond$u</code> are essentially probabilities that the process belongs to the given Markov state, hence, when we calculate the distributional parameters (like <code>mu</code> and <code>sd</code> in <code>Mstep.norm</code>) we calculate weighted sums using the probabilities <code>cond$u</code>. This procedure can be shown to give the maximum likelihood estimates of <code>mu</code> and <code>sd</code>, and hence a similar weighting should be used for the distribution <code>"xyz"</code> (see Harte, 2006, for further mathematical detail). One needs to take a little more care when dealing with a distributions like the beta, where the cross derivatives of the log likelihood between the parameters, i.e. <code class="reqn">\partial^2 \log L /(\partial \alpha_1 \partial \alpha_2)</code> are non-zero. See <code>Mstep.beta</code> for further details.
+<br></p>
+<p>Now consider a situation where we want to modify the way in which a normal distribution is fitted. Say we know the Markov dependent means, and we only want to estimate the standard deviations. Since both parameters are Markov dependent, they both need to be specified in the <code>pm</code> argument of <code>dthmm</code>. The estimation of the distribution specific parameters takes place in the M-step, in this case <code>Mstep.norm</code>. To achieve what we want, we need to modify this function. In this case it is relatively easy (see code in “Examples” below). From the function <code>Mstep.norm</code>, take the code under the section <code>if (all(nms==c("mean", "sd")))</code>, i.e. both of the parameters are Markov dependent. However, replace the line where the mean is estimated to <code>mean &lt;- pm$mean</code>, i.e. leave it as was initially specified. Unfortunately, one cannot easily modify the functions in a package namespace. The simple work-around here is to define a new distribution, say <code>"xyz"</code>, then define a new function with the above changes called <code>Mstep.xyz</code>. However, the distribution related functions are just the same as those for the normal distribution, hence, define them as follows:
+</p>
+<pre>
+rxyz &lt;- rnorm
+dxyz &lt;- dnorm
+pxyz &lt;- pnorm
+qxyz &lt;- qnorm
+</pre>
+<p>See the 2nd example below for full details.
+</p>
+
+
+<h3>Note</h3>
+
+<p>The Mstep functions can be used to estimate the maximum likelihood parameters from a simple sample. See the example below where this is done for the logistic distribution.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>BaumWelch</code>, <code>Estep</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">#    Fit logistic distribution to a simple single sample
+
+#    Simulate data
+n &lt;- 20000
+location &lt;- -2
+scale &lt;- 1.5
+
+x &lt;- rlogis(n, location, scale)
+
+#    give each datum equal weight
+cond &lt;- NULL
+cond$u &lt;- matrix(rep(1/n, n), ncol=1)
+
+#    calculate maximum likelihood parameter estimates
+#    start iterations at values used to simulate
+print(Mstep.logis(x, cond,
+                  pm=list(location=location,
+                          scale=scale)))
+
+#-----------------------------------------------------
+#   Example with Gaussian Observations
+#   Assume that both mean and sd are Markov dependent, but the means
+#   are known and sd requires estimation (See "Modifications" above).
+#   One way is to define a new distribution called "xyz", say.
+
+Mstep.xyz &lt;- function(x, cond, pm, pn){
+    #   this function is a modified version of Mstep.norm
+    #   here the mean is fixed to the values specified in pm$mean
+    nms &lt;- sort(names(pm))
+    n &lt;- length(x)
+    m &lt;- ncol(cond$u)
+    if (all(nms==c("mean", "sd"))){
+        mean &lt;- pm$mean
+        sd &lt;- sqrt(apply((matrix(x, nrow=n, ncol=m) - 
+                   matrix(mean,
+                   nrow=n, ncol=m, byrow=TRUE))^2 * cond$u, MARGIN=2,
+                   FUN=sum)/apply(cond$u, MARGIN=2, FUN=sum))
+        return(list(mean=mean, sd=sd))
+    }
+}
+
+#   define the distribution related functions for "xyz"
+#   they are the same as those for the Normal distribution
+rxyz &lt;- rnorm
+dxyz &lt;- dnorm
+pxyz &lt;- pnorm
+qxyz &lt;- qnorm
+
+Pi &lt;- matrix(c(1/2, 1/2,   0,
+               1/3, 1/3, 1/3,
+                 0, 1/2, 1/2),
+             byrow=TRUE, nrow=3)
+p1 &lt;- c(1, 6, 3)
+p2 &lt;- c(0.5, 1, 0.5)
+n &lt;- 1000
+
+pm &lt;- list(mean=p1, sd=p2)
+
+x &lt;- dthmm(NULL, Pi, c(0, 1, 0), "xyz", pm, discrete=FALSE)
+
+x &lt;- simulate(x, n, seed=5)
+
+#    use above parameter values as initial values
+y &lt;- BaumWelch(x)
+
+print(y$delta)
+print(y$pm)
+print(y$Pi)
+</code></pre>
+
+
+</div>

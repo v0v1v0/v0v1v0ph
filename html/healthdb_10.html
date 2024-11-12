@@ -1,0 +1,91 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>exclude</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Remove rows based on conditions or another data set</h2>
+
+<h3>Description</h3>
+
+<p>This function combines <code>dplyr::anti_join()</code>, and negation of <code>dplyr::filter()</code>. When a second data set is supplied through the <code>excl</code> argument, anti join would be performed; otherwise, <code>data</code> would be filtered with the expression given via the <code>condition</code> argument, and the filter result would in turn be removed using <code>dplyr::setdiff()</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">exclude(
+  data,
+  excl = NULL,
+  by = NULL,
+  condition = NULL,
+  verbose = getOption("healthdb.verbose"),
+  report_on = NULL,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>Data.frames or remote tables (e.g., from <code>dbplyr::tbl_sql()</code>). A subset will be removed from this data.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>excl</code></td>
+<td>
+<p>Data frames or remote tables (e.g., from 'dbplyr'). Rows/values present in it will be removed from <code>data</code> if there is a match. This will be passed to <code>dplyr::anti_join()</code> as the second argument.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>by</code></td>
+<td>
+<p>Column names that should be matched by <code>dplyr::anti_join()</code>, or a expressions with <code>dplyr::join_by()</code>. See <code>dplyr::anti_join()</code>'s <code>by</code> argument for detail. Default NULL is the same as <code>setdiff(data, excl)</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>condition</code></td>
+<td>
+<p>An expression that will be passed to <code>dplyr::filter()</code>. The rows that satisfy <code>condition</code> are those to be removed from <code>data</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p>A logical for whether printing explanation for the operation. Default is fetching from options. Use <code>options(healthdb.verbose = FALSE)</code> to suppress once and for all.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>report_on</code></td>
+<td>
+<p>A quoted/unquoted column name for counting how many of its distinct values were removed from <code>data</code>, e.g., counting how many client IDs were removed. Default is NULL.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Additional arguments passing to <code>dplyr::filter()</code>/<code>dplyr::anti_join()</code> for finer control of matching, e.g., na action, by-group filtering, etc.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A data frame or remote table that is a subset of <code>data</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># exclude with condition
+cyl_not_4 &lt;- exclude(mtcars, condition = cyl == 4, report_on = cyl)
+
+# exclude with another data
+exclude(mtcars, cyl_not_4, dplyr::join_by(cyl), report_on = cyl)
+</code></pre>
+
+
+</div>

@@ -1,0 +1,75 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>CUSUM</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>CUSUM transformation of a matrix</h2>
+
+<h3>Description</h3>
+
+<p>R wrapper for C function computing the CUSUM transformation of a matrix over an interval <code class="reqn">(s,e]</code>. For compatibility with C indexing, the user should subtract <code class="reqn">1</code> from both <code class="reqn">s</code> and <code class="reqn">e</code> when supplying the arguments to the function. If start and stop are not supplied, the CUSUM is computed over the full data, so <code class="reqn">(s,e] = (0,n]</code>. In this case, <code>CUSUM</code> returns the same result as <code>cusum.transform</code> in the package <code>InspectChangepoint</code> (Wang and Samworth 2020).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">CUSUM(X, start = NULL, stop = NULL)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>X</code></td>
+<td>
+<p>Matrix of observations, where each row contains a time series</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>start</code></td>
+<td>
+<p>Starting point of interval over which the CUSUM should be computed, subtracted by one</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>stop</code></td>
+<td>
+<p>Ending point of interval over which the CUSUM should be computed, subtracted by one</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A matrix of CUSUM values. The <code class="reqn">(i,j)</code>-th element corresponds to the CUSUM transformation of the <code class="reqn">i</code>-th row of <code class="reqn">X</code>, computed over the interval <code class="reqn">(\code{start}+1,\code{end}+1]</code> and evaluated at position <code class="reqn">\code{start}+1+j</code>, i.e. 
+<code class="reqn">\sqrt{\frac{e-v}{(e-s)(v-s)}}\sum_{t=s+1}^v X_{i,t} - \sqrt{\frac{v-s}{(e-s)(e-v)}}\sum_{t=v+1}^e X_{i,t}</code>, 
+where <code class="reqn">s = (\code{start}+1)</code>, <code class="reqn">e = (\code{stop}+1)</code> and <code class="reqn">v = \code{start}+1+j</code>.
+</p>
+
+
+<h3>References</h3>
+
+<p>Wang T, Samworth R (2020).
+<em>InspectChangepoint: High-Dimensional Changepoint Estimation via Sparse Projection</em>.
+R package version 1.1, <a href="https://CRAN.R-project.org/package=InspectChangepoint">https://CRAN.R-project.org/package=InspectChangepoint</a>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">n = 10
+p = 10
+set.seed(101)
+X = matrix(rnorm(n*p), ncol = n, nrow=p)
+# CUSUM over the full data (s,e] = (0,n]
+X_cusum = CUSUM(X)
+
+# CUSUM over (s,e] = (3,9]:
+s = 3
+e = 9
+X_cusum = CUSUM(X, start = s-1, stop = e-1)
+</code></pre>
+
+
+</div>

@@ -1,0 +1,96 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>HTSCluster-package</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Clustering high throughput sequencing (HTS) data
+</h2>
+
+<h3>Description</h3>
+
+<p>A Poisson mixture model is implemented to cluster genes from high-throughput 
+transcriptome sequencing (RNA-seq) data. Parameter estimation is performed using 
+either the EM or CEM algorithm, and the slope heuristics are used for model 
+selection (i.e., to choose the number of clusters).
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Andrea Rau, Gilles Celeux, Marie-Laure Martin-Magniette, Cathy Maugis-Rabusseau
+</p>
+<p>Maintainer: Andrea Rau
+</p>
+
+
+<h3>References</h3>
+
+<p>Rau, A., Maugis-Rabusseau, C., Martin-Magniette, M.-L., Celeux G. (2015). Co-expression analysis of high-throughput transcriptome sequencing data with Poisson mixture models. Bioinformatics, 31(9):1420-1427.
+</p>
+<p>Rau, A., Celeux, G., Martin-Magniette, M.-L., Maugis-Rabusseau, C. (2011) Clustering high-throughput sequencing data with Poisson mixture models. Inria Research Report 7786. Available at <a href="https://inria.hal.science/inria-00638082">https://inria.hal.science/inria-00638082</a>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+set.seed(12345)
+
+## Simulate data as shown in Rau et al. (2011)
+## Library size setting "A", high cluster separation
+## n = 2000 observations
+
+simulate &lt;- PoisMixSim(n = 200, libsize = "A", separation = "high")
+y &lt;- simulate$y
+conds &lt;- simulate$conditions
+
+## Run the PMM model for g = 3
+## "TC" library size estimate, EM algorithm
+
+run &lt;- PoisMixClus(y, g=3, conds=conds, norm="TC") 
+
+## Estimates of pi and lambda for the selected model
+
+pi.est &lt;- run$pi
+lambda.est &lt;- run$lambda
+
+
+## Not run: PMM for 4 total clusters, with one fixed class
+## "TC" library size estimate, EM algorithm
+##
+## run &lt;- PoisMixClus(y, g = 3, norm = "TC", conds = conds, 
+##    fixed.lambda = list(c(1,1,1))) 
+##
+##
+## Not run: PMM model for 4 clusters, with equal proportions
+## "TC" library size estimate, EM algorithm
+##
+## run &lt;- PoisMixClus(y, g = 4, norm = "TC", conds = conds, 
+##     equal.proportions = TRUE) 
+##
+##
+## Not run: PMM model for g = 1, ..., 10 clusters, Split Small-EM init
+##
+## run1.10 &lt;- PoisMixClusWrapper(y, gmin = 1, gmax = 10, conds = conds, 
+##	norm = "TC")
+##
+##
+## Not run: PMM model for g = 1, ..., 10 clusters, Small-EM init
+##
+## run1.10bis &lt;-  &lt;- PoisMixClusWrapper(y, gmin = 1, gmax = 10, conds = conds, 
+##	norm = "TC", split.init = FALSE)
+##
+##
+## Not run: previous model equivalent to the following
+##
+## for(K in 1:10) {
+##	run &lt;- PoisMixClus(y, g = K, conds = conds, norm = "TC")
+## }
+
+
+</code></pre>
+
+
+</div>

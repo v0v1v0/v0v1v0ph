@@ -1,0 +1,167 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hct</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Comparison of a single armed study to a collection of study results from multiple previous clinical trials.
+
+</h2>
+
+<h3>Description</h3>
+
+<p> When comparing a single armed study to
+historical controls it is necessary to take
+into account that there may be variation in the underlying
+treatment/placebo effect from study to study.  If this among-study
+variability is not accounted for the type one and two errors may
+be inaccurate. Given a historical database of study data,
+such as one might have in a meta-analysis the program
+calculates the criteria for
+significance for a new study that uses the database as an
+historical control and calculates the power of such as study
+as a function of sample size and difference to be detected.</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hct(data, estimate, standardError, N, iter = 2000, rseed = NA,
+silent=TRUE,constantStderr=TRUE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>A data frame of historical data one study per row.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>estimate</code></td>
+<td>
+<p>The name or column number of the variable in
+<code>data</code> containing the estimated outcome.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>standardError</code></td>
+<td>
+<p>The name or column number of the variable in <code>data</code>
+containing the standard error of the estimated outcome.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>N</code></td>
+<td>
+<p> The name or column number of the variable in <code>data</code>
+containing the sample size of the study.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>iter</code></td>
+<td>
+
+<p>The number of interations to use in the MCMC to
+calculate the posterior distribution of the among-study
+variation and mean outcome measure.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rseed</code></td>
+<td>
+<p>Seed for random number generator</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>silent</code></td>
+<td>
+<p>Suppresses STAN output to the console</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>constantStderr</code></td>
+<td>
+<p>If <code>TRUE</code> it assumes that that standard
+deviation for each study is known exactly this is
+appropriate for larger studies.
+If <code>FALSE</code> it assumes that they are proportional to a
+chi-square distribution with <code>N-1</code> degrees of freedom and
+uses a hierarchical model for the patient-level variance.
+</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A <code>hct</code> object which is a list of four elements.
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>criteria</code></td>
+<td>
+<p>A function with signature <code>(p,se,df==NULL)</code> to calculate the cut-off value
+for statistical significance at a one sided p-value of <code>p</code>,  with standard
+error of the estimate equal to <code>se</code>. When <code>df=NULL</code> a normal test is used otherwise a t-test with <code>df</code> degrees of freedom.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>power</code></td>
+<td>
+<p>A function to calculate the power of a study with signature <code>(t,delta,se,df=NULL)</code>,
+where <code>t</code> is the cuttoff value, <code>se</code> is the standard error of the estimate
+and <code>delta</code>
+is the treatment effect</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>effective.SD</code></td>
+<td>
+<p>Which is the effective standard deviation of the outcome measure.
+It is calculated as
+<code>sqrt(sum(data[,standardError]^2*data[,N]*(data[,N]-1))/(sum(data[,N])-1)))</code>,
+which is what it would be if the parameter estimates were sample means. When <code>df=NULL</code> a normal test is used otherwise a t-test with <code>df</code> degrees of freedom.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fit</code></td>
+<td>
+<p>An object of class <code>stanfit</code> with the fit of the data</p>
+</td>
+</tr>
+</table>
+<p>A generic summary function prints out the value of <code>effective.SD</code> and uses the data
+frame <code>summary</code> function for
+<code>data.frame(extract(fit,c("mu"","sig"","y_pred")))</code>. The generic <code>print</code>
+function prints this summary.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>David A. Schoenfeld
+</p>
+
+
+<h3>References</h3>
+
+<p><a href="http://hedwig.mgh.harvard.edu/biostatistics/node/98">Design and
+analysis of a clinical trial using previous trials as historical control</a>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+als=data.frame(estimate=c(3.5,2.6,2.3),SE=c(.4,.3,.6),N=c(100,150,76))
+ts=hct(als,'estimate','SE','N')
+print(ts)
+us=ts$criteria(0.025,.3)
+ts$power(us,5,.4)
+
+</code></pre>
+
+
+</div>

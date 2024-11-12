@@ -1,0 +1,91 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>bootPerformance</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>bootPerformance</h2>
+
+<h3>Description</h3>
+
+<p>Evaluate model performance by bootstrapping from training dataset
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">bootPerformance(model, df, metric, n = 100)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>model</code></td>
+<td>
+<p>a model trained by h2o machine learning software</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>df</code></td>
+<td>
+<p>training, validation, or testing dataset to bootstrap from</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>metric</code></td>
+<td>
+<p>character. model evaluation metric to be passed to boot R package.
+this could be, for example "AUC", "AUCPR", RMSE", etc., depending
+of the model you have trained. all evaluation metrics provided
+for your H2O models can be specified here.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n</code></td>
+<td>
+<p>number of bootstraps</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>list of mean perforance of the specified metric and other bootstrap results
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>E. F. Haghish
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+## Not run: 
+library(h2o)
+h2o.init(ignore_config = TRUE, nthreads = 2, bind_to_localhost = FALSE, insecure = TRUE)
+prostate_path &lt;- system.file("extdata", "prostate.csv", package = "h2o")
+df &lt;- read.csv(prostate_path)
+
+# prepare the dataset for analysis before converting it to h2o frame.
+df$CAPSULE &lt;- as.factor(df$CAPSULE)
+
+# convert the dataframe to H2OFrame and run the analysis
+prostate.hex &lt;- as.h2o(df)
+aml &lt;- h2o.automl(y = "CAPSULE", training_frame = prostate.hex, max_runtime_secs = 30)
+
+# evaluate the model performance
+perf &lt;- h2o.performance(aml@leader, xval = TRUE)
+
+# evaluate bootstrap performance for the training dataset
+#    NOTE that the raw data is given not the 'H2OFrame'
+perf &lt;- bootPerformance(model = aml@leader, df = df, metric = "RMSE", n = 500)
+
+## End(Not run)
+</code></pre>
+
+
+</div>

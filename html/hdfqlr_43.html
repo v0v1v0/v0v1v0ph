@@ -1,0 +1,101 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hql_read</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Read HDF Dataset or Attribute</h2>
+
+<h3>Description</h3>
+
+<p>Read a dataset or attribute from an HDF file into memory.
+</p>
+<p>Generic helper for reading HDF objects into memory.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hql_read(what = c("DATASET", "ATTRIBUTE"), path, parallel = FALSE)
+
+hql_read_dataset(path, include.attributes = TRUE, parallel = FALSE)
+
+hql_read_attribute(path, parallel = FALSE)
+
+hql_read_all_attributes(path, parallel = FALSE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>path</code></td>
+<td>
+<p>The location of the dataset, attribute, or group within the HDF file.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>parallel</code></td>
+<td>
+<p>Use parallel processing functionality.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>include.attributes</code></td>
+<td>
+<p>If <code>TRUE</code>, include the dataset attributes.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A matrix.
+</p>
+<p>The attribute value.
+</p>
+<p>A named list of attributes.
+</p>
+
+
+<h3>Functions</h3>
+
+
+<ul>
+<li> <p><code>hql_read_dataset</code>: Read a dataset from an HDF file.
+</p>
+</li>
+<li> <p><code>hql_read_attribute</code>: Read a single attribute from an HDF file.
+</p>
+</li>
+<li> <p><code>hql_read_all_attributes</code>: Read attributes from an HDF file.
+</p>
+</li>
+</ul>
+<h3>Examples</h3>
+
+<pre><code class="language-R">if(hql_is_loaded()){
+  tf = tempfile(fileext = ".h5")
+  hql_create_file(tf)
+
+  hql_use_file(tf)
+  x = matrix(rnorm(100), nrow = 20)
+  hql_write_dataset(x, "dataset0")
+  hql_write_attribute("normal", "dataset0/dist")
+ y = month.name
+ attr(y, "abbreviation") = month.abb
+ attr(y, "number") = 1:12
+ hql_write_dataset(y, "group1/dataset1")
+
+hql_read_dataset("dataset0")
+hql_read_dataset("group1/dataset1")
+hql_read_attribute("group1/dataset1/abbreviation")
+hql_read_all_attributes("group1/dataset1")
+
+hql_close_file(tf)
+}
+
+</code></pre>
+
+
+</div>

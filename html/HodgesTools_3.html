@@ -1,0 +1,114 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>createManhattandQQ</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Creating a Manhattan Plot and QQ plot</h2>
+
+<h3>Description</h3>
+
+<p>Creates a Manhattan plot and QQ plot using GWAS results output from PLINK
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">createManhattandQQ(
+  gwas_results,
+  highlights_file = NULL,
+  suggestive_line = -log10(0.05),
+  set_color_vector = c("gray10", "gray60"),
+  genomewide_line = -log10(5e-08),
+  annotate_Pval = 0.05,
+  y_lim = c(0, 8)
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>gwas_results</code></td>
+<td>
+<p>output file listing SNP-trait association values for GWAS run using PLINK</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>highlights_file</code></td>
+<td>
+<p>a text file with a 'snp' column listing the SNPs to annotate/color on the Manhattan plot</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>suggestive_line</code></td>
+<td>
+<p>where to draw a "suggestive" line; default -log10(1e-5).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>set_color_vector</code></td>
+<td>
+<p>a character vector listing colors in palette of interest (you must create this chr object before calling the createManhattanandQQ function and assign it to set_color_vector)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>genomewide_line</code></td>
+<td>
+<p>where to draw a "genome-wide significant" line; default -log10(5e-8)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>annotate_Pval</code></td>
+<td>
+<p>if set, SNPs below this p-value will be annotated on the plot; default is 0.05</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>y_lim</code></td>
+<td>
+<p>set the y-axis limits; default is c(0,8)</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>This function reads in a GWAS result file output from plink2 listing the coordinates, ids, and associated p-values for SNPs under study
+This function also has the option of reading in a "highlights" file listing the IDs of SNPs to annotate/color on the Manhattan plot
+</p>
+
+
+<h3>Value</h3>
+
+<p>a Manhattan plot of SNP-trait associations and QQ plot
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Verda Agan
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">#' #load external data.
+gwas_results &lt;- system.file(package = "HodgesTools", "extdata",
+"createManhattandQQ_example_sum_stats.txt")
+snps_to_annotate &lt;- system.file(package = "HodgesTools", "extdata",
+"createManhattandQQ_example_highlights_file.txt")
+
+#Make a Manhattan plot that highlights a select list of SNPs subset from GWAS results
+createManhattandQQ(gwas_results, highlights_file=snps_to_annotate,
+suggestive_line = -log10(0.001), set_color_vector = c("gray10", "gray60"),
+genomewide_line = -log10(5e-8), annotate_Pval = 0.001, y_lim =c(0,8))
+
+#Make a Manhattan plot that doesn't highlight a select list of SNPs subset from GWAS results
+createManhattandQQ(gwas_results, suggestive_line = -log10(0.001),
+set_color_vector = c("gray10", "gray60"), genomewide_line = -log10(5e-8),
+annotate_Pval = 0.001, y_lim =c(0,8))
+</code></pre>
+
+
+</div>

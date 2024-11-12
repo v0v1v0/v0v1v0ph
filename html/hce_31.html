@@ -1,0 +1,129 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>simORD</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Simulate ordinal variables for two treatment groups using categorization of beta distributions</h2>
+
+<h3>Description</h3>
+
+<p>Simulate ordinal variables for two treatment groups using categorization of beta distributions
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">simORD(n, n0 = n, M, alpha1 = 8, beta1 = 7, alpha0 = 5, beta0 = 5)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>n</code></td>
+<td>
+<p>sample size in the active treatment group.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n0</code></td>
+<td>
+<p>sample size in the placebo group.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>M</code></td>
+<td>
+<p>number of ordinal values to be simulated.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alpha1</code></td>
+<td>
+<p>shape1 parameter for the beta distribution in the active group.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>beta1</code></td>
+<td>
+<p>shape2 parameter for the beta distribution in the active group.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alpha0</code></td>
+<td>
+<p>shape1 parameter for the beta distribution in the placebo group.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>beta0</code></td>
+<td>
+<p>shape2 parameter for the beta distribution in the placebo group.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>a data frame containing the following columns:
+</p>
+
+<ul>
+<li>
+<p> ID subject identifier.
+</p>
+</li>
+<li>
+<p> TRTP planned treatment group - "A" for active, "P" for Placebo.
+</p>
+</li>
+<li>
+<p> GROUPN ordinal values. The number of unique values is specified by the variable <code>M0</code>.
+</p>
+</li>
+<li>
+<p> tau the theoretical win odds.
+</p>
+</li>
+<li>
+<p> theta the theoretical win probability.
+</p>
+</li>
+</ul>
+<h3>See Also</h3>
+
+<p><code>simHCE()</code>, <code>simADHCE()</code> for simulating <code>hce</code> objects.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Example 1
+set.seed(2024)
+d &lt;- simORD(n = 100, n0 = 50, M = 2)
+d_hce &lt;- hce(GROUP = d$GROUPN, TRTP = d$TRTP)
+calcWO(d_hce)
+### compare with the theoretical values of the continuous distributions 
+c(tau = unique(d$tau), theta = unique(d$theta))
+# Example 2 - Convergence of the win odds to its theoretical value
+set.seed(2024)
+N &lt;- NULL
+size &lt;- c(seq(10, 500, 1))
+for(i in size){
+  d &lt;- simORD(n = i, M = 2)
+  d_hce &lt;- hce(GROUP = d$GROUPN, TRTP = d$TRTP)
+  TAU &lt;- calcWO(d_hce)
+  D &lt;- data.frame(WO = TAU$WO, n = i, tau = unique(d$tau))
+  N &lt;- rbind(N, D)
+}
+plot(N$n, N$WO, log = "y", ylim = c(0.5, 2), ylab = "Win Odds", xlab = "Sample size", type = "l")
+lines(N$n, N$tau, col = "darkgreen", lty = 2, lwd = 2)
+abline(h = 1, lty = 4, col = "red")
+legend("bottomright", legend = c("Null", "Theoretical Win Odds", "Win Odds Estimate"), 
+lty = c(4, 2, 1), col = c("darkgreen", "red", "black"))
+title("Convergence of the win odds to its theoretical value")
+</code></pre>
+
+
+</div>

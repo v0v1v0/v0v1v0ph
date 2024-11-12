@@ -1,0 +1,73 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>fetch_cms_data</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Fetch Data as Tibble</h2>
+
+<h3>Description</h3>
+
+<p>This function retrieves data from the provided link and returns it as a tibble
+with cleaned names. This function is intended to be used with the CMS data API
+function <code>get_cms_meta_data</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">fetch_cms_data(.data_link)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table><tr style="vertical-align: top;">
+<td><code>.data_link</code></td>
+<td>
+<p>A character string containing the URL to fetch data from.</p>
+</td>
+</tr></table>
+<h3>Details</h3>
+
+<p>The function sends a request to the provided URL using <code>httr2::request</code> and
+<code>httr2::req_perform</code>. If the response status is not 200, it stops with an
+error message indicating the failure. The response body is parsed as JSON and
+converted into a tibble using <code>dplyr::as_tibble</code>. The column names are cleaned
+using <code>janitor::clean_names</code>, and any character columns are stripped of leading
+and trailing whitespace using <code>stringr::str_squish</code>.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A tibble containing the fetched data with cleaned names. If an error
+occurs, returns <code>NULL</code>.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>get_cms_meta_data</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">library(dplyr)
+
+# Example usage:
+base_url &lt;- "https://data.cms.gov/data-api/v1/dataset/"
+data_identifier &lt;- "9767cb68-8ea9-4f0b-8179-9431abc89f11"
+data_url &lt;- paste0(base_url, data_identifier, "/data")
+
+df_tbl &lt;- fetch_cms_data(data_url)
+
+df_tbl |&gt;
+ head(1) |&gt;
+ glimpse()
+
+</code></pre>
+
+
+</div>

@@ -1,0 +1,183 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>pc_adjust</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Adjusting shrinkage in PC scores
+</h2>
+
+<h3>Description</h3>
+
+<p>Adjusts the shrinkage bias in the predicted PC scores based on the estimated shrinkage factors.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">pc_adjust(train.eval, p, n, test.scores, method = c("d.gsp", "l.gsp", "osp"),
+n.spikes, n.spikes.max, smooth = TRUE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>train.eval</code></td>
+<td>
+
+<p>Numeric vector containing the sample eigenvalues. The vector must have dimension <code>n</code> or <code>n-1</code>, it may be unordered.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>p</code></td>
+<td>
+
+<p>The number of features.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n</code></td>
+<td>
+
+<p>The number of training samples.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>test.scores</code></td>
+<td>
+
+<p>An <code class="reqn">m\times k</code> matrix or data frame containing the first <code class="reqn">k</code> predicted PC scores of <code class="reqn">m</code> many test samples.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+
+<p>String specifying the estimation method. Possible values are "<code>d.gsp</code>" (default),"<code>l.gsp</code>" and "<code>osp</code>".
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n.spikes</code></td>
+<td>
+
+<p>Number of distant spikes in the population (Optional).
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n.spikes.max</code></td>
+<td>
+
+<p>Upper bound of the number of distant spikes in the population. Optional, but needed if <code>n.spikes</code> is not specified. Ignored if <code>n.spikes</code> is specified.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>smooth</code></td>
+<td>
+
+<p>Logical. If <code>TRUE</code> and <code>method="l.gsp"</code>, kernel smoothing will be performed on the estimated population eigenvalue spectrum. Default is <code>TRUE</code>.
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The different choices for <code>method</code> are:
+</p>
+
+<ul>
+<li>
+<p> "<code>d.gsp</code>": <code class="reqn">d</code>-estimation method based on the Generalized Spiked Population (GSP) model.
+</p>
+</li>
+<li>
+<p> "<code>l.gsp</code>": <code class="reqn">\lambda</code>-estimation method based on the GSP model.
+</p>
+</li>
+<li>
+<p> "<code>osp</code>": Estimation method based on the Ordinary Spiked Population (OSP) model.
+</p>
+</li>
+</ul>
+<p>The <code class="reqn">(i,j)^{th}</code> element of <code>test.scores</code> should denote the <code class="reqn">j^{th}</code> predicted PC score for the <code class="reqn">i^{th}</code> subject in the test sample.
+</p>
+<p>At least one of <code>n.spikes</code> and <code>n.spikes.max</code> must be provided. If <code>n.spikes</code> is provided then <code>n.spikes.max</code> is ignored, else <code>n.spikes.max</code> is used to find out the number of distant spikes using <code>select.nspike</code>.
+</p>
+<p>The argument <code>nonspikes.out</code> is ignored if <code>method="d.gsp"</code> or "<code>osp</code>".
+</p>
+<p>The argument <code>smooth</code> is useful when the user assumes the population spectral distribution to be continuous.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A matrix containing the bias-adjusted PC scores. The dimension of the matrix is the same as the dimension of <code>test.scores</code>.
+</p>
+<p>A printed message shows the number of top PCs that were adjusted for shrinkage bias.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Rounak Dey, <a href="mailto:deyrnk@umich.edu">deyrnk@umich.edu</a>
+</p>
+
+
+<h3>References</h3>
+
+<p>Dey, R. and Lee, S. (2019).
+<em>Asymptotic properties of principal component analysis and shrinkage-bias adjustment under the generalized spiked population model.</em>
+Journal of Multivariate Analysis, Vol 173, 145-164.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>hdpc_est,select.nspike</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(hapmap)
+#n = 198, p = 75435 for this data
+
+####################################################
+## Not run: 
+#First estimate the number of spikes and then adjust test scores based on that
+train.eval&lt;-hapmap$train.eval
+n&lt;-hapmap$nSamp
+p&lt;-hapmap$nSNP
+trainscore&lt;-hapmap$trainscore
+testscore&lt;-hapmap$testscore
+
+m&lt;-select.nspike(train.eval,p,n,n.spikes.max=10,evals.out=FALSE)$n.spikes
+score.adj.o1&lt;-pc_adjust(train.eval,p,n,testscore,method="osp",n.spikes=m)
+score.adj.d1&lt;-pc_adjust(train.eval,p,n,testscore,method="d.gsp",n.spikes=m)
+score.adj.l1&lt;-pc_adjust(train.eval,p,n,testscore,method="l.gsp",n.spikes=m)
+
+#Or you can provide an upper bound n.spikes.max
+score.adj.o2&lt;-pc_adjust(train.eval,p,n,testscore,method="osp",n.spikes.max=10)
+score.adj.d2&lt;-pc_adjust(train.eval,p,n,testscore,method="d.gsp",n.spikes.max=10)
+score.adj.l2&lt;-pc_adjust(train.eval,p,n,testscore,method="l.gsp",n.spikes.max=10)
+
+#Plot the training score, test score, and adjusted scores
+plot(trainscore,pch=19)
+points(testscore,col='blue',pch=19)
+points(score.adj.o1,col='red',pch=19)
+points(score.adj.d2,col='green',pch=19)
+
+## End(Not run)
+</code></pre>
+
+
+</div>

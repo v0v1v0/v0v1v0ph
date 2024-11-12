@@ -1,0 +1,288 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>NSE</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Nash-Sutcliffe Efficiency
+</h2>
+
+<h3>Description</h3>
+
+<p>Nash-Sutcliffe efficiency between <code>sim</code> and <code>obs</code>, with treatment of missing values.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">NSE(sim, obs, ...)
+
+## Default S3 method:
+NSE(sim, obs, na.rm=TRUE, fun=NULL, ..., 
+             epsilon.type=c("none", "Pushpalatha2012", "otherFactor", "otherValue"), 
+             epsilon.value=NA)
+
+## S3 method for class 'data.frame'
+NSE(sim, obs, na.rm=TRUE, fun=NULL, ..., 
+             epsilon.type=c("none", "Pushpalatha2012", "otherFactor", "otherValue"), 
+             epsilon.value=NA)
+
+## S3 method for class 'matrix'
+NSE(sim, obs, na.rm=TRUE, fun=NULL, ..., 
+             epsilon.type=c("none", "Pushpalatha2012", "otherFactor", "otherValue"), 
+             epsilon.value=NA)
+
+## S3 method for class 'zoo'
+NSE(sim, obs, na.rm=TRUE, fun=NULL, ..., 
+            epsilon.type=c("none", "Pushpalatha2012", "otherFactor", "otherValue"), 
+            epsilon.value=NA)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>sim</code></td>
+<td>
+
+<p>numeric, zoo, matrix or data.frame with simulated values
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>obs</code></td>
+<td>
+
+<p>numeric, zoo, matrix or data.frame with observed values
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>na.rm</code></td>
+<td>
+
+<p>a logical value indicating whether 'NA' should be stripped before the computation proceeds. <br>
+When an 'NA' value is found at the i-th position in <code>obs</code> <b>OR</b> <code>sim</code>, the i-th value of <code>obs</code> <b>AND</b> <code>sim</code> are removed before the computation.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fun</code></td>
+<td>
+
+<p>function to be applied to <code>sim</code> and <code>obs</code> in order to obtain transformed values thereof before computing the Nash-Sutcliffe efficiency.
+</p>
+<p>The first argument MUST BE a numeric vector with any name (e.g., <code>x</code>), and additional arguments are passed using <code>...</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+
+<p>arguments passed to <code>fun</code>, in addition to the mandatory first numeric vector.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>epsilon.type</code></td>
+<td>
+
+<p>argument used to define a numeric value to be added to both <code>sim</code> and <code>obs</code> before applying <code>FUN</code>. 
+</p>
+<p>It is was  designed to allow the use of logarithm and other similar functions that do not work with zero values.
+</p>
+<p>Valid values of <code>epsilon.type</code> are:
+</p>
+<p>1) <kbd>"none"</kbd>: <code>sim</code> and <code>obs</code> are used by <code>fun</code> without the addition of any numeric value. This is the default option.
+</p>
+<p>2) <kbd>"Pushpalatha2012"</kbd>: one hundredth (1/100) of the mean observed values is added to both <code>sim</code> and <code>obs</code> before applying <code>fun</code>, as described in Pushpalatha et al. (2012). 
+</p>
+<p>3) <kbd>"otherFactor"</kbd>: the numeric value defined in the <code>epsilon.value</code> argument is used to multiply the mean of the observed values, instead of the one hundredth (1/100) described in Pushpalatha et al. (2012). The resulting value is then added to both <code>sim</code> and <code>obs</code>, before applying <code>fun</code>.
+</p>
+<p>4) <kbd>"otherValue"</kbd>: the numeric value defined in the <code>epsilon.value</code> argument is directly added to both <code>sim</code> and <code>obs</code>, before applying <code>fun</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>epsilon.value</code></td>
+<td>
+
+<p>-) when <code>epsilon.type="otherValue"</code> it represents the numeric value to be added to both <code>sim</code> and <code>obs</code> before applying <code>fun</code>. <br>
+-) when <code>epsilon.type="otherFactor"</code> it represents the numeric factor used to multiply the mean of the observed values, instead of the one hundredth (1/100) described in Pushpalatha et al. (2012). The resulting value is then added to both <code>sim</code> and <code>obs</code> before applying <code>fun</code>.
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p style="text-align: center;"><code class="reqn"> NSE = 1 -\frac { \sum_{i=1}^N { \left( S_i - O_i \right)^2 } } { \sum_{i=1}^N { \left( O_i - \bar{O} \right)^2 } }  </code>
+</p>
+
+<p>The Nash-Sutcliffe efficiency (NSE) is a normalized statistic that determines the relative magnitude of the residual variance ("noise") compared to the measured data variance ("information") (Nash and Sutcliffe, 1970). <br></p>
+<p>NSE indicates how well the plot of observed versus simulated data fits the 1:1 line.<br></p>
+<p>Nash-Sutcliffe efficiencies range from -Inf to 1. Essentially, the closer to 1, the more accurate the model is. <br>
+-) NSE = 1, corresponds to a perfect match of modelled to the observed data. <br>
+-) NSE = 0, indicates that the model predictions are as accurate as the mean of the observed data, <br>
+-) -Inf &lt; NSE &lt; 0, indicates that the observed mean is better predictor than the model.
+</p>
+
+
+<h3>Value</h3>
+
+<p>Nash-Sutcliffe efficiency between <code>sim</code> and <code>obs</code>. <br></p>
+<p>If <code>sim</code> and <code>obs</code> are matrixes, the returned value is a vector, with the Nash-Sutcliffe efficiency between each column of <code>sim</code> and <code>obs</code>.
+</p>
+
+
+<h3>Note</h3>
+
+<p><code>obs</code> and <code>sim</code> has to have the same length/dimension <br></p>
+<p>The missing values in <code>obs</code> and <code>sim</code> are removed before the computation proceeds, and only those positions with non-missing values in <code>obs</code> and <code>sim</code> are considered in the computation
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Mauricio Zambrano Bigiarini &lt;mzb.devel@gmail.com&gt;
+</p>
+
+
+<h3>References</h3>
+
+<p><a href="https://en.wikipedia.org/wiki/Nash%E2%80%93Sutcliffe_model_efficiency_coefficient">https://en.wikipedia.org/wiki/Nash%E2%80%93Sutcliffe_model_efficiency_coefficient</a>
+</p>
+<p><cite>Nash, J.E. and Sutcliffe, J.V. (1970). River flow forecasting through conceptual models. Part 1: a discussion of principles, Journal of Hydrology 10, pp. 282-290. doi:10.1016/0022-1694(70)90255-6.</cite>
+</p>
+<p><cite>Garrick, M.; Cunnane, C.; Nash, J.E. (1978). A criterion of efficiency for rainfall-runoff models. Journal of Hydrology 36, 375-381. doi:10.1016/0022-1694(78)90155-5.</cite>
+</p>
+<p><cite>Schaefli, B., Gupta, H. (2007). Do Nash values have value?. Hydrological Processes 21, 2075-2080. doi:10.1002/hyp.6825.</cite>
+</p>
+<p><cite>Criss, R. E.; Winston, W. E. (2008), Do Nash values have value? Discussion and alternate proposals. Hydrological Processes, 22: 2723-2725. doi:10.1002/hyp.7072.</cite>
+</p>
+<p><cite>Gupta, H.V.; Kling, H. (2011). On typical range, sensitivity, and normalization of Mean Squared Error and Nash-Sutcliffe Efficiency type metrics. Water Resources Research, 47(10). doi:10.1029/2011WR010962.</cite>
+</p>
+<p><cite>Pushpalatha, R.; Perrin, C.; Le Moine, N.; Andreassian, V. (2012). A review of efficiency criteria suitable for evaluating low-flow simulations. Journal of Hydrology, 420, 171-182. doi:10.1016/j.jhydrol.2011.11.055.</cite>  
+</p>
+<p><cite>Knoben, W. J.; Freer, J. E.; Woods, R. A. (2019). Inherent benchmark or not? Comparing Nash-Sutcliffe and Kling-Gupta efficiency scores. Hydrology and Earth System Sciences, 23(10), 4323-4331. doi:10.5194/hess-23-4323-2019.</cite>
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>mNSE</code>, <code>rNSE</code>, <code>wNSE</code>, <code>KGE</code>, <code>gof</code>, <code>ggof</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">##################
+# Example 1: basic ideal case
+obs &lt;- 1:10
+sim &lt;- 1:10
+NSE(sim, obs)
+
+obs &lt;- 1:10
+sim &lt;- 2:11
+NSE(sim, obs)
+
+##################
+# Example 2: 
+# Loading daily streamflows of the Ega River (Spain), from 1961 to 1970
+data(EgaEnEstellaQts)
+obs &lt;- EgaEnEstellaQts
+
+# Generating a simulated daily time series, initially equal to the observed series
+sim &lt;- obs 
+
+# Computing the 'NSE' for the "best" (unattainable) case
+NSE(sim=sim, obs=obs)
+
+##################
+# Example 3: NSE for simulated values equal to observations plus random noise 
+#            on the first half of the observed values. 
+#            This random noise has more relative importance for ow flows than 
+#            for medium and high flows.
+  
+# Randomly changing the first 1826 elements of 'sim', by using a normal distribution 
+# with mean 10 and standard deviation equal to 1 (default of 'rnorm').
+sim[1:1826] &lt;- obs[1:1826] + rnorm(1826, mean=10)
+ggof(sim, obs)
+
+NSE(sim=sim, obs=obs)
+
+##################
+# Example 4: NSE for simulated values equal to observations plus random noise 
+#            on the first half of the observed values and applying (natural) 
+#            logarithm to 'sim' and 'obs' during computations.
+
+NSE(sim=sim, obs=obs, fun=log)
+
+# Verifying the previous value:
+lsim &lt;- log(sim)
+lobs &lt;- log(obs)
+NSE(sim=lsim, obs=lobs)
+
+##################
+# Example 5: NSE for simulated values equal to observations plus random noise 
+#            on the first half of the observed values and applying (natural) 
+#            logarithm to 'sim' and 'obs' and adding the Pushpalatha2012 constant
+#            during computations
+
+NSE(sim=sim, obs=obs, fun=log, epsilon.type="Pushpalatha2012")
+
+# Verifying the previous value, with the epsilon value following Pushpalatha2012
+eps  &lt;- mean(obs, na.rm=TRUE)/100
+lsim &lt;- log(sim+eps)
+lobs &lt;- log(obs+eps)
+NSE(sim=lsim, obs=lobs)
+
+##################
+# Example 6: NSE for simulated values equal to observations plus random noise 
+#            on the first half of the observed values and applying (natural) 
+#            logarithm to 'sim' and 'obs' and adding a user-defined constant
+#            during computations
+
+eps &lt;- 0.01
+NSE(sim=sim, obs=obs, fun=log, epsilon.type="otherValue", epsilon.value=eps)
+
+# Verifying the previous value:
+lsim &lt;- log(sim+eps)
+lobs &lt;- log(obs+eps)
+NSE(sim=lsim, obs=lobs)
+
+##################
+# Example 7: NSE for simulated values equal to observations plus random noise 
+#            on the first half of the observed values and applying (natural) 
+#            logarithm to 'sim' and 'obs' and using a user-defined factor
+#            to multiply the mean of the observed values to obtain the constant
+#            to be added to 'sim' and 'obs' during computations
+
+fact &lt;- 1/50
+NSE(sim=sim, obs=obs, fun=log, epsilon.type="otherFactor", epsilon.value=fact)
+
+# Verifying the previous value:
+eps  &lt;- fact*mean(obs, na.rm=TRUE)
+lsim &lt;- log(sim+eps)
+lobs &lt;- log(obs+eps)
+NSE(sim=lsim, obs=lobs)
+
+##################
+# Example 8: NSE for simulated values equal to observations plus random noise 
+#            on the first half of the observed values and applying a 
+#            user-defined function to 'sim' and 'obs' during computations
+
+fun1 &lt;- function(x) {sqrt(x+1)}
+
+NSE(sim=sim, obs=obs, fun=fun1)
+
+# Verifying the previous value, with the epsilon value following Pushpalatha2012
+sim1 &lt;- sqrt(sim+1)
+obs1 &lt;- sqrt(obs+1)
+NSE(sim=sim1, obs=obs1)
+</code></pre>
+
+
+</div>

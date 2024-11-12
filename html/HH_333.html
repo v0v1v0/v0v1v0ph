@@ -1,0 +1,536 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>NormalAndTplot</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Specify plots to illustrate Normal and t Hypothesis Tests or Confidence Intervals.</h2>
+
+<h3>Description</h3>
+
+<p>Specify plots to illustrate Normal and t Hypothesis Tests
+or Confidence Intervals.</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">NormalAndTplot(mean0, ...)
+## Default S3 method:
+NormalAndTplot(mean0=0,
+             mean1=NA,
+             xbar=NA,
+             df=Inf, n=1,
+             sd=1,
+             xlim=c(-3, 3)*sd/sqrt(n) + range(c(mean0, mean1, xbar), na.rm=TRUE),
+             ylim, alpha.right=.05, alpha.left=0,
+             float=TRUE, ntcolors="original",
+             digits=4, digits.axis=digits, digits.float=digits,
+             distribution.name=c("normal","z","t","binomial"),
+             type=c("hypothesis", "confidence"),
+             zaxis=FALSE, z1axis=FALSE,
+             cex.z=.5, cex.xbar=.5, cex.y=.5, cex.prob=.6, cex.top.axis=1,
+             cex.left.axis=1, cex.pb.axis=1,
+             cex.xlab=1, cex.ylab=1.5, cex.strip=1,
+             main=NA, xlab, ylab,
+             prob.labels=(type=="hypothesis"),
+             xhalf.multiplier=1,
+             yhalf.multiplier=1,
+             cex.main=1,
+             key.axis.padding=4.5,
+             number.vars=1,
+             sub=NULL,
+             NTmethod="default",
+             power=FALSE,
+             beta=FALSE,
+              ...)
+## S3 method for class 'htest'
+NormalAndTplot(mean0, type="hypothesis", xlim=NULL, mean1=NA, ...,
+             xbar, sd, df, n, alpha.left, alpha.right, ## ignored
+             distribution.name, sub ## these input arguments will be ignored
+             )
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>mean0</code></td>
+<td>
+
+<p>Null hypothesis <code class="reqn">\mu_0</code>.
+When graphing a confidence interval, <code>mean0</code> will be used for
+<code>xbar</code> should <code>xbar</code> itself have the value <code>NA</code>.
+For the <code>htest</code> method, <code>mean0</code> is an <code>"htest"</code>
+object.
+See <code>NTplot</code> for more information.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mean1</code></td>
+<td>
+
+<p>Alternative hypothesis <code class="reqn">\mu_1</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>xbar</code></td>
+<td>
+
+<p>Observed <code class="reqn">\bar{x}</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sd</code></td>
+<td>
+
+<p>Standard deviation in the data scale <code class="reqn">\sigma</code> for normal-, or <code class="reqn">s</code> for <code class="reqn">t</code>-distribution.
+</p>
+</td>
+</tr>
+</table>
+<table>
+<tr style="vertical-align: top;">
+<td><code>df</code></td>
+<td>
+
+<p>Degrees of freedom for <code class="reqn">t</code>-distribution.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n</code></td>
+<td>
+
+<p>Number of observations per group.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>main, xlab, ylab, xlim, ylim, sub</code></td>
+<td>
+
+<p>Standard <code>xyplot</code> arguments.  Default values
+are constructed if these arguments are missing. The input value
+<code>main=NA</code>
+forces a new constructed <code>main</code> instead of using the <code>main</code> coming in through the
+<code>htest</code> methods.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+
+<p>Additional <code>xyplot</code> arguments.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>number.vars</code></td>
+<td>
+
+<p>Number of variables. 1 for a one-sample test, 2 for two-sample tests
+and paired tests.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alpha.left, alpha.right</code></td>
+<td>
+<p>For <code>type="hypothesis"</code>,
+the sum of these two numbers is the probability of the Type I Error
+<code class="reqn">\alpha</code>.  When both of these numbers are positive, there is a two-sided
+test.  Note that it is not required that they be equal.  If one of the
+numbers is 0, then it is a one-sided test.  For
+<code>type="confidence"</code>, 1 minus the sum of these two numbers is the
+confidence level.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>float</code></td>
+<td>
+
+<p>Logical.  If <code>TRUE</code>, then the probabilities <code class="reqn">\alpha</code>, <code class="reqn">\beta</code>, power, and
+<code class="reqn">p</code>-values or the confidence value are displayed on the graph.  If <code>FALSE</code>, these values
+are not displayed.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ntcolors</code></td>
+<td>
+
+<p>Vector of colors used in the graph.  The default value is
+<code>"original"</code> and two named alternatives are <code>"stoplight"</code> and
+<code>"BW"</code>.
+The sets of colors associated with these three named sets are shown in a <code>dontrun</code>
+section of the examples.
+The user can enter any other color scheme by specifying a vector of ten
+named colors.  The names are:
+<code>col.alpha, col.notalpha, col.beta, col.power, col.pvalue,
+  col.pvaluetranslucent, col.critical, col.border, col.text, col.conf</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>digits.axis, digits.float, digits</code></td>
+<td>
+
+<p><code>digits.axis</code> is the number of significant digits for the top
+axis.  <code>digits.float</code> is the number of significant digits for
+the floating probability values on the graph.  <code>digits</code> is a
+convenience argument to set both <code>digits.axis</code> and
+<code>digits.float</code> at the same time.  These number is passed to the
+<code>format</code> function.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>distribution.name</code></td>
+<td>
+
+<p>Name of distribution.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>type</code></td>
+<td>
+
+<p>"hypothesis" for a Hypothesis Test graph, or "confidence" for a
+Confidence Interval graph.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>zaxis, z1axis</code></td>
+<td>
+
+<p>Logical or list.  Should the <code class="reqn">z</code>-axis centered on <code class="reqn">\mu_0</code>, or the
+<code class="reqn">z_1</code>-axis centered on <code class="reqn">\mu_1</code>, be displayed?  The list
+version of the argument must have two components <code>at</code> and <code>labels</code> as
+specified in <code>panel.axis</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cex.z, cex.xbar, cex.y, cex.prob, cex.top.axis,
+cex.left.axis, cex.pb.axis, cex.xlab, cex.ylab, cex.strip,
+cex.main</code></td>
+<td>
+
+<p><code>cex.z</code> is the <code>cex</code> value for the <code class="reqn">z</code> and <code class="reqn">z_1</code>
+axes on the plot.  <code>cex.prob</code> is the <code>cex</code> value for the
+floating probabilities on the graph. <code>cex.top.axis</code> is the <code>cex</code> value
+for the top axis values.  <code>cex.main</code> is the <code>cex</code> value for
+the main title.  <code>cex.xbar</code> and <code>cex.y</code> are the <code>cex</code>
+values for the horizontal and vertical axes of the plot.
+<code>cex.left.axis</code> and <code>cex.pb.axis</code> are the <code>cex</code> values
+for the power or beta (Type II error) values and the <code class="reqn">\mu_1</code> value
+in the power and beta plots.  <code>cex.xlab</code>, <code>cex.ylab</code>, and
+<code>cex.strip</code> are the <code>cex</code> values for <code>xlab</code>,
+<code>ylab</code>, and <code>strip</code> labels.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>key.axis.padding</code></td>
+<td>
+<p>tuning constant to create additional room above the
+graph for a larger <code>cex.main</code> to fit.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>prob.labels</code></td>
+<td>
+<p>logical. If <code>TRUE</code> label the floating
+probability values with their name, such as <code class="reqn">\alpha</code>.  If
+<code>FALSE</code>,
+then don't label them.  The default is <code>TRUE</code> for
+<code>type="hypothesis"</code>
+and <code>FALSE</code> for <code>type="confidence"</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>xhalf.multiplier, yhalf.multiplier</code></td>
+<td>
+
+<p>Numerical tuning constants to control the width and height of the floating
+probability values.  Empirically, we need a smaller value for the
+<span class="pkg">shiny</span>
+app then we need for direct writing onto a graphic device.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>NTmethod</code></td>
+<td>
+<p>Character string used when <code>shiny=TRUE</code>.  It is
+normally calculated by the methods.  <code>NTmethod</code> tells
+<code>shiny</code> how to use or ignore the <code>df</code> and <code>n</code>
+sliders.
+</p>
+<p><code>"htest"</code> objects by default are interpreted
+as a single observation (<code>n=1</code>) of a <code class="reqn">t</code>-statistic with
+<code>df</code> degrees of freedom.  The slider will let the user change
+the <code>df</code>, but not the <code>n</code>.
+</p>
+<p><code>"power.htest"</code> objects are interpreted as a set of <code class="reqn">n</code>
+obervations per group and <code>df</code> is calculated as <code class="reqn">(n-1)</code> for
+single-sample tests and as <code class="reqn">2(n-1)</code> for two-sample tests.
+The slider will let the user change <code>n</code> and will calculate the
+revised <code>df</code>.
+</p>
+<p>For the normal approximation to the binomial
+(<code>distribution.name="binomial"</code>),
+only <code>n</code> is meaningful.  The <code>df</code> is always ignored.
+</p>
+<p>For the default situation of <code>t</code>, determined by the initially
+specified sample size <code class="reqn">n&gt;1</code>, the degrees of freedom is
+calculated as <code class="reqn">(n-1)</code> for single-sample tests and as
+<code class="reqn">2(n-1)</code> for two-sample tests.  The default <code>z</code>, is
+initially specified by a sample size <code class="reqn">n=1</code>.
+</p>
+<p>In all cases except the <code>"binomial"</code>, the user can change the
+interpretation of the <code>n</code> and <code>df</code> sliders.  The
+interpretation when both <code>n</code> and <code>df</code> are under user
+control is not always obvious.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>power, beta</code></td>
+<td>
+<p>Logical.  If <code>TRUE</code>, then display that graph,
+else don't display it.  Passed forward to
+<code>powerplot</code>.
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The graphs produced by this single function cover most of the first semester
+introductory Statistics course.  The <code>htest</code> method plots the
+results of the <code>stats::t.test</code> function.
+</p>
+<p><code>NormalAndTplot</code> is built on <code>xyplot</code>.
+Most of the arguments detailed in <code>xyplot</code> documentation work to
+control the appearance of the plot.
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>"trellis"</code> object.
+</p>
+
+
+<h3>Note</h3>
+
+<p>This function is built on <span class="pkg">lattice</span> and <span class="pkg">latticeExtra</span>.
+It supersedes the similar function
+<code>normal.and.t.dist</code> built on base graphics that is used in many
+displays in the book by Erich Neuwirth and me: <em>R through Excel</em>, Springer
+(2009).
+<a href="https://link.springer.com/book/10.1007/978-1-4419-0052-4">https://link.springer.com/book/10.1007/978-1-4419-0052-4</a>.  Many details,
+particularly the
+alternate color scheme and the concept of floating probability labels,
+grew out of discussions that Erich and I have had since the book was
+published.
+The method for <code>"htest"</code> objects incorporates ideas that Jay Kerns and I developed at the 2011 UseR! conference.
+This version incorporates some ideas suggested by Moritz Heene.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Richard M. Heiberger (rmh@temple.edu)</p>
+
+
+<h3>See Also</h3>
+
+<p><code>NTplot</code></p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">   NTplot(mean0=0, mean1=2,  xbar=1.8,  xlim=c(-3, 5))
+   NTplot(mean0=0, mean1=2,  xbar=1.8,  xlim=c(-3, 5), distribution.name="t", df=4)
+   NTplot(mean0=100, sd=12, mean1=113,  xbar=105,  xlim=c(92, 120), n=20)
+   NTplot(mean0=100, sd=12, mean1=113,  xbar=105,  xlim=c(92, 120), n=20,
+          zaxis=TRUE, z1axis=TRUE)
+   NTplot(mean0=100, sd=12,  xbar=105,  xlim=c(92, 108), n=20, ntcolors="stoplight")
+   NTplot(xbar=95, sd=10, xlim=c(65, 125), type="confidence",
+          alpha.left=.025, alpha.right=.025)
+
+
+x &lt;- rnorm(12, mean=.78)
+x.t &lt;- t.test(x)
+NTplot(x.t)
+NTplot(x.t, type="confidence")
+x.tg &lt;- t.test(x, alternative="greater")
+NTplot(x.tg)
+
+y &lt;- rnorm(12, mean=-.05)
+xy.t &lt;- t.test(x, y)
+NTplot(xy.t)
+NTplot(xy.t, type="confidence")
+
+## Not run: 
+  if (interactive())
+    NTplot(shiny=TRUE)  ## with any other arguments for initialization of the shiny app.
+
+## End(Not run)
+
+## Not run: 
+   ##  The partially transparent colors are:
+   black127="#0000007F" ## HH:::ColorWithAlpha("black")
+   green127="#00FF007F" ## HH:::ColorWithAlpha("green")
+   blue127 ="#0000FF7F" ## HH:::ColorWithAlpha("blue")
+
+
+## this is the default set of colors that are assigned when
+## ntcolors="original" or when ntcolors is not specified
+c(col.alpha = "blue",
+  col.notalpha = "lightblue",
+  col.beta = "red",
+  col.power = "pink",
+  col.pvalue = "green",
+  col.pvaluetranslucent = green127,
+  col.critical = "gray50",
+  col.border = black127,
+  col.text = "black",
+  col.conf = "lightgreen")
+
+  NTplot(                 )
+  NTplot(mean1 = 2,       )
+  NTplot(           xbar=1)
+  NTplot(mean1 = 2, xbar=1)
+  NTplot(type="confidence")
+
+
+## this is the set of colors that are assigned when ntcolors="stoplight"
+c(col.alpha = "red",
+  col.notalpha = "honeydew2",
+  col.beta = "orange",
+  col.power = "pink",
+  col.pvalue = "blue",
+  col.pvaluetranslucent = blue127,
+  col.critical = "gray50",
+  col.border = black127,
+  col.text = "black",
+  col.conf = "lightgreen")
+
+  NTplot(                   ntcolors="stoplight")
+  NTplot(mean1 = 2,         ntcolors="stoplight")
+  NTplot(           xbar=1, ntcolors="stoplight")
+  NTplot(mean1 = 2, xbar=1, ntcolors="stoplight")
+  NTplot(type="confidence", ntcolors="stoplight")
+
+## this is the set of colors that are assigned when ntcolors="BW"
+c(col.alpha             = "gray35",
+  col.notalpha          = "gray85",
+  col.beta              = "gray15",
+  col.power             = "gray40",
+  col.pvalue            = "gray50",
+  col.pvaluetranslucent = HH:::ColorWithAlpha("gray65"),
+  col.critical          = "gray15",
+  col.border            = "gray75",
+  col.text              = "black",
+  col.conf              = "gray45")
+
+  NTplot(                   ntcolors="BW")
+  NTplot(mean1 = 2,         ntcolors="BW")
+  NTplot(           xbar=1, ntcolors="BW")
+  NTplot(mean1 = 2, xbar=1, ntcolors="BW")
+  NTplot(type="confidence", ntcolors="BW")
+
+
+## End(Not run)
+
+## Not run: 
+## mean1 and xbar
+  NTplot(mean0=0, mean1=2,  xbar=1.8,  xlim=c(-3, 5))
+  NTplot(mean0=0, mean1=-2, xbar=-1.8, xlim=c(-5, 3),
+         alpha.left=.05,  alpha.right=0)
+  NTplot(mean0=0, mean1=2,  xbar=2.1,  xlim=c(-3, 5),
+         alpha.left=.025, alpha.right=.025)
+  NTplot(mean0=0, mean1=-2, xbar=-2.1, xlim=c(-5, 3),
+         alpha.left=.025, alpha.right=.025)
+
+## mean1
+  NTplot(mean0=0, mean1=2,  xbar=NA, xlim=c(-3, 5))
+  NTplot(mean0=0, mean1=-2, xbar=NA, xlim=c(-5, 3),
+         alpha.left=.05,  alpha.right=0)
+  NTplot(mean0=0, mean1=2,  xbar=NA, xlim=c(-3, 5),
+         alpha.left=.025, alpha.right=.025)
+  NTplot(mean0=0, mean1=-2, xbar=NA, xlim=c(-5, 3),
+         alpha.left=.025, alpha.right=.025)
+
+## xbar
+  NTplot(mean0=0, mean1=NA, xbar=1.8,  xlim=c(-3, 5))
+  NTplot(mean0=0, mean1=NA, xbar=-1.8, xlim=c(-5, 3),
+         alpha.left=.05,  alpha.right=0)
+  NTplot(mean0=0, mean1=NA, xbar=2.1,  xlim=c(-3, 5),
+         alpha.left=.025, alpha.right=.025)
+  NTplot(mean0=0, mean1=NA, xbar=-2.1, xlim=c(-5, 3),
+         alpha.left=.025, alpha.right=.025)
+
+## t distribution
+## mean1 and xbar
+  NTplot(mean0=0, mean1=2,  xbar=1.8,  xlim=c(-3, 5),
+         distribution.name="t", df=4)
+  NTplot(mean0=0, mean1=-2, xbar=-1.8, xlim=c(-5, 3),
+         alpha.left=.05,  alpha.right=0, distribution.name="t", df=4)
+  NTplot(mean0=0, mean1=2,  xbar=2.1,  xlim=c(-3, 5),
+         alpha.left=.025, alpha.right=.025, distribution.name="t", df=4)
+  NTplot(mean0=0, mean1=-2, xbar=-2.1, xlim=c(-5, 3),
+         alpha.left=.025, alpha.right=.025, distribution.name="t", df=4)
+
+## mean1
+  NTplot(mean0=0, mean1=2,  xbar=NA, xlim=c(-3, 5),
+         distribution.name="t", df=4)
+  NTplot(mean0=0, mean1=-2, xbar=NA, xlim=c(-5, 3),
+         alpha.left=.05,  alpha.right=0, distribution.name="t", df=4)
+  NTplot(mean0=0, mean1=2,  xbar=NA, xlim=c(-3, 5),
+         alpha.left=.025, alpha.right=.025, distribution.name="t", df=4)
+  NTplot(mean0=0, mean1=-2, xbar=NA, xlim=c(-5, 3),
+         alpha.left=.025, alpha.right=.025, distribution.name="t", df=4)
+
+## xbar
+  NTplot(mean0=0, mean1=NA, xbar=1.8,  xlim=c(-3, 5),
+         distribution.name="t", df=4)
+  NTplot(mean0=0, mean1=NA, xbar=-1.8, xlim=c(-5, 3),
+         alpha.left=.05,  alpha.right=0, distribution.name="t", df=4)
+  NTplot(mean0=0, mean1=NA, xbar=2.1,  xlim=c(-3, 5),
+         alpha.left=.025, alpha.right=.025, distribution.name="t", df=4)
+  NTplot(mean0=0, mean1=NA, xbar=-2.1, xlim=c(-5, 3),
+         alpha.left=.025, alpha.right=.025, distribution.name="t", df=4)
+
+## confidence intervals
+
+  NTplot(mean0=0, xlim=c(-3, 4), type="confidence")
+  NTplot(xbar=01, xlim=c(-3, 4), type="confidence")
+  NTplot(mean0=0, xlim=c(-4, 3), type="confidence",
+         alpha.left=.05,  alpha.right=0)
+  NTplot(mean0=0, xlim=c(-3, 3), type="confidence",
+         alpha.left=.025, alpha.right=.025)
+  NTplot(mean0=95, sd=10, xlim=c(65, 125), type="confidence",
+         alpha.left=.025, alpha.right=.025)
+  NTplot(mean0=95, sd=10, xlim=c(65, 125), type="confidence",
+         alpha.left=.025, alpha.right=.025,
+         distribution="t", df=10)
+
+
+## End(Not run)
+</code></pre>
+
+
+</div>

@@ -1,0 +1,97 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>spruce-multiple</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Spruce up multi-outcome predictions</h2>
+
+<h3>Description</h3>
+
+<p>This family of <code style="white-space: pre;">⁠spruce_*_multiple()⁠</code> functions converts multi-outcome
+predictions into a standardized format. They are generally called from a
+prediction implementation function for the specific <code>type</code> of prediction to
+return.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">spruce_numeric_multiple(...)
+
+spruce_class_multiple(...)
+
+spruce_prob_multiple(...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table><tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Multiple vectors of predictions:
+</p>
+
+<ul>
+<li>
+<p> For <code>spruce_numeric_multiple()</code>, numeric vectors of equal size.
+</p>
+</li>
+<li>
+<p> For <code>spruce_class_multiple()</code>, factors of "hard" class predictions of
+equal size.
+</p>
+</li>
+<li>
+<p> For <code>spruce_prob_multiple()</code>, tibbles of equal size, which are the result
+of calling <code>spruce_prob()</code> on each matrix of prediction probabilities.
+</p>
+</li>
+</ul>
+<p>If the <code>...</code> are named, then this name will be used as the suffix on the
+resulting column name, otherwise a positional index will be used.</p>
+</td>
+</tr></table>
+<h3>Value</h3>
+
+
+<ul>
+<li>
+<p> For <code>spruce_numeric_multiple()</code>, a tibble of numeric columns named with the
+pattern <code style="white-space: pre;">⁠.pred_*⁠</code>.
+</p>
+</li>
+<li>
+<p> For <code>spruce_class_multiple()</code>, a tibble of factor columns named with the
+pattern <code style="white-space: pre;">⁠.pred_class_*⁠</code>.
+</p>
+</li>
+<li>
+<p> For <code>spruce_prob_multiple()</code>, a tibble of data frame columns named with the
+pattern <code style="white-space: pre;">⁠.pred_*⁠</code>.
+</p>
+</li>
+</ul>
+<h3>Examples</h3>
+
+<pre><code class="language-R">spruce_numeric_multiple(1:3, foo = 2:4)
+
+spruce_class_multiple(
+  one_step = factor(c("a", "b", "c")),
+  two_step = factor(c("a", "c", "c"))
+)
+
+one_step &lt;- matrix(c(.3, .7, .0, .1, .3, .6), nrow = 2, byrow = TRUE)
+two_step &lt;- matrix(c(.2, .7, .1, .2, .4, .4), nrow = 2, byrow = TRUE)
+binary &lt;- matrix(c(.5, .5, .4, .6), nrow = 2, byrow = TRUE)
+
+spruce_prob_multiple(
+  one_step = spruce_prob(c("a", "b", "c"), one_step),
+  two_step = spruce_prob(c("a", "b", "c"), two_step),
+  binary = spruce_prob(c("yes", "no"), binary)
+)
+</code></pre>
+
+
+</div>

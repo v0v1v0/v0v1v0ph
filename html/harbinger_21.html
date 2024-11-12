@@ -1,0 +1,59 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>har_eval</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Evaluation of event detection</h2>
+
+<h3>Description</h3>
+
+<p>Evaluation of event detection (traditional hard evaluation)
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">har_eval()
+</code></pre>
+
+
+<h3>Value</h3>
+
+<p><code>har_eval</code> object
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">library(daltoolbox)
+
+#loading the example database
+data(examples_anomalies)
+
+dataset &lt;- examples_anomalies$simple
+head(dataset)
+
+# setting up time change point using GARCH
+model &lt;- hcp_garch()
+
+# fitting the model
+model &lt;- fit(model, dataset$serie)
+
+# making detections
+detection &lt;- detect(model, dataset$serie)
+
+# filtering detected events
+print(detection[(detection$event),])
+
+# evaluating the detections
+evaluation &lt;- evaluate(har_eval(), detection$event, dataset$event)
+print(evaluation$confMatrix)
+
+# ploting the results
+grf &lt;- har_plot(model, dataset$serie, detection, dataset$event)
+plot(grf)
+</code></pre>
+
+
+</div>

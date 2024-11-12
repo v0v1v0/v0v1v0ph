@@ -1,0 +1,152 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hdd_slice</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Applies a function to slices of data to create a HDD data set</h2>
+
+<h3>Description</h3>
+
+<p>This function is useful to apply complex R functions to large data sets (out of memory). It slices the input data, applies the function, then saves each chunk into a hard drive folder. This can then be a HDD data set.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hdd_slice(
+  x,
+  fun,
+  dir,
+  chunkMB = 500,
+  rowsPerChunk,
+  replace = FALSE,
+  verbose = 1,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>A data set (data.frame, HDD).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fun</code></td>
+<td>
+<p>A function to be applied to slices of the data set. The function must return a data frame like object.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dir</code></td>
+<td>
+<p>The destination directory where the data is saved.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>chunkMB</code></td>
+<td>
+<p>The size of the slices, default is 500MB. That is: the function <code>fun</code> is applied to each 500Mb of data <code>x</code>. If the function creates a lot of additional information, you may want this number to go down. On the other hand, if the function reduces the information you may want this number to go up. In the end it will depend on the amount of memory available.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rowsPerChunk</code></td>
+<td>
+<p>Integer, default is missing. Alternative to the argument <code>chunkMB</code>. If provided, the functions will be applied to chunks of <code>rowsPerChunk</code> of <code>x</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>replace</code></td>
+<td>
+<p>Whether all information on the destination directory should be erased beforehand. Default is <code>FALSE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p>Integer, defaults to 1. If greater than 0 then the progress is displayed.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Other parameters to be passed to <code>fun</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>This function splits the original data into several slices and then apply a function to each of them, saving the results into a HDD data set.
+</p>
+<p>You can perform merging operations with <code>hdd_slice</code>, but for regular merges not that you have the function <code>hdd_merge</code> that may prove more convenient (not need to write a ad hoc function).
+</p>
+
+
+<h3>Value</h3>
+
+<p>It doesn't return anything, the output is a "hard drive data" saved in the hard drive.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Laurent Berge
+</p>
+
+
+<h3>See Also</h3>
+
+<p>See <code>hdd</code>, <code>sub-.hdd</code> and <code>cash-.hdd</code>
+for the extraction and manipulation of out of memory data. For importation of
+HDD data sets from text files: see <code>txt2hdd</code>.
+</p>
+<p>See <code>hdd_slice</code> to apply functions to chunks of data (and create
+HDD objects) and <code>hdd_merge</code> to merge large files.
+</p>
+<p>To create/reshape HDD objects from memory or from other HDD objects, see
+<code>write_hdd</code>.
+</p>
+<p>To display general information from HDD objects: <code>origin</code>,
+<code>summary.hdd</code>, <code>print.hdd</code>,
+<code>dim.hdd</code> and <code>names.hdd</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+# Toy example with iris data.
+# Say you want to perform a cartesian merge
+# If the results of the function is out of memory
+# you can use hdd_slice (not the case for this example)
+
+# preparing the cartesian merge
+iris_bis = iris
+names(iris_bis) = c(paste0("x_", 1:4), "species_bis")
+
+
+fun_cartesian = function(x){
+	# Note that x is treated as a data.table
+	# =&gt; we need the argument allow.cartesian
+	merge(x, iris_bis, allow.cartesian = TRUE)
+}
+
+hdd_result = tempfile() # =&gt; folder where results are saved
+hdd_slice(iris, fun_cartesian, dir = hdd_result, rowsPerChunk = 30)
+
+# Let's look at the result
+base_hdd = hdd(hdd_result)
+summary(base_hdd)
+head(base_hdd)
+
+
+
+</code></pre>
+
+
+</div>

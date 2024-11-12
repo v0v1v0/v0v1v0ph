@@ -1,0 +1,184 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>plot_lattice</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Plot Lattice of Emulator Implausibilities</h2>
+
+<h3>Description</h3>
+
+<p>Plots a set of projections of the full-dimensional input space.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">plot_lattice(
+  ems,
+  targets,
+  ppd = 20,
+  cb = FALSE,
+  cutoff = 3,
+  maxpoints = 50000,
+  imp_breaks = NULL,
+  contour = TRUE,
+  ranges = NULL,
+  raster_imp = FALSE,
+  plot_vars = NULL,
+  fixed_vars = NULL
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>ems</code></td>
+<td>
+<p>The <code>Emulator</code> objects in question.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>targets</code></td>
+<td>
+<p>The corresponding target values.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ppd</code></td>
+<td>
+<p>The number of points to sample per dimension.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cb</code></td>
+<td>
+<p>Whether or not a colourblind-friendly plot should be produced.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cutoff</code></td>
+<td>
+<p>The cutoff value for non-implausible points.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>maxpoints</code></td>
+<td>
+<p>The limit on the number of points to be evaluated.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>imp_breaks</code></td>
+<td>
+<p>If plotting nth maximum implausibility, defines the levels at
+which to draw contours.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>contour</code></td>
+<td>
+<p>Logical determining whether to plot implausibility contours or not.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ranges</code></td>
+<td>
+<p>Parameter ranges. If not supplied, defaults to emulator ranges.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>raster_imp</code></td>
+<td>
+<p>Should the implausibility plots be rasterised?</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>plot_vars</code></td>
+<td>
+<p>If provided, indicates which subset of parameters to plot.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fixed_vars</code></td>
+<td>
+<p>If provided, indicates the fixed value of the plot-excluded parameters.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The plots are:
+</p>
+<p>One dimensional optical depth plots (diagonal);
+</p>
+<p>Two dimensional optical depth plots (lower triangle);
+</p>
+<p>Two dimensional minimum implausibility plots (upper triangle).
+</p>
+<p>The optical depth is calculated as follows. A set of points is constructed across the
+full d-dimensional parameter space, and implausibility is calculated at each point.
+The points are collected into groups based on their placement in a projection to a
+one- or two-dimensional slice of the parameter space. For each group, the proportion
+of non-implausible points is calculated, and this value in [0,1] is plotted. The
+minimum implausibility plots are similar, but with minimum implausibility calculated
+rather than proportion of non-implausible points.
+</p>
+<p>The <code>maxpoints</code> argument is used as a cutoff for if a regular ppd grid would
+result in a very large number of points. If this is the case, then <code>maxpoints</code> points
+are sampled uniformly from the region instead of regularly spacing them.
+</p>
+<p>If only a subset of parameters are relevant, then the <code>plot_vars</code> and <code>fixed_vars</code>
+can be used to specify the subset. If <code>plot_vars</code> is provided, corresponding to a list
+of parameter names, then those parameters not included are fixed to their mid-range values;
+if <var>fixed_vars</var> is provided as a named list, then the parameters not included are fixed
+to the corresponding specified values.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A ggplot object
+</p>
+
+
+<h3>References</h3>
+
+<p>Bower, Goldstein &amp; Vernon (2010) &lt;doi:10.1214/10-BA524&gt;
+</p>
+
+
+<h3>See Also</h3>
+
+<p>Other visualisation tools: 
+<code>behaviour_plot()</code>,
+<code>diagnostic_wrap()</code>,
+<code>effect_strength()</code>,
+<code>emulator_plot()</code>,
+<code>hit_by_wave()</code>,
+<code>output_plot()</code>,
+<code>plot_actives()</code>,
+<code>plot_wrap()</code>,
+<code>simulator_plot()</code>,
+<code>space_removed()</code>,
+<code>validation_pairs()</code>,
+<code>wave_dependencies()</code>,
+<code>wave_points()</code>,
+<code>wave_values()</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"> # Excessive runtime
+ plot_lattice(SIREmulators$ems, SIREmulators$targets, ppd = 10)
+ plot_lattice(SIREmulators$ems$nS, SIREmulators$targets)
+ plot_lattice(SIREmulators$ems, SIREmulators$targets, plot_vars = c('aSI', 'aIR'))
+ plot_lattice(SIREmulators$ems, SIREmulators$targets, fixed_vars = list(aSR = 0.03))
+
+</code></pre>
+
+
+</div>

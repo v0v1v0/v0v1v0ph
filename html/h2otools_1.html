@@ -1,0 +1,65 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>automlModelParam</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>AutoML Models' Parameters Summary</h2>
+
+<h3>Description</h3>
+
+<p>Extracts models' parameters from AutoML grid
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">automlModelParam(model)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table><tr style="vertical-align: top;">
+<td><code>model</code></td>
+<td>
+<p>a h2o AutoML object</p>
+</td>
+</tr></table>
+<h3>Value</h3>
+
+<p>a dataframe of models' parameters
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>E. F. Haghish
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+if(requireNamespace("h2o")) {
+  library(h2o)
+  h2o.init(ignore_config = TRUE, nthreads = 2, bind_to_localhost = FALSE, insecure = TRUE)
+  prostate_path &lt;- system.file("extdata", "prostate.csv", package = "h2o")
+  prostate &lt;- h2o.importFile(path = prostate_path, header = TRUE)
+  y &lt;- "CAPSULE"
+  prostate[,y] &lt;- as.factor(prostate[,y])  #convert to factor for classification
+  aml &lt;- h2o.automl(y = y,
+                    training_frame = prostate,
+                    include_algos = "GLM",
+                    max_models = 1,
+                    max_runtime_secs = 60)
+
+  # extract the model parameters
+  model.param &lt;- automlModelParam(aml@leader)
+}
+
+## End(Not run)
+</code></pre>
+
+
+</div>

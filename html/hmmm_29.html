@@ -1,0 +1,97 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>summary.hmmmfit</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+summary for the class hmmmfit
+</h2>
+
+<h3>Description</h3>
+
+<p>The generic function ‘summary’ is adapted to the objects inheriting from class <code>hmmmfit</code> 
+(summary.hmmmfit) to display the results of the estimation of a hmm model by ‘hmmm.mlfit’.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">## S3 method for class 'hmmmfit'
+summary(object, cell.stats = TRUE, ...)</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>object</code></td>
+<td>
+<p>An object of the class <code>hmmmfit</code>, i.e. a result of ‘hmmm.mlfit’</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cell.stats</code></td>
+<td>
+<p>If TRUE cell-specific statistics are returned</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Further arguments passed to or from other methods</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The marginal interactions of a hmm model can be defined in terms of linear predictor of covariates Cln(Mm)=Xbeta, where
+the X matrix is specified by ‘create.XMAT’ and 
+the parameters beta indicate the additive effects of covariate on the marginal interactions. 
+The function ‘hmmm.mlfit’ estimates either the parameters beta and the interactions; the function ‘summary’ of a fitted model 
+(by ‘hmmm.mlfit’) returns the estimated betas and the estimated interactions, while the function ‘print’ provides the 
+estimated interactions only. If the model is defined under  equality constraints ECln(Mm)=0, parameters betas are meaningless so they are not printed. 
+</p>
+<p>The printed output of ‘summary’ provides: 1. values of the likelihood ratio and
+Pearson's score statistics, degrees of freedom and pvalues. Note that degrees of freedom and pvalues are meaningful only for 
+the hmm models without inequality constraints (see ‘hmmm.chibar’ to test hmm models defined under inequality constraints on interactions); 
+2. the linear predictor model results: estimated betas, standard errors, z-ratios, pvalues; estimated interactions, 
+standard errors, residuals; 3. cell-specific statistics: 
+observed and predicted frequencies of the multi-way table, estimated joint probabilities with standard errors, adjusted residuals; 
+4. convergence statistics.</p>
+
+
+<h3>Value</h3>
+
+<p>No return value</p>
+
+
+<h3>Note</h3>
+
+<p>Use ‘print’ to display only the goodness-of-fit test and the estimated interactions.</p>
+
+
+<h3>See Also</h3>
+
+<p><code>hmmm.mlfit</code>, <code>print.hmmmfit</code>, <code>anova.hmmmfit</code>, <code>create.XMAT</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(relpol)
+y&lt;-getnames(relpol,st=12,sep=";")
+# 1 = Religion, 2 = Politics
+names&lt;-c("Rel","Pol")
+marglist&lt;-c("l-m","m-g","l-g")
+marginals&lt;-marg.list(marglist,mflag="m")
+
+# Hypothesis of stochastic independence: all log odds ratios are null 
+model&lt;-hmmm.model(marg=marginals,lev=c(3,7),sel=c(9:20),names=names)
+fitmodel&lt;-hmmm.mlfit(y,model)
+# print(fitmodel,aname="Independence model",printflag=TRUE)
+summary(fitmodel)
+</code></pre>
+
+
+</div>

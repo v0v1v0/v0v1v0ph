@@ -1,0 +1,130 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hgate_sample</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>hgate_sample</h2>
+
+<h3>Description</h3>
+
+<p>Downsample the data in order to fasten the computation and
+reduce the memory usage.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hgate_sample(gate_vector, level, size = 1000, method = "prop")
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>gate_vector</code></td>
+<td>
+<p>A Categorical vector whose length equals the number of
+rows of the matrix to sample (nrow(xp))</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>level</code></td>
+<td>
+<p>A level of gate_vector so that gate_vector == level will produce
+a boolean vector identifying events of interest</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>size</code></td>
+<td>
+<p>An integer specifying the maximum number of events of interest to
+retain. If the count of events of interest is lower than <code>size</code>, than
+<code>size</code> will be set to that count.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+<p>A string specifying the method to balance the count of events.
+<code>"prop"</code> means proportionnality: if events of interest are sampled in
+a 1/10 ratio, then all others events are sampled by the same ratio.
+<code>"10x"</code> means a balance of 10 between the count events of interest and
+the count all others events. <code>"ceil"</code> means a uniform sampling no more
+than the specified size for each level of the gate_vector. <code>level</code> is
+unused in that method.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A logical vector with TRUE correspond to the events being sampled, ie
+kept to further analysis
+</p>
+
+
+<h3>Note</h3>
+
+<p>No replacement is applied. If there are less events in one group or the
+alternate than the algorithm requires, then all available events are
+returned. NA values in gate_vector are not sampled, ie ignored.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Standard procedure with downsampling
+data(Samusik_01_subset)
+xp &lt;- Samusik_01_subset$xp_src[,Samusik_01_subset$regular_channels]
+gate_vector &lt;- Samusik_01_subset$labels
+sampled &lt;- hgate_sample(gate_vector, level=8, 100)
+table(sampled)
+table(gate_vector[sampled])
+xp_sampled &lt;- xp[sampled, ]
+gate_vector_sampled &lt;- gate_vector[sampled]
+hg &lt;- hypergate(xp_sampled, gate_vector_sampled, level=8, delta_add=0.01)
+# cluster 8 consists in 122 events
+table(gate_vector)
+# Downsampling
+table(gate_vector[hgate_sample(gate_vector, level=8, 100)])
+# Downsampling reduces the alternate events
+table(gate_vector[hgate_sample(gate_vector, level=8, 100, "10x")])
+# Downsampling is limited to the maximum number of events of interest
+table(gate_vector[hgate_sample(gate_vector, level=8, 150)])
+# Downsampling is limited to the maximum number of events of interest, and
+# the alternate events are downsampled to a total of 10 times
+table(gate_vector[hgate_sample(gate_vector, level=8, 150, "10x")])
+# More details about sampling
+# Convert -1 to NA, NA are not sampled
+gate_vector[gate_vector==-1] = NA
+gate_vector = factor(gate_vector)
+table(gate_vector, useNA = "alw")
+#
+# target size = 100 whereas initial freq is 122 for pop 8
+smp.prop = hgate_sample(gate_vector, level = 8, size = 100, method = "prop")
+smp.10x  = hgate_sample(gate_vector, level = 8, size = 100, method = "10x")
+smp.ceil = hgate_sample(gate_vector, size = 10, method = "ceil")
+table(smp.prop)
+table(smp.10x)
+table(smp.ceil)
+rbind(raw = table(gate_vector),
+      prop = table(gate_vector[smp.prop]),
+      `10x` = table(gate_vector[smp.10x]),
+      ceil = table(gate_vector[smp.ceil]))
+#
+# target size = 30 whereas initial freq is 25 for pop 14
+smp.prop = hgate_sample(gate_vector, level = 14, size = 30, method = "prop")
+smp.10x  = hgate_sample(gate_vector, level = 14, size = 30, method = "10x")
+table(smp.prop)
+table(smp.10x)
+rbind(raw = table(gate_vector),
+      prop = table(gate_vector[smp.prop]),
+      `10x` = table(gate_vector[smp.10x]))
+# prop returns original data, because target size ids larger than initial freq
+# 10x  returns sampled data according to initial freq, such as the total amount
+# of other events equals 10x initial freq of pop 14
+</code></pre>
+
+
+</div>

@@ -1,0 +1,208 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hlm_resid.default</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Calculating residuals from HLMs</h2>
+
+<h3>Description</h3>
+
+<p><code>hlm_resid</code> takes a hierarchical linear model fit as a <code>lmerMod</code> or
+<code>lme</code> object and extracts residuals and predicted values from the model,
+using Least Squares (LS) and Empirical Bayes (EB) methods. It then appends
+them to the model data frame in the form of a tibble inspired by the <code>augment</code>
+function in <code>broom</code>. This unified framework enables the analyst to more
+easily conduct an upward residual analysis during model exploration/checking.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">## Default S3 method:
+hlm_resid(object, ...)
+
+## S3 method for class 'lmerMod'
+hlm_resid(
+  object,
+  level = 1,
+  standardize = FALSE,
+  include.ls = TRUE,
+  data = NULL,
+  ...
+)
+
+## S3 method for class 'lme'
+hlm_resid(
+  object,
+  level = 1,
+  standardize = FALSE,
+  include.ls = TRUE,
+  data = NULL,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>object</code></td>
+<td>
+<p>an object of class <code>lmerMod</code> or <code>lme</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>do not use</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>level</code></td>
+<td>
+<p>which residuals should be extracted: 1 for within-group
+(case-level) residuals, the name of a grouping factor for between-group
+residuals (as defined in <code>flist</code> in <code>lmerMod</code> objects or in
+<code>groups</code> in <code>lme</code> objects)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>standardize</code></td>
+<td>
+<p>for any level, if <code>standardize = TRUE</code> the
+standardized residuals will be returned for any group; for level-1 only, if
+<code>standardize = "semi"</code> then the semi-standardized level-1 residuals
+will be returned</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>include.ls</code></td>
+<td>
+<p>a logical indicating if LS residuals be included in the
+return tibble. <code>include.ls = FALSE</code> decreases runtime substantially.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>if <code>na.action = na.exclude</code>, the user must provide the data
+set used to fit the model, otherwise <code>NULL</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The <code>hlm_resid</code> function provides a wrapper that will extract
+residuals and predicted values from a fitted <code>lmerMod</code> or <code>lme</code>
+object. The function provides access to residual quantities already made available by
+the functions <code>resid</code>, <code>predict</code>, and <code>ranef</code>, but adds
+additional functionality. Below is a list of types of residuals and predicted
+values that are extracted and appended to the model data.
+</p>
+
+<dl>
+<dt><strong>level-1 residuals</strong></dt>
+<dd></dd>
+<dt>
+<code>.resid</code> and <code>.fitted</code>
+</dt>
+<dd>
+<p>Residuals calculated using
+the EB method (using maximum likelihood). Level-1 EB residuals are interrelated
+with higher level residuals. Equivalent to the residuals extracted by
+<code>resid(object)</code> and <code>predict(object)</code> respectively. When
+<code>standardize = TRUE</code>, residuals are standardized by sigma components of
+the model object.</p>
+</dd>
+<dt>
+<code>.ls.resid</code> and <code>.ls.fitted</code>
+</dt>
+<dd>
+<p>Residuals calculated calculated
+by fitting separate LS regression models for each group. Level-1 LS residuals
+are unconfounded by higher level residuals, but unreliable for small
+within-group sample sizes.</p>
+</dd>
+<dt>
+<code>.mar.resid</code> and <code>.mar.fitted</code>
+</dt>
+<dd>
+<p>Marginal residuals only
+consider the fixed effect portion of the estimates. Equivalent to
+<code>resid(object, level=0)</code> in <code>nlme</code>, not currently implemented
+within the <code>lme4::resid</code> function. When <code>standardize = TRUE</code>,
+Cholesky marginal residuals are returned.</p>
+</dd>
+<dt>
+<strong>higher-level residuals</strong> (random effects)</dt>
+<dd></dd>
+<dt><code>.ranef.var_name</code></dt>
+<dd>
+<p>The group level random effects using the EB method of
+estimating parameters. Equivalent to <code>ranef(object)</code> on the specified
+level. EB residuals are preferred at higher levels as LS residuals are dependent
+on a large sample size.</p>
+</dd>
+<dt><code>.ls.var_name</code></dt>
+<dd>
+<p>The group level random effects using the LS method of
+estimating parameters. Calculated using <code>ranef</code> on a <code>lmList</code>
+object to compare the random effects of individual models to the global
+model.</p>
+</dd>
+</dl>
+<p>Note that <code>standardize = "semi"</code> is only implemented for level-1 LS residuals.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Adam Loy <a href="mailto:loyad01@gmail.com">loyad01@gmail.com</a>, Jack Moran, Jaylin Lowe
+</p>
+
+
+<h3>References</h3>
+
+<p>Hilden-Minton, J. (1995) Multilevel diagnostics for mixed and hierarchical 
+linear models. University of California Los Angeles.
+</p>
+<p>Houseman, E. A., Ryan, L. M., &amp; Coull, B. A. (2004) 
+Cholesky Residuals for Assessing Normal Errors in a Linear 
+Model With Correlated Outcomes. 
+<em>Journal of the American Statistical Association</em>, 99(466), 383–394.
+</p>
+<p>David Robinson and Alex Hayes (2020). broom: Convert Statistical Analysis
+Objects into Tidy Tibbles. R package version 0.5.6.
+<a href="https://CRAN.R-project.org/package=broom">https://CRAN.R-project.org/package=broom</a>
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>hlm_augment</code>, <code>resid</code>, <code>ranef</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(sleepstudy, package = "lme4")
+fm.lmer &lt;- lme4::lmer(Reaction ~ Days + (Days|Subject), sleepstudy)
+fm.lme &lt;- nlme::lme(Reaction ~ Days, random = ~Days|Subject, sleepstudy)
+
+# level-1 and marginal residuals
+fm.lmer.res1 &lt;- hlm_resid(fm.lmer) ## raw level-1 and mar resids
+fm.lmer.res1
+fm.lme.std1 &lt;- hlm_resid(fm.lme, standardize = TRUE) ## std level-1 and mar resids
+fm.lme.std1
+
+# level-2 residuals
+fm.lmer.res2 &lt;- hlm_resid(fm.lmer, level = "Subject") ## level-2 ranefs
+fm.lmer.res2
+fm.lme.res2 &lt;- hlm_resid(fm.lme, level = "Subject", include.ls = FALSE) ##level-2 ranef, no LS
+fm.lme.res2
+</code></pre>
+
+
+</div>

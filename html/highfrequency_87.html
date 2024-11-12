@@ -1,0 +1,235 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>rRTSCov</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Robust two time scale covariance estimation</h2>
+
+<h3>Description</h3>
+
+<p>Calculate the robust two time scale covariance matrix proposed in Boudt and Zhang (2010).
+Unlike the <code>rOWCov</code>, but similarly to the <code>rThresholdCov</code>, the <code>rRTSCov</code> uses univariate jump detection rules
+to truncate the effect of jumps on the covariance
+estimate. By the use of two time scales, this covariance estimate
+is not only robust to price jumps, but also to microstructure noise and non-synchronic trading.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">rRTSCov(
+  pData,
+  cor = FALSE,
+  startIV = NULL,
+  noisevar = NULL,
+  K = 300,
+  J = 1,
+  KCov = NULL,
+  JCov = NULL,
+  KVar = NULL,
+  JVar = NULL,
+  eta = 9,
+  makePsd = FALSE,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>pData</code></td>
+<td>
+<p>a list. Each list-item i contains an <code>xts</code> object with the intraday price data
+of stock <code class="reqn">i</code> for day <code class="reqn">t</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cor</code></td>
+<td>
+<p>boolean, in case it is <code>TRUE</code>, and the input data is multivariate, the correlation is returned instead of the covariance matrix. <code>FALSE</code> by default.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>startIV</code></td>
+<td>
+<p>vector containing the first step estimates of the integrated variance of the assets, needed in the truncation. Is <code>NULL</code> by default.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>noisevar</code></td>
+<td>
+<p>vector containing the estimates of the noise variance of the assets, needed in the truncation. Is <code>NULL</code> by default.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>K</code></td>
+<td>
+<p>positive integer, slow time scale returns are computed on prices that are <code>K</code> steps apart.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>J</code></td>
+<td>
+<p>positive integer, fast time scale returns are computed on prices that are <code>J</code> steps apart.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>KCov</code></td>
+<td>
+<p>positive integer, for the extradiagonal covariance elements the slow time scale returns are computed on prices that are <code>K</code> steps apart.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>JCov</code></td>
+<td>
+<p>positive integer, for the extradiagonal covariance elements the fast time scale returns are computed on prices that are <code>J</code> steps apart.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>KVar</code></td>
+<td>
+<p>vector of positive integers, for the diagonal variance elements the slow time scale returns are computed on prices that are <code>K</code> steps apart.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>JVar</code></td>
+<td>
+<p>vector of positive integers, for the diagonal variance elements the fast time scale returns are computed on prices that are <code>J</code> steps apart.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>eta</code></td>
+<td>
+<p>positive real number, squared standardized high-frequency returns that exceed eta are detected as jumps.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>makePsd</code></td>
+<td>
+<p>boolean, in case it is <code>TRUE</code>, the positive definite version of rRTSCov is returned. 
+<code>FALSE</code> by default.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>used internally, do not change.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The rRTSCov requires the tick-by-tick transaction prices. 
+(Co)variances are then computed using log-returns calculated on a rolling basis
+on stock prices that are <code class="reqn">K</code> (slow time scale) and <code class="reqn">J</code> (fast time scale) steps apart.
+</p>
+<p>The diagonal elements of the rRTSCov matrix are the variances, computed for log-price series <code class="reqn">X</code> with <code class="reqn">n</code> price observations
+at times <code class="reqn">  \tau_1,\tau_2,\ldots,\tau_n</code> as follows:
+</p>
+<p style="text-align: center;"><code class="reqn">
+(1-\frac{\overline{n}_K}{\overline{n}_J})^{-1}(\{X,X\}_T^{(K)^{*}}-\frac{\overline{n}_K}{\overline{n}_J}\{X,X\}_T^{(J)^{*}}),
+</code>
+</p>
+
+<p>where <code class="reqn">\overline{n}_K=(n-K+1)/K</code>,  <code class="reqn">\overline{n}_J=(n-J+1)/J</code> and
+</p>
+<p style="text-align: center;"><code class="reqn">\{X,X\}_T^{(K)^{*}} =\frac{c_\eta^{*}}{K}\frac{\sum_{i=1}^{n-K+1}(X_{t_{i+K}}-X_{t_i})^2I_X^K(i;\eta)}{\frac{1}{n-K+1}\sum_{i=1}^{n-K+1}I_X^K(i;\eta)}.</code>
+</p>
+
+<p>The constant  <code class="reqn">c_\eta</code> adjusts for the bias due to the thresholding  and <code class="reqn">I_{X}^K(i;\eta)</code> is a jump indicator function
+that is one if
+</p>
+<p style="text-align: center;"><code class="reqn"> \frac{(X_{t_{i+K}}-X_{t_{i}})^2}{(\int_{t_{i}}^{t_{i+K}} \sigma^2_sds +2\sigma_{\varepsilon_{\mbox{\tiny X}}}^2)}  \ \ \leq  \ \    \eta </code>
+</p>
+
+<p>and zero otherwise.  The elements in the denominator are the integrated variance (estimated recursively) and noise variance (estimated by the method in Zhang et al, 2005).
+</p>
+<p>The extradiagonal elements of the rRTSCov are the covariances.
+For their calculation, the data is first synchronized by the refresh time method proposed by Harris et al (1995).
+It uses the function <code>refreshTime</code> to collect first the so-called refresh times at which all assets have traded at least once
+since the last refresh time point. Suppose we have two log-price series:  <code class="reqn">X</code> and <code class="reqn">Y</code>. Let <code class="reqn"> \Gamma =\{ \tau_1,\tau_2,\ldots,\tau_{N^{\mbox{\tiny X}}_{\mbox{\tiny T}}}\}</code> and
+<code class="reqn">\Theta=\{\theta_1,\theta_2,\ldots,\theta_{N^{\mbox{\tiny Y}}_{\mbox{\tiny T}}}\}</code>
+be the set of transaction times of these assets.
+The first refresh time corresponds to the first time at which both stocks have traded, i.e.
+<code class="reqn">\phi_1=\max(\tau_1,\theta_1)</code>. The subsequent refresh time is defined as the first time when both stocks have again traded, i.e.
+<code class="reqn">\phi_{j+1}=\max(\tau_{N^{\mbox{\tiny{X}}}_{\phi_j}+1},\theta_{N^{\mbox{\tiny{Y}}}_{\phi_j}+1})</code>. The
+complete refresh time sample grid is
+<code class="reqn">\Phi=\{\phi_1,\phi_2,...,\phi_{M_N+1}\}</code>, where <code class="reqn">M_N</code> is the total number of paired returns.  The
+sampling points of asset <code class="reqn">X</code> and <code class="reqn">Y</code> are defined to be
+<code class="reqn">t_i=\max\{\tau\in\Gamma:\tau\leq \phi_i\}</code> and
+<code class="reqn">s_i=\max\{\theta\in\Theta:\theta\leq \phi_i\}</code>.
+</p>
+<p>Given these refresh times, the covariance is computed as follows:
+</p>
+<p style="text-align: center;"><code class="reqn">
+c_{N}( \{X,Y\}^{(K)}_T-\frac{\overline{n}_K}{\overline{n}_J}\{X,Y\}^{(J)}_T ),
+</code>
+</p>
+
+<p>where
+</p>
+<p style="text-align: center;"><code class="reqn">\{X,Y\}^{(K)}_T =\frac{1}{K} \frac{\sum_{i=1}^{M_N-K+1}c_i (X_{t_{i+K}}-X_{t_{i}})(Y_{s_{i+K}}-Y_{s_{i}})I_{X}^K(i;\eta)
+I_{Y}^K(i;\eta)}{\frac{1}{M_N-K+1}\sum_{i=1}^{M_N-K+1}{I_X^K(i;\eta)I_Y^K(i;\eta)}},</code>
+</p>
+
+<p>with  <code class="reqn">I_{X}^K(i;\eta)</code> the same jump indicator function as for the variance and <code class="reqn">c_N</code> a constant to adjust for the bias due to the thresholding.
+</p>
+<p>Unfortunately, the rRTSCov is not always positive semidefinite.
+By setting the argument <code>makePsd = TRUE</code>, the function  <code>makePsd</code> is used to return a positive semidefinite
+matrix. This function replaces the negative eigenvalues with zeroes.
+</p>
+
+
+<h3>Value</h3>
+
+<p>an <code class="reqn">N \times N</code> matrix
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup.
+</p>
+
+
+<h3>References</h3>
+
+<p>Boudt K. and Zhang, J. 2010. Jump robust two time scale covariance estimation and realized volatility budgets. Mimeo.
+</p>
+<p>Harris, F., McInish, T., Shoesmith, G., and Wood, R. (1995). Cointegration, error correction, and price discovery on informationally linked security markets. <em>Journal of Financial and Quantitative Analysis</em>, 30, 563-581.
+</p>
+<p>Zhang, L., Mykland, P. A., and Ait-Sahalia, Y. (2005). A tale of two time scales: Determining integrated volatility with noisy high-frequency data. <em>Journal of the American Statistical Association</em>, 100, 1394-1411.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>ICov</code> for a list of implemented estimators of the integrated covariance.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+library(xts)
+set.seed(123)
+start &lt;- strptime("1970-01-01", format = "%Y-%m-%d", tz = "UTC")
+timestamps &lt;- start + seq(34200, 57600, length.out = 23401)
+
+dat &lt;- cbind(rnorm(23401) * sqrt(1/23401), rnorm(23401) * sqrt(1/23401))
+
+dat &lt;- exp(cumsum(xts(dat, timestamps)))
+price1 &lt;- dat[,1]
+price2 &lt;- dat[,2]
+rcRTS &lt;- rRTSCov(pData = list(price1, price2))
+# Note: List of prices as input
+rcRTS
+
+## End(Not run)
+</code></pre>
+
+
+</div>

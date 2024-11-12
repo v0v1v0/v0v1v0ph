@@ -1,0 +1,244 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>bootLOPR</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Bootstrap Lasso OLS Partial Ridge
+</h2>
+
+<h3>Description</h3>
+
+<p>Combines residual (or paired) bootstrap Lasso+Partial Ridge and residual (or paired) bootstrap Lasso+OLS, and produces confidence intervals for regression coefficients.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">bootLOPR(x, y, lambda2, B = 500, type.boot = "residual", thres = 0.5, alpha = 0.05, 
+         OLS = TRUE, cv.method = "cv", nfolds = 10, foldid, cv.OLS = TRUE, tau = 0, 
+         parallel = FALSE, standardize = TRUE, intercept = TRUE, parallel.boot = 
+         FALSE, ncores.boot = 1, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+
+<p>Input matrix as in glmnet, of dimension nobs x nvars; each row is an observation vector.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+
+<p>Response variable.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lambda2</code></td>
+<td>
+
+<p>Tuning parameter in the Partial Ridge. If missing, lambda2 will be set to 1/nobs, where nobs is the number of observations.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>B</code></td>
+<td>
+
+<p>Number of replications in the bootstrap – default is 500.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>type.boot</code></td>
+<td>
+
+<p>Bootstrap method which can take one of the following two values: "residual" or "paired". The default is residual.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>thres</code></td>
+<td>
+
+<p>A threshold parameter. For the variables/predictors with selection probability (obtained by bootstrap) larger than thres, this function uses bootstrap Lasso+OLS (if OLS=TRUE) or bootstrap Lasso (if OLS=FALSE) to produce confidence intervals; while, for the variables/predictors with selection probability (obtained by bootstrap) smaller than thres, this function uses bootstrap Lasso+Partial Ridge to produce confidence intervals.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alpha</code></td>
+<td>
+
+<p>Significance level – default is 0.05.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>OLS</code></td>
+<td>
+
+<p>If TRUE, this function uses Lasso+OLS estimator to compute the residuals for residual bootstrap Lasso+Partial Ridge; otherwise, it uses Lasso estimator to compute the residuals for residual bootstrap Lasso+Partial Ridge. The default value is TRUE. This argument can be ignored for paired bootstrap Lasso+Partial Ridge.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cv.method</code></td>
+<td>
+
+<p>The method used to select lambda in the Lasso – can be cv, cv1se, and escv; the default is cv.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nfolds, foldid, cv.OLS, tau, parallel</code></td>
+<td>
+
+<p>Arguments that can be passed to escv.glmnet.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>standardize</code></td>
+<td>
+
+<p>Logical flag for x variable standardization, prior to fitting the model. Default is standardize=TRUE.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>intercept</code></td>
+<td>
+
+<p>Should intercept be fitted (default is TRUE) or set to zero (FALSE).
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>parallel.boot</code></td>
+<td>
+
+<p>If TRUE, use parallel foreach to run the bootstrap replication. Must register parallel before hand, such as doParallel or others. See the example below.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ncores.boot</code></td>
+<td>
+
+<p>Number of cores used in the bootstrap replication.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+
+<p>Other arguments that can be passed to glmnet.
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The function combines the performance of bootstrap Lasso+Partial Ridge and bootstrap Lasso+OLS (if OLS=TRUE). For "large" regression coefficient in the sense that their selection probability (obtained by bootstrap) is larger than a threshold value (thres), it uses bootstrap Lasso+OLS to produce confidence intervals which can decrease the interval length ; while, for "small" regression coefficients meaning that their selection probability (obtained by bootstrap) is smaller than a threshold value (thres), it uses bootstrap Lasso+Partial Ridge to produce confidence intervals which can guarantee coverage. Note that there are two arguments related to parallel, "parallel" and "parallel.boot": "parallel" is used for parallel foreach in the escv.glmnet; while, "paralle.boot" is used for the parallel foreach in the bootstrap replication precodure.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A list consisting of the following elements is returned.
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>lambda.opt</code></td>
+<td>
+
+<p>The optimal value of lambda selected by cv/cv1se/escv.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Beta</code></td>
+<td>
+
+<p>Lasso+OLS (if OLS=TRUE) or Lasso (if OLS=FALSE) estimate of the regression coefficients.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Beta.LPR</code></td>
+<td>
+
+<p>Lasso+Partial Ridge estimate of the regression coefficients. 
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>interval</code></td>
+<td>
+
+<p>A 2 by p matrix containing the bootstrap Lasso+OLS (if OLS=TRUE) or bootstrap Lasso (if OLS=FALSE) confidence intervals – the first row is the lower bounds of the confidence intervals for each of the coefficients and the second row is the upper bounds of the confidence intervals.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>interval.LPR</code></td>
+<td>
+
+<p>A 2 by p matrix containing the bootstrap Lasso+Partial Ridge confidence intervals – the first row is the lower bounds of the confidence intervals for each of the coefficients and the second row is the upper bounds of the confidence intervals. 
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>interval.LOPR</code></td>
+<td>
+
+<p>A 2 by p matrix containing the combining confidence intervals of bootstrap Lasso+Partial Ridge and bootstrap Lasso+OLS (or bootstrap Lasso if OLS=FALSE) – the first row is the lower bounds of the confidence intervals for each of the coefficients and the second row is the upper bounds of the confidence intervals.
+</p>
+</td>
+</tr>
+</table>
+<h3>Examples</h3>
+
+<pre><code class="language-R">library("glmnet")
+library("mvtnorm") 
+
+## generate the data
+set.seed(2015)
+n &lt;- 200      # number of obs
+p &lt;- 500
+s &lt;- 10
+beta &lt;- rep(0, p)
+beta[1:s] &lt;- runif(s, 1/3, 1)
+x &lt;- rmvnorm(n = n, mean = rep(0, p), method = "svd")
+signal &lt;- sqrt(mean((x %*% beta)^2))
+sigma &lt;- as.numeric(signal / sqrt(10))  # SNR=10
+y &lt;- x %*% beta + rnorm(n)
+
+## residual bootstrap Lasso OLS + Partial Ridge
+set.seed(0)
+obj &lt;- bootLOPR(x = x, y = y, B = 10)
+# confidence interval
+obj$interval
+sum((obj$interval[1,]&lt;=beta) &amp; (obj$interval[2,]&gt;=beta))
+
+## using parallel in the bootstrap replication
+#library("doParallel")
+#registerDoParallel(2)
+#set.seed(0)
+#system.time(obj &lt;- bootLOPR(x = x, y = y))
+#system.time(obj &lt;- bootLOPR(x = x, y = y, parallel.boot = TRUE, ncores.boot = 2))
+
+</code></pre>
+
+
+</div>

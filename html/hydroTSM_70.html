@@ -1,0 +1,330 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>fdc</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Flow Duration Curve
+</h2>
+
+<h3>Description</h3>
+
+<p>Computes and plots the Flow Duration Curve (<abbr><span class="acronym">FDC</span></abbr>) corresponding to a given time series of streamflow discharges. 
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">fdc(x, ...)
+
+## Default S3 method:
+fdc(x,lQ.thr=0.7,hQ.thr=0.2, plot=TRUE, log="y", 
+    main="Flow Duration Curve", xlab="% Time flow equalled or exceeded", 
+    ylab="Q, [m3/s]", ylim, yat=c(0.01, 0.1, 1), xat=c(0.01, 0.025, 0.05), col="black", 
+    pch=1, lwd=1, lty=1, cex=0.4, cex.axis=1.2, cex.lab=1.2, leg.txt=NULL, leg.cex=1, 
+    leg.pos="topright", verbose= TRUE, thr.shw=TRUE, new=TRUE, ...)
+
+## S3 method for class 'matrix'
+fdc(x, lQ.thr=0.7, hQ.thr=0.2, plot=TRUE, log="y", 
+    main= "Flow Duration Curve",  xlab="% Time flow equalled or exceeded", 
+    ylab="Q, [m3/s]", ylim, yat=c(0.01, 0.1, 1), xat=c(0.01, 0.025, 0.05), 
+    col=palette("default")[1:ncol(x)], pch=1:ncol(x), lwd=rep(1, ncol(x)), 
+    lty=1:ncol(x), cex=0.4, cex.axis=1.2, cex.lab=1.2, leg.txt=NULL, 
+    leg.cex=1, leg.pos="topright",verbose=TRUE, thr.shw=TRUE, new=TRUE, ...)
+
+## S3 method for class 'data.frame'
+fdc(x, lQ.thr=0.7, hQ.thr=0.2, plot=TRUE, log="y", 
+     main= "Flow Duration Curve", xlab="% Time flow equalled or exceeded", 
+     ylab="Q, [m3/s]", ylim, yat=c(0.01, 0.1, 1), xat=c(0.01, 0.025, 0.05), 
+     col=palette("default")[1:ncol(x)], pch=1:ncol(x), lwd=rep(1, ncol(x)), 
+     lty=1:ncol(x), cex=0.4, cex.axis=1.2, cex.lab=1.2, leg.txt=NULL, 
+     leg.cex=1, leg.pos="topright", verbose=TRUE, thr.shw=TRUE, new=TRUE, ...)
+     
+## S3 method for class 'zoo'
+fdc(x, lQ.thr=0.7, hQ.thr=0.2, plot=TRUE, log="y", 
+     main= "Flow Duration Curve", xlab="% Time flow equalled or exceeded", 
+     ylab="Q, [m3/s]", ylim, yat=c(0.01, 0.1, 1), xat=c(0.01, 0.025, 0.05), 
+     col=palette("default")[1:NCOL(x)], pch=1:NCOL(x), lwd=rep(1, NCOL(x)), 
+     lty=1:NCOL(x), cex=0.4, cex.axis=1.2, cex.lab=1.2, leg.txt=NULL, 
+     leg.cex=1, leg.pos="topright", verbose=TRUE, thr.shw=TRUE, new=TRUE, ...)
+
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+
+<p>numeric, zoo, data.frame or matrix object with the observed streamflows for which the flow duration curve have to be computed. <br>
+Measurements at several gauging stations can be stored in a data.frame of matrix object, and in that case, each column of <code>x</code> represent the time series measured in each gauging station, and the column names of <code>x</code> have to correspond to the ID of each station (starting by a letter). When <code>x</code> is a matrix or data.frame, the flow duration curve is computed for each column.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lQ.thr</code></td>
+<td>
+
+<p>numeric, low-flow separation threshold. If this value is different from NA, a vertical line is drawn in this value, and all the values to the right of it should be deemed as low flows. Default value is 0.7.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>hQ.thr</code></td>
+<td>
+
+<p>numeric, high-flow separation threshold. If this value is different from NA, a vertical line is drawn in this value, and all the values to the left of it should br deemed as high flows. Default value is 0.2.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>plot</code></td>
+<td>
+
+<p>logical. Indicates if the flow duration curve should be plotted or not. Default value is TRUE.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>log</code></td>
+<td>
+
+<p>character, indicates which axis has to be plotted with a logarithmic scale. Default value is <kbd>y</kbd> 
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>main</code></td>
+<td>
+
+<p>See <code>plot</code>. An overall title for the plot: see <code>title</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>xlab</code></td>
+<td>
+
+<p>A title for the x axis. See <code>plot</code>. 
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ylab</code></td>
+<td>
+
+<p>A title for the y axis. See <code>plot</code>. 
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ylim</code></td>
+<td>
+
+<p>The y limits of the plot. See <code>plot.default</code>. 
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>yat</code></td>
+<td>
+
+<p>Only used when <code>log="y"</code>. <br>
+numeric, with points at which tick-marks will try to be drawn in the Y axis, in addition to the defaults computed by R. See the <code>at</code> argument in <code>Axis</code>. 
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>xat</code></td>
+<td>
+
+<p>Only used when <code>log="x"</code>. <br>
+numeric, with points at which tick-marks will try to be drawn in the x axis, in addition to the defaults computed by R. See the <code>at</code> argument in <code>Axis</code>. 
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>col</code></td>
+<td>
+
+<p>The colors to be used for lines and points. Multiple colors can be specified so that each point can be given its own color. If there are fewer colors than points they are recycled in the standard fashion. Lines will all be plotted in the first colour specified. See <code>plot.default</code>. 
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pch</code></td>
+<td>
+
+<p>A vector of plotting characters or symbols: see <code>points</code>. See <code>plot.default</code>. 
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lwd</code></td>
+<td>
+
+<p>The line width, see <code>par</code>. See <code>plot.default</code>. 
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lty</code></td>
+<td>
+
+<p>The line type, see <code>par</code>. See <code>plot.default</code>. 
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cex</code></td>
+<td>
+
+<p>See <code>plot.default</code>. A numerical vector giving the amount by which plotting characters and symbols should be scaled relative to the default.  <br>
+This works as a multiple of <span class="env">par("cex")</span>. 'NULL' and 'NA' are equivalent to '1.0'.  Note that this does not affect annotation
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cex.axis</code></td>
+<td>
+
+<p>magnification of axis annotation relative to 'cex'.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cex.lab</code></td>
+<td>
+
+<p>Magnification to be used for x and y labels relative to the current setting of 'cex'. See '?par'.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>leg.txt</code></td>
+<td>
+
+<p>vector with the names that have to be used for each column of <code>x</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>leg.cex</code></td>
+<td>
+
+<p>numeric, indicating the character expansion factor for the legend, *relative* to current <code>par("cex")</code>. Default value = 1
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>leg.pos</code></td>
+<td>
+
+<p>keyword to be used to position the legend. One of the list ‘"bottomright", "bottom", "bottomleft", "left", "topleft", "top", "topright", "right", "center"’. This places the legend on the inside of the plot frame at the given location. See <code>legend</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+
+<p>logical; if TRUE, progress messages are printed (when <code>x</code> is a matrix or data.frame). 
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>thr.shw</code></td>
+<td>
+
+<p>logical, indicating if the streamflow values corresponding to the user-defined thresholds <code>lQ.thr</code> and <code>hQ.thr</code> have to be shown in the plot.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>new</code></td>
+<td>
+
+<p>logical, if TRUE (default), a new plotting window is created. 
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+
+<p>further arguments passed to or from other methods (to the plotting functions)
+</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>numeric, matrix or data.frame whose columns contains the % of time each one of the streamflow magnitudes given as input was equalled or exceeded. The resulting values have to be multiplied by 100 to get a percentage. <br></p>
+<p>When <code>plot</code> is TRUE (default), the resulting flow duration curve is plotted in a new window.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Mauricio Zambrano-Bigiarini, <a href="mailto:mzb.devel@gmail">mzb.devel@gmail</a>
+</p>
+
+
+<h3>References</h3>
+
+<p><cite>Vogel, R., and N. M. Fennessey (1994), Flow duration curves I: A new interpretation and confidence intervals, ASCE, Journal of Water Resources Planning and Management, 120(4)</cite>. <br></p>
+<p><cite>Vogel, R., and N. Fennessey (1995), Flow duration curves II: A review of applications in water resources planning, Water Resources Bulletin, 31(6), 1029-1039, doi:10.1111/j.1752-1688.1995.tb03419.x</cite>. <br></p>
+<p><cite>Yilmaz, K. K., H. V. Gupta, and T. Wagener  (2008), A process-based diagnostic approach to model evaluation: Application to the NWS distributed hydrologic model, Water Resour. Res., 44, W09417, doi:10.1029/2007WR006716</cite>.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>fdcu</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Loading daily streamflows at the station Oca en Ona (Ebro River basin, Spain) ##
+data(OcaEnOnaQts)
+
+## Daily Flow Duration Curve
+fdc(OcaEnOnaQts)
+
+###################
+# Getting the streamflow values corresponding to 5 and 95% of time equalled or 
+# exceeded (and also the first streamflow value in 'x' just for verification)
+x  &lt;- OcaEnOnaQts
+
+# First streamflow value (x1=42.1 m3/s)
+x1 &lt;- x[1]
+
+# Daily FDC for 'x'
+y &lt;- fdc(x)
+
+# value of the FDC for x1 (y1=0.002739726)
+y1 &lt;- y[1]
+
+# Performing cubic (or Hermite) spline interpolation of 'x' and 'y'
+f &lt;- splinefun(y,x)
+
+# Getting the (known) streamflow value for 'y1'
+f(y1) # 42.1 m3/s, equal to the known 'x1'
+
+# Streamflow values corresponding to 5 and 95% of time equalled or exceeded
+f(c(.05, .95))
+
+###################
+## Getting 
+data(OcaEnOnaQts)
+
+## Daily Flow Duration Curve
+fdc(OcaEnOnaQts)
+</code></pre>
+
+
+</div>

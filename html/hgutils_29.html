@@ -1,0 +1,105 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>inclusion_flowchart</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Patient flowchart</h2>
+
+<h3>Description</h3>
+
+<p>Creates a patient flowchart which visualizes exclusions and updates the dataset.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">inclusion_flowchart(
+  dataset,
+  node_text = "%s eligable patients",
+  stratum = NULL
+)
+
+exclude_patients(
+  flowchart,
+  dataset,
+  exclusion_criterium,
+  reason = deparse(substitute(exclusion_criterium)),
+  node_text = "%s eligable patients",
+  excluded_text = "%s excluded"
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>dataset</code></td>
+<td>
+<p>The dataset, must be a data.frame.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>node_text</code></td>
+<td>
+<p>The text of the starting node, must be a string which can be interpreted by sprintf.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>stratum</code></td>
+<td>
+<p>An optional stratum, must be variable in dataset.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>flowchart</code></td>
+<td>
+<p>The flowchart object.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>exclusion_criterium</code></td>
+<td>
+<p>A boolean statement which is used to select patients to be discarded from the dataset.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>reason</code></td>
+<td>
+<p>An optional string to specify why patients were excluded. Defaults to the exclusion criterium.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>excluded_text</code></td>
+<td>
+<p>The text of the exclusion node, must be a string which can be interpreted by <code>sprintf</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A flowchart (when creating the flowchart), or updated dataset (when excluding patients).
+</p>
+
+
+<h3>Note</h3>
+
+<p>When excluding patients, the flowchart is updated 'behind the scenes' and is not returned.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+dataset = survival::lung; dataset$sex = factor(dataset$sex,labels=c("male","female"))
+flowchart = inclusion_flowchart(dataset)
+dataset = exclude_patients(flowchart, dataset, status==1) #exclude all patients who did not die
+dataset = exclude_patients(flowchart, dataset, time&lt;100) #exclude patients with a short follow-up
+flowchart #print diagram
+
+## End(Not run)
+</code></pre>
+
+
+</div>

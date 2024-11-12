@@ -1,0 +1,119 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>MC.Xmcupo.statistics</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Size and Power of Several Sample RAD-Probability Mean Test Comparisons: Unknown Vector of Proportion</h2>
+
+<h3>Description</h3>
+
+<p>This Monte-Carlo simulation procedure provides the power and size of the several sample RAD-probability mean test 
+comparisons without reference vector of proportions, using the Generalized Wald-type statistics.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">	MC.Xmcupo.statistics(group.Nrs, numMC = 10, pi0, group.pi, group.theta, 
+		type = "ha", siglev = 0.05)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>group.Nrs</code></td>
+<td>
+<p>A list specifying the number of reads/sequence depth for each sample in a group with one group per list entry.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>numMC</code></td>
+<td>
+<p>Number of Monte-Carlo experiments.  In practice this should be at least 1,000.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pi0</code></td>
+<td>
+<p>The RAD-probability mean vector.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>group.pi</code></td>
+<td>
+
+<p>If <code>"hnull"</code>: This argument is ignored. <br>
+If <code>"ha"</code>: A matrix where each row is a vector pi values for each group.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>group.theta</code></td>
+<td>
+<p>A vector of overdispersion values for each group.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>type</code></td>
+<td>
+
+<p>If <code>"hnull"</code>: Computes the size of the test.<br>
+If <code>"ha"</code>: Computes the power of the test. (default)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>siglev</code></td>
+<td>
+<p>Significance level for size of the test / power calculation. The default is 0.05.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Note: Though the test statistic supports an unequal number of reads across samples, the performance has not yet been fully tested.
+</p>
+
+
+<h3>Value</h3>
+
+<p>Size of the test statistics (under <code>"hnull"</code>) or power (under <code>"ha"</code>) of the test.</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">	data(saliva) 
+	data(throat) 
+	data(tonsils)
+	
+	### Get a list of dirichlet-multinomial parameters for the data
+	fit.saliva &lt;- DM.MoM(saliva) 
+	fit.throat &lt;- DM.MoM(throat)
+	fit.tonsils &lt;- DM.MoM(tonsils) 
+	
+	### Set up the number of Monte-Carlo experiments
+	### We use 1 for speed, should be at least 1,000
+	numMC &lt;- 1
+	
+	### Generate the number of reads per sample
+	### The first number is the number of reads and the second is the number of subjects
+	Nrs1 &lt;- rep(12000, 10)
+	Nrs2 &lt;- rep(12000, 19)
+	group.Nrs &lt;- list(Nrs1, Nrs2)
+	
+	group.theta &lt;- c(fit.throat$theta, fit.tonsils$theta)
+	pi0 &lt;- fit.saliva$pi
+	
+	### Computing size of the test statistics (Type I error)
+	pval1 &lt;- MC.Xmcupo.statistics(group.Nrs, numMC, pi0, group.theta=group.theta, type="hnull")
+	pval1
+	
+	### Computing Power of the test statistics (Type II error)
+	group.pi &lt;- rbind(fit.throat$pi, fit.tonsils$pi)
+	pval2 &lt;- MC.Xmcupo.statistics(group.Nrs, numMC, group.pi=group.pi, group.theta=group.theta)
+	pval2
+</code></pre>
+
+
+</div>

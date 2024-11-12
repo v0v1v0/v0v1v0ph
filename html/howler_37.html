@@ -1,0 +1,122 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>howlerServer</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Update howler.js Server-Side</h2>
+
+<h3>Description</h3>
+
+<p>Change the state of the howler player from the server.
+</p>
+<p><code>playHowl</code>, <code>pauseHowl</code>, <code>togglePlayHowl</code> and <code>stopHowl</code>
+will all be applied to the current track.
+</p>
+<p><code>changeTrack</code> will update the track to the file specified.
+</p>
+<p><code>addTrack</code> will add a new track to the specified player.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">changeTrack(id, track, session = getDefaultReactiveDomain())
+
+addTrack(id, track, play_track = FALSE, session = getDefaultReactiveDomain())
+
+deleteTrack(id, track, session = getDefaultReactiveDomain())
+
+playHowl(id, session = getDefaultReactiveDomain())
+
+pauseHowl(id, session = getDefaultReactiveDomain())
+
+togglePlayHowl(id, session = getDefaultReactiveDomain())
+
+stopHowl(id, session = getDefaultReactiveDomain())
+
+seekHowl(id, seek, session = getDefaultReactiveDomain())
+
+changeHowlSpeed(id, rate = 1, session = getDefaultReactiveDomain())
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>id</code></td>
+<td>
+<p>ID of the <code>howler</code> to update</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>track</code></td>
+<td>
+<p>Either the track name of the file to change to, or the index of the file to play.
+If the file is not included in the player nothing will happen.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>session</code></td>
+<td>
+<p>Shiny session</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>play_track</code></td>
+<td>
+<p>Logical, should the new track be played on addition?</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>seek</code></td>
+<td>
+<p>Time (in seconds) to set the position of the track</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rate</code></td>
+<td>
+<p>Rate (from 0.5 to 4.0) of the audio playback speed</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>For 'deleteTrack', make sure that the name is used of the track
+rather than the file name.
+</p>
+
+
+<h3>Value</h3>
+
+<p>Updates the the state of the specified <code>howler</code> in the shiny application.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">if (interactive()) {
+  library(shiny)
+
+  tracks &lt;- c("audio/track1.mp3", "audio/track2.mp3")
+
+  ui &lt;- fluidPage(
+    title = "howler.js Player",
+    selectInput("track", "Select Track", basename(tracks)),
+    howler(elementId = "howler", tracks),
+    howlerPlayPauseButton("howler")
+  )
+
+  server &lt;- function(input, output) {
+    observeEvent(input$track, changeHowlerTrack("howler", input$track))
+  }
+
+  runShiny(ui, server)
+}
+
+</code></pre>
+
+
+</div>

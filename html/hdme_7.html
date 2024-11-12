@@ -1,0 +1,149 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>cv_gds</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Cross-Validated Generalized Dantzig Selector</h2>
+
+<h3>Description</h3>
+
+<p>Generalized Dantzig Selector with cross-validation.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">cv_gds(
+  X,
+  y,
+  family = "gaussian",
+  no_lambda = 10,
+  lambda = NULL,
+  n_folds = 5,
+  weights = rep(1, length(y))
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>X</code></td>
+<td>
+<p>Design matrix.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+<p>Vector of the continuous response value.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>family</code></td>
+<td>
+<p>Use "gaussian" for linear regression, "binomial" for logistic
+regression and "poisson" for Poisson regression.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>no_lambda</code></td>
+<td>
+<p>Length of the vector <code>lambda</code> of regularization
+parameters. Note that if <code>lambda</code> is not provided, the actual number
+of values might differ slightly, due to the algorithm used by
+<code>glmnet::glmnet</code> in finding a grid of <code>lambda</code> values.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lambda</code></td>
+<td>
+<p>Regularization parameter. If not supplied and if
+<code>no_lambda &gt; 1</code>, a sequence of <code>no_lambda</code> regularization
+parameters is computed with <code>glmnet::glmnet</code>. If <code>no_lambda = 1</code>
+then the cross-validated optimum for the lasso is computed using
+<code>glmnet::cv.glmnet</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n_folds</code></td>
+<td>
+<p>Number of cross-validation folds to use.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>weights</code></td>
+<td>
+<p>A vector of weights for each row of <code>X</code>. Defaults to 1
+per observation.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Cross-validation loss is calculated as the deviance of the model divided
+by the number of observations.
+For the Gaussian case, this is the mean squared error. Weights supplied
+through the <code>weights</code> argument are used both in fitting the models
+and when evaluating the test set deviance.
+</p>
+
+
+<h3>Value</h3>
+
+<p>An object of class <code>cv_gds</code>.
+</p>
+
+
+<h3>References</h3>
+
+<p>Candes E, Tao T (2007).
+“The Dantzig selector: Statistical estimation when p is much larger than n.”
+<em>Ann. Statist.</em>, <b>35</b>(6), 2313–2351.
+</p>
+<p>James GM, Radchenko P (2009).
+“A generalized Dantzig selector with shrinkage tuning.”
+<em>Biometrika</em>, <b>96</b>(2), 323-337.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+# Example with logistic regression
+n &lt;- 1000  # Number of samples
+p &lt;- 10 # Number of covariates
+X &lt;- matrix(rnorm(n * p), nrow = n) # True (latent) variables # Design matrix
+beta &lt;- c(seq(from = 0.1, to = 1, length.out = 5), rep(0, p-5)) # True regression coefficients
+y &lt;- rbinom(n, 1, (1 + exp(-X %*% beta))^(-1)) # Binomially distributed response
+cv_fit &lt;- cv_gds(X, y, family = "binomial", no_lambda = 50, n_folds = 10)
+print(cv_fit)
+plot(cv_fit)
+
+# Now fit a single GDS at the optimum lambda value determined by cross-validation
+fit &lt;- gds(X, y, lambda = cv_fit$lambda_min, family = "binomial")
+plot(fit)
+
+# Compare this to the fit for which lambda is selected by GDS
+# This automatic selection is performed by glmnet::cv.glmnet, for
+# the sake of speed
+fit2 &lt;- gds(X, y, family = "binomial")
+
+The following plot compares the two fits.
+library(ggplot2)
+library(tidyr)
+df &lt;- data.frame(fit = fit$beta, fit2 = fit2$beta, index = seq(1, p, by = 1))
+ggplot(gather(df, key = "Model", value = "Coefficient", -index),
+       aes(x = index, y = Coefficient, color = Model)) +
+       geom_point() +
+       theme(legend.title = element_blank())
+
+
+## End(Not run)
+
+</code></pre>
+
+
+</div>

@@ -1,0 +1,183 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>get_physchem_param</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Get physico-chemical parameters from chem.physical_and_invitro.data table</h2>
+
+<h3>Description</h3>
+
+<p>This function retrieves physico-chemical properties ("param") for the 
+chemical specified by chem.name or chem.cas from the table
+<code>chem.physical_and_invitro.data</code>. This 
+function is distinguished from <code>get_invitroPK_param</code> in that
+there are no species-specific values. Physically meaningful values for 
+ionization equilibria are NA/none (that is, no ionization), a single value, 
+or a series of values separated by commas. If logMA (log10 membrane affinity) 
+is NA, we use calc_ma() to predict it later on in the model parameterization 
+functions.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">get_physchem_param(param, chem.name = NULL, chem.cas = NULL, dtxsid = NULL)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>param</code></td>
+<td>
+<p>The desired parameters, a vector or single value.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>chem.name</code></td>
+<td>
+<p>The chemical names that you want parameters for, a vector or single value</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>chem.cas</code></td>
+<td>
+<p>The chemical CAS numbers that you want parameters for, a vector or single value</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dtxsid</code></td>
+<td>
+<p>EPA's 'DSSTox Structure ID (https://comptox.epa.gov/dashboard)
+the chemical must be identified by either CAS, name, or DTXSIDs</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Note that this function works with a local version of the 
+<code>chem.physical_and_invitro.data</code> table to allow users to 
+add/modify chemical
+data (for example, adding new data via <code>add_chemtable</code> or 
+loading in silico predictions distributed with httk via
+<code>load_sipes2017</code>, <code>load_pradeep2020</code>,
+<code>load_dawson2021</code>, or <code>load_honda2023</code>).
+</p>
+<p>User can request the following via argument param (case-insensitive):
+</p>
+
+<table>
+<tr>
+<td style="text-align: left;">
+<strong>Parameter</strong> </td>
+<td style="text-align: left;"> <strong>Description</strong> </td>
+<td style="text-align: left;"> <strong>Units</strong> </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+MW  </td>
+<td style="text-align: left;"> Molecular weight </td>
+<td style="text-align: left;"> g/mole </td>
+</tr>
+<tr>
+<td style="text-align: left;"> 
+pKa_Donor </td>
+<td style="text-align: left;"> Hydrogen donor ionization equilibria (acidic pKa) </td>
+<td style="text-align: left;"> pH </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+pKa_Accept </td>
+<td style="text-align: left;"> Hyrdogen acceptor ionization equilibria (basic pKa </td>
+<td style="text-align: left;"> pH </td>
+</tr>
+<tr>
+<td style="text-align: left;"> 
+logMA </td>
+<td style="text-align: left;"> log10 Membrane Affinity </td>
+<td style="text-align: left;"> unitless </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+logP </td>
+<td style="text-align: left;"> log10 Octanol:Water Partition Coefficient (hydrophobicity) </td>
+<td style="text-align: left;"> unitless </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+logPwa </td>
+<td style="text-align: left;"> log10 Water:Air Partition Coefficient </td>
+<td style="text-align: left;"> unitless </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+logHenry </td>
+<td style="text-align: left;"> log10 Henry's Law Constant </td>
+<td style="text-align: left;"> atm-m3/mole </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+logWSol </td>
+<td style="text-align: left;"> log10 Water Solubility </td>
+<td style="text-align: left;"> moles/L: Water solubility at 25C </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+MP </td>
+<td style="text-align: left;"> Melting point </td>
+<td style="text-align: left;">  deg C </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>The parameters, either a single value, a named list for a single chemical, or a list of lists
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>John Wambaugh and Robert Pearce
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>chem.physical_and_invitro.data</code>
+</p>
+<p><code>get_invitroPK_param</code>
+</p>
+<p><code>add_chemtable</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+get_physchem_param(param = 'logP', chem.cas = '80-05-7')
+get_physchem_param(param = c('logP','MW'), chem.cas = c('80-05-7','81-81-2'))
+# This function should be case-insensitive:
+try(get_physchem_param(chem.cas="80-05-7","LogP"))
+# Asking for a parameter we "don't" have produces an error:
+try(get_physchem_param(chem.cas="80-05-7","MA"))
+get_physchem_param(chem.cas="80-05-7","logMA")
+# Ionization equilibria can be NA/none, a single value, or a series of values
+# separated by commas:
+get_physchem_param(chem.cas="80-05-7","pKa_Donor")
+get_physchem_param(chem.cas="80-05-7","pKa_Accept")
+get_physchem_param(chem.cas="71751-41-2","pKa_Donor")
+get_physchem_param(chem.cas="71751-41-2","pKa_Accept")
+# If logMA (log10 membrane affinity) is NA, we use calc_ma() to predict it
+# in the parameterization functions:
+get_physchem_param(chem.cas="71751-41-2","logMA")
+parameterize_steadystate(chem.cas="71751-41-2")
+
+</code></pre>
+
+
+</div>

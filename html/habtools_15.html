@@ -1,0 +1,106 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>fd</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Calculate fractal dimension</h2>
+
+<h3>Description</h3>
+
+<p>Calculate fractal dimension
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">fd(data, method, lvec, keep_data = FALSE, diagnose = FALSE, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>Digital elevation model of class RasterLayer or a triangular mesh of class mesh3d.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+<p>If data is a RasterLayer, possible methods are:"hvar", "area", "sd", and "cubes" (defaults to "hvar").
+If data is a mesh3d, possible methods are "cubes" and "area" (defaults to "cubes").</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lvec</code></td>
+<td>
+<p>Vector of scales to use for calculation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>keep_data</code></td>
+<td>
+<p>Logical. Keep data? Default is FALSE.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>diagnose</code></td>
+<td>
+<p>Logical. Show diagnostic plot and metrics?</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Arguments from method-specific fd_ functions.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Calculates fractal dimension using the specified method.
+Note that methods are distinctly different and should not be mixed when comparing values for multiple objects.
+See <code>fd_hvar()</code>, <code>fd_area()</code>, <code>fd_cubes()</code>, <code>fd_sd()</code> for details about each method.
+If <code>lvec</code> is not specified, a default based on resolution, extent, and method will be used.
+The <code>cubes</code> method is not recommended if the height range is much smaller than the extent of a 3d object or DEM, which is typically the case for DEMs.
+Most objects and surfaces are not perfectly fractal. It is recommended to investigate scale transitions by setting diagnose to TRUE.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A value for fractal dimension, typically between 2 and 3 or a list if keep_data = TRUE.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>fd_hvar()</code>
+</p>
+<p><code>fd_area()</code>
+</p>
+<p><code>fd_sd()</code>
+</p>
+<p><code>fd_cubes()</code>
+</p>
+<p><code>fd_diagnose()</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+dem &lt;- dem_crop(horseshoe, x0 = -469, y0 = 1267, L = 2, plot = TRUE)
+fd(dem, method = "hvar", lvec = c(0.125, 0.25, 0.5, 1, 2))
+fd(dem, method = "area", diagnose = TRUE)
+fd(dem, method = "sd")
+fd(mcap2, method = "cubes",  plot = TRUE)
+fd(mcap2, method = "area",  diagnose = TRUE)
+
+</code></pre>
+
+
+</div>

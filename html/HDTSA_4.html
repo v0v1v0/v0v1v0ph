@@ -1,0 +1,131 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>Factors</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Factor modeling: Inference for the number of factors</h2>
+
+<h3>Description</h3>
+
+<p><code>Factors()</code> deals with factor modeling for high-dimensional
+time series proposed in Lam and Yao (2012):</p>
+<p style="text-align: center;"><code class="reqn">{\bf y}_t = {\bf Ax}_t +
+{\boldsymbol{\epsilon}}_t, </code>
+</p>
+<p> where <code class="reqn">{\bf x}_t</code> is an <code class="reqn">r \times 1</code>
+latent process with (unknown) <code class="reqn">r \leq p</code>, <code class="reqn">{\bf A}</code> is a <code class="reqn">p
+\times r</code> unknown constant matrix, and <code class="reqn"> {\boldsymbol{\epsilon}}_t \sim
+\mathrm{WN}({\boldsymbol{\mu}}_{\epsilon}, {\bf \Sigma}_{\epsilon})</code> is a
+vector white noise process. The number of factors <code class="reqn">r</code> and the factor
+loadings <code class="reqn">{\bf A}</code> can be estimated in terms of an eigenanalysis for a
+nonnegative definite matrix, and is therefore applicable when the dimension
+of <code class="reqn">{\bf y}_t</code> is on the order of a few thousands. This function aims to
+estimate the number of factors <code class="reqn">r</code> and the factor loading matrix
+<code class="reqn">{\bf A}</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">Factors(Y, lag.k = 5, twostep = FALSE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>Y</code></td>
+<td>
+<p><code class="reqn">{\bf Y} = \{{\bf y}_1, \dots , {\bf y}_n \}'</code>, a data matrix
+with <code class="reqn">n</code> rows and <code class="reqn">p</code> columns, where <code class="reqn">n</code> is the sample size and
+<code class="reqn">p</code> is the dimension of <code class="reqn">{\bf y}_t</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lag.k</code></td>
+<td>
+<p>Time lag <code class="reqn">k_0</code> used to calculate the nonnegative definte
+matrix <code class="reqn"> \widehat{\mathbf{M}}</code>: </p>
+<p style="text-align: center;"><code class="reqn">\widehat{\mathbf{M}}\ =\
+\sum_{k=1}^{k_0}\widehat{\mathbf{\Sigma}}_y(k)\widehat{\mathbf{\Sigma}}_y(k)',
+</code>
+</p>
+<p> where <code class="reqn">\widehat{\bf \Sigma}_y(k)</code> is the sample autocovariance of
+<code class="reqn"> {\bf y}_t</code> at lag <code class="reqn">k</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>twostep</code></td>
+<td>
+<p>Logical. If <code>FALSE</code> (the default), then standard
+procedures [See Section 2.2 in Lam and Yao (2012)] for estimating <code class="reqn">r</code>
+and <code class="reqn">{\bf A}</code> will be implemented. If <code>TRUE</code>, then a two step
+estimation procedure [See Section 4 in Lam and Yao (2012)] will be
+implemented for estimating <code class="reqn">r</code> and <code class="reqn">{\bf A}</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>An object of class "factors" is a list containing the following
+components: </p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>factor_num</code></td>
+<td>
+<p>The estimated number of factors
+<code class="reqn">\hat{r}</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>loading.mat</code></td>
+<td>
+<p>The estimated <code class="reqn">p \times r</code> factor
+loading matrix <code class="reqn">\widehat{\bf A}</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lag.k</code></td>
+<td>
+<p>the time lag used in function.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+<p>a character string indicating what method was performed.</p>
+</td>
+</tr>
+</table>
+<h3>References</h3>
+
+<p>Lam, C. &amp; Yao, Q. (2012). <em>Factor modelling for
+high-dimensional time series: Inference for the number of factors</em>, The
+Annals of Statistics, Vol. 40, pp. 694–726.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Generate x_t
+p &lt;- 400
+n &lt;- 400
+r &lt;- 3
+X &lt;- mat.or.vec(n, r)
+A &lt;- matrix(runif(p*r, -1, 1), ncol=r)
+x1 &lt;- arima.sim(model=list(ar=c(0.6)), n=n)
+x2 &lt;- arima.sim(model=list(ar=c(-0.5)), n=n)
+x3 &lt;- arima.sim(model=list(ar=c(0.3)), n=n)
+eps &lt;- matrix(rnorm(n*p), p, n)
+X &lt;- t(cbind(x1, x2, x3))
+Y &lt;- A %*% X + eps
+Y &lt;- t(Y)
+fac &lt;- Factors(Y,lag.k=2)
+r_hat &lt;- fac$factor_num
+loading_Mat &lt;- fac$loading.mat
+</code></pre>
+
+
+</div>

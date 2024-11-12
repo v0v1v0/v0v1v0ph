@@ -1,0 +1,111 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>h5WriteScalar</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Write a scalar into HDF5 file</h2>
+
+<h3>Description</h3>
+
+<p>Low-level helper function to write scalar R data into HDF5 dataset. Data will 
+be written into scalar space instead of array space.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">h5WriteScalar(x, name, robj, ...)
+
+## S3 method for class 'H5Group'
+h5WriteScalar(x, name, robj, stype = c("utf8", "ascii7"), ...)
+
+## S3 method for class 'H5File'
+h5WriteScalar(x, name, robj, ...)
+
+## S3 method for class 'character'
+h5WriteScalar(x, name, robj, overwrite = FALSE, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>An <code>H5File</code>, <code>H5Group</code> or a 
+path name of HDF5 file.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>name</code></td>
+<td>
+<p>Name of an HDF5 link.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>robj</code></td>
+<td>
+<p>A scalar object.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Arguments passed to <code>H5File$create_dataset()</code>. See 
+<code>link[hdf5r:H5File-class]{H5File}</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>stype</code></td>
+<td>
+<p>'utf8' or 'ascii7'. Passed to <code>h5GuessDtype</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>overwrite</code></td>
+<td>
+<p>Whether or not to overwrite the existing <code>name</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>This is an operation function and no return. Any failure should raise an 
+error.
+</p>
+
+
+<h3>Note</h3>
+
+<p>If you want to write <code>robj</code> into array space, you should use 
+<code>h5WriteDataset</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">tmp.file &lt;- tempfile(fileext = ".h5")
+h5CreateFile(tmp.file)
+
+h5WriteScalar(tmp.file,  name = "test/scalar", TRUE)
+x &lt;- h5ReadDataset(tmp.file, name = "test/scalar")
+stopifnot(x)
+
+h5WriteScalar(tmp.file,  name = "test/scalar", 100.0, overwrite = TRUE)
+x &lt;- h5ReadDataset(tmp.file, name = "test/scalar")
+stopifnot(identical(x, 100.0))
+
+h5WriteScalar(tmp.file,  name = "test/scalar", "ABC", overwrite = TRUE)
+x &lt;- h5Read(tmp.file, name = "test/scalar")
+stopifnot(identical(x, "ABC"))
+
+h5WriteScalar(tmp.file,  name = "test/factor", factor("ABC"))
+x &lt;- h5ReadDataset(tmp.file, name = "test/factor")
+stopifnot(identical(x, factor("ABC")))
+
+</code></pre>
+
+
+</div>

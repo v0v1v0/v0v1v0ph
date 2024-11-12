@@ -1,0 +1,189 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>mdffits.default</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Influence on fixed effects of HLMs</h2>
+
+<h3>Description</h3>
+
+<p>These functions calculate measures of the change in the fixed effects
+estimates based on the deletion of an observation, or group of 
+observations, for a hierarchical linear model fit using <code>lmer</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">## Default S3 method:
+mdffits(object, ...)
+
+## S3 method for class 'mer'
+cooks.distance(model, level = 1, delete = NULL, ...)
+
+## S3 method for class 'lmerMod'
+cooks.distance(model, level = 1, delete = NULL, include.attr = FALSE, ...)
+
+## S3 method for class 'lme'
+cooks.distance(model, level = 1, delete = NULL, include.attr = FALSE, ...)
+
+## S3 method for class 'mer'
+mdffits(object, level = 1, delete = NULL, ...)
+
+## S3 method for class 'lmerMod'
+mdffits(object, level = 1, delete = NULL, include.attr = FALSE, ...)
+
+## S3 method for class 'lme'
+mdffits(object, level = 1, delete = NULL, include.attr = FALSE, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>object</code></td>
+<td>
+<p>fitted object of class <code>mer</code> or <code>lmerMod</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>do not use</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>model</code></td>
+<td>
+<p>fitted model of class <code>mer</code> or <code>lmerMod</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>level</code></td>
+<td>
+<p>variable used to define the group for which cases will be
+deleted.  If <code>level = 1</code> (default), then individual cases will be deleted.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>delete</code></td>
+<td>
+<p>index of individual cases to be deleted. To delete specific 
+observations the row number must be specified. To delete higher level
+units the group ID and <code>group</code> parameter must be specified.
+If <code>delete = NULL</code> then all cases are iteratively deleted.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>include.attr</code></td>
+<td>
+<p>logical value determining whether the difference between 
+the full and deleted parameter estimates should be included. If <code>FALSE</code> 
+(default), a numeric vector of Cook's distance or MDFFITS is returned. 
+If <code>TRUE</code>, a tibble with the Cook's distance or MDFFITS values in the 
+first column and the parameter differences in the remaining columns is returned.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Both Cook's distance and MDFFITS measure the change in the 
+fixed effects estimates based on the deletion of a subset of observations. 
+The key difference between the two diagnostics is that Cook's distance uses
+the covariance matrix for the fixed effects from the original
+model while MDFFITS uses the covariance matrix from the deleted 
+model.
+</p>
+
+
+<h3>Value</h3>
+
+<p>Both functions return a numeric vector (or single value if 
+<code>delete</code> has been specified) as the default. If <code>include.attr = TRUE</code>, 
+then a tibble is returned. The first column consists of the Cook's distance or
+MDFFITS values, and the later columns capture the difference between the full
+and deleted parameter estimates.
+</p>
+
+
+<h3>Note</h3>
+
+<p>Because MDFFITS requires the calculation of the covariance matrix
+for the fixed effects for every model, it will be slower.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Adam Loy <a href="mailto:loyad01@gmail.com">loyad01@gmail.com</a>
+</p>
+
+
+<h3>References</h3>
+
+<p>Christensen, R., Pearson, L., &amp; Johnson, W. (1992) 
+Case-deletion diagnostics for mixed models. <em>Technometrics</em>, <b>34</b>, 
+38–45.
+</p>
+<p>Schabenberger, O. (2004) Mixed Model Influence Diagnostics,
+in <em>Proceedings of the Twenty-Ninth SAS Users Group International Conference</em>,
+SAS Users Group International.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>leverage.mer</code>,
+<code>covratio.mer</code>, <code>covtrace.mer</code>, <code>rvc.mer</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(sleepstudy, package = 'lme4')
+ss &lt;- lme4::lmer(Reaction ~ Days + (Days | Subject), sleepstudy)
+
+# Cook's distance for individual observations
+ss.cd.lev1 &lt;- cooks.distance(ss)
+
+# Cook's distance for each Subject
+ss.cd.subject &lt;- cooks.distance(ss, level = "Subject")
+
+## Not run: 
+data(Exam, package = 'mlmRev')
+fm &lt;- lme4::lmer(normexam ~ standLRT * schavg + (standLRT | school), Exam)
+
+# Cook's distance for individual observations
+cd.lev1 &lt;- cooks.distance(fm)
+
+# Cook's distance for each school
+cd.school &lt;- cooks.distance(fm, level = "school")
+
+# Cook's distance when school 1 is deleted
+cd.school1 &lt;- cooks.distance(fm, level = "school", delete = 1)
+
+
+## End(Not run)
+
+
+# MDFFITS  for individual observations
+ss.m1 &lt;- mdffits(ss)
+
+# MDFFITS for each Subject
+ss.m.subject &lt;- mdffits(ss, level = "Subject")
+
+## Not run:   
+
+# MDFFITS  for individual observations
+m1 &lt;- mdffits(fm)
+
+# MDFFITS for each school
+m.school &lt;- mdffits(fm, level = "school")
+
+## End(Not run)
+</code></pre>
+
+
+</div>

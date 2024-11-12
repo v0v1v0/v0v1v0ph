@@ -1,0 +1,131 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>rBeta</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Realized beta</h2>
+
+<h3>Description</h3>
+
+<p>Depending on users' choices of estimator (realized covariance (RCOVestimator) and realized variance (RVestimator)), 
+the function returns the realized beta, defined as the ratio between both.
+</p>
+<p>The realized beta is given by
+</p>
+<p style="text-align: center;"><code class="reqn">
+\beta_{jm} = \frac {RCOVestimator_{jm}}{RVestimator_{m}}
+</code>
+</p>
+
+<p>in which
+</p>
+<p><code class="reqn">RCOVestimator:</code> Realized covariance of asset j and market index <code class="reqn">m</code>.
+</p>
+<p><code class="reqn">RVestimator:</code> Realized variance of market index <code class="reqn">m</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">rBeta(
+  rData,
+  rIndex,
+  RCOVestimator = "rCov",
+  RVestimator = "rRVar",
+  makeReturns = FALSE,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>rData</code></td>
+<td>
+<p>a <code>xts</code> object containing all returns in period t for one asset.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rIndex</code></td>
+<td>
+<p>a <code>xts</code> object containing return in period t for an index.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>RCOVestimator</code></td>
+<td>
+<p>can be chosen among realized covariance estimators: <code>"rCov"</code>, <code>"rAVGCov"</code>, <code>"rBPCov"</code>, <code>"rHYCov"</code>, <code>"rKernelCov"</code>, <code>"rOWCov"</code>, <code>"rRTSCov"</code>, <code>"rThresholdCov"</code> and <code>"rTSCov"</code> <code>"rCov"</code> by default.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>RVestimator</code></td>
+<td>
+<p>can be chosen among realized variance estimators: <code>"rRVar"</code>, <code>"rMinRVar"</code> and <code>"rMedRVar"</code>. <code>"rRVar"</code> by default. 
+In case of missing <code>RVestimator</code>, <code>RCOVestimator</code> function applying for <code>rIndex</code> will be used.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>makeReturns</code></td>
+<td>
+<p>boolean, should be <code>TRUE</code> when <code>rData</code> contains prices instead of returns. <code>FALSE</code> by default.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>arguments passed to <code>RCOVestimator</code> and <code>RVestimator</code></p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Suppose there are <code class="reqn">N</code> equispaced returns on day <code class="reqn">t</code> for the asset <code class="reqn">j</code> and the index <code class="reqn">m</code>. 
+Denote <code class="reqn">r_{(j)i,t}</code>, <code class="reqn">r_{(m)i,t}</code> as the <code class="reqn">i</code>th return on day <code class="reqn">t</code> for asset <code class="reqn">j</code> and index <code class="reqn">m</code> (with <code class="reqn">i=1, \ldots,N</code>).
+</p>
+<p>By default, the RCov is used and the realized beta coefficient is computed as:
+</p>
+<p style="text-align: center;"><code class="reqn">
+\hat{\beta}_{(jm)t}= \frac{\sum_{i=1}^{N} r_{(j)i,t} r_{(m)i,t}}{\sum_{i=1}^{N} r_{(m)i,t}^2}.
+</code>
+</p>
+
+<p>Note: The function does not support to calculate betas across multiple days.
+</p>
+
+
+<h3>Value</h3>
+
+<p>numeric
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Giang Nguyen, Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup.
+</p>
+
+
+<h3>References</h3>
+
+<p>Barndorff-Nielsen, O. E. and Shephard, N. (2004). Econometric analysis of realized covariation: high frequency based covariance, regression, and correlation in
+financial economics. <em>Econometrica</em>, 72, 885-925.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+library("xts")
+a &lt;- as.xts(sampleOneMinuteData[as.Date(DT) == "2001-08-04", list(DT, MARKET)])
+b &lt;-  as.xts(sampleOneMinuteData[as.Date(DT) == "2001-08-04", list(DT, STOCK)])
+rBeta(a, b, RCOVestimator = "rBPCov", RVestimator = "rMinRVar", makeReturns = TRUE)
+
+## End(Not run)
+
+</code></pre>
+
+
+</div>

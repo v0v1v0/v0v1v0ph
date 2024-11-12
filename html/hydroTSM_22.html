@@ -1,0 +1,252 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>baseflow</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Baseflow
+</h2>
+
+<h3>Description</h3>
+
+<p>Given a complete (without missing values) series of streamflow, this function computes the baseflow using the filter proposed by Arnold and Allen (1999). 
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">baseflow(x, ...)
+
+## S3 method for class 'zoo'
+baseflow(x, beta=0.925, from=start(x), to=end(x), date.fmt, tz, 
+         na.fill=c("none", "linear", "spline"), out.type=c("last", "all"), 
+         plot=TRUE, xcol="black", bfcol=c("blue", "darkcyan", "darkorange3"),
+         pch=15, cex=0.3, ...)
+
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+
+<p>zoo or numeric object with streamflow records. The suggested time frequency should be hourly or daily, but the algorithm will work with any time frequency.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>beta</code></td>
+<td>
+
+<p>numeric representing the filter parameter. Default value is 0.925 as recommended by Arnold and Allen (1999)
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>from</code></td>
+<td>
+
+<p>Character indicating the starting date for subsetting <code>x</code>. It has to be in the format indicated by <code>date.fmt</code>. <br>
+The default value corresponds to the date of the first element of <code>x</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>to</code></td>
+<td>
+
+<p>Character indicating the ending date for subsetting <code>x</code>. It has to be in the format indicated by <code>date.fmt</code>. <br>
+The default value corresponds to the date of the last element of <code>x</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>date.fmt</code></td>
+<td>
+
+<p>character indicating the format in which the dates are stored in <code>from</code> and <code>to</code>, e.g. <kbd>%Y-%m-%d</kbd>. See ‘Details’ section in <code>strptime</code>.
+By default, <code>date.fmt</code> is missing, and it is automatically set to <kbd>%Y-%m-%d</kbd> when <code>time(x)</code> is <code>Date</code> object, and set to <kbd>%Y-%m-%d %H:%M:%S</kbd> when <code>x</code> is a sub-daily zoo object.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tz</code></td>
+<td>
+
+<p>character, with the specification of the time zone used for <code>from</code>, <code>to</code>. System-specific (see time zones), but <code>""</code> is the current time zone, and <code>"GMT"</code> is UTC (Universal Time, Coordinated). See <code>Sys.timezone</code> and <code>as.POSIXct</code>. <br></p>
+<p>If <code>tz</code> is missing (the default), it is automatically set to the time zone used in <code>time(x)</code>. <br></p>
+<p>This argument can be used when working with sub-daily zoo objects to force using  time zones other than the local time zone for <code>from</code> and <code>to</code>. It should be used with caution, being well aware of the time zone of the data. See examples.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>na.fill</code></td>
+<td>
+<p>Character indicating how to fill any NA present in <code>x</code>. Valid values are: <br>
+-) <kbd>remove</kbd>      =&gt; NAs are not plotted                                                         <br>
+-) <kbd>linear</kbd>      =&gt; NAs are removed by linear interpolation, using <code>na.approx</code> <br> 
+-) <kbd>spline</kbd>      =&gt; NAs are removed by spline interpolation, using <code>na.spline</code>
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>out.type</code></td>
+<td>
+
+<p>Character indicating the type of result that is given by this function. Valid values are: <br>
+-) <kbd>last</kbd> =&gt; only the baseflow computed after the third pass of the filter is returned. <br>
+-) <kbd>all</kbd>  =&gt; the 3 baseflows computed after each pass of the filter are returned in a matrix or zoo object.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>plot</code></td>
+<td>
+
+<p>logical. Indicates if the baseflow should be plotted or not. If plotted, the original <code>x</code> values are plotted as well.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>xcol</code></td>
+<td>
+
+<p>character, representing the color to be used for ploting the streamflow time series. Only used when <code>plot=TRUE</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>bfcol</code></td>
+<td>
+
+<p>character of lenght 3, representing the color(s) to be used for ploting the baseflow time series. The first, second and third element are used to represent the baseflow after the third, second and first pass of the filter, respectively. Only used when <code>plot=TRUE</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pch</code></td>
+<td>
+
+<p>numeric, representing the symbols used for ploting the streamflow time series (both, the original series and the baseflow). Only used when <code>plot=TRUE</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cex</code></td>
+<td>
+
+<p>a numerical vector giving the amount by which plotting characters and symbols should be scaled relative to the default. This works as a multiple of <code>par("cex")</code>. See <code>plot.default</code>. Only used when <code>plot=TRUE</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+
+<p>further arguments passed to or from other methods. Not used yet.
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Although most procedures to separate baseflow from total streamflow are based on physical reasoning, some elements of all separation techniques are subjective.
+</p>
+<p>The digital filter technique (Nathan and McMahon, 1990) implemented in this function was originally proposed by Lyne and Hollick (1979) for signal analysis and processing. Although this technique has no true physical meaning, it is objective and reproducible. 
+</p>
+<p>The equation of the filter is: 
+</p>
+<p>q(t) = Beta*q(t-1) + [ (1+Beta)/2 ]*[ Q(t) - Q(t-1) ]
+</p>
+<p>where q(t) is the filtered surface runoff (quick response) at the time step t (one day), Q is the original streamflow, and Beta is the filter parameter (Beta=0.925). The value Beta=0.925 was obtained by Nathan and McMahon (1990) and Arnold et al. (1995) to give realistic results when compared to manual separation techniques.
+</p>
+<p>Baseflow b(t) is then computed as:
+</p>
+<p>b(t) = Q(t) - q(t)
+</p>
+<p>The filter can be passed over the streamflow data three times (forward, backward, and forward), depending on the user' selected estimates of baseflow from pilot studies. In general, each pass will result in less baseflow as a percentage of total streamflow. 
+</p>
+
+
+<h3>Value</h3>
+
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>If <code>out.type="last"</code></code></td>
+<td>
+<p>(default value), only the baseflow computed after the third pass of the filter is returned.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>If <code>out.type="all"</code></code></td>
+<td>
+<p>the 3 baseflows computed after each pass of the filter are returned in a matrix or zoo object.</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>Mauricio Zambrano-Bigiarini, <a href="mailto:mzb.devel@gmail">mzb.devel@gmail</a>
+</p>
+
+
+<h3>References</h3>
+
+<p><cite>Arnold, J. G., Allen, P. M., Muttiah, R., Bernhardt, G. (1995). Automated base flow separation and recession analysis techniques. Groundwater, 33(6), 1010–1018. doi:10.1111/j.1745-6584.1995.tb00046.x</cite>.
+</p>
+<p><cite>Arnold, J. G., Allen, P. M. (1999). Automated methods for estimating baseflow and ground water recharge from streamflow records. JAWRA Journal of the American Water Resources Association, 35(2), 411–424. doi:10.1111/j.1752-1688.1999.tb03599.x</cite>.
+</p>
+<p><cite>Lyne, V., Hollick, M. (1979). Stochastic time-variable rainfall-runoff modelling. Proceedings of the Hydrology and Water Resources Symposium, Perth, 10–12 September. Institution of Engineers National Conference Publication, No. 79/10, 89–92</cite>.
+</p>
+<p><cite>Nathan, R. J., &amp; McMahon, T. A. (1990). Evaluation of automated techniques for base flow and recession analyses. Water resources research, 26(7), 1465–1473. doi:10.1029/WR026i007p01465</cite>.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>plot_pq</code>, <code>hydroplot</code>, <code>fdc</code>, <code>fdcu</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">######################
+## Ex1: Computing and plotting the baseflows for the full time period
+##      of a given time series of streamflows.
+
+## First, we load the daily Q time series for the Cauquenes en 
+## El Arrayan catchment, where Q, [m3/s] are stored in the sixth column.
+data(Cauquenes7336001)
+q &lt;- Cauquenes7336001[, 6]
+
+## Computing the daily baseflow for the full time period
+#baseflow(q) # it can not run due to NA values in 'x'
+
+# filling the NA values using spline interpolation
+baseflow(q, na.fill="spline") 
+
+## Computing and plotting the daily baseflow for the full time period
+baseflow(q, na.fill="spline", plot=TRUE)
+
+
+######################
+## Ex2: Computing and plotting the daily baseflow only for a 
+##      specific time period, from April to December 2000.
+baseflow(q, na.fill="spline", from="2000-04-01", to="2000-12-31")
+
+
+######################
+## Ex3: Computing and plotting the three daily baseflows (one for each pass 
+##      of the filter) only for a specific time period, from April to December
+##      2000.
+baseflow(q, na.fill="spline", from="2000-04-01", to="2000-12-31", 
+         out.type="all", plot=TRUE)
+</code></pre>
+
+
+</div>

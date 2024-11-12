@@ -1,0 +1,110 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>KPCA</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Estimating the Pair of Factor Numbers via Eigenvalue Ratios Corresponding to <code class="reqn">\alpha</code>-PCA
+</h2>
+
+<h3>Description</h3>
+
+<p>The function is to estimate the pair of factor numbers via eigenvalue ratios corresponding to <code class="reqn">\alpha</code>-PCA. 
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">KPCA(X, kmax, alpha = 0)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>X</code></td>
+<td>
+
+<p>Input an array with <code class="reqn">T \times p_1 \times p_2</code>, where <code class="reqn">T</code> is the sample size, <code class="reqn">p_1</code> is the the row dimension of each matrix observation and <code class="reqn">p_2</code> is the the column dimension of each matrix observation.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>kmax</code></td>
+<td>
+
+<p>The user-supplied maximum factor numbers. Here it means the upper bound of the number of row factors and column factors.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alpha</code></td>
+<td>
+
+<p>A hyper-parameter balancing the information of the first and second moments    (<code class="reqn">\alpha \geq -1</code> ). The default is 0.
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The function <code>KPCA</code> uses the eigenvalue-ratio idea to estimate the number of factors. In details, the number of factors <code class="reqn">k_1</code> is estimated by
+</p>
+<p style="text-align: center;"><code class="reqn">\hat{k}_1 = \arg \max_{j \leq k_{max}} \frac{\lambda _j (\hat{\bold{M}}_R)}{\lambda _{j+1} (\hat{\bold{M}}_R)},</code>
+</p>
+ 
+<p>where <code class="reqn">k_{max}</code> is a given upper bound. <code class="reqn">k_2</code> is defined similarly with respect to <code class="reqn">\hat{\bold{M}}_C</code>. See the function <code>alpha_PCA</code> for the definition of <code class="reqn">\hat{\bold{M}}_R</code> and <code class="reqn">\hat{\bold{M}}_C</code>. For more details, see Chen &amp; Fan (2021).
+</p>
+
+
+<h3>Value</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code><code class="reqn">k_1</code></code></td>
+<td>
+<p>The estimated row factor number.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code><code class="reqn">k_2</code></code></td>
+<td>
+<p>The estimated column factor number.</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>Yong He, Changwei Zhao, Ran Zhao.
+</p>
+
+
+<h3>References</h3>
+
+<p>Chen, E. Y., &amp; Fan, J. (2021). Statistical inference for high-dimensional matrix-variate factor models. Journal of the American Statistical Association, 1-18.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">   set.seed(11111)
+   T=20;p1=20;p2=20;k1=3;k2=3
+   R=matrix(runif(p1*k1,min=-1,max=1),p1,k1)
+   C=matrix(runif(p2*k2,min=-1,max=1),p2,k2)
+   X=array(0,c(T,p1,p2))
+   Y=X;E=Y
+   F=array(0,c(T,k1,k2))
+   for(t in 1:T){
+     F[t,,]=matrix(rnorm(k1*k2),k1,k2)
+     E[t,,]=matrix(rnorm(p1*p2),p1,p2)
+     Y[t,,]=R%*%F[t,,]%*%t(C)
+   }
+   X=Y+E
+   
+   KPCA(X, 8, alpha = 0)
+</code></pre>
+
+
+</div>

@@ -1,0 +1,125 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>individual_errors</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Predictive Error Plots</h2>
+
+<h3>Description</h3>
+
+<p>Plots the predictive error with respect to a variety of quantities.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">individual_errors(
+  em,
+  validation,
+  errtype = "normal",
+  xtype = "index",
+  plottype = "normal"
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>em</code></td>
+<td>
+<p>The emulator to perform diagnostics on</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>validation</code></td>
+<td>
+<p>The validation set of points with output(s)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>errtype</code></td>
+<td>
+<p>The type of individual error to be plotted.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>xtype</code></td>
+<td>
+<p>The value to plot against</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>plottype</code></td>
+<td>
+<p>Whether to plot a standard or Q-Q plot.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The choice of errors to plot is controlled by <code>errtype</code>, and can be one
+of four things: normal, corresponding to the regular standardised errors; eigen,
+corresponding to the errors after reordering given by the eigendecomposition
+of the emulator covariance matrix; chol, similarly deriving errors after Cholesky
+decomposition; and cholpivot, deriving the errors after pivoted Cholesky decomposition.
+</p>
+<p>What the errors are plotted with respect to is controlled by <code>xtype</code>. The options
+are index, which plots them in their order in the validation set; em, which plots errors
+with respect to the emulator prediction at that point; and any named parameter of the
+model, which plots with respect to the values of that parameter.
+</p>
+<p>Finally, the plot type is controlled by <code>plottype</code>: this can be one of normal,
+which plots the errors; or qq, which produces a Q-Q plot of the errors.
+</p>
+<p>The default output is to plot the standardised errors (with no decomposition)
+against the ordering in the validation set; i.e. <code>errtype = "normal"</code>,
+<code>xtype = "index"</code>, <code>plottype = "normal"</code>.
+</p>
+<p>Some combinations are not permitted, as the output would not be meaningful. Errors
+arising from an eigendecomposition cannot be plotted against either emulator prediction
+or a particular parameter (due to the transformation induced by the eigendecomposition);
+Q-Q plots are not plotted for a non-decomposed set of errors, as the correlation
+between errors makes it much harder to interpret.
+</p>
+
+
+<h3>Value</h3>
+
+<p>The relevant plot.
+</p>
+
+
+<h3>References</h3>
+
+<p>Bastos &amp; O'Hagan (2009) &lt;doi:10.1198/TECH.2009.08019&gt;
+</p>
+
+
+<h3>See Also</h3>
+
+<p>Other diagnostic functions: 
+<code>analyze_diagnostic()</code>,
+<code>classification_diag()</code>,
+<code>comparison_diag()</code>,
+<code>get_diagnostic()</code>,
+<code>residual_diag()</code>,
+<code>standard_errors()</code>,
+<code>summary_diag()</code>,
+<code>validation_diagnostics()</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">i1 &lt;- individual_errors(SIREmulators$ems$nS, SIRSample$validation)
+i2 &lt;- individual_errors(SIREmulators$ems$nS, SIRSample$validation, "chol", "em")
+i3 &lt;- individual_errors(SIREmulators$ems$nS, SIRSample$validation, "eigen", plottype = "qq")
+i4 &lt;- individual_errors(SIREmulators$ems$nS, SIRSample$validation, "cholpivot", xtype = "aSI")
+
+</code></pre>
+
+
+</div>

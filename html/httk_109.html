@@ -1,0 +1,579 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>httkpop_generate</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Generate a virtual population for PBTK</h2>
+
+<h3>Description</h3>
+
+<p>Generate a virtual population characterized by demographic, anthropometric, and physiological parameters relevant to PBTK.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">httkpop_generate(
+  method,
+  nsamp = NULL,
+  gendernum = NULL,
+  agelim_years = NULL,
+  agelim_months = NULL,
+  weight_category = c("Underweight", "Normal", "Overweight", "Obese"),
+  gfr_category = c("Normal", "Kidney Disease", "Kidney Failure"),
+  reths = c("Mexican American", "Other Hispanic", "Non-Hispanic White",
+    "Non-Hispanic Black", "Other"),
+  gfr_resid_var = TRUE,
+  ckd_epi_race_coeff = FALSE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+<p>The population-generation method to use. Either "virtual
+individuals" or "direct resampling." Short names may be used: "d" or "dr"
+for "direct resampling", and "v" or "vi" for "virtual individuals".</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nsamp</code></td>
+<td>
+<p>The desired number of individuals in the virtual population.
+<code>nsamp</code> need not be provided if <code>gendernum</code> is provided.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>gendernum</code></td>
+<td>
+<p>Optional: A named list giving the numbers of male and female
+individuals to include in the population, e.g. <code>list(Male=100,
+Female=100)</code>. Default is NULL, meaning both males and females are included,
+in their proportions in the NHANES data. If both <code>nsamp</code> and
+<code>gendernum</code> are provided, they must agree (i.e., <code>nsamp</code> must be
+the sum of <code>gendernum</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>agelim_years</code></td>
+<td>
+<p>Optional: A two-element numeric vector giving the minimum
+and maximum ages (in years) to include in the population. Default is
+c(0,79). If only a single value is provided, both minimum and maximum ages
+will be set to that value; e.g. <code>agelim_years=3</code> is equivalent to
+<code>agelim_years=c(3,3)</code>. If <code>agelim_years</code> is provided and
+<code>agelim_months</code> is not, <code>agelim_years</code> will override the default
+value of <code>agelim_months</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>agelim_months</code></td>
+<td>
+<p>Optional: A two-element numeric vector giving the
+minimum and maximum ages (in months) to include in the population. Default
+is c(0, 959), equivalent to the default <code>agelim_years</code>. If only a
+single value is provided, both minimum and maximum ages will be set to that
+value; e.g. <code>agelim_months=36</code> is equivalent to
+<code>agelim_months=c(36,36)</code>. If <code>agelim_months</code> is provided and
+<code>agelim_years</code> is not, <code>agelim_months</code> will override the default
+values of <code>agelim_years</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>weight_category</code></td>
+<td>
+<p>Optional: The weight categories to include in the
+population. Default is <code>c('Underweight', 'Normal', 'Overweight',
+'Obese')</code>. User-supplied vector must contain one or more of these strings.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>gfr_category</code></td>
+<td>
+<p>The kidney function categories to include in the
+population. Default is <code>c('Normal','Kidney Disease', 'Kidney
+Failure')</code> to include all kidney function levels.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>reths</code></td>
+<td>
+<p>Optional: a character vector giving the races/ethnicities to
+include in the population. Default is <code>c('Mexican American','Other
+Hispanic','Non-Hispanic White','Non-Hispanic Black','Other')</code>, to include
+all races and ethnicities in their proportions in the NHANES data.
+User-supplied vector must contain one or more of these strings.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>gfr_resid_var</code></td>
+<td>
+<p>TRUE to add residual variability to GFR predicted from
+serum creatinine; FALSE to not add residual variability</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ckd_epi_race_coeff</code></td>
+<td>
+<p>TRUE to use the CKD-EPI equation as originally
+published (with a coefficient changing predicted GFR for individuals
+identified as "Non-Hispanic Black"); FALSE to set this coefficient to 1.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Demographic and anthropometric (body measures) variables, along with serum creatinine and hematocrit,
+are generated from survey data from the Centers for Disease Control's National Health and Nutrition Examination Survey (NHANES).
+Those data are stored in the object <code>nhanes_mec_svy</code> (a <code>survey.design</code> object, see package <code>survey</code>).
+With <code>method = "d"</code>, these variables will be sampled with replacement directly from NHANES data. Each NHANES respondent's likelihood of being sampled is given by their sample weight.
+With <code>method = "v"</code>, these variables will be sampled from distributions fitted to NHANES data.
+Tissue masses and flows are generated based on demographic, body measures, and serum creatinine values, using regression equations from the literature and/or allometric scaling based on height. 
+Extensive details about how each of these parameters are generated are available in the supplemental material of Ring et al. (2017) (see References for full citation).
+</p>
+
+
+<h3>Value</h3>
+
+<p>A data.table where each row represents an individual, and each column
+represents a demographic, anthropometric, or physiological parameter.
+Details of the parameters returned and their units are in the following tables.
+</p>
+
+
+<h3>Demographic variables</h3>
+
+
+<table>
+<tr>
+<td style="text-align: right;">
+  <strong>Name</strong> </td>
+<td style="text-align: right;"> <strong>Definition</strong> </td>
+<td style="text-align: right;"> <strong>Units</strong> </td>
+</tr>
+<tr>
+<td style="text-align: right;">
+  <code>seqn</code> </td>
+<td style="text-align: right;"> NHANES unique identifier (only included if <code>method = "direct resampling"</code>) </td>
+<td style="text-align: right;"> NA </td>
+</tr>
+<tr>
+<td style="text-align: right;">
+  <code>gender</code> </td>
+<td style="text-align: right;"> Sex: "Male" or "Female" </td>
+<td style="text-align: right;"> NA </td>
+</tr>
+<tr>
+<td style="text-align: right;">
+  <code>reth</code> </td>
+<td style="text-align: right;"> Race/ethnicity: "Non-Hispanic Black", "Non-Hispanic white", "Mexican American", "Other Hispanic", or "Other". </td>
+<td style="text-align: right;"> NA </td>
+</tr>
+<tr>
+<td style="text-align: right;">
+  <code>age_years</code> </td>
+<td style="text-align: right;"> Age (0-79 years) </td>
+<td style="text-align: right;"> years </td>
+</tr>
+<tr>
+<td style="text-align: right;">
+  <code>age_months</code> </td>
+<td style="text-align: right;"> Age (0-959 months) </td>
+<td style="text-align: right;"> months
+  </td>
+</tr>
+</table>
+<h3>Body measures and laboratory measurements</h3>
+
+
+<table>
+<tr>
+<td style="text-align: right;">
+   <strong>Name</strong> </td>
+<td style="text-align: right;"> <strong>Definition</strong> </td>
+<td style="text-align: right;"> <strong>Units</strong> </td>
+</tr>
+<tr>
+<td style="text-align: right;">
+  <code>height</code> </td>
+<td style="text-align: right;"> Height </td>
+<td style="text-align: right;"> cm </td>
+</tr>
+<tr>
+<td style="text-align: right;">
+  <code>weight</code> </td>
+<td style="text-align: right;"> Body weight </td>
+<td style="text-align: right;"> kg </td>
+</tr>
+<tr>
+<td style="text-align: right;">
+  <code>serum_creat</code> </td>
+<td style="text-align: right;"> Serum creatinine </td>
+<td style="text-align: right;"> mg/dL </td>
+</tr>
+<tr>
+<td style="text-align: right;">
+  <code>hematocrit</code> </td>
+<td style="text-align: right;"> Hematocrit (percentage by volume of red blood cells in blood) </td>
+<td style="text-align: right;"> % 
+  </td>
+</tr>
+</table>
+<h3>Tissue masses</h3>
+
+
+<table>
+<tr>
+<td style="text-align: right;">
+   <strong>Name</strong> </td>
+<td style="text-align: right;"> <strong>Definition</strong> </td>
+<td style="text-align: right;"> <strong>Units</strong> </td>
+</tr>
+<tr>
+<td style="text-align: right;">
+  <code>Blood_mass</code> </td>
+<td style="text-align: right;"> Mass of blood </td>
+<td style="text-align: right;"> kg </td>
+</tr>
+<tr>
+<td style="text-align: right;">
+  <code>Brain_mass</code> </td>
+<td style="text-align: right;"> Mass of brain </td>
+<td style="text-align: right;"> kg </td>
+</tr>
+<tr>
+<td style="text-align: right;">
+  <code>Gonads_mass</code> </td>
+<td style="text-align: right;"> Mass of gonads </td>
+<td style="text-align: right;"> kg </td>
+</tr>
+<tr>
+<td style="text-align: right;">
+  <code>Heart_mass</code> </td>
+<td style="text-align: right;"> Mass of heart </td>
+<td style="text-align: right;"> kg </td>
+</tr>
+<tr>
+<td style="text-align: right;">
+  <code>Kidneys_mass</code> </td>
+<td style="text-align: right;"> Mass of kidneys </td>
+<td style="text-align: right;"> kg </td>
+</tr>
+<tr>
+<td style="text-align: right;">
+  <code>Large_intestine_mass</code> </td>
+<td style="text-align: right;"> Mass of large intestine </td>
+<td style="text-align: right;"> kg </td>
+</tr>
+<tr>
+<td style="text-align: right;">
+  <code>Liver_mass</code> </td>
+<td style="text-align: right;"> Mass of liver </td>
+<td style="text-align: right;"> kg </td>
+</tr>
+<tr>
+<td style="text-align: right;">
+  <code>Lung_mass</code> </td>
+<td style="text-align: right;"> Mass of lungs </td>
+<td style="text-align: right;"> kg </td>
+</tr>
+<tr>
+<td style="text-align: right;">
+  <code>Muscle_mass</code> </td>
+<td style="text-align: right;"> Mass of skeletal muscle </td>
+<td style="text-align: right;"> kg </td>
+</tr>
+<tr>
+<td style="text-align: right;">
+  <code>Pancreas_mass</code> </td>
+<td style="text-align: right;"> Mass of pancreas </td>
+<td style="text-align: right;"> kg </td>
+</tr>
+<tr>
+<td style="text-align: right;">
+  <code>Skeleton_mass</code> </td>
+<td style="text-align: right;"> Mass of skeleton (including bone, red and yellow marrow, cartilage, periarticular tissue) </td>
+<td style="text-align: right;"> kg </td>
+</tr>
+<tr>
+<td style="text-align: right;">
+  <code>Skin_mass</code> </td>
+<td style="text-align: right;"> Mass of skin </td>
+<td style="text-align: right;"> kg </td>
+</tr>
+<tr>
+<td style="text-align: right;">
+  <code>Small_intestine_mass</code> </td>
+<td style="text-align: right;"> Mass of small intestine </td>
+<td style="text-align: right;"> kg </td>
+</tr>
+<tr>
+<td style="text-align: right;">
+  <code>Spleen_mass</code> </td>
+<td style="text-align: right;"> Mass of spleen </td>
+<td style="text-align: right;"> kg </td>
+</tr>
+<tr>
+<td style="text-align: right;">
+  <code>Stomach_mass</code> </td>
+<td style="text-align: right;"> Mass of stomach tissue </td>
+<td style="text-align: right;"> kg </td>
+</tr>
+<tr>
+<td style="text-align: right;">
+  <code>Other_mass</code> </td>
+<td style="text-align: right;"> Mass of GI tract contents (1.4% of body weight) and tissues not otherwise enumerated (3.3% of body weight). </td>
+<td style="text-align: right;"> kg </td>
+</tr>
+<tr>
+<td style="text-align: right;">
+  <code>org_mass_sum</code> </td>
+<td style="text-align: right;"> Sum of the above tissue masses.  A check to ensure this is less than body weight. </td>
+<td style="text-align: right;"> kg </td>
+</tr>
+<tr>
+<td style="text-align: right;">
+  <code>Adipose_mass</code> </td>
+<td style="text-align: right;"> Mass of adipose tissue. Assigned as <code>weight - org_mass_sum</code>. </td>
+<td style="text-align: right;"> kg
+  </td>
+</tr>
+</table>
+<h3>Tissue flows</h3>
+
+
+<table>
+<tr>
+<td style="text-align: right;">
+ <strong>Name</strong> </td>
+<td style="text-align: right;"> <strong>Definition</strong> </td>
+<td style="text-align: right;"> <strong>Units</strong> </td>
+</tr>
+<tr>
+<td style="text-align: right;">
+  <code>Adipose_flow</code> </td>
+<td style="text-align: right;"> Blood flow to adipose tissue </td>
+<td style="text-align: right;"> L/h </td>
+</tr>
+<tr>
+<td style="text-align: right;">
+  <code>Brain_flow</code> </td>
+<td style="text-align: right;"> Blood flow to brain tissue </td>
+<td style="text-align: right;"> L/h </td>
+</tr>
+<tr>
+<td style="text-align: right;">
+  <code>CO</code> </td>
+<td style="text-align: right;"> Cardiac output </td>
+<td style="text-align: right;"> L/h </td>
+</tr>
+<tr>
+<td style="text-align: right;">
+  <code>Gonads_flow</code> </td>
+<td style="text-align: right;"> Blood flow to gonads tissue </td>
+<td style="text-align: right;"> L/h </td>
+</tr>
+<tr>
+<td style="text-align: right;">
+  <code>Heart_flow</code> </td>
+<td style="text-align: right;"> Blood flow to heart tissue </td>
+<td style="text-align: right;"> L/h </td>
+</tr>
+<tr>
+<td style="text-align: right;">
+  <code>Kidneys_flow</code> </td>
+<td style="text-align: right;"> Blood flow to kidneys tissue (not for glomerular filtration!) </td>
+<td style="text-align: right;"> L/h </td>
+</tr>
+<tr>
+<td style="text-align: right;">
+  <code>Large_intestine_flow</code> </td>
+<td style="text-align: right;"> Blood flow to large intestine tissue </td>
+<td style="text-align: right;"> L/h </td>
+</tr>
+<tr>
+<td style="text-align: right;">
+  <code>Liver_flow</code> </td>
+<td style="text-align: right;"> Blood flow to liver tissue </td>
+<td style="text-align: right;"> L/h </td>
+</tr>
+<tr>
+<td style="text-align: right;">
+  <code>Lung_flow</code> </td>
+<td style="text-align: right;"> Blood flow to lung tissue </td>
+<td style="text-align: right;"> L/h </td>
+</tr>
+<tr>
+<td style="text-align: right;">
+  <code>Muscle_flow</code> </td>
+<td style="text-align: right;"> Blood flow to skeletal muscle tissue </td>
+<td style="text-align: right;"> L/h </td>
+</tr>
+<tr>
+<td style="text-align: right;">
+  <code>Pancreas_flow</code> </td>
+<td style="text-align: right;"> Blood flow to pancreas tissue </td>
+<td style="text-align: right;"> L/h </td>
+</tr>
+<tr>
+<td style="text-align: right;">
+  <code>Skeleton_flow</code> </td>
+<td style="text-align: right;"> Blood flow to skeleton </td>
+<td style="text-align: right;"> L/h </td>
+</tr>
+<tr>
+<td style="text-align: right;">
+  <code>Skin_flow</code> </td>
+<td style="text-align: right;"> Blood flow to skin </td>
+<td style="text-align: right;"> L/h </td>
+</tr>
+<tr>
+<td style="text-align: right;">
+  <code>Small_intestine_flow</code> </td>
+<td style="text-align: right;"> Blood flow to small intestine </td>
+<td style="text-align: right;"> L/h </td>
+</tr>
+<tr>
+<td style="text-align: right;">
+  <code>Spleen_flow</code> </td>
+<td style="text-align: right;"> Blood flow to spleen </td>
+<td style="text-align: right;"> L/h </td>
+</tr>
+<tr>
+<td style="text-align: right;">
+  <code>Stomach_flow</code> </td>
+<td style="text-align: right;"> Blood flow to stomach </td>
+<td style="text-align: right;"> L/h </td>
+</tr>
+<tr>
+<td style="text-align: right;">
+  <code>org_flow_check</code> </td>
+<td style="text-align: right;"> Sum of blood flows as a fraction of cardiac output (CO). A check to make sure this is less than 1. </td>
+<td style="text-align: right;"> Unitless fraction
+  </td>
+</tr>
+</table>
+<h3>Adjusted variables</h3>
+
+
+<table>
+<tr>
+<td style="text-align: right;">
+ <strong>Name</strong> </td>
+<td style="text-align: right;"> <strong>Definition</strong> </td>
+<td style="text-align: right;"> <strong>Units</strong> </td>
+</tr>
+<tr>
+<td style="text-align: right;">
+  <code>weight_adj</code> </td>
+<td style="text-align: right;"> Adjusted body weight: Sum of all tissue masses. </td>
+<td style="text-align: right;"> kg </td>
+</tr>
+<tr>
+<td style="text-align: right;">
+  <code>BSA_adj</code> </td>
+<td style="text-align: right;"> Adjusted body surface area, based on <code>height</code> and <code>weight_adj</code>. </td>
+<td style="text-align: right;"> cm^2 </td>
+</tr>
+<tr>
+<td style="text-align: right;">
+  <code>million.cells.per.gliver</code> </td>
+<td style="text-align: right;"> Hepatocellularity </td>
+<td style="text-align: right;"> 1e6 cells/g liver </td>
+</tr>
+<tr>
+<td style="text-align: right;">
+  <code>gfr_est</code> </td>
+<td style="text-align: right;"> Glomerular filtration rate (GFR) estimated using either the CKD-EPI equation (for adults) or a body-surface-area-based equation (for children). </td>
+<td style="text-align: right;"> mL/min/1.73 m^2 body surface area </td>
+</tr>
+<tr>
+<td style="text-align: right;">
+  <code>bmi_adj</code> </td>
+<td style="text-align: right;"> Body mass index (BMI), adjusted to match <code>weight_adj</code> and <code>height</code>. </td>
+<td style="text-align: right;"> kg/m^2 </td>
+</tr>
+<tr>
+<td style="text-align: right;">
+  <code>weight_class</code> </td>
+<td style="text-align: right;"> Weight category based on <code>bmi_adj</code>: "Underweight" (BMI &lt; 18.5), "Normal" (18.5 &lt; BMI &lt; 24.9), "Overweight" (25.0 &lt; BMI &lt; 29.9), or "Obese" (BMI &gt;= 30) </td>
+<td style="text-align: right;"> Unitless category </td>
+</tr>
+<tr>
+<td style="text-align: right;">
+  <code>gfr_class</code> </td>
+<td style="text-align: right;"> Kidney function category based on GFR: "Normal" (GFR &gt;=60 mL/min/1.73 m^2), "Kidney Disease" (15 &lt;= GFR &lt;= 60), or "Kidney Failure" (GFR &lt; 15). </td>
+<td style="text-align: right;"> Unitless category
+  </td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>Caroline Ring
+</p>
+
+
+<h3>References</h3>
+
+<p>Ring CL, Pearce RG, Setzer RW, Wetmore BA, Wambaugh JF (2017).
+“Identifying populations sensitive to environmental chemicals by simulating toxicokinetic variability.”
+<em>Environment International</em>, <b>106</b>, 105–118.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+
+#Simply generate a virtual population of 100 individuals,
+ #using the direct-resampling method
+ set.seed(42)
+httkpop_generate(method='direct resampling', nsamp=100)
+
+#Generate a population using the virtual-individuals method,
+#including 80 females and 20 males,
+#including only ages 20-65,
+#including only Mexican American and
+#Non-Hispanic Black individuals,
+#including only non-obese individuals
+set.seed(42)
+mypop &lt;- httkpop_generate(method = 'virtual individuals',
+                          gendernum=list(Female=80,
+                          Male=20),
+                          agelim_years=c(20,65),
+                          reths=c('Mexican American',
+                          'Non-Hispanic Black'),
+                          weight_category=c('Underweight',
+                          'Normal',
+                          'Overweight'))
+# Including a httkpop.dt argument will overwrite the number of sample and
+# the httkpop on/off logical switch:
+samps1 &lt;- create_mc_samples(chem.name="bisphenola",
+                           httkpop=FALSE,
+                           httkpop.dt=mypop)
+samps2 &lt;- create_mc_samples(chem.name="bisphenola",
+                           httkpop.dt=mypop)
+samps3 &lt;- create_mc_samples(chem.name="bisphenola",
+                           httkpop=FALSE)
+# Now run calc_mc_oral equiv on the same pop for two different chemcials:
+calc_mc_oral_equiv(conc=10,
+                   chem.name="bisphenola",
+                   httkpop.dt=mypop,
+                   return.samples=TRUE)
+calc_mc_oral_equiv(conc=2,
+                   chem.name="triclosan",
+                   httkpop.dt=mypop,
+                   return.samples=TRUE)
+
+
+
+
+</code></pre>
+
+
+</div>

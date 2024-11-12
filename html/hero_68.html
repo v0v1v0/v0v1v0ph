@@ -1,0 +1,184 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>prepare.matrix</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Prepare data matrix for sandwich smooth</h2>
+
+<h3>Description</h3>
+
+<p><code>prepare.matrix</code> prepares a data matrix for the
+sandwich smooth.  The dimensionality of <code>data</code> and
+the length of <code>x</code> must match.  Specifically,
+<code>length(dim(data))</code> must equal
+<code>length(x)</code>.     The dimensionality of
+<code>data</code> and the length of <code>splines</code> must match.
+Specifically, <code>length(dim(data))</code> must equal
+<code>length(splines)</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">## S3 method for class 'matrix'
+prepare(
+  data,
+  x,
+  splines,
+  m = 2,
+  sparse = TRUE,
+  spdiffpen = TRUE,
+  digits = 1,
+  sts = FALSE,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>A data matrix.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>A list of values at which to evaluate the basis
+functions.  See Examples and Details.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>splines</code></td>
+<td>
+<p>A list of spline objects
+(<code>hero_bspline</code> and <code>hero_radspline</code>).  See
+Examples and Details.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>m</code></td>
+<td>
+<p>A positive integer indicating order of the difference penalty.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sparse</code></td>
+<td>
+<p>A logical value indicating if the result
+should be a sparse version of the
+<code>Matrix-class</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>spdiffpen</code></td>
+<td>
+<p>A logical value indicating whether
+<code>spdiffpen</code> should be used to compute the
+difference penalty.  The default is <code>FALSE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>digits</code></td>
+<td>
+<p>The number of digits to use when applying
+<code>round</code> to the distances.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sts</code></td>
+<td>
+<p>A logical value indicating whether <code>data</code>
+is a spatial time series, in which each row of
+<code>data</code> corresponds to a distinct spatial location
+and each column corresponds to a distinct time.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Not currently implemented.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>For a typical sandwich smooth (<code>sts = FALSE</code>),
+for two-dimensional data, <code>data[i, j]</code> is assumed
+to be observed at position <code>x[[1]][i]</code>,
+<code>x[[2]][j]</code>.  If the data are a spatial time series,
+then the first dimension is assumed to refer to space,
+and the second dimension to time.  In that case,
+<code>data[i, j]</code> is assumed
+to be observed at location <code>x[[1]][i, ]</code> and time
+<code>x[[2]][j]</code>.
+</p>
+<p>If <code>sts = TRUE</code>, then <code>x[[1]]</code> should be a
+matrix of spatial coordinates, with each row
+corresponding to a location, and <code>x[[2]]</code> should
+be a vector with the observation times.
+</p>
+<p>If <code>x</code> is not supplied, then
+<code>default.evalargs</code> is used to create it
+automatically.  This is only valid when
+<code>sts = FALSE</code>.
+</p>
+<p>If <code>splines</code> is not supplied, then a B-spline basis
+is automatically created for each dimension using
+<code>default.splines</code>.  This is only valid when
+<code>sts = FALSE</code>.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A <code>prepared_matrix</code> object.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Joshua French.  Based off code by Luo Xiao (see
+References).
+</p>
+
+
+<h3>References</h3>
+
+<p>Xiao, L. , Li, Y. and Ruppert, D. (2013),
+Fast bivariate P-splines: the sandwich smoother. J. R.
+Stat. Soc. B, 75: 577-599. &lt;doi:10.1111/rssb.12007&gt;
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>bspline</code>, <code>radspline</code>,
+<code>diffpen</code>, <code>spdiffpen</code>,
+<code>default.evalargs</code>,
+<code>default.splines</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># prepare Lu et al. (2012) noisy f1 data
+data(ludata)
+obj = prepare(lunoisyf1, x = list(x, z))
+h = hero(obj)
+
+# precompute some stuff
+splines = default.splines(list(x, z))
+l = assemble(splines, x = list(x, z))
+obj2 = prepare(lunoisyf1, x = list(x, z),
+               splines = splines, assembled = l)
+h2 = hero(obj2)
+all.equal(h, h2)
+</code></pre>
+
+
+</div>

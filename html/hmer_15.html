@@ -1,0 +1,317 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>emulator_from_data</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Generate Emulators from Data</h2>
+
+<h3>Description</h3>
+
+<p>Given data from simulator runs, generates a set of <code>Emulator</code> objects,
+one for each output.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">emulator_from_data(
+  input_data,
+  output_names,
+  ranges,
+  input_names = names(ranges),
+  emulator_type = NULL,
+  specified_priors = NULL,
+  order = 2,
+  beta.var = FALSE,
+  corr_name = "exp_sq",
+  adjusted = TRUE,
+  discrepancies = NULL,
+  verbose = interactive(),
+  na.rm = FALSE,
+  check.ranges = TRUE,
+  targets = NULL,
+  has.hierarchy = FALSE,
+  covariance_opts = NULL,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>input_data</code></td>
+<td>
+<p>Required. A data.frame containing parameter and output values</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>output_names</code></td>
+<td>
+<p>Required. A character vector of output names</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ranges</code></td>
+<td>
+<p>Required if input_names is not given. A named list of input parameter ranges</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>input_names</code></td>
+<td>
+<p>Required if ranges is not given. The names of the parameters</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>emulator_type</code></td>
+<td>
+<p>Selects between deterministic, variance, covariance, and multistate emulation</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>specified_priors</code></td>
+<td>
+<p>A collection of user-determined priors (see description)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>order</code></td>
+<td>
+<p>To what polynomial order should regression surfaces be fitted?</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>beta.var</code></td>
+<td>
+<p>Should uncertainty in the regression coefficients be included?</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>corr_name</code></td>
+<td>
+<p>If not exp_sq, the name of the correlation structures to fit</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>adjusted</code></td>
+<td>
+<p>Should the return emulators be Bayes linear adjusted?</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>discrepancies</code></td>
+<td>
+<p>Any known internal or external discrepancies of the model</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p>Should status updates be provided?</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>na.rm</code></td>
+<td>
+<p>If TRUE, removes output values that are NA</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>check.ranges</code></td>
+<td>
+<p>If TRUE, modifies ranges to a conservative minimum enclosing hyperrectangle</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>targets</code></td>
+<td>
+<p>If provided, outputs are checked for consistent over/underestimation</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>has.hierarchy</code></td>
+<td>
+<p>Internal - distinguishes deterministic from hierarchical emulators</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>covariance_opts</code></td>
+<td>
+<p>User-specified options for emulating covariance matrices</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Any additional parameters for custom correlators or additional verbosity options</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Many of the parameters that can be passed to this function are optional: the minimal operating
+example requires <code>input_data</code>, <code>output_names</code>, and one of <code>ranges</code> or
+<code>input_names</code>. If <code>ranges</code> is supplied, the input names are intuited from that list,
+data.frame, or data.matrix; if only <code>input_names</code> is supplied, then ranges are
+assumed to be [-1, 1] for each input.
+</p>
+<p>The ranges can be provided in a few different ways: either as a named list of length-2
+numeric vectors (corresponding to upper and lower bounds for each parameter); as a
+data.frame with 2 columns and each row corresponding to a parameter; or as a data.matrix
+defined similarly as the data.frame. In the cases where the ranges are provided as a
+data.frame or data.matrix, the <code>row.names</code> of the data object must be provided, and
+a warning will be given if not.
+</p>
+<p>If the set <code>(input_data, output_names, ranges)</code> is provided and nothing else,
+then emulators are fitted as follows. The basis functions and associated regression
+coefficients are generated using linear regression up to quadratic order, allowing for
+cross-terms. These regression parameters are assumed 'known'.
+</p>
+<p>The correlation function c(x, x') is assumed to be <code>exp_sq</code> and a corresponding
+<code>Correlator</code> object is created. The hyperparameters of the correlation
+structure are determined using a constrained maximum likelihood argument. This determines
+the variance, correlation length, and nugget term.
+</p>
+<p>The maximum allowed order of the regression coefficients is controlled by <code>order</code>;
+the regression coefficients themselves can be deemed uncertain by setting
+<code>beta.var = TRUE</code> (in which case their values can change in the hyperparameter
+estimation); the hyperparameter search can be overridden by specifying ranges for
+each using <code>hp_range</code>.
+</p>
+<p>In the presence of expert beliefs about the structure of the emulators, information
+can be supplied directly using the <code>specified_priors</code> argument. This can contain
+specific regression coefficient values <code>beta</code> and regression functions <code>func</code>,
+correlation structures <code>u</code>, hyperparameter values <code>hyper_p</code> and nugget term
+values <code>delta</code>.
+</p>
+<p>Some rudimentary data handling functionality exists, but is not a substitute for
+sense-checking input data directly. The <code>na.rm</code> option will remove rows of
+training data that contain NA values if true; the <code>check.ranges</code> option allows
+a redefinition of the ranges of input parameters for emulator training if true. The
+latter is a common practice in later waves of emulation in order to maximise the
+predictive power of the emulators, but should only be used if it is believed that
+the training set provided is truly representative of and spans the full space of
+interest.
+</p>
+<p>Various different classes of emulator can be created using this function, depending
+on the nature of the model. The <code>emulator_type</code> argument accepts a few different
+options:
+</p>
+
+<dl>
+<dt>"variance"</dt>
+<dd>
+<p>Create emulators for the mean and variance surfaces, for each stochastic output</p>
+</dd>
+<dt>"covariance</dt>
+<dd>
+<p>Create emulators for the mean surface, and a covariance matrix for the variance surface</p>
+</dd>
+<dt>"multistate"</dt>
+<dd>
+<p>Create sets of emulators per output for multistate stochastic systems</p>
+</dd>
+<dt>"default"</dt>
+<dd>
+<p>Deterministic emulators with no covariance structure</p>
+</dd>
+</dl>
+<p>The "default" behaviour will apply if the <code>emulator_type</code> argument is not supplied, or
+does not match any of the above options. If the data provided looks to display stochasticity,
+but default behaviour is used, a warning will be generated and only the first model result
+for each individual parameter set will be used in training.
+</p>
+<p>For examples of this function's usage (including optional argument behaviour), see the examples.
+</p>
+
+
+<h3>Value</h3>
+
+<p>An appropriately structured list of <code>Emulator</code> objects
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Deterministic: use the SIRSample training dataset as an example.
+ranges &lt;- list(aSI = c(0.1, 0.8), aIR = c(0, 0.5), aSR = c(0, 0.05))
+out_vars &lt;- c('nS', 'nI', 'nR')
+ems_linear &lt;- emulator_from_data(SIRSample$training, out_vars, ranges, order = 1)
+ems_linear # Printout of the key information.
+
+# Stochastic: use the BirthDeath training dataset
+v_ems &lt;- emulator_from_data(BirthDeath$training, c("Y"),
+ list(lambda = c(0, 0.08), mu = c(0.04, 0.13)), emulator_type = 'variance')
+
+# If different specifications are wanted for variance/expectation ems, then
+# enter a list with entries 'variance', 'expectation'. Eg corr_names
+v_ems_corr &lt;- emulator_from_data(BirthDeath$training, c("Y"),
+ list(lambda = c(0, 0.08), mu = c(0.4, 0.13)), emulator_type = 'variance',
+ corr_name = list(variance = "matern", expectation = "exp_sq")
+)
+
+ # Excessive runtime
+  ems_quad &lt;- emulator_from_data(SIRSample$training, out_vars, ranges)
+  ems_quad # Now includes quadratic terms
+  ems_cub &lt;- emulator_from_data(SIRSample$training, out_vars, ranges, order = 3)
+  ems_cub # Up to cubic order in the parameters
+
+  ems_unadjusted &lt;- emulator_from_data(SIRSample$training, out_vars, ranges, adjusted = FALSE)
+  ems_unadjusted # Looks the same as ems_quad, but the emulators are not Bayes Linear adjusted
+
+  # Reproduce the linear case, but with slightly adjusted beta values
+  basis_f &lt;- list(
+   c(function(x) 1, function(x) x[[1]], function(x) x[[2]]),
+   c(function(x) 1, function(x) x[[1]], function(x) x[[2]]),
+   c(function(x) 1, function(x) x[[1]], function(x) x[[3]])
+  )
+  beta_val &lt;- list(
+   list(mu = c(550, -400, 250)),
+   list(mu = c(200, 200, -300)),
+   list(mu = c(200, 200, -50))
+  )
+  ems_custom_beta &lt;- emulator_from_data(SIRSample$training, out_vars, ranges,
+   specified_priors = list(func = basis_f, beta = beta_val)
+  )
+  # Custom correlation functions
+  corr_structs &lt;- list(
+   list(sigma = 83, corr = Correlator$new('exp_sq', list(theta = 0.5), nug = 0.1)),
+   list(sigma = 95, corr = Correlator$new('exp_sq', list(theta = 0.4), nug = 0.25)),
+   list(sigma = 164, corr = Correlator$new('matern', list(theta = 0.2, nu = 1.5), nug = 0.45))
+  )
+  ems_custom_u &lt;- emulator_from_data(SIRSample$training, out_vars, ranges,
+  specified_priors = list(u = corr_structs))
+  # Allowing the function to choose hyperparameters for 'non-standard' correlation functions
+  ems_matern &lt;- emulator_from_data(SIRSample$training, out_vars, ranges, corr_name = 'matern')
+  # Providing hyperparameters directly
+  matern_hp &lt;- list(
+   list(theta = 0.8, nu = 1.5),
+   list(theta = 0.6, nu = 2.5),
+   list(theta = 1.2, nu = 0.5)
+  )
+  ems_matern2 &lt;- emulator_from_data(SIRSample$training, out_vars, ranges, corr_name = 'matern',
+   specified_priors = list(hyper_p = matern_hp))
+  # "Custom" correaltion function with user-specified ranges: gamma exponential
+  # Any named, defined, correlation function can be passed. See Correlator documentation
+  ems_gamma &lt;- emulator_from_data(SIRSample$training, out_vars, ranges, corr_name = 'gamma_exp',
+   specified_priors = list(hyper_p = list(gamma = c(0.01, 2), theta = c(1/3, 2))))
+
+  # Multistate emulation: use the stochastic SIR dataset
+  SIR_names &lt;- c("I10", "I25", "I50", "R10", "R25", "R50")
+  b_ems &lt;- emulator_from_data(SIR_stochastic$training, SIR_names,
+   ranges, emulator_type = 'multistate')
+
+  # Covariance emulation, with specified non-zero matrix elements
+  which_cov &lt;- matrix(rep(TRUE, 16), nrow = 4)
+  which_cov[2,3] &lt;- which_cov[3,2] &lt;- which_cov[1,4] &lt;- which_cov[4,1] &lt;- FALSE
+  c_ems &lt;- emulator_from_data(SIR_stochastic$training, SIR_names[-c(3,6)], ranges,
+   emulator_type = 'covariance', covariance_opts = list(matrix = which_cov))
+
+
+</code></pre>
+
+
+</div>

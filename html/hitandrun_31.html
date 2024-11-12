@@ -1,0 +1,93 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>transformConstraints</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Apply a transformation to a set of linear constraints.
+</h2>
+
+<h3>Description</h3>
+
+<p>Given a set of linear constraints and a transformation matrix, return the constraints in the transformed space.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">transformConstraints(transform, constr)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>transform</code></td>
+<td>
+<p>Transformation matrix</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>constr</code></td>
+<td>
+<p>Constraints</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Transforming the constraint matrix is a necessary preprocessing step for applying "Hit and Run" to subsets of a space defined by linear equality constraints. See <code>solution.basis</code> and <code>createTransform</code> for building the transformation matrix.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A set of constraints in the new basis.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Gert van Valkenhoef
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>solution.basis</code>
+<code>createTransform</code>
+<code>har</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Sample from the space where 2*x_1 = x_2 + x_3 and
+# 0 &lt;= x_1, x_2, x_3 &lt;= 5
+n &lt;- 3
+
+eq.constr &lt;- list(
+  constr = matrix(c(2, -1, -1), nrow=1, ncol=n),
+  dir = '=',
+  rhs = 0)
+
+ineq.constr &lt;- list(
+  constr = rbind(-diag(n), diag(n)),
+  dir = rep('&lt;=', n * 2),
+  rhs = c(rep(0, n), rep(5, n)))
+
+basis &lt;- solution.basis(eq.constr)
+transform &lt;- createTransform(basis)
+constr &lt;- transformConstraints(transform, ineq.constr)
+x0 &lt;- createSeedPoint(constr, homogeneous=TRUE)
+x &lt;- har(x0, constr, 500, transform=transform, homogeneous=TRUE)$samples
+
+stopifnot(all.equal(2 * x[,1], x[,2] + x[,3]))
+stopifnot(all(x &gt;= 0))
+stopifnot(all(x &lt;= 5))
+</code></pre>
+
+
+</div>

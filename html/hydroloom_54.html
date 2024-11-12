@@ -1,0 +1,80 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>make_index_ids</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Make Index ids</h2>
+
+<h3>Description</h3>
+
+<p>makes index ids for the provided hy object. These can be used
+for graph traversal algorithms such that the row number and id are equal.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">make_index_ids(x, long_form = FALSE)
+
+## S3 method for class 'data.frame'
+make_index_ids(x, long_form = FALSE)
+
+## S3 method for class 'hy'
+make_index_ids(x, long_form = FALSE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>data.frame network compatible with hydroloom_names.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>long_form</code></td>
+<td>
+<p>logical if TRUE, return will be a long-form version of the
+<code>to_list</code>. This form can be converted to the default list format with
+format_index_ids.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>list containing named elements: <code>to</code>: adjacency matrix <code>lengths</code>:
+vector indicating the number of connections from each node, and: <code>to_list</code>:
+a data.frame with an <code>id</code>, <code>indid</code> and a <code>toindid</code> list column. If long_form
+= TRUE, return will be a long form data.frame with no list column as in <code>to_list</code>.
+NOTE: the long_form output should be used with caution as indid may not
+correspond to row number.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+x &lt;- data.frame(id = c(1, 2, 3, 4, 5, 6, 7, 8, 9),
+              toid = c(2, 3, 4, 5, 0, 7, 8, 9, 4))
+
+make_index_ids(x)
+
+x &lt;- hy(sf::read_sf(system.file("extdata/new_hope.gpkg", package = "hydroloom")))
+
+x &lt;- add_toids(x, return_dendritic = FALSE)
+
+x &lt;- make_index_ids(x)
+
+names(x)
+class(x$to)
+class(x$lengths)
+class(x$to_list)
+is.list(x$to_list$toindid)
+
+</code></pre>
+
+
+</div>

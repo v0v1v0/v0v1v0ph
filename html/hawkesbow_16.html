@@ -1,0 +1,166 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>Model</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>C++ abstract class for Hawkes processes</h2>
+
+<h3>Description</h3>
+
+<p>This is a C++ abstract class for Hawkes processes, which holds
+methods for the estimation of its parameters.
+</p>
+
+
+<h3>Details</h3>
+
+<p>This serves as a basis for the Hawkes model and its count sequence,
+with conditional intensity function
+</p>
+<p style="text-align: center;"><code class="reqn">\lambda(t) = \eta + \mu \sum_{T_i &lt; t} h^\ast(t - T_i).</code>
+</p>
+
+<p>As an abstract class, an object of class <code>Model</code> should never be directly
+instanciated, but rather one of its derived class.
+The constructor can take no argument, in which case the vector <code>param</code> is
+initialised to sensible values and <code>binsize</code> defaults to 1.
+Alternatively, <code>param</code> and/or <code>binsize</code> can be specified.
+</p>
+
+
+<h3>Fields</h3>
+
+
+<dl>
+<dt><code>param</code></dt>
+<dd>
+<p>Vector of parameters of the Hawkes process, of the form <code class="reqn">(\eta, \mu, ...)</code>.</p>
+</dd>
+<dt><code>binsize</code></dt>
+<dd>
+<p>Bin size for the count sequences.</p>
+</dd>
+<dt><code>new(DerivedClass,(param),(binsize))</code></dt>
+<dd>
+<p>Constructor for derived classes; <code>param</code> and/or <code>binsize</code>
+can be safely ignored.</p>
+</dd>
+<dt><code>mean()</code></dt>
+<dd>
+<p>Returns the expected value on <code class="reqn">[0,\mathrm{end}]</code>.</p>
+</dd>
+<dt><code>dmean()</code></dt>
+<dd>
+<p>Returns the Jacobian matrix of the expected value on <code class="reqn">[0,\mathrm{end}]</code>.</p>
+</dd>
+<dt><code>ddmean()</code></dt>
+<dd>
+<p>Returns the Hessian matrix of the expected value on <code class="reqn">[0,\mathrm{end}]</code>.</p>
+</dd>
+<dt><code>f(xi)</code></dt>
+<dd>
+<p>Returns the spectral density function of the time-continuous count sequence. </p>
+
+<ul><li> <p><code>xi</code> A numeric vector of frequencies.
+</p>
+</li></ul>
+</dd>
+<dt><code>f1(xi,trunc)</code></dt>
+<dd>
+<p>Returns the spectral density function of the discrete time count sequence. </p>
+
+<ul>
+<li> <p><code>xi</code> A numeric vector of frequencies.
+</p>
+</li>
+<li> <p><code>trunc</code> The number of foldings to take into account for the aliasing.
+</p>
+</li>
+</ul>
+</dd>
+<dt><code>whittle(I,trunc)</code></dt>
+<dd>
+<p>Returns the log-spectral likelihood of a discrete time count sequence. </p>
+
+<ul>
+<li> <p><code>I</code> The periodogram of the count sequence.
+</p>
+</li>
+<li> <p><code>trunc</code> The number of foldings to take into account for the aliasing.
+</p>
+</li>
+</ul>
+</dd>
+<dt><code>loglik(events,end)</code></dt>
+<dd>
+<p>Returns the log-likelihood of a sequence of arrival times. </p>
+
+<ul>
+<li> <p><code>events</code> The sequence of arrival times.
+</p>
+</li>
+<li> <p><code>end</code> The endpoint of the observation window <code class="reqn">[0,\mathrm{end}]</code>.
+</p>
+</li>
+</ul>
+</dd>
+<dt><code>dloglik(events,end)</code></dt>
+<dd>
+<p>Returns the Jacobian matrix of the log-likelihood of a sequence of arrival times. </p>
+
+<ul>
+<li> <p><code>events</code> The sequence of arrival times.
+</p>
+</li>
+<li> <p><code>end</code> The endpoint of the observation window <code class="reqn">[0,\mathrm{end}]</code>.
+</p>
+</li>
+</ul>
+</dd>
+<dt><code>ddloglik(events,end)</code></dt>
+<dd>
+<p>Returns the Hessian matrix of the log-likelihood of a sequence of arrival times. </p>
+
+<ul>
+<li> <p><code>events</code> The sequence of arrival times.
+</p>
+</li>
+<li> <p><code>end</code> The endpoint of the observation window <code class="reqn">[0,\mathrm{end}]</code>.
+</p>
+</li>
+</ul>
+</dd>
+</dl>
+<h3>See Also</h3>
+
+<p>Exponential
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Simulate 1000 exponential Hawkes processes on \eqn{[0, 100]},
+# and average the periodogram of the count sequences with bin size 1
+# at each frequency.
+I = rep(0, 100)
+for (k in 1:1e3) {
+    x = hawkes(100, fun = 1, repr = .5, family = "exp", rate = 2)
+    y = discrete(x, binsize = 1)
+    I = I + Mod(fft(y - mean(y)))^2 / length(y)
+}
+
+# Check that the averaged periodogram correctly approximates the spectral
+# density function of the count sequence
+model = new(Exponential)
+model$param = c(1, .5, 2)
+model$binsize = 1
+
+z = 2 * pi * 0:99 / 100     # Frequencies of the periodogram
+plot(z, I / 1e3, type = "l") # Averaged periodogram
+lines(z, model$f1(xi = z, trunc = 10L), col = "red")
+
+</code></pre>
+
+
+</div>

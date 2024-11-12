@@ -1,0 +1,137 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>apval_Chen2010</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Asymptotics-Based p-value of the Test Proposed by Chen and Qin (2010)
+</h2>
+
+<h3>Description</h3>
+
+<p>Calculates p-value of the test for testing equality of two-sample high-dimensional mean vectors proposed by Chen and Qin (2010) based on the asymptotic distribution of the test statistic.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">apval_Chen2010(sam1, sam2, eq.cov = TRUE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>sam1</code></td>
+<td>
+
+<p>an n1 by p matrix from sample population 1. Each row represents a <code class="reqn">p</code>-dimensional sample.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sam2</code></td>
+<td>
+
+<p>an n2 by p matrix from sample population 2. Each row represents a <code class="reqn">p</code>-dimensional sample.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>eq.cov</code></td>
+<td>
+
+<p>a logical value. The default is <code>TRUE</code>, indicating that the two sample populations have same covariance; otherwise, the covariances are assumed to be different. 
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Suppose that the two groups of <code class="reqn">p</code>-dimensional independent and identically distributed samples <code class="reqn">\{X_{1i}\}_{i=1}^{n_1}</code> and <code class="reqn">\{X_{2j}\}_{j=1}^{n_2}</code> are observed; we consider high-dimensional data with <code class="reqn">p \gg n := n_1 + n_2 - 2</code>. The primary object is to test <code class="reqn">H_{0}: \mu_1 = \mu_2</code> versus <code class="reqn">H_{A}: \mu_1 \neq \mu_2</code>. Let <code class="reqn">\bar{X}_{k}</code> be the sample mean for group <code class="reqn">k = 1, 2</code>.
+</p>
+<p>Chen and Qin (2010) proposed the following test statistic:
+</p>
+<p style="text-align: center;"><code class="reqn">T_{CQ} = \frac{\sum_{i \neq j}^{n_1} X_{1i}^T X_{1j}}{n_1 (n_1 - 1)} + \frac{\sum_{i \neq j}^{n_2} X_{2i}^T X_{2j}}{n_2 (n_2 - 1)} - 2 \frac{\sum_{i = 1}^{n_1} \sum_{j = 1}^{n_2} X_{1i}^T X_{2j}}{n_1 n_2},</code>
+</p>
+
+<p>and its asymptotic distribution is normal under the null hypothesis.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A list including the following elements:
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>sam.info</code></td>
+<td>
+
+<p>the basic information about the two groups of samples, including the samples sizes and dimension.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cov.assumption</code></td>
+<td>
+
+<p>the equality assumption on the covariances of the two sample populations; this was specified by the argument <code>eq.cov</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+
+<p>this output reminds users that the p-values are obtained using the asymptotic distributions of test statistics.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pval</code></td>
+<td>
+
+<p>the p-value of the test proposed by Chen and Qin (2010).
+</p>
+</td>
+</tr>
+</table>
+<h3>References</h3>
+
+<p>Chen SX and Qin YL (2010). "A two-sample test for high-dimensional data with applications to gene-set testing." <em>The Annals of Statistics</em>, <b>38</b>(2), 808–835.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>epval_Chen2010</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">library(MASS)
+set.seed(1234)
+n1 &lt;- n2 &lt;- 50
+p &lt;- 200
+mu1 &lt;- rep(0, p)
+mu2 &lt;- mu1
+mu2[1:10] &lt;- 0.2
+true.cov &lt;- 0.4^(abs(outer(1:p, 1:p, "-"))) # AR1 covariance
+sam1 &lt;- mvrnorm(n = n1, mu = mu1, Sigma = true.cov)
+sam2 &lt;- mvrnorm(n = n2, mu = mu2, Sigma = true.cov)
+apval_Chen2010(sam1, sam2)
+
+# the two sample populations have different covariances
+true.cov1 &lt;- 0.2^(abs(outer(1:p, 1:p, "-")))
+true.cov2 &lt;- 0.6^(abs(outer(1:p, 1:p, "-")))
+sam1 &lt;- mvrnorm(n = n1, mu = mu1, Sigma = true.cov1)
+sam2 &lt;- mvrnorm(n = n2, mu = mu2, Sigma = true.cov2)
+apval_Chen2010(sam1, sam2, eq.cov = FALSE)
+</code></pre>
+
+
+</div>

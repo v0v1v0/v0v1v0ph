@@ -1,0 +1,179 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>extractPeriod</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Extract period from list or dataframe.</h2>
+
+<h3>Description</h3>
+
+<p>Extract common period or certain period from a list of different dataframes of time series, or from a 
+dataframe. 
+NOTE: all the dates in the datalist should follow the format in ?as.Datebase.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">extractPeriod(
+  data,
+  startDate = NULL,
+  endDate = NULL,
+  commonPeriod = FALSE,
+  year = NULL,
+  month = NULL
+)
+
+## S4 method for signature 'data.frame'
+extractPeriod(
+  data,
+  startDate = NULL,
+  endDate = NULL,
+  commonPeriod = FALSE,
+  year = NULL,
+  month = NULL
+)
+
+## S4 method for signature 'list'
+extractPeriod(
+  data,
+  startDate = NULL,
+  endDate = NULL,
+  commonPeriod = FALSE,
+  year = NULL,
+  month = NULL
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>A list of different dataframes of time series, or a dataframe with first column Date, the rest columns value.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>startDate</code></td>
+<td>
+<p>A Date showing the start of the extract period, default as NULL, check details.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>endDate</code></td>
+<td>
+<p>A Date showing the end of the extract period, default as NULL, check details.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>commonPeriod</code></td>
+<td>
+<p>A boolean showing whether the common period is extracted. If chosen, startDate and endDate
+should be NULL.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>year</code></td>
+<td>
+<p>extract certain year in the entire time series. if you want to extract year 2000, set <code>year = 2000</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>month</code></td>
+<td>
+<p>extract certain months in a year. e.g. if you want to extract Jan, Feb of each year, 
+set <code>month = c(1, 2)</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p><strong>startDate and endDate</strong>
+</p>
+<p>If startDate and endDate are assigned, then certain period between startDate and endDate will be returned, 
+for both datalist input and dataframe input.
+</p>
+<p>If startDate and endDate are NOT assigned, then,
+</p>
+<p>if input is a datalist, the startDate and endDate of the common period of different datalists will be assigned
+to the startDate and endDate.
+</p>
+<p>if input is a dataframe, the startDate and endDate of the input dataframe will be assigned to the startDate
+and endDate . Since different value columns share a common Date column in a dataframe input. 
+</p>
+<p><strong>year and month</strong>
+</p>
+<p>For year crossing month input, hyfo will take from the year before. E.g. if <code>month = c(10, 11, 12, 1)</code>,
+and <code>year = 1999</code>, hyfo will take month 10, 11 and 12 from year 1998, and month 1 from 1999.You DO NOT 
+have to set <code>year = 1998 : 1999</code>.
+</p>
+<p>Well, if you set <code>year = 1998 : 1999</code>, hyfo will take month 10, 11 and 12 from year 1997, and month 1 from 1998,
+then, take month 10, 11 and 12 from year 1998, month 1 from 1999. So you only have to care about the latter year.
+</p>
+<p>It is a generic function, if in your case you need to debug, please see <code>?debug()</code> 
+for how to debug S4 method.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A list or a dataframe with all the time series inside containing the same period.
+</p>
+
+
+<h3>References</h3>
+
+
+<ul><li>
+<p> Achim Zeileis and Gabor Grothendieck (2005). zoo: S3 Infrastructure for Regular and Irregular Time
+Series. Journal of Statistical Software, 14(6), 1-27. URL https://www.jstatsoft.org/v14/i06/
+</p>
+</li></ul>
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Generate timeseries datalist. Each data frame consists of a Date and a value.
+
+AAA &lt;- data.frame(
+# date column
+Date = seq(as.Date('1990-10-28'),as.Date('1997-4-1'),1),
+ # value column
+AAA = sample(1:100,length(seq(as.Date('1990-10-28'),as.Date('1997-4-1'),1)), repl = TRUE))
+
+BBB &lt;- data.frame(
+Date = seq(as.Date('1993-3-28'),as.Date('1999-1-1'),1), 
+BBB = sample(1:100,length(seq(as.Date('1993-3-28'),as.Date('1999-1-1'),1)), repl = TRUE))
+ 
+CCC &lt;- data.frame(
+Date = seq(as.Date('1988-2-2'),as.Date('1996-1-1'),1), 
+CCC = sample(1:100,length(seq(as.Date('1988-2-2'),as.Date('1996-1-1'),1)), repl = TRUE)) 
+
+list &lt;- list(AAA, BBB, CCC)# dput() and dget() can be used to save and load list file.
+
+list_com &lt;- extractPeriod(list, commonPeriod = TRUE)
+
+# list_com is the extracted datalist.
+str(list_com)
+
+# If startDate and endDate is provided, the record between them will be extracted.
+# make sure startDate is later than any startDate in each dataframe and endDate is 
+# earlier than any endDate in each dataframe.
+
+data(testdl)
+datalist_com1 &lt;- extractPeriod(testdl, startDate = '1994-1-1', endDate = '1995-10-1')
+
+
+dataframe &lt;- list2Dataframe(datalist_com1)
+# now we have a dataframe to extract certain months and years.
+dataframe_new &lt;- extractPeriod(dataframe, month = c(1,2,3))
+dataframe_new &lt;- extractPeriod(dataframe, month = c(12,1,2), year = 1995)
+
+
+# More examples can be found in the user manual on https://yuanchao-xu.github.io/hyfo/
+
+</code></pre>
+
+
+</div>

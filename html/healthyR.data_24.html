@@ -1,0 +1,82 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>fetch_provider_data</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Fetch Provider Data as Tibble or Download CSV</h2>
+
+<h3>Description</h3>
+
+<p>This function retrieves provider data from the provided link and returns it as a tibble
+with cleaned names or downloads the data as a CSV file if the link ends in .csv.
+This function is intended to be used with the CMS provider data API.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">fetch_provider_data(.data_link, .limit = 500)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>.data_link</code></td>
+<td>
+<p>A character string containing the URL to fetch data from.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.limit</code></td>
+<td>
+<p>An integer specifying the maximum number of rows to fetch.
+Default is 500. If set to 0, all records will be returned.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The function sends a request to the provided URL using <code>httr2::request</code> and
+<code>httr2::req_perform</code>. If the response status is not 200, it stops with an
+error message indicating the failure. If the URL ends in .csv, it uses <code>utils::download.file</code>
+to download the CSV file to a directory chosen by the user. Otherwise, the
+response body is parsed as JSON and converted into a tibble using
+<code>dplyr::as_tibble</code>. The column names are cleaned using <code>janitor::clean_names</code>,
+and any character columns are stripped of leading and trailing whitespace
+using <code>stringr::str_squish</code>. The default limit for a return on records is 500.
+If the limit is set to 0, all records will be returned.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A tibble containing the fetched data with cleaned names, or downloads
+a CSV file to the user-selected directory. If an error occurs, returns <code>NULL</code>.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>get_provider_meta_data</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">library(dplyr)
+
+# Example usage:
+data_url &lt;- "069d-826b"
+
+df_tbl &lt;- fetch_provider_data(data_url, .limit = 1)
+
+df_tbl |&gt;
+ glimpse()
+
+</code></pre>
+
+
+</div>

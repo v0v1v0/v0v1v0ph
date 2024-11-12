@@ -1,0 +1,201 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>logLikePoisMix</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Log likelihood calculation for a Poisson mixture model
+</h2>
+
+<h3>Description</h3>
+
+<p>Functions to calculate the log likelihood for a Poisson mixture model, the difference in log likelihoods for two different sets of parameters of a Poisson mixture model or the log-likelihood for each observation.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">logLikePoisMix(y, mean, pi)
+logLikePoisMixDiff(y, mean.new, pi.new, mean.old, pi.old)
+mylogLikePoisMixObs(y, conds, s, lambda, pi)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+
+<p>(<em>n</em> x <em>q</em>) matrix of observed counts for <em>n</em> observations and <em>q</em> variables
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mean</code></td>
+<td>
+
+<p>List of length <em>g</em> containing the (<em>n</em> x <em>q</em>) matrices of conditional mean expression for all observations, as calculated by the <code>PoisMixMean</code> function, where <em>g</em> represents the number of clusters
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mean.new</code></td>
+<td>
+
+<p>List of length <em>g</em> containing the (<em>n</em> x <em>q</em>) matrices of conditional mean expression for all observations for one set of parameters, as calculated by the <code>PoisMixMean</code> function, where <em>g</em> represents the number of clusters
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mean.old</code></td>
+<td>
+
+<p>List of length <em>g</em> containing the (<em>n</em> x <em>q</em>) matrices of conditional mean expression for all observations for another set of parameters, as calculated by the <code>PoisMixMean</code> function, where <em>g</em> represents the number of clusters
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pi.new</code></td>
+<td>
+
+<p>Vector of length <em>g</em> containing one estimate for <code class="reqn">\hat{\boldsymbol{\pi}}</code>
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pi.old</code></td>
+<td>
+
+<p>Vector of length <em>g</em> containing another estimate for <code class="reqn">\hat{\boldsymbol{\pi}}</code>
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pi</code></td>
+<td>
+
+<p>Vector of length <em>g</em> containing estimate for <code class="reqn">\hat{\boldsymbol{\pi}}</code>
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>conds</code></td>
+<td>
+
+<p>Vector of length <em>q</em> defining the condition (treatment group) for each variable (column) in <code>y</code>
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>s</code></td>
+<td>
+
+<p>Estimate of normalized per-variable library size
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lambda</code></td>
+<td>
+
+<p>(<em>d</em> x <code>g</code>) matrix containing the current estimate of lambda, where <em>d</em> is the number of conditions (treatment groups) and <code>g</code> is the number of clusters
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The <code>logLikePoisMixDiff</code> function is used to calculate the difference in log likelihood for two different sets of parameters in a Poisson mixture model; it is used to determine convergence in the EM algorithm run by the <code>PoisMixClus</code> function.
+The <code>logLikePoisMix</code> function (taken largely from the <code>mylogLikePoisMix</code> function from the <code>poisson.glm.mix</code> R package) calculates the log likelihood for a given set of parameters in a Poisson mixture model and is used in the <code>PoisMixClus</code> function for the calculation of the BIC and ICL. 
+The <code>mylogLikePoisMixObs</code> function calculates the log likelihood per observation for a given set of parameters in a Poisson mixture model. 
+</p>
+
+
+<h3>Value</h3>
+
+<table><tr style="vertical-align: top;">
+<td><code>ll </code></td>
+<td>
+<p>(Depending on the context), the log likelihood, difference in log likelihoods for two different sets of parameters, or per-observation log-likelihood</p>
+</td>
+</tr></table>
+<h3>Note</h3>
+
+<p>In the <code>logLikePoisMixDiff</code> function, we make use of the alternative mass function for a Poisson density proposed by Loader (2000) to avoid computational difficulties. The <code>logLikePoisMixDiff</code> function returns a default value of 100 if one or both of the log likelihoods associated with the two parameter sets takes on a value of <code class="reqn">-\infty</code>.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Andrea Rau
+</p>
+
+
+<h3>References</h3>
+
+<p>Loader, C. (2000) Fast and accurate computation of binomial probabilities. Available at <a href="https://lists.gnu.org/archive/html/octave-maintainers/2011-09/pdfK0uKOST642.pdf">https://lists.gnu.org/archive/html/octave-maintainers/2011-09/pdfK0uKOST642.pdf</a>.
+</p>
+<p>Rau, A., Maugis-Rabusseau, C., Martin-Magniette, M.-L., Celeux G. (2015). Co-expression analysis of high-throughput transcriptome sequencing data with Poisson mixture models. Bioinformatics, 31(9):1420-1427.
+</p>
+<p>Rau, A., Celeux, G., Martin-Magniette, M.-L., Maugis-Rabusseau, C. (2011) Clustering high-throughput sequencing data with Poisson mixture models. Inria Research Report 7786. Available at <a href="https://inria.hal.science/inria-00638082">https://inria.hal.science/inria-00638082</a>.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>PoisMixClus</code> for Poisson mixture model estimation and model selection; 
+<code>PoisMixMean</code> to calculate the per-cluster conditional mean of each observation
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+set.seed(12345)
+
+## Simulate data as shown in Rau et al. (2011)
+## Library size setting "A", low cluster separation
+## n = 200 observations
+
+simulate &lt;- PoisMixSim(n = 200, libsize = "A", separation = "low")
+y &lt;- simulate$y
+conds &lt;- simulate$conditions
+w &lt;- rowSums(y)               ## Estimate of w
+r &lt;- table(conds)             ## Number of replicates per condition
+d &lt;- length(unique(conds))    ## Number of conditions
+s &lt;- colSums(y) / sum(y)      ## TC estimate of lib size
+s.dot &lt;- rep(NA, d)           ## Summing lib size within conditions
+for(j in 1:d) s.dot[j] &lt;- sum(s[which(conds == unique(conds)[j])]);
+
+## Initial guess for pi and lambda
+g.true &lt;- 4
+pi.guess &lt;- simulate$pi
+## Recalibrate so that (s.dot * lambda.guess) = 1
+lambda.sim &lt;- simulate$lambda
+lambda.guess &lt;- matrix(NA, nrow = d, ncol = g.true)
+for(k in 1:g.true) {
+    tmp &lt;- lambda.sim[,k]/sum(lambda.sim[,k])
+    lambda.guess[,k] &lt;- tmp/s.dot
+}
+
+## Run the PMM-II model for g = 4
+## with EM algorithm and "TC" library size parameter
+run &lt;- PoisMixClus(y, g = 4, norm = "TC", conds = conds) 
+pi.est &lt;- run$pi
+lambda.est &lt;- run$lambda
+
+## Mean values for each of the parameter sets
+mean.guess &lt;- PoisMixMean(y, 4, conds, s, lambda.guess)
+mean.est &lt;- PoisMixMean(y, 4, conds, s, lambda.est)
+
+## Difference in log likelihoods       
+LL.diff &lt;- logLikePoisMixDiff(y, mean.guess, pi.guess, mean.est, pi.est)
+LL.diff             ## -12841.11
+
+</code></pre>
+
+
+</div>

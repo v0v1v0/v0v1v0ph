@@ -1,0 +1,180 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>fSAE</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Fit a linear model with random area effects and compute small area estimates.</h2>
+
+<h3>Description</h3>
+
+<p>This function prepares the (unit-level) input data and calls one of the lower level functions <code>fSurvReg</code>, <code>fSAE.Area</code> or <code>fSAE.Unit</code>
+to compute survey regression, area-level model or unit-level model small area estimates. Area-level model estimates 
+are computed by first computing survey regression estimates and using these as input for <code>fSAE.Area</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">fSAE(
+  formula,
+  data,
+  area = NULL,
+  popdata = NULL,
+  type = "unit",
+  model.direct = NULL,
+  formula.area = NULL,
+  contrasts.arg = NULL,
+  remove.redundant = TRUE,
+  redundancy.tol = 1e-07,
+  sparse = FALSE,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>formula</code></td>
+<td>
+<p>model formula, indicating response variable and covariates.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>unit-level data frame containing all variables used in <code>formula</code>, <code>area</code> and <code>formula.area</code> arguments.
+These variables should not contain missing values.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>area</code></td>
+<td>
+<p>name of area indicator variable in <code>data</code>; if <code>NULL</code>, no random effects are used in the model.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>popdata</code></td>
+<td>
+<p>data frame or matrix containing area population totals for all covariates. The rows should correspond to areas
+for which estimates are required.
+Column names should include those produced by <code>model.matrix(formula, data, contrasts.arg)</code>, up to permutations of the names in interactions.
+A column named '(Intercept)' is required and should contain the area population sizes.
+If <code>popdata</code> is <code>NULL</code>, only the model fit is returned.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>type</code></td>
+<td>
+<p>type of small area estimates: "direct" for survey regression, "area" for area-level model, "unit" for unit-level model estimates.
+If <code>type</code> is "data" then only the data including the model matrix and population means are returned.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>model.direct</code></td>
+<td>
+<p>if type="area", this argument can be used to specify by means of a formula the covariates to use for the computation of the initial survey regression estimates.
+If unspecified, the covariates specified by <code>formula</code> are used both at the unit level (for the initial estimates) and at the area level (for the area-level model estimates).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>formula.area</code></td>
+<td>
+<p>if type="unit", this is an optional formula specifying covariates that should be used at the area level.
+These covariates should be available in <code>popdata</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>contrasts.arg</code></td>
+<td>
+<p>list for specification of contrasts for factor variables. Passed to <code>model.matrix</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>remove.redundant</code></td>
+<td>
+<p>if <code>TRUE</code> redundant columns in the design matrix are removed. A warning is issued if
+the same redundancy does not show also in the corresponding population totals. In the case of the
+area-level model there may still be redundancy at the area level.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>redundancy.tol</code></td>
+<td>
+<p>tolerance for detecting linear dependencies among the columns of the design matrix. Also used as tolerance in the check whether the design matrix redundancy is shared by the population totals.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sparse</code></td>
+<td>
+<p>if <code>TRUE</code> <code>sparse.model.matrix</code> (package <code>Matrix</code>) is used to compute the covariate design matrix. This can be efficient
+for large datasets and a model containing categorical variables with many categories.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>additional arguments passed to <code>fSAE.Unit</code> or <code>fSurvReg</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>An object of class <code>sae</code> containing the small area estimates, their MSEs, and the model fit. If <code>type</code> is "data" a list containing
+the model matrix, response vector, area indicator, area population sizes and matrix of population means is returned.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>sae-class</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">d &lt;- generateFakeData()
+
+# model fitting only
+(fit &lt;- fSAE(y0 ~ x + area2, data=d$sam, area="area"))
+
+# model fitting and small area estimation, unit-level model
+saeHB &lt;- fSAE(y0 ~ x + area2, data=d$sam, area="area", popdata=d$Xpop,
+              silent=TRUE)
+saeHB  # print a summary
+EST(saeHB)  # small area estimates
+RMSE(saeHB)  # error estimates
+str(saeHB)
+plot(saeHB, list(est=d$mY0), CI=2)  # compare to true population means
+
+# unit-level model with REML model-fit instead of Bayesian approach
+saeREML &lt;- fSAE(y0 ~ x + area2, data=d$sam, area="area", popdata=d$Xpop,
+                method="REML", silent=TRUE)
+plot(saeHB, saeREML)  # compare
+
+# basic area-level model
+saeA &lt;- fSAE(y0 ~ x + area2, data=d$sam, area="area", popdata=d$Xpop,
+             type="area")
+plot(saeHB, saeA)
+
+# SAE estimates based on a linear unit-level model without area effects
+saeL &lt;- fSAE(y0 ~ x + area2, data=d$sam, area="area", popdata=d$Xpop,
+             method="synthetic")
+plot(saeHB, saeL)
+
+# model-based estimation of overall population mean without area effects
+est.global &lt;- fSAE(y0 ~ x + area2, data=d$sam, area=NULL,
+                   popdata=colSums(d$Xpop), method="synthetic")
+EST(est.global); RMSE(est.global)
+
+# no model fitting or estimation, but return design matrix, variable of interest,
+#   area indicator, area population sizes and matrix of population means
+dat &lt;- fSAE(y0 ~ x + area2, data=d$sam, area="area", popdata=d$Xpop,
+            type="data")
+str(dat)
+</code></pre>
+
+
+</div>

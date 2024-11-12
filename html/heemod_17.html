@@ -1,0 +1,166 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>calibrate_model</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Calibrate Model Parameters</h2>
+
+<h3>Description</h3>
+
+<p>Search for the appropriate value of unknown parameters to
+obtain specific model results.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">calibrate_model(
+  x,
+  parameter_names,
+  fn_values,
+  target_values,
+  initial_values = NULL,
+  method = c("Nelder-Mead", "BFGS", "L-BFGS-B"),
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>Result from <code>run_model()</code> or <code>update()</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>parameter_names</code></td>
+<td>
+<p>Names of the parameters to
+calibrate.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fn_values</code></td>
+<td>
+<p>Function applied to the model that
+returns the values of interest as a numeric vector.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>target_values</code></td>
+<td>
+<p>Values to match, same length as the
+output from <code>fn_values</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>initial_values</code></td>
+<td>
+<p>Optional starting values. See
+details.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+<p>Optimisation method (<code>Nelder-Mead</code>,
+<code>BFGS</code>, or <code>L-BFGS-B</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Optional arguments passed to
+<code>optimx::optimx()</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Parameters not being optimized are unchanged from the
+values in the model run. If <code>initial_values</code> is <code>NULL</code>,
+the initial parameter values will also be taken from the
+model run.
+</p>
+<p><code>initial_values</code> can be a vector or a table. In the
+second case each row corresponds to a set of initial
+parameter values: the calibration will be run once per
+set.
+</p>
+<p>Passing in multiple initial values allows (among other
+things) the user to check whether the calibration gets
+the same results from different starting points.
+</p>
+<p>Multi-dimensional problems are optimized with
+<code>optimx::optimx()</code>, 1-dimensional problems with
+<code>stats::optimise()</code> (except when a <code>method</code> is given).
+<code>convcode</code> is always <code>NA</code> with <code>stats::optimise()</code>.
+</p>
+<p>Running <code>calibrate_model()</code> does not change the model
+parameters; the user must create a new model and run it
+if desired.
+</p>
+<p>See also <code>vignette("k-calibration")</code>.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A data frame in which each row has the calibrated
+values of parameters given in <code>parameter_names</code>, for
+the corresponding row of <code>initial_values</code>, along with
+the convergence code for each run.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+param &lt;- define_parameters(p = 0.8)
+
+mat &lt;- define_transition(
+  p, C,
+  0, 1
+)
+mod &lt;- define_strategy(
+  transition = mat,
+  A = define_state(cost=10, effect = 0.5), 
+  B = define_state(cost = 5, effect = 0.8)
+)
+
+res_mod &lt;- run_model(
+  mod = mod,
+  parameters = param,
+  init = c(1000L, 0L),
+  cycles = 10,
+  cost = cost,
+  effect = effect,
+  method = "end"
+)
+
+f &lt;- function(x) {
+  dplyr::filter(
+    get_counts(x),
+    state_names == "A" &amp; model_time == 10
+  )$count
+}
+f(res_mod)
+
+#'\dontrun{
+#'calibrate_model(
+#'  res_mod,
+#'  parameter_names = "p",
+#'  fn_values = f,
+#'  target_values = 130,
+#'  initial_values = data.frame(p = c(0.5, 0.9)),
+#'  lower = 0, upper = 1
+#')
+#'}
+</code></pre>
+
+
+</div>

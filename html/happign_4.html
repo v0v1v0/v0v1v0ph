@@ -1,0 +1,191 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>get_apicarto_cadastre</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Apicarto Cadastre</h2>
+
+<h3>Description</h3>
+
+<p>Implementation of the cadastre module from the
+<a href="https://apicarto.ign.fr/api/doc/cadastre">IGN's apicarto</a>
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">get_apicarto_cadastre(x,
+                      type = "commune",
+                      code_com = NULL,
+                      section = NULL,
+                      numero = NULL,
+                      code_arr = NULL,
+                      code_abs = NULL,
+                      dTolerance = 0L,
+                      source = "pci",
+                      progress = TRUE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>It can be a shape, insee codes or departement codes :
+</p>
+
+<ul>
+<li>
+<p> Shape : must be an object of class <code>sf</code> or <code>sfc</code>.
+</p>
+</li>
+<li>
+<p> Code insee : must be a <code>character</code> of length 5
+</p>
+</li>
+<li>
+<p> Code departement : must be a <code>character</code> of length  2 or 3 (DOM-TOM)
+</p>
+</li>
+</ul>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>type</code></td>
+<td>
+<p>A <code>character</code> from <code>"parcelle"</code>, <code>"commune"</code>, <code>"feuille"</code>,
+<code>"division"</code>, <code>"localisant"</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>code_com</code></td>
+<td>
+<p>A <code>character</code> of length 5 corresponding to the commune code. Only use with
+<code>type = "division"</code> or <code>type = "feuille"</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>section</code></td>
+<td>
+<p>A <code>character</code> of length 2</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>numero</code></td>
+<td>
+<p>A <code>character</code> of length 4</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>code_arr</code></td>
+<td>
+<p>A <code>character</code> corresponding to district code for Paris,
+Lyon, Marseille</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>code_abs</code></td>
+<td>
+<p>A <code>character</code> corresponding to the code of absorbed commune.
+This prefix is useful to differentiate between communes that have merged</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dTolerance</code></td>
+<td>
+<p>numeric; Complex shape cannot be handle by API; using <code>dTolerance</code>
+allow to simplify them. See <code>?sf::st_simplify</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>source</code></td>
+<td>
+<p>Can be "bdp" for BD Parcellaire or "pci" for Parcellaire express.
+See detail for more info.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>progress</code></td>
+<td>
+<p>Display a progress bar? Use TRUE to turn on a basic progress
+bar, use a string to give it a name. See <code>httr2::req_perform_iterative()</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p><code>x</code>, <code>section</code>, <code>numero</code>, <code>code_arr</code>, <code>code_abs</code>, <code>code_com</code> can take vector of character.
+In this case vector recycling is done. See the example section below.
+</p>
+<p><code>source</code>: BD Parcellaire is a discontinued product. Its use is no longer
+recommended because it is no longer updated. The use of PCI Express is
+strongly recommended and will become mandatory. More information on the
+comparison of this two products can be found
+<a href="https://geoservices.ign.fr/sites/default/files/2021-07/Comparatif_PEPCI_BDPARCELLAIRE.pdf">here</a>
+</p>
+
+
+<h3>Value</h3>
+
+<p>Object of class <code>sf</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+library(sf)
+library(tmap)
+
+# shape from the town of penmarch
+penmarch &lt;- read_sf(system.file("extdata/penmarch.shp", package = "happign"))
+
+# get commune borders
+## from shape
+penmarch_borders &lt;- get_apicarto_cadastre(penmarch, type = "commune")
+qtm(penmarch_borders, fill = NA)+qtm(penmarch)
+
+## from insee_code
+border &lt;- get_apicarto_cadastre("29158", type = "commune")
+borders &lt;- get_apicarto_cadastre(c("29158", "29135"), type = "commune")
+qtm(borders, fill="nom_com")
+
+# get cadastral parcels
+## from shape
+parcels &lt;- get_apicarto_cadastre(penmarch, section = "AW", type = "parcelle")
+
+## from insee code
+parcels &lt;- get_apicarto_cadastre("29158", type = "parcelle")
+
+# Use parameter recycling
+## get sections "AX" parcels from multiple insee_code
+parcels &lt;- get_apicarto_cadastre(c("29158", "29135"), section = "AW", type = "parcelle")
+qtm(penmarch_borders, fill = NA)+qtm(parcels)
+
+## get parcels numbered "0001", "0010" of section "AW" and "BR"
+section &lt;- c("AW", "BR")
+numero &lt;- rep(c("0001", "0010"), each = 2)
+parcels &lt;- get_apicarto_cadastre("29158", section = section, numero = numero, type = "parcelle")
+qtm(penmarch_borders, fill = NA)+qtm(parcels)
+
+## generalization with expand.grid
+params &lt;- expand.grid(code_insee = c("29158", "29135"),
+                      section = c("AW", "BR"),
+                      numero = c("0001", "0010"),
+                      stringsAsFactors = FALSE)
+parcels &lt;- get_apicarto_cadastre(params$code_insee,
+                                 section = params$section,
+                                 numero = params$numero,
+                                 type = "parcelle")
+qtm(penmarch_borders, fill = NA)+qtm(parcels$geometry)
+
+
+## End(Not run)
+
+</code></pre>
+
+
+</div>

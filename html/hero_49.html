@@ -1,0 +1,94 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>loglambda2gcv</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Determine GCV statistic</h2>
+
+<h3>Description</h3>
+
+<p><code>loglambda2gcv</code> uses a vector of penalty values
+to evaluate the GCV statistic for a
+<code>prepared_response</code> object.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">loglambda2gcv(loglambda, obj, loggcv = FALSE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>loglambda</code></td>
+<td>
+<p>A vector of penalty values (assumed to
+be on a natural logarithmic scale) for computing the GCV.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>obj</code></td>
+<td>
+<p>A <code>prepared_*</code> object from a
+<code>prepare</code> function.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>loggcv</code></td>
+<td>
+<p>A logical value indicating whether the log of the
+GCV statistic should be returned.
+The default is <code>FALSE</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Though this function can be used by the user, it is
+basically an internal function used to find the
+value of <code>loglambda</code> minimizing the GCV statistic.
+</p>
+
+
+<h3>Value</h3>
+
+<p>The scalar GCV statistic
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>prepare</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">n1 = 10
+b1 = bspline(nbasis = 10)
+x1 = seq(0, 1, len = n1)
+n2 = 20
+x2 = seq(0, 1, len = n2)
+b2 = bspline(nbasis = 12)
+# construct "true" data
+mu = matrix(0, nrow = n1, ncol = n2)
+for(i in seq_len(n1)) {
+   for(j in seq_len(n2)) {
+      mu[i, j] =  sin(2*pi*(x1[i]-.5)^3)*cos(4*pi*x2[j])
+   }
+}
+image(mu)
+# construct noisy data
+data = mu + rnorm(n1 * n2)
+x = list(x1, x2)
+splines = list(b1, b2)
+obj = prepare(data, x, splines)
+loglambda2gcv(c(0, 0), obj)
+</code></pre>
+
+
+</div>

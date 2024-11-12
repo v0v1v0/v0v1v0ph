@@ -1,0 +1,115 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>denoise.poisson</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>denoise.poisson</h2>
+
+<h3>Description</h3>
+
+<p>Main routine of the package. Estimates the deterministic discretised intensity of a one-dimensional Poisson process using the Haar-Fisz transformation and partial cycle spinning. 
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">denoise.poisson(y, meth.1 = hf.bt, cs.1 = 50, meth.2 = hf.cv, cs.2 = 50, hybrid = TRUE) 
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+<p>The vector of Poisson counts, its length must be a power of 2.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>meth.1</code></td>
+<td>
+<p>Unquoted name of an S-Plus routine for denoising Gaussian contaminated vectors. Must take and return a vector of length <code class="reqn">2^J</code> where J is an integer. The following routines supplied in this package can be used here: <code>hf.u</code>, <code>hf.cv</code>, <code>hf.bt</code>, <code>hf.tiu</code>. The user can define and plug in his or her own routines here. </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cs.1</code></td>
+<td>
+<p>The number of cycle spins to be performed with <code>meth.1</code>. Must be between 1 and N-1, where N is the length of <code>y</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>meth.2</code></td>
+<td>
+<p>Of the same type as <code>meth.1</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cs.2</code></td>
+<td>
+<p>The number of cycle spins to be performed with <code>meth.2</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>hybrid</code></td>
+<td>
+<p>If set to TRUE, then the estimates are computed using both <code>meth.1</code> with <code>cs.1</code> cycle spins, and <code>meth.2</code> with <code>cs.2</code> cycle spins, and the final estimate is taken to be the average of these two. If set to <code>FALSE</code>, only <code>meth.1</code> with <code>cs.1</code> cycle spins is used to compute the final estimate.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>For a given input sequence, basic operation of the code
+performs a cyclic shift on
+the data. Then applies the Haar-Fisz transform, then one 
+of the denoising methods (specified by <code>meth.1</code>),
+then the inverse Haar-Fisz transform and then a shift back.
+This is repeated for <code>cs.1</code> cyclic shifts and the results of
+all shifts returned.
+</p>
+
+
+<h3>Value</h3>
+
+<p>Returns vector of the same length as the input <code>y</code> but is the
+denoised estimate.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Piotr Fryzlewicz</p>
+
+
+<h3>References</h3>
+
+<p>Fryzlewicz, P. and Nason, G.P. (2004) A Haar-Fisz algorithm for Poisson
+intensity estimation.
+<em>Journal of Computational and Graphical Statistics</em>,
+<b>13</b>, 621-638. <a href="https://doi.org/10.1198/106186004X2697">doi:10.1198/106186004X2697</a>
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>hft</code>, <code>hft.inv</code>,
+<code>hf.u</code>, <code>hf.cv</code>, <code>hf.bt</code>, <code>hf.tiu</code></p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">#
+# Apply denoise.poisson to xquake data
+#
+data(xquake)
+xquake.denoised &lt;- denoise.poisson(xquake)
+#
+# Now plot the original data and it's denoised version in red
+#
+plot(xquake, type="l")
+lines(xquake.denoised, col=2)
+</code></pre>
+
+
+</div>

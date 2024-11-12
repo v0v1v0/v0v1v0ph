@@ -1,0 +1,116 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>variance_emulator_from_data</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Variance Emulator Creation (Deprecated)</h2>
+
+<h3>Description</h3>
+
+<p>Trains hierarchical emulators to stochastic systems
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">variance_emulator_from_data(
+  input_data,
+  output_names,
+  ranges,
+  input_names = names(ranges),
+  verbose = interactive(),
+  na.rm = FALSE,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>input_data</code></td>
+<td>
+<p>All model runs at all points.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>output_names</code></td>
+<td>
+<p>The observation names.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ranges</code></td>
+<td>
+<p>A named list of parameter ranges</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>input_names</code></td>
+<td>
+<p>The names of the parameters (if <code>ranges</code> is not provided).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p>Should status updates be printed to console?</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>na.rm</code></td>
+<td>
+<p>Should NA values be removed before training?</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Optional parameters that can be passed to <code>link{emulator_from_data}</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>This function is deprecated in favour of using <code>emulator_from_data</code>
+with argument <code>emulator_type = "variance"</code>. See the associated help file.
+</p>
+<p>For stochastic systems, one may emulate the variance as well as the function itself.
+This is particularly true if one expects the variance to be very different in different
+areas of the parameter space (for example, in an epidemic model). This function performs
+the requisite two-stage Bayes Linear update.
+</p>
+<p>All observations are required (including replicates at points) - this function collects
+them into the required chunks and calculates the summary statistics as required.
+</p>
+<p>All other parameters passed to this function are equivalent to those in
+emulators are the Bayes Linear adjusted forms.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A list of lists: one for the variance emulators and one for the function emulators.
+</p>
+
+
+<h3>References</h3>
+
+<p>Goldstein &amp; Vernon (2016) in preparation
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"> # Excessive runtime
+ # A simple example using the BirthDeath dataset
+ v_ems &lt;- variance_emulator_from_data(BirthDeath$training, c("Y"),
+  list(lambda = c(0, 0.08), mu = c(0.04, 0.13)), c_lengths = c(0.75))
+
+
+</code></pre>
+
+
+</div>

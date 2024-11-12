@@ -1,0 +1,220 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>F.curve</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>plot a chisquare or a F-curve.</h2>
+
+<h3>Description</h3>
+
+<p>Plot a chisquare or a F-curve.  Shade a region for
+rejection region or do-not-reject region.  <code>F.observed</code> and
+<code>chisq.observed</code> plots a vertical line with arrowhead markers at
+the location of the observed xbar and outlines the area corresponding
+to the <code class="reqn">p</code>-value.  </p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">F.setup(df1=1,
+        df2=Inf,
+        ncp=0,
+        log.p=FALSE,
+        xlim.in=c(0, 5),
+        ylim.in=range(c(0, 1.1*df.intermediate(x=seq(.5,1.5,.01),
+                       df1=df1, df2=df2, ncp=ncp, log=log.p))),
+        main.in=main.calc, ylab.in="F density",
+        ...)
+
+F.curve(df1=1,
+        df2=Inf,
+        ncp=0,
+        log.p=FALSE,
+        alpha=.05,
+        critical.values=f.alpha,
+        f=seq(0, par()$usr[2], length=109),
+        shade="right", col=par("col"),
+        axis.name="f",
+        ...)
+
+F.observed(f.obs, col="green",
+           df1=1,
+           df2=Inf,
+           ncp=0,
+           log.p=FALSE,
+           axis.name="f",
+           shade="right",
+           shaded.area=0,
+           display.obs=TRUE)
+
+chisq.setup(df=1,
+           ncp=0,
+           log.p=FALSE,
+           xlim.in=c(0, qchisq.intermediate(p=1-.01, df=df, ncp=ncp, log.p=log.p)),
+           ylim.in=range(c(0, 1.1*dchisq.intermediate(x=seq(max(0.5,df-2),df+2,.01),
+                         df=df, ncp=ncp, log=log.p))),
+           main.in=main.calc, ylab.in="Chisq density",
+           ...)
+
+chisq.curve(df=1,
+            ncp=0,
+            log.p=FALSE,
+            alpha=.05,
+            critical.values=chisq.alpha,
+            chisq=seq(0, par()$usr[2], length=109),
+            shade="right", col=par("col"),
+            axis.name="chisq",
+            ...)
+
+chisq.observed(chisq.obs, col="green",
+               df=1,
+               ncp=0,
+               log.p=FALSE,
+               axis.name="chisq",
+               shade="right",
+               shaded.area=0,
+               display.obs=TRUE)
+
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>xlim.in, ylim.in</code></td>
+<td>
+<p>Initial settings for <code>xlim, ylim</code>.
+The defaults are calculated for the degrees of freedom.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>df, df1, df2, ncp, log.p</code></td>
+<td>
+<p>Degrees of freedom,
+non-centrality parameter, probabilities are given as log(p).
+See <code>pchisq</code> and <code>pf</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alpha</code></td>
+<td>
+<p>Probability of a Type I error.  <code>alpha</code> is a vector
+of
+one or two values.  If one value, it is the right alpha.  If two values,
+they are the <code>c(left.alpha, right.alpha)</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>critical.values</code></td>
+<td>
+<p>Critical values.  Initial values correspond
+to the specified <code>alpha</code> levels.
+A scalar value implies a one-sided test on the right side.
+A vector of two values
+implies a two-sided test.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>main.in, ylab.in</code></td>
+<td>
+<p>Main title, default ylab.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>shade</code></td>
+<td>
+
+<p>Valid values for shade are "right", "left", "inside", "outside", "none".
+Default is "right" for one-sided critical.values and "outside"
+for two-sided critical values.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>col</code></td>
+<td>
+<p>color of the shaded region and the area of the shaded region.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>shaded.area</code></td>
+<td>
+<p>Numerical value of the area.  This value may
+be cumulated over two calls to the function (one call for left, one
+call for right).
+The <code>shaded.area</code> is the return value of the function.
+The calling program is responsible for the
+cumulation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>display.obs</code></td>
+<td>
+<p>Logical.  If <code>TRUE</code>, print the numerical value
+of the observed value, plot a vertical <code>abline</code> at the value,
+and use it for showing the <code class="reqn">p</code>-value.
+If <code>FALSE</code>, don't print or plot the observed value; just use it
+for showing the <code class="reqn">p</code>-value.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>f,chisq</code></td>
+<td>
+<p>Values used to draw curve.  Replace them if more
+resolution is needed.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>f.obs, chisq.obs</code></td>
+<td>
+<p>Observed values of statistic.  <code class="reqn">p</code>-values are
+calculated for these values.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>axis.name</code></td>
+<td>
+<p>Axis name.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Other arguments which are ignored.</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p> Richard M. Heiberger &lt;rmh@temple.edu&gt; </p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">old.omd &lt;- par(omd=c(.05,.88, .05,1))
+chisq.setup(df=12)
+chisq.curve(df=12, col='blue')
+chisq.observed(22, df=12)
+par(old.omd)
+
+old.omd &lt;- par(omd=c(.05,.88, .05,1))
+chisq.setup(df=12)
+chisq.curve(df=12, col='blue', alpha=c(.05, .05))
+par(old.omd)
+
+old.omd &lt;- par(omd=c(.05,.88, .05,1))
+F.setup(df1=5, df2=30)
+F.curve(df1=5, df2=30, col='blue')
+F.observed(3, df1=5, df2=30)
+par(old.omd)
+
+old.omd &lt;- par(omd=c(.05,.88, .05,1))
+F.setup(df1=5, df2=30)
+F.curve(df1=5, df2=30, col='blue', alpha=c(.05, .05))
+par(old.omd)
+
+</code></pre>
+
+
+</div>

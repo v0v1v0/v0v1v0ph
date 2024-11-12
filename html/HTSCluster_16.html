@@ -1,0 +1,141 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>probaPost</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Calculate the conditional probability of belonging to each cluster in a Poisson mixture model
+</h2>
+
+<h3>Description</h3>
+
+<p>This function computes the conditional probabilities <code class="reqn">t_{ik}</code> that an observation <em>i</em> arises from the <code class="reqn">k^{\mathrm{th}}</code> component for the current value of the mixture parameters.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">probaPost(y, g, conds, pi, s, lambda)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+
+<p>(<em>n</em> x <em>q</em>) matrix of observed counts for <em>n</em> observations and <em>q</em> variables
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>g</code></td>
+<td>
+
+<p>Number of clusters
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>conds</code></td>
+<td>
+
+<p>Vector of length <em>q</em> defining the condition (treatment group) for each variable (column) in <code>y</code>
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pi</code></td>
+<td>
+
+<p>Vector of length <code>g</code> containing the current estimate of <code class="reqn">\hat{\boldsymbol{\pi}}</code>
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>s</code></td>
+<td>
+
+<p>Vector of length <em>q</em> containing the estimates for the normalized library size parameters for each of the <em>q</em> variables in <code>y</code>
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lambda</code></td>
+<td>
+
+<p>(<em>d</em> x <code>g</code>) matrix containing the current estimate <code class="reqn">\boldsymbol{\lambda}</code>, where <em>d</em> is the number of conditions (treatment groups)
+</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<table><tr style="vertical-align: top;">
+<td><code>t </code></td>
+<td>
+<p>(<em>n</em> x <code>g</code>) matrix made up of the conditional probability of each observation belonging to each of the <code>g</code> clusters</p>
+</td>
+</tr></table>
+<h3>Note</h3>
+
+<p>If all values of <code class="reqn">t_{ik}</code> are 0 (or nearly zero), the observation is assigned with probability one to belong to the cluster with the closest mean (in terms of the Euclidean distance from the observation). To avoid calculation difficulties, extreme values of <code class="reqn">t_{ik}</code> are smoothed, such that those smaller than 1e-10 or larger than 1-1e-10 are set equal to 1e-10 and 1-1e-10, respectively.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Andrea Rau
+</p>
+
+
+<h3>References</h3>
+
+<p>Rau, A., Maugis-Rabusseau, C., Martin-Magniette, M.-L., Celeux G. (2015). Co-expression analysis of high-throughput transcriptome sequencing data with Poisson mixture models. Bioinformatics, 31(9):1420-1427.
+</p>
+<p>Rau, A., Celeux, G., Martin-Magniette, M.-L., Maugis-Rabusseau, C. (2011). Clustering high-throughput sequencing data with Poisson mixture models. Inria Research Report 7786. Available at <a href="https://inria.hal.science/inria-00638082">https://inria.hal.science/inria-00638082</a>.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>PoisMixClus</code> for Poisson mixture model estimation and model selection;
+<code>PoisMixMean</code> to calculate the conditional per-cluster mean of each observation
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+set.seed(12345)
+
+## Simulate data as shown in Rau et al. (2011)
+## Library size setting "A", high cluster separation
+## n = 200 observations
+
+simulate &lt;- PoisMixSim(n = 200, libsize = "A", separation = "high")
+y &lt;- simulate$y
+conds &lt;- simulate$conditions
+s &lt;- colSums(y) / sum(y)     ## TC estimate of lib size
+
+## Run the PMM-II model for g = 3
+## "TC" library size estimate, EM algorithm
+
+run &lt;- PoisMixClus(y, g = 3, norm = "TC",
+ 	conds = conds) 
+pi.est &lt;- run$pi
+lambda.est &lt;- run$lambda
+
+## Calculate the conditional probability of belonging to each cluster
+proba &lt;- probaPost(y, g = 3, conds = conds, pi = pi.est, s = s, 
+	lambda = lambda.est)
+
+## head(round(proba,2))
+
+</code></pre>
+
+
+</div>

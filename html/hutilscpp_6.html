@@ -1,0 +1,112 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>anyOutside</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Are any values outside the interval specified?</h2>
+
+<h3>Description</h3>
+
+<p>Are any values outside the interval specified?
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">anyOutside(x, a, b, nas_absent = NA, na_is_outside = NA)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>A numeric vector.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>a, b</code></td>
+<td>
+<p>Single numeric values designating the interval.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nas_absent</code></td>
+<td>
+<p>Are <code>NA</code>s <em>known</em> to be absent from <code>x</code>?
+If <code>nas_absent = NA</code>, the default, <code>x</code> will be searched for <code>NA</code>s;
+if <code>nas_absent = TRUE</code>, <code>x</code> will not be checked;
+if <code>nas_absent = FALSE</code>, the answer is <code>NA_integer_</code> if <code>na.rm = FALSE</code>
+otherwise only non-NA values outside <code>[a, b]</code>.
+</p>
+<p>If <code>nas_absent = TRUE</code> but <code>x</code> has missing values then the result is unreliable.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>na_is_outside</code></td>
+<td>
+<p>(logical, default: <code>NA</code>) How should <code>NA</code>s in <code>x</code> be treated?
+</p>
+
+<dl>
+<dt>If <code>NA</code>
+</dt>
+<dd>
+<p> the default, then the first value in <code>x</code> that is either
+outside <code>[a, b]</code> or <code>NA</code> is detected: if it is <code>NA</code>, then
+<code>NA_integer_</code> is returned; otherwise the position of that value is returned.</p>
+</dd>
+</dl>
+<p>#'
+</p>
+<dl>
+<dt>If <code>FALSE</code>
+</dt>
+<dd>
+<p>then <code>NA</code> values are effectively skipped; the position of the first
+<em>known</em> value outside <code>[a, b]</code> is returned.</p>
+</dd>
+<dt>If <code>TRUE</code>
+</dt>
+<dd>
+<p>the position of the first value that is either
+outside <code>[a, b]</code> or <code>NA</code> is returned.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p><code>0L</code> if no values in <code>x</code> are outside <code>[a, b]</code>. Otherwise, the position
+of the first value of <code>x</code> outside <code>[a, b]</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">anyOutside(1:10, 1L, 10L)
+anyOutside(1:10, 1L, 7L)
+
+# na_is_outside = NA
+anyOutside(c(1:10, NA), 1L, 7L)     # Already outside before the NA
+anyOutside(c(NA, 1:10, NA), 1L, 7L) # NA since it occurred first
+
+anyOutside(c(1:7, NA), 1L, 7L, na_is_outside = FALSE)
+anyOutside(c(1:7, NA), 1L, 7L, na_is_outside = TRUE)
+
+##
+# N &lt;- 500e6
+N &lt;- 500e3
+x &lt;- rep_len(hutils::samp(-5:6, size = 23), N)
+bench_system_time(anyOutside(x, -5L, 6L))
+#    process      real
+#  453.125ms 459.758ms
+
+</code></pre>
+
+
+</div>

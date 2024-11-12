@@ -1,0 +1,121 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>dotplot_diag</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Dot plots for influence diagnostics</h2>
+
+<h3>Description</h3>
+
+<p>This is a function that can be used to create (modified) dotplots for the
+diagnostic measures.  The plot allows the user to understand the distribution
+of the diagnostic measure and visually identify unusual cases.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">dotplot_diag(
+  x,
+  cutoff,
+  name = c("cooks.distance", "mdffits", "covratio", "covtrace", "rvc", "leverage"),
+  data,
+  index = NULL,
+  modify = FALSE,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>values of the diagnostic of interest</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cutoff</code></td>
+<td>
+<p>value(s) specifying the boundary for unusual values of the 
+diagnostic. The cutoff(s) can either be supplied by the user, or automatically
+calculated using measures of internal scaling if <code>cutoff = "internal"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>name</code></td>
+<td>
+<p>what diagnostic is being plotted
+(one of <code>"cooks.distance"</code>, <code>"mdffits"</code>, <code>"covratio"</code>, 
+<code>"covtrace"</code>, <code>"rvc"</code>, or <code>"leverage"</code>).
+This is used for the calculation of "internal" cutoffs.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>data frame to use (optional)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>index</code></td>
+<td>
+<p>optional parameter to specify index (IDs) of <code>x</code> values.
+If <code>NULL</code>(default), values will be indexed in the order of the vector 
+passed to <code>x</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>modify</code></td>
+<td>
+<p>specifies the <code>geom</code> to be used to produce a 
+space-saving modification: either <code>"dotplot"</code> or <code>"boxplot"</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>other arguments to be passed to <code>ggplot()</code></p>
+</td>
+</tr>
+</table>
+<h3>Note</h3>
+
+<p>The resulting plot uses <code>coord_flip</code> to rotate the plot, so when
+adding customized axis labels you will need to flip the names 
+between the x and y axes.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Adam Loy <a href="mailto:loyad01@gmail.com">loyad01@gmail.com</a>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(sleepstudy, package = 'lme4')
+fm &lt;- lme4::lmer(Reaction ~ Days + (Days | Subject), sleepstudy)
+
+#Observation level deletion and diagnostics
+obs.infl &lt;- hlm_influence(fm, level = 1)
+
+dotplot_diag(x = obs.infl$cooksd, cutoff = "internal", name = "cooks.distance", modify = FALSE)
+
+dotplot_diag(x = obs.infl$mdffits, cutoff = "internal", name = "cooks.distance", modify = FALSE)
+
+# Subject level deletion and diagnostics
+subject.infl  &lt;- hlm_influence(fm, level = "Subject")
+
+dotplot_diag(x = subject.infl$cooksd, cutoff = "internal",
+             name = "cooks.distance", modify = FALSE)
+             
+dotplot_diag(x = subject.infl$mdffits, cutoff = "internal", name = "mdffits", modify = "dotplot")
+</code></pre>
+
+
+</div>

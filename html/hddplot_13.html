@@ -1,0 +1,321 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>scoreplot</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Plot discriminant function scores, with various identification</h2>
+
+<h3>Description</h3>
+
+<p>There is provision for the plottting of two sets of scores on the same
+graph, possibly with different classifying factors.  The function is
+designed for use with output from <code>cvscores()</code> or from
+<code>simulateScores()</code>. 
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">scoreplot(scorelist, plot.disc = 1:2, xlab = NULL, ylab = NULL, params = NULL,
+          circle = NULL, cl.circle = NULL, circle.pos = c(1, 1), adj.circle = 1,
+          adj.title = 0.5, join.legends = TRUE, prefix.title = "", cex.title = 1,
+          ratio = 1, plot.folds = FALSE, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>scorelist</code></td>
+<td>
+<p>list, with elements <code>scores</code> (a matrix of scores)
+<code>cl</code> (a classifying factor), <code>other</code> (optional, a further sets
+of scores), <code>cl.other</code> (a a classifying factor for <code>other</code>,
+optional) and <code>nfeatures</code> (optional, used to label the graph)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>plot.disc</code></td>
+<td>
+<p>choice of columns of <code>scorelist</code> to plot</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>xlab</code></td>
+<td>
+<p>label for x-axis</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ylab</code></td>
+<td>
+<p>label for y-axis</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>params</code></td>
+<td>
+<p>List, with optional elements (lists) <code>points</code>,
+<code>other</code>, <code>circle</code> and <code>legend</code>.  Allowed list elements
+for <code>points</code> and <code>other</code> are <code>cex</code>, <code>lwd</code>, <code>pch</code>
+and <code>col</code>. For <code>circle</code> they are <code>cex</code>, <code>lwd</code> and
+<code>col</code>.  For <code>legend</code>, they are <code>cex</code> and <code>cex.other</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>circle</code></td>
+<td>
+<p>identifies points that are to be circled</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cl.circle</code></td>
+<td>
+<p>different colors may be used for different
+points, according to levels of <code>cl.circle</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>circle.pos</code></td>
+<td>
+<p>This is a vector of length 2, that specifies where
+to place the legend information for the circling of points.
+Possibilities are <code>c(0,0)</code> (left, below), <code>c(1,1)</code> (right, above),
+etc.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>adj.circle</code></td>
+<td>
+<p>controls positioning of circle legend</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>adj.title</code></td>
+<td>
+<p>controls positioning of title</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>join.legends</code></td>
+<td>
+<p>logical; should legends for <code>points</code> and
+<code>other</code> be combined?</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>prefix.title</code></td>
+<td>
+<p>prefix, to place before title</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cex.title</code></td>
+<td>
+<p><code>cex</code> for title</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ratio</code></td>
+<td>
+<p><code>y</code>-scale to <code>x</code>-scale ratio for graph</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>plot.folds</code></td>
+<td>
+<p>Plot individual fold information, comparing projected
+training scores with their projections onto the global space.  This is
+not at present implemented</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Other parameters to be passed to <code>eqscplot()</code></p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A graph is plotted.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>John Maindonald</p>
+
+
+<h3>See Also</h3>
+
+<p>See also <code>cvdisc</code>, <code>cvscores</code></p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Use first 500 rows (expression values) of Golub, for demonstration.
+data(Golub)
+data(golubInfo)
+attach(golubInfo)
+miniG.BM &lt;- Golub[1:500, BM.PB=="BM"]  # 1st 500 rows only
+cancer.BM &lt;- cancer[BM.PB=="BM"]
+miniG.cv &lt;- cvdisc(miniG.BM, cl=cancer.BM, nfeatures=1:10,
+                    nfold=c(3,1))
+miniG.scores &lt;- cvscores(cvlist=miniG.cv, nfeatures=4,
+                         cl.other=NULL)
+subsetB &lt;- (cancer=="allB") &amp; (tissue.mf %in% c("BM:f","BM:m","PB:m"))
+tissue.mfB &lt;- tissue.mf[subsetB, drop=TRUE]
+scoreplot(scorelist=miniG.scores, cl.circle=tissue.mfB,
+       circle=tissue.mfB%in%c("BM:f","BM:m"),
+       params=list(circle=list(col=c("cyan","gray"))),
+       prefix="BM samples -")
+detach(golubInfo)
+
+## The function is currently defined as
+  function(scorelist, plot.disc=1:2,
+           xlab=NULL, ylab=NULL, params=NULL,
+           circle=NULL, cl.circle=NULL, circle.pos=c(1,1),
+           adj.circle=1,
+           adj.title=0.5, join.legends=T, prefix.title="Golub data - ",
+           cex.title=1.0, ratio=1, plot.folds=FALSE, ...){
+    library(MASS)
+    combine.params &lt;-
+      function(params=list(circle=list(col=c("cyan","gray")))){
+        default.params=list(points=list(cex=1, lwd=1.25, pch=1:8, col=1:8),
+          other=list(cex=0.65, lwd=1.25, pch=13:9, col=c(6:8,5:1)),
+          circle=list(cex=2, lwd=1, pch=1.75, col="gray40"),
+          legend=list(cex=1, cex.other=1))
+        nam &lt;- names(params)
+        if(!is.null(nam))
+          for(a in nam){
+            nam2 &lt;- names(params[[a]])
+            for(b in nam2)default.params[[a]][[b]] &lt;- params[[a]][[b]]
+          }
+        default.params
+      }
+    params &lt;- combine.params(params=params)
+    cl &lt;- scorelist$cl
+    cl.other &lt;- scorelist$cl.other
+    if(!is.null(cl.other)) cl.other &lt;- factor(cl.other)
+    nfeatures &lt;- scorelist$nfeatures
+    if(length(plot.disc)==2){
+      n1 &lt;- plot.disc[1]
+      n2 &lt;- plot.disc[2]
+      if(is.null(xlab))xlab &lt;- paste("Discriminant function", n1)
+      if(is.null(ylab))ylab &lt;- paste("Discriminant function", n2)
+    } else stop("plot.disc must be a vector of length 2")
+    if(!is.factor(cl))cl &lt;- factor(cl)
+    levnames &lt;- levels(cl)
+    fitscores &lt;- scorelist$scores
+    other.scores &lt;- scorelist$other
+    ngp &lt;- length(levnames)
+    n1lim &lt;- range(fitscores[,n1])
+    n2lim &lt;- range(fitscores[,n2])
+    if(!is.null(cl.other)){
+      n1lim &lt;- range(c(n1lim, other.scores[,n1]))
+      n2lim &lt;- range(c(n2lim, other.scores[,n2]))
+      levnum &lt;- unclass(cl.other)
+      levnames.other &lt;- levels(cl.other)
+      intlev.other &lt;- unclass(cl.other)
+      ngp.other &lt;- length(levels(cl.other))
+    }
+    n1 &lt;- plot.disc[1]; n2 &lt;- plot.disc[2]
+    intlev &lt;- unclass(cl)
+    oldpar &lt;- par(lwd=1)
+    on.exit(par(oldpar))
+    eqscplot(n1lim, n2lim, type="n",
+             xlab=xlab, ylab=ylab, ratio=ratio, ...)
+    with(params$points,
+         points(fitscores[,n1], fitscores[,n2], col=col[intlev],
+                pch=pch[intlev], cex=cex, lwd=lwd))
+    if(!is.null(cl.other))
+      with(params$other,
+           points(other.scores[,n1], other.scores[,n2],
+                  pch=pch[intlev.other],
+                  col=col[intlev.other],
+                  cex=cex, lwd=lwd))
+    if(!is.null(cl.circle)){
+      cl.circle &lt;- factor(cl.circle[circle])
+      lev.circle &lt;- levels(cl.circle)
+      with(params$circle,
+           points(fitscores[circle, n1], fitscores[circle,n2], pch=pch,
+                  cex=cex, col=col[unclass(cl.circle)], lwd=lwd))
+    }
+    par(xpd=TRUE)
+    chw &lt;- par()$cxy[1]
+    chh &lt;- par()$cxy[2]
+    par(lwd=1.5)
+    ypos &lt;- par()$usr[4]
+    xmid &lt;- mean(par()$usr[1:2])
+    top.pos &lt;- 0
+    mtext(side=3, line=(top.pos+1), paste(prefix.title,
+            nfeatures, "features"), cex=cex.title, adj=adj.title)
+    ypos.legend &lt;- ypos+(top.pos-0.45)*chh*0.8
+
+    if(join.legends&amp;!is.null(cl.other)){
+      leg.info &lt;- legend(xmid, ypos.legend, xjust=0.5, yjust=0, plot=FALSE,
+                         x.intersp=0.5, ncol=ngp, legend=levnames,
+                         pt.lwd=params$points$lwd,
+                         pt.cex=params$points$cex,
+                         cex=params$legend$cex,
+                         pch=params$points$pch)
+      legother.info &lt;- legend(xmid, ypos.legend, xjust=0.5, yjust=0,
+                              plot=FALSE, x.intersp=0.5,
+                              ncol=ngp.other, legend=levnames.other,
+                              pt.lwd=params$other$lwd,
+                              pt.cex=params$other$cex,
+                              cex=params$legend$cex.other,
+                              pch=params$other$pch)
+      leftoff &lt;- 0.5*legother.info$rect$w-0.5*chw
+      rightoff &lt;- 0.5*leg.info$rect$w+0.5*chw
+      ypos.other &lt;- ypos.legend
+    }
+    else {
+      leftoff &lt;- 0
+      rightoff &lt;- 0
+      ypos.other &lt;- ypos+(top.pos-1.5)*chh*0.8
+    }
+    legend(xmid-leftoff, ypos.legend, xjust=0.5, yjust=0,
+           bty="n", pch=params$points$pch,
+           x.intersp=0.5, col=params$points$col, ncol=ngp,
+           legend=levnames,
+           pt.lwd=params$points$lwd,
+           pt.cex=params$points$cex,
+           cex=params$legend$cex)
+    par(lwd=1)
+    if(!is.null(cl.other))
+      lego.info &lt;- legend(xmid+rightoff, ypos.other, xjust=0.5, yjust=0,
+                          pch=params$other$pch, x.intersp=0.5,
+                          col=params$other$col, ncol=ngp.other,
+                          pt.lwd=params$other$lwd,
+                          pt.cex=params$other$cex,
+                          legend=levnames.other,
+                          cex=params$legend$cex.other,
+                          bty="n")
+    if(!is.null(cl.other)&amp;join.legends)
+      text(lego.info$rect$left+c(0.4*chw,lego.info$rect$w-0.25*chw),
+           rep(ypos.other,2)+0.8*chh, labels=c("(",")"),
+           cex=params$legend$cex,
+           lwd=params$legend$lwd, bty="n")
+    par(lwd=params$circle$lwd)
+    if(!is.null(cl.circle))if(lev.circle[1]!=""){
+      pch.circle &lt;- params$circle$pch
+      xy &lt;- par()$usr[circle.pos+c(1,3)]
+      legend(xy[1], xy[2],
+             xjust=adj.circle[1], yjust=circle.pos[2], bty="n", x.intersp=0.5,
+             pch=rep(pch.circle,length(lev.circle)), col=params$circle$col,
+             ncol=1, legend=lev.circle, cex=0.85, pt.cex=1.5)
+    }
+    par(lwd=1, xpd=FALSE)
+    if(plot.folds){
+      mtext(side=1, line=1.25, "Discriminant function 1", outer=T)
+      mtext(side=2, line=1.25, "Discriminant function 2", outer=T)
+    }
+  }
+</code></pre>
+
+
+</div>

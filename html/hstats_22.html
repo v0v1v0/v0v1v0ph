@@ -1,0 +1,372 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hstats</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Calculate Interaction Statistics</h2>
+
+<h3>Description</h3>
+
+<p>This is the main function of the package. It does the expensive calculations behind
+the following H-statistics:
+</p>
+
+<ul>
+<li>
+<p> Total interaction strength <code class="reqn">H^2</code>, a statistic measuring the proportion of
+prediction variability unexplained by main effects of <code>v</code>, see <code>h2()</code> for details.
+</p>
+</li>
+<li>
+<p> Friedman and Popescu's statistic <code class="reqn">H^2_j</code> of overall interaction strength per
+feature, see <code>h2_overall()</code> for details.
+</p>
+</li>
+<li>
+<p> Friedman and Popescu's statistic <code class="reqn">H^2_{jk}</code> of pairwise interaction strength,
+see <code>h2_pairwise()</code> for details.
+</p>
+</li>
+<li>
+<p> Friedman and Popescu's statistic <code class="reqn">H^2_{jkl}</code> of three-way interaction strength,
+see <code>h2_threeway()</code> for details. To save time, this statistic is not calculated
+by default. Set <code>threeway_m</code> to a value above 2 to get three-way statistics of the
+<code>threeway_m</code> variables with strongest overall interaction.
+</p>
+</li>
+</ul>
+<p>Furthermore, it allows to calculate an experimental partial dependence based
+measure of feature importance, <code class="reqn">\textrm{PDI}_j^2</code>. It equals the proportion of
+prediction variability unexplained by other features, see <code>pd_importance()</code>
+for details. This statistic is not shown by <code>summary()</code> or <code>plot()</code>.
+</p>
+<p>Instead of using <code>summary()</code>, interaction statistics can also be obtained via the
+more flexible functions <code>h2()</code>, <code>h2_overall()</code>, <code>h2_pairwise()</code>, and
+<code>h2_threeway()</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hstats(object, ...)
+
+## Default S3 method:
+hstats(
+  object,
+  X,
+  v = NULL,
+  pred_fun = stats::predict,
+  pairwise_m = 5L,
+  threeway_m = 0L,
+  approx = FALSE,
+  grid_size = 50L,
+  n_max = 500L,
+  eps = 1e-10,
+  w = NULL,
+  verbose = TRUE,
+  ...
+)
+
+## S3 method for class 'ranger'
+hstats(
+  object,
+  X,
+  v = NULL,
+  pred_fun = NULL,
+  pairwise_m = 5L,
+  threeway_m = 0L,
+  approx = FALSE,
+  grid_size = 50L,
+  n_max = 500L,
+  eps = 1e-10,
+  w = NULL,
+  verbose = TRUE,
+  survival = c("chf", "prob"),
+  ...
+)
+
+## S3 method for class 'explainer'
+hstats(
+  object,
+  X = object[["data"]],
+  v = NULL,
+  pred_fun = object[["predict_function"]],
+  pairwise_m = 5L,
+  threeway_m = 0L,
+  approx = FALSE,
+  grid_size = 50L,
+  n_max = 500L,
+  eps = 1e-10,
+  w = object[["weights"]],
+  verbose = TRUE,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>object</code></td>
+<td>
+<p>Fitted model object.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Additional arguments passed to <code>pred_fun(object, X, ...)</code>,
+for instance <code>type = "response"</code> in a <code>glm()</code> model, or <code>reshape = TRUE</code> in a
+multiclass XGBoost model.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>X</code></td>
+<td>
+<p>A data.frame or matrix serving as background dataset.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>v</code></td>
+<td>
+<p>Vector of feature names. The default (<code>NULL</code>) will use all column names of
+<code>X</code> except the column name of the optional case weight <code>w</code> (if specified as name).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pred_fun</code></td>
+<td>
+<p>Prediction function of the form <code style="white-space: pre;">⁠function(object, X, ...)⁠</code>,
+providing <code class="reqn">K \ge 1</code> predictions per row. Its first argument represents the
+model <code>object</code>, its second argument a data structure like <code>X</code>. Additional arguments
+(such as <code>type = "response"</code> in a GLM, or <code>reshape = TRUE</code> in a multiclass XGBoost
+model) can be passed via <code>...</code>. The default, <code>stats::predict()</code>, will work in
+most cases.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pairwise_m</code></td>
+<td>
+<p>Number of features for which pairwise statistics are to be
+calculated. The features are selected based on Friedman and Popescu's overall
+interaction strength <code class="reqn">H^2_j</code>. Set to to 0 to avoid pairwise calculations.
+For multivariate predictions, the union of the <code>pairwise_m</code> column-wise
+strongest variable names is taken. This can lead to very long run-times.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>threeway_m</code></td>
+<td>
+<p>Like <code>pairwise_m</code>, but controls the feature count for
+three-way interactions. Cannot be larger than <code>pairwise_m</code>.
+To save computation time, the default is 0.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>approx</code></td>
+<td>
+<p>Should quantile approximation be applied to dense numeric features?
+The default is <code>FALSE</code>. Setting this option to <code>TRUE</code> brings a massive speed-up
+for one-way calculations. It can, e.g., be used when the number of features is
+very large.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>grid_size</code></td>
+<td>
+<p>Integer controlling the number of quantile midpoints used to
+approximate dense numerics. The quantile midpoints are calculated after
+subampling via <code>n_max</code>. Only relevant if <code>approx = TRUE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n_max</code></td>
+<td>
+<p>If <code>X</code> has more than <code>n_max</code> rows, a random sample of <code>n_max</code> rows is
+selected from <code>X</code>. In this case, set a random seed for reproducibility.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>eps</code></td>
+<td>
+<p>Threshold below which numerator values are set to 0. Default is 1e-10.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>w</code></td>
+<td>
+<p>Optional vector of case weights. Can also be a column name of <code>X</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p>Should a progress bar be shown? The default is <code>TRUE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>survival</code></td>
+<td>
+<p>Should cumulative hazards ("chf", default) or survival
+probabilities ("prob") per time be predicted? Only in <code>ranger()</code> survival models.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>An object of class "hstats" containing these elements:
+</p>
+
+<ul>
+<li> <p><code>X</code>: Input <code>X</code> (sampled to <code>n_max</code> rows, after optional quantile approximation).
+</p>
+</li>
+<li> <p><code>w</code>: Case weight vector <code>w</code> (sampled to <code>n_max</code> values), or <code>NULL</code>.
+</p>
+</li>
+<li> <p><code>v</code>: Vector of column names in <code>X</code> for which overall
+H statistics have been calculated.
+</p>
+</li>
+<li> <p><code>f</code>: Matrix with (centered) predictions <code class="reqn">F</code>.
+</p>
+</li>
+<li> <p><code>mean_f2</code>: (Weighted) column means of <code>f</code>. Used to normalize <code class="reqn">H^2</code> and
+<code class="reqn">H^2_j</code>.
+</p>
+</li>
+<li> <p><code>F_j</code>: List of matrices, each representing (centered)
+partial dependence functions <code class="reqn">F_j</code>.
+</p>
+</li>
+<li> <p><code>F_not_j</code>: List of matrices with (centered) partial dependence
+functions <code class="reqn">F_{\setminus j}</code> of other features.
+</p>
+</li>
+<li> <p><code>K</code>: Number of columns of prediction matrix.
+</p>
+</li>
+<li> <p><code>pred_names</code>: Column names of prediction matrix.
+</p>
+</li>
+<li> <p><code>pairwise_m</code>: Like input <code>pairwise_m</code>, but capped at <code>length(v)</code>.
+</p>
+</li>
+<li> <p><code>threeway_m</code>: Like input <code>threeway_m</code>, but capped at the smaller of
+<code>length(v)</code> and <code>pairwise_m</code>.
+</p>
+</li>
+<li> <p><code>eps</code>: Like input <code>eps</code>.
+</p>
+</li>
+<li> <p><code>pd_importance</code>: List with numerator and denominator of <code class="reqn">\textrm{PDI}_j</code>.
+</p>
+</li>
+<li> <p><code>h2</code>: List with numerator and denominator of <code class="reqn">H^2</code>.
+</p>
+</li>
+<li> <p><code>h2_overall</code>: List with numerator and denominator of <code class="reqn">H^2_j</code>.
+</p>
+</li>
+<li> <p><code>v_pairwise</code>: Subset of <code>v</code> with largest <code class="reqn">H^2_j</code> used for pairwise
+calculations. Only if pairwise calculations have been done.
+</p>
+</li>
+<li> <p><code>combs2</code>: Named list of variable pairs for which pairwise partial
+dependence functions are available. Only if pairwise calculations have been done.
+</p>
+</li>
+<li> <p><code>F_jk</code>: List of matrices, each representing (centered) bivariate
+partial dependence functions <code class="reqn">F_{jk}</code>.
+Only if pairwise calculations have been done.
+</p>
+</li>
+<li> <p><code>h2_pairwise</code>: List with numerator and denominator of <code class="reqn">H^2_{jk}</code>.
+Only if pairwise calculations have been done.
+</p>
+</li>
+<li> <p><code>v_threeway</code>: Subset of <code>v</code> with largest <code>h2_overall()</code> used for three-way
+calculations. Only if three-way calculations have been done.
+</p>
+</li>
+<li> <p><code>combs3</code>: Named list of variable triples for which three-way partial
+dependence functions are available. Only if three-way calculations have been done.
+</p>
+</li>
+<li> <p><code>F_jkl</code>: List of matrices, each representing (centered) three-way
+partial dependence functions <code class="reqn">F_{jkl}</code>.
+Only if three-way calculations have been done.
+</p>
+</li>
+<li> <p><code>h2_threeway</code>: List with numerator and denominator of <code class="reqn">H^2_{jkl}</code>.
+Only if three-way calculations have been done.
+</p>
+</li>
+</ul>
+<h3>Methods (by class)</h3>
+
+
+<ul>
+<li> <p><code>hstats(default)</code>: Default hstats method.
+</p>
+</li>
+<li> <p><code>hstats(ranger)</code>: Method for "ranger" models.
+</p>
+</li>
+<li> <p><code>hstats(explainer)</code>: Method for DALEX "explainer".
+</p>
+</li>
+</ul>
+<h3>References</h3>
+
+<p>Friedman, Jerome H., and Bogdan E. Popescu. <em>"Predictive Learning via Rule Ensembles."</em>
+The Annals of Applied Statistics 2, no. 3 (2008): 916-54.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>h2()</code>, <code>h2_overall()</code>, <code>h2_pairwise()</code>, <code>h2_threeway()</code>,
+and <code>pd_importance()</code> for specific statistics calculated from the resulting object.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># MODEL 1: Linear regression
+fit &lt;- lm(Sepal.Length ~ . + Petal.Width:Species, data = iris)
+s &lt;- hstats(fit, X = iris[, -1])
+s
+plot(s)
+plot(s, zero = FALSE)  # Drop 0
+summary(s)
+  
+# Absolute pairwise interaction strengths
+h2_pairwise(s, normalize = FALSE, squared = FALSE, zero = FALSE)
+
+# MODEL 2: Multi-response linear regression
+fit &lt;- lm(as.matrix(iris[, 1:2]) ~ Petal.Length + Petal.Width * Species, data = iris)
+s &lt;- hstats(fit, X = iris[, 3:5], verbose = FALSE)
+plot(s)
+summary(s)
+
+# MODEL 3: Gamma GLM with log link
+fit &lt;- glm(Sepal.Length ~ ., data = iris, family = Gamma(link = log))
+
+# No interactions for additive features, at least on link scale
+s &lt;- hstats(fit, X = iris[, -1], verbose = FALSE)
+summary(s)
+
+# On original scale, we have interactions everywhere. 
+# To see three-way interactions, we set threeway_m to a value above 2.
+s &lt;- hstats(fit, X = iris[, -1], type = "response", threeway_m = 5)
+plot(s, ncol = 1)  # All three types use different denominators
+
+# All statistics on same scale (of predictions)
+plot(s, squared = FALSE, normalize = FALSE, facet_scale = "free_y")
+</code></pre>
+
+
+</div>

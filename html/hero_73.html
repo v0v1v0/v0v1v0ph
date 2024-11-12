@@ -1,0 +1,148 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>radspline</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Radial basis spline specification</h2>
+
+<h3>Description</h3>
+
+<p><code>radspline</code> specifies a set of radial basis splines.
+<code>nknots</code> is the approximate number of knots to
+sample in the (usually) enlarged study area.  If
+<code>eborder</code> is not provided, then <code>eborder</code> is
+automatically constructed by enlarging the <code>border</code>
+object using the <code>enlarge</code> function and
+<code>width</code>. See Details for additional information
+about sampling the knot locations.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">radspline(
+  nknots,
+  border,
+  poverlap = 2,
+  k = 2,
+  width,
+  type = "hexagonal",
+  longlat = FALSE,
+  eborder,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>nknots</code></td>
+<td>
+<p>The approximate number of knots locations.
+Can be a vector of positive integers for successive
+samplings. See Details.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>border</code></td>
+<td>
+<p>A <code>SpatialPolygons-class</code>
+object.  If <code>eborder</code> is not supplied, this will
+be used to determine the sampling region for the knots.
+See Details.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>poverlap</code></td>
+<td>
+<p>The proportional amount of overlap (&gt;=1)
+beyond the nearest neighbor knots.  Default is 2.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>k</code></td>
+<td>
+<p>The order of the Wendland covariance function.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>width</code></td>
+<td>
+<p>The width for the border enlargement.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>type</code></td>
+<td>
+<p>The sampling type for
+<code>spsample</code>.  The default is
+<code>"hexagonal"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>longlat</code></td>
+<td>
+<p>A logical value indicating whether Great
+Circle distances should be used (<code>TRUE</code>) or
+Euclidean distances (<code>FALSE</code>).  The default is
+<code>FALSE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>eborder</code></td>
+<td>
+<p>A <code>SpatialPolygons-class</code>
+object.  The enlarged border from which the knots will
+be selected.  If not supplied, this is automatically
+computed using <code>border</code> and <code>width</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Additional arguments passed to
+<code>spsample</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The <code>spsample</code> function is used to
+"automatically" select the knot locations within
+<code>eborder</code>.  <code>nknots</code> corresponds to the
+<code>n</code> argument in that function.  A hexagonal sampling
+scheme is used by default, but other options are
+available.
+</p>
+<p>Great circle distance IS NOT used in sampling from the
+regular grid.  This is computationally expensive, so it
+has not been implemented.  Great circle distance is only
+used  when the constructed <code>hero_radspline</code> is
+evaluated (and <code>longlat = TRUE</code>).
+</p>
+
+
+<h3>Value</h3>
+
+<p>A <code>hero_radspline</code> object.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">border = border.grid(lon, lat)
+r = radspline(nknots = c(36, 36 * 4), border = border)
+# default color scheme
+plot(r)
+# change color and point styles of points,
+# and background of original domain
+plot(r, blist = list(col = "yellow"),
+        glist = list(col = c("blue", "orange"),
+                     pch =  3:4))
+</code></pre>
+
+
+</div>

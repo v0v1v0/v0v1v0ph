@@ -1,0 +1,113 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>crit_ICU</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Integrated Contour Uncertainty criterion</h2>
+
+<h3>Description</h3>
+
+<p>Computes ICU infill criterion
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">crit_ICU(x, model, thres = 0, Xref, w = NULL, preds = NULL, kxprime = NULL)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>matrix of new designs, one point per row (size n x d)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>model</code></td>
+<td>
+<p><code>homGP</code> or <code>hetGP</code> model, including inverse matrices</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>thres</code></td>
+<td>
+<p>for contour finding</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Xref</code></td>
+<td>
+<p>matrix of input locations to approximate the integral by a sum</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>w</code></td>
+<td>
+<p>optional weights vector of weights for <code>Xref</code> locations</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>preds</code></td>
+<td>
+<p>optional predictions at <code>Xref</code> to avoid recomputing if already done</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>kxprime</code></td>
+<td>
+<p>optional covariance matrix between <code>model$X0</code> and <code>Xref</code> to avoid its recomputation</p>
+</td>
+</tr>
+</table>
+<h3>References</h3>
+
+<p>Lyu, X., Binois, M. &amp; Ludkovski, M. (2018+). Evaluating Gaussian Process Metamodels and Sequential Designs for Noisy Level Set Estimation. arXiv:1807.06712. <br></p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Infill criterion example
+set.seed(42)
+branin &lt;- function(x){
+  m &lt;- 54.8104; s &lt;- 51.9496
+  if(is.null(dim(x))) x &lt;- matrix(x, nrow = 1)
+  xx &lt;- 15 * x[,1] - 5; y &lt;- 15 * x[,2]
+  f &lt;- (y - 5.1 * xx^2/(4 * pi^2) + 5 * xx/pi - 6)^2 + 10 * (1 - 1/(8 * pi)) * cos(xx) + 10
+  f &lt;- (f - m)/s
+  return(f)
+}
+
+ftest &lt;- function(x, sd = 0.1){
+  if(is.null(dim(x))) x &lt;- matrix(x, nrow = 1)
+  return(apply(x, 1, branin) + rnorm(nrow(x), sd = sd))
+}
+
+ngrid &lt;- 51; xgrid &lt;- seq(0, 1, length.out = ngrid)
+Xgrid &lt;- as.matrix(expand.grid(xgrid, xgrid))
+Zgrid &lt;- ftest(Xgrid)
+
+n &lt;- 20
+N &lt;- 500
+X &lt;- Xgrid[sample(1:nrow(Xgrid), n),]
+X &lt;- X[sample(1:n, N, replace = TRUE),]
+Z &lt;- ftest(X)
+model &lt;- mleHetGP(X, Z, lower = rep(0.001,2), upper = rep(1,2))
+
+# Precalculations for speedup
+preds &lt;- predict(model, x = Xgrid)
+kxprime &lt;- cov_gen(X1 = model$X0, X2 = Xgrid, theta = model$theta, type = model$covtype)
+ 
+critgrid &lt;- apply(Xgrid, 1, crit_ICU, model = model, Xref = Xgrid,
+                  preds = preds, kxprime = kxprime)
+
+filled.contour(matrix(critgrid, ngrid), color.palette = terrain.colors, main = "ICU criterion")
+
+</code></pre>
+
+
+</div>

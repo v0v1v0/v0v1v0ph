@@ -1,0 +1,129 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>rbindFiles</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Combine a sequence of files by rows</h2>
+
+<h3>Description</h3>
+
+<p>Takes a sequence of files and combines them by rows, without reading the full files into memory. This is especially useful when dealing with large datasets, where the reading of entire files may be time consuming and require a large amount of memory.</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">rbindFiles(infiles, outfile, col.sep, header = FALSE, ask = TRUE, 
+verbose = FALSE, add.file.number = FALSE, blank.lines.skip = FALSE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>infiles</code></td>
+<td>
+<p>A character vector of names (and paths) of the files to combine.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>outfile</code></td>
+<td>
+<p>A character string giving the name of the modified file. The name of the file is relative to the current working directory, unless the file name contains a definite path.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>col.sep</code></td>
+<td>
+<p>Specifies the separator used to split the columns in the files. To split at all types of spaces or blank characters, set <code>col.sep = "[[:space:]]"</code> or <code>col.sep = "[[:blank:]]"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>header</code></td>
+<td>
+<p>A logical variable which indicates if the first line in each file contains the names of the variables. If "TRUE", <code>outfile</code> will display this header in its first row, assuming the headers for each file are identical. Equals FALSE by default, i.e. no headers assumed.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ask</code></td>
+<td>
+<p>Logical. Default is "TRUE". If set to "FALSE", an already existing outfile will be overwritten without asking.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p>Logical. Default is "TRUE", which means that the line number is displayed for each iteration, i.e. each combined line.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>add.file.number</code></td>
+<td>
+<p>A logical variable which equals "FALSE" by deafult. If "TRUE", an extra first column will be added to the outfile, consisting of the file numbers for each line.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>blank.lines.skip</code></td>
+<td>
+<p>Logical. If "TRUE" (default), <code>lineByLine</code> ignores blank lines in the input.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The function <code>rbind</code> combines R objects by rows. However, reading large data files may require a large amount of memory and be extremely time consuming.
+<code>rbindFiles</code> avoids reading the full files into memory. It reads the files line by line, possibly modifies each line, then writes to outfile. 
+If however, <code>header</code>, <code>verbose</code>, <code>add.file.number</code> and <code>blank.lines.skip</code> are all set to "FALSE" 
+(their default values), the files are appended directly, thus evading line-by-line modifications. 
+In the case where <code>infiles</code> contains only one file and no output or modifications are requested 
+(<code>verbose</code>, <code>add.file.number</code> and <code>blank.lines.skip</code> equal "FALSE"), an identical copy of this file is made.
+</p>
+
+
+<h3>Value</h3>
+
+<p>There is no useful output; the objective of <code>rbindFiles</code> is to produce <code>outfile</code>.</p>
+
+
+<h3>Note</h3>
+
+<p>Combining the files by reading each file line by line is less time efficient than appending the files directly. For this reason, if <code>header = FALSE</code>, changing the values of the logical variables <code>verbose</code>, <code>add.file.number</code>
+and <code>blank.lines.skip</code> from "FALSE" to "TRUE" should not be done unless absolutely necessary.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Miriam Gjerdevik,<br>
+with Hakon K. Gjessing<br>
+Professor of Biostatistics<br>
+Division of Epidemiology<br>
+Norwegian Institute of Public Health<br><a href="mailto:hakon.gjessing@uib.no">hakon.gjessing@uib.no</a></p>
+
+
+<h3>References</h3>
+
+<p>Web Site: <a href="https://haplin.bitbucket.io">https://haplin.bitbucket.io</a>
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>cbindFiles</code>, <code>lineByLine</code></p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+
+# Combines the three infiles, by rows
+rbindFiles(file.names = c("myfile1.txt", "myfile2.txt", "myfile3.txt"), 
+outfile = "myfile_combined_by_rows.txt", col.sep = " ", header = TRUE, verbose = TRUE)
+
+
+## End(Not run)
+</code></pre>
+
+
+</div>

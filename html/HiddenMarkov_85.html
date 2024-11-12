@@ -1,0 +1,123 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>simulate</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Simulate Hidden Markov Process</h2>
+
+<h3>Description</h3>
+
+<p>These functions provide methods for the generic function <code>simulate</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">## S3 method for class 'dthmm'
+simulate(object, nsim = 1, seed = NULL, ...)
+## S3 method for class 'mchain'
+simulate(object, nsim = 1, seed = NULL, ...)
+## S3 method for class 'mmglm0'
+simulate(object, nsim = 1, seed = NULL, ...)
+## S3 method for class 'mmglm1'
+simulate(object, nsim = 1, seed = NULL, ...)
+## S3 method for class 'mmglmlong1'
+simulate(object, nsim = 1, seed = NULL, ...)
+## S3 method for class 'mmpp'
+simulate(object, nsim = 1, seed = NULL, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>object</code></td>
+<td>
+<p>an object with class <code>"dthmm"</code>, <code>"mchain"</code>, <code>"mmglm0"</code>, <code>"mmglm1"</code>, <code>"mmglmlong1"</code> or <code>"mmpp"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nsim</code></td>
+<td>
+<p>number of points to simulate.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>seed</code></td>
+<td>
+<p>seed for the random number generator.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>other arguments.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Below details about particular methods are given where necessary.
+</p>
+
+<dl>
+<dt><code>simulate.mmglm0</code></dt>
+<dd>
+<p>If the covariate <code>x1</code> is <code>NULL</code>, then uniform (0,1) variables are generated as the values for <code>x1</code>. When the <code>family</code> is <code>"binomial"</code> and <code>size</code> is <code>NULL</code> (i.e. the number of Bernoulli trials are not specified), then they are simulated as <code>100+rpois(nsim, lambda=5)</code>.</p>
+</dd>
+</dl>
+<p>The code for the methods <code>"dthmm"</code>, <code>"mchain"</code>, <code>"mmglm0"</code>, <code>"mmglm1"</code>,<code>"mmglmlong1"</code> and <code>"mmpp"</code> can be viewed by appending <code>simulate.dthmm</code>, <code>simulate.mchain</code>, <code>simulate.mmglm0</code>, <code>simulate.mmglm1</code>, <code>simulate.mmglmlong1</code>  or <code>simulate.mmpp</code>, respectively, to <code>HiddenMarkov:::</code>, on the <span style="font-family: Courier New, Courier; color: #666666;"><b>R</b></span> command line; e.g. <code>HiddenMarkov:::dthmm</code>. The three colons are needed because these method functions are not in the exported NAMESPACE.
+</p>
+
+
+<h3>Value</h3>
+
+<p>The returned object has the same class as the input object and contains the components that were in the input object. Additional components depend on the class as below:
+</p>
+<p><code>"dthmm"</code>: it will also have a vector <code>x</code> containing the simulated values;
+</p>
+<p><code>"mmglm0"</code>: it will also contain a dataframe <code>x</code> about the glm; and
+</p>
+<p><code>"mmpp"</code>: <code>tau</code> contains times of the simulated Poisson events (plus time 0), <code>ys</code> is a vector of states at the time of each event, <code>y</code> is the sequence of states visited, and <code>x</code> is the time spent in each state.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">#    The hidden Markov chain has 5 states with transition matrix:
+
+Pi &lt;- matrix(c(1/2, 1/2,   0,   0,   0,
+               1/3, 1/3, 1/3,   0,   0,
+                 0, 1/3, 1/3, 1/3,   0,
+                 0,   0, 1/3, 1/3, 1/3,
+                 0,   0,   0, 1/2, 1/2),
+             byrow=TRUE, nrow=5)
+
+#--------------------------------------------
+#   simulate a Poisson HMM
+
+x &lt;- dthmm(NULL, Pi, c(0, 1, 0, 0, 0), "pois",
+           list(lambda=c(1, 4, 2, 5, 3)), discrete = TRUE)
+
+x &lt;- simulate(x, nsim=2000)
+
+#    check Poisson means
+for (i in 1:5) print(mean(x$x[x$y==i]))
+
+#--------------------------------------------
+#   simulate a Gaussian HMM
+
+x &lt;- dthmm(NULL, Pi, c(0, 1, 0, 0, 0), "norm",
+           list(mean=c(1, 4, 2, 5, 3), sd=c(0.5, 1, 1, 0.5, 0.1)))
+
+x &lt;- simulate(x, nsim=2000)
+
+#    check means and standard deviations
+for (i in 1:5) print(mean(x$x[x$y==i]))
+for (i in 1:5) print(sd(x$x[x$y==i]))
+</code></pre>
+
+
+</div>

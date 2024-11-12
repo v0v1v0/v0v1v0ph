@@ -1,0 +1,92 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>data_split</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Data split</h2>
+
+<h3>Description</h3>
+
+<p><code>kfold_split</code> splits data into k folds with equal sizes, which is used for cross-validation.
+<code>twofold_split</code> splits data into two folds, which samples the training set.
+Both stratified sampling and simple sampling are allowed.
+The details can be found in function <code>do_cv</code> and <code>do_cumulative_htrx</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">kfold_split(outcome, fold, method = "simple")
+
+twofold_split(outcome, train_proportion = 0.5, method = "simple")
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>outcome</code></td>
+<td>
+<p>a vector of the variable (usually the outcome)
+based on which the data is going to be stratified.
+This only works when <code>method="stratified"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fold</code></td>
+<td>
+<p>a positive integer specifying how many folds the data should be split into.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+<p>the method to be used for data split, either <code>"simple"</code> (default) or <code>"stratified"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>train_proportion</code></td>
+<td>
+<p>a positive number between 0 and 1 giving
+the proportion of the training dataset when splitting data into 2 folds.
+By default, <code>train_proportion=0.5</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Stratified sampling works only when the <code>outcome</code> variable is binary (either 0 or 1),
+and it ensures each fold has almost the same number of <code>outcome=0</code> and <code>outcome=1</code>.
+</p>
+<p>Simple sampling randomly splits the data into k folds.
+</p>
+<p>Two-fold data split is used to select candidate models in Step 1 of HTRX or cumulative HTRX,
+while k-fold data split is used for 10-fold cross-validation in Step 2 which aims at selecting the best model.
+</p>
+
+
+<h3>Value</h3>
+
+<p>Both functions return a list containing the indexes of different folds.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## create the binary outcome (20% prevalence)
+outcome=rbinom(200,1,0.2)
+
+## simple sampling (10 folds)
+kfold_split(outcome,10)
+
+## stratified sampling (10 folds)
+kfold_split(outcome,10,"stratified")
+
+## stratified sampling (2 folds, with 50% training data)
+twofold_split(outcome,0.5,"stratified")
+</code></pre>
+
+
+</div>

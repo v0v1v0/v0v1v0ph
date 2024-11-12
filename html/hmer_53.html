@@ -1,0 +1,151 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>wave_dependencies</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Multiple Wave Inputs vs Outputs</h2>
+
+<h3>Description</h3>
+
+<p>Given multiple waves of points, produce input-output plots for each pair.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">wave_dependencies(
+  waves,
+  targets,
+  output_names = names(targets),
+  input_names = names(waves[[1]])[!names(waves[[1]]) %in% names(targets)],
+  p_size = 1.5,
+  l_wid = 1.5,
+  normalize = FALSE,
+  zero_in = TRUE,
+  wave_numbers = ifelse(zero_in, 0, 1):(length(waves) - ifelse(zero_in, 1, 0)),
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>waves</code></td>
+<td>
+<p>The list of data.frame objects, one for each set of outputs at that wave.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>targets</code></td>
+<td>
+<p>The target values of the outputs.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>output_names</code></td>
+<td>
+<p>The outputs to plot, if not all are wanted.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>input_names</code></td>
+<td>
+<p>The inputs to plot, if not all are wanted.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>p_size</code></td>
+<td>
+<p>Control for the point size on the plots: smaller is better for many plots.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>l_wid</code></td>
+<td>
+<p>Control for line width of superimposed targets.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>normalize</code></td>
+<td>
+<p>If true, plotting is done with target bounds equal size.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>zero_in</code></td>
+<td>
+<p>Is a wave 0 included in the waves list?</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>wave_numbers</code></td>
+<td>
+<p>Which waves to plot</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Optional parameters (not to be used directly)</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>It can be useful to consider what the dependencies between the input values and output
+values are, to investigate the suitability of the chosen input ranges (i.e. if widening
+an input range could result in the targets being matchable). This function provides those
+plots.
+</p>
+<p>For each output-input pair, a points plot is produced with the input value on the x-axis
+and the output value on the y-axis. The target bounds are superimposed as horizontal lines.
+The points themselves are coloured by which wave of history matching they came from.
+</p>
+<p>These can show dependencies between specific outputs and inputs and, if points are clustering
+at the far left or right edge of a plot, can give an indication that the input ranges are
+unsuitable for matching the target.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A grid of ggplot objects.
+</p>
+
+
+<h3>See Also</h3>
+
+<p>Other visualisation tools: 
+<code>behaviour_plot()</code>,
+<code>diagnostic_wrap()</code>,
+<code>effect_strength()</code>,
+<code>emulator_plot()</code>,
+<code>hit_by_wave()</code>,
+<code>output_plot()</code>,
+<code>plot_actives()</code>,
+<code>plot_lattice()</code>,
+<code>plot_wrap()</code>,
+<code>simulator_plot()</code>,
+<code>space_removed()</code>,
+<code>validation_pairs()</code>,
+<code>wave_points()</code>,
+<code>wave_values()</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"> wave_dependencies(SIRMultiWaveData, SIREmulators$targets, l_wid = 0.8, p_size = 0.8)
+ wave_dependencies(SIRMultiWaveData, SIREmulators$targets, c('nS', 'nI'), c('aIR', 'aSI'))
+ 
+     # For many plots, it may be helpful to manually modify the font size
+     wave_dependencies(SIRMultiWaveData, SIREmulators$targets) +
+      ggplot2::theme(text = ggplot2::element_text(size = 5))
+ 
+</code></pre>
+
+
+</div>

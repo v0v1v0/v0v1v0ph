@@ -1,0 +1,79 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>dfr_mcdd</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Mean Comparison Distance method</h2>
+
+<h3>Description</h3>
+
+<p>Mean Comparison statistical method for concept drift detection.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">dfr_mcdd(target_feat, alpha = 0.05, window_size = 100)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>target_feat</code></td>
+<td>
+<p>Feature to be monitored</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alpha</code></td>
+<td>
+<p>Probability theshold for all test statistics</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>window_size</code></td>
+<td>
+<p>Size of the sliding window</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p><code>dfr_mcdd</code> object
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">library(daltoolbox)
+library(heimdall)
+
+# This example uses a dist-based drift detector with a synthetic dataset.
+
+data(st_drift_examples)
+data &lt;- st_drift_examples$univariate
+data$event &lt;- NULL
+
+model &lt;- dfr_mcdd(target_feat='depart_visibility')
+
+detection &lt;- NULL
+output &lt;- list(obj=model, drift=FALSE)
+for (i in 1:length(data$serie)){
+ output &lt;- update_state(output$obj, data$serie[i])
+ if (output$drift){
+   type &lt;- 'drift'
+   output$obj &lt;- reset_state(output$obj)
+ }else{
+   type &lt;- ''
+ }
+ detection &lt;- rbind(detection, data.frame(idx=i, event=output$drift, type=type))
+}
+
+detection[detection$type == 'drift',]
+</code></pre>
+
+
+</div>

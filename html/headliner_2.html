@@ -1,0 +1,100 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>add_date_columns</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Add columns with date calculations based on reference date</h2>
+
+<h3>Description</h3>
+
+<p>Using a reference date (defaults to current date), columns are
+appended to the data set describing the number of days, weeks, months,
+quarters, calendar years and fiscal years since the reference date. If
+the new columns share names with an existing column, the function will show
+a warning.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">add_date_columns(
+  df,
+  date_col,
+  ref_date = Sys.Date(),
+  fiscal_year_offset = 6,
+  week_start = 1,
+  drop = FALSE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>df</code></td>
+<td>
+<p>data frame</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>date_col</code></td>
+<td>
+<p>column with class of 'date'</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ref_date</code></td>
+<td>
+<p>reference date for calculations, defaults to current date</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fiscal_year_offset</code></td>
+<td>
+<p>the number of months to offset date, if fiscal
+year ends in June, use 6</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>week_start</code></td>
+<td>
+<p>integer for start of week where Monday = 1 and Sunday = 7</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>drop</code></td>
+<td>
+<p>some of the generated fields may match the input data frame. When
+TRUE, the original columns will be removed and replaced with the new field
+of the same name. Otherwise, columns with the same name will be appended with
+a '1'</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>Returns a data frame with columns appended to describe
+date distances from a reference date.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">demo_data() |&gt;
+  add_date_columns(date_col = date)
+
+# if columns overlap, you will see a warning
+demo_data() |&gt;
+  dplyr::mutate(week = 1) |&gt;
+  add_date_columns(date_col = date)
+
+# to drop the old column and keep the new column use `drop = TRUE`
+demo_data() |&gt;
+  dplyr::mutate(week = 1) |&gt;
+  add_date_columns(date_col = date, drop = TRUE)
+</code></pre>
+
+
+</div>

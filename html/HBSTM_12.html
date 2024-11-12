@@ -1,0 +1,170 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hbstm</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Fitting Hierarchical Bayesian Space Time models
+</h2>
+
+<h3>Description</h3>
+
+<p><code>hbstm</code> is used to fit Hierarchical Bayesian Space Time models.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">	hbstm(Zt,K,newGrid,reglag,seas,spatlags,hyperpriors,initialvalues,
+	nIter,nBurn,fit,plots,posterior,save,control)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>Zt</code></td>
+<td>
+<p>: MxT <code>"data.frame"</code> containing the data. The rows contains the "M" spatial points and the columns the "T" temporal observations.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>K</code></td>
+<td>
+<p>: MxS <code>"matrix"</code> that relates the observed spatial points with the new Grid. S is the number of predicted spatial points.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>newGrid</code></td>
+<td>
+<p> An Sx2 <code>"data.frame"</code> containing the "Longitude" and the "Latitude" of the new Grid.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>reglag</code></td>
+<td>
+<p> A vector containing the temporal autoregressive lags of the model.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>seas</code></td>
+<td>
+<p> A vector containing the seasonal coefficients of the model.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>spatlags</code></td>
+<td>
+<p> A vector of length 4 containing the spatial lags of the model. See details for more information.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>hyperpriors</code></td>
+<td>
+<p> An object of class <code>Hyperpriors</code> containing all the values of the model hyperpriors.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>initialvalues</code></td>
+<td>
+<p> An object of class <code>Parameters</code> containing all the initial values of the model parameters.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nIter</code></td>
+<td>
+<p> Number of Gibbs Sampling iterations. Default value is 1000.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nBurn</code></td>
+<td>
+<p> Number of burn-in samples. This number of samples will be discarded before making any inference. Default value is the 20 percent of nIter.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fit</code></td>
+<td>
+<p> A <code>"logical"</code> indicating whether the HBSTM is fitted. </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>plots</code></td>
+<td>
+<p> A <code>"logical"</code> indicating whether the method shows the plots of the execution (The mse, Zt vs X*Yt and the ACF/PACF of the residuals.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>posterior</code></td>
+<td>
+<p> A <code>"character"</code> indicating whether the function returns the 'mean' and 'sd' the fitted values of Yt or returns the 'median' with its 95 percent credibility intervals.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>save</code></td>
+<td>
+<p> A <code>"character"</code> indicating if, for each iteration, the algorithm saves the estimation of certain parameters. See "Details"s for more information.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>control</code></td>
+<td>
+<p>a list of control parameters. See "Details".</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Each position of the argument <code>spatlags</code> refers to the spatial lags of a specified direction. These four directions are "east-west", "north-south", "northwest-southeast" and "northeast-southwest".
+</p>
+<p>The <code>save</code> argument is a <code>"character"</code> that can have any of the following options:
+</p>
+<p>-<code>"all"</code>: Save an object of class <code>Parameters</code>.
+</p>
+<p>-<code>"Mu"</code>: Save an object of class <code>Mu</code>.
+</p>
+<p>-<code>"Mt"</code>: Save an object of class <code>Mt</code>.
+</p>
+<p>-<code>"Xt"</code>: Save an object of class <code>Xt</code>.
+</p>
+<p>The <code>control</code> argument is a list that can supply any of the following components:
+</p>
+<p>-<code>time</code>: A <code>"logical"</code> indicating whether the method shows the estimated time of execution.
+</p>
+<p>-<code>timerem</code>: A <code>"logical"</code> indicating whether the method shows the estimated remaining time of execution
+</p>
+<p>-<code>seed</code>: The seed to use in the function <code>"set.seed"</code> and set it to fit the model.
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>hbstm</code> returns an object of class <code>HBSTM</code>
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Pilar Munyoz and Alberto Lopez Moreno
+</p>
+
+
+<h3>See Also</h3>
+
+<p>Overview: <code>HBSTM-package</code> <br>
+Classes : <code>HBSTM,Parameters,Mu,Mt,Xt,Autoregressive,Seas,SpatParam,VectSubdiag,
+	Hyperpriors,Mu0,Mt0,Xt0,Seas0,Autoregressive0,SpatParam0,VectSubdiag0</code><br>
+Methods : <code>hbstm,hbstm.fit,results,estimation,resid,mse</code><br>
+Plot : <code>plotRes,plotFit</code><br>	
+Data: <code>hirlam,coordinates</code><br></p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## See 'tutorial.pdf', included in the documentation of the package, to see a full example
+</code></pre>
+
+
+</div>

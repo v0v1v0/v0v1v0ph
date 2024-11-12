@@ -1,0 +1,90 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>by_cases</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Map cell contents to properties using <code>case_when</code>
+</h2>
+
+<h3>Description</h3>
+
+<p>This function uses <code>dplyr::case_when()</code> to set cell properties.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">by_cases(..., ignore_na = TRUE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>A list of two-sided formulas interpreted by <code>case_when</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ignore_na</code></td>
+<td>
+<p>If <code>TRUE</code>, <code>NA</code> values in the result will be left unchanged
+from their previous values. Otherwise, <code>NA</code>
+normally resets to the default.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Within the formulas, the variable <code>.</code> will refer to the content of
+<code>ht[rows, cols]</code>, after conversion to a vector.
+</p>
+<p><code>case_when</code> returns <code>NA</code> when no formula LHS is matched. To avoid this, set a
+default in the last formula: <code>TRUE ~ default</code>.
+</p>
+<p><code>case_when</code> can't deal with <code>brdr()</code> objects, so you cannot use
+these in <code>by_cases()</code>.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A function for use in <code style="white-space: pre;">⁠map_***⁠</code> functions.
+</p>
+
+
+<h3>See Also</h3>
+
+<p>mapping-functions
+</p>
+<p>Other mapping functions: 
+<code>by_colorspace()</code>,
+<code>by_function()</code>,
+<code>by_quantiles()</code>,
+<code>by_ranges()</code>,
+<code>by_regex()</code>,
+<code>by_rows()</code>,
+<code>by_values()</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">if (! requireNamespace("dplyr")) {
+  stop("Please install the 'dplyr' package to run this example")
+}
+
+ht &lt;- hux(runif(5), letters[1:5])
+
+map_background_color(ht, by_cases(
+        . == "a" ~ "red",
+        . %in% letters ~ "green",
+        . &lt; 0.5 ~ "pink"
+      ))
+</code></pre>
+
+
+</div>

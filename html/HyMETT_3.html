@@ -1,0 +1,363 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>calc_annual_flow_stats</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Calculate annual flow statistics from daily data</h2>
+
+<h3>Description</h3>
+
+<p>Calculate annual flow statistics from daily data
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">calc_annual_flow_stats(
+  data = NULL,
+  Date,
+  year_group,
+  Q,
+  Q3 = NA_real_,
+  Q7 = NA_real_,
+  Q30 = NA_real_,
+  jd = NA_integer_,
+  calc_high = FALSE,
+  calc_low = FALSE,
+  calc_percentiles = FALSE,
+  calc_monthly = FALSE,
+  calc_WSCVD = FALSE,
+  longitude = NA,
+  calc_ICVD = FALSE,
+  zero_threshold = 33,
+  quantile_type = 8,
+  na.action = c("na.omit", "na.pass")
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>'data.frame'. Optional data.frame input, with columns containing <code>Date</code>,<br><code>year_group</code>, <code>Q</code>, and <code style="white-space: pre;">⁠Q3, Q7, Q30, jd⁠</code> (if required). Column names are specified as strings
+in the corresponding parameter. Default is <code>NULL</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Date</code></td>
+<td>
+<p>'Date' or 'character' vector when <code>data = NULL</code>, or character' string identifying
+Date column name when <code>data</code> is specified. Date associated with each value in <code>Q</code> parameter.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>year_group</code></td>
+<td>
+<p>'numeric' vector when <code>data = NULL</code>, or 'character' string identifying
+grouping column name when <code>data</code> is specified. Year grouping for each daily value in <code>Q</code>
+parameter. Must be same length as <code>Q</code> parameter. Often <code>year_group</code> is water year or climate
+year.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Q</code></td>
+<td>
+<p>'numeric' vector when <code>data = NULL</code>, or 'character' string identifying streamflow values
+column name when <code>data</code> is specified. Daily streamflow data. Must be same length as <code>year_group</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Q3</code></td>
+<td>
+<p>'numeric' vector when <code>data = NULL</code>, or 'character' string identifying Q3 column name
+when <code>data</code> is specified. 3-day moving average of daily streamflow data <code>Q</code> parameter, often
+returned from <code>preproc_precondition_data</code>. Default is <code>NA_real_</code>, required if <code>calc_high</code> or
+<code>calc_low = TRUE</code>. If specified, must be same length as <code>Q</code> parameter.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Q7</code></td>
+<td>
+<p>'numeric' vector when <code>data = NULL</code>, or 'character' string identifying Q7 column name
+when <code>data</code> is specified. 7-day moving average of daily streamflow data <code>Q</code> parameter, often
+returned from <code>preproc_precondition_data</code>. Default is <code>NA_real_</code>, required if <code>calc_high</code> or
+<code>calc_low = TRUE</code>. If specified, must be same length as <code>Q</code> parameter.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Q30</code></td>
+<td>
+<p>'numeric' vector when <code>data = NULL</code>, or 'character' string identifying Q30 column name
+when <code>data</code> is specified. 30-day average of daily streamflow data <code>Q</code> parameter, often returned
+from <code>preproc_precondition_data</code>. Default is <code>NA_real_</code>, required if <code>calc_high</code> or
+<code>calc_low = TRUE</code>. If specified, must be same length as <code>Q</code> parameter.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>jd</code></td>
+<td>
+<p>'numeric' vector when <code>data = NULL</code>, or 'character' string identifying jd column name
+when <code>data</code> is specified. Calendar Julian day of daily streamflow data <code>Q</code> parameter, often
+returned from <code>preproc_precondition_data</code>. Default is <code>NA_integer_</code>, required if <code>calc_high</code>,
+<code>calc_low</code>, <code>calc_WSCVD</code> or <code>calc_ICVD = TRUE</code>. If specified, must be same length as <code>Q</code>
+parameter.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>calc_high</code></td>
+<td>
+<p>'boolean' value. Calculate high flow statistics for years in <code>year_group</code>.
+Default is <code>FALSE</code>. See <strong>Details</strong> for more information.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>calc_low</code></td>
+<td>
+<p>'boolean' value. Calculate low flow statistics for years in <code>year_group</code>.
+Default is <code>FALSE</code>. See <strong>Details</strong> for more information.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>calc_percentiles</code></td>
+<td>
+<p>'boolean' value. Calculate percentiles for years in <code>year_group</code>.
+Default is <code>FALSE</code>. See <strong>Details</strong> for more information.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>calc_monthly</code></td>
+<td>
+<p>'boolean' value. Calculate monthly statistics for years in <code>year_group</code>.
+Default is <code>FALSE</code>. See <strong>Details</strong> for more information.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>calc_WSCVD</code></td>
+<td>
+<p>'boolean' value. Calculate winter-spring center volume date for years in
+<code>year_group</code>. Default is <code>FALSE</code>. See <strong>Details</strong> for more information.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>longitude</code></td>
+<td>
+<p>'numeric' value. Site longitude in North American Datum of 1983 (NAD83),
+required in WSCVD calculation. Default is <code>NA</code>. See <strong>Details</strong> for more information.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>calc_ICVD</code></td>
+<td>
+<p>'boolean' value. Calculate inverse center volume date for years in <code>year_group</code>.
+Default is <code>FALSE</code>. See <strong>Details</strong> for more information.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>zero_threshold</code></td>
+<td>
+<p>'numeric' value as percentage. The percentage of years of a statistic that
+need to be zero in order for it to be deemed a zero flow site for that statistic. For use in
+trend calculation. See <strong>Details</strong> on attributes. Default is <code>33</code> (33 percent) of the
+annual statistic values.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>quantile_type</code></td>
+<td>
+<p>'numeric' value. The distribution type used in the <code>stats::quantile</code>
+function. Default is <code>8</code> (median-unbiased regardless of distribution). Other
+types common in hydrology are <code>6</code> (Weibull) or <code>9</code> (unbiased for normal distributions).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>na.action</code></td>
+<td>
+<p>'character' string indicating na.action passed to <code>stats::aggregate</code>
+<code>na.action</code> parameter. Default is <code>"na.omit"</code>, which removes <code>NA</code> values before aggregating
+statistics, or <code>"na.pass"</code>, which will pass <code>NA</code> values and return <code>NA</code> in the grouped calculation
+if any <code>NA</code> values are present.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p><code>year_group</code> is commonly water year, climate year, or calendar year.<br></p>
+<p>Default annual statistics returned:
+</p>
+
+<dl>
+<dt><code>annual_mean</code></dt>
+<dd>
+<p>annual mean in <code>year_group</code></p>
+</dd>
+<dt><code>annual_sd</code></dt>
+<dd>
+<p>annual standard deviation in <code>year_group</code></p>
+</dd>
+<dt><code>annual_sum</code></dt>
+<dd>
+<p>annual sum in <code>year_group</code></p>
+</dd>
+</dl>
+<p>If <code>calc_high/low</code> are selected, annual statistics returned:<br>
+1-, 3-, 7-, and 30-day high/low and Julian date (jd) of n-day high/low.
+</p>
+
+<dl>
+<dt>
+<code>high_q</code><em>n</em>
+</dt>
+<dd>
+<p>where <em>n</em> = 1, 3, 7, and 30</p>
+</dd>
+<dt>
+<code>high_q</code><em>n</em><code style="white-space: pre;">⁠_jd⁠</code>
+</dt>
+<dd>
+<p>where <em>n</em> = 1, 3, 7, and 30</p>
+</dd>
+<dt>
+<code>low_q</code><em>n</em>
+</dt>
+<dd>
+<p>where <em>n</em> = 1, 3, 7, and 30</p>
+</dd>
+<dt>
+<code>low_q</code><em>n</em><code style="white-space: pre;">⁠_jd⁠</code>
+</dt>
+<dd>
+<p>where <em>n</em> = 1, 3, 7, and 30</p>
+</dd>
+</dl>
+<p>If <code>calc_percentiles</code> is selected, annual statistics returned:<br>
+1, 5, 10, 25, 50, 75, 90, 95, 99 percentile based on daily streamflow.
+</p>
+
+<dl>
+<dt>
+<code>annual_</code><em>n</em><code style="white-space: pre;">⁠_percentile⁠</code>
+</dt>
+<dd>
+<p>where <em>n</em> = 1, 5, 10, 25, 50, 75, 90, 95, and 99</p>
+</dd>
+</dl>
+<p>If <code>calc_monthly</code> is selected, annual statistics returned:<br>
+Monthly mean, standard deviation, max, min, percent of annual for each month in <code>year_group</code>.
+</p>
+
+<dl>
+<dt>
+<em>month</em><code style="white-space: pre;">⁠_mean⁠</code>
+</dt>
+<dd>
+<p>monthly mean, where <em>month</em> = <code>month.abb</code></p>
+</dd>
+<dt>
+<em>month</em><code style="white-space: pre;">⁠_sd⁠</code>
+</dt>
+<dd>
+<p>monthly standard deviation, where <em>month</em> = <code>month.abb</code></p>
+</dd>
+<dt>
+<em>month</em><code style="white-space: pre;">⁠_max⁠</code>
+</dt>
+<dd>
+<p>monthly maximum, where <em>month</em> = <code>month.abb</code></p>
+</dd>
+<dt>
+<em>month</em><code style="white-space: pre;">⁠_min⁠</code>
+</dt>
+<dd>
+<p>monthly minimum, where <em>month</em> = <code>month.abb</code></p>
+</dd>
+<dt>
+<em>month</em><code style="white-space: pre;">⁠_percent_annual⁠</code>
+</dt>
+<dd>
+<p>monthly percent of annual, where <em>month</em> = <code>month.abb</code></p>
+</dd>
+</dl>
+<p>If <code>calc_WSCVD</code> is selected, Julian date of annual winter-spring center volume date is returned.<br>
+Longitude (in NAD83 datum) is used to determine the ending month of spring. July for longitudes
+West of <code class="reqn">-</code>95 degrees, May for longitudes east of <code class="reqn">-</code>95 degrees. See <strong>References</strong>
+Dudley and others, 2017. Commonly calculated when <code>year_group</code> is water year.
+</p>
+
+<dl>
+<dt><code>WSCVD</code></dt>
+<dd>
+<p>Julian date of winter-spring center volume</p>
+</dd>
+</dl>
+<p>If <code>calc_ICVD</code> is selected, Julian date of annual inverse center volume date is returned.<br>
+Commonly calculated when <code>year_group</code> is climate year.
+</p>
+
+<dl>
+<dt><code>ICVD</code></dt>
+<dd>
+<p>Julian date of inverse center volume date</p>
+</dd>
+</dl>
+<p><strong>Attribute:</strong> <code>zero_flow_years</code><br>
+A data.frame with each annual statistic calculated, the percentage of years where the
+statistic = 0, a flag indicating if the percentage is over the <code>zero_threshold</code> parameter,
+and the number of years with a zero value. Columns in <code>zero_flow_years</code>:
+</p>
+
+<dl>
+<dt><code>annual_stat</code></dt>
+<dd>
+<p>annual statistic</p>
+</dd>
+<dt><code>percent_zeros</code></dt>
+<dd>
+<p>percentage of years with 0 statistic value</p>
+</dd>
+<dt><code>over_threshold</code></dt>
+<dd>
+<p>boolean if percentage is over threshold</p>
+</dd>
+<dt><code>number_years</code></dt>
+<dd>
+<p>number of years with 0 value statistic</p>
+</dd>
+</dl>
+<p>The <code>zero_flow_years</code> attribute can be useful in trend calculation, where a trend may not be
+appropriate to calculate with many zero flow years.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A tibble (see <code>tibble::tibble</code>) with annual statistics depending on options selected.
+See <strong>Details</strong>.
+</p>
+
+
+<h3>References</h3>
+
+<p>Dudley, R.W., Hodgkins, G.A, McHale, M.R., Kolian, M.J., Renard, B., 2017, Trends in
+snowmelt-related streamflow timing in the conterminous United States: Journal of Hydrology, v.
+547, p. 208-221. [Also available at https://doi.org/10.1016/j.jhydrol.2017.01.051.]
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>preproc_precondition_data</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">calc_annual_flow_stats(data = example_preproc, Date = "Date", year_group = "WY", Q = "value")
+
+</code></pre>
+
+
+</div>

@@ -1,0 +1,202 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>as.likert</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Support functions for diverging stacked barcharts for Likert, semantic
+differential, and rating scale data.</h2>
+
+<h3>Description</h3>
+
+<p>Constructs class="likert" objects to be used by the plot.likert methods.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">
+is.likert(x)
+
+as.likert(x, ...)
+## Default S3 method:
+as.likert(x, ...)
+## S3 method for class 'data.frame'
+as.likert(x, ...)
+## S3 method for class 'formula'
+as.likert(x, ...)  ## doesn't work yet
+## S3 method for class 'ftable'
+as.likert(x, ...)
+## S3 method for class 'table'
+as.likert(x, ...)
+## S3 method for class 'matrix'
+as.likert(x,
+          ReferenceZero=NULL,
+          ...,
+          rowlabel=NULL, collabel=NULL,
+          xlimEqualLeftRight=FALSE,
+          xTickLabelsPositive=TRUE,
+          padding=FALSE,
+          reverse.left=TRUE)
+## S3 method for class 'listOfNamedMatrices'
+as.likert(x, ...)
+## S3 method for class 'array'
+as.likert(x, ...)
+
+
+## S3 method for class 'likert'
+rev(x)
+
+is.likertCapable(x, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>For the <code>as.likert</code> methods, a numeric object stored as a vector, matrix,
+two-dimensional table, two-dimensional ftable,
+two-dimensional structable (as defined in the <code>vcd</code> package),
+or list of named matrices.
+For functions <code>is.likert</code> and <code>is.likertCapable</code>, any object.
+This is the only required argument.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rowlabel, collabel</code></td>
+<td>
+<p><code>names(dimnames(x))</code>, where <code>x</code> is
+the argument to the <code>as.likert</code> functions.
+These will become the <code>xlab</code> and <code>ylab</code> of the likert plot.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>other arguments.  They will be ignored by
+the <code>as.likert</code> method.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ReferenceZero</code></td>
+<td>
+<p>Please see discussion of this argument
+in <code>likert</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>xlimEqualLeftRight</code></td>
+<td>
+<p>Logical. The default is <code>FALSE</code>.  If
+<code>TRUE</code>, then the left and right x limits are set to negative
+and positive of the larger of the absolute value of the original x limits.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>xTickLabelsPositive</code></td>
+<td>
+<p>Logical. The default is <code>TRUE</code>.
+If <code>TRUE</code>, then the tick labels on the negative side are
+displayed as positive values.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>padding, reverse.left</code></td>
+<td>
+<p><code>padding</code> is <code>FALSE</code> for
+<code>likert</code> and <code>TRUE</code> for <code>likertMosaic</code>.
+<code>reverse.left</code> is <code>TRUE</code> for <code>likert</code> and <code>FALSE</code>
+for <code>likertMosaic</code>.  <code>likert</code> is based on
+<code>barchart</code>
+and requires that the sequencing of negative values be reversed. <code>likertMosiac</code> is
+based on <code>mosaic</code> and needs padding on left and right
+to fill the rectangle implied by the convex hull of the plot.
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Please see <code>likert</code> for information on the plot for which
+<code>as.likert</code> prepares the data.
+</p>
+
+
+<h3>Value</h3>
+
+<p>For the <code>as.likert</code> methods, a <code>likert</code> object, which is
+a matrix with additional attributes that are needed to make the
+<code>barchart</code> method used by the <code>plot.likert</code> methods
+work with the data.  Columns for respondents who
+disagree have negated values.
+Any <code>NA</code> values in the argument <code>x</code> are changed to <code>0</code>.
+The column of the original data for respondents who
+neither agree nor disagree is split into two columns, each containing
+halved values—one positive and one negative.
+Negative columns come first in the sequence of "No Opinion"(negative)–"Strongly
+Disagree",
+followed by "No Opinion"(positive)–"Strongly Agree".
+There are four
+attributes:
+<code>"even.col"</code> indicating whether there were originally an even
+number of columns, <code>"n.levels"</code> the original number of levels,
+<code>"levels"</code>
+the original levels in the original order, <code>"positive.order"</code>
+The sequence in which to display the rows in order to make the right
+hand sides progress with high values on top.
+</p>
+<p><code>is.likert</code> returns a <code>TRUE</code> or <code>FALSE</code> value.
+</p>
+<p><code>is.likertCapable</code> returns a <code>TRUE</code> or <code>FALSE</code> value
+if the argument can used as an argument to one of the <code>plot.likert</code> methods.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p> Richard M. Heiberger &lt;rmh@temple.edu&gt; </p>
+
+
+<h3>References</h3>
+
+<p>Richard M. Heiberger, Naomi B. Robbins (2014).,
+"Design of Diverging Stacked Bar Charts for Likert Scales and Other Applications",
+Journal of Statistical Software, 57(5), 1–32,
+
+<a href="https://doi.org/10.18637/jss.v057.i05">doi:10.18637/jss.v057.i05</a>.
+</p>
+<p>Naomi Robbins &lt;naomi@nbr-graphs.com&gt;, "Visualizing Data: Challenges to
+Presentation of Quality Graphics—and Solutions", Amstat News,
+September 2011, 28–30.
+</p>
+<p>Naomi B. Robbins and Richard M. Heiberger (2011).  Plotting Likert and
+Other Rating Scales.  In JSM Proceedings, Section on Survey Research
+Methods. Alexandria, VA: American Statistical Association.
+</p>
+<p>Luo, Amy and Tim Keyes (2005). "Second Set of Results in from the Career
+Track Member Survey," Amstat News. Arlington, VA: American Statistical
+Association.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>likert</code></p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Please see ?likert to see these functions used in context.
+
+tmp2 &lt;- array(1:12, dim=c(3,4), dimnames=list(B=LETTERS[3:5], C=letters[6:9]))
+as.likert(tmp2)  ## even number of levels.
+
+is.likert(tmp2)
+is.likert(as.likert(tmp2))
+</code></pre>
+
+
+</div>

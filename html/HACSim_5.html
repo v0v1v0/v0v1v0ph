@@ -1,0 +1,141 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>HAC.simrep</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Run a simulation of haplotype accumulation curves for hypothetical or 
+real species</h2>
+
+<h3>Description</h3>
+
+<p>Runs the <code>HACSim</code> algorithm by successively calling 
+<code>HAC.sim</code> to iteratively extrapolate haplotype accumulation curves to 
+determine likely specimen sample sizes for hypothetical or real species
+</p>
+<p>The algorithm employs the following iterative methods when calculating the 
+"Measures of Sampling Closeness":
+</p>
+
+<ul>
+<li>
+<p> Mean number of haplotype sampled: <code class="reqn">H_i</code>
+</p>
+</li>
+<li>
+<p> Mean number of haplotypes not sampled <code class="reqn">H^* - H_i</code>
+</p>
+</li>
+<li>
+<p> Proportion of haplotypes sampled: <code class="reqn">\frac{H_i}{H^*}</code>
+</p>
+</li>
+<li>
+<p> Proportion of haplotypes not sampled: <code class="reqn">1 - \frac{H_i}{H^*}</code>
+</p>
+</li>
+<li>
+<p> Mean value of <code class="reqn">N*</code>: <code class="reqn">\frac{N_iH^*}{H_i}</code>
+</p>
+</li>
+<li>
+<p> Mean number of specimens not sampled: <code class="reqn">\frac{N_iH^*}{H_i} - N_i</code>
+</p>
+</li>
+</ul>
+<p>where <code class="reqn">H_i</code> is stochastically-determined through sampling from 
+<code>probs</code>, the observed species' haplotype frequency distribution vector. 
+</p>
+<p>As the algorithm proceeds, <code class="reqn">H_i</code> will approach <code class="reqn">H^*</code> asymptotically 
+(and hence, <code class="reqn">N_i</code> will converge to <code class="reqn">N^*</code>), but will likely fluctuate 
+randomly from one iteration to the next. However, estimates of <code class="reqn">N^*</code> found 
+at each iteration will be monotonically-increasing.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">HAC.simrep(HACSObject)</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table><tr style="vertical-align: top;">
+<td><code>HACSObject</code></td>
+<td>
+<p>object containing the desired simulation 
+parameters</p>
+</td>
+</tr></table>
+<h3>Value</h3>
+
+<p>Iteration results are outputted to the console and graphs displayed in 
+the plot window. Plots depict haplotype accumulation (along with shaded 
+confidence intervals for the mean number of haplotypes found). Dashed lines 
+correspond to the endpoint of the curve and reflect haplotype recovery for a 
+user-defined cutoff (default <code>p</code> = 0.95, 95% haplotype diversity). Output 
+from the first iteration is useful for judging levels of haplotype diversity 
+and recovery found in observed intraspecific sequence datasets, reflecting 
+current sampling depth. The required sample size is displayed in the second-
+last iteration. All other information corresponding to the extrapolated sample 
+size can be found in the last iteration. Iteration results can optionally be 
+saved to a CSV file. Subsampled DNA sequences are automatically saved to a 
+FASTA file.</p>
+
+
+<h3>Note</h3>
+
+<p>When simulating real species via <code>HACReal(...)</code>, a pop-up window will appear prompting the user to select an intraspecific FASTA file of 
+aligned/trimmed DNA sequences. The alignment must not contain missing or 
+ambiguous nucleotides (i.e., it should only contain A, C, G or T); otherwise, haplotype diversity may be overestimated. Excluding sequences or alignment 
+sites with missing/ambiguous data is an option.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+  ## Simulate hypothetical species ##
+  
+  N &lt;- 100 # total number of sampled individuals
+  Hstar &lt;- 10 # total number of haplotypes
+  probs &lt;- rep(1/Hstar, Hstar) # equal haplotype frequency distribution
+  
+  HACSObj &lt;- HACHypothetical(N = N, Hstar = Hstar , probs = probs, 
+  filename = "output") # outputs a CSV file called "output.csv"
+  
+  ## Simulate hypothetical species - subsampling ##
+  HACSObj &lt;- HACHypothetical(N = N, Hstar = Hstar, probs = probs, 
+  perms = 1000, p = 0.95, subsample = TRUE, prop = 0.25, 
+  conf.level = 0.95, filename = "output")
+  
+  ## Simulate hypothetical species and all paramaters changed - subsampling ##
+  HACSObj &lt;- HACHypothetical(N = N, Hstar = Hstar, probs = probs, 
+  perms = 10000, p = 0.90, subsample = TRUE, prop = 0.15, conf.level = 0.95, 
+  filename = "output")
+  
+  try(HAC.simrep(HACSObj)) # runs a simulation
+  
+  ## Simulate real species ##
+  
+  ## Not run: 
+    ## Simulate real species ##
+    # outputs file called "output.csv"
+    HACSObj &lt;- HACReal(filename = "output") 
+    
+    ## Simulate real species - subsampling ##
+    HACSObj &lt;- HACReal(subsample = TRUE, prop = 0.15, conf.level = 0.95, 
+    filename = "output")
+    
+    ## Simulate real species and all parameters changed - subsampling ##
+    HACSObj &lt;- HACReal(perms = 10000, p = 0.90, subsample = TRUE, 
+    prop = 0.15, conf.level = 0.99, filename = "output")
+    
+    # user prompted to select appropriate FASTA file
+    try(HAC.simrep(HACSObj))
+    
+## End(Not run)
+</code></pre>
+
+
+</div>

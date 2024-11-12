@@ -1,0 +1,118 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>anova.haplo.glm</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Analysis of variance for haplo.glm model fit
+</h2>
+
+<h3>Description</h3>
+
+<p>Perform an analysis of variance between two haplo.glm model fits
+using the deviances from the fitted objects 
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">## S3 method for class 'haplo.glm'
+anova(object, ..., dispersion=NULL, test="Chisq")
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>object</code></td>
+<td>
+
+<p>A haplo.glm or glm object
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+
+<p>More model fits to compare against the fit in the first argument
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dispersion </code></td>
+<td>
+
+<p>the dispersion parameter for the fitting family. By default it is
+obtained from the object(s)
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>test</code></td>
+<td>
+
+<p>character string for the test of model comparison. Only "Chisq"
+supported for haplo.glm objects
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Uses print.anova for the displayed result
+</p>
+
+
+<h3>Value</h3>
+
+<p>A data.frame of the anova class, with these columns: Df, Deviance, Resid.Df,
+Resid.Dev, p-value
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>haplo.glm</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"> data(hla.demo)
+ geno &lt;- as.matrix(hla.demo[,c(17,18,21:24)])
+ keep &lt;- !apply(is.na(geno) | geno==0, 1, any) # SKIP THESE THREE LINES
+ hla.demo &lt;- hla.demo[keep,]                   # IN AN ANALYSIS
+ geno &lt;- geno[keep,]                           # 
+ attach(hla.demo)
+ label &lt;-c("DQB","DRB","B")
+ y &lt;- hla.demo$resp
+ y.bin &lt;- 1*(hla.demo$resp.cat=="low")
+
+# set up a genotype array as a model.matrix for inserting into data frame
+# Note that hla.demo is a data.frame, and we need to subset to columns
+# of interest. Also also need to convert to a matrix object, so that
+# setupGeno can code alleles and convert geno to 'model.matrix' class.
+
+ geno &lt;- setupGeno(geno, miss.val=c(0,NA))
+
+  # geno now has an attribute 'unique.alleles' which must be passed to
+  # haplo.glm as allele.lev=attributes(geno)$unique.alleles, see below
+
+ my.data &lt;- data.frame(geno=geno, age=hla.demo$age, male=hla.demo$male,
+                        y=y, y.bin=y.bin)
+
+
+ fit.gaus &lt;- haplo.glm(y ~ male + geno, family = gaussian,  na.action=
+               "na.geno.keep", data=my.data, locus.label=label,
+               control = haplo.glm.control(haplo.freq.min=0.02))
+ glmfit.gaus &lt;- glm(y~male, family=gaussian, data=my.data)
+
+ anova.haplo.glm(glmfit.gaus, fit.gaus)
+
+</code></pre>
+
+
+</div>

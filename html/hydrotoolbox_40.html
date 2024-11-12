@@ -1,0 +1,302 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hm_plot</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Methods to easily use <code>ggplot2</code> or <code>plotly</code> (interactive)</h2>
+
+<h3>Description</h3>
+
+<p>This method allows you to make plots (using simple and expressive arguments)
+of the variables contained inside an <code>hydromet_XXX</code> class object.
+The plot outputs can be static (<code>ggplot2</code>) or dynamic (<code>plotly</code>).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hm_plot(
+  obj,
+  slot_name,
+  col_name,
+  interactive = FALSE,
+  line_type = NULL,
+  line_color = NULL,
+  line_size = NULL,
+  line_alpha = NULL,
+  x_lab = "date",
+  y_lab = "y",
+  title_lab = NULL,
+  legend_lab = NULL,
+  dual_yaxis = NULL,
+  from = NULL,
+  to = NULL,
+  scatter = NULL
+)
+
+## S4 method for signature 'hydromet_station'
+hm_plot(
+  obj,
+  slot_name,
+  col_name,
+  interactive = FALSE,
+  line_type = NULL,
+  line_color = NULL,
+  line_size = NULL,
+  line_alpha = NULL,
+  x_lab = "date",
+  y_lab = "y",
+  title_lab = NULL,
+  legend_lab = NULL,
+  dual_yaxis = NULL,
+  from = NULL,
+  to = NULL,
+  scatter = NULL
+)
+
+## S4 method for signature 'hydromet_compact'
+hm_plot(
+  obj,
+  slot_name,
+  col_name,
+  interactive = FALSE,
+  line_type = NULL,
+  line_color = NULL,
+  line_size = NULL,
+  line_alpha = NULL,
+  x_lab = "date",
+  y_lab = "y",
+  title_lab = NULL,
+  legend_lab = NULL,
+  dual_yaxis = NULL,
+  from = NULL,
+  to = NULL,
+  scatter = NULL
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>obj</code></td>
+<td>
+<p>a valid <code>hydromet_XXX</code> class object.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>slot_name</code></td>
+<td>
+<p>string vector with the name of the slot(s) to use in plotting.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>col_name</code></td>
+<td>
+<p>list containing the column name of the variables to plot. Every element inside
+the list belongs to the previous defined slot(s).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>interactive</code></td>
+<td>
+<p>logical. Default value, <code>FALSE</code>, will return a <code>ggplot2</code>
+class object. Otherwise you will get a <code>plotly</code> one.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>line_type</code></td>
+<td>
+<p>string with the name of the line dash type (<code>ggplot2</code>) or mode in
+the <code>plotly</code> case. <code>ggplot2</code>: <code>'solid'</code> (default value), <code>'twodash'</code>,
+<code>'longdash'</code>, <code>'dotted'</code>, <code>'dotdash'</code>, <code>'dashed'</code> or <code>'blank'</code>.
+<code>plotly</code>: <code>'lines'</code> (default value), <code>'lines+markers'</code> or <code>'markers'</code>.
+<b>NOTE:</b> when using <code>scatter</code> plot this arguments goes through the <code>shape</code>
+argument (in <code>geom_point()</code>) as numeric.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>line_color</code></td>
+<td>
+<p>string with a valid <code>color</code> name. See <code>'colors()'</code> or
+<a href="http://www.stat.columbia.edu/~tzheng/files/Rcolor.pdf">Rcolor document</a>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>line_size</code></td>
+<td>
+<p>numeric vector containing the size of every line to plot. If you use
+the <code>NULL</code> value it will return the plots with default(s) for either
+<code>ggplot2</code> or <code>plotly</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>line_alpha</code></td>
+<td>
+<p>numeric vector with line(s) transparency. From 0 (invisible) to 1.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x_lab</code></td>
+<td>
+<p>string with <code>x axis</code> label. Default is <code>'Date'</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>y_lab</code></td>
+<td>
+<p>string with <code>y axis</code> label. In case you use <code>dual_yaxis</code>
+argument you must supply both <code>c('ylab', 'y2lab')</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>title_lab</code></td>
+<td>
+<p>string with the title of the plot. Default is a plot without title.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>legend_lab</code></td>
+<td>
+<p>string vector with plot label(s) name(s).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dual_yaxis</code></td>
+<td>
+<p>string vector suggesting which variables are assign either to
+the <code>'left'</code> or <code>'right'</code> y axis.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>from</code></td>
+<td>
+<p>string value for <code>'Date'</code> class or <code>POSIXct(lt)</code> class
+for date-time data with the starting <code>Date</code>. You can use <code>'from'</code>
+without <code>'to'</code>. In this case you will subset your data <code>'from'</code> till the end.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>to</code></td>
+<td>
+<p>string value for <code>'Date'</code> class or <code>POSIXct(lt)</code> class for date-time
+data with the ending <code>Date</code>. You can use <code>'to'</code> without <code>'from'</code>.
+In this case you will subset your data from the beginning till <code>'to'</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>scatter</code></td>
+<td>
+<p>string vector (of length two) suggesting which variables goes in
+the <code>'x'</code> and <code>'y'</code> axis respectively. Valid character entries
+are <code>'x'</code> and <code>'y'</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A <code>ggplot2</code> or <code>plotly</code> object.
+</p>
+
+
+<h3>Functions</h3>
+
+
+<ul>
+<li> <p><code>hm_plot(hydromet_station)</code>: plot method for station class
+</p>
+</li>
+<li> <p><code>hm_plot(hydromet_compact)</code>: plot method for compact class
+</p>
+</li>
+</ul>
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+# lets work with the cuevas station
+path &lt;- system.file('extdata', package = 'hydrotoolbox')
+
+# use the build method
+hm_cuevas &lt;-
+  hm_create() %&gt;%
+  hm_build(bureau = 'ianigla', path = path,
+           file_name = 'ianigla_cuevas.csv',
+           slot_name = c('tair', 'rh', 'patm',
+                         'precip', 'wspd', 'wdir',
+                         'kin', 'hsnow', 'tsoil'),
+           by = 'hour',
+           out_name = c('tair(°C)', 'rh(%)', 'patm(mbar)',
+                        'p(mm)', 'wspd(km/hr)', 'wdir(°)',
+                        'kin(kW/m2)', 'hsnow(cm)', 'tsoil(°C)' )
+           )
+
+# let's start by making a single variable static plot
+hm_plot(obj = hm_cuevas, slot_name = 'tair',
+        col_name = list('tair(°C)') )
+
+# we add labels, change color, line type and we focus
+# on specific date range
+hm_plot(obj = hm_cuevas, slot_name = 'tair',
+        col_name = list('tair(°C)'),
+        line_type = 'longdash',
+        line_color = 'dodgerblue',
+        x_lab = 'Date time', y_lab = 'T(°C)',
+        title_lab = 'Hourly temperature at Cuevas',
+        legend_lab = 'Tair',
+        from = ISOdate(2020, 7, 1),
+        to = ISOdate(2020, 7, 5))
+
+# compare air with soil temperature
+hm_plot(obj = hm_cuevas, slot_name = c('tair', 'tsoil'),
+        col_name = list('tair(°C)', 'tsoil(°C)'),
+        line_type = c('longdash', 'solid'),
+        line_color = c('dodgerblue', 'tan4'),
+        x_lab = 'Date time', y_lab = 'T(°C)',
+        title_lab = 'Hourly temperature at Cuevas',
+        legend_lab = c('Tair', 'Tsoil'),
+        from = ISOdate(2020, 7, 1),
+        to = ISOdate(2020, 7, 5))
+
+# let's add relative humidity on the right y-axis
+hm_plot(obj = hm_cuevas, slot_name = c('tair', 'tsoil', 'rh'),
+        col_name = list('tair(°C)', 'tsoil(°C)', 'rh(%)'),
+        line_type = c('longdash', 'solid', 'solid'),
+        line_color = c('dodgerblue', 'tan4', 'red'),
+        x_lab = 'Date time', y_lab = c('T(°C)', 'RH(%)'),
+        title_lab = 'Hourly meteo data at Cuevas',
+        legend_lab = c('Tair', 'Tsoil', 'RH'),
+        dual_yaxis = c('left', 'left', 'right'),
+        from = ISOdate(2020, 7, 1),
+        to = ISOdate(2020, 7, 5))
+
+# we decide to analize the previous variables in detail
+# with a dynamic plot
+hm_plot(obj = hm_cuevas, slot_name = c('tair', 'tsoil', 'rh'),
+        col_name = list('tair(°C)', 'tsoil(°C)', 'rh(%)'),
+        line_color = c('dodgerblue', 'tan4', 'red'),
+        x_lab = 'Date time', y_lab = c('T(°C)', 'RH(%)'),
+        title_lab = 'Hourly meteo data at Cuevas',
+        legend_lab = c('Tair', 'Tsoil', 'RH'),
+        dual_yaxis = c('left', 'left', 'right'),
+        interactive = TRUE)
+# click on the Zoom icon and play a little...
+
+
+# suppose now that we want to make a scatter plot to show
+# the negative correlation between air temperature and
+# relative humidity
+hm_plot(obj = hm_cuevas, slot_name = c('tair', 'rh'),
+        col_name = list('tair(°C)', 'rh(%)'),
+        line_color = 'dodgerblue',
+        x_lab = 'Tair', y_lab = 'RH',
+        scatter = c('x', 'y') )
+
+## End(Not run)
+
+
+</code></pre>
+
+
+</div>

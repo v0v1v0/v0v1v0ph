@@ -1,0 +1,111 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>req_headers</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Modify request headers</h2>
+
+<h3>Description</h3>
+
+<p><code>req_headers()</code> allows you to set the value of any header.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">req_headers(.req, ..., .redact = NULL)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>.req</code></td>
+<td>
+<p>A request.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>&lt;<code>dynamic-dots</code>&gt; Name-value pairs of headers
+and their values.
+</p>
+
+<ul>
+<li>
+<p> Use <code>NULL</code> to reset a value to httr2's default
+</p>
+</li>
+<li>
+<p> Use <code>""</code> to remove a header
+</p>
+</li>
+<li>
+<p> Use a character vector to repeat a header.
+</p>
+</li>
+</ul>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.redact</code></td>
+<td>
+<p>Headers to redact. If <code>NULL</code>, the default, the added headers
+are not redacted.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A modified HTTP request.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">req &lt;- request("http://example.com")
+
+# Use req_headers() to add arbitrary additional headers to the request
+req |&gt;
+  req_headers(MyHeader = "MyValue") |&gt;
+  req_dry_run()
+
+# Repeated use overrides the previous value:
+req |&gt;
+  req_headers(MyHeader = "Old value") |&gt;
+  req_headers(MyHeader = "New value") |&gt;
+  req_dry_run()
+
+# Setting Accept to NULL uses curl's default:
+req |&gt;
+  req_headers(Accept = NULL) |&gt;
+  req_dry_run()
+
+# Setting it to "" removes it:
+req |&gt;
+  req_headers(Accept = "") |&gt;
+  req_dry_run()
+
+# If you need to repeat a header, provide a vector of values
+# (this is rarely needed, but is important in a handful of cases)
+req |&gt;
+  req_headers(HeaderName = c("Value 1", "Value 2", "Value 3")) |&gt;
+  req_dry_run()
+
+# If you have headers in a list, use !!!
+headers &lt;- list(HeaderOne = "one", HeaderTwo = "two")
+req |&gt;
+   req_headers(!!!headers, HeaderThree = "three") |&gt;
+   req_dry_run()
+
+# Use `.redact` to hide a header in the output
+req |&gt;
+  req_headers(Secret = "this-is-private", Public = "but-this-is-not", .redact = "Secret") |&gt;
+  req_dry_run()
+</code></pre>
+
+
+</div>

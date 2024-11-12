@@ -1,0 +1,273 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hierNet</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>A Lasso for interactions</h2>
+
+<h3>Description</h3>
+
+<p>One of the main functions in the hierNet package.
+Builds a regression model with hierarchically constrained pairwise interactions.
+Required inputs are an x matrix of
+features (the columns are the features) and a y vector of
+values.
+Reasonably fast for moderate sized problems (100-200 variables). We are currently working
+on an alternate algorithm for large scale problems.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hierNet(x, y, lam, delta=1e-8, strong=FALSE, diagonal=TRUE, aa=NULL, zz=NULL,
+        center=TRUE, stand.main=TRUE, stand.int=FALSE, 
+        rho=nrow(x), niter=100, sym.eps=1e-3,
+        step=1, maxiter=2000, backtrack=0.2, tol=1e-5, trace=0)</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>A matrix of predictors, where the rows are the samples and
+the columns are the predictors</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+<p>A vector of observations, where length(y)  equals
+nrow(x)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lam</code></td>
+<td>
+<p>Regularization parameter (&gt;0).  L1 penalty param is <code>lam * (1-delta)</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>delta</code></td>
+<td>
+<p>Elastic Net parameter. Squared L2 penalty param is <code>lam * delta</code>. Not a tuning parameter: Think of as fixed and small. Default 1e-8.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>strong</code></td>
+<td>
+<p>Flag specifying strong hierarchy (TRUE) or weak
+hierarchy (FALSE). Default FALSE.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>diagonal</code></td>
+<td>
+<p>Flag specifying whether to include "pure" quadratic
+terms, th_jjX_j^2, in the model.  Default TRUE.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>aa</code></td>
+<td>
+<p>An *optional* argument, a list with results from a previous call</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>zz</code></td>
+<td>
+<p>An *optional* argument, a matrix whose columns are products of features, computed by the function compute.interactions.c</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>center</code></td>
+<td>
+<p>Should features be centered? Default TRUE; FALSE should rarely be used.  This option is available for special uses only</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>stand.main</code></td>
+<td>
+<p>Should main effects be standardized? Default TRUE.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>stand.int</code></td>
+<td>
+<p>Should interactions be standardized? Default FALSE.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rho</code></td>
+<td>
+<p>ADMM parameter: tuning parameter (&gt;0) for ADMM. If there are convergence
+problems, try decreasing <code>rho</code>. Default n.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>niter</code></td>
+<td>
+<p>ADMM parameter: number of iterations</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sym.eps</code></td>
+<td>
+<p>ADMM parameter: threshold for symmetrizing with strong=TRUE</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>step</code></td>
+<td>
+<p>Stepsize for generalized gradient descent</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>maxiter</code></td>
+<td>
+<p>Maximum number of iterations for generalized gradient descent</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>backtrack</code></td>
+<td>
+<p>Backtrack parameter for generalized gradient descent</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tol</code></td>
+<td>
+<p>Error tolerance parameter for generalized gradient descent</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>trace</code></td>
+<td>
+<p>Output option; trace=1 gives verbose output</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>bp</code></td>
+<td>
+<p>p-vector of estimated  "positive part"  main effect (p=# features)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>bn</code></td>
+<td>
+<p>p-vector of estimated  "negative part"  main effect; overall main effect estimated coefficients are bp-bn </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>th</code></td>
+<td>
+<p> Matrix of estimated interaction coefficients, of dimension p by p. Note: when output from hierNet is printed, th is symmetrized (set to (th+t(th))/2)
+for simplicity.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>obj</code></td>
+<td>
+<p>Value of objective function at minimum.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lam</code></td>
+<td>
+<p>Value of lambda used</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>type</code></td>
+<td>
+<p>Type of model fit- "gaussian" or "logistic" (binomial)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mx</code></td>
+<td>
+<p> p-vector of  column means of x</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sx</code></td>
+<td>
+<p> p-vector of  column standard deviations of x</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>my</code></td>
+<td>
+<p> mean of y</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mzz</code></td>
+<td>
+<p> column means of feature product matrix</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>szz</code></td>
+<td>
+<p> column standard deviations of feature product matrix</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>call</code></td>
+<td>
+<p>The call to hierNet</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>Jacob Bien and Robert Tibshirani</p>
+
+
+<h3>References</h3>
+
+<p>Bien, J., Taylor, J., Tibshirani, R., (2013) "A Lasso for Hierarchical Interactions." Annals of Statistics. 41(3). 1111-1141.</p>
+
+
+<h3>See Also</h3>
+
+<p>predict.hierNet, hierNet.cv, hierNet.path</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">set.seed(12)
+# fit a single hierNet model
+x=matrix(rnorm(100*10),ncol=10)
+x=scale(x,TRUE,TRUE)
+y=x[,1]+2*x[,2]+ x[,1]*x[,2]+3*rnorm(100)
+fit=hierNet(x,y,lam=50)
+print(fit)
+
+# try strong (rather than weak) hierarchy
+fit=hierNet(x,y,lam=50, strong=TRUE)
+print(fit)
+
+# a typical analysis including cross-validation
+set.seed(12)
+x=matrix(rnorm(100*10),ncol=10)
+x=scale(x,TRUE,TRUE)
+y=x[,1]+2*x[,2]+ x[,1]*x[,2]+3*rnorm(100)
+fit=hierNet.path(x,y)
+fitcv=hierNet.cv(fit,x,y)
+print(fitcv)
+
+lamhat=fitcv$lamhat.1se
+fit2=hierNet(x,y,lam=lamhat)
+yhat=predict(fit2,x)
+</code></pre>
+
+
+</div>

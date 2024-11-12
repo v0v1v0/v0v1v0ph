@@ -1,0 +1,170 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>HWData</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Generate genetic marker data in or out of Hardy-Weinberg Equilibrium</h2>
+
+<h3>Description</h3>
+
+<p>HWData generates samples of genotypic counts under various schemes. It mainly
+uses sampling from the multinomial distribution for given or random allele frequencies,
+either assuming Hardy-Weinberg proportions or a specified degree of inbreeding. Sampling
+can also be performed conditional on the allele frequency. The same procedures are
+also available for X linked markers.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">HWData(nm = 100, n = rep(100, nm), f = rep(0, nm), p = NULL, conditional = FALSE,
+exactequilibrium = FALSE, x.linked = FALSE, nA = NULL, n.males = round(0.5 * n),
+shape1 = 1, shape2 = 1, counts = TRUE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>nm</code></td>
+<td>
+<p>The number of bi-allelic markers.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n</code></td>
+<td>
+<p>The sample sizes.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>f</code></td>
+<td>
+<p>The inbreeding coefficients (only for autosomal markers)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>p</code></td>
+<td>
+<p>a vector of allele frequencies</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>conditional</code></td>
+<td>
+<p>if <code>TRUE</code> The Levene-Haldane distribution will be used for sampling autosomal markers,
+the Graffelman-Weir distribution for sampling X chromosomal markers. If <code>FALSE</code> a multinomial distribution is used</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>exactequilibrium</code></td>
+<td>
+<p>generates data in exact HWE if set to
+<code>TRUE</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x.linked</code></td>
+<td>
+<p>Simulated autosomal markers (<code>x.linked=FALSE</code>,
+the default) or X-chromosomal markers (<code>x.linked=TRUE</code>)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nA</code></td>
+<td>
+<p>A vector of minor allele counts, one for each marker. If not
+specified, it will be calculated from <code>p</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n.males</code></td>
+<td>
+<p>The number of males (only relevant if <code>x.linked = TRUE</code>)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>shape1</code></td>
+<td>
+<p>First shape parameter of the beta distribution used to generate allele frequencies</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>shape2</code></td>
+<td>
+<p>Second shape parameter of the beta distribution used to generate allele frequencies</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>counts</code></td>
+<td>
+<p>If <code>counts=TRUE</code> the output are genotype counts, if <code>counts=TRUE</code> relative genotype frequencies</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Option <code>pfixed</code> is deprecated and replaced by <code>conditional</code>
+Option <code>pdist</code> is deprecated and replaced by parameters <code>shape1</code> and <code>shape2</code>
+</p>
+<p><code>HWData</code> returns a matrix of genotype counts, <code>nm</code> by 3 for
+autsomal markers or <code>nm</code> by 5 for X-chromosomal markers.
+</p>
+<p>If the inbreeding coefficient is specified (<code>f</code>) it will only
+take effect for autosomal markers (<code>x.linked=FALSE</code>) and
+multinomial sampling (<code>conditional=FALSE</code>).
+</p>
+
+
+<h3>Value</h3>
+
+<table><tr style="vertical-align: top;">
+<td><code>X</code></td>
+<td>
+<p>A matrix containing the genotype counts.</p>
+</td>
+</tr></table>
+<h3>Author(s)</h3>
+
+<p> Jan Graffelman (jan.graffelman@upc.edu) </p>
+
+
+<h3>See Also</h3>
+
+<p><code>HWTernaryPlot</code></p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">#
+# Generate 100 SNPs with uniform allele frequency under the equilibrium assumption.
+#
+out &lt;- HWData(nm=100,n=100)
+#
+# Generate genotype frequencies of 100 SNPs with uniform allele frequency assuming exact equilbrium.
+#
+X &lt;- HWData(nm=100, exactequilibrium = TRUE, counts = FALSE)
+#
+# Generate 100 SNPs (as counts), all having an expected A allele frequency of 0.50
+#
+X &lt;- HWData(nm=100,p=0.5)
+#
+#  Generate 100 SNPs, 50 with A allele frequency 0.25 and 50 with A allele frequency 0.75,
+#  assuming fixed allele frequencies. 
+#
+X &lt;- HWData(nm=100,p=rep(c(0.25,0.75),50), conditional = TRUE)
+#
+#  Generate 100 SNPs with a skewed (beta) distribution of the allele frequency,
+#  rich in variants with a low minor allele frequency.
+#
+X &lt;- HWData(nm=100,shape1=1,shape2=10)
+#
+# Generate 100 X chromosomal SNPs with uniformly distributed allele frequency.
+#
+X &lt;- HWData(nm=100, x.linked = TRUE)
+</code></pre>
+
+
+</div>

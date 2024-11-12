@@ -1,0 +1,164 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>fit_model</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Fit Model</h2>
+
+<h3>Description</h3>
+
+<p><code>fit_model()</code> fits a Bayesian hierarchical model to the model training data
+in <code>model_docs</code> and draws samples from the model as Markov Chain Monte
+Carlo (MCMC) estimates.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">fit_model(
+  main_dir,
+  model_docs,
+  num_iters,
+  num_chains = 1,
+  num_cores,
+  writer_indices,
+  doc_indices,
+  a = 2,
+  b = 0.25,
+  c = 2,
+  d = 2,
+  e = 0.5
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>main_dir</code></td>
+<td>
+<p>A directory that contains a cluster template created by
+<code>make_clustering_template()</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>model_docs</code></td>
+<td>
+<p>A directory containing model training documents</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>num_iters</code></td>
+<td>
+<p>An integer number of iterations of MCMC.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>num_chains</code></td>
+<td>
+<p>An integer number of chains to use.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>num_cores</code></td>
+<td>
+<p>An integer number of cores to use for parallel processing
+clustering assignments. The model fitting is not done in parallel.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>writer_indices</code></td>
+<td>
+<p>A vector of the start and stop character of the writer
+ID in the model training file names. E.g., if the file names are
+writer0195_doc1, writer0210_doc1, writer0033_doc1 then writer_indices is
+'c(7,10)'.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>doc_indices</code></td>
+<td>
+<p>A vector of the start and stop character of the "document
+name" in the model training file names. This is used to distinguish between
+two documents written by the same writer. E.g., if the file names are
+writer0195_doc1, writer0195_doc2, writer0033_doc1, writer0033_doc2 then
+doc_indices are 'c(12,15)'.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>a</code></td>
+<td>
+<p>The shape parameter for the Gamma distribution in the hierarchical
+model</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>b</code></td>
+<td>
+<p>The rate parameter for the Gamma distribution in the hierarchical
+model</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>c</code></td>
+<td>
+<p>The first shape parameter for the Beta distribution in the
+hierarchical model</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>d</code></td>
+<td>
+<p>The second shape parameter for the Beta distribution in the
+hierarchical model</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>e</code></td>
+<td>
+<p>The scale parameter for the hyper prior for mu in the hierarchical
+model</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A list of training data used to fit the model and the fitted model
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+main_dir &lt;- "/path/to/main_dir"
+model_docs &lt;- "path/to/model_training_docs"
+questioned_docs &lt;- "path/to/questioned_docs"
+
+model &lt;- fit_model(
+  main_dir = main_dir,
+  model_docs = model_docs,
+  num_iters = 100,
+  num_chains = 1,
+  num_cores = 2,
+  writer_indices = c(2, 5),
+  doc_indices = c(7, 18)
+)
+
+model &lt;- drop_burnin(model = model, burn_in = 25)
+
+analysis &lt;- analyze_questioned_documents(
+  main_dir = main_dir,
+  questioned_docs = questioned_docs,
+  model = model,
+  num_cores = 2
+)
+analysis$posterior_probabilities
+
+## End(Not run)
+
+</code></pre>
+
+
+</div>

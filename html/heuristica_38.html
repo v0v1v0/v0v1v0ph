@@ -1,0 +1,99 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>rowPairApply</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Apply functions to all row pairs.</h2>
+
+<h3>Description</h3>
+
+<p>Apply functions like heuristic predictions to all row pairs in a matrix
+or data.frame.  This does not accept arbitrary functions– they must be
+functions designed to be run by rowPairApply.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">rowPairApply(test_data, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>test_data</code></td>
+<td>
+<p>The data to apply the functions to as a matrix or
+data.frame.  Heuristics must have already been fitted to trying data and
+must include the same criterion_col and cols_to_fit.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>The functions that generate the functions to apply, such as
+heuristics(ttb) and correctGreater(col)– see example below.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A matrix of outputs from the functions.  The number of rows is based
+on the number of row pairs in test_data.  If the input has N rows, the
+output will have N x (N-1) rows.  The number of columns will be at least
+the number of functions but may be more as some functions may output more
+than one column.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>heuristics</code> and <code>heuristics</code> to wrap heuristics
+to be applied.
+</p>
+<p><code>rowIndexes</code> to get apply to output row indexes for the pair.
+</p>
+<p><code>correctGreater</code> to get the correct output based on the criterion column.
+(CorrectGreater should be used with heuristics while probGreater should be used with
+heuristicsProb.)
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Fit two models to data.
+data &lt;- cbind(y=c(30,20,10,5), x1=c(1,1,0,0), x2=c(1,1,0,1))
+ttb &lt;- ttbModel(data, 1, c(2:ncol(data)))
+lreg &lt;- logRegModel(data, 1, c(2:ncol(data)))
+
+## Generate predictions for all row pairs for these two models:
+rowPairApply(data, heuristics(ttb, lreg))
+## Returns a matrix of 2 columns, named ttbModel and regModel, and 6 rows.
+## The original data had 4 rows, meaning there are 4*3/2 = 6 row pairs.
+
+## To see which row pair is which row, use rowIndexes:
+rowPairApply(data, rowIndexes(), heuristics(ttb, lreg))
+## Returns a matrix with columns Row1, Row2, ttbModel, logRegModel.
+## (RowIndexes returns *two* columns.)
+
+## To see whether the first row was actually greater than the second in the
+## row pair, use correctGreater and give it the criterion column index, in
+## this case 1.
+rowPairApply(data, heuristics(lreg, ttb), correctGreater(1))
+## Returns a matrix with columns logRegModel, ttbModel,
+## CorrectGreater.  Values are -1, 0, or 1.
+
+## To do the same analysis for the *probabilty* that the first row is
+## greater. use heuristicsProb and probGreater.  Warning: Not all heuristica
+## models have implemented the prob greater function.
+rowPairApply(data, heuristicsProb(lreg, ttb), probGreater(1))
+## Returns a matrix with columns logRegModel, ttbModel, ProbGreater.
+## Values range from 0.0 to 1.0.
+
+</code></pre>
+
+
+</div>

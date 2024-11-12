@@ -1,0 +1,259 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>marker_h2_means</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Compute a marker-based estimate of heritability, given genotypic means.
+</h2>
+
+<h3>Description</h3>
+
+<p>Given a genetic relatedness matrix and genotypic means,
+this function computes REML-estimates of the genetic and
+residual variance and their standard errors, using the AI-algorithm (Gilmour <em>et al.</em> 1995).
+Based on this, heritability estimates and confidence intervals are given
+(the estimator <code class="reqn">h_m^2</code> in Kruijer <em>et al.</em>).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">marker_h2_means(data.vector, geno.vector, K, Dm=NULL, alpha = 0.05, eps = 1e-06,
+       max.iter = 100, fix.h2 = FALSE, h2 = 0.5, grid.size=99)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>data.vector</code></td>
+<td>
+
+<p>A vector of phenotypic observations, typically genotypic means. Needs to be of type numeric. May contain
+missing values.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>geno.vector</code></td>
+<td>
+
+<p>A vector of genotype labels, either a factor or character. This vector should
+correspond to <code>data.vector</code>, and hence needs to be of the same length.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>K</code></td>
+<td>
+
+<p>A genetic relatedness or kinship matrix, typically marker-based.
+Must have row- and column-names corresponding to the levels of <code>geno.vector</code>
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Dm</code></td>
+<td>
+
+<p>Covariance of the genotypic means contained in data.vector; see details. Should be of class matrix, with row- and column-names corresponding to the levels of <code>geno.vector</code>
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alpha</code></td>
+<td>
+
+<p>Confidence level, for the 1-alpha confidence intervals.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>eps</code></td>
+<td>
+
+<p>Numerical precision, used as convergence criterion in the AI-algorithm.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>max.iter</code></td>
+<td>
+
+<p>Maximal number of iterations in the AI-algorithm.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fix.h2</code></td>
+<td>
+
+<p>Compute the log-likelihood and inverse AI-matrix for a fixed heritability value. Default is <code>FALSE</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>h2</code></td>
+<td>
+
+<p>When <code>fix.h2</code> is <code>TRUE</code>, the value of the heritability. Must be of type numeric, between 0 and 1.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>grid.size</code></td>
+<td>
+<p>If the AI-algorithm has not converged after <code>max.iter</code> iterations,
+the likelihood is computed on the grid of heritability values 1/(<code>grid.size</code>+1),...,<code>grid.size</code>/(<code>grid.size</code>+1); see details.
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+
+
+<ul>
+<li>
+<p> Given phenotypic observations <code class="reqn">Y_{i}</code> for genotypes <code class="reqn">i=1,...,n</code>, the mixed model
+<code class="reqn">Y_{i} = \mu + G_i + E_{i}</code>
+is assumed. Typically, the <code class="reqn">Y_{i}</code> are genotypic means or BLUEs obtained from fitting a linear (mixed) model to
+the raw data, containing several plants or plots for each genotype.
+The vector of additive genetic effects <code class="reqn">(G_1,...,G_n)'</code> follows a
+multivariate normal distribution with mean zero and covariance <code class="reqn">\sigma_A^2 K</code>,
+where <code class="reqn">\sigma_A^2</code> is the additive genetic variance, and <code class="reqn">K</code> is a genetic relatedness matrix derived from a dense set of markers.
+The vector of errors <code class="reqn">(E_1,...,E_n)'</code> follows a
+multivariate normal distribution with mean zero and covariance <code class="reqn">\sigma_E^2 D_m</code>,
+where <code class="reqn">D_m</code> is the covariance of the means obtained from the initial analysis.
+In case of a completely randomized design with <code class="reqn">r_i</code> replicates for genotypes
+<code class="reqn">i=1,...,n</code>, <code class="reqn">D_m</code> is diagonal with elements <code class="reqn">1 / r_i</code>.
+Under certain assumptions (see Speed <em>et al.</em> 2012) the marker- or chip-heritability <code class="reqn">h^2 = \sigma_A^2 / (\sigma_A^2 + \sigma_E^2)</code>
+equals the narrow-sense heritability.
+
+</p>
+</li>
+<li>
+<p> As in the <code>marker_h2</code> function, it is assumed that the genetic relatedness matrix <code class="reqn">K</code> is scaled such that <code class="reqn">trace(P K P) = n - 1</code>, where
+<code class="reqn">P</code> is the projection matrix <code class="reqn">I_n - 1_n 1_n' / n</code>, for the identity matrix <code class="reqn">I_n</code> and <code class="reqn">1_n</code> being a column vector of ones.
+If this is not the case, <code class="reqn">K</code> is automatically scaled prior to fitting the mixed model.
+
+</p>
+</li>
+<li>
+<p> No covariates can be included, as it is assumed that these are available at plant- or plot level, and accounted for in the genotypic means.
+
+</p>
+</li>
+<li>
+<p> The resulting heritability estatimes are less accurate than those obtained from individual plant or plot data, and the likelihood can be monotone
+in <code class="reqn">h^2 = \sigma_A^2 / (\sigma_A^2 + \sigma_E^2)</code>. If the AI-algorithm has not converged after <code>max.iter</code> iterations,
+the likelihood is computed on the grid of heritability values 1/(<code>grid.size</code>+1),...,<code>grid.size</code>/(<code>grid.size</code>+1)
+
+</p>
+</li>
+<li>
+<p> As in the <code>marker_h2</code> function, confidence intervals for heritability are constructed using the delta-method and the inverse AI-matrix.
+The delta-method can be applied either directly to the
+function <code class="reqn">(\sigma_A^2,\sigma_E^2) -&gt; \sigma_A^2 / (\sigma_A^2 + \sigma_E^2)</code> or to the function
+<code class="reqn">(\sigma_A^2,\sigma_E^2) -&gt; log(\sigma_A^2 / \sigma_E^2)</code>. In the latter case,
+a confidence interval for <code class="reqn">log(\sigma_A^2 / \sigma_E^2)</code> is obtained, which is back-transformed to a confidence interval for heritability.
+This approach (proposed in Kruijer <em>et al.</em>) has the advantage that intervals are always contained in the unit interval.
+
+</p>
+</li>
+</ul>
+<h3>Value</h3>
+
+<p>A list with the following components:
+</p>
+
+<ul>
+<li>
+<p>va:  REML-estimate of the (additive) genetic variance.
+</p>
+</li>
+<li>
+<p>ve:  REML-estimate of the residual variance.
+</p>
+</li>
+<li>
+<p>h2:  Plug-in estimate of heritability: <code class="reqn">va / (va + ve)</code>.
+</p>
+</li>
+<li>
+<p>conf.int1:  1-alpha confidence interval for heritability.
+</p>
+</li>
+<li>
+<p>conf.int2:  1-alpha confidence interval for heritability, obtained by
+application of the delta method on a logarithmic scale.
+</p>
+</li>
+<li>
+<p>inv.ai:  The inverse of the average information (AI) matrix.
+</p>
+</li>
+<li>
+<p>loglik:  The log-likelihood.
+</p>
+</li>
+<li>
+<p>loglik.vector:  Empty numeric vector if the AI-algorthm converged within <code class="reqn">max.iter</code> iterations. Otherwise it contains the log-likelihood on a grid.
+</p>
+</li>
+</ul>
+<h3>Author(s)</h3>
+
+<p>Willem Kruijer.
+</p>
+
+
+<h3>References</h3>
+
+
+<ul>
+<li>
+<p> Gilmour <em>et al.</em> Gilmour, A.R., R. Thompson and B.R. Cullis (1995) Average Information REML: An Efficient Algorithm for Variance Parameter
+Estimation in Linear Mixed Models. <em>Biometrics</em>, volume 51, number 4, 1440-1450.
+</p>
+</li>
+<li>
+<p> Kruijer, W. <em>et al.</em> (2015) Marker-based estimation of heritability in immortal
+populations. <em>Genetics</em>, Vol. 199(2), p. 1-20.
+</p>
+</li>
+<li>
+<p> Speed, D., G. Hemani, M. R. Johnson, and D.J. Balding (2012) Improved heritability
+estimation from genome-wide snps. <em>the American journal of human genetics</em> 91: 1011-1021.
+</p>
+</li>
+</ul>
+<h3>See Also</h3>
+
+<p>For marker-based estimation of heritability using individual plant or plot data, see
+<code>marker_h2</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(means_LDV)
+data(R_matrix_LDV)
+data(K_atwell)
+out &lt;- marker_h2_means(data.vector=means_LDV$LDV,geno.vector=means_LDV$genotype,
+                       K=K_atwell,Dm=R_matrix_LDV)
+# Takes about a minute:
+#data(means_LD)
+#data(R_matrix_LD)
+#out &lt;- marker_h2_means(data.vector=means_LD$LD,geno.vector=means_LD$genotype,
+#                       K=K_atwell,Dm=R_matrix_LD)
+# The likelihood is monotone increasing:
+#plot(x=(1:99)/100,y=out$loglik.vector,type="l",ylab="log-likelihood",lwd=2,
+#     main='',xlab='h2',cex.lab=2,cex.axis=2.5)
+</code></pre>
+
+
+</div>

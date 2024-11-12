@@ -1,0 +1,315 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>haplin</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Fitting log-linear models to case-parent triad and/or case-control data</h2>
+
+<h3>Description</h3>
+
+<p><code>haplin</code> fits a log-linear model to case-parent triads, case-control data, or combined (hybrid) case-parent control-parent triads or dyads. It estimates marker or haplotype frequencies, and uses the EM algorithm to reconstruct haplotypes and, if requested, impute missing genotypes. <code>haplin</code> prints and plots estimates of relative risks associated with fetal and maternal haploypes, and in addition allows splitting fetal haplotype effects into maternally and paternally inherited effects. It allows special models, like x-inactivation, to be fitted on the X-chromosome. The result is an object of class <code>haplin</code>, which can be explored with <code>summary</code>, <code>plot</code>, and <code>haptable</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">haplin( data, markers = "ALL", 
+design = "triad", use.missing = FALSE, 
+xchrom = FALSE, maternal = FALSE, test.maternal = FALSE, 
+poo = FALSE, scoretest = "no", ccvar = NULL, strata = NULL, 
+sex = NULL, comb.sex = "double",
+reference = "reciprocal", response = "free", 
+threshold = 0.01, max.haplos = NULL, haplo.file = NULL, 
+resampling = "no", max.EM.iter = 50, data.out = "no", 
+verbose = TRUE, printout = TRUE )
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>An R-object which is the result of using genDataPreprocess. See the web page for a detailed description of how to use this function.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>markers</code></td>
+<td>
+<p>Default is "ALL", which means <code>haplin</code> uses all available markers in the data set in the analysis. For the current version of <code>haplin</code> the number of markers used at a single run should probably not exceed 4 or 5 due to the computational burden. The markers argument can be used to select appropriate markers from the file without creating a new file for the selected markers. The relevant markers can be specified by giving a vector or numbers (e.g., <code>markers = c(1, 3:10)</code> will use the 10 first markers except marker 2) or characters (e.g., <code>markers = c("m1", "m3", "rs35971")</code>). When running <code>haplin</code>, it may be a good idea to start exploring a few markers at a time, using this argument.  </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>design</code></td>
+<td>
+<p>The value "triad" is used for the standard case triad design, without independent controls. The value "cc.triad" means a combination of case triads and control triads. This requires the argument <code>ccvar</code> to point to the data column containing the case-control variable. The value "cc" means a simple case-control design, where the parents have not been genotyped (there are no data columns for parental genes). NOTE: <code>design</code> is also set in <code>genDataPreprocess</code>. Almost always, the two arguments should be equal. Occasionally, however, the user might want to override the original argument by switching from 'cc.triad' to 'triad' or vice versa.	</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>use.missing</code></td>
+<td>
+<p> A logical value used to determine whether triads with missing data should be included in the analysis. When set to TRUE, <code>haplin</code> uses the EM algorithm to obtain risk estimates, also taking into account triads with missing data. The standard errors and p-values are adjusted to correct for this. The default, however, is FALSE. When FALSE, all triads having  any sort of missing data are excluded before the analysis is run. Note that <code>haplin</code> only looks at markers actually used in the analysis,  so that if the markers  argument (see below) is used to select a collection of markers for analysis, <code>haplin</code> only excludes triads with missing data on the included markers. </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>xchrom</code></td>
+<td>
+<p>Logical, defaults to "FALSE". If set to "TRUE", <code>haplin</code> assumes the markers are on the x-chromosome. This option should be combined with specifying the <code>sex</code> argument. In addition, <code>comb.sex</code> can be useful. <code>xchrom = T</code> can be combined with <code>poo = T</code> and/or <code>maternal = T</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>maternal</code></td>
+<td>
+<p> If TRUE, maternal effects are estimated as well as the standard fetal effects. </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>test.maternal</code></td>
+<td>
+<p>Not yet implemented.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>poo</code></td>
+<td>
+<p>Parent-Of-Origin effects. If TRUE, <code>haplin</code> will split single-dose effects into two separate effect estimates, one for the maternally inherited haplotype, and one for the paternally inherited haplotype. Double dose will be estimated as before.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>scoretest</code></td>
+<td>
+<p>Special interest only. If "no", no score test is computed. If "yes", an overall score p-value is included in the output, and the individual score values are returned in the <code>haplin</code> object. If "only", <code>haplin</code> is only run under the null hypothesis, and a simple score object is returned instead of the full <code>haplin</code> object. Useful if only score testing is needed.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ccvar</code></td>
+<td>
+<p>Numeric. Should give the column number for the column containing the case-control indicator in the data file. Needed for the "cc" and "cc.triad" designs. The column should contain two numeric values, of which the largest one is always used to denote cases.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>strata</code></td>
+<td>
+<p>Not yet implemented.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sex</code></td>
+<td>
+<p>To be used with <code>xchrom = TRUE</code>. A numeric value specifying which of the data columns that contains the sex variable. The variable should be coded 1 for males and 2 for females.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>comb.sex</code></td>
+<td>
+<p>To be used with <code>xchrom = TRUE</code>. A character value that specifies how to handle gender differences on the X-chromosome. If set to "males" or "females", analyses are done either for just males or just females, respectively. If set to "single" or "double", males and females are used in a combined analysis. Specifically, when "single", the effect of a (single) allele in males is assumed to equal the effect of a single allele dose in females, and similarly, when "double", a single allele in males is assumed to have the same effect as a double allele dose in females. Default is "double", which corresponds to X-inactivation. See separate description for more details.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>reference</code></td>
+<td>
+<p>Decides how <code>haplin</code> chooses its reference category for the effect estimates. Default value is "reciprocal". With the reciprocal reference the effect of a single or double dose of each haplotype is measured relative to the remaining haplotypes. This means that a new reference category is used for each single haplotype. Other possible values are "population" (which is similar to reciprocal, but where the reference category is always the total population), and "ref.cat", where a single haplotype is used as reference for all the rest. For ref.cat, the default is to choose the most frequent haplotype as the reference haplotype. The reference haplotype can be set explicitly by giving a numeric value for the reference argument. Note that the numeric value refers to the haplotype's position among the haplotypes selected for analysis by <code>haplin</code>. This means that one should run <code>haplin</code> once first to see what haplotypes are used before giving a numeric value to reference. </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>response</code></td>
+<td>
+<p>The default value "free" means that both single- and double dose effects are estimated. Choosing "mult" instead specifies a multiplicative dose-response model. </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>threshold</code></td>
+<td>
+<p>Sets the (approximate) lower limit for the haplotype frequencies of those haplotypes that should be retained in the analysis. Hapotypes that are less frequent are removed, and information about this is given in the output. Default is 0.01.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>max.haplos</code></td>
+<td>
+<p>Not yet implemented.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>haplo.file</code></td>
+<td>
+<p>Not yet implemented.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>resampling</code></td>
+<td>
+<p>Mostly for testing. Default is "no". When "no", the individual haplotypes reconstructed by the EM algorithm as assumed known when computing CIs and p-values. If set to "jackknife" a jackknife-based resampling procedure is used when computing confidence intervals and p-values for effect estimates. This takes more time, but corrects the CIs and p-values for the uncertainty contained in unphased data. Note: in all recent versions of <code>haplin</code>, the resampling is no longer needed since the confidence intervals and p-values are already corrected in the standard computation. </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>max.EM.iter</code></td>
+<td>
+<p>The maximum number of iterations used by the EM algorithm. This value can be increased if necessary, which sometimes is the case with e.g. case-control data which a substantial amount of missing. However, for triad data with little missing information there is usually no need for many iterations. </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>data.out</code></td>
+<td>
+<p>Character. Accepts values "no", "prelim", "null" or "full", with "no" as default. For values other than default, <code>haplin</code> returns the data file prepared for analysis rather than the usual <code>haplin</code> estimation results. The data file contains the haplotypes identified for each triad, and a vector of weights giving the probability distribution of different haplotype configurations within a triad. The probabilities are computed from preliminary haplotype frequency estimates, from the null model or from the full likelihood model. The "prelim" option will be much faster but somewhat less precise than the likelihood models.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p> Default is T (=TRUE). During the EM algorithm, <code>haplin</code> prints the estimated parameters and deviance for each step. To avoid the output, set this argument to F (=FALSE). </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>printout</code></td>
+<td>
+<p>Logical. If TRUE (default), <code>haplin</code> prints a full summary of the results after finishing the estimation. If FALSE, no such printout is given, but the <code>summary</code> function can later be applied to a saved result to get the same summary.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Input data can be either a <code>haplin</code> format data file, or a PED data. These have to be loaded into R first, using genDataRead or genDataLoad functions, and then pre-processed with the genDataPreprocess function. If the PED data file is used, the arguments <code>filename</code>, <code>n.vars</code>, <code>sep</code>, <code>allele.sep</code>, <code>na.strings</code>, <code>ccvar</code>, and <code>sex</code> need not be specified.<br>
+The output can be examined by <code>print</code>, <code>summary</code>, <code>plot</code> and <code>haptable</code>.
+</p>
+
+
+<h3>Value</h3>
+
+<p>An object of class <code>haplin</code> is returned.
+(The only exception is when <code>data.out</code> is set different from "no", where <code>haplin</code> will produce a data file with haplotypes identified.)
+</p>
+
+
+<h3>Warning</h3>
+
+<p>Typically, some of the included haplotypes will be relatively rare, such as a frequency of 1% - 5%. For those haplotypes there may be too little data to estimate the double doses properly, so the estimates may be unreliable. This is seen from the extremely wide confidence intervals. The rare double dose estimates should be disregarded, but the remaining single and double dose estimates are valid. To avoid the problem one can also reduce the model to a purely multiplicative model by setting <code>response = "mult"</code> combined with <code>reference = "ref.cat"</code>.</p>
+
+
+<h3>Note</h3>
+
+<p>Further information is found on the web page.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Hakon K. Gjessing<br>
+Professor of Biostatistics<br>
+Division of Epidemiology<br>
+Norwegian Institute of Public Health<br><a href="mailto:hakon.gjessing@uib.no">hakon.gjessing@uib.no</a></p>
+
+
+<h3>References</h3>
+
+<p> Gjessing HK and Lie RT. Case-parent triads: Estimating single- and double-dose effects of fetal and maternal disease gene haplotypes. Annals of Human Genetics (2006) 70, pp. 382-396.<br><br>
+Web Site: <a href="https://haplin.bitbucket.io">https://haplin.bitbucket.io</a></p>
+
+
+<h3>See Also</h3>
+
+<p><code>summary.haplin</code>, <code>plot.haplin</code>, <code>pedToHaplin</code>, <code>haptable</code>, <code>haplinSlide</code>, <code>genDataLoad</code>, <code>genDataRead</code>, <code>genDataPreprocess</code> </p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># setting up the directory with exemplary data
+dir.in &lt;- system.file( "extdata", package = "Haplin" )
+file.in &lt;- file.path( dir.in, "data.dat" )
+
+# reading data in
+data.in &lt;- genDataRead( file.in, file.out = "poo_exmpl_data_read", format = "haplin",
+  dir.out = tempdir( check = TRUE ), n.vars = 1, allele.sep = " ", col.sep = " ",
+  overwrite = TRUE )
+# preprocessing the data
+data.preproc &lt;- genDataPreprocess( data.in, design = "triad",
+  file.out = "poo_exmpl_data_preproc", dir.out = tempdir( check = TRUE ), overwrite = TRUE )
+
+# running haplin, calculating POO
+res.POO &lt;- haplin( data.preproc, markers = 2, poo = TRUE, response = "mult",
+  reference = 2, use.missing = TRUE )
+res.POO
+
+## Not run: 
+# 1. Read the data:
+my.haplin.data &lt;- genDataRead( file.in = "HAPLIN.trialdata.txt", file.out =
+  "trial_data1", dir.out = ".", format = "haplin", n.vars = 0 )
+
+# 2. Run pre-processing:
+haplin.data.prep &lt;- genDataPreprocess( data.in = my.haplin.data, format =
+  "haplin", design = "triad", file.out = "trial_data1_prep", dir.out = "." )
+
+# 3. Analyze:
+# Standard run:
+haplin( haplin.data.prep )
+
+# Specify path, estimate maternal effects:
+haplin( haplin.data.prep, maternal = T )
+
+# Specify path, use haplotype no. 2 as reference:
+haplin( haplin.data.prep, reference = 2 )
+
+# Remove more haplotypes from estimation by increasing the threshold 
+# to 5%:
+haplin( haplin.data.prep, threshold = 0.05 )
+
+# Estimate maternal effects, using the most frequent haplotype as reference. 
+# Use all data, including triads with missing data. Select 
+# markers 3, 4 and 8 from the supplied data.
+haplin( haplin.data.prep, use.missing = T, maternal = T, 
+reference = "ref.cat", markers = c(3,4,8) )
+# Note: in this version of haplin, the jackknife is 
+# no longer necessary since the standard errors are already corrected.
+
+# Some examples showing how to save the haplin result and later 
+# recall plot and summary results:
+
+# Same analysis as above, saving the result in the object "result.1":
+result.1 &lt;- haplin( haplin.data.prep, use.missing = T, maternal = T, 
+reference = "ref.cat", markers = c(3,4,8) )
+
+# Replot the saved result (fetal effects):
+plot( result.1 )
+
+# Replot the saved result (maternal effects):
+plot( result.1, plot.maternal = T )
+
+# Print a very short summary of saved result:
+result.1
+
+# A full summary of saved result, with confidence intervals and 
+# p-values (the same as haplin prints when running):
+summary( result.1 )
+
+# Some examples when the data file contains two covariates, 
+# the second is the case-control variable:
+
+# The following standard triad run is INCORRECT since it disregards 
+# case status:
+haplin("data.dat", use.missing = T, n.vars = 2, design = "triad")
+
+# Combined run on "hybrid" design, correctly using both case-parent 
+# triads and control-parent triads:
+haplin( my.haplin.data, use.missing = T, n.vars = 2, ccvar = 2, 
+design = "cc.triad" )
+
+# If parent columns are not in the file, a plain case-control 
+# run can be used:
+haplin( my.haplin.data, use.missing = T, n.vars = 2, ccvar = 2, 
+design = "cc", response = "mult", reference = "ref.cat" )
+
+# An example of how to produce a data file with all possible haplotypes
+# identified for each triad, together with their probaility weights:
+result.data &lt;- haplin( my.haplin.data, use.missing = T, 
+markers = c(3,4,8), data.out = "prelim" )
+# result.data will then contain the data file, with a vector of 
+# probabilities (freq) computed from the preliminary haplotype
+# frequencies.
+
+## End(Not run)
+
+</code></pre>
+
+
+</div>

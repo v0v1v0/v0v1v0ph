@@ -1,0 +1,120 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>gds</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Generalized Dantzig Selector</h2>
+
+<h3>Description</h3>
+
+<p>Generalized Dantzig Selector
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">gds(X, y, lambda = NULL, family = "gaussian", weights = NULL)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>X</code></td>
+<td>
+<p>Design matrix.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+<p>Vector of the continuous response value.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lambda</code></td>
+<td>
+<p>Regularization parameter. Only a single value is supported.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>family</code></td>
+<td>
+<p>Use "gaussian" for linear regression, "binomial" for logistic regression and "poisson" for Poisson regression.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>weights</code></td>
+<td>
+<p>A vector of weights for each row of <code>X</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>Intercept and coefficients at the values of lambda specified.
+</p>
+
+
+<h3>References</h3>
+
+<p>Candes E, Tao T (2007).
+“The Dantzig selector: Statistical estimation when p is much larger than n.”
+<em>Ann. Statist.</em>, <b>35</b>(6), 2313–2351.
+</p>
+<p>James GM, Radchenko P (2009).
+“A generalized Dantzig selector with shrinkage tuning.”
+<em>Biometrika</em>, <b>96</b>(2), 323-337.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Example with logistic regression
+n &lt;- 1000  # Number of samples
+p &lt;- 10 # Number of covariates
+X &lt;- matrix(rnorm(n * p), nrow = n) # True (latent) variables # Design matrix
+beta &lt;- c(seq(from = 0.1, to = 1, length.out = 5), rep(0, p-5)) # True regression coefficients
+y &lt;- rbinom(n, 1, (1 + exp(-X %*% beta))^(-1)) # Binomially distributed response
+fit &lt;- gds(X, y, family = "binomial")
+print(fit)
+plot(fit)
+coef(fit)
+
+# Try with more penalization
+fit &lt;- gds(X, y, family = "binomial", lambda = 0.1)
+coef(fit)
+coef(fit, all = TRUE)
+
+
+# Case weighting
+# Assume we wish to put more emphasis on predicting the positive cases correctly
+# In this case we give the 1s three times the weight of the zeros.
+weights &lt;- (y == 0) * 1 + (y == 1) * 3
+fit_w &lt;- gds(X, y, family = "binomial", weights = weights, lambda = 0.1)
+
+# Next we test this on a new dataset, generated with the same parameters
+X_new &lt;- matrix(rnorm(n * p), nrow = n)
+y_new &lt;- rbinom(n, 1, (1 + exp(-X_new %*% beta))^(-1))
+# We use a 50 % threshold as classification rule
+# Unweighted classifcation
+classification &lt;- ((1 + exp(- fit$intercept - X_new %*% fit$beta))^(-1) &gt; 0.5) * 1
+# Weighted classification
+classification_w &lt;- ((1 + exp(- fit_w$intercept - X_new %*% fit_w$beta))^(-1) &gt; 0.5) * 1
+
+# As expected, the weighted classification predicts many more 1s than 0s, since
+# these are heavily up-weighted
+table(classification, classification_w)
+
+# Here we compare the performance of the weighted and unweighted models.
+# The weighted model gets most of the 1s right, while the unweighted model
+# gets the highest overall performance.
+table(classification, y_new)
+table(classification_w, y_new)
+
+</code></pre>
+
+
+</div>

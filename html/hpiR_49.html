@@ -1,0 +1,103 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>rtModel</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Estimate repeat transaction model for index creation</h2>
+
+<h3>Description</h3>
+
+<p>Estimate coefficients for an index via the repeat transaction approach (generic method)
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">rtModel(rt_df, time_matrix, price_diff, estimator, lm_recover = TRUE,
+  ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>rt_df</code></td>
+<td>
+<p>Repeat transactions dataset from rtCreateTrans()</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>time_matrix</code></td>
+<td>
+<p>Time matrix object from rtTimeMatrix()</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>price_diff</code></td>
+<td>
+<p>Difference in price between the two transactions</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>estimator</code></td>
+<td>
+<p>Type of model to estimates (base, robust, weighted).  Must be in that class.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lm_recover</code></td>
+<td>
+<p>(TRUE) Allows robust model to use linear model if it fails</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Additional arguments</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>'rtmodel' object
+</p>
+
+
+<h3>Further Details</h3>
+
+<p>Three available specific methods: 'base', 'robust' and 'weighted'
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+  # Load data
+  data(ex_sales)
+
+  # With a raw transaction data.frame
+  rt_data &lt;- rtCreateTrans(trans_df = ex_sales,
+                           prop_id = 'pinx',
+                           trans_id = 'sale_id',
+                           price = 'sale_price',
+                           periodicity = 'monthly',
+                           date = 'sale_date')
+
+  # Calc price differences
+  price_diff &lt;- rt_data$price_2 - rt_data$price_1
+
+  # Create time matrix
+  rt_matrix &lt;- rtTimeMatrix(rt_data)
+
+  # Calculate model
+  rt_model &lt;- rtModel(rt_df = rt_data,
+                      price_diff = price_diff,
+                      time_matrix = rt_matrix,
+                      estimator = structure('base', class='base'))
+
+</code></pre>
+
+
+</div>

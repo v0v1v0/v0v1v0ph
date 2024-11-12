@@ -1,0 +1,73 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>HCR.fast</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>The Fast Version for Fitting Hidden Compact Representation Model</h2>
+
+<h3>Description</h3>
+
+<p>A fast implementation for fitting the HCR model.
+This implementation caches all intermediate results to speed up the greedy search.
+The basic idea is that if there are two categories need to be combined, for instance, X=1 and X=2 mapping to the same Y'=1, then the change of the score only depend on the frequency of the data where X=1 and X=2.
+Therefore, after combination, if the increment of the likelihood is greater than the penalty, then we will admit such combination.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">HCR.fast(X, Y, score_type = "bic", ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>X</code></td>
+<td>
+<p>The data of cause.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Y</code></td>
+<td>
+<p>The data of effect.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>score_type</code></td>
+<td>
+<p>You can choose "bic","aic","aicc","log" as the type of score to fit the HCR model. Default: bic</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Other arguments passed on to methods. Not currently used.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>The fitted HCR model and its score.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">library(data.table)
+set.seed(1)
+data=simuXY(sample_size=2000)
+r1=HCR.fast(data$X,data$Y)
+r2=HCR.fast(data$Y,data$X)
+# The canonical hidden representation
+unique(r1$data[,c("X","Yp")])
+# The recovery of hidden representation
+unique(data.frame(data$X,data$Yp))
+
+</code></pre>
+
+
+</div>

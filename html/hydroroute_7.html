@@ -1,0 +1,206 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>peaktrace</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Trace Longitudinal Hydropeaking Waves Along a River Section</h2>
+
+<h3>Description</h3>
+
+<p>Estimates all settings based on the ‘relation’ file of a river
+section. The function uses a single ‘relation’ file and determines the
+settings for all neighboring stations with
+<code>estimate_AE()</code> for all event types specified in
+<code>event_type</code>. It fits models to describe translation and retention
+processes between neighboring hydrographs, and generates plots
+(see vignette for details). Given a file with initial values (see vignette),
+predictions are made and visualized in a plot.
+Optionally, the results can be written to a directory.
+All files need to have the same separator (<code>inputsep</code>) and
+character for decimal points (<code>inputdec</code>).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">peaktrace(
+  relation_path,
+  events_path,
+  initial_values_path,
+  settings_path,
+  unique = c("time", "metric"),
+  inputdec = ".",
+  inputsep = ",",
+  event_type = c(2, 4),
+  saveResults = FALSE,
+  outdir = tempdir(),
+  TimeFormat = "%Y-%m-%d %H:%M",
+  tz = "Etc/GMT-1",
+  formula = y ~ x,
+  model = stats::lm,
+  FKM_MAX = 65,
+  impute_method = base::max,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>relation_path</code></td>
+<td>
+<p>Character string containing the path of the file where
+the relation file is to be read from with
+<code>utils::read.csv()</code>. The file must contain a
+column <code>ID</code> that contains the gauging station ID. ID's in the file have to be
+in order of their location in downstream direction.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>events_path</code></td>
+<td>
+<p>Character string containing the path of the directory
+where the event files corresponding to the ‘relation’ file are located. Only
+relevant files in this directory will be used, i.e., files that are related to
+the ‘relation’ file.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>initial_values_path</code></td>
+<td>
+<p>Character string containing the path of the file
+which contains initial values for predictions (see vignette).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>settings_path</code></td>
+<td>
+<p>Character string containing the path where the
+settings files are to be read from with
+<code>utils::read.csv()</code> if
+available. The settings files must be in the format of the
+output of <code>peaktrace()</code>. If missing or
+incomplete, the settings are determined automatically.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>unique</code></td>
+<td>
+<p>Character string specifying if the potential AEs which
+meet the <code>timeLag</code> and <code>metricLag</code> condition should
+be filtered to contain only unique events using <code>"time"</code>,
+i.e., by selecting those where the time difference is smallest
+compared to the specified factor of the mean translation time, or using
+<code>"metric"</code>, i.e., by selecting those where the relative
+difference in amplitude is smallest (default: <code>"time"</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>inputdec</code></td>
+<td>
+<p>Character string for decimal points in input data.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>inputsep</code></td>
+<td>
+<p>Field separator character string for input data.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>event_type</code></td>
+<td>
+<p>Vector specifying the event type that is used to identify
+event files by their file names
+(see <code>hydropeak::get_events()</code>).
+Default: <code>c(2, 4)</code>, i.e., increasing and decreasing events.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>saveResults</code></td>
+<td>
+<p>A logical. If <code>FALSE</code> (default), the generated plots
+and the estimated settings are not saved. Otherwise the settings are written
+to a csv file and the plots are saved as png and pdf files.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>outdir</code></td>
+<td>
+<p>Character string naming a directory where the estimated
+settings should be saved to.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>TimeFormat</code></td>
+<td>
+<p>Character string giving the date-time format of the
+date-time column in the input data frame (default: "%Y-%m-%d %H:%M").</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tz</code></td>
+<td>
+<p>Character string specifying the time zone to be used for the
+conversion (default: "Etc/GMT-1").</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>formula</code></td>
+<td>
+<p>An object of class <code>stats::formula()</code>
+to fit models.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>model</code></td>
+<td>
+<p>Function which specifies the method used for fitting models
+(default: <code>stats::lm()</code>). The model class must have a
+<code>stats::predict()</code> function.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>FKM_MAX</code></td>
+<td>
+<p>Numeric value that specifies the maximum fkm (see ‘relation’
+file) for which predictions seem valid.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>impute_method</code></td>
+<td>
+<p>Function which specifies the method used for imputing
+missing values in initial values based on potential AEs
+(default: <code>base::max()</code>).'</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Additional arguments to be passed to the function specified in
+argument <code>model</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A nested list containing an element for each event type in order as
+defined in <code>event_type</code>. Each element contains again six elements,
+namely a data frame of estimated settings, a '<code>gtable</code>' object that specifies
+the combined plot of all stations (plot it with
+<code>grid::grid.draw()</code>), a data frame containing
+“real” AEs (i.e., events where the relative difference in amplitude is within
+the estimated cut points), a grid of scatterplots ('gtable' object) for
+neighboring hydrographs with a regression line for each metric, a data
+frame of results of the model fitting where each row contains the
+corresponding stations and metric, the model type (default: "lm"), formula,
+coefficients, number of observations and <code class="reqn">R^2</code>, and a plot of predicted
+values based on the “initial values”.
+</p>
+
+
+</div>

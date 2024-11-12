@@ -1,0 +1,409 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>ae.dotplot</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2> AE (Adverse Events) dotplot of incidence and relative risk </h2>
+
+<h3>Description</h3>
+
+<p>A two-panel display of the most
+frequently occurring AEs in the active arm of a clinical
+study. The first panel displays their incidence by
+treatment group, with different symbols for each
+group. The second panel displays the relative risk
+of an event on the active arm relative to the
+placebo arm, with 95% confidence intervals for a <code class="reqn">2\times2</code> table.
+By default, the AEs are ordered by
+relative risk so that events with the largest
+increases in risk for the active treatment are
+prominent at the top of the display.  See the Details section for
+information
+on changing the sort order.</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">ae.dotplot(ae, ...)
+
+ae.dotplot.long(xr,
+                A.name = levels(xr$RAND)[1], B.name = levels(xr$RAND)[2],
+                col.AB = c("red","blue"), pch.AB = c(16, 17),
+                main.title = paste("Most Frequent On-Therapy Adverse Events",
+                                   "Sorted by Relative Risk"),
+                main.cex = 1,
+                cex.AB.points = NULL, cex.AB.y.scale = 0.6,
+                position.left = c(0, 0, 0.7, 1), position.right = c(0.61, 0, 0.98, 1),
+                key.y = -0.2, CI.percent=95)
+
+logrelrisk(ae, A.name, B.name, crit.value=1.96)
+
+panel.ae.leftplot(x, y, groups, col.AB, ...)
+
+panel.ae.rightplot(x, y, ..., lwd=6, lower, upper, cex=.7)
+
+panel.ae.dotplot(x, y, groups, ..., col.AB, pch.AB, lower, upper) ## R only
+
+aeReshapeToLong(aewide)
+
+
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>ae</code></td>
+<td>
+<p>For <code>ae.dotplot</code>, either a data.frame containing the Adverse
+Event data in long format as described by the detail for <code>xr</code>
+below, or a data.frame containing the Adverse event data in wide format as
+described by the detail for <code>aewide</code> below.
+For <code>logrelrisk</code>, a data.frame containing the first 4 columns of <code>xr</code>
+described below.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>For <code>ae.dotplot</code>, all the arguments listed in the
+calling sequence for <code>ae.ddotplot.long</code> and possibly standard panel
+function arguments.
+</p>
+<p>For the other functions, just standard panel function arguments.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>xr</code></td>
+<td>
+
+<ul>
+<li>
+<p><code>RAND</code>:   treatment as randomized (factor).
+</p>
+</li>
+<li>
+<p><code>PREF</code>:   adverse event symptom name (factor).
+</p>
+</li>
+<li>
+<p><code>SN</code>:     number of patients in treatment group.
+</p>
+</li>
+<li>
+<p><code>SAE</code>:    number of patients  in each group for whom the event PREF was observed.
+</p>
+</li>
+<li>
+<p><code>PCT</code>: <code>SAE</code>/<code>SN</code> as a percent.
+</p>
+</li>
+<li>
+<p><code>relrisk</code>: Relative risk defined as <code>PCT</code> for the B
+treatment divided by <code>PCT</code> for the A treatment.
+</p>
+</li>
+<li>
+<p><code>logrelrisk</code>: natural logarithm of <code>relrisk</code>.
+</p>
+</li>
+<li>
+<p><code>ase.logrelrisk</code>: asymptotic standard error of <code>logrelrisk</code>.
+</p>
+</li>
+<li>
+<p><code>logrelriskCI.lower, logrelriskCI.upper</code>: confidence interval for
+</p>
+</li>
+<li>
+<p><code>logrelrisk</code>.
+</p>
+</li>
+<li>
+<p><code>relriskCI.lower, relriskCI.upper</code>: back transform of the CI for
+the log relative risk into the relative risk scale.
+</p>
+</li>
+</ul>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>aewide</code></td>
+<td>
+
+<ul>
+<li>
+<p><code>Event</code>: adverse event symptom name (factor).
+</p>
+</li>
+<li>
+<p><code>N.A, N.B</code>: number of patients in treatment groups A and B.
+</p>
+</li>
+<li>
+<p><code>AE.A, AE.B</code>: number of patients in treatment groups A and B for
+whom the event Event was observed.
+</p>
+</li>
+<li>
+<p><code>PCT.A, PCT.B</code>: <code>AE.A</code>/<code>N.A</code> and  <code>AE.B</code>/<code>N.B</code> as a percent.
+</p>
+</li>
+<li>
+<p><code>Relative.Risk</code>: Relative risk defined as <code>PCT.B</code>
+divided by <code>PCT.A</code>.
+</p>
+</li>
+<li>
+<p><code>logrelrisk</code>: natural logarithm of <code>relrisk</code>.
+</p>
+</li>
+<li>
+<p><code>ase.logrelrisk</code>: asymptotic standard error of <code>logrelrisk</code>.
+</p>
+</li>
+<li>
+<p><code>logrelriskCI.lower, logrelriskCI.upper</code>: confidence interval for
+</p>
+</li>
+<li>
+<p><code>logrelrisk</code>.
+</p>
+</li>
+<li>
+<p><code>relriskCI.lower, relriskCI.upper</code>: back transform of the CI for
+the log relative risk into the relative risk scale.
+</p>
+</li>
+</ul>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>A.name, B.name</code></td>
+<td>
+<p>Names of treatment groups (in <code>x$RAND</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>col.AB, pch.AB, cex.AB.points</code></td>
+<td>
+<p>color, plotting character and
+character expansion for the individual points on the left plot.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cex.AB.y.scale</code></td>
+<td>
+<p>Character expansion for the left tick labels
+(the symptom names). </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>main.title, main.cex</code></td>
+<td>
+<p>Main title and character expansion for the
+combined plot in <code>ae.dotplot</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cex</code></td>
+<td>
+<p>The character expansion for the points in the left and
+right plots.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>position.left, position.right</code></td>
+<td>
+<p><code>position</code> of the left and
+right plots.  This argument is use in S-Plus only, not in R.
+See the discussion of <code>position</code> in
+
+<code>print.trellis</code>,
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>key.y</code></td>
+<td>
+<p>Position of the key (legend) in the combined plot.  This
+is the <code>y</code> argument of the <code>key</code>.
+
+See the discussion of the <code>key</code> argument to <code>xyplot</code> in
+<code>xyplot</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>crit.value</code></td>
+<td>
+<p>Critical value used to compute confidence intervals
+on the log relative risk.  Defaults to 1.96.  User is responsible
+for specifying both <code>crit.value</code> and <code>CI.percent</code>
+consistently.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>CI.percent</code></td>
+<td>
+<p>Confidence percent associated with the
+<code>crit.value</code> Defaults to 95.  User is responsible for
+specifying both <code>crit.value</code> and <code>CI.percent</code>
+consistently.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x, y, groups, lwd</code></td>
+<td>
+<p>standard panel function arguments.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lower, upper</code></td>
+<td>
+<p><code>xr$logrelriskCI.lower</code> and
+<code>xr$logrelriskCI.upper</code> inside the panel functions.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The second panel shows relative risk of an event on the active arm
+(treatment B)
+relative to the placebo arm (treatment A), with 95% confidence
+intervals for a <code class="reqn">2\times2</code> table.  Confidence intervals on the log
+relative risk are calculated using the asymptotic standard error
+formula given as Equation 3.18 in Agresti A., Categorical Data
+Analysis. Wiley: New York, 1990.
+</p>
+<p>By default the <code>ae.dotplot</code> function sorts the events by relative risk.
+To change the sort order, you must redefine the ordering of the
+ordered factor <code>PREF</code>.  See the examples below.
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>logrelrisk</code> takes an input data.frame of the form <code>x</code>
+described in the argument list and returns a data.frame consisting of
+the input argument with additional columns as described in the
+argument <code>xr</code>.  The result column of symptom names <code>PREF</code> is
+an ordered factor, with the order specified by the relative risk.
+</p>
+<p><code>ae.leftplot</code> returns a <code>"trellis"</code> object containing a
+horizontal dotplot of the percents against each of the symptom names.
+</p>
+<p><code>ae.rightplot</code> returns a <code>"trellis"</code> object containing a
+horizontal plot on the log scale of the relative risk confidence
+intervals against each of the symptom names.
+</p>
+<p><code>ae.dotplot</code> calls both <code>ae.leftplot</code> and <code>ae.rightplot</code>
+and combines their plots into a single display with a single set of
+left axis labels, a main title, and a key.  The value returned
+invisibly is a list of the full left trellis object and the right
+trellis object with its left labels blanked out.  Printing the value
+will not usually be interesting as the main title and key are not
+included.
+It is better to call <code>ae.dotplot</code> directly, perhaps with a change
+in some of the positioning arguments.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p> Richard M. Heiberger &lt;rmh@temple.edu&gt; </p>
+
+
+<h3>References</h3>
+
+<p>Ohad Amit, Richard M. Heiberger, and Peter W. Lane. (2008)
+“Graphical Approaches to the Analysis of Safety Data from Clinical Trials”.
+<em>Pharmaceutical Statistics</em>,
+<b>7</b>, 1, 20–35.
+
+<a href="https://onlinelibrary.wiley.com/doi/10.1002/pst.254">https://onlinelibrary.wiley.com/doi/10.1002/pst.254</a>
+
+
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>AEdotplot</code> for a three-panel version that also has
+an associated shiny app.</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## variable names in the input data.frame aeanonym
+## RAND   treatment as randomized
+## PREF   adverse event symptom name
+## SN     number of patients in treatment group
+## SAE    number of patients  in each group for whom the event PREF was observed
+##
+## Input sort order is PREF/RAND
+
+data(aeanonym)
+head(aeanonym)
+
+## Calculate log relative risk and confidence intervals (95% by default).
+## logrelrisk sets the sort order for PREF to match the relative risk.
+aeanonymr &lt;- logrelrisk(aeanonym) ## sorts by relative risk
+head(aeanonymr)
+
+## construct and print plot on current graphics device
+ae.dotplot(aeanonymr,
+           A.name="TREATMENT A (N=216)",
+           B.name="TREATMENT B (N=431)")
+## export.eps(h2("stdt/figure/aerelrisk.eps"))
+## This looks great on screen and exports badly to eps.
+## We recommend drawing this plot directly to the postscript device:
+##
+## trellis.device(postscript, color=TRUE, horizontal=TRUE,
+##                colors=ps.colors.rgb[
+##                  c("black", "blue", "red", "green",
+##                    "yellow", "cyan","magenta","brown"),],
+##                onefile=FALSE, print.it=FALSE,
+##                file=h2("stdt/figure/aerelrisk.ps"))
+## ae.dotplot(aeanonymr,
+##            A.name="TREATMENT A (N=216)",
+##            B.name="TREATMENT B (N=431)")
+## dev.off()
+
+## To change the sort order, redefine the PREF factor.
+## For this example, to plot alphabetically, use the statement
+aeanonymr$PREF &lt;- ordered(aeanonymr$PREF, levels=sort(levels(aeanonymr$PREF)))
+ae.dotplot(aeanonymr,
+           A.name="TREATMENT A (N=216)",
+           B.name="TREATMENT B (N=431)",
+           main.title="change the main title to reflect the new sort order")
+
+## Not run: 
+## to restore the order back to the default, use
+relrisk &lt;- aeanonymr[seq(1, nrow(aeanonymr), 2), "relrisk"]
+PREF &lt;- unique(aeanonymr$PREF)
+aeanonymr$PREF &lt;- ordered(aeanonymr$PREF, levels=PREF[order(relrisk)])
+ae.dotplot(aeanonymr,
+           A.name="TREATMENT A (N=216)",
+           B.name="TREATMENT B (N=431)",
+           main.title="back to the original sort order")
+
+## smaller artifical example with the wide format
+aewide &lt;- data.frame(Event=letters[1:6],
+                     N.A=c(50,50,50,50,50,50),
+                     N.B=c(90,90,90,90,90,90),
+                     AE.A=2*(1:6),
+                     AE.B=1:6)
+aewtol &lt;- aeReshapeToLong(aewide)
+xr &lt;- logrelrisk(aewtol)
+ae.dotplot(xr)
+
+## End(Not run)
+</code></pre>
+
+
+</div>

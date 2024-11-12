@@ -1,0 +1,175 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hurrecon_set_path</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Utility Functions</h2>
+
+<h3>Description</h3>
+
+<p>hurrecon_set_path sets the path for the current set of model runs.
+</p>
+<p>hurrecon_get_path returns the current path for a set of model runs.
+</p>
+<p>hurrecon_create_land_water creates a land-water raster file in GeoTiff 
+format from boundary files in shapefile format. The land-water file
+(land_water.tif) is assumed to be aligned with lines of latitude and 
+longitude.  Boundary files are assumed to be named boundary.* on the vector 
+subdirectory. This function requires a reclasification file (reclassify.csv)
+on the vector subdirectory. For more details, see documentation for the 
+terra::classify function. The land-water file is created on the input 
+subdirectory with the following values: 1=water, 2=land.
+</p>
+<p>hurrecon_reformat_hurdat2 reformats a HURDAT2 file from the National 
+Hurricane Center for use with the HURRECON model. The input file is assumed
+to be in space-delimited text format. The output file (hurdat2_tracks.csv)
+contains full track information for each hurricane plus columns for standard 
+datetime and Julian day with fraction. Hurricane IDs are reformatted to
+facilitate sorting by year. The user must specify the path and the name
+of the HURDAT2 file.
+</p>
+<p>hurrecon_extract_tracks extracts track data from an input track file
+(input_tracks.csv) created from HURDAT2 using hurrecon_reformat_hurdat2
+or created from other sources with the same file structure. The geographic 
+window used to select hurricanes is set by the land-water file and is optionally
+extended by the margin parameter. Selection begins by identifying all positions
+in the window where winds reach or exceed hurricane speed (33 meters/second). 
+If at least one such position exists, the track is extended to include one 
+position before and one position after the first and last hurricane position 
+in the window, if possible. If the resulting track contains at least two positions 
+and the maximum sustained wind speed equals or exceeds wind_min, the track is 
+included. For included storms, summary data are written to ids.csv, track data 
+are written to tracks.csv, and track data for all positions are written to 
+tracks_all.csv.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hurrecon_set_path(hur_path)
+
+hurrecon_get_path()
+
+hurrecon_create_land_water(
+  nrows,
+  ncols,
+  xmin,
+  xmax,
+  ymin,
+  ymax,
+  save = TRUE,
+  hur_path = NULL
+)
+
+hurrecon_reformat_hurdat2(path, hurdat2_file, save = TRUE)
+
+hurrecon_extract_tracks(
+  margin = 0,
+  wind_min = 33,
+  status = TRUE,
+  save = TRUE,
+  hur_path = NULL
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>hur_path</code></td>
+<td>
+<p>path for current set of model runs</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nrows</code></td>
+<td>
+<p>number of rows</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ncols</code></td>
+<td>
+<p>number of columns</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>xmin</code></td>
+<td>
+<p>minimum longitude (degrees)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>xmax</code></td>
+<td>
+<p>maximum longitude (degrees)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ymin</code></td>
+<td>
+<p>minimum latitude (degrees)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ymax</code></td>
+<td>
+<p>maximum latitude (degrees)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>save</code></td>
+<td>
+<p>whether to save results to CSV files</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>path</code></td>
+<td>
+<p>path for input &amp; output files</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>hurdat2_file</code></td>
+<td>
+<p>name of HURDAT2 file</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>margin</code></td>
+<td>
+<p>an optional extension of the geographic window set by the
+land-water file (degrees)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>wind_min</code></td>
+<td>
+<p>the minimum value of maximum sustained wind speed 
+(meters/second)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>status</code></td>
+<td>
+<p>whether to limit search to storms with hurricane status</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>no return value
+</p>
+<p>current path
+</p>
+<p>land-water raster
+</p>
+<p>a data frame of track data
+</p>
+<p>a list of three track-related data frames
+</p>
+
+
+</div>

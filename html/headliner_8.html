@@ -1,0 +1,260 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>headline</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Compose phrases that describe differences in the data</h2>
+
+<h3>Description</h3>
+
+<p>Given two values, <code>headline()</code> will use
+<code>glue</code> syntax to string together "talking points".
+For example <code>headline(8, 10)</code> will describe a difference of 2 and can be
+expressed as
+<code>headline(8, 10, headline = "changed by {delta} ({raw_delta_p}%)")</code>. This
+returns "changed by 2 (-20%)".
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">headline(
+  x,
+  y,
+  headline = "{trend} of {delta} ({orig_values})",
+  ...,
+  if_match = "There was no difference",
+  trend_phrases = headliner::trend_terms(),
+  plural_phrases = NULL,
+  orig_values = "{x} vs. {y}",
+  n_decimal = 1,
+  round_all = TRUE,
+  multiplier = 1,
+  return_data = FALSE
+)
+
+headline_list(
+  l,
+  headline = "{trend} of {delta} ({orig_values})",
+  x,
+  y,
+  ...,
+  if_match = "There was no difference.",
+  trend_phrases = headliner::trend_terms(),
+  plural_phrases = NULL,
+  orig_values = "{x} vs. {y}",
+  n_decimal = 1,
+  round_all = TRUE,
+  multiplier = 1,
+  return_data = FALSE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>a numeric value to compare to the reference value of 'y'</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+<p>a numeric value to act as a control for the 'x' value</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>headline</code></td>
+<td>
+<p>a string to format the final output. Uses
+<code>glue</code> syntax</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>arguments passed to <code>glue_data</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>if_match</code></td>
+<td>
+<p>string to display if numbers match, uses
+<code>glue</code> syntax</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>trend_phrases</code></td>
+<td>
+<p>list of values to use for when x is more than y
+or x is less than y. You can pass it just
+<code>trend_terms</code> (the default) and call the result with
+<code>"...{trend}..."</code> or pass is a named list (see examples)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>plural_phrases</code></td>
+<td>
+<p>named list of values to use when difference (delta) is
+singular (delta = 1) or plural (delta != 1)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>orig_values</code></td>
+<td>
+<p>a string using <code>glue</code> syntax.
+example: <code style="white-space: pre;">⁠({x} vs {y})⁠</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n_decimal</code></td>
+<td>
+<p>numeric value to limit the number of decimal places in
+the returned values.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>round_all</code></td>
+<td>
+<p>logical value to indicate if all values should be rounded.
+When FALSE, the values will return with no modification. When TRUE (default)
+all values will be round to the length specified by 'n_decimal'.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>multiplier</code></td>
+<td>
+<p>number indicating the scaling factor. When multiplier = 1
+(default), 0.25 will return 0.25. When multiplier = 100, 0.25 will return 25.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>return_data</code></td>
+<td>
+<p>logical to indicate whether function should return the
+talking points used to compose the headline</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>l</code></td>
+<td>
+<p>a list with values to compare, if named, can call by name</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p><code>headline()</code> relies heavily on <code>glue_data</code>.
+Objects can be combined into a headline using the following search path:
+If given
+</p>
+<div class="sourceCode r"><pre>delta &lt;- 123
+headline(1, 3, delta = "abc")
+</pre></div>
+<div class="sourceCode"><pre>## decrease of abc (1 vs. 3)
+</pre></div>
+<p><code>delta</code> is one of the "talking points" from <code>compare_values()</code> and would
+usually return "2" but because we passed the named variable
+<code>delta = "none"</code>, <code>headline()</code> (really  <code>glue_data</code>)
+will look first at the named variables, then at the result of
+<code>compare_values()</code> then in the global environment. So in the example above,
+the output will return <code>"decrease of xxxxxx (1 vs. 3)"</code>
+</p>
+
+
+<h3>Value</h3>
+
+<p>Returns a character vector the same length as the input,
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>compare_values()</code>, <code>trend_terms()</code>, and <code>add_article()</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># values can be manually entered, some headlines are provided by default
+headline(10, 8)
+headline(8, 10)
+headline(1:3, 3:1)
+
+# most likely you'll edit the headline by hand
+headline(
+  x = 10,
+  y = 8,
+  headline = "There was a ${delta} {trend} vs last year"
+)
+
+# you can also adjust the phrasing of higher/lower values
+headline(
+  x = 10,
+  y = 8,
+  headline = "Group A was {trend} by {delta_p}%.",
+  trend_phrases = trend_terms(more = "higher", less = "lower")
+ )
+
+# a phrase about the comparion can be edited by providing glue syntax
+# 'c' = the 'compare' value, 'r' = 'reference'
+headline(10, 8, orig_values = "{x} to {y} people")
+
+# you can also add phrases for when the difference = 1 or not
+headline(
+  x = 10,
+  y = 8,
+  plural_phrases = list(
+    were = plural_phrasing(single = "was", multi = "were"),
+    people = plural_phrasing(single = "person", multi = "people")
+  ),
+  headline = "there {were} {delta} {people}"
+)
+
+# you can also adjust the rounding, the default is 1
+headline(0.1234, 0.4321)
+headline(0.1234, 0.4321, n_decimal = 3)
+# or use a multiplier
+headline(0.1234, 0.4321, multiplier = 100)
+
+# there are many components you can assemble
+headline(
+  x = 16,
+  y = 8,
+  headline = "there was {article_delta_p}% {trend}, \\
+  {add_article(trend)} of {delta} ({orig_values})"
+)
+
+
+# compare_conditions() produces a one-row data frame that can be
+# passed to headline_list()
+pixar_films |&gt;
+  compare_conditions(
+    x = (rating == "G"),
+    y = (rating == "PG"),
+    rotten_tomatoes
+  ) |&gt;
+  headline_list(
+    headline = "On average, G-rated films score {delta} points {trend} than \\
+    PG films on Rotten Tomatoes",
+    trend_phrases = trend_terms(more = "higher", less = "lower")
+  )
+
+# if you have more than 2 list items, you can specify them by name
+list(
+  x = 1,
+  y = 2,
+  z = 3
+ ) |&gt;
+  headline_list(
+    x = x,
+    y = z
+  )
+</code></pre>
+
+
+</div>

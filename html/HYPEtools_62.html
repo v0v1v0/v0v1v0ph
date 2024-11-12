@@ -1,0 +1,58 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>MergeObs</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Merge two HYPE observation data frames</h2>
+
+<h3>Description</h3>
+
+<p>Function to merge two HYPE observation data frames, with handling of overlapping time periods and time periods gaps
+as well as merging of common columns.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">MergeObs(x, y)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table><tr style="vertical-align: top;">
+<td><code>x, y</code></td>
+<td>
+<p>Data frames containing observation timeseries data. Typically imported using <code>ReadObs</code>.</p>
+</td>
+</tr></table>
+<h3>Details</h3>
+
+<p><code>MergeObs</code> handles time steps of different lengths (e.g. daily, hourly), but requires identical time
+step lengths from both inputs data frames.
+</p>
+<p>In case of common columns (identical date and SUBID combinations in <code>x</code> and <code>y</code>),
+values from columns in <code>x</code> will take precedence, and values from <code>y</code> will only be added if
+<code>x</code> values are missing.
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>MergeObs</code> returns a data frame with merged Obs data.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Import dummy data, add new observations to second Obs table, and merge
+te1 &lt;- ReadObs(filename = system.file("demo_model", "Tobs.txt", package = "HYPEtools"))
+te2 &lt;- ReadObs(filename = system.file("demo_model", "Tobs.txt", package = "HYPEtools"))
+te2$X0000[1:365] &lt;- runif(n = 365, -20, 25)
+MergeObs(x = te1, y = te2)
+
+</code></pre>
+
+
+</div>

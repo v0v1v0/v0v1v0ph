@@ -1,0 +1,112 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>classifyToPNV</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Function to reclassify flood durations to potential natural vegetation</h2>
+
+<h3>Description</h3>
+
+<p>This function is a wrapper to the function
+<code>classify</code> to convert flood durations computed with
+<code>flood3</code> into potential natural vegetation (PNV) distributions using
+reclassification rules supplied with <code>df.pnv</code>. Alternative
+reclassification rules may be applied, but they must match column names and
+types as given by <code>df.pnv</code>. <code>classify</code> is
+called with <code>include.lowest = TRUE</code> and <code>right = FALSE</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">classifyToPNV(x, rcl = NULL, filename = "", ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>argument of type <code>SpatRaster</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rcl</code></td>
+<td>
+<p>optional argument of type <code>data.frame</code> with columns and
+column types as specified in <code>df.pnv</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>filename</code></td>
+<td>
+<p>supplies an optional output filename of type
+<code>character</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>additional arguments as for <code>writeRaster</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p><code>SpatRaster</code> object containing potential natural
+vegetation distribution as categorical raster.
+</p>
+
+
+<h3>References</h3>
+
+<p>Ochs K, Egger G, Weber A, Ferreira T, Householder JE, Schneider M (2020).
+“The potential natural vegetation of large river floodplains – From dynamic to static equilibrium.”
+<em>Journal of Hydro-environment Research</em>, <b>30</b>, 71-81.
+<a href="https://doi.org/10.1016/j.jher.2020.01.005">doi:10.1016/j.jher.2020.01.005</a>.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>df.pnv</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+  # deactivated, since it's very time-consuming
+  if (FALSE) {
+    cache &lt;- tempdir()
+    options("hyd1d.datadir" = cache)
+    options("hydflood.datadir" = cache)
+    options(timeout = 200)
+    library(hydflood)
+    
+    # import the raster data and create a raster stack
+    c &lt;- st_crs("EPSG:25833")
+    e &lt;- ext(309000, 310000, 5749000, 5750000)
+    x &lt;- hydSpatRaster(ext = e, crs = c)
+    
+    # create a temporal sequence
+    seq &lt;- seq(as.Date("2016-01-01"), as.Date("2016-12-31"), by = "day")
+    
+    # compute a flood duration
+    fd &lt;- flood3(x = x, seq = seq)
+    
+    # reclassify to PNV
+    pnv &lt;- classifyToPNV(fd)
+    
+    # plot pnv map
+    plot(pnv)
+  }
+
+
+</code></pre>
+
+
+</div>

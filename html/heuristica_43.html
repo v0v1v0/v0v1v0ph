@@ -1,0 +1,119 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>ttbGreedyModel</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Greedy Take The Best</h2>
+
+<h3>Description</h3>
+
+<p>A variant of the Take The Best heuristic with a different cue order, namely
+using conditional cue validity, where the validity of a cue is judged only
+on row pairs not already decided by prior cues.  Specifically, it uses the
+cue ranks returned by <code>conditionalCueValidityComplete</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">ttbGreedyModel(
+  train_data,
+  criterion_col,
+  cols_to_fit,
+  fit_name = "ttbGreedyModel"
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>train_data</code></td>
+<td>
+<p>Training/fitting data as a matrix or data.frame.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>criterion_col</code></td>
+<td>
+<p>The index of the column in train_data that has the
+criterion.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cols_to_fit</code></td>
+<td>
+<p>A vector of column indices in train_data, used to fit
+the criterion.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fit_name</code></td>
+<td>
+<p>Optional The name other functions can use to label output.
+It defaults to the class name.  It is useful to change this to a unique name
+if you are making multiple fits, e.g. "ttb1", "ttb2", "ttbNoReverse."</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>An object of <code>class</code> ttbGreedyModel, which can
+be passed in to <code>predictPair</code>.
+</p>
+
+
+<h3>References</h3>
+
+<p>Martignon, L., &amp; Hoffrage, U.  (2002).  Fast, frugal, and fit: Simple
+heuristics for paired comparisons.  Theory and Decision, 52: 29-71.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>conditionalCueValidityComplete</code> for the metric used to sort cues.
+</p>
+<p><code>ttbModel</code> for the original version of Take The Best.
+</p>
+<p><code>predictPair</code> for predicting whether row1 is greater.
+</p>
+<p><code>predictPairProb</code> for predicting the probability row1 is
+greater.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## A data set where Take the Best and Greedy Take the Best disagree.
+matrix &lt;- cbind(y=c(3:1), x1=c(1,0,0), x2=c(1,0,1))
+ttb &lt;- ttbModel(matrix, 1, c(2,3))
+ttb$cue_validities
+# Returns
+#  x1  x2 
+# 1.0 0.5
+ttbG &lt;- ttbGreedyModel(matrix, 1, c(2:3))
+ttbG$cue_validities
+# Returns
+#  x1  x2 
+#   1   1
+# because after using x1, only decisions between row 2 and 3 are left,
+# and x2 gets 100% right  on those (after reversal).  However, these
+# cue_validities depend on using x1, first, so cue_rank is key.
+ttbG$cue_ranks
+# Returns
+#  x1  x2 
+#   1   2
+
+# Now see how this affects predictions on row 2 vs. 3.
+# Take the best guesses (output 0).
+predictPair(oneRow(matrix, 2), oneRow(matrix, 3), ttb)
+# Greedy Take The Best selects row 2 (output 1).
+predictPair(oneRow(matrix, 2), oneRow(matrix, 3), ttbG)
+
+</code></pre>
+
+
+</div>

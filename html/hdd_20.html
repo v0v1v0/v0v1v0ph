@@ -1,0 +1,161 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>[.hdd</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Extraction of HDD data</h2>
+
+<h3>Description</h3>
+
+<p>This function extract data from HDD files, in a similar fashion as data.table but with more arguments.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">## S3 method for class 'hdd'
+x[index, ..., file, newfile, replace = FALSE, all.vars = FALSE]
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>A hdd file.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>index</code></td>
+<td>
+<p>An index, you can use <code>.N</code> and variable names, like in data.table.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Other components of the extraction to be passed to <code>data.table</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>file</code></td>
+<td>
+<p>Which file to extract from? (Remember hdd data is split in several files.) You can use <code>.N</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>newfile</code></td>
+<td>
+<p>A destination directory. Default is missing. Should be result of the query be saved into a new HDD directory? Otherwise, it is put in memory.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>replace</code></td>
+<td>
+<p>Only used if argument <code>newfile</code> is not missing: default is <code>FALSE</code>. If the <code>newfile</code> points to an existing HDD data, then to replace it you must have <code>replace = TRUE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>all.vars</code></td>
+<td>
+<p>Logical, default is <code>FALSE</code>. By default, if the first argument of <code>...</code> is provided (i.e. argument <code>j</code>) then only variables appearing in all <code>...</code> plus the variable names found in <code>index</code> are extracted. If <code>TRUE</code> all variables are extracted before any selection is done. (This can be useful when the algorithm getting the variable names gets confused in case of complex queries.)</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The extraction of variables look like a regular <code>data.table</code> extraction but in fact all operations are made chunk-by-chunk behind the scene.
+</p>
+<p>The extra arguments <code>file</code>, <code>newfile</code> and <code>replace</code> are added to a regular <code>data.table</code> call. Argument <code>file</code> is used to select the chunks, you can use the special variable <code>.N</code> to identify the last chunk.
+</p>
+<p>By default, the operation loads the data in memory. But if the expected size is still too large, you can use the argument <code>newfile</code> to create a new HDD data set without size restriction. If a HDD data set already exists in the <code>newfile</code> destination, you can use the argument <code>replace=TRUE</code> to override it.
+</p>
+
+
+<h3>Value</h3>
+
+<p>Returns a data.table extracted from a HDD file (except if newwfile is not missing).
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Laurent Berge
+</p>
+
+
+<h3>See Also</h3>
+
+<p>See <code>hdd</code>, <code>sub-.hdd</code> and <code>cash-.hdd</code>
+for the extraction and manipulation of out of memory data. For importation of
+HDD data sets from text files: see <code>txt2hdd</code>.
+</p>
+<p>See <code>hdd_slice</code> to apply functions to chunks of data (and create
+HDD objects) and <code>hdd_merge</code> to merge large files.
+</p>
+<p>To create/reshape HDD objects from memory or from other HDD objects, see
+<code>write_hdd</code>.
+</p>
+<p>To display general information from HDD objects: <code>origin</code>,
+<code>summary.hdd</code>, <code>print.hdd</code>,
+<code>dim.hdd</code> and <code>names.hdd</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+# Toy example with iris data
+
+# First we create a hdd data set to run the example
+hdd_path = tempfile()
+write_hdd(iris, hdd_path, rowsPerChunk = 40)
+
+# your data set is in the hard drive, in hdd format already.
+data_hdd = hdd(hdd_path)
+
+# summary information on the whole file:
+summary(data_hdd)
+
+# You can use the argument 'file' to subselect slices.
+# Let's have some descriptive statistics of the first slice of HDD
+summary(data_hdd[, file = 1])
+
+# It extract the data from the first HDD slice and
+# returns a data.table in memory, we then apply summary to it
+# You can use the special argument .N, as in data.table.
+
+# the following query shows the first and last lines of
+# each slice of the HDD data set:
+data_hdd[c(1, .N), file = 1:.N]
+
+# Extraction of observations for which the variable
+# Petal.Width is lower than 0.1
+data_hdd[Petal.Width &lt; 0.2, ]
+
+# You can apply data.table syntax:
+data_hdd[, .(pl = Petal.Length)]
+
+# and create variables
+data_hdd[, pl2 := Petal.Length**2]
+
+# You can use the by clause, but then
+# the by is applied slice by slice, NOT on the full data set:
+data_hdd[, .(mean_pl = mean(Petal.Length)), by = Species]
+
+# If the data you extract does not fit into memory,
+# you can create a new HDD file with the argument 'newfile':
+hdd_path_new = tempfile()
+data_hdd[, pl2 := Petal.Length**2, newfile = hdd_path_new]
+# check the result:
+data_hdd_bis = hdd(hdd_path_new)
+summary(data_hdd_bis)
+print(data_hdd_bis)
+
+</code></pre>
+
+
+</div>

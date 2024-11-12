@@ -1,0 +1,150 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>partial.series</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Partial and annual exceedence series.
+</h2>
+
+<h3>Description</h3>
+
+<p>Returns a partial or annual exceedence series (ari=1) based on a user defined recurrence interval (ari).
+</p>
+<p>For analyses based on a defined threshold (rather than recurrence interval) use <code>high.spells</code> instead.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">partial.series(flow.ts, ari = 2, ind.days = 7, duration = T, plot = F, volume = T, 
+series = FALSE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>flow.ts</code></td>
+<td>
+<p>Dataframe with date and discharge data in columns named "Date" and "Q" respectively. Date must be in POSIX format (see ts.format)
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ari</code></td>
+<td>
+
+<p>The desired average return interval. As a partial series, an ari of 1 will return statistics for the n largest floods in n years of record (also referred to as the annual exceedence series).  The annual maximum series can be derived from high.spells with annual.stats=T</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ind.days</code></td>
+<td>
+
+<p>Spells of less than ind.days (default 7) are considered to be non-independent, and only the larger of the two spells is included in the results. This behaviour differs from high.spells, where periods below the determined spell threshold of less than the independence period are infilled for the purposes of determining spell duration. This behaviour may change in the future</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>duration</code></td>
+<td>
+
+<p>logical. If TRUE (default), statistics describing the duration of events are returned</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>plot</code></td>
+<td>
+
+<p>logical. If TRUE a plot is returned showing the events included in the partial series</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>volume</code></td>
+<td>
+
+<p>logical. If TRUE, statistics are returned describing the volume of spells (above the spell threshold)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>series</code></td>
+<td>
+
+<p>logical. If TRUE, the partial series is returned. If FALSE (default), only the indices describing the partial series are returned</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A list or dataframe dependening on whether series = TRUE. If TRUE, a list is returned (see below). If FALSE a dataframe is returned with all indices but without the actual partial series (p.series).
+</p>
+
+
+<p>Indices
+</p>
+<table><tr style="vertical-align: top;">
+<td><code>p.series </code></td>
+<td>
+<p>A dataframe containing an ordered partial series<br> showing the timing and peak magnitude of events</p>
+</td>
+</tr></table>
+<p>.
+</p>
+<table><tr style="vertical-align: top;">
+<td><code>n.years </code></td>
+<td>
+<p>Number of (almost) complete years in the series. Years with fewer than 350 non-missing values are ignored</p>
+</td>
+</tr></table>
+<p>.
+</p>
+<table><tr style="vertical-align: top;">
+<td><code>n.events </code></td>
+<td>
+<p>Number of events in the partial series</p>
+</td>
+</tr></table>
+<table><tr style="vertical-align: top;">
+<td><code>flow.threshold </code></td>
+<td>
+<p>the peak volume of the smallest event include in the series</p>
+</td>
+</tr></table>
+<table><tr style="vertical-align: top;">
+<td><code>avg.duration </code></td>
+<td>
+<p>the average duration of events in the series</p>
+</td>
+</tr></table>
+<table><tr style="vertical-align: top;">
+<td><code>max.duration </code></td>
+<td>
+<p>the maximum duration of events in the series</p>
+</td>
+</tr></table>
+<table><tr style="vertical-align: top;">
+<td><code>med.spell.volume </code></td>
+<td>
+<p>the median volume (above the threshold) of events in the series</p>
+</td>
+</tr></table>
+<h3>Author(s)</h3>
+
+<p>Nick Bond &lt;n.bond@latrobe.edu.au&gt;
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(Cooper)
+Cooper&lt;-ts.format(Cooper)
+
+partial.series(Cooper,ari=2)
+partial.series(Cooper, ari=5, plot=TRUE, ind.days=2)
+partial.series(Cooper, ari=5, plot=TRUE, ind.days=10)
+</code></pre>
+
+
+</div>

@@ -1,0 +1,73 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>plot.haldensify</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Plot Method for HAL Conditional Density Estimates</h2>
+
+<h3>Description</h3>
+
+<p>Plot Method for HAL Conditional Density Estimates
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">## S3 method for class 'haldensify'
+plot(x, ..., type = c("risk", "density"))
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>Object of class <code>haldensify</code>, containing conditional density
+estimates, as produced by <code>haldensify</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Additional arguments to be passed <code>plot</code>, currently ignored.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>type</code></td>
+<td>
+<p>A <code>character</code> indicating the type of plot to be produced.
+Options include visualizing the empirical risks of the conditional density
+estimators across a grid of values of the regularization parameter and a
+plot of the estimated conditional density (based on the estimator selected
+by cross-validation). The latter has yet to be implemented.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>Object of class <code>ggplot</code> containing a plot of the desired
+<code>type</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># simulate data: W ~ U[-4, 4] and A|W ~ N(mu = W, sd = 0.5)
+n_train &lt;- 50
+w &lt;- runif(n_train, -4, 4)
+a &lt;- rnorm(n_train, w, 0.5)
+# learn relationship A|W using HAL-based density estimation procedure
+haldensify_fit &lt;- haldensify(
+  A = a, W = w, n_bins = 3,
+  lambda_seq = exp(seq(-1, -10, length = 50)),
+  # the following arguments are passed to hal9001::fit_hal()
+  max_degree = 3, reduce_basis = 0.1
+)
+plot(haldensify_fit)
+</code></pre>
+
+
+</div>

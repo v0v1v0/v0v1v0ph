@@ -1,0 +1,148 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>Extract</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Extract or replace parts of a hyper2 object
+</h2>
+
+<h3>Description</h3>
+
+<p>Extract or replace parts of a hyper2 object
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">## S3 method for class 'hyper2'
+x[...]
+## S3 replacement method for class 'hyper2'
+x[index, ...] &lt;- value
+assign_lowlevel(x,index,value)
+overwrite_lowlevel(x,value)
+
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>An object of class <code>hyper2</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Further arguments, currently ignored</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>index</code></td>
+<td>
+<p>A list with integer vector elements corresponding to the
+brackets whose power is to be replaced</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>value</code></td>
+<td>
+<p>Numeric vector of powers</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>These methods should work as expected, although the off-by-one issue
+might be a gotcha.
+</p>
+<p>For the extract method, <code>H[L]</code>, a <code>hyper2</code> object is
+returned.  The replace method, <code>H[L] &lt;- value</code>, the index
+specifies the brackets whose powers are to be overwritten; standard
+<code>disordR</code> protocol is used.
+</p>
+<p>If the index argument is missing, viz <code>H1[] &lt;- H2</code>, this is a
+special case.  Argument <code>H1</code> must be a <code>hyper2</code> object, and
+the idiom effectively executes <code>H1[brackets(H2)] &lt;- powers(H2)</code>,
+but more efficiently (note that this operation is well-defined even
+though the order of the brackets is arbitrary).  This special case is
+included in the package because it has a very natural <code>C++</code>
+expression [function <code>overwrite()</code> in the <code>src/</code> directory]
+that was too neat to omit.
+</p>
+<p>Altering (incrementing or decrementing) the power of a single bracket
+is possible using idiom like <code>H[x] &lt;- H[x] + 1</code>; this is
+documented at <code>Ops.hyper2</code>, specifically
+<code>hyper2_sum_numeric()</code> and a discussion is given at
+<code>increment.Rd</code>.
+</p>
+<p>Functions <code>assign_lowlevel()</code> and <code>overwrite_lowlevel()</code> are
+low-level helper functions and not really intended for the end-user.
+</p>
+
+
+<h3>Value</h3>
+
+<p>The extractor method returns a <code>hyper2</code> object, restricted to the
+elements specified
+</p>
+
+
+<h3>Note</h3>
+
+<p>Use <code>powers()</code> and <code>brackets()</code> to extract a numeric vector of
+powers or a list of integer vectors respectively.
+</p>
+<p>Replacement idiom <code>H[x] &lt;- val</code> cannot use non-trivial recycling.
+This is because the elements of <code>H</code> are stored in an arbitrary
+order, but the elements of <code>val</code> are stored in a particular order.
+Also see function <code>hyper2_sum_numeric()</code>.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Robin K. S. Hankin</p>
+
+
+<h3>See Also</h3>
+
+<p><code>hyper2</code>,<code>Ops.hyper2</code></p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(chess)
+
+chess["Topalov"]
+chess[c("Topalov","Anand")]
+chess[c("Anand","Topalov")]
+
+# Topalov plays Anand and wins:
+
+chess["Topalov"] &lt;- chess["Topalov"]+1 
+chess[c("Topalov","Anand")] &lt;- chess[c("Topalov","Anand")]-1
+
+
+# Topalov plays *Kasparov* and wins:
+chess["Topalov"] &lt;- chess["Topalov"] + 1
+chess[c("Topalov","Kasparov")] &lt;- chess[c("Topalov","Kasparov")] -1
+
+# magrittr idiom:
+# chess["Topalov"] %&lt;&gt;% inc
+# chess[c("Topalov","Kasparov")] %&lt;&gt;% dec  
+
+# overwriting idiom:
+H &lt;- hyper2(list("Topalov","X"),6)
+chess[] &lt;- H
+
+H &lt;- icons
+
+</code></pre>
+
+
+</div>

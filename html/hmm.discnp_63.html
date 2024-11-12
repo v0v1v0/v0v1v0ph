@@ -1,0 +1,144 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>predict.hmm.discnp</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Predicted values of a discrete non-parametric hidden Markov
+model.
+</h2>
+
+<h3>Description</h3>
+
+<p>Calculates predicted values given a specification of a discrete
+non-parametric hidden Markov model.  The specification may be
+provided in the form of a <code>hmm.discnp</code> object as returned
+by <code>hmm()</code> or in the form of “components” of such
+a model:  the data <code>y</code>, the transition probability matrix
+<code>tpm</code>, the emission probabilities <code>Rho</code>, etc.  If the
+data are numeric then these predicted values are the conditional
+expectations of the observations, given the entire observation
+sequence (and the — possibly estimated — parameters of the
+model).  If the data are categorical (whence “expectations”
+make no sense) the “predicted values” are taken to be the
+probabilities of each of the possible values of the observations,
+at each time point.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">## S3 method for class 'hmm.discnp'
+predict(object, y = NULL, tpm=NULL, Rho=NULL,
+                             ispd=NULL, X=NULL,addIntercept=NULL,
+                             warn=TRUE, drop=TRUE, ...)
+
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>object</code></td>
+<td>
+
+<p>If not <code>NULL</code>, an object of class <code>hmm.discnp</code> as returned by
+<code>hmm()</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+<p>A data structure to which the fitted model <code>object</code>
+<em>could</em> have been fitted.  If <code>y</code> is NULL, an attempt
+is made to extract <code>y</code> from <code>model</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tpm,Rho,ispd,X,addIntercept,warn</code></td>
+<td>
+
+<p>See the help for <code>sp()</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>drop</code></td>
+<td>
+<p>Logical scalar.  See the help for
+<code>fitted.hmm.discnp()</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+
+<p>Not used.
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>This function is essentially the same as
+<code>fitted.hmm.discnp()</code>.  The main difference is
+that it allows the calculation of fitted/predicted values for a
+data object <code>y</code> possibly different from that to which the
+model was fitted.  Note that if both the argument <code>y</code> and
+<code>object[["y"]]</code> are present, the “argument” value takes
+precedence.  This function also allows the model to be specfied
+in terms of individual components rather than as a fitted model
+of class <code>"hmm.discnp"</code>.  These components, (<code>tpm</code>,
+<code>Rho</code>, <code>ispd</code>, <code>X</code>, <code>addIntercept</code>) if
+supplied, <em>take precedence</em> over the corresponding components
+of <code>object</code>.  The opposite applies with <code>sp()</code>.  The
+function <code>fitted.hmm.discnp()</code> makes use <em>only</em>
+of the components of <code>object</code>.
+</p>
+
+
+<h3>Value</h3>
+
+<p>See the help for <code>fitted.hmm.discnp()</code>.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Rolf Turner
+<a href="mailto:r.turner@auckland.ac.nz">r.turner@auckland.ac.nz</a><br></p>
+
+
+<h3>See Also</h3>
+
+ <p><code>sp()</code> <code>link{fitted.hmm.discnp}()</code> </p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">P &lt;- matrix(c(0.7,0.3,0.1,0.9),2,2,byrow=TRUE)
+R &lt;- matrix(c(0.5,0,0.1,0.1,0.3,
+              0.1,0.1,0,0.3,0.5),5,2)
+set.seed(42)
+ll1  &lt;- sample(250:350,20,TRUE)
+y1   &lt;- rhmm(ylengths=ll1,nsim=1,tpm=P,Rho=R,drop=TRUE)
+fit  &lt;- hmm(y1,K=2,verb=TRUE,keep.y=TRUE,itmax=10)
+fv   &lt;- fitted(fit)
+set.seed(176)
+ll2  &lt;- sample(250:350,20,TRUE)
+y2   &lt;- rhmm(ylengths=ll2,nsim=1,tpm=P,Rho=R,drop=TRUE)
+pv   &lt;- predict(fit,y=y2)
+yval &lt;- letters[1:5]
+set.seed(171)
+y3   &lt;- rhmm(ylengths=ll2,yval=yval,nsim=1,tpm=P,Rho=R,drop=TRUE)
+fit3 &lt;- hmm(y3,K=2,verb=TRUE,keep.y=TRUE,itmax=10)
+pv3  &lt;- predict(fit3) # Same as fitted(fit3).
+</code></pre>
+
+
+</div>

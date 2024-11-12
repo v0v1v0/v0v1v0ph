@@ -1,0 +1,125 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>haplotype-methods</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Methods for function <code>haplotype</code> in the package <span class="pkg">haplotypes</span>
+</h2>
+
+<h3>Description</h3>
+
+<p>Collapses identical DNA sequences into haplotypes or infering haplotypes using user provided absolute pairwise character difference matrix. 
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">## S4 method for signature 'Dna'
+haplotype(x,indels="sic")
+## S4 method for signature 'dist'
+haplotype(x)
+## S4 method for signature 'matrix'
+haplotype(x)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>an object of class <code>Dna</code>, <code>dist</code>, or <code>matrix</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>indels</code></td>
+<td>
+<p>the indel coding method to be used. This must be one of "sic", "5th" or "missing". Any unambiguous substring can be given.  See <code>distance</code> for details. </p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p><code>haplotype</code> returns an object of class <code>Haplotype</code>, <code>as.list-methods</code> can be used to coerce the object to a list.
+</p>
+
+
+<h3>Methods</h3>
+
+
+<dl>
+<dt><code>signature(x = "Dna")</code></dt>
+<dd>
+<p>Inferring haplotypes from DNA sequences.
+</p>
+</dd>
+<dt><code>signature(x = "dist")</code></dt>
+<dd>
+<p>Inferring haplotypes using an absolute pairwise character difference matrix (dist object).
+</p>
+</dd>
+<dt><code>signature(x = "matrix")</code></dt>
+<dd>
+<p>Inferring haplotypes using an absolute pairwise character difference matrix.
+</p>
+</dd>
+</dl>
+<h3>Author(s)</h3>
+
+<p>Caner Aktas, <a href="mailto:caktas.aca@gmail.com">caktas.aca@gmail.com</a>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">	
+data("dna.obj")
+x&lt;-dna.obj[1:6,,as.matrix=FALSE]
+
+##Inferring haplotypes using 'Dna' object.
+# coding gaps using simple indel coding method
+h&lt;-haplotype(x,indels="sic")
+h
+
+# giving DNA sequences of haplotypes
+as.dna(h) 
+
+## Not run: 
+	
+## Slots of an object Haplotype	
+h@haplist  #haplotype list (names)
+h@hapind  #haplotype list (index)
+h@uniquehapind  #getting index of the first occurrence of haplotypes
+h@sequence  #DNA sequences of haplotypes
+h@d  #distance matrix of haplotypes
+h@freq  #haplotype frequencies
+h@nhap  #total number of haplotypes
+
+## End(Not run)
+
+## Inferring haplotypes using dist object. 
+d&lt;-distance(x)
+h&lt;-haplotype(d) 
+h
+## Not run: 
+# returns an error message 
+as.dna(h)
+
+## End(Not run) 
+
+## Inferring haplotypes using distance matrix.
+d&lt;-as.matrix(distance(x))
+h&lt;-haplotype(d) 
+h
+## Not run: 
+# returns an error message
+as.dna(h)
+
+## End(Not run)  
+
+</code></pre>
+
+
+</div>

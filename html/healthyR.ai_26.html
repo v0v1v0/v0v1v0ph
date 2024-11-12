@@ -1,0 +1,121 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hai_data_poly</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Data Preprocessor - Polynomial Function</h2>
+
+<h3>Description</h3>
+
+<p>Takes in a recipe and will scale values using a selected recipe.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hai_data_poly(.recipe_object = NULL, ..., .p_degree = 2)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>.recipe_object</code></td>
+<td>
+<p>The data that you want to process</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>One or more selector functions to choose variables to be imputed.
+When used with imp_vars, these dots indicate which variables are used to
+predict the missing data in each variable. See selections() for more details</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.p_degree</code></td>
+<td>
+<p>The polynomial degree, an integer.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>This function will get your data ready for processing with many types of ml/ai
+models.
+</p>
+<p>This is intended to be used inside of the data processor and
+therefore is an internal function. This documentation exists to explain the process
+and help the user understand the parameters that can be set in the pre-processor function.
+</p>
+<p><code>recipes::step_poly()</code>
+</p>
+
+
+<h3>Value</h3>
+
+<p>A list object
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Steven P. Sanderson II, MPH
+</p>
+
+
+<h3>See Also</h3>
+
+<p><a href="https://recipes.tidymodels.org/reference/step_poly.html">https://recipes.tidymodels.org/reference/step_poly.html</a>
+</p>
+<p>Other Data Recipes: 
+<code>hai_data_impute()</code>,
+<code>hai_data_scale()</code>,
+<code>hai_data_transform()</code>,
+<code>hai_data_trig()</code>,
+<code>pca_your_recipe()</code>
+</p>
+<p>Other Preprocessor: 
+<code>hai_c50_data_prepper()</code>,
+<code>hai_cubist_data_prepper()</code>,
+<code>hai_data_impute()</code>,
+<code>hai_data_scale()</code>,
+<code>hai_data_transform()</code>,
+<code>hai_data_trig()</code>,
+<code>hai_earth_data_prepper()</code>,
+<code>hai_glmnet_data_prepper()</code>,
+<code>hai_knn_data_prepper()</code>,
+<code>hai_ranger_data_prepper()</code>,
+<code>hai_svm_poly_data_prepper()</code>,
+<code>hai_svm_rbf_data_prepper()</code>,
+<code>hai_xgboost_data_prepper()</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">suppressPackageStartupMessages(library(dplyr))
+suppressPackageStartupMessages(library(recipes))
+
+date_seq &lt;- seq.Date(from = as.Date("2013-01-01"), length.out = 100, by = "month")
+val_seq &lt;- rep(rnorm(10, mean = 6, sd = 2), times = 10)
+df_tbl &lt;- tibble(
+  date_col = date_seq,
+  value    = val_seq
+)
+
+rec_obj &lt;- recipe(value ~ ., df_tbl)
+
+hai_data_poly(
+  .recipe_object = rec_obj,
+  value
+)$scale_rec_obj %&gt;%
+  get_juiced_data()
+
+</code></pre>
+
+
+</div>

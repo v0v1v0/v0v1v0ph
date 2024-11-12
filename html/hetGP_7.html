@@ -1,0 +1,177 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>bfs</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2> Bayes Factor Data </h2>
+
+<h3>Description</h3>
+
+<p>Data from a Bayes factor MCMC-based simulation experiment comparing Student-t to Gaussian errors in an RJ-based Laplace prior Bayesian linear regession setting
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">data(ato)</code></pre>
+
+
+<h3>Format</h3>
+
+<p>Calling <code>data(bfs)</code> causes the following objects to be loaded into the namespace.
+</p>
+
+<dl>
+<dt><code>bfs.exp</code></dt>
+<dd>
+<p> 20x11 <code>data.frame</code> whose first column is <code class="reqn">\theta</code>, indicating the mean parameter of an exponential distribution encoding the prior of the Student-t degrees of freedom parameter <code class="reqn">\nu</code>.  The remaining ten
+columns comprise of Bayes factor evaluations under that setting  </p>
+</dd>
+<dt><code>bfs.gamma</code></dt>
+<dd>
+<p> 80x7 <code>data.frame</code> whose first two columns are <code class="reqn">\beta</code> and <code class="reqn">\alpha</code>, indicating the second and first parameters to a 
+Gamma distribution encoding the prior of the Student-t degrees of freedom parameters <code class="reqn">\nu</code>.  The remaining five columns comprise of Bayes factor evaluations under those settings </p>
+</dd>
+</dl>
+<h3>Details</h3>
+
+<p>Gramacy &amp; Pantaleo (2010), Sections 3-3-3.4, describe an experiment
+involving Bayes factor (BF)  calculations to determine if data are
+leptokurtic (Student-t errors) or not (simply Gaussian) as a function of the
+prior parameterization on the Student-t degrees of freedom parameter
+<code class="reqn">\nu</code>. Franck &amp; Gramacy (2018) created a grid of hyperparameter
+values in <code class="reqn">\theta</code> describing the mean of an Exponential
+distribution, evenly spaced in <code class="reqn">\log_{10}</code> space from
+<code>10^(-3)</code> to <code>10^6</code> spanning “solidly Student-t” (even
+Cauchy) to “essentially Gaussian” in terms of the mean of the prior
+over <code class="reqn">\nu</code>.  For each <code class="reqn">\theta</code> setting on the grid they
+ran the Reversible Jump (RJ) MCMC to approximate the BF of Student-t over Gaussian 
+by feeding in sample likelihood evaluations provided by <span class="pkg">monomvn</span>'s
+<code>blasso</code> to compute the BF. In order to understand the
+Monte Carlo variability in those calculations, ten replicates of the BFs
+under each hyperparameter setting were collected.  These data are provided
+in <code>bfs.exp</code>.
+</p>
+<p>A similar, larger experiment was provided with <code class="reqn">\nu</code> under a Gamma
+prior with parameters <code class="reqn">\alpha</code> and <code class="reqn">\beta \equiv \theta</code>.  In this higher dimensional space, a Latin hypercube sample 
+of size eighty was created, and five replicates of BFs were recorded.  
+These data are provided in <code>bfs.gamma</code>.
+</p>
+<p>The examples below involve <code>mleHetTP</code> fits (Chung, et al., 2018)
+to these data and a visualization of the predictive surfaces thus obtained.
+The code here follows an example provided, with more detail, in
+<code>vignette("hetGP")</code> 
+</p>
+
+
+<h3>Note</h3>
+
+<p> For code showing how these BFs were calculated, see supplementary material
+from Franck &amp; Gramacy (2018) </p>
+
+
+<h3>Author(s)</h3>
+
+ 
+<p>Mickael Binois, <a href="mailto:mbinois@mcs.anl.gov">mbinois@mcs.anl.gov</a>, and
+Robert B. Gramacy, <a href="mailto:rbg@vt.edu">rbg@vt.edu</a>
+</p>
+
+
+<h3>References</h3>
+
+ 
+<p>Franck CT, Gramacy RB (2018). Assessing Bayes factor surfaces using
+interactive visualization and computer surrogate modeling. Preprint
+available on arXiv:1809.05580.
+</p>
+<p>Gramacy RB (2017). <span class="pkg">monomvn</span>: Estimation for Multivariate Normal
+and Student-t Data with Monotone Missingness. R package version 1.9-7,
+<a href="https://CRAN.R-project.org/package=monomvn">https://CRAN.R-project.org/package=monomvn</a>. 
+</p>
+<p>R.B. Gramacy and E. Pantaleo (2010). Shrinkage regression for multivariate
+inference with missing data, and an application to portfolio balancing.
+Bayesian Analysis 5(2), 237-262. Preprint available on arXiv:0907.2135
+</p>
+<p>Chung M, Binois M, Gramacy RB, Moquin DJ, Smith AP, Smith AM (2018).
+Parameter and Uncertainty Estimation for Dynamical Systems Using Surrogate
+Stochastic Processes. SIAM Journal on Scientific Computing, 41(4), 2212-2238.
+Preprint available on arXiv:1802.00852. 
+</p>
+
+
+<h3>See Also</h3>
+
+ 
+<p><code>ato</code>, <code>sirEval</code>, <code>mleHetTP</code>, 
+<code>vignette("hetGP")</code>, <code>blasso</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(bfs)
+
+##
+## Exponential version first
+##
+
+thetas &lt;- matrix(bfs.exp$theta, ncol=1)
+bfs &lt;- as.matrix(t(bfs.exp[,-1]))
+
+## the data are heavy tailed, so t-errors help
+bfs1 &lt;- mleHetTP(X=list(X0=log10(thetas), Z0=colMeans(log(bfs)),
+  mult=rep(nrow(bfs), ncol(bfs))), Z=log(as.numeric(bfs)), lower=10^(-4), 
+  upper=5, covtype="Matern5_2")
+
+## predictions on a grid in 1d
+dx &lt;- seq(0,1,length=100)
+dx &lt;- 10^(dx*4 - 3)
+p &lt;- predict(bfs1, matrix(log10(dx), ncol=1))
+
+## visualization
+matplot(log10(thetas), t(log(bfs)), col=1, pch=21, ylab="log(bf)", 
+  main="Bayes factor surface")
+lines(log10(dx), p$mean, lwd=2, col=2)
+lines(log10(dx), p$mean + 2*sqrt(p$sd2 + p$nugs), col=2, lty=2, lwd=2)
+lines(log10(dx), p$mean - 2*sqrt(p$sd2 + p$nugs), col=2, lty=2, lwd=2)
+legend("topleft", c("hetTP mean", "hetTP interval"), lwd=2, lty=1:2, col=2)
+
+##
+## Now Gamma version
+##
+
+D &lt;- as.matrix(bfs.gamma[,1:2])
+bfs &lt;- as.matrix(t(bfs.gamma[,-(1:2)]))
+
+## fitting in 2fd
+bfs2 &lt;- mleHetTP(X=list(X0=log10(D), Z0=colMeans(log(bfs)), 
+  mult=rep(nrow(bfs), ncol(bfs))), Z = log(as.numeric(bfs)), 
+  lower = rep(10^(-4), 2), upper = rep(5, 2), covtype = "Matern5_2", 
+  maxit=100000)
+
+## predictions on a grid in 2d
+dx &lt;- seq(0,1,length=100)
+dx &lt;- 10^(dx*4 - 3)
+DD &lt;- as.matrix(expand.grid(dx, dx))
+p &lt;- predict(bfs2, log10(DD))
+
+## visualization via image-contour plots
+par(mfrow=c(1,2))
+mbfs &lt;- colMeans(bfs)
+image(log10(dx), log10(dx), t(matrix(p$mean, ncol=length(dx))),  
+  col=heat.colors(128), xlab="log10 alpha", ylab="log10 beta", 
+  main="mean log BF")
+text(log10(D[,2]), log10(D[,1]), signif(log(mbfs), 2), cex=0.5)
+contour(log10(dx), log10(dx),t(matrix(p$mean, ncol=length(dx))),
+  levels=c(-5,-3,-1,0,1,3,5), add=TRUE, col=4)
+image(log10(dx), log10(dx), t(matrix(sqrt(p$sd2 + p$nugs), 
+  ncol=length(dx))),  col=heat.colors(128), xlab="log10 alpha", 
+  ylab="log10 beta", main="sd log BF")
+text(log10(D[,2]), log10(D[,1]), signif(apply(log(bfs), 2, sd), 2), 
+  cex=0.5)
+</code></pre>
+
+
+</div>

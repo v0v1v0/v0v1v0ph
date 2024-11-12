@@ -1,0 +1,98 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>coef.heckmanGE</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Extract Coefficients from a Generalized Heckman Model</h2>
+
+<h3>Description</h3>
+
+<p>This function extracts the coefficients from a <code>heckmanGE</code> class object. You can specify which parts of the model you want to retrieve the coefficients for: selection, outcome, dispersion, or correlation. By default, the function returns the complete coefficient vector for all parts.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">## S3 method for class 'heckmanGE'
+coef(
+  object,
+  part = c("selection", "outcome", "dispersion", "correlation"),
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>object</code></td>
+<td>
+<p>An object of class <code>heckmanGE</code>, which contains the fitted model.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>part</code></td>
+<td>
+<p>A character vector indicating which parts of the model coefficients to return. Valid options are: <code>"selection"</code>, <code>"outcome"</code>, <code>"dispersion"</code>, and <code>"correlation"</code>. Multiple parts can be specified. By default, all parts are included in the returned coefficients.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Additional arguments passed to or from other methods. Currently, these are not used in this method but must be included to match the generic method signature.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The <code>coef.heckmanGE</code> function retrieves coefficients from the <code>heckmanGE</code> model object based on the specified parts. The parts represent different components of the Heckman model:
+</p>
+
+<ul>
+<li> <p><code>"selection"</code>: Coefficients related to the selection equation.
+</p>
+</li>
+<li> <p><code>"outcome"</code>: Coefficients related to the outcome equation.
+</p>
+</li>
+<li> <p><code>"dispersion"</code>: Coefficients related to the dispersion equation.
+</p>
+</li>
+<li> <p><code>"correlation"</code>: Coefficients related to the correlation between selection and outcome.
+</p>
+</li>
+</ul>
+<p>By default, the function returns coefficients from all parts. You can specify one or more parts in the <code>part</code> argument to extract coefficients from specific components.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A numeric vector containing the coefficients extracted from the model object. The coefficients correspond to the specified model parts, returned in the order they are requested.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(MEPS2001)
+selectEq  &lt;- dambexp ~ age + female + educ + blhisp + totchr + ins + income
+outcomeEq &lt;- lnambx ~ age + female + educ + blhisp + totchr + ins
+dispersion  &lt;- ~ age + female + totchr + ins
+correlation  &lt;- ~ age
+fit &lt;- heckmanGE(selection = selectEq,
+                 outcome = outcomeEq,
+                 dispersion = dispersion,
+                 correlation = correlation,
+                 data = MEPS2001)
+# Extracting all coefficients:
+coef(fit)
+
+# Extracting only the selection and outcome coefficients:
+coef(fit, part = c("selection", "outcome"))
+
+</code></pre>
+
+
+</div>

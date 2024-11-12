@@ -1,0 +1,103 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>map_wind_exposure</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Map counties with wind exposure</h2>
+
+<h3>Description</h3>
+
+<p>Map counties as "exposed" or "unexposed" based on the criterion that the
+storm had a certain wind speed (specified by <code>wind_limit</code>, in meters
+per second).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">map_wind_exposure(
+  storm,
+  wind_var = "vmax_sust",
+  wind_limit,
+  add_track = TRUE,
+  wind_source = "modeled"
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>storm</code></td>
+<td>
+<p>A character string giving the storm ID (e.g., "Floyd-1999")</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>wind_var</code></td>
+<td>
+<p>A character string giving the wind variable to use. Choices
+are <code>"vmax_sust"</code> (maximum sustained winds; default), <code>"vmax_gust"</code>
+(maximum gust winds), <code>"sust_dur"</code> (minutes of sustained winds of 20 m / s
+or higher) and <code>"gust_dur"</code> (minutes of gust winds of 20 m / s or higher).
+If the Extended Best Tracks wind radii are used as the source of wind data,
+the <code>"gust_dur"</code> option cannot be selected.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>wind_limit</code></td>
+<td>
+<p>A numeric vector of length one giving the minimum
+wind speed (in meters per second) or duration of winds of 20 m / s or more
+(in minutes) to use in the filter. The units of this variable will depend on
+the user's choice for the <code>wind_var</code> parameter. If the Extended Best
+Tracks wind radii are used as the source of the wind data, the sustained
+winds will only be available for cutpoints of 34 knots, 50 knots, and 64
+knots, so these values should be used (e.g., to get all counties with winds of
+34 knots or higher, you could use <code>wind_limit = 17.4</code>, with the limit
+given as a value just below 34 knots in the units meters per second).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>add_track</code></td>
+<td>
+<p>TRUE / FALSE of whether to add the storm's track to the map. The
+default is TRUE.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>wind_source</code></td>
+<td>
+<p>A character string specifying the source to use for the winds. Options
+are <code>"modeled"</code>, for estimates based on running a wind model from Best
+Tracks data inputs, and <code>"ext_tracks"</code>, for estimates based on
+the wind radii in the Extended Best Tracks data. See the help files for the
+datasets <code>storm_winds</code> and <code>ext_tracks_wind</code> in the
+<code>hurricaneexposuredata</code> package for more details on each of these sources
+for wind estimates. For the gust wind estimates, these are based on applying
+a gust factor of 1.49 to the sustained wind estimates in both wind data sources.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>Plots a map showing whether eastern US counties were exposed or
+unexposed to a specific storm based on a wind criterion.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Ensure that data package is available before running the example.
+#  If it is not, see the `hurricaneexposure` package vignette for details
+# on installing the required data package.
+if (requireNamespace("hurricaneexposuredata", quietly = TRUE)) {
+
+map_wind_exposure(storm = "Beryl-1988", wind_limit = 15)
+}
+</code></pre>
+
+
+</div>

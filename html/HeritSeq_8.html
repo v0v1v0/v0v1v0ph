@@ -1,0 +1,82 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>getReadMatrix.NB</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Simulate a count matrix from negative binomial mixed effect models (NBMM).</h2>
+
+<h3>Description</h3>
+
+<p>Simulate a (possibly unbalanced) count matrix from NBMM.
+Under NBMM, an observed number of reads aligned to feature/gene <code class="reqn">g</code>, 
+<code class="reqn">Y_{gsr}</code>, follows a negative binomial (NB) distribution with mean 
+<code class="reqn">\mu_{gs}</code> and variance <code class="reqn">\mu_{gs}+\phi_{g} \mu_{gs}^2</code>, where 
+<code class="reqn">\phi_g</code> is the dispersion parameter, shared across strains. The 
+generalized linear model uses a <code class="reqn">\log</code>-link:<br><code class="reqn">\log(\mu_{gs}) = \alpha_g+ b_{gs}, \;\;b_{gs}\sim N(0, \sigma^2_g).</code>
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">getReadMatrix.NB(vec.num.rep, alphas, sigma2s, phis)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>vec.num.rep</code></td>
+<td>
+<p>A vector of replicate numbers for each strain.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alphas</code></td>
+<td>
+<p>Intercept vector <code class="reqn">\alpha_g</code>'s, 
+<code class="reqn">1 \times \texttt{num.features}</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sigma2s</code></td>
+<td>
+<p>Random effect variance vector <code class="reqn">\sigma^2_g</code>'s, 
+<code class="reqn">1 \times \texttt{num.features}</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>phis</code></td>
+<td>
+<p>Dispersion parameter in NB models, <code class="reqn">\phi_g</code>'s, a
+<code class="reqn">1 \times \texttt{num.features}</code> vector.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A <code class="reqn">G \times N</code> matrix with NB reads. <code class="reqn">N</code> is the 
+total number of samples; <code class="reqn">G</code> is the number of features. Column names 
+are sample names of the form "Ss_r", where S stands for sample, s is the 
+strain number, r is the replicate number within the strain. Row names 
+are the feature names of the form "Gene g", where g is the feature index.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Generate a sequencing dataset with 5 features and 6 strains. 
+## Assign parameter values.
+rep.num &lt;- c(3, 5, 2, 3, 4, 2)
+a0s &lt;- c(-1, 1, 2, 5, 10)
+sig2s &lt;- c(10, 0.2, 0.1, 0.03, 0.01)
+phis &lt;- c(0.5, 1, 0.05, 0.01, 0.1)
+
+set.seed(1234)
+## Generate reads:
+nbData &lt;- getReadMatrix.NB(rep.num, a0s, sig2s, phis)
+</code></pre>
+
+
+</div>

@@ -1,0 +1,121 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>cvSingleModalityAdmm</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Cross Validation for High-dimensional Single Mediation Models</h2>
+
+<h3>Description</h3>
+
+<p>Cross Validation for High-dimensional Single Mediation Models
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">cvSingleModalityAdmm(
+  X,
+  Y,
+  M1,
+  numFolds = 10,
+  typeMeasure = "rmse",
+  lambda1a,
+  lambda1b,
+  lambda1g,
+  lambda2a,
+  lambda2b,
+  rho = 1,
+  penalty = "ElasticNet",
+  penaltyParameterList = list(),
+  SIS = FALSE,
+  SISThreshold = 2,
+  maxIter = 3000,
+  tol = 1e-04,
+  verbose = FALSE,
+  debug = FALSE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>X</code></td>
+<td>
+<p>The matrix of independent variables (exposure/treatment/group).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Y</code></td>
+<td>
+<p>The vector of dependent variable (outcome response).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>M1</code></td>
+<td>
+<p>The single-modality mediator.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>numFolds</code></td>
+<td>
+<p>The number of folds. The default is 10. Although nfolds can be as large as the sample size (leave-one-out CV),
+it is not recommended for large datasets. Smallest value allowable is nfolds=3.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>typeMeasure</code></td>
+<td>
+<p>Default is "rmse".</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rho, lambda1g, lambda1a, lambda1b, lambda2a, lambda2b, penaltyParameterList</code></td>
+<td>
+<p>Allow to put sequences for each parameter. Please refer to the function, <code>singleModalityAdmm</code> for the details.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>penalty, SIS, SISThreshold, maxIter, tol, verbose, debug</code></td>
+<td>
+<p>Please refer to the function, <code>singleModalityAdmm</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>An <code>cvSingleModalityAdmm</code> object which is a matrix containing all the combinations of parameter sequences with an additional column called <code>measure</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+## Generate Empirical Data
+simuData &lt;- modalityMediationDataGen(seed = 20231201)
+
+## Cross-Validation for ElasticNet penalty
+cvElasticNetResults &lt;- cvSingleModalityAdmm(
+  X = simuData$MediData$X, Y = simuData$MediData$Y, M1 = simuData$MediData$M1,
+  numFolds = 5, typeMeasure = "rmse",
+  rho = c(0.9, 1, 1.1), lambda1a = c(0.1, 0.5, 1), lambda1b = c(0.1, 0.3),
+  lambda1g = c(1, 2), lambda2a = c(0.5, 1), lambda2b = c(0.5, 1),
+  penalty = "ElasticNet"
+)
+
+## Cross-Validation for Pathway Lasso penalty (lambda2a, lambda2b are not tuned.)
+cvPathwayLassoResults &lt;- cvSingleModalityAdmm(
+  X = simuData$MediData$X, Y = simuData$MediData$Y, M1 = simuData$MediData$M1,
+  numFolds = 5, typeMeasure = "rmse",
+  rho = c(0.9, 1, 1.1), lambda1a = c(0.1, 0.5, 1), lambda1b = c(0.1, 0.3),
+  lambda1g = c(1, 2), lambda2a = 1, lambda2b = 1,
+  penalty = "PathwayLasso", penaltyParameterList = list(kappa = c(0.5, 1), nu = c(1, 2))
+)
+
+</code></pre>
+
+
+</div>

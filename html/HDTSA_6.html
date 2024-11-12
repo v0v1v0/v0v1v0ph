@@ -1,0 +1,163 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>MartG_test</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Testing for martingale difference hypothesis in high dimension</h2>
+
+<h3>Description</h3>
+
+<p><code>MartG_test()</code> implements a new test proposed in
+Chang, Jiang and Shao (2021) for the following hypothesis testing problem: 
+</p>
+<p style="text-align: center;"><code class="reqn">H_0:\{{\bf x}_t\}_{t=1}^n\mathrm{\ is\ a\ MDS\ \ versus\ \ }H_1:
+\{{\bf x}_t\}_{t=1}^n\mathrm{\ is\ not\ a\ MDS,} </code>
+</p>
+<p> where 
+MDS is the abbreviation of "martingale difference sequence".
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">MartG_test(
+  X,
+  lag.k = 2,
+  B = 1000,
+  type = c("Linear", "Quad"),
+  alpha = 0.05,
+  kernel.type = c("QS", "Par", "Bart")
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>X</code></td>
+<td>
+<p><code class="reqn">{\bf X} = \{{\bf x}_1, \dots , {\bf x}_n \}'</code>, an <code class="reqn">n\times
+p</code> sample matrix, where <code class="reqn">n</code> is the sample size and <code class="reqn">p</code> is the 
+dimension of <code class="reqn">{\bf x}_t</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lag.k</code></td>
+<td>
+<p>Time lag <code class="reqn">K</code>, a positive integer, used to calculate the test
+statistic. Default is <code>lag.k</code> <code class="reqn">=2</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>B</code></td>
+<td>
+<p>Bootstrap times for generating multivariate normal distributed 
+random vectors in calculating the critical value. 
+Default is <code>B</code> <code class="reqn">=1000</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>type</code></td>
+<td>
+<p>String, a map is chosen by the R users, such as the
+default option is <code>'Linear'</code> means linear identity 
+map (<code class="reqn">\boldsymbol \phi({\bf x})={\bf x}</code>). Also including another 
+option <code>'Quad'</code> (Both linear and quadratic terms 
+<code class="reqn">\boldsymbol \phi({\bf x})=\{{\bf x}',({\bf x}^2)'\}'</code>). Also the users
+can choose set the map themselves, use for example <code>expression(X, X^2)</code>,
+<code>quote(X, X^2)</code>, <code>parse(X, X^2)</code>, <code>substitute(X, X^2)</code> or 
+just map without function (such as cbind(X, X^2)) to set their own map. 
+See Section 2.1 in Chang, Jiang and Shao (2021) for more information.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alpha</code></td>
+<td>
+<p>The prescribed significance level. Default is 0.05.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>kernel.type</code></td>
+<td>
+<p>String, an option for choosing the symmetric kernel 
+used in the estimation of long-run covariance matrix, 
+for example, <code>'QS'</code> (Quadratic spectral kernel), 
+<code>'Par'</code> (Parzen kernel) and <code>'Bart'</code> 
+(Bartlett kernel), see Andrews (1991) for more 
+information. Default option is <code>kernel.type = 'QS'</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>An object of class "hdtstest" is a list containing the following
+components:
+</p>
+<p>.  </p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>statistic</code></td>
+<td>
+<p>The value of the test statistic.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>p.value</code></td>
+<td>
+<p>Numerical value which represents the p-value of the test.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lag.k</code></td>
+<td>
+<p>The time lag used in function.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+<p>A character string indicating what method was performed.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>type</code></td>
+<td>
+<p>A character string which map used on data matrix <code>X</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>kernel.type</code></td>
+<td>
+<p>A character string indicating what kenel method was performed.</p>
+</td>
+</tr>
+</table>
+<h3>References</h3>
+
+<p>Chang, J., Jiang, Q. &amp; Shao, X. (2022). <em>Testing the
+martingale difference hypothesis in high dimension</em>.  Journal of 
+Econometrics, in press
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">n &lt;- 200
+p &lt;- 10
+X &lt;- matrix(rnorm(n*p),n,p)
+res &lt;- MartG_test(X, type="Linear")
+res &lt;- MartG_test(X, type=cbind(X, X^2)) #the same as Linear type
+res &lt;- MartG_test(X, type=quote(cbind(X, X^2))) # expr using quote
+res &lt;- MartG_test(X, type=substitute(cbind(X, X^2))) # expr using substitute
+res &lt;- MartG_test(X, type=expression(cbind(X, X^2))) # expr using expression
+res &lt;- MartG_test(X, type=parse(text="cbind(X, X^2)")) # expr using parse
+map_fun &lt;- function(X) {X &lt;- cbind(X,X^2); X}
+res &lt;- MartG_test(X, type=map_fun)
+Pvalue &lt;- res$p.value
+rej &lt;- res$reject
+</code></pre>
+
+
+</div>

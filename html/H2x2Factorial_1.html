@@ -1,0 +1,196 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>calc.H2x2Factorial</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>H2x2Factorial Sample Size and Power Calculation</h2>
+
+<h3>Description</h3>
+
+<p>The function <code>calc.H2x2Factorial</code> estimates the required number of clusters or the achieved power level under different types of
+hypothesis tests of either the controlled (main) effect (by default) or the natural (marginal) effect of the two treatments in a hierarchical 2x2 factorial trial
+with unequal cluster sizes and a continuous outcome. Two types of treatment effect estimands, five types of hypothesis tests as well as their corresponding
+finite-sample considerations could be chosen for the predictions. Users may input an optional cluster number through the <code>n.input</code> argument. When this
+number is provided, the function will calculate the power under a chosen hypothesis test as well as a finite-sample correction if specified, and the function
+will ignore the potential input for the power parameter; When the number of clusters is not provided, the function will calculate the required number of
+clusters based on a given power threshold, which is set to 0.8 by default.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">calc.H2x2Factorial(power=0.8, n_input=NULL, alpha=0.05,
+                   pi_x=0.5, pi_z=0.5,
+                   delta_x=0.25, delta_z=0.33, delta_xz=0.3, sigma2_y=1,
+                   m_bar=50, CV=0, rho=0,
+                   estimand="controlled", test="cluster", correction=FALSE,
+                   max_n=1e8, seed_mix=NULL, size_mix=1e4,
+                   verbose=TRUE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>power</code></td>
+<td>
+<p>a numeric value between 0 and 1 as the desired power level for sample size estimation. Default is <code>0.8</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n_input</code></td>
+<td>
+<p>a number of cluster provided by the user to estimate the power that can be achieved. Default is <code>NULL</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alpha</code></td>
+<td>
+<p>a numeric value between 0 and 1 as the type I error rate. Default is <code>0.05</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pi_x</code></td>
+<td>
+<p>a numeric value between 0 and 1 as the proportion of clusters randomized to the cluster-level treatment. Default is <code>0.5</code>, representing a balanced allocation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pi_z</code></td>
+<td>
+<p>a numeric value between 0 and 1 as the proportion of individuals randomized to the individual-level treatment within each cluster. Default is <code>0.5</code>, representing a balanced allocation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>delta_x</code></td>
+<td>
+<p>a nonzero numeric value for the (unstandardized) effect size of the marginal cluster-level treatment effect. Default is <code>0.25</code>, which is the hypothetical value for the example in the referenced paper.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>delta_z</code></td>
+<td>
+<p>a nonzero numeric value for the (unstandardized) effect size of the marginal individual-level treatment effect. Default is <code>0.33</code>, which is the hypothetical value for the example in the referenced paper.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>delta_xz</code></td>
+<td>
+<p>a nonzero numeric value for the (unstandardized) effect size of the interaction effect of the two treatments. Default is <code>0.3</code>, which is the hypothetical value for the example in the referenced paper.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sigma2_y</code></td>
+<td>
+<p>a positive numeric value for the total variance of the continuous outcome. Default is <code>1</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>m_bar</code></td>
+<td>
+<p>a numeric value larger than 2 for the mean cluster size. Default is <code>50</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>CV</code></td>
+<td>
+<p>a positive numeric value as the coefficient of variation of the cluster sizes. Default is <code>0</code>, representing equal cluster sizes.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rho</code></td>
+<td>
+<p>a numeric value between 0 and 1 as the intraclass correlation coefficient characterizing the between-cluster variability. Default is <code>0</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>estimand</code></td>
+<td>
+<p>a character argument indicating the type of treatment effect estimand. Supported values include <code>"controlled"</code>
+(controlled or main effect estimand) and <code>"natural"</code> (natural or marginal effect estimand). Default is <code>"controlled"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>test</code></td>
+<td>
+<p>a character argument indicating the type of hypothesis test of interest. Supported values include
+<code>"cluster"</code> (test for marginal cluster-level treatment effect), <code>"individual"</code> (test for marginal individual-level treatment effect),
+<code>"interaction"</code> (interaction test for the two treatments), <code>"joint"</code> (joint test for the two marginal treatment effects),
+<code>"I-U"</code> (intersection-union test for the two marginal effects). Default is <code>"cluster"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>correction</code></td>
+<td>
+<p>a logical argument indicating whether a finite sample correction should be used. Default is <code>FALSE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>max_n</code></td>
+<td>
+<p>an optional setting of a maximum number of clusters, which is only functional under <code>test="cluster"</code>, <code>"joint"</code>, or <code>"I-U"</code>. Default is <code>1e8</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>seed_mix</code></td>
+<td>
+<p>an optional setting of a seed for conducting the simulation-based testing under a mixed distribution, which is only functional under <code>test="joint"</code>. Default is <code>NULL</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>size_mix</code></td>
+<td>
+<p>a pre-specified size for the mixed distribution in the simulation-based procedure, which is only needed under <code>test="joint"</code>. Default is <code>1e4</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p>a logical argument indicating whether the parameter reiterations and supplementary messages should be presented or suppressed. Default is <code>TRUE</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Given the input parameters, our method will firstly compute the variances of the effects of interest based on Generalized Least Square estimators and large-sample approximations.
+Then, the variances are used to build up either the classic sample size formulas (for the separate tests for controlled or natural treatment effects and the interaction test) or
+the power formulas (for the simultaneous tests and the corrected tests), which help to deliver both the sample size and power calculations.
+Without finite-sample considerations, the separate tests of the two controlled effects and the two natural effects as well as the interaction test use the two-sided Wald z-test,
+the joint test use the Chi-square test, and the intersection-union (I-U) test use also a two-sided z-based test.
+With <code>correction=T</code>, finite-sample corrections are customized for the three types of tests involving either the controlled effect or the natural effect of the cluster-level
+treatment: For the tests for the controlled effect and the natural effect of the cluster-level treatment, a two-sided t-test is used;
+For the joint test of the two controlled effects, a F-test is used as a naive correction, which might lead to slight overpower;
+For the joint test of the two natural effects, a simulation-based mixed F-chi-square test is used;
+For the I-U test of the two controlled effects, a two-sided t-based test is used as a naive correction, which might lead to slight overpower.
+For the I-U test of the two natural effects, a two-sided mixed t- and z-based test is used.
+For the finite-sample corrected joint test of the two natural effects, since there does not exist the required parametric distribution, we offer a simulation-based method to
+generate the null and alternative distributions, and we use the simulated distributions to compute the power and required sample size.
+A seed should be set via <code>seed_mix</code> for this random process to promote reproducibility, and this is only needed under the natural effect joint test with finite-sample correction.
+The two types of <code>estimand</code>, the five types of <code>test</code>, and the developments of <code>correction</code> are defined in Tian et al. (under review).
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>calc.H2x2Factorial</code> returns an integer representing the required number of clusters or a decimal representing the power that can be achieved by the provided
+sample size, with some useful and suppressible messages elaborating vital parameter choices and results (the power will be displayed in 4 decimal places; the messages can be suppressed via <code>verbose=FALSE</code>).
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">#Predict the actual power of a natural effect joint test when the number of clusters is 10
+joint.power &lt;- calc.H2x2Factorial(n_input=10,
+                                  delta_x=0.2, delta_z=0.1,
+                                  rho=0.1, CV=0.38,
+                                  estimand="natural",
+                                  test="joint",
+                                  correction=TRUE, seed_mix=123456, verbose=FALSE)
+print(joint.power)
+
+</code></pre>
+
+
+</div>

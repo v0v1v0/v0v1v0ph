@@ -1,0 +1,361 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>dthmm</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Discrete Time HMM Object (DTHMM)</h2>
+
+<h3>Description</h3>
+
+<p>Creates a discrete time hidden Markov model object with class <code>"dthmm"</code>. The observed process is univariate.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">dthmm(x, Pi, delta, distn, pm, pn = NULL, discrete = NULL,
+      nonstat = TRUE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>is a vector of length <code class="reqn">n</code> containing the univariate observed process. Alternatively, <code>x</code> could be specified as <code>NULL</code>, meaning that the data will be added later (e.g. simulated).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Pi</code></td>
+<td>
+<p>is the <code class="reqn">m \times m</code> transition probability matrix of the homogeneous hidden Markov chain.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>delta</code></td>
+<td>
+<p>is the marginal probability distribution of the <code class="reqn">m</code> hidden states at the first time point.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>distn</code></td>
+<td>
+<p>is a character string with the abbreviated distribution name. Distributions provided by the package are <code>Beta</code> (<code>"beta"</code>), <code>Binomial</code> (<code>"binom"</code>), <code>Exponential</code> (<code>"exp"</code>), <code>GammaDist</code> (<code>"gamma"</code>), <code>Lognormal</code> (<code>"lnorm"</code>), <code>Logistic</code> (<code>"logis"</code>), <code>Normal</code> (<code>"norm"</code>), and <code>Poisson</code> (<code>"pois"</code>). See topic <code>Mstep</code>, Section “Modifications and Extensions”, to extend to other distributions.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pm</code></td>
+<td>
+<p>is a list object containing the (Markov dependent) parameter values associated with the distribution of the observed process (see below).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pn</code></td>
+<td>
+<p>is a list object containing the observation dependent parameter values associated with the distribution of the observed process (see below).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>discrete</code></td>
+<td>
+<p>is logical, and is <code>TRUE</code> if <code>distn</code> is a discrete distribution. Set automatically for distributions already contained in the package.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nonstat</code></td>
+<td>
+<p>is logical, <code>TRUE</code> if the homogeneous Markov chain is assumed to be non-stationary, default. See section “Stationarity” below.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A <code>list</code> object with class <code>"dthmm"</code>, containing the above arguments as named components.
+</p>
+
+
+<h3>Notation</h3>
+
+
+<ol>
+<li>
+<p> MacDonald &amp; Zucchini (1997) use <code class="reqn">t</code> to denote the <em>time</em>, where <code class="reqn">t = 1, \cdots, T</code>. To avoid confusion with other uses of <code>t</code> and <code>T</code> in <span style="font-family: Courier New, Courier; color: #666666;"><b>R</b></span>, we use <code class="reqn">i = 1, \cdots, n</code>.
+</p>
+</li>
+<li>
+<p> We denote the observed sequence as <code class="reqn">\{X_i\},\ i = 1, \cdots, n</code>; and the hidden Markov chain as <code class="reqn">\{C_i\},\ i = 1, \cdots, n</code>.
+</p>
+</li>
+<li>
+<p> The history of the observed process up to time <code class="reqn">i</code> is denoted by <code class="reqn">X^{(i)}</code>, i.e.
+</p>
+<p style="text-align: center;"><code class="reqn">
+X^{(i)} = (X_1, \cdots, X_i)
+</code>
+</p>
+
+<p>where <code class="reqn">i = 1, \cdots, n</code>. Similarly for <code class="reqn">C^{(i)}</code>.
+</p>
+</li>
+<li>
+<p> The hidden Markov chain has <code class="reqn">m</code> states denoted by <code class="reqn">1, \cdots, m</code>.
+</p>
+</li>
+<li>
+<p> The Markov chain transition probability matrix is denoted by <code class="reqn">\Pi</code>, where the <code class="reqn">(j, k)</code>th element is
+</p>
+<p style="text-align: center;"><code class="reqn">
+\pi_{jk} = \Pr\{ C_{i+1}=k \, | \, C_i=j \}
+</code>
+</p>
+
+<p>for all <code class="reqn">i</code> (i.e. all time points), and <code class="reqn">j,k = 1, \cdots, m</code>.
+</p>
+</li>
+<li>
+<p> The Markov chain is assumed to be <em>homogeneous</em>, i.e. for each <code class="reqn">j</code> and <code class="reqn">k</code>, <code class="reqn">\pi_{jk}</code> is constant over time.
+</p>
+</li>
+<li>
+<p> The Markov chain is said to be <em>stationary</em> if the marginal distribution is the same over time, i.e. for each <code class="reqn">j</code>, <code class="reqn">\delta_j = \Pr\{ C_i = j \}</code> is constant for all <code class="reqn">i</code>. The marginal distribution is denoted by <code class="reqn">\delta = (\delta_1, \cdots, \delta_m)</code>.
+</p>
+</li>
+</ol>
+<h3>List Object pm</h3>
+
+<p>The list object <code>pm</code> contains parameter values for the probability distribution of the observed process that are dependent on the hidden Markov state. These parameters are generally required to be estimated. See “Modifications” in topic <code>Mstep</code> when some do not require estimation.
+</p>
+<p>Assume that the hidden Markov chain has <code class="reqn">m</code> states, and that there are <code class="reqn">\ell</code> parameters that are dependent on the hidden Markov state. Then the list object <code>pm</code> should contain <code class="reqn">\ell</code> <em>named</em> vector components each of length <code class="reqn">m</code>. The names are determined by the required probability distribution.
+</p>
+<p>For example, if <code>distn == "norm"</code>, the arguments names must coincide with those used by the functions <code>dnorm</code> or <code>rnorm</code>, which are <code>mean</code> and <code>sd</code>. Each must be specified in either <code>pm</code> or <code>pn</code>. If they both vary according to the hidden Markov state then <code>pm</code> should have the <em>named</em> components <code>mean</code> and <code>sd</code>. These are both vectors of length <code class="reqn">m</code> containing the means and standard deviations of the observed process when the hidden Markov chain is in each of the <code class="reqn">m</code> states. If, for example, <code>sd</code> was “time” dependent, then <code>sd</code> would be contained in <code>pn</code> (see below).
+</p>
+<p>If <code>distn == "pois"</code>, then <code>pm</code> should have one component named <code>lambda</code>, being the parameter name in the function <code>dpois</code>. Even if there is only one parameter, the vector component should still be within a list and named.
+</p>
+
+
+<h3>List Object pn</h3>
+
+<p>The list object <code>pn</code> contains parameter values of the probability distribution for the observed process that are dependent on the observation number or “time”. These parameters are assumed to be <em>known</em>.
+</p>
+<p>Assume that the observed process is of length <code class="reqn">n</code>, and that there are <code class="reqn">\ell</code> parameters that are dependent on the observation number or time. Then the list object <code>pn</code> should contain <code class="reqn">\ell</code> <em>named</em> vector components each of length <code class="reqn">n</code>. The names, as in <code>pm</code>, are determined by the required probability distribution.
+</p>
+<p>For example, in the observed process we may count the number of successes in a <em>known</em> number of Bernoulli trials, i.e. the number of Bernoulli trials is known at each time point, but the probability of success varies according to a hidden Markov state. The <code>prob</code> parameter of <code>rbinom</code> (or <code>dbinom</code>) would be specified in <code>pm</code> and the <code>size</code> parameter would specified in <code>pn</code>.
+</p>
+<p>One could also have a situation where the observed process was Gaussian, with the means varying according to the hidden Markov state, but the variances varying non-randomly according to the observation number (or vice versa). Here <code>mean</code> would be specified within <code>pm</code> and <code>sd</code> within <code>pn</code>. Note that a given parameter can only occur within <em>one</em> of <code>pm</code> or <code>pn</code>.
+</p>
+
+
+<h3>Complete Data Likelihood</h3>
+
+<p>The “complete data likelihood”, <code class="reqn">L_c</code>, is
+</p>
+<p style="text-align: center;"><code class="reqn">
+L_c = \Pr\{ X_1=x_1, \cdots, X_n=x_n, C_1=c_1, \cdots, C_n=c_n \}\,.
+</code>
+</p>
+
+<p>This can be shown to be
+</p>
+<p style="text-align: center;"><code class="reqn">
+\Pr\{ X_1=x_1 \,|\, C_1=c_1 \} \Pr\{ C_1=c_1 \} \prod_{i=2}^n \Pr\{ X_i=x_i \,|\, C_i=c_i \} \Pr\{ C_i=c_i \,|\, C_{i-1}=c_{i-1} \}\,,
+</code>
+</p>
+
+<p>and hence, substituting model parameters, we get
+</p>
+<p style="text-align: center;"><code class="reqn">
+L_c = \delta_{c_1} \pi_{c_1c_2} \pi_{c_2c_3} \cdots \pi_{c_{n-1}c_n} \prod_{i=1}^n \Pr\{ X_i=x_i \,|\, C_i=c_i \}\,,
+</code>
+</p>
+
+<p>and so
+</p>
+<p style="text-align: center;"><code class="reqn">
+\log L_c = \log \delta_{c_1} +  \sum_{i=2}^n \log \pi_{c_{i-1}c_i} + \sum_{i=1}^n \log \Pr\{ X_i=x_i \,|\, C_i=c_i \}\,.
+</code>
+</p>
+
+<p>Hence the “complete data likelihood” is split into three terms: the first relates to parameters of the marginal distribution (Markov chain), the second to the transition probabilities, and the third to the distribution parameters of the observed random variable. When the Markov chain is non-stationary, each term can be maximised separately.
+</p>
+
+
+<h3>Stationarity</h3>
+
+<p>When the hidden Markov chain is assumed to be non-stationary, the complete data likelihood has a neat structure, in that <code class="reqn">\delta</code> only occurs in the first term, <code class="reqn">\Pi</code> only occurs in the second term, and the parameters associated with the observed probabilities only occur in the third term. Hence, the likelihood can easily be maximised by maximising each term individually. In this situation, the estimated parameters using <code>BaumWelch</code> will be the “exact” maximum likelihood estimates.
+</p>
+<p>When the hidden Markov chain is assumed to be stationary, <code class="reqn">\delta = \Pi^\prime \delta</code> (see topic <code>compdelta</code>), and then the first two terms of the complete data likelihood determine the transition probabilities <code class="reqn">\Pi</code>. This raises more complicated numerical problems, as the first term is effectively a constraint. In our implementation of the EM algorithm, we deal with this in a slightly ad-hoc manner by effectively disregarding the first term, which is assumed to be relatively small. In the M-step, the transition matrix is determined by the second term, then <code class="reqn">\delta</code> is estimated using the relation <code class="reqn">\delta = \delta \Pi</code>. Hence, using the <code>BaumWelch</code> function will only provide approximate maximum likelihood estimates. Exact solutions can be calculated by directly maximising the likelihood function, see first example in <code>neglogLik</code>.
+</p>
+
+
+<h3>References</h3>
+
+<p>Cited references are listed on the HiddenMarkov manual page.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">#-----  Test Gaussian Distribution -----
+
+Pi &lt;- matrix(c(1/2, 1/2,   0,
+               1/3, 1/3, 1/3,
+                 0, 1/2, 1/2),
+             byrow=TRUE, nrow=3)
+
+delta &lt;- c(0, 1, 0)
+
+x &lt;- dthmm(NULL, Pi, delta, "norm",
+           list(mean=c(1, 6, 3), sd=c(0.5, 1, 0.5)))
+
+x &lt;- simulate(x, nsim=1000)
+
+#    use above parameter values as initial values
+y &lt;- BaumWelch(x)
+
+print(summary(y))
+print(logLik(y))
+hist(residuals(y))
+
+#   check parameter estimates
+print(sum(y$delta))
+print(y$Pi %*% rep(1, ncol(y$Pi)))
+
+
+#-----  Test Poisson Distribution  -----
+
+Pi &lt;- matrix(c(0.8, 0.2,
+               0.3, 0.7),
+             byrow=TRUE, nrow=2)
+
+delta &lt;- c(0, 1)
+
+x &lt;- dthmm(NULL, Pi, delta, "pois", list(lambda=c(4, 0.1)),
+           discrete = TRUE)
+
+x &lt;- simulate(x, nsim=1000)
+
+#    use above parameter values as initial values
+y &lt;- BaumWelch(x)
+
+print(summary(y))
+print(logLik(y))
+hist(residuals(y))
+
+#   check parameter estimates
+print(sum(y$delta))
+print(y$Pi %*% rep(1, ncol(y$Pi)))
+
+
+#-----  Test Exponential Distribution  -----
+
+Pi &lt;- matrix(c(0.8, 0.2,
+               0.3, 0.7),
+             byrow=TRUE, nrow=2)
+
+delta &lt;- c(0, 1)
+
+x &lt;- dthmm(NULL, Pi, delta, "exp", list(rate=c(2, 0.1)))
+
+x &lt;- simulate(x, nsim=1000)
+
+#    use above parameter values as initial values
+y &lt;- BaumWelch(x)
+
+print(summary(y))
+print(logLik(y))
+hist(residuals(y))
+
+#   check parameter estimates
+print(sum(y$delta))
+print(y$Pi %*% rep(1, ncol(y$Pi)))
+
+
+#-----  Test Beta Distribution  -----
+
+Pi &lt;- matrix(c(0.8, 0.2,
+               0.3, 0.7),
+             byrow=TRUE, nrow=2)
+
+delta &lt;- c(0, 1)
+
+x &lt;- dthmm(NULL, Pi, delta, "beta", list(shape1=c(2, 6), shape2=c(6, 2)))
+
+x &lt;- simulate(x, nsim=1000)
+
+#    use above parameter values as initial values
+y &lt;- BaumWelch(x)
+
+print(summary(y))
+print(logLik(y))
+hist(residuals(y))
+
+#   check parameter estimates
+print(sum(y$delta))
+print(y$Pi %*% rep(1, ncol(y$Pi)))
+
+
+#-----  Test Binomial Distribution  -----
+
+Pi &lt;- matrix(c(0.8, 0.2,
+               0.3, 0.7),
+             byrow=TRUE, nrow=2)
+
+delta &lt;- c(0, 1)
+
+#   vector of "fixed &amp; known" number of Bernoulli trials
+pn &lt;- list(size=rpois(1000, 10)+1)
+
+x &lt;- dthmm(NULL, Pi, delta, "binom", list(prob=c(0.2, 0.8)), pn,
+           discrete=TRUE)
+
+x &lt;- simulate(x, nsim=1000)
+
+#    use above parameter values as initial values
+y &lt;- BaumWelch(x)
+
+print(summary(y))
+print(logLik(y))
+hist(residuals(y))
+
+#   check parameter estimates
+print(sum(y$delta))
+print(y$Pi %*% rep(1, ncol(y$Pi)))
+
+
+#-----  Test Gamma Distribution  -----
+
+Pi &lt;- matrix(c(0.8, 0.2,
+               0.3, 0.7),
+             byrow=TRUE, nrow=2)
+
+delta &lt;- c(0, 1)
+
+pm &lt;- list(rate=c(4, 0.5), shape=c(3, 3))
+
+x &lt;- seq(0.01, 10, 0.01)
+plot(x, dgamma(x, rate=pm$rate[1], shape=pm$shape[1]),
+     type="l", col="blue", ylab="Density")
+points(x, dgamma(x, rate=pm$rate[2], shape=pm$shape[2]),
+       type="l", col="red")
+
+x &lt;- dthmm(NULL, Pi, delta, "gamma", pm)
+
+x &lt;- simulate(x, nsim=1000)
+
+#    use above parameter values as initial values
+y &lt;- BaumWelch(x)
+
+print(summary(y))
+print(logLik(y))
+hist(residuals(y))
+
+#   check parameter estimates
+print(sum(y$delta))
+print(y$Pi %*% rep(1, ncol(y$Pi)))
+</code></pre>
+
+
+</div>

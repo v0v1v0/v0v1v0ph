@@ -1,0 +1,96 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>multi_county_wind</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Hurricane exposure by wind for communities</h2>
+
+<h3>Description</h3>
+
+<p>This function takes a dataframe with multi-county communities and returns a
+community-level dataframe of "exposed" storms, based on the highest of the
+maximum sustained wind speed for each county in the community.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">multi_county_wind(communities, start_year, end_year, wind_limit)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>communities</code></td>
+<td>
+<p>A dataframe with the FIPS codes for all counties within
+each community. It must include columns with a column identifier
+(<code>commun</code>) and with the FIPS codes of counties included in each
+community (<code>fips</code>). See the example code.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>start_year</code></td>
+<td>
+<p>Four-digit integer with first year to consider.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>end_year</code></td>
+<td>
+<p>Four-digit integer with last year to consider.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>wind_limit</code></td>
+<td>
+<p>A numeric vector of length one giving the minimum
+wind speed (in meters per second) or duration of winds of 20 m / s or more
+(in minutes) to use in the filter. The units of this variable will depend on
+the user's choice for the <code>wind_var</code> parameter. If the Extended Best
+Tracks wind radii are used as the source of the wind data, the sustained
+winds will only be available for cutpoints of 34 knots, 50 knots, and 64
+knots, so these values should be used (e.g., to get all counties with winds of
+34 knots or higher, you could use <code>wind_limit = 17.4</code>, with the limit
+given as a value just below 34 knots in the units meters per second).</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>Returns the same type dataframe as <code>county_rain</code>,
+but with storms listed by community instead of county.
+</p>
+
+
+<h3>Note</h3>
+
+<p>This function currently will only input a threshold for the sustained wind
+metric. If you would like to use gust winds or duration of winds, you will need
+to use the <code>county_wind</code> function to pull storms and aggregate to the
+multi-county community level yourself.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Ensure that data package is available before running the example.
+#  If it is not, see the `hurricaneexposure` package vignette for details
+# on installing the required data package.
+if (requireNamespace("hurricaneexposuredata", quietly = TRUE)) {
+
+communities &lt;- data.frame(community_name = c(rep("ny", 6), "no", "new"),
+                         fips = c("36005", "36047", "36061",
+                                  "36085", "36081", "36119",
+                                  "22071", "51700"))
+wind_df &lt;- multi_county_wind(communities = communities,
+                                     start_year = 1988, end_year = 2005,
+                                     wind_limit = 20)
+}
+</code></pre>
+
+
+</div>

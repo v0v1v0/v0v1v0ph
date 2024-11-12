@@ -1,0 +1,88 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>madPlot</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Mean Absolute Deviation Plot</h2>
+
+<h3>Description</h3>
+
+<p>Function to create Mean Absolute Deviation Plot
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">madPlot(hvt.scoring, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>hvt.scoring</code></td>
+<td>
+<p>List. A list of hvt.scoring obtained from the scoreHVT
+function.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>The ellipsis is passed to it as additional argument. (Used internally)</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>This function plots percentage anomalies vs mean absolute deviation for test data. The plot helps in
+deciding an optimal MAD value for the use case.
+</p>
+
+
+<h3>Value</h3>
+
+<p>Mean Absolute Deviation Plot
+</p>
+<table><tr style="vertical-align: top;">
+<td><code>mad_plot</code></td>
+<td>
+<p>ggplot plot. A plot with percentage anomalies on y axis and mean absolute deviation values on xaxis. </p>
+</td>
+</tr></table>
+<h3>Author(s)</h3>
+
+<p>Shubhra Prakash &lt;shubhra.prakash@mu-sigma.com&gt;
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>scoreHVT</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data("EuStockMarkets")
+dataset &lt;- data.frame(date = as.numeric(time(EuStockMarkets)),
+                     DAX = EuStockMarkets[, "DAX"],
+                     SMI = EuStockMarkets[, "SMI"],
+                     CAC = EuStockMarkets[, "CAC"],
+                     FTSE = EuStockMarkets[, "FTSE"])
+#adding this step especially for this function
+rownames(EuStockMarkets) &lt;- dataset$date
+train &lt;- EuStockMarkets[1:1302, ]
+test &lt;- EuStockMarkets[1303:1860, ]
+hvt_summary &lt;- list()
+hvt_summary&lt;- trainHVT(train,n_cells = 15, depth = 1, quant.err = 0.2,
+                      distance_metric = "L1_Norm", error_metric = "mean", 
+                      normalize = TRUE, quant_method = "kmeans")
+score_var &lt;- scoreHVT(test, hvt_summary, child.level = 2, mad.threshold = 0.2)
+madPlot(hvt.scoring=score_var)
+</code></pre>
+
+
+</div>

@@ -1,0 +1,187 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>baseflows</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Measures of central tendency and baseflow via the Lynne-Hollick (LH) baseflow filter
+</h2>
+
+<h3>Description</h3>
+
+<p>Calculate measure of central tendency and baseflow indices using the Lynne-Hollick filter
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">baseflows(flow.ts, a, n.reflected = 30, ts = "mean")
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>flow.ts</code></td>
+<td>
+
+<p>Dataframe with date and discharge data in columns named "Date" and "Q" respectively. Date must be in POSIX format (see ts.format). Missing values are ignored.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>a</code></td>
+<td>
+
+<p>The alpha value used in the Lynne-Hollick filter for digital baseflow separation. Default value is 0.975  
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n.reflected</code></td>
+<td>
+
+<p>The number of days that are reflected at the start and end of the series to provide a burn in for the digital filter. Default value is 30. (See Ladson et al. 2013).
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ts</code></td>
+<td>
+
+<p>ts="mean" returns means for the entire time series <br>
+ts="annual" returns annual averages. Note this function does not currently use hydrologic years even when defined<br>
+ts="daily" returns complete series</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Technically the LH filter cannot be calculated where there are missing data. Here the function removes missing values and is applied to a concatenated version of the time series. Missing dates are reinserted after the filter has been applied for the purpose of returning annual or daily series. The function further reports the number of missing values leaving the user to decide on the reliability of the baseflow estimates.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A dataframe. See below for details. The original dataframe with appended columns "bf" and "bfi". See ts="annual" for details.
+</p>
+<p>ts="mean" 
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>n.years </code></td>
+<td>
+<p>The number of years of record in the series</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>prop.obs </code></td>
+<td>
+<p>proportion of non-missing observations</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>MDF </code></td>
+<td>
+<p>mean daily flow</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Q50 </code></td>
+<td>
+<p>median daily flow</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mean.bf </code></td>
+<td>
+<p>mean baseflow volume</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mean.bfi </code></td>
+<td>
+<p>mean baseflow index</p>
+</td>
+</tr>
+</table>
+<p>ts="annual"
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>year</code></td>
+<td>
+<p>the record year</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>no.obs</code></td>
+<td>
+<p>no of observations in each year</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Q</code></td>
+<td>
+<p>mean daily flow in each year</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>bf</code></td>
+<td>
+<p>mean baseflow volume in each year</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>bfi</code></td>
+<td>
+<p>baseflow index for each year</p>
+</td>
+</tr>
+</table>
+<p>ts="daily"
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>bf</code></td>
+<td>
+<p>baseflow index for each observation</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>bfi</code></td>
+<td>
+<p>baseflow index associated with each observation</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>Nick Bond &lt;n.bond@latrobe.edu.au&gt;
+</p>
+
+
+<h3>References</h3>
+
+<p>Ladson, A. R., R. Brown, B. Neal and R. Nathan (2013) A standard approach to baseflow separation using the Lyne and Hollick filter. Australian Journal of Water Resources 17(1): 173-18
+</p>
+<p>Lynne, V., Hollick, M. (1979) Stochastic time-variable rainfall-runoff modelling. In: pp. 89-93 Institute of Engineers Australia National Conference. Perth.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(Acheron)
+Acheron&lt;-ts.format(Acheron)
+
+baseflows(Acheron,a=0.975, ts="mean")
+baseflows(Acheron,a=0.975, ts="annual")
+head(baseflows(Acheron,a=0.975, ts="daily"))
+
+
+</code></pre>
+
+
+</div>

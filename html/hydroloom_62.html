@@ -1,0 +1,103 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>navigate_network_dfs</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Navigate all Paths Depth First</h2>
+
+<h3>Description</h3>
+
+<p>given a starting node, return all reachable paths. Once visited,
+a node is marked as visited and will not take part in a future path.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">navigate_network_dfs(x, starts, direction = "down", reset = FALSE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>data.frame containing hydroloom compatible network or list
+as returned by make_index_ids (for down) or make_fromids
+(for up). The list formats avoids recreating the index ids for every call
+to navigate network dfs in the case that it needs to be called many times.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>starts</code></td>
+<td>
+<p>vector with ids from x to start at.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>direction</code></td>
+<td>
+<p>character "up", "upmain", "down", or "downmain". If "upmain" or
+"downmain", x must contain sufficient information to construct an upmain and
+downmain network (see details).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>reset</code></td>
+<td>
+<p>logical if TRUE, reset graph for each start such that later paths
+will have overlapping results.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p><code>navigate_network_dfs</code> offers two usage patterns. In the simple case,
+you can provide an <code>hy</code> in which case preprocessing is performed automatically,
+or you can do the preprocessing ahead of time and provide index ids. The latter
+is more complicated but can be much faster in certain circumstances.
+</p>
+<p><code>hy</code> object:
+</p>
+<p>If the function will only be called one or a few times, it can be called
+with x containing (at a minimum) <code>id</code> and <code>toid</code>. For "upmain" and "downmain"
+support, x also requires attributes for determination of the primary upstream
+and downstream connection across every junction.
+</p>
+<p>In this pattern, the <code>hy</code> object will be passed to  make_index_ids
+called for every call to <code>navigate_network_dfs</code> and the resulting index ids
+will be used for network navigation.
+</p>
+<p>Index ids:
+</p>
+<p>If the function will be called repeatedly or index_ids are available for
+other reasons, the index_id list as created by make_index_ids (for
+downstream) or make_fromids (for upstream) can be used. For "upmain"
+and "downmain" support, the <code>main</code> element must be included.
+</p>
+
+
+<h3>Value</h3>
+
+<p>list containing dfs result for each start.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+x &lt;- hy(sf::read_sf(system.file("extdata/new_hope.gpkg", package = "hydroloom")))
+
+x &lt;- add_toids(x, return_dendritic = FALSE)
+
+navigate_network_dfs(x, 8893402)
+
+navigate_network_dfs(x, 8897784, direction = "up")
+
+</code></pre>
+
+
+</div>

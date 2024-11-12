@@ -1,0 +1,82 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>refreshTime</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Synchronize (multiple) irregular timeseries by refresh time</h2>
+
+<h3>Description</h3>
+
+<p>This function implements the refresh time synchronization scheme proposed by Harris et al. (1995). 
+It picks the so-called refresh times at which all assets have traded at least once since the last refresh time point. 
+For example, the first refresh time corresponds to the first time at which all stocks have traded.
+The subsequent refresh time is defined as the first time when all stocks have traded again.
+This process is repeated until the end of one time series is reached.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">refreshTime(pData, sort = FALSE, criterion = "squared duration")
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>pData</code></td>
+<td>
+<p>a list. Each list-item contains an <code>xts</code> or a <code>data.table</code> object (with first column DT (datetime)) containing the original time series (one day only and typically a price series).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sort</code></td>
+<td>
+<p>logical determining whether to sort the index based on a criterion (will only sort descending; i.e., most liquid first). Default is <code>FALSE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>criterion</code></td>
+<td>
+<p>character determining which criterion used. Currently supports <code>"squared duration"</code> and <code>"duration"</code>. Default is <code>"squared duration"</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>An <code>xts</code> or <code>data.table</code> object containing the synchronized time series - depending on the input.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup.
+</p>
+
+
+<h3>References</h3>
+
+<p>Harris, F., T. McInish, Shoesmith, G., and Wood, R. (1995). Cointegration, error correction, and price discovery on informationally linked security markets. <em>Journal of Financial and Quantitative Analysis</em>, 30, 563-581.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Suppose irregular timepoints:
+start &lt;- as.POSIXct("2010-01-01 09:30:00")
+ta &lt;- start + c(1,2,4,5,9)
+tb &lt;- start + c(1,3,6,7,8,9,10,11)
+
+# Yielding the following timeseries:
+a &lt;- xts::as.xts(1:length(ta), order.by = ta)
+b &lt;- xts::as.xts(1:length(tb), order.by = tb)
+
+# Calculate the synchronized timeseries:
+refreshTime(list(a,b))
+
+</code></pre>
+
+
+</div>

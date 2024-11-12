@@ -1,0 +1,137 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>get_round_idx</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Utilities for accessing round ID metadata</h2>
+
+<h3>Description</h3>
+
+<p>Utilities for accessing round ID metadata
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">get_round_idx(config_tasks, round_id)
+
+get_round_ids(
+  config_tasks,
+  flatten = c("all", "model_task", "task_id", "none")
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>config_tasks</code></td>
+<td>
+<p>a list version of the content's of a hub's <code>tasks.json</code>
+config file, accessed through the <code>"config_tasks"</code> attribute of a <code style="white-space: pre;">⁠&lt;hub_connection&gt;⁠</code>
+object or function <code>read_config()</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>round_id</code></td>
+<td>
+<p>Character string. Round identifier. If the round is set to
+<code>round_id_from_variable: true</code>, IDs are values of the task ID defined in the
+round's <code>round_id</code> property of <code>config_tasks</code>.
+Otherwise should match round's <code>round_id</code> value in config. Ignored if hub
+contains only a single round.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>flatten</code></td>
+<td>
+<p>Character. Whether and how much to flatten output.
+</p>
+
+<ul>
+<li> <p><code>"all"</code>: Complete flattening.
+Returns a character vector of unique round IDs across all rounds.
+</p>
+</li>
+<li> <p><code>"model_task"</code>: Flatten model tasks.
+Returns a list with an element for each round.
+Each round element contains a character vector of unique round IDs
+across all round model tasks.
+Only applicable if <code>round_id_from_variable</code> is <code>TRUE</code>.
+</p>
+</li>
+<li> <p><code>"task_id"</code>: Flatten task ID.
+Returns a nested list with an element for each round.
+Each round element contains a list with an element for each model task.
+Each model task element contains a character vector of unique round IDs.
+across <code>required</code> and <code>optional</code> properties.
+Only applicable if <code>round_id_from_variable</code> is <code>TRUE</code>
+</p>
+</li>
+<li> <p><code>"none"</code>: No flattening.
+If <code>round_id_from_variable</code> is <code>TRUE</code>,
+returns a nested list with an element for each round.
+Each round element contains a nested element for each model task.
+Each model task element contains a nested list of <code>required</code> and <code>optional</code>
+character vectors of round IDs.
+If <code>round_id_from_variable</code> is <code>FALSE</code>,a list with a round ID for each round
+is returned.
+</p>
+</li>
+</ul>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>the integer index of the element in <code>config_tasks$rounds</code> that a
+character round identifier maps to
+</p>
+<p>a list or character vector of hub round IDs
+</p>
+
+<ul>
+<li>
+<p> A character vector is returned only if <code>flatten = "all"</code>
+</p>
+</li>
+<li>
+<p> A list is returned otherwise (see <code>flatten</code> for more details)
+</p>
+</li>
+</ul>
+<h3>Functions</h3>
+
+
+<ul>
+<li> <p><code>get_round_idx()</code>: Get an integer index of the element in
+<code>config_tasks$rounds</code> that a character round identifier maps to.
+</p>
+</li>
+<li> <p><code>get_round_ids()</code>: Get a list or character vector of hub round IDs.
+For each round, if <code>round_id_from_variable</code> is <code>TRUE</code>, round IDs returned are
+the values of the task ID defined in the <code>round_id</code> property. Otherwise, if
+<code>round_id_from_variable</code> is <code>FALSE</code>, the value of the <code>round_id</code> property is
+returned.
+</p>
+</li>
+</ul>
+<h3>Examples</h3>
+
+<pre><code class="language-R">config_tasks &lt;- read_config(
+  hub_path = system.file("testhubs/simple", package = "hubUtils")
+)
+# Get round IDs
+get_round_ids(config_tasks)
+get_round_ids(config_tasks, flatten = "model_task")
+get_round_ids(config_tasks, flatten = "task_id")
+get_round_ids(config_tasks, flatten = "none")
+# Get round integer index using a round_id
+get_round_idx(config_tasks, "2022-10-01")
+get_round_idx(config_tasks, "2022-10-29")
+</code></pre>
+
+
+</div>

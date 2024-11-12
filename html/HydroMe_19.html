@@ -1,0 +1,101 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>Tani</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+A Tani water retention model
+</h2>
+
+<h3>Description</h3>
+
+<p>This is a three- parameter function to determine water retention hydraulic parameters contained in the Tani water retention model
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">Tani(x, thr, ths, alp)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+
+<p>Suction potential/head as contained in the x-column of the xy water retention table or data
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>thr</code></td>
+<td>
+
+<p>This is the residual moisture content. It's the moisture content when suction potential is very high (almost at the drying point)
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ths</code></td>
+<td>
+
+<p>This is the saturated moisture content. It's the moisture content when suction potential is very low (almost at the saturation point)
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alp</code></td>
+<td>
+
+<p>It's the inverse of air-entry potential or bubbling pressure
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Tani model is a type of nonlinear curve fitting model for fitting water retention characteristics using experimental data. It requires initial parameter estimates for the model to work. This can be done using Dstart function (e.g. thr=Dstart(data)[1]). If warnings are given during the estimation process, try to increase the iteration limit using control function. Sometimes the warnings can be suppressed using (warn=-1)/ignored since they do not terminate the process
+</p>
+
+
+<h3>Value</h3>
+
+<p>A list of objects returned by standard R regression functions such as nls and lm
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Christian Thine Omuto
+</p>
+
+
+<h3>References</h3>
+
+<p>Tani M. 1982. The properties of water-table rise produced by a one-dimensional, vertical, unsaturated flow. Journal of Japan Forestry Society 64: 409-418
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>Brook</code>, <code>Ruso</code>, <code>Campbel</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(isric)
+pf &lt;- subset(isric, Sample=="Italy4")
+library(minpack.lm)
+tani.ns &lt;- nlsLM(y ~ Tani(x,thr,ths,alp), data = pf,
+                 control = nls.lm.control(maxiter=200),
+                 start = c(thr=Dstart(pf)[1],ths=Dstart(pf)[2], alp=Dstart(pf)[3]))
+coef(tani.ns)
+</code></pre>
+
+
+</div>

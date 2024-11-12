@@ -1,0 +1,124 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>GwRetention</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Calculate groundwater retention of nutrients</h2>
+
+<h3>Description</h3>
+
+<p>Function to calculate nutrient load retention fractions in groundwater parts of HYPE, i.e. after root zone retention. See Details for
+exact definition.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">GwRetention(nfrz, nfs3, gts3, gd, par, unit.area = TRUE, nutrient = "tn")
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>nfrz</code></td>
+<td>
+<p>Data frame with two-columns. Sub-basin IDs in first column, net loads from root zone in kg/year in second column. Typically an
+imported HYPE map output file, HYPE output variable SL06. See Details.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nfs3</code></td>
+<td>
+<p>Data frame with two-columns. Sub-basin IDs in first column, net loads from soil layer 3 in kg/year in second column.
+Typically an imported HYPE map output file, HYPE output variable SL18. See Details.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>gts3</code></td>
+<td>
+<p>Data frame with two-columns. Sub-basin IDs in first column, gross loads to soil layer 3 in kg/year in second column.
+Typically an imported HYPE map output file, HYPE output variable SL17. See Details.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>gd</code></td>
+<td>
+<p>Data frame, with columns containing sub-basin IDs and rural household emissions, e.g. an imported 'GeoData.txt' file.
+See details.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>par</code></td>
+<td>
+<p>List, HYPE parameter list, typically an imported 'par.txt' file. Must contain parameter <em>locsoil</em> (not case-sensitive).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>unit.area</code></td>
+<td>
+<p>Logical, set to <code>FALSE</code> to calculate incoming load (leaching rates) in kg/year instead of kg/(ha year).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nutrient</code></td>
+<td>
+<p>Character keyword, one of the HYPE-modeled nutrient groups, for which to calculate groundwater retention. Not
+case-sensitive. <em>Currently, only <code>tn</code> (total nitrogen) is implemented.</em></p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p><code>GwRetention</code> calculates a groundwater nutrient retention as fractions of outgoing and incoming loads using HYPE soil load variables. Incoming loads
+include drainage into layer 3 from the root zone (defined as soil layer 1 and 2), rural load fractions into soil (dependent on parameter <em>locsoil</em>),
+tile drainage, surface flow, and flow from layer 1 and 2. Outgoing loads include runoff from all soil layers, tile drain, and surface flow.
+</p>
+<p>The retention fraction <em>R</em> is calculated as (see also the
+<a href="http://hype.smhi.net//wiki/doku.php?id=start:hype_model_description:hype_np_soil#diagnostic_output_variables_of_soil_nutrients">variable description in the HYPE online documentation</a>):
+</p>
+<p><code class="reqn">R = 1 - \frac{OUT}{IN} = 1 - \frac{nfrz - gts3 + nfs3 + locsoil * lr}{nfrz + locsoil * lr}</code> -
+</p>
+<p><code class="reqn">li = nfrz + locsoil * lr</code> [kg/y]
+</p>
+<p><code class="reqn">lr = LOC_VOL * LOC_TN * 0.365</code> [kg/y]
+</p>
+<p>, where <em>li</em> is incoming load to groundwater (leaching rates), <em>lr</em> is rural load (total from GeoData converted to kg/yr; <em>locsoil</em> in the formula converts it to rural load into soil layer 3), and
+<em>nfrz</em>, <em>gts3</em>, <em>nfs3</em> are soil loads as in function arguments described above. See Examples for HYPE variable names for <code>TN</code> loads.
+</p>
+<p>Columns <code>SUBID</code>, <code>LOC_VOL</code>, and <code>LOC_TN</code> must be present in <code>gd</code>, for a description of column contents see the
+<a href="http://hype.smhi.net//wiki/doku.php?id=start:hype_file_reference:geodata.txt">GeoData file description in the HYPE online documentation</a>.
+Column names are not case-sensitive.
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>GwRetention</code> returns a three-column data frame, containing SUBIDs, retention in groundwater as a fraction of incoming loads
+(if multiplied by 100, it becomes \
+.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Create dummy data
+te1 &lt;- ReadGeoData(filename = system.file("demo_model",
+"GeoData.txt", package = "HYPEtools"))
+te1$loc_tn &lt;- runif(n = nrow(te1), min = 0, max = 100)
+te1$loc_vol &lt;- runif(n = nrow(te1), min = 0, max = 2)
+te2 &lt;- ReadPar(filename = system.file("demo_model",
+"par.txt", package = "HYPEtools"))
+te2$locsoil &lt;- .3
+# HYPE soil load (sl) variables for TN, dummy loads
+GwRetention(nfrz = data.frame(SUBID = te1$SUBID, SL06 = runif(n = nrow(te1), 10, 50)), 
+            gts3 = data.frame(SUBID = te1$SUBID, SL17 = runif(n = nrow(te1), 10, 50)), 
+            nfs3 = data.frame(SUBID = te1$SUBID, SL18 = runif(n = nrow(te1), 10, 50)), 
+            gd = te1, par = te2)
+
+</code></pre>
+
+
+</div>

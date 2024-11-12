@@ -1,0 +1,240 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>design_MVSKtilting_portfolio_via_sample_moments</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Design high-order portfolio by tilting a given portfolio to the MVSK efficient frontier</h2>
+
+<h3>Description</h3>
+
+<p>Design high-order portfolio by tilting a given portfolio to the MVSK efficient frontier
+(i.e., mean, variance, skewness, and kurtosis):
+</p>
+<pre>
+  minimize     - delta
+               m1(w) &gt;= m1(w0) + delta*d1
+               m2(w) &lt;= m2(w0) - delta*d2
+               m3(w) &gt;= m3(w0) + delta*d3
+               m4(w) &lt;= m4(w0) - delta*d4
+               (w-w0)'Sigma(w-w0) &lt;= kappa^2
+  subject to   ||w||_1 &lt;= leverage, sum(w) == 1.
+</pre>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">design_MVSKtilting_portfolio_via_sample_moments(
+  d = rep(1, 4),
+  X_moments,
+  w_init = rep(1/length(X_moments$mu), length(X_moments$mu)),
+  w0 = w_init,
+  w0_moments = NULL,
+  leverage = 1,
+  kappa = 0,
+  method = c("Q-MVSKT", "L-MVSKT"),
+  tau_w = 1e-05,
+  tau_delta = 1e-05,
+  gamma = 1,
+  zeta = 1e-08,
+  maxiter = 100,
+  ftol = 1e-05,
+  wtol = 1e-05,
+  theta = 0.5,
+  stopval = -Inf
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>d</code></td>
+<td>
+<p>Numerical vector of length 4 indicating the weights of first four moments.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>X_moments</code></td>
+<td>
+<p>List of moment parameters, see <code>estimate_sample_moments()</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>w_init</code></td>
+<td>
+<p>Numerical vector indicating the initial value of portfolio weights.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>w0</code></td>
+<td>
+<p>Numerical vector indicating the reference portfolio vector.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>w0_moments</code></td>
+<td>
+<p>Numerical vector indicating the reference moments.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>leverage</code></td>
+<td>
+<p>Number (&gt;= 1) indicating the leverage of portfolio.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>kappa</code></td>
+<td>
+<p>Number indicating the maximum tracking error volatility.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+<p>String indicating the algorithm method, must be one of: "Q-MVSK", "MM", "DC".</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tau_w</code></td>
+<td>
+<p>Number (&gt;= 0) guaranteeing the strong convexity of approximating function.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tau_delta</code></td>
+<td>
+<p>Number (&gt;= 0) guaranteeing the strong convexity of approximating function.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>gamma</code></td>
+<td>
+<p>Number (0 &lt; gamma &lt;= 1) indicating the initial value of gamma.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>zeta</code></td>
+<td>
+<p>Number (0 &lt; zeta &lt; 1) indicating the diminishing paramater of gamma.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>maxiter</code></td>
+<td>
+<p>Positive integer setting the maximum iteration.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ftol</code></td>
+<td>
+<p>Positive number setting the convergence criterion of function objective.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>wtol</code></td>
+<td>
+<p>Positive number setting the convergence criterion of portfolio weights.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>theta</code></td>
+<td>
+<p>Number (0 &lt; theta &lt; 1) setting the combination coefficient when enlarge feasible set.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>stopval</code></td>
+<td>
+<p>Number setting the stop value of objective.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A list containing the following elements:
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>w</code></td>
+<td>
+<p>Optimal portfolio vector.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>delta</code></td>
+<td>
+<p>Maximum tilting distance of the optimal portfolio.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cpu_time_vs_iterations</code></td>
+<td>
+<p>Time usage over iterations.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>objfun_vs_iterations</code></td>
+<td>
+<p>Objective function over iterations.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>iterations</code></td>
+<td>
+<p>Iterations index.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>moments</code></td>
+<td>
+<p>Moments of portfolio return at optimal portfolio weights.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>improvement</code></td>
+<td>
+<p>The relative improvement of moments of designed portfolio w.r.t. the reference portfolio.</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>Rui Zhou and Daniel P. Palomar
+</p>
+
+
+<h3>References</h3>
+
+<p>R. Zhou and D. P. Palomar, "Solving High-Order Portfolios via Successive Convex Approximation Algorithms," 
+in <em>IEEE Transactions on Signal Processing</em>, vol. 69, pp. 892-904, 2021.
+&lt;doi:10.1109/TSP.2021.3051369&gt;.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+library(highOrderPortfolios)
+data(X50)
+
+# estimate moments
+X_moments &lt;- estimate_sample_moments(X50[, 1:10])
+
+# decide problem setting
+w0 &lt;- rep(1/10, 10)
+w0_moments &lt;- eval_portfolio_moments(w0, X_moments)
+d &lt;- abs(w0_moments) 
+kappa &lt;- 0.3 * sqrt(w0 %*% X_moments$Sgm %*% w0)
+
+# portfolio optimization
+sol &lt;- design_MVSKtilting_portfolio_via_sample_moments(d, X_moments, w_init = w0, w0 = w0, 
+                                                       w0_moments = w0_moments, kappa = kappa)
+
+
+</code></pre>
+
+
+</div>

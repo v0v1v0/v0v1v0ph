@@ -1,0 +1,113 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>SSvgm4</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+A four-parameter van Genuchten water retention model
+</h2>
+
+<h3>Description</h3>
+
+<p>This is a four-parameter function to determine water retention hydraulic parameters contained in the van Genuchten water retention model
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">SSvgm4(input, Thr, Ths, alp, nscal)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>input</code></td>
+<td>
+
+<p>Suction potential/head as contained in the x-column of the xy water retention table or data
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Thr</code></td>
+<td>
+
+<p>This is the residual moisture content. It's the moisture content when suction potential is very high (almost at the drying point)
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Ths</code></td>
+<td>
+
+<p>This is the saturated moisture content. It's the moisture content when suction potential is very low (almost at the saturation point)
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alp</code></td>
+<td>
+
+<p>It's natural logarithm of the inverse of air-entry potential or bubbling pressure
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nscal</code></td>
+<td>
+
+<p>This is a parameter or index for the pore-size distribution
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Van Genuchten model is a type of self-starting nonlinear curve fitting model for fitting water retention characteristics using experimental data. In this model, the restriction of m=1-1/n has been imposed on the water retention characteristics. Air-entry potential = exp(alp). If warnings are given during the estimation process, try to increase the iteration limit using control function. Sometimes the warnings can be suppressed using (warn=-1)/ignored since they do not terminate the process
+</p>
+
+
+<h3>Value</h3>
+
+<p>A list of objects returned by standard R regression functions such as nls and lm
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Christian Thine Omuto
+</p>
+
+
+<h3>References</h3>
+
+<p>van Genuchten MT. 1980. A closed-form equation for predicting the hydraulic conductivity of unsaturated soils. Soil Science Society of America Journal 44: 892-898
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>SSomuto</code>, <code>Brook</code>, <code>Campbel</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(isric)
+library(nlme)
+library(minpack.lm)
+pfdata=subset(isric,Country=="Benin")
+suppressWarnings(
+vn4.ns &lt;- nlsList(y ~ SSvgm4(x,thr,ths,alp,nscal)|Sample,
+               data = pfdata,
+               control = nls.lm.control(maxiter=200)))
+coef(vn4.ns)
+plot(fitted(vn4.ns)~pfdata$y)
+cor(fitted(vn4.ns),pfdata$y)^2
+</code></pre>
+
+
+</div>

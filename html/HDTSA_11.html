@@ -1,0 +1,186 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>WN_test</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Testing for white noise hypothesis in high dimension</h2>
+
+<h3>Description</h3>
+
+<p><code>WN_test()</code> is the test proposed in Chang, Yao and Zhou
+(2017) for the following hypothesis testing problems: </p>
+<p style="text-align: center;"><code class="reqn">H_0:\{{\bf x}_t
+\}_{t=1}^n\mathrm{\ is\ white\ noise\ \ versus\ \ }H_1:\{{\bf x}_t
+\}_{t=1}^n\mathrm{\ is\ not\ white\ noise.} </code>
+</p>
+
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">WN_test(
+  X,
+  lag.k = 2,
+  B = 2000,
+  kernel.type = c("QS", "Par", "Bart"),
+  pre = FALSE,
+  alpha = 0.05,
+  k0 = 5,
+  thresh = FALSE,
+  tuning.vec = NULL
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>X</code></td>
+<td>
+<p><code class="reqn">{\bf X} = \{{\bf x}_1, \dots , {\bf x}_n \}'</code>, an <code class="reqn">n\times
+p</code> sample matrix, where <code class="reqn">n</code> is the sample size and <code class="reqn">p</code> is the
+dimension of <code class="reqn">{\bf x}_t</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lag.k</code></td>
+<td>
+<p>Time lag <code class="reqn">K</code>, a positive integer, used to calculate the test
+statistic [See (4) in Chang, Yao and Zhou (2017)]. Default is <code>lag.k</code>
+<code class="reqn">=2</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>B</code></td>
+<td>
+<p>Bootstrap times for generating multivariate normal distributed
+random vectors in calculating the critical value. Default is <code>B</code>
+<code class="reqn">=2000</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>kernel.type</code></td>
+<td>
+<p>String, an option for choosing the symmetric kernel used
+in the estimation of long-run covariance matrix, for example, <code>'QS'</code>
+(Quadratic spectral kernel), <code>'Par'</code> (Parzen kernel) and <code>'Bart'</code>
+(Bartlett kernel), see Andrews (1991) for more information. Default option
+is<code>kernel.type = 'QS'</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pre</code></td>
+<td>
+<p>Logical value which determines whether to performs preprocessing
+procedure on data matrix <code>X</code> or not, see Remark 1 in Chang, Yao and
+Zhou (2017) for more information. If <code>TRUE</code>, then the segment
+procedure will be performed to data <code>X</code> first. The three additional
+options including <code>thresh</code>, <code>tuning.vec</code> and <code>cv.num</code> are
+the same as those in <code>PCA_TS</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alpha</code></td>
+<td>
+<p>The prescribed significance level. Default is 0.05.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>k0</code></td>
+<td>
+<p>A positive integer specified to calculate <code class="reqn">\widehat{{\bf
+W}}_y</code>. See parameter <code>lag.k</code> in <code>PCA_TS</code> for more
+information.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>thresh</code></td>
+<td>
+<p>Logical. It determines whether to perform the threshold method
+to estimate <code class="reqn">\widehat{{\bf W}}_y</code> or not. See parameter <code>thresh</code>
+in <code>PCA_TS</code> for more information.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tuning.vec</code></td>
+<td>
+<p>The value of thresholding tuning parameter <code class="reqn">\lambda</code>.
+See parameter <code>tuning.vec</code> in <code>PCA_TS</code> for more
+information.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>An object of class "hdtstest" is a list containing the following
+components:
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>statistic</code></td>
+<td>
+<p>The value of the test statistic.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>p.value</code></td>
+<td>
+<p>Numerical value which represents the p-value of the test
+based on the observed data <code class="reqn">\{{\bf x}_t\}_{t=1}^n</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lag.k</code></td>
+<td>
+<p>The time lag used in function.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+<p>A character string indicating what method was performed.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>kernel.type</code></td>
+<td>
+<p>A character string indicating what kenel method was performed.</p>
+</td>
+</tr>
+</table>
+<h3>References</h3>
+
+<p>Chang, J., Yao, Q. &amp; Zhou, W. (2017). <em>Testing for
+high-dimensional white noise using maximum cross-correlations</em>, Biometrika,
+Vol. 104, pp. 111–127.
+</p>
+<p>Chang, J., Guo, B. &amp; Yao, Q. (2018). <em>Principal component analysis for
+second-order stationary vector time series</em>, The Annals of Statistics, Vol.
+46, pp. 2094–2124.
+</p>
+<p>Cai, T. and Liu, W. (2011). <em>Adaptive thresholding for sparse
+covariance matrix estimation</em>,  Journal of the American Statistical
+Association, Vol. 106, pp. 672–684.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>PCA_TS</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">n &lt;- 200
+p &lt;- 10
+X &lt;- matrix(rnorm(n*p),n,p)
+res &lt;- WN_test(X)
+Pvalue &lt;- res$p.value
+rej &lt;- res$reject
+</code></pre>
+
+
+</div>

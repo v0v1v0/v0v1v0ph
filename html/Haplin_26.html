@@ -1,0 +1,294 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hapRun</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Simulates genetic data and runs Haplin for each simulation</h2>
+
+<h3>Description</h3>
+
+<p>Calculates Haplin results by first simulating genetic data, allowing a various number of family designs, and then running Haplin on the simulations.
+The simulated data may contain of fetal effects, maternal effects and/or parent-of-origin effects.
+The function allows for simulations and calculations on both autosomal and X-chromosome markers, 
+assuming Hardy-Weinberg equilibrium.
+It enables simulation and calculation of gene-environment interaction effects, i.e, the input (relative risks, number of cases etc.) may vary across strata.
+<code>hapRun</code> calls <code>haplin</code>, <code>haplinStrat</code> or <code>haplinSlide</code> to run on the simulated data files.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hapRun(nall, n.strata= 1, cases, controls, haplo.freq,
+RR, RRcm, RRcf, RRstar, RR.mat, RRstar.mat, hapfunc = "haplin",
+gen.missing.cases = NULL, gen.missing.controls = NULL, 
+n.sim = 1000, xchrom = FALSE, sim.comb.sex = "double", BR.girls, dire,
+ask = TRUE, cpus = 1, slaveOutfile = "", ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>nall</code></td>
+<td>
+<p>A vector of the number of alleles at each locus.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n.strata</code></td>
+<td>
+<p>The number of strata.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cases</code></td>
+<td>
+<p>A list of the number of case families. Each element is a vector of the number of families of the specified family design(s) in the corresponding stratum. The possible family designs, i.e., the possible names of the elements, are <code>"mfc"</code> (full triad), <code>"mc"</code> (mother-child dyad), <code>"fc"</code> (father-child dyad) or <code>"c"</code> (a single case child). See Details for a thorough description.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>controls</code></td>
+<td>
+<p>A list of the number of control families. Each element is a vector of the number of families of the specified family design(s) in the corresponding stratum. The possible family designs are <code>"mfc"</code> (full triad), <code>"mc"</code> (mother-child-dyad), <code>"fc"</code> (father-child dyad), <code>"mf"</code> (mother-father dyad), <code>"c"</code> (a single control child), <code>"m"</code> (a single control mother) or <code>"f"</code> (a single control father). See Details for a thorough description.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>haplo.freq</code></td>
+<td>
+<p>A list of which each element is a numeric vector of the haplotype frequencies in each stratum. The frequencies are normalized and sum to one. The Details section shows how to implement this argument in agreement with the possible haplotypes.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>RR</code></td>
+<td>
+<p>A list of which each element is a numeric vector of the relative risks in each stratum. The Details section shows how to implement this argument in agreement with the possible haplotypes.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>RRcm</code></td>
+<td>
+<p>A list of numeric vectors. Each vector contains the relative risks associated with the haplotypes transmitted from the mother for this stratum. See Details for description of how to implement this argument in agreement with the possible haplotypes.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>RRcf</code></td>
+<td>
+<p>A list of numeric vectors. Each vector contains the relative risks associated with the haplotypes transmitted from the father for this stratum. See Details for description of how to implement this argument in agreement with the possible haplotypes.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>RRstar</code></td>
+<td>
+<p>A list of numeric vectors. Estimates how much double-dose children would deviate from the risk expected in a multiplicative dose-response relationship.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>RR.mat</code></td>
+<td>
+<p>The interpretation is similar to <code>RR</code> when simulating genetic data with maternal effects.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>RRstar.mat</code></td>
+<td>
+<p>The interpretation is similar to <code>RRstar</code> when simulating genetic data with maternal effects.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>hapfunc</code></td>
+<td>
+<p>Defines which haplin function to run, the options being <code>"haplin"</code>, <code>"haplinSlide"</code> or <code>"haplinStrat"</code>. <code>"haplinSlide"</code> is however only partially implemented.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>gen.missing.cases</code></td>
+<td>
+<p>Generates missing values at random for the case families. Set to <code>NULL</code> by default, i.e., no missing values generated. See Details for description of how to implement this argument.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>gen.missing.controls</code></td>
+<td>
+<p>Generates missing values at random for the control families. Set to <code>NULL</code> by default, i.e., no missing values generated. See Details for description of how to implement this argument.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n.sim</code></td>
+<td>
+<p>The number of simulations, i.e., the number of simulated data files.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>xchrom</code></td>
+<td>
+<p>Logical. Equals <code>FALSE</code> by default, which indicates simulation of autosomal markers. If <code>TRUE</code>, hapSim simulates X-linked genes.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sim.comb.sex</code></td>
+<td>
+<p>To be used with <code>xchrom = TRUE</code>. A character value that specifies how to handle gender differences on the X-chromosome. If <code>"single"</code>, the effect of a (single) allele in males is equal to the effect of a single allele dose in females, and similarly, if <code>"double"</code>, a single allele in males has the same effect as a double allele dose in females. Default is "double", which corresponds to X-inactivation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>BR.girls</code></td>
+<td>
+<p>To be used with <code>xchrom = TRUE</code>. Gives the ratio of baseline risk for females to the baseline risk for males.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dire</code></td>
+<td>
+<p>Gives the directory of the simulated data files. Missing by default, which means that none of the files are saved to files.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ask</code></td>
+<td>
+<p>Logical. If <code>TRUE</code>, hapSim will ask before overwriting the files in an already existing directory.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cpus</code></td>
+<td>
+<p>Allows parallel processing of its analyses. The <code>cpus</code> argument should preferably be set to the number of available CPUs. If set lower, it will save some capacity for other processes to run. Setting it too high should not cause any serious problems.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>slaveOutfile</code></td>
+<td>
+<p>Character. If <code>slaveOutfile = ""</code> (default), output from all running cores will be printed in the standard R session window. Alternatively, the output can be saved to a file by specifying the file path and name.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Arguments to be used by <code>haplin</code>, <code>haplinSlide</code> or <code>haplinStrat</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p><code>hapRun</code> applies <code>haplin</code>, <code>haplinSlide</code> or <code>haplinStrat</code>
+on each data file simulated by <code>hapSim</code>. 
+It provides simulations on various family designs, i.e., triads, case-control, the hybrid design, and all intermediate designs.
+The simulated files may accomodate fetal effects, maternal effects and/or parent-of-origin effects.
+<code>hapRun</code> allows simulation of both autosomal and X-chromosome markers, assuming Hardy-Weinberg equilibrium.
+It also enables simulation and calculation of gene-environment interaction effects.
+</p>
+<p>Details on how to implement the arguments listed above are provided by <code>hapSim</code> and the Examples section below.
+The stratum specific arguments may be simplified if the number of strata is one, or if the arguments are equal across all strata.
+</p>
+<p><code>haplin</code>, <code>haplinStrat</code> and <code>haplinSlide</code> will run with default values unless otherwise specified by <code>hapRun</code>.
+For example, if <code>hapfunc = "haplin"</code>, <code>haplin</code> will use <code>response = "free"</code> unless <code>response = "mult"</code> is explicitly given as an argument in <code>hapRun</code>. 
+Moreover, triads with missing data are only included in the haplin analysis if the argument <code>use.missing</code> equals <code>TRUE</code> (default in <code>hapRun</code>). Please confer <a href="https://haplin.bitbucket.io/docu/Haplin_power.pdf">https://haplin.bitbucket.io/docu/Haplin_power.pdf</a> for further details and examples.
+</p>
+<p>For information on the arguments to be passed on to <code>haplin</code>, <code>haplinStrat</code> and <code>haplinSlide</code>, please consult their help pages.
+</p>
+<p>Note that <code>RR.mat</code> and <code>RRstar.mat</code> and <code>RRcm</code> and <code>RRcf</code> are required for <code>hapSim</code> to simulate maternal and parent-of-origin effects, respectively.
+To calculate these effects, however, arguments <code>maternal = TRUE</code> and/or <code>poo = TRUE</code> must be specified.
+</p>
+<p><code>gen.missing.cases</code> and <code>gen.missing.controls</code> are flexible arguments. By default, both equal NULL, which means that no missing data are generated at random.
+If the arguments are single numbers, missing data are generated at random with this proportion for all cases and/or controls. 
+If the arguments are vectors of length equal to the number of loci, missing data are generated with the corresponding proportion for each locus.
+The arguments can also be matrices with the number of rows equal to the number of loci and three columns. 
+Each row corresponds to a locus, and the columns correspond to mothers, fathers and children, respectively. 
+</p>
+
+
+<h3>Value</h3>
+
+<p>If <code>hapfunc = "haplin"</code>, <code>hapRun</code> returns a dataframe consisting of results from running <code>haplin</code> on each simulated file.
+The first two columns are:
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>sim.no  </code></td>
+<td>
+<p>The name of the directory from which the results are calculated, i.e., the simulation number</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>row.no  </code></td>
+<td>
+<p>The row number within each simulation</p>
+</td>
+</tr>
+</table>
+<p><code>haptable</code> gives detailed information of the full dataframe. 
+</p>
+<p>If <code>hapfunc = "haplinSlide"</code>, <code>hapRun</code> returns a list of which each element contains the results from a single run of <code>haplinSlide</code>.
+Consult <code>suest</code> for a thorough description of the output. Note, however, that <code>hapfunc = "haplinSlide"</code> is currently only implemented for diallelic markers, and the reference category is always chosen to be the first haplotype (see <code>hapSim</code> for a description of the haplotype grid). 
+</p>
+<p>If <code>hapfunc = "haplinStrat"</code>, <code>haplinStrat</code> is used to estimate gene-effects in each stratum of the exposure covariate, and the results from all strata are compared using <code>gxe</code>.  <code>hapRun</code> returns a list, where each element is the result of a single run of 
+<code>gxe</code>.
+</p>
+<p>Additionaly, if <code>dire</code> is not missing by default, the simulated files from which the Haplin results are calculated, are stored in the given directory.</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Miriam Gjerdevik,<br>
+with Hakon K. Gjessing<br>
+Professor of Biostatistics<br>
+Division of Epidemiology<br>
+Norwegian Institute of Public Health<br></p>
+<p><a href="mailto:hakon.gjessing@uib.no">hakon.gjessing@uib.no</a></p>
+
+
+<h3>References</h3>
+
+<p>Web Site: <a href="https://haplin.bitbucket.io">https://haplin.bitbucket.io</a>
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>haplin</code>, <code>haplinSlide</code>, <code>hapSim</code>, <code>haptable</code>, <code>suest</code>, <code>hapPower</code>, <code>hapPowerAsymp</code></p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+## Simulate Haplin results from 100 files using the multiplicative model in haplin. 
+## The files consist of fetal effects at two diallelic markers,
+## corresponding to haplo.freq = rep(0.25, 4), RR = c(2,1,1,1) 
+## and RRstar = c(1,1,1,1). That is, the first allele has a doubled risk 
+## relative to the rest. The data consists of a combination of 
+## 100 case triads and 100 control triads with no missing data.
+## No environmental factors are considered, i.e. the number of strata is one.
+hapRun(nall = c(2,2), n.strata = 1, cases = c(mfc=100), controls = c(mfc=100),
+haplo.freq = rep(0.25,4), RR = c(2,1,1,1), RRstar = c(1,1,1,1), 
+hapfunc = "haplin", response = "mult", n.sim = 100, dire = "simfiles", ask = FALSE)
+
+## Simulate power from 100 files applying haplinStrat. 
+## The files consist of fetal and maternal effects at two diallelic markers.
+## The data is simulated for 500 case triads and 200 control families in the first stratum,
+## and 500 case triads and 500 control trids in the second.
+## The fetal effects vary across strata,
+## whereas the maternal effects are the same.
+## One percent of the case triads are missing at random in the second stratum.
+hapRun(nall = c(2,2), n.strata = 2, cases = c(mfc=500),
+controls = list(c(mfc=200),c(mfc=500)), haplo.freq = rep(0.25,4), maternal = TRUE, 
+RR = list(c(1.5,1,1,1),c(1,1,1,1)), RRstar = c(1,1,1,1),
+RR.mat = c(1.5,1,1,1), RRstar.mat = c(1,1,1,1), 
+gen.missing.cases = list(NULL,0.01), use.missing = TRUE, hapfunc = "haplinStrat", 
+n.sim = 100, ask = FALSE)
+
+## Simulate Haplin results from 100 files using haplin. 
+## The files consist of fetal effects at one diallelic locus, 
+## corresponding to haplo.freq = rep(0.5,2), RR = c(1.5,1) and RRstar = c(1,1).
+## We have a combination of 100 case triads and 
+## 100 control triads with no missing data. 
+## No environmental effects are considered.
+hapRun(nall = c(2), n.strata = 1, cases = c(mfc=100), controls = c(mfc=100),
+haplo.freq = rep(0.5,2), RR = c(1.5,1), RRstar = c(1,1),
+hapfunc = "haplin", n.sim = 100, dire = "simfiles", ask = FALSE)
+
+## End(Not run)
+</code></pre>
+
+
+</div>

@@ -1,0 +1,125 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>getCutPoints</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Calculate the threshold cut-points and individual adjusted responses using Jurges' method</h2>
+
+<h3>Description</h3>
+
+<p>Calculate the threshold cut-points and individual adjusted responses using Jurges' method
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">getCutPoints(model, decreasing.levels = model$decreasing.levels, subset = NULL)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>model</code></td>
+<td>
+<p>a fitted <code>hopit</code> model.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>decreasing.levels</code></td>
+<td>
+<p>a logical indicating whether self-reported health classes are ordered in increasing order.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>subset</code></td>
+<td>
+<p>an optional vector specifying a subset of observations.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>a list with the following components:
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>cutpoints</code></td>
+<td>
+<p> cut-points for the adjusted categorical response levels with the corresponding percentiles of the latent index.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>adjusted.levels</code></td>
+<td>
+<p> adjusted categorical response levels for each individual.</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>Maciej J. Danko
+</p>
+
+
+<h3>References</h3>
+
+<p>Jurges H (2007).
+“True health vs response styles: exploring cross-country differences in self-reported health.”
+<em>Health Economics</em>, <b>16</b>(2), 163-178.
+<a href="https://doi.org/10.1002/hec.1134">doi:10.1002/hec.1134</a>.<br><br>
+Oksuzyan A, Danko MJ, Caputo J, Jasilionis D, Shkolnikov VM (2019).
+“Is the story about sensitive women and stoical men true? Gender differences in health after adjustment for reporting behavior.”
+<em>Social Science &amp; Medicine</em>, <b>228</b>, 41-50.
+<a href="https://doi.org/10.1016/j.socscimed.2019.03.002">doi:10.1016/j.socscimed.2019.03.002</a>.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>latentIndex</code>, <code>standardiseCoef</code>, <code>getLevels</code>, <code>hopit</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># DATA
+data(healthsurvey)
+
+# the order of response levels decreases from the best health to
+# the worst health; hence the hopit() parameter decreasing.levels
+# is set to TRUE
+levels(healthsurvey$health)
+
+# Example 1 ---------------------
+
+# fit a model
+model1 &lt;- hopit(latent.formula = health ~ hypertension + high_cholesterol +
+                heart_attack_or_stroke + poor_mobility + very_poor_grip +
+                depression + respiratory_problems +
+                IADL_problems + obese + diabetes + other_diseases,
+              thresh.formula = ~ sex + ageclass + country,
+              decreasing.levels = TRUE,
+              control = list(trace = FALSE),
+              data = healthsurvey)
+
+# calculate the health index cut-points
+z &lt;- getCutPoints(model = model1)
+z$cutpoints
+
+plot(z)
+
+# tabulate the adjusted health levels for individuals (Jurges method):
+rev(table(z$adjusted.levels))
+
+# tabulate the original health levels for individuals
+table(model1$y_i)
+
+# tabulate the predicted health levels
+table(model1$Ey_i)
+</code></pre>
+
+
+</div>

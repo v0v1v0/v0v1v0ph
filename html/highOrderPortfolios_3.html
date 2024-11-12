@@ -1,0 +1,193 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>design_MVSK_portfolio_via_sample_moments</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Design high-order portfolio based on weighted linear combination of first four moments</h2>
+
+<h3>Description</h3>
+
+<p>Design high-order portfolio based on weighted linear combination of first four moments
+(i.e., mean, variance, skewness, and kurtosis):
+</p>
+<pre>
+  minimize     - lmd1*(w'*mu) + lmd2*(w'*Sigma*w) 
+               - lmd3*(w'*Phi*w*w) + lmd4*(w'*Psi*w*w*w)
+  subject to   ||w||_1 &lt;= leverage, sum(w) == 1.
+</pre>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">design_MVSK_portfolio_via_sample_moments(
+  lmd = rep(1, 4),
+  X_moments,
+  w_init = rep(1/length(X_moments$mu), length(X_moments$mu)),
+  leverage = 1,
+  method = c("Q-MVSK", "MM", "DC"),
+  tau_w = 0,
+  gamma = 1,
+  zeta = 1e-08,
+  maxiter = 100,
+  ftol = 1e-05,
+  wtol = 1e-04,
+  stopval = -Inf
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>lmd</code></td>
+<td>
+<p>Numerical vector of length 4 indicating the weights of first four moments.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>X_moments</code></td>
+<td>
+<p>List of moment parameters, see <code>estimate_sample_moments()</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>w_init</code></td>
+<td>
+<p>Numerical vector indicating the initial value of portfolio weights.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>leverage</code></td>
+<td>
+<p>Number (&gt;= 1) indicating the leverage of portfolio.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+<p>String indicating the algorithm method, must be one of: "Q-MVSK", "MM", "DC".</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tau_w</code></td>
+<td>
+<p>Number (&gt;= 0) guaranteeing the strong convexity of approximating function.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>gamma</code></td>
+<td>
+<p>Number (0 &lt; gamma &lt;= 1) indicating the initial value of gamma.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>zeta</code></td>
+<td>
+<p>Number (0 &lt; zeta &lt; 1) indicating the diminishing paramater of gamma.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>maxiter</code></td>
+<td>
+<p>Positive integer setting the maximum iteration.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ftol</code></td>
+<td>
+<p>Positive number setting the convergence criterion of function objective.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>wtol</code></td>
+<td>
+<p>Positive number setting the convergence criterion of portfolio weights.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>stopval</code></td>
+<td>
+<p>Number setting the stop value of objective.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A list containing the following elements:
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>w</code></td>
+<td>
+<p>Optimal portfolio vector.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cpu_time_vs_iterations</code></td>
+<td>
+<p>Time usage over iterations.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>objfun_vs_iterations</code></td>
+<td>
+<p>Objective function over iterations.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>iterations</code></td>
+<td>
+<p>Iterations index.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>convergence</code></td>
+<td>
+<p>Boolean flag to indicate whether or not the optimization converged.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>moments</code></td>
+<td>
+<p>Moments of portfolio return at optimal portfolio weights.</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>Rui Zhou and Daniel P. Palomar
+</p>
+
+
+<h3>References</h3>
+
+<p>R. Zhou and D. P. Palomar, "Solving High-Order Portfolios via Successive Convex Approximation Algorithms," 
+in <em>IEEE Transactions on Signal Processing</em>, vol. 69, pp. 892-904, 2021.
+&lt;doi:10.1109/TSP.2021.3051369&gt;.
+</p>
+<p>X. Wang, R. Zhou, J. Ying, and D. P. Palomar, "Efficient and Scalable High-Order Portfolios Design via Parametric Skew-t Distribution," 
+Available in arXiv, 2022. &lt;https://arxiv.org/pdf/2206.02412v1.pdf&gt;.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">library(highOrderPortfolios)
+data(X50)
+
+# estimate moments
+X_moments &lt;- estimate_sample_moments(X50[, 1:10])
+
+# decide moment weights
+xi &lt;- 10
+lmd &lt;- c(1, xi/2, xi*(xi+1)/6, xi*(xi+1)*(xi+2)/24)
+
+# portfolio optimization
+sol &lt;- design_MVSK_portfolio_via_sample_moments(lmd, X_moments)
+
+</code></pre>
+
+
+</div>

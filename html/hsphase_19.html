@@ -1,0 +1,98 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>ohplot</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Opposing Homozygotes Plot
+</h2>
+
+<h3>Description</h3>
+
+<p>Plot the sorted vectorized matrix of Opposing Homozygotes.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">ohplot(oh, genotype, pedigree, check = FALSE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>oh</code></td>
+<td>
+
+<p><code>integer</code> Opposing homozygotes matrix (Output of <code>ohg</code>) </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>genotype</code></td>
+<td>
+
+<p><code>matrix</code> genotype of one chromosome (data should be numeric. Use 0, 1 and 2 for respectively AA, AB and BB. Use 9 for missing data)
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pedigree</code></td>
+<td>
+
+<p><code>matrix</code>  the pedigree matrix should contain at least two columns, the first column with the half-sib IDs
+and the second column with the sires IDs. This argument is optional.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>check</code></td>
+<td>
+
+<p><code>logical</code> check the genotype file for the possible errors
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The <code>cut off</code> line shows the edge of most different groups. 
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>ohg</code> and <code>rpoh</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">set.seed(100)
+chr &lt;- list()
+sire &lt;- list()
+set.seed(1)
+chr &lt;- list()
+for(i in 1:5)
+{
+	chr[[i]] &lt;- .simulateHalfsib(numInd = 20, numSNP = 5000, recbound = 1:10)
+	sire[[i]] &lt;- ssp(bmh(chr[[i]]), chr[[i]])
+	sire[[i]] &lt;- sire[[i]][1,] + sire[[i]][2,]
+	sire[[i]][sire[[i]] == 18] &lt;- 9
+}
+
+Genotype &lt;- do.call(rbind, chr)
+rownames(Genotype) &lt;- 6:(nrow(Genotype) + 5)
+sire &lt;- do.call(rbind, sire)
+rownames(sire) &lt;- 1:5
+Genotype &lt;- rbind(sire, Genotype)
+oh &lt;- ohg(Genotype)  # creating the Opposing Homozygote matrix
+pedigree &lt;- as.matrix(data.frame(c(1:5, 6:(nrow(Genotype))), 
+rep = c(rep(0,5), rep(1:5, rep(20,5)))))
+ohplot(oh, Genotype, pedigree, check = TRUE)
+</code></pre>
+
+
+</div>

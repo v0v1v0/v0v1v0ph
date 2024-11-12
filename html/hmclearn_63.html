@@ -1,0 +1,127 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>predict.hmclearn</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Model Predictions for HMC or MH</h2>
+
+<h3>Description</h3>
+
+<p><code>predict</code> generates simulated data from the posterior predictive distribution.
+This simulated data can be used for posterior predictive check diagnostics from the <code>bayesplot</code> package
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">## S3 method for class 'hmclearn'
+predict(object, X, fam = "linear", burnin = NULL, draws = NULL, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>object</code></td>
+<td>
+<p>an object of class <code>hmclearn</code>, usually a result of a call to <code>mh</code> or <code>hmc</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>X</code></td>
+<td>
+<p>design matrix, either from fitting the model or new data</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fam</code></td>
+<td>
+<p>generalized linear model family.  Currently "linear", "binomial", and "poisson" are supported</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>burnin</code></td>
+<td>
+<p>optional numeric parameter for the number of initial MCMC samples to omit from the summary</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>draws</code></td>
+<td>
+<p>Number of simulated values from the posterior conditioned on <code>X</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>additional parameters, currently unsupported</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>An object of class <code>hmclearnpred</code>.
+</p>
+
+
+<h3>Elements of <code>hmclearnpred</code> objects</h3>
+
+
+<dl>
+<dt><code>y</code></dt>
+<dd>
+<p>Median simulated values for each observation in <code>X</code>
+</p>
+</dd>
+<dt><code>yrep</code></dt>
+<dd>
+<p>Matrix of simulated values where each row is a draw from the posterior predictive distribution
+</p>
+</dd>
+<dt><code>X</code></dt>
+<dd>
+<p>Numeric design matrix
+</p>
+</dd>
+</dl>
+<h3>References</h3>
+
+<p>Gabry, Jonah and Mahr, Tristan (2019).  <em>bayesplot:  Plotting for Bayesian Models</em>.  <a href="https://mc-stan.org/bayesplot/">https://mc-stan.org/bayesplot/</a>
+</p>
+<p>Gabry, J., Simpson, D., Vehtari, A., Betancourt, M., and Gelman, A (2019).  <em>Visualization in Bayesian Workflow</em>.  Journal of the Royal Statistical Society: Series A. Vol 182.  Issue 2.  p.389-402.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Linear regression example
+set.seed(521)
+X &lt;- cbind(1, matrix(rnorm(300), ncol=3))
+betavals &lt;- c(0.5, -1, 2, -3)
+y &lt;- X%*%betavals + rnorm(100, sd=.2)
+
+f1 &lt;- hmc(N = 500,
+          theta.init = c(rep(0, 4), 1),
+          epsilon = 0.01,
+          L = 10,
+          logPOSTERIOR = linear_posterior,
+          glogPOSTERIOR = g_linear_posterior,
+          varnames = c(paste0("beta", 0:3), "log_sigma_sq"),
+          param=list(y=y, X=X), parallel=FALSE, chains=1)
+
+summary(f1)
+
+p &lt;- predict(f1, X)
+predvals &lt;- p$y
+plot(predvals, y, xlab="predicted", ylab="actual")
+
+X2 &lt;- cbind(1, matrix(rnorm(30), ncol=3))
+p2 &lt;- predict(f1, X2)
+p2$y
+
+</code></pre>
+
+
+</div>

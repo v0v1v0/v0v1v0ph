@@ -1,0 +1,112 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hm_mutate</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Create, modify and delete columns inside a slot</h2>
+
+<h3>Description</h3>
+
+<p>This method allows you to modify whatever (except <code>'date'</code> column)
+you want inside a slot data frame. Since this package was designed with the aim of providing
+useful objects to store and track changes in hydro-meteorological series, is not recommend
+to delete or change the original data, but it is upon to you.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hm_mutate(obj, slot_name, FUN, ...)
+
+## S4 method for signature 'hydromet_station'
+hm_mutate(obj, slot_name, FUN, ...)
+
+## S4 method for signature 'hydromet_compact'
+hm_mutate(obj, slot_name, FUN, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>obj</code></td>
+<td>
+<p>a valid <code>hydromet_XXX</code> class object.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>slot_name</code></td>
+<td>
+<p>string with the a valid name.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>FUN</code></td>
+<td>
+<p>function name. The function output must be a data frame with
+the first column being the <code>Date</code>. Note that <code>hydrotoolbox</code> provides common
+used hydrological functions: see for example mov_avg. An interesting function to use is
+<code>mutate</code> from <code>dplyr</code> package.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p><code>FUN</code> arguments to pass.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>The same object but with the modified slot's data frame
+</p>
+
+
+<h3>Functions</h3>
+
+
+<ul>
+<li> <p><code>hm_mutate(hydromet_station)</code>: method for station class.
+</p>
+</li>
+<li> <p><code>hm_mutate(hydromet_compact)</code>: method for compact class.
+</p>
+</li>
+</ul>
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+# path to all example files
+path &lt;- system.file('extdata', package = 'hydrotoolbox')
+
+# build the snih station file
+guido &lt;-
+hm_create() %&gt;%
+  hm_build(bureau = 'snih', path = path,
+           file_name = c('snih_hq_guido.xlsx',
+           'snih_qd_guido.xlsx'),
+           slot_name = c('hq', 'qd'),
+           by = c('none', 'day') ) %&gt;%
+  hm_name(slot_name = 'qd',
+          col_name = 'q(m3/s)')
+
+ # apply a moving average windows to streamflow records
+hm_mutate(obj = guido, slot_name = 'qd',
+          FUN = mov_avg, k = 10,
+          pos = 'c', out_name = 'mov_avg') %&gt;%
+ hm_plot(slot_name = 'qd',
+         col_name = list(c('q(m3/s)', 'mov_avg') ),
+         interactive = TRUE,
+         line_color = c('dodgerblue', 'red3'),
+         y_lab = 'Q(m3/s)',
+         legend_lab = c('original', 'mov_avg')  )
+
+## End(Not run)
+
+
+</code></pre>
+
+
+</div>

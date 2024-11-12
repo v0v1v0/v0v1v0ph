@@ -1,0 +1,80 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>ts_extract_auto_fitted_workflow</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Extract Boilerplate Items</h2>
+
+<h3>Description</h3>
+
+<p>Extract the fitted workflow from a <code>ts_auto_</code> function.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">ts_extract_auto_fitted_workflow(.input)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table><tr style="vertical-align: top;">
+<td><code>.input</code></td>
+<td>
+<p>This is the output list object of a <code>ts_auto_</code> function.</p>
+</td>
+</tr></table>
+<h3>Details</h3>
+
+<p>Extract the fitted workflow from a <code>ts_auto_</code> function. This will
+only work on those functions that are designated as <em>Boilerplate</em>.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A fitted <code>workflow</code> object.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Steven P. Sanderson II, MPH
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+library(dplyr)
+
+data &lt;- AirPassengers %&gt;%
+  ts_to_tbl() %&gt;%
+  select(-index)
+
+splits &lt;- time_series_split(
+  data
+  , date_col
+  , assess = 12
+  , skip = 3
+  , cumulative = TRUE
+)
+
+ts_lm &lt;- ts_auto_lm(
+  .data = data,
+  .date_col = date_col,
+  .value_col = value,
+  .rsamp_obj = splits,
+  .formula = value ~ .,
+)
+
+ts_extract_auto_fitted_workflow(ts_lm)
+
+## End(Not run)
+
+</code></pre>
+
+
+</div>

@@ -1,0 +1,195 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>h2_threeway</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Three-way Interaction Strength</h2>
+
+<h3>Description</h3>
+
+<p>Friedman and Popescu's statistic of three-way interaction strength, see Details.
+Use <code>plot()</code> to get a barplot. In <code>hstats()</code>, set <code>threeway_m</code> to a value above 2
+to calculate this statistic for all feature triples of the <code>threeway_m</code>
+features with strongest overall interaction.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">h2_threeway(object, ...)
+
+## Default S3 method:
+h2_threeway(object, ...)
+
+## S3 method for class 'hstats'
+h2_threeway(
+  object,
+  normalize = TRUE,
+  squared = TRUE,
+  sort = TRUE,
+  zero = TRUE,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>object</code></td>
+<td>
+<p>Object of class "hstats".</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Currently unused.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>normalize</code></td>
+<td>
+<p>Should statistics be normalized? Default is <code>TRUE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>squared</code></td>
+<td>
+<p>Should <em>squared</em> statistics be returned? Default is <code>TRUE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sort</code></td>
+<td>
+<p>Should results be sorted? Default is <code>TRUE</code>.
+(Multi-output is sorted by row means.)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>zero</code></td>
+<td>
+<p>Should rows with all 0 be shown? Default is <code>TRUE</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Friedman and Popescu (2008) describe a test statistic to measure three-way
+interactions: in case there are no three-way interactions between features
+<code class="reqn">x_j</code>, <code class="reqn">x_k</code> and <code class="reqn">x_l</code>, their (centered) three-dimensional partial
+dependence function <code class="reqn">F_{jkl}</code> can be decomposed into lower order terms:
+</p>
+<p style="text-align: center;"><code class="reqn">
+  F_{jkl}(x_j, x_k, x_l) = B_{jkl} - C_{jkl}
+</code>
+</p>
+
+<p>with
+</p>
+<p style="text-align: center;"><code class="reqn">
+  B_{jkl} = F_{jk}(x_j, x_k) + F_{jl}(x_j, x_l) + F_{kl}(x_k, x_l)
+</code>
+</p>
+
+<p>and
+</p>
+<p style="text-align: center;"><code class="reqn">
+  C_{jkl} =  F_j(x_j) + F_k(x_k) + F_l(x_l).
+</code>
+</p>
+
+<p>The squared and scaled difference between the two sides of the equation leads to the statistic
+</p>
+<p style="text-align: center;"><code class="reqn">
+  H_{jkl}^2 = \frac{\frac{1}{n} \sum_{i = 1}^n \big[\hat F_{jkl}(x_{ij}, x_{ik}, x_{il}) - B^{(i)}_{jkl} + C^{(i)}_{jkl}\big]^2}{\frac{1}{n} \sum_{i = 1}^n \hat F_{jkl}(x_{ij}, x_{ik}, x_{il})^2},
+</code>
+</p>
+
+<p>where
+</p>
+<p style="text-align: center;"><code class="reqn">
+  B^{(i)}_{jkl} = \hat F_{jk}(x_{ij}, x_{ik}) + \hat F_{jl}(x_{ij}, x_{il}) + 
+  \hat F_{kl}(x_{ik}, x_{il})
+</code>
+</p>
+
+<p>and
+</p>
+<p style="text-align: center;"><code class="reqn">
+  C^{(i)}_{jkl} = \hat F_j(x_{ij}) + \hat F_k(x_{ik}) + \hat F_l(x_{il}).
+</code>
+</p>
+
+<p>Similar remarks as for <code>h2_pairwise()</code> apply.
+</p>
+
+
+<h3>Value</h3>
+
+<p>An object of class "hstats_matrix" containing these elements:
+</p>
+
+<ul>
+<li> <p><code>M</code>: Matrix of statistics (one column per prediction dimension), or <code>NULL</code>.
+</p>
+</li>
+<li> <p><code>SE</code>: Matrix with standard errors of <code>M</code>, or <code>NULL</code>.
+Multiply with <code>sqrt(m_rep)</code> to get <em>standard deviations</em> instead.
+Currently, supported only for <code>perm_importance()</code>.
+</p>
+</li>
+<li> <p><code>m_rep</code>: The number of repetitions behind standard errors <code>SE</code>, or <code>NULL</code>.
+Currently, supported only for <code>perm_importance()</code>.
+</p>
+</li>
+<li> <p><code>statistic</code>: Name of the function that generated the statistic.
+</p>
+</li>
+<li> <p><code>description</code>: Description of the statistic.
+</p>
+</li>
+</ul>
+<h3>Methods (by class)</h3>
+
+
+<ul>
+<li> <p><code>h2_threeway(default)</code>: Default pairwise interaction strength.
+</p>
+</li>
+<li> <p><code>h2_threeway(hstats)</code>: Pairwise interaction strength from "hstats" object.
+</p>
+</li>
+</ul>
+<h3>References</h3>
+
+<p>Friedman, Jerome H., and Bogdan E. Popescu. <em>"Predictive Learning via Rule Ensembles."</em>
+The Annals of Applied Statistics 2, no. 3 (2008): 916-54.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>hstats()</code>, <code>h2()</code>, <code>h2_overall()</code>, <code>h2_pairwise()</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># MODEL 1: Linear regression
+fit &lt;- lm(uptake ~ Type * Treatment * conc, data = CO2)
+s &lt;- hstats(fit, X = CO2[, 2:4], threeway_m = 5)
+h2_threeway(s)
+
+#' MODEL 2: Multivariate output (taking just twice the same response as example)
+fit &lt;- lm(cbind(up = uptake, up2 = 2 * uptake) ~ Type * Treatment * conc, data = CO2)
+s &lt;- hstats(fit, X = CO2[, 2:4], threeway_m = 5)
+h2_threeway(s)
+h2_threeway(s, normalize = FALSE, squared = FALSE)  # Unnormalized H
+plot(h2_threeway(s))
+</code></pre>
+
+
+</div>

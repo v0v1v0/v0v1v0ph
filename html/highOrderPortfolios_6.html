@@ -1,0 +1,181 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>estimate_skew_t</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Estimate the parameters of skew-t distribution from multivariate observations</h2>
+
+<h3>Description</h3>
+
+<p>Using the package fitHeavyTail to estimate the parameters of ghMST distribution from multivariate observations, namely,
+location vector (mu), skewness vector (gamma), scatter matrix (scatter), degree of freedom (nu), parameters a,
+and the Cholesky decomposition of the scatter matrix (chol_Sigma).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">estimate_skew_t(
+  X,
+  initial = NULL,
+  nu_lb = 9,
+  max_iter = 100,
+  ptol = 0.001,
+  ftol = Inf,
+  PXEM = TRUE,
+  return_iterates = FALSE,
+  verbose = FALSE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>X</code></td>
+<td>
+<p>Data matrix containing the multivariate time series (each column is one time series).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>initial</code></td>
+<td>
+<p>List of initial values of the parameters for the iterative estimation method.
+Possible elements include:
+</p>
+<ul>
+<li>
+<p><code>nu</code>: default is <code>4</code>,
+</p>
+</li>
+<li>
+<p><code>mu</code>: default is the data sample mean,
+</p>
+</li>
+<li>
+<p><code>gamma</code>: default is the sample skewness vector,
+</p>
+</li>
+<li>
+<p><code>scatter</code>: default follows from the scaled sample covariance matrix,
+</p>
+</li>
+</ul>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nu_lb</code></td>
+<td>
+<p>Minimum value for the degree of freedom to maintain the existence of high-order moments (default is <code>9</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>max_iter</code></td>
+<td>
+<p>Integer indicating the maximum number of iterations for the iterative estimation
+method (default is <code>100</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ptol</code></td>
+<td>
+<p>Positive number indicating the relative tolerance for the change of the variables
+to determine convergence of the iterative method (default is <code>1e-3</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ftol</code></td>
+<td>
+<p>Positive number indicating the relative tolerance for the change of the log-likelihood
+value to determine convergence of the iterative method (default is <code>Inf</code>, so it is
+not active). Note that using this argument might have a computational cost as a convergence
+criterion due to the computation of the log-likelihood (especially when <code>X</code> is high-dimensional).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>PXEM</code></td>
+<td>
+<p>Logical value indicating whether to use the parameter expansion (PX) EM method to accelerating the convergence.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>return_iterates</code></td>
+<td>
+<p>Logical value indicating whether to record the values of the parameters (and possibly the
+log-likelihood if <code>ftol &lt; Inf</code>) at each iteration (default is <code>FALSE</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p>Logical value indicating whether to allow the function to print messages (default is <code>FALSE</code>).</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A list containing the following elements:
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>mu</code></td>
+<td>
+<p>Location vector estimate (not the mean).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>gamma</code></td>
+<td>
+<p>Skewness vector estimate.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>scatter</code></td>
+<td>
+<p>Scatter matrix estimate.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nu</code></td>
+<td>
+<p>Degrees of freedom estimate.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>chol_Sigma</code></td>
+<td>
+<p>Choleski decomposition of the Scatter matrix estimate.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>a</code></td>
+<td>
+<p>A list of coefficients useful for later computation</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>Xiwen Wang, Rui Zhou, and Daniel P. Palomar
+</p>
+
+
+<h3>References</h3>
+
+<p>Aas, Kjersti and Ingrid Hobæk Haff. "The generalized hyperbolic skew student’st-distribution,"
+Journal of financial econometrics, pp. 275-309, 2006.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">library(highOrderPortfolios)
+data("X50")
+X_skew_t_params &lt;- estimate_skew_t(X50)
+
+</code></pre>
+
+
+</div>

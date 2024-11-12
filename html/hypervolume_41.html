@@ -1,0 +1,141 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hypervolume_overlap_confidence</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Confidence intervals for overlap statistics
+</h2>
+
+<h3>Description</h3>
+
+<p>Generates confidence intervals of four different overlap statistics. In order to find the confidence interval for the overlap statistics of two hypervolumes, use <code>hypervolume_resample</code> twice to generate bootstraps. The function takes in paths to two sets of bootstrapped hypervolumes and gets overlap statistics for each possible pair. Confidence interval is calculated by taking a quantile of generated overlap statistics.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hypervolume_overlap_confidence(path1, path2, CI = .95, cores = 1)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>path1</code></td>
+<td>
+
+<p>A path to a directory of bootstrapped hypervolumes
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>path2</code></td>
+<td>
+
+<p>A path to a directory of bootstrapped hypervolumes
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>CI</code></td>
+<td>
+
+<p>Desired confidence interval proportion
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cores</code></td>
+<td>
+
+<p>Number of logical cores to use while generating overlap statistics. If parallel backend already registered to <code>doParallel</code>, function will use that backend and ignore the argument in cores.
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The four overlap statistics are Sorensen, Jaccard, frac_unique_1, frac_unique_2. See <code>hypervolume_overlap_statistics</code>
+</p>
+<p>Each hypervolume from path1 is overlapped with each hypervolume from path2 using <code>hypervolume_set</code>. The four overlap statistics are calculated for each overlap.
+</p>
+
+
+<h3>Value</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>jaccard</code></td>
+<td>
+
+<p>Confidence interval for jaccard similarity score
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sorensen</code></td>
+<td>
+
+<p>Confidence interval for sorensen similarity score
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>frac_unique_1</code></td>
+<td>
+
+<p>Confidence interval for fraction of first hypervolume that is unique
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>frac_unique_2</code></td>
+<td>
+
+<p>Confidence interval for fraction of second hypervolume that is unique
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>distribution</code></td>
+<td>
+
+<p>a matrix of overlap statistics used to generate the confidence intervals
+</p>
+</td>
+</tr>
+</table>
+<h3>See Also</h3>
+
+<p><code>hypervolume_resample</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+# Let us overlap two hypervolumes generated from multivariate nomral 
+# distributions with different means and same covariance matrices.
+sample1 = rmvnorm(150, mean = c(0, 0))
+sample2 = rmvnorm(150, mean = c(0.5, 0.5))
+
+hv1 = hypervolume(sample1)
+hv2 = hypervolume(sample2)
+
+# generates confidence intervals from quantiles of 20*20 overlaps
+path1 = hypervolume_resample("mean_0_0", hv1, n = 20)
+path2 = hypervolume_resample("mean_0.5_0.5", hv2, n = 20)
+
+result = hypervolume_overlap_confidence(path1, path2)
+# confidence index of Sorensen coefficient
+print(result["sorensen"])
+
+
+## End(Not run)
+</code></pre>
+
+
+</div>

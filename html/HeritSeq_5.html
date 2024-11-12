@@ -1,0 +1,94 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>fitComputeVPC.lmer</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Fit linear mixed models (LMM) and compute the VPC values for one or more 
+features.</h2>
+
+<h3>Description</h3>
+
+<p>Fit the Gaussian-like data to LMM and compute the VPC values for 
+one or more features.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">fitComputeVPC.lmer(
+  CountMatrix,
+  Strains,
+  PriorWeights = NULL,
+  test = FALSE,
+  VPCname = "LMM"
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>CountMatrix</code></td>
+<td>
+<p>Sequencing count matrix for one or more features. Each 
+row is for one feature, and the columns are for samples.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Strains</code></td>
+<td>
+<p>Strain labels for the samples.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>PriorWeights</code></td>
+<td>
+<p>Weights used in the lmer function in the package lme4. 
+It is an optional vector used in the fitting process.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>test</code></td>
+<td>
+<p>TRUE or FALSE (default). Test the presence of heritability 
+through examining the random effect variance <code class="reqn">\sigma_g^2 = 0</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>VPCname</code></td>
+<td>
+<p>Name of the VPC result, default = "LMM".</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A list with two objects. The first object is a 
+<code class="reqn">1 \times G</code> vector indicating the variance partition coefficients
+(VPC). If the argument test is set to be true, the second object of 
+the list consists of p-values for testing the hypothesis that random 
+effects <code class="reqn">\sigma_a^2 = 0</code>; otherwise, the second 
+object is NULL.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Compute VPC for the first two features under linear mixed models for Gaussian-like datasets. 
+
+## Provide normalized data and include hypothesis testing on presence of
+## heritability:
+result.vst &lt;- fitComputeVPC.lmer(simData_vst[1:2,], strains, test = TRUE)
+## Extract parameters
+vpc.vst &lt;- result.vst[[1]]
+## Extract p-values
+pval.vst &lt;- result.vst[[2]]
+
+## Visulize the distribution of p-values.
+hist(pval.vst, breaks = 30, col = "cyan")
+</code></pre>
+
+
+</div>

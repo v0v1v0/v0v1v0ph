@@ -1,0 +1,92 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>get_ecoulement_stations</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Retrieve data from API "Ecoulement des cours d'eau"</h2>
+
+<h3>Description</h3>
+
+<p>The data originate from the "ONDE" river low waters monitoring network.
+Available endpoints are:
+</p>
+
+<ul>
+<li> <p><code>get_ecoulement_stations</code> retrieves site data and locations
+</p>
+</li>
+<li> <p><code>get_ecoulement_observations</code> retrieves flow information
+</p>
+</li>
+<li> <p><code>get_ecoulement_campagnes</code> retrieves annual surveys
+</p>
+</li>
+</ul>
+<p>See the API documentation for available filter parameters: <a href="https://hubeau.eaufrance.fr/page/api-ecoulement">https://hubeau.eaufrance.fr/page/api-ecoulement</a>
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">get_ecoulement_stations(...)
+
+get_ecoulement_observations(...)
+
+get_ecoulement_campagnes(...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table><tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>parameters of the queries and their values in the format
+<code style="white-space: pre;">⁠Param1_Name = "Param1 value", Param2_Name = "Param2 value"⁠</code>, use the
+function list_params for a list of the available filter parameters
+for a given API endpoint and see the API documentation for their description</p>
+</td>
+</tr></table>
+<h3>Value</h3>
+
+<p>A tibble::tibble with one row by record and one column by field.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+# Retrieve 2022 observation campaigns in the Jura French department
+get_ecoulement_campagnes(
+  list(code_departement = "39",
+       date_campagne_min = "2022-01-01",
+       date_campagne_max = "2022-12-31")
+)
+
+# Retrieve river stations
+stations_39 &lt;- get_ecoulement_stations(
+  list(code_departement = "39",
+       fields = "code_station,libelle_cours_eau,libelle_commune")
+)
+stations_39
+
+# Get the query parameters for the requested API/endpoint
+list_params(api = "ecoulement",
+                     endpoint = "observations")
+
+# Retrieve the river flow data in the Jura departement in 2022 with
+# a selection of the fields
+onde_39 &lt;- get_ecoulement_observations(
+  list(code_departement = "39",
+       date_observation_min = "2022-01-01",
+       date_observation_max = "2022-12-31",
+       fields = "code_station,libelle_station,date_observation,libelle_ecoulement")
+)
+onde_39
+
+## End(Not run)
+</code></pre>
+
+
+</div>

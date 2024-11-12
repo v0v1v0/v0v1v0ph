@@ -1,0 +1,187 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>genDataGetPart</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Extracting part of genetic data.</h2>
+
+<h3>Description</h3>
+
+<p>This function enables to extract (and save for later use) part of genetic data
+read in with genDataRead.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">genDataGetPart(
+  data.in = stop("No data given!", call. = FALSE),
+  design = stop("Design type must be given!"),
+  markers,
+  indiv.ids,
+  rows,
+  cc,
+  sex,
+  file.out = "my_data_part",
+  dir.out = ".",
+  overwrite = NULL,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>data.in</code></td>
+<td>
+<p>The data object (in format as the output of genDataRead).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>design</code></td>
+<td>
+<p>The design used in the study - choose from:
+</p>
+
+<ul>
+<li> <p><em>triad</em> - (default), data includes genotypes of mother, father and child;
+</p>
+</li>
+<li> <p><em>cc</em> - classical case-control;
+</p>
+</li>
+<li> <p><em>cc.triad</em> - hybrid design: triads with cases and controls;
+</p>
+</li>
+</ul>
+<p>.
+</p>
+<p>Any of the following can be given to narrow down the dataset:</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>markers</code></td>
+<td>
+<p>Vector with numbers or names indicating which markers to choose.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>indiv.ids</code></td>
+<td>
+<p>Character vector giving IDs of individuals. <strong>CAUTION:</strong>
+in a standard PED file, individual IDs are not unique, so this will select
+all individuals with given IDs.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rows</code></td>
+<td>
+<p>Numeric vector giving the positions - this will select only these rows.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cc</code></td>
+<td>
+<p>One or more values to choose based on case-control status ('cc' column).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sex</code></td>
+<td>
+<p>One or more values to choose based on the 'sex' column.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>file.out</code></td>
+<td>
+<p>The base for the output filename (default: "my_data_part").</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dir.out</code></td>
+<td>
+<p>The path to the directory where the output files will be saved.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>overwrite</code></td>
+<td>
+<p>Whether to overwrite the output files: if NULL (default), will prompt
+the user to give answer; set to TRUE, will automatically overwrite any existing files;
+and set to FALSE, will stop if the output files exist.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>If any additional covariate data are available in <code>data.in</code>, 
+the user can choose based on values of these (see the Examples section).</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The genetic data from GWAS studies can be quite large, and thus the analysis
+is time-consuming. If a user knows where they want to focus the analysis,
+they can use this function to extract part of the entire dataset and use
+only this part in subsequent Haplin analysis.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A list object with three elements:
+</p>
+
+<ul>
+<li> <p><em>cov.data</em> - a <code>data.frame</code> with covariate data (if available in
+the input file)
+</p>
+</li>
+<li> <p><em>gen.data</em> - a list with chunks of the genetic data; the data is divided
+column-wise, using 10,000 columns per chunk; each element of this list is a
+ff matrix
+</p>
+</li>
+<li> <p><em>aux</em> - a list with meta-data and important parameters.
+</p>
+</li>
+</ul>
+<p>This now contains only the selected subset of data.
+</p>
+
+
+<h3>Warning</h3>
+
+<p>No checks are performed when choosing a subset of the data - it is the user's
+obligation to check whether the data subset contains correct number of individuals
+(especially important when using the <code>triad</code> design study) and/or markers!
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">  # The argument 'overwrite' is set to TRUE!
+  # Read the data:
+  examples.dir &lt;- system.file( "extdata", package = "Haplin" )
+  example.file &lt;- file.path( examples.dir, "HAPLIN.trialdata2.txt" )
+  my.gen.data.read &lt;- genDataRead( file.in = example.file, file.out = "trial_data",
+   dir.out = tempdir( check = TRUE ), format = "haplin", allele.sep = "", n.vars = 2,
+   cov.header = c( "smoking", "sex" ), overwrite = TRUE )
+  my.gen.data.read
+  # Extract part with only men:
+  men.subset &lt;- genDataGetPart( my.gen.data.read, design = "triad", sex = 1,
+    dir.out = tempdir( check = TRUE ), file.out = "gen_data_men_only", overwrite = TRUE )
+  men.subset
+  # Extract the part with only smoking women:
+  women.smoke.subset &lt;- genDataGetPart( my.gen.data.read, design = "triad",
+    dir.out = tempdir( check = TRUE ), sex = 0, smoking = c( 1,2 ), overwrite = TRUE )
+  women.smoke.subset 
+
+</code></pre>
+
+
+</div>

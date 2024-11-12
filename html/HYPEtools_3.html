@@ -1,0 +1,81 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>AllDownstreamSubids</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Find All Downstream SUBIDs</h2>
+
+<h3>Description</h3>
+
+<p>Function to find all SUBIDs of downstream sub-catchments along the main stem for a single
+sub-catchment.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">AllDownstreamSubids(subid, gd, bd = NULL, write.arcgis = FALSE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>subid</code></td>
+<td>
+<p>Integer, SUBID of a target sub-catchment (must exist in <code>gd</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>gd</code></td>
+<td>
+<p>Dataframe, an imported 'GeoData.txt' file. Mandatory argument. See 'Details'.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>bd</code></td>
+<td>
+<p>Dataframe, an imported 'BranchData.txt' file. Optional argument. See 'Details'.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>write.arcgis</code></td>
+<td>
+<p>Logical. If <code>TRUE</code>, a string containing an SQL expression suitable for ArcGIS's
+'Select By Attributes' feature will be written to the clipboard.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p><code>AllDownstreamSubids</code> finds all downstream SUBIDs of a given SUBID along the main stem (including itself but not
+including potential irrigation links or groundwater flows) using GeoData columns 'SUBID' and 'MAINDOWN'. If a BranchData file
+is provided, the function will also include information on downstream bifurcations.
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>AllDownstreamSubids</code> returns a vector of downstream SUBIDs to the outlet if no BranchData is provided, otherwise a data frame with
+two columns <code>downstream</code> with downstream SUBIDs and <code>is.branch</code> with logical values indicating if a downstream SUBID contains a
+bifurcation ('branch' in HYPE terms). Downstream SUBIDs are ordered from source to final outlet SUBID.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>AllUpstreamSubids</code>, <code>OutletSubids</code>, <code>OutletIds</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">te &lt;- ReadGeoData(filename = system.file("demo_model", "GeoData.txt", package = "HYPEtools"))
+AllDownstreamSubids(subid = 3344, gd = te)
+
+</code></pre>
+
+
+</div>

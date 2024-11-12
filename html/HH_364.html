@@ -1,0 +1,339 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>ancovaplot</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Analysis of Covariance Plots
+</h2>
+
+<h3>Description</h3>
+
+<p>Analysis of Covariance Plots. Any of the ancova models<br><code>y ~ x * t</code><br><code>y ~ t * x</code><br><code>y ~ x + t</code><br><code>y ~ t + x</code><br><code>y ~ x    , groups=t</code><br><code>y ~     t, x=x</code><br><code>y ~ x * t, groups=b</code><br><code>y ~ t * x, groups=b</code><br><code>y ~ x + t, groups=b</code><br><code>y ~ t + x, groups=b</code>
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">ancovaplot(object, ...)
+## S3 method for class 'formula'
+ancovaplot(object, data, groups=NULL, x=NULL, ...,
+           formula=object,
+           col=rep(tpg$col,
+             length=length(levels(as.factor(groups)))),
+           pch=rep(c(15,19,17,18,16,20, 0:14),
+             length=length(levels(as.factor(groups)))),
+           slope, intercept,
+           layout=c(length(levels(cc)), 1),
+           col.line=col, lty=1,
+           superpose.panel=TRUE,
+           between=if (superpose.panel)
+                      list(x=c(rep(0, length(levels(cc))-1), 1))
+                   else
+                      list(x=0),
+           col.by.groups=FALSE ## ignored unless groups= is specified
+           )
+
+panel.ancova.superpose(x, y, subscripts, groups,
+                       slope, intercept,
+                       col, pch, ...,
+                       col.line, lty,
+                       superpose.panel,
+                       col.by.groups,
+                       condition.factor,
+                       groups.cc.incompatible,
+                       plot.resids=FALSE,
+                       print.resids=FALSE,
+                       mean.x.line=FALSE,
+                       col.mean.x.line="gray80")
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>formula, object</code></td>
+<td>
+
+<p><code>formula</code> specifying the <code>aov</code> model.  The function modifies it for the
+<code>xyplot</code> specification.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+
+<p><code>data.frame</code>
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>groups</code></td>
+<td>
+
+<p>If the treatment factor is included in the <code>formula</code>, then <code>groups</code> is not
+needed.  By default <code>groups</code> will be set to the treatment factor, but the
+user may specify another factor for <code>groups</code>, usually a blocking factor.  The
+<code>pch</code> will follow the value of <code>groups</code>.  If the treatment
+is not included in the <code>formula</code>, then <code>groups</code> is required.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+
+<p>Covariate.  Required by <code>ancovaplot.formula</code> if the covariate is
+not included in the <code>formula</code>.
+</p>
+<p>For <code>panel.ancova.superpose</code>, see <code>panel.superpose</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+
+<p>Other arguments to be passed to <code>xyplot</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>col, pch</code></td>
+<td>
+
+<p>Standard <span class="pkg">lattice</span> arguments.  <code>pch</code> follows the value of
+<code>groups</code>.  When <code>col.by.groups</code> is <code>TRUE</code>, then
+<code>col</code> follow the value of <code>groups</code>.
+When <code>col.by.groups</code> is <code>FALSE</code>, then
+<code>col</code> follows the value of the treatment factor, and is constant in
+each panel.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>slope, intercept</code></td>
+<td>
+
+<p>Vector, the length of the number of treatment levels, containing slope
+and intercept of the <code>abline</code> in each panel.
+This is by default calculated based on the formula.  The user may
+override each independently.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>layout, between</code></td>
+<td>
+
+<p>Standard <span class="pkg">lattice</span> arguments.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>col.line, lty</code></td>
+<td>
+
+<p>Standard <span class="pkg">lattice</span> arguments.  By default, they follow the value of the
+treatment factor in the <code>formula</code>. <code>col.line</code> is recycled to
+the number of panels in the plot.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>y, subscripts</code></td>
+<td>
+
+<p>See <code>panel.xyplot</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>superpose.panel</code></td>
+<td>
+
+<p>logical.  if <code>TRUE</code> (the default), there is an additional panel on
+the right containing the superposition of the points and lines for all treatment levels.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>col.by.groups</code></td>
+<td>
+
+<p>logical. See the discussion in argument <code>col</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>condition.factor, groups.cc.incompatible</code></td>
+<td>
+
+<p>These are both internal variables.  <code>condition.factor</code> contains a
+copy of the treatment factor.  <code>groups.cc.incompatible</code> is a
+logical which is set to <code>TRUE</code> when the <code>groups</code> argument is
+explicitly set by the user.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>plot.resids, print.resids, mean.x.line, col.mean.x.line</code></td>
+<td>
+
+<p>logical, logical, logical or numeric, color name.
+When <code>plot.resids==TRUE</code> then vertical line segments
+connecting the data points and the fitted line are drawn.
+The other two arguments are interpreted only when
+<code>plot.resids==TRUE</code>.
+When <code>print.resids==TRUE</code> then the values of the residuals are
+printed on the console.  When <code>is.numeric(mean.x.line)</code> then a vertical
+reference line is drawn at the specified value, which will normally be
+specified by the user as the mean of the full set of x values.
+The reference line will have color specified by <code>col.mean.x.line</code>.
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+
+<table>
+<tr>
+<td style="text-align: left;">
+  <code>ancova=aov specification</code>
+</td>
+<td style="text-align: left;"><code>xyplot specification</code></td>
+<td style="text-align: left;"><code>abline         </code></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">
+  <code>y ~ x * t               </code>
+</td>
+<td style="text-align: left;"><code>y ~ x | t, groups=t </code></td>
+<td style="text-align: left;"><code>lm(y[t] ~ x[t])</code></td>
+<td style="text-align: left;"><code>## separate lines</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">
+  <code>y ~ t * x               </code>
+</td>
+<td style="text-align: left;"><code>y ~ x | t, groups=t </code></td>
+<td style="text-align: left;"><code>lm(y[t] ~ x[t])</code></td>
+<td style="text-align: left;"><code>## separate lines</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">
+  <code>y ~ x + t               </code>
+</td>
+<td style="text-align: left;"><code>y ~ x | t, groups=t </code></td>
+<td style="text-align: left;"><code>lm(y ~ x + t)  </code></td>
+<td style="text-align: left;"><code>## parallel lines</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">
+  <code>y ~ t + x               </code>
+</td>
+<td style="text-align: left;"><code>y ~ x | t, groups=t </code></td>
+<td style="text-align: left;"><code>lm(y ~ x + t)  </code></td>
+<td style="text-align: left;"><code>## parallel lines</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">
+  <code>y ~ x    , groups=t     </code>
+</td>
+<td style="text-align: left;"><code>y ~ x | t, groups=t </code></td>
+<td style="text-align: left;"><code>lm(y ~ x)      </code></td>
+<td style="text-align: left;"><code>## single regression line</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">
+  <code>y ~     t, x=x          </code>
+</td>
+<td style="text-align: left;"><code>y ~ x | t, groups=t </code></td>
+<td style="text-align: left;"><code>mean(t)        </code></td>
+<td style="text-align: left;"><code>## separate horizontal lines</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">
+  <code>y ~ x * t, groups=b     </code>
+</td>
+<td style="text-align: left;"><code>y ~ x | t, groups=b </code></td>
+<td style="text-align: left;"><code>lm(y[t] ~ x[t])</code></td>
+<td style="text-align: left;"><code>## sep lines, pch&amp;col follow b</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">
+  <code>y ~ t * x, groups=b     </code>
+</td>
+<td style="text-align: left;"><code>y ~ x | t, groups=b </code></td>
+<td style="text-align: left;"><code>lm(y[t] ~ x[t])</code></td>
+<td style="text-align: left;"><code>## sep lines, pch&amp;col follow b</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">
+  <code>y ~ x + t, groups=b     </code>
+</td>
+<td style="text-align: left;"><code>y ~ x | t, groups=b </code></td>
+<td style="text-align: left;"><code>lm(y ~ x + t)  </code></td>
+<td style="text-align: left;"><code>## par lines, pch&amp;col follow b</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">
+  <code>y ~ t + x, groups=b     </code>
+</td>
+<td style="text-align: left;"><code>y ~ x | t, groups=b </code></td>
+<td style="text-align: left;"><code>lm(y ~ x + t)  </code></td>
+<td style="text-align: left;">
+<code>## par lines, pch&amp;col follow b</code>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p><code>ancovaplot</code> returns a <code>c("ancova","trellis")</code> object.
+<code>panel.ancova.superpose</code> is an ordinary <span class="pkg">lattice</span> <code>panel</code> function.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p> Richard M. Heiberger &lt;rmh@temple.edu&gt; </p>
+
+
+<h3>References</h3>
+
+<p>Heiberger, Richard M. and Holland, Burt (2015).
+<em>Statistical Analysis and Data Display: An Intermediate Course with Examples in R</em>.
+Second Edition.
+Springer-Verlag, New York.
+<a href="https://link.springer.com/book/10.1007/978-1-4939-2122-5">https://link.springer.com/book/10.1007/978-1-4939-2122-5</a>
+</p>
+
+
+<h3>See Also</h3>
+
+<p>See the older <code>ancova</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">  data(hotdog, package="HH")
+  ancovaplot(Sodium ~ Calories + Type, data=hotdog)
+  ancovaplot(Sodium ~ Calories * Type, data=hotdog)
+  ancovaplot(Sodium ~ Calories, groups=Type, data=hotdog)
+  ancovaplot(Sodium ~ Type, x=Calories, data=hotdog)
+
+  ## Please see demo("ancova", package="HH") to coordinate placement
+  ## of all four of these plots on the same page.
+
+  ancovaplot(Sodium ~ Calories + Type, data=hotdog, plot.resids=TRUE)
+
+</code></pre>
+
+
+</div>

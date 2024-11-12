@@ -1,0 +1,292 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hack_sig</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Score samples by gene signatures</h2>
+
+<h3>Description</h3>
+
+<p>Compute gene signature single sample scores in one of different ways.
+You can choose to apply either the <em>original</em> procedure or one of three single
+sample scoring methods: the combined z-score (<em>Lee et al., 2008</em>), the single
+sample GSEA (<em>Barbie et al., 2009</em>) or the singscore method (<em>Foroutan et al., 2018</em>).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hack_sig(
+  expr_data,
+  signatures = "all",
+  method = "original",
+  direction = "none",
+  sample_norm = "raw",
+  rank_norm = "none",
+  alpha = 0.25
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>expr_data</code></td>
+<td>
+<p>A normalized gene expression matrix (or data frame) with
+gene symbols as row names and samples as columns.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>signatures</code></td>
+<td>
+<p>It can be a list of signatures or a character vector indicating
+keywords for a group of signatures. The default (<code>"all"</code>) will cause the
+function to compute single sample scores for all the signatures implemented
+in <code>hacksig</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+<p>A character string specifying which method to use for computing
+the single sample score for each signature. You can choose one of:
+</p>
+
+<ul>
+<li> <p><code>"original"</code>, the original method used by the authors of the signature;
+</p>
+</li>
+<li> <p><code>"zscore"</code>, the combined z-score method;
+</p>
+</li>
+<li> <p><code>"ssgsea"</code>, the single sample GSEA method;
+</p>
+</li>
+<li> <p><code>"singscore"</code>, the singscore method;
+</p>
+</li>
+</ul>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>direction</code></td>
+<td>
+<p>A character string specifying the <strong>singscore</strong> computation
+method depending on the direction of the signatures. Can be on of:
+</p>
+
+<ul>
+<li> <p><code>"none"</code> (default), undirected signatures, that is you do not know whether
+the genes are up- or down-regulated;
+</p>
+</li>
+<li> <p><code>"up"</code>, all genes in the signature are supposed to be up-regulated;
+</p>
+</li>
+<li> <p><code>"down"</code>, all genes in the signature are supposed to be down-regulated;
+</p>
+</li>
+</ul>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sample_norm</code></td>
+<td>
+<p>A character string specifying the type of normalization
+affecting the <strong>single sample GSEA</strong> scores. Can be one of:
+</p>
+
+<ul>
+<li> <p><code>"raw"</code> (default), obtain raw scores;
+</p>
+</li>
+<li> <p><code>"separate"</code>, normalize raw scores in <code class="reqn">[0, 1]</code> across samples for
+each signature separately.
+</p>
+</li>
+<li> <p><code>"all"</code>, normalize raw scores both across samples and signatures.
+</p>
+</li>
+</ul>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rank_norm</code></td>
+<td>
+<p>A character string specifying how gene expression ranks should
+be normalized in the <strong>single sample GSEA</strong> procedure. Valid choices are:
+</p>
+
+<ul>
+<li> <p><code>"none"</code> (default), no rank normalization;
+</p>
+</li>
+<li> <p><code>"rank"</code>, ranks are multiplied by <code>10000 / nrow(expr_data)</code>;
+</p>
+</li>
+<li> <p><code>"logrank"</code>, normalized ranks are logged.
+</p>
+</li>
+</ul>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alpha</code></td>
+<td>
+<p>A numeric scalar. Exponent in the running sum of the <strong>single sample GSEA</strong>
+score calculation which weighs the gene ranks. Defaults to <code class="reqn">\alpha = 0.25</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>For <code>"original"</code> method, it is intended the procedure used in the original
+publication by the authors for computing the signature score.
+<code>hack_sig()</code> can compute signature scores with the original method only if
+this is a relatively simple procedure (e.g weighted sum of fitted model
+coefficients and expression values).
+For more complex methods, such as CINSARC, ESTIMATE and Immunophenoscore,
+use the dedicated functions.
+</p>
+<p>If <code>signatures</code> is a custom list of gene signatures, then the <code>"ssgsea"</code>
+method will be applied by default.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A tibble with one row for each sample in <code>expr_data</code>, a column <code>sample_id</code>
+indicating sample identifiers and one column for each input signature giving
+single sample scores.
+</p>
+
+
+<h3>Algorithm</h3>
+
+<p>This section gives a brief explanation of how single sample scores are obtained
+from different methods.
+</p>
+
+
+<h4>Combined z-score</h4>
+
+<p>Gene expression values are centered by their mean value and scaled by their
+standard deviation across samples for each gene (z-scores). Then, for each
+sample and signature, corresponding z-scores are added up and divided by the
+square root of the signature size (i.e. the number of genes composing a signature).
+</p>
+<p>The combined z-score method is also implemented in the R package <code>GSVA</code>
+(<em>Hänzelmann et al., 2013</em>).
+</p>
+
+
+
+<h4>Single sample GSEA</h4>
+
+<p>For each sample, genes are ranked by expression value in increasing order and
+rank normalization may follow (see argument <code>rank_norm</code>). Then, two probability-like
+vectors are computed for each sample and signature:
+</p>
+
+<ul>
+<li> <p><code class="reqn">P_{in}</code>, the cumulative sum of weighted ranks divided by their total
+sum for genes in the signature;
+</p>
+</li>
+<li> <p><code class="reqn">P_{out}</code>, the cumulative sum of ones (indicating genes not in the signature)
+divided by the number of genes not in the signature.
+</p>
+</li>
+</ul>
+<p>The single sample GSEA score is obtained by adding up the elements of the
+vector difference <code class="reqn">P_{in} - P_{out}</code>.
+Finally, single sample scores could be normalized either across samples or across
+gene signatures and samples.
+</p>
+<p>The single sample GSEA method is also implemented in the R package <code>GSVA</code>
+(<em>Hänzelmann et al., 2013</em>).
+</p>
+
+
+
+<h4>Singscore</h4>
+
+<p>For signatures whose genes are supposed to be up- or down-regulated, genes
+are ranked by expression value in increasing or decreasing order, respectively.
+For signatures whose direction is unknown, genes are ranked by absolute expression
+in increasing order and are median-centered.
+Enrichment scores are then computed for each sample and signature by averaging
+gene ranks for genes in the signature.
+Finally, normalized scores are obtained by subtracting the theoretical minimum
+mean rank from the score and dividing by the difference between the theoretical
+maximum and minimum mean ranks.
+</p>
+<p>The <code>hacksig</code> implementation of this method works only with unidirectional (i.e.
+all genes up- or down-regulated) and undirected gene signatures.
+If you want to get single sample scores for bidirectional gene signatures (i.e.
+signatures composed of both up- and down-regulated genes), please use the R
+package <code>singscore</code> (<em>Foroutan et al., 2018</em>).
+</p>
+
+
+
+<h3>References</h3>
+
+<p>Barbie, D. A., Tamayo, P., Boehm, J. S., Kim, S. Y., Moody, S. E., Dunn, I. F.,
+Schinzel, A. C., Sandy, P., Meylan, E., Scholl, C., Fröhling, S., Chan, E. M.,
+Sos, M. L., Michel, K., Mermel, C., Silver, S. J., Weir, B. A., Reiling, J. H.,
+Sheng, Q., Gupta, P. B., … Hahn, W. C. (2009). Systematic RNA interference
+reveals that oncogenic KRAS-driven cancers require TBK1. <em>Nature</em>, 462(7269),
+108–112. doi: <a href="https://doi.org/10.1038/nature08460">10.1038/nature08460</a>.
+</p>
+<p>Foroutan, M., Bhuva, D. D., Lyu, R., Horan, K., Cursons, J., &amp;
+Davis, M. J. (2018). Single sample scoring of molecular phenotypes.
+<em>BMC bioinformatics</em>, 19(1), 404. doi: <a href="https://doi.org/10.1186/s12859-018-2435-4">10.1186/s12859-018-2435-4</a>.
+</p>
+<p>Hänzelmann, S., Castelo, R., &amp; Guinney, J. (2013). GSVA: gene set variation
+analysis for microarray and RNA-seq data. <em>BMC bioinformatics</em>, 14, 7.
+doi: <a href="https://doi.org/10.1186/1471-2105-14-7">10.1186/1471-2105-14-7</a>.
+</p>
+<p>Lee, E., Chuang, H. Y., Kim, J. W., Ideker, T., &amp; Lee, D. (2008). Inferring
+pathway activity toward precise disease classification.
+<em>PLoS computational biology</em>, 4(11), e1000217.
+doi: <a href="https://doi.org/10.1371/journal.pcbi.1000217">10.1371/journal.pcbi.1000217</a>.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>get_sig_info()</code> to get information about all implemented signatures.
+</p>
+<p><code>check_sig()</code> to check if signatures are applicable to your data.
+</p>
+<p><code>hack_cinsarc()</code> to apply the original CINSARC procedure.
+</p>
+<p><code>hack_estimate()</code> to obtain the original ESTIMATE scores.
+</p>
+<p><code>hack_immunophenoscore()</code> to apply the original Immunophenoscore procedure.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Raw ssGSEA scores for all implemented signatures can be obtained with:
+hack_sig(test_expr, method = "ssgsea")
+
+# To obtain 0-1 normalized ssGSEA scores, use:
+hack_sig(test_expr, method = "ssgsea", sample_norm = "separate")
+
+# You can also change the exponent of the ssGSEA running sum with:
+hack_sig(test_expr, method = "ssgsea", sample_norm = "separate", alpha = 0.5)
+
+# To obtain combined z-scores for custom gene signatures, use:
+custom_list &lt;- list(rand_sig1 = rownames(test_expr)[1:5],
+                    rand_sig2 = c(rownames(test_expr)[6:8], "RANDOMGENE"))
+hack_sig(test_expr, custom_list, method = "zscore")
+</code></pre>
+
+
+</div>

@@ -1,0 +1,111 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>operations</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Set and multiset operations</h2>
+
+<h3>Description</h3>
+
+<p>Operations between <code>"hset"</code> objects.</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">intersection(hset1, ..., semantic = "refer")
+hset1 %&amp;%  hset2 # refer semantic, operator equivalent to %&amp;&amp;%  , %and%
+hset1 %&amp;~% hset2 # value semantic, operator equivalent to %&amp;&amp;~% , %and~%
+
+union(hset1, ..., semantic = "refer")
+hset1 %|%  hset2 # refer semantic, operator equivalent to %||%  , %or%
+hset1 %|~% hset2 # value semantic, operator equivalent to %||~% , %or~%
+
+difference(hset1, ..., semantic = "refer")
+hset1 %-%  hset2 # refer semantic, operator equivalent to %!imp%
+hset1 %-~% hset2 # value semantic, operator equivalent to %!imp~%
+
+symmdiff(hset1, ..., semantic = "refer")
+hset1 %--%  hset2 # refer semantic, operator equivalent to %xor%
+hset1 %--~% hset2 # value semantic, operator equivalent to %xor~%
+
+setsum(hset1, ..., semantic = "refer")
+hset1 %+%  hset2 # refer semantic, operator equivalent to %sum%
+hset1 %+~% hset2 # value semantic, operator equivalent to %sum~%
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>hset1</code></td>
+<td>
+<p>first operand, which is an object of class <code>"hset"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>hset2</code></td>
+<td>
+<p>second operand, which is an object of class <code>"hset"</code>, used with infix operators.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>other operands, which are all objects of class <code>"hset"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>semantic</code></td>
+<td>
+<p>either <code>"refer"</code> or <code>"value"</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>If <code>...</code> is empty, <code>hset1</code> is returned.
+</p>
+<p>The returned object is a multiset if at least one operand is as such, otherwise the returned object is a set.
+</p>
+<p>If reference semantic is used, the returned value and the first operand point to the same object in memory, as the first operand has been modified in place to produce the returned value. So after an operation with reference semantic, the original operand can not be accessed directly.
+</p>
+
+
+<h3>Value</h3>
+
+<p>Object of class <code>"hset"</code> that is the result of the operation.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## operations between sets
+X1 &lt;- hset(c(2,3,4)); X2 &lt;- hset(c(2,3,5))
+intersection(X1, X2, semantic = "value") # X1 %&amp;~% X2
+union(X1, X2, semantic = "value") # X1 %|~% X2
+difference(X1, X2, semantic = "value") # X1 %-~% X2
+symmdiff(X1, X2, semantic = "value") # X1 %--~% X2
+setsum(X1, X2, semantic = "value") # X1 %+~% X2
+
+## semantic of operations
+X1 # same as before, as value semantic is used so far
+union(X1, X2) # union with reference semantic
+X1 # result of previous computation
+
+## operations between multisets
+Y1 &lt;- hset(c(2,3,4), c(2,1,.5)); Y2 &lt;- hset(c(2,3,5), c(1,1,.5))
+intersection(Y1, Y2, semantic = "value") # Y1 %&amp;~% Y2
+union(Y1, Y2, semantic = "value") # Y1 %|~% Y2
+difference(Y1, Y2, semantic = "value") # Y1 %-~% Y2
+symmdiff(Y1, Y2, semantic = "value") # Y1 %--~% Y2
+setsum(Y1, Y2, semantic = "value") # Y1 %+~% Y2
+
+## mixed operation
+Y3 &lt;- setsum(Y1, X2, semantic = "value")
+Y3
+</code></pre>
+
+
+</div>

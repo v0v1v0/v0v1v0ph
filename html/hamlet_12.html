@@ -1,0 +1,76 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>match.vec2mat</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Transform a matching vector to a binary matching matrix
+</h2>
+
+<h3>Description</h3>
+
+<p>This function allows transforming a matching vector to a binary matching matrix. A matching vector is of length N where each element indicates the submatch to which the observation belongs to. Notice that this is not the same as the group allocation vector that is provided by the match.allocate-function. The binary matching matrix is of size N x N where 0 indicates that the observations have been part of a different submatch, and 1 indicates that the observations have been part of the same submatch. Diagonal is always 0 although an observation is always in the same submatch with its self.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">match.vec2mat(x)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table><tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+
+<p>A matching vector 'x'
+</p>
+</td>
+</tr></table>
+<h3>Value</h3>
+
+<p>N times N binary matching matrix, where 0 indicates that the observations have been part of a different submatch, and 1 indicates that the observations have been part of the same submatch.</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Teemu Daniel Laajala &lt;teelaa@utu.fi&gt;
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>match.allocate</code>
+<code>match.mat2vec</code>
+<code>match.bb</code>
+<code>match.dummy</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(vcapwide)
+
+# Construct an Euclidean distance example distance matrix using 15 observations from the VCaP study
+d &lt;- as.matrix(dist(vcapwide[1:15,c("PSAWeek10", "BWWeek10")]))
+
+bb3 &lt;- match.bb(d, g=3)
+str(bb3)
+
+solvec &lt;- bb3$solution 
+# matching vector, where each element indicates to which submatch each observation belongs to
+
+solvec
+mat &lt;- match.vec2mat(solvec)
+mat
+which(mat[1,] == 1) 
+# E.g. the first, third and thirteenth observation are part of the same submatch
+which(solvec == solvec[1]) 
+# Similarly
+</code></pre>
+
+
+</div>

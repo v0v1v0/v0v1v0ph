@@ -1,0 +1,123 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>scale_dosing</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Scale mg/kg body weight doses according to body weight and units</h2>
+
+<h3>Description</h3>
+
+<p>This function transforms the dose (in mg/kg) into the appropriate units. It
+handles single doses, matrices of doses, or daily repeated doses at varying
+intervals. Gut absorption is also factored in through the parameter Fabsgut,
+and scaling is currently avoided in the inhalation exposure case with a 
+scale factor of 1
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">scale_dosing(
+  dosing,
+  parameters,
+  route,
+  input.units = NULL,
+  output.units = "uM",
+  vol = NULL,
+  state = "liquid"
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>dosing</code></td>
+<td>
+<p>List of dosing metrics used in simulation, which must include
+the general entries with names "initial.dose", "doses.per.day", 
+"daily.dose", and "dosing.matrix". The "dosing.matrix" is used for more
+precise dose regimen specification, and is a matrix consisting of two
+columns or rows named "time" and "dose" containing the time and amount,
+in mg/kg BW, of each dose. The minimal usage case involves all entries but
+"initial.dose" set to NULL in value.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>parameters</code></td>
+<td>
+<p>Chemical parameters from parameterize_pbtk function,
+overrides chem.name and chem.cas.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>route</code></td>
+<td>
+<p>String specification of route of exposure for simulation:
+"oral", "iv", "inhalation", ...</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>input.units</code></td>
+<td>
+<p>Units of the dose values being scaled. (Default is NULL.) 
+Currently supported units "mg/L", "ug/L","ug/mL", "uM", "umol/L", "ug/dL",
+"ug/g", "nmol/L", "nM", and "ppmw" (supported input.units subject to change).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>output.units</code></td>
+<td>
+<p>Desired units (either "mg/L", "mg", "umol", or default
+"uM").</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>vol</code></td>
+<td>
+<p>Volume for the target tissue of interest.
+NOTE: Volume should not be in units of per BW, i.e. "kg".</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>state</code></td>
+<td>
+<p>Chemical state of matter (gas or default liquid).</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A list of numeric values for doses converted to output.units, potentially
+(depending on argument dosing) including:
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>initial.dose</code></td>
+<td>
+<p>The first dose given</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dosing.matrix</code></td>
+<td>
+<p>A 2xN matrix where the first column is dose time and
+the second is dose amount for N doses</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>daily.dose</code></td>
+<td>
+<p>The total cumulative daily dose</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>John Wambaugh and Sarah E. Davidson
+</p>
+
+
+</div>

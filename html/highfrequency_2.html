@@ -1,0 +1,118 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>aggregatePrice</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Aggregate a time series but keep first and last observation</h2>
+
+<h3>Description</h3>
+
+<p>Function to aggregate high frequency data by last tick aggregation to an arbitrary periodicity based on wall clocks.
+Alternatively the aggregation can be done by number of ticks. In case we DON'T do tick-based aggregation, 
+this function accepts arbitrary number of symbols over a arbitrary number of days. Although the function has the word Price in the name,
+the function is general and works on arbitrary time series, either <code>xts</code> or <code>data.table</code> objects the latter requires a <code>DT</code>
+column containing POSIXct time stamps.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">aggregatePrice(
+  pData,
+  alignBy = "minutes",
+  alignPeriod = 1,
+  marketOpen = "09:30:00",
+  marketClose = "16:00:00",
+  fill = FALSE,
+  tz = NULL
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>pData</code></td>
+<td>
+<p><code>data.table</code> or <code>xts</code> object to be aggregated containing the intraday price series, possibly across multiple days.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alignBy</code></td>
+<td>
+<p>character, indicating the time scale in which <code>alignPeriod</code> is expressed. Possible values are: "secs", "seconds", "mins", "minutes","hours", and "ticks".
+To aggregate based on a 5 minute frequency, set <code>alignPeriod</code> to 5 and <code>alignBy</code> to <code>"minutes"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alignPeriod</code></td>
+<td>
+<p>positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate
+based on a 5 minute frequency, set <code>alignPeriod</code> to 5 and <code>alignBy</code> to <code>"minutes"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>marketOpen</code></td>
+<td>
+<p>the market opening time, by default: <code>marketOpen = "09:30:00"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>marketClose</code></td>
+<td>
+<p>the market closing time, by default: <code>marketClose = "16:00:00"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fill</code></td>
+<td>
+<p>indicates whether rows without trades should be added with the most recent value, FALSE by default.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tz</code></td>
+<td>
+<p>fallback time zone used in case we we are unable to identify the timezone of the data, by default: <code>tz = NULL</code>. We attempt to extract the timezone from the DT column (or index) of the data, which may fail. 
+In case of failure we use <code>tz</code> if specified, and if it is not specified, we use <code>"UTC"</code></p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The time stamps of the new time series are the closing times and/or days of the intervals. 
+The element of the returned series with e.g. time stamp 09:35:00 contains
+the last observation up to that point, including the value at 09:35:00 itself.
+</p>
+<p>In case <code>alignBy = "ticks"</code>, the sampling is done such the sampling starts on the first tick, and the last tick is always included.
+For example, if 14 observations are made on one day, and these are 1, 2, 3, ... 14.
+Then, with <code>alignBy = "ticks"</code> and <code>alignPeriod = 3</code>, the output will be 1, 4, 7, 10, 13, 14.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A <code>data.table</code> or <code>xts</code> object containing the aggregated time series.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+# Aggregate price data to the 30-second frequency
+aggregatePrice(sampleTData, alignBy = "secs", alignPeriod = 30)
+
+# Aggregate price data to 30-minute frequency including zero return price changes
+aggregatePrice(sampleTData, alignBy = "minutes", alignPeriod = 30, fill = TRUE)
+
+</code></pre>
+
+
+</div>

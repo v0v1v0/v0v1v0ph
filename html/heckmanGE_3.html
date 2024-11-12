@@ -1,0 +1,70 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>estfun.heckmanGE</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Compute Estimating Functions for Generalized Heckman Model</h2>
+
+<h3>Description</h3>
+
+<p>This function calculates the estimating functions (i.e., the gradient of the log-likelihood) for the Generalized Heckman model.
+It is primarily used for model diagnostics and inference, providing the gradient for each observation with respect to model parameters.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">estfun.heckmanGE(x, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>An object of class <code>heckmanGE</code>, typically the result of fitting a generalized Heckman model. This object should contain model responses, model matrices, weights, and coefficient indexes necessary for the computation of the gradient.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Additional arguments (currently not used, reserved for future extensions).</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The function computes the gradient of the log-likelihood function for the Generalized Heckman model, which includes the selection, outcome, dispersion, and correlation components.
+</p>
+<p>The gradient is calculated per observation, and internally, the helper function <code>gradlik_gen_i</code> computes the gradient for each observation given the model parameters. This involves extracting components such as model matrices, weights, and coefficient indexes, and performing matrix operations specific to the model's structure.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A matrix of dimensions <code style="white-space: pre;">⁠n x p⁠</code>, where <code>n</code> is the number of observations and <code>p</code> is the number of parameters in the model. Each element of the matrix corresponds to the gradient of the log-likelihood function with respect to a given parameter for each observation.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Assuming 'model' is a fitted object of class 'heckmanGE':
+data(MEPS2001)
+selectEq  &lt;- dambexp ~ age + female + educ + blhisp + totchr + ins + income
+outcomeEq &lt;- lnambx ~ age + female + educ + blhisp + totchr + ins
+dispersion  &lt;- ~ age + female + totchr + ins
+correlation  &lt;- ~ age
+fit &lt;- heckmanGE(selection = selectEq,
+                 outcome = outcomeEq,
+                 dispersion = dispersion,
+                 correlation = correlation,
+                 data = MEPS2001)
+estfun.heckmanGE(fit)
+
+</code></pre>
+
+
+</div>

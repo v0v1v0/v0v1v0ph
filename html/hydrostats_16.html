@@ -1,0 +1,106 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>low.spell.lengths</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Calculate the length of all low flow spells
+</h2>
+
+<h3>Description</h3>
+
+<p>Returns the length (and start date) of all flow spells above (or below) a given percentile or user defined threshold. 
+</p>
+<p>Independence criteria allow short periods below the spell threshold to be ignored and flows below a threshold (e.g. zero flows) can be ignored when calculating percentile flows (useful in ephemeral rivers).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">low.spell.lengths(flow.ts, quant = 0.1, threshold,
+ind.days = 5, ignore.zeros = F, ctf.threshold = 0.1, inter.spell=FALSE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>flow.ts</code></td>
+<td>
+
+<p>Dataframe with date and discharge data in columns named "Date" and "Q" respectively. Date must be in POSIX format (see ts.format).
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>quant</code></td>
+<td>
+
+<p>Percentile/quantile to use for defining event magnitude (default 0.9). A value of 0.9 is the upper 90th percentile (i.e. a volume exceeded 10% of the time).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>threshold</code></td>
+<td>
+
+<p>A user supplied threshold for defining spells. This would typically be derived from hydraulic models or similar knowledge pertaining to a gauge site.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ind.days</code></td>
+<td>
+
+<p>Periods between spells of less than ind.days (default 5) are considered to be 'in spell' for the purpose of further calculations. A value of 0 means spells 1 day apart are considered indpedendent.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ignore.zeros</code></td>
+<td>
+
+<p>logical. If TRUE, days below a user defined cease-to-flow threshold (default 0.1) will be excluded when estimating the spell threshold for a given percentile. This is primarily of interest in highly ephemeral rivers, where flow may only occur for a small fraction of the time. In such cases, the inclusion of zeros will skew estimates of low flow events downwards, which may be undesirable.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ctf.threshold</code></td>
+<td>
+
+<p>values below this threshold are treated as zero for the purpose of percentile based calculations (see ignore zeros).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>inter.spell</code></td>
+<td>
+
+<p>logical. If TRUE, the function returns the spell lengths and start dates for periods above (rather than below) the defined threshold.
+</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>Returns a dataframe of spell lengths and their associated starting dates.
+</p>
+<p>Note that spells will always end at NAs.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Nick Bond &lt;n.bond@latrobe.edu.au&gt;
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(Cooper)
+Cooper&lt;-ts.format(Cooper)
+
+low.spell.lengths(Cooper, threshold=50000)
+
+</code></pre>
+
+
+</div>

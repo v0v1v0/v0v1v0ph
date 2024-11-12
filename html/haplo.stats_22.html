@@ -1,0 +1,127 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>haplo.design</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Build a design matrix for haplotypes
+</h2>
+
+<h3>Description</h3>
+
+<p>Build a design matrix for haplotypes estimated from a haplo.em object. 
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">haplo.design(obj, haplo.effect="additive", hapcodes=NA, min.count=5, haplo.base=NA)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>obj</code></td>
+<td>
+
+<p>an object created from haplo.em
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>haplo.effect </code></td>
+<td>
+
+<p>The "effect" pattern of haplotypes on the response. This
+parameter determines the coding for scoring the haplotypes. 
+Valid coding options for heterozygous and homozygous carriers
+of a haplotype are "additive" (1, 2, respectively),
+"dominant" (1,1, respectively), and "recessive" (0, 1,
+respectively). 
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>hapcodes</code></td>
+<td>
+
+<p>codes assigned in haplo.em, corresponding to the row numbers in the
+haplotypes matrix item in <code>obj</code>
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>min.count </code></td>
+<td>
+
+<p>The minimum number of estimated counts of the haplotype in the sample
+in order for a haplotype to be included in the design matrix.  
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>haplo.base </code></td>
+<td>
+
+<p>code for which haplotype will be the reference group, or to be
+considered the baseline of a model.  The code is the row number of the
+<code>haplotypes</code> matrix in <code>obj</code>. This haplotype is removed from
+the design matrix.
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>First a matrix is made for the possible haplotypes for each
+person, coded for the haplo.effect, weighted by the posterior
+probability of those possible haplotypes per person, and then 
+collapsed back to a single row per person.
+</p>
+
+
+<h3>Value</h3>
+
+<p>Matrix of columns for haplotype effects. Column names are "hap.k"
+where k is the row number of the unique haplotypes within the haplo.em
+object's "haplotypes" item. 
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>haplo.em</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+ ###------------------------------------------------
+ ### See the user manual for more complete examples
+ ###------------------------------------------------
+
+ data(hla.demo)
+ attach(hla.demo)
+
+ geno &lt;- hla.demo[,c(17,18,21:24)]
+ label &lt;-c("DQB","DRB","B")
+
+ keep &lt;- !apply(is.na(geno) | geno==0, 1, any)
+
+ save.em.keep &lt;- haplo.em(geno=geno[keep,], locus.label=label)
+
+ save.df &lt;- haplo.design(save.em.keep, min.count=10)
+ dim(save.df)
+
+ names(save.df)
+ save.df[1:10,]
+
+
+</code></pre>
+
+
+</div>

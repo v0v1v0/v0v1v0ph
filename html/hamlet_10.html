@@ -1,0 +1,262 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>match.ga</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Non-bipartite matching using the Genetic Algorithm (GA)
+</h2>
+
+<h3>Description</h3>
+
+<p>An implementation of the Genetic Algorithm for solving non-bipartite matching tasks with customizable evolutionary events and parameters
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">match.ga(d, g, 
+	pops, 
+	generations = 100, 
+	popsize = 100, 
+	nmutate = 100, 
+	ndeath = 30, 
+	type = "min", 
+	mutate = hamlet:::.ga.mutate, 
+	breed = hamlet:::.ga.breed, 
+	weight = hamlet:::.ga.weight, 
+	fitness = hamlet:::.ga.fitness, 
+	step = hamlet:::.ga.step, 
+	initialize = hamlet:::.ga.init, 
+	progplot = T, 
+	plot = T, 
+	verb = 0, 
+	progress = 500, 
+	...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>d</code></td>
+<td>
+
+<p>A distance/dissimilarity matrix 'd'
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>g</code></td>
+<td>
+
+<p>The size in submatches, as in how many observations are always connected
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pops</code></td>
+<td>
+
+<p>If user wants to specify starting populations, they can be provided here as a matrix. Each row correspondings to the observations, while columns are the different solutions (population in the GA). For example, a 10 row 100 column pops-matrix would be 100 different matching solutions of 10 observations. Each number in the matrix indicates a different submatch.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>generations</code></td>
+<td>
+
+<p>Number of simulations to run in the GA. In each step, mutations, breeding and breeding occur according to user's specified settings, and a new generation is created out of this.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>popsize</code></td>
+<td>
+
+<p>Number of solutions (='individuals') to have in each step of the algorithm.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nmutate</code></td>
+<td>
+
+<p>Number of mutations to occur in each step. Individuals are sampled with replacement, and then given the corresponding number of mutations.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ndeath</code></td>
+<td>
+
+<p>Number of deaths to occur in each step. Each dead solution (='individual') is then replaced by breeding suitable parents (probability of being a parent weighted by fitness).
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>type</code></td>
+<td>
+
+<p>Type of optimization, can be 'min' or 'max'.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mutate</code></td>
+<td>
+
+<p>Mutation function; by default the hamlet internal function '.ga.mutate' is used. This function takes in solution vector 'x'. Two random positions are then swapped, which could be seen as a form of a point mutation.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>breed</code></td>
+<td>
+
+<p>Breeding function; by default the hamlet internal function '.ga.breed' is used. This function takes in solution vectors 'x' and 'y' ,which will be the parents, and the distance matrix 'd'. The products x*d and y*d are computed, and row-wise differences are computed between the two matrices. The row with the highest difference indicates where one of the parents can be most improved, and this trait is inherited from the other parent.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>weight</code></td>
+<td>
+
+<p>Weighting function; by default the hamlet internal function '.ga.weight' is used. This weight should be correspond to probabilities that the corresponding individuals will undergo some sort of event (i.e. mutation, death) or participate in producing offspring (i.e. breed). This probability weight is computed according to ranks of fitnesses computed in the
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fitness</code></td>
+<td>
+
+<p>Fitness function; by default the hamlet internal function '.ga.fitness' is used. This should yield the numeric fitness for a solution, indicating how viable the solution is in relation to the others. In a minimization task the lower fitness indicates better viability.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>step</code></td>
+<td>
+
+<p>A step function; by default the hamlet internal function '.ga.step' is used. The step function which combines all operations in the GA, in order to produce the next generation of solutions given the previous one.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>initialize</code></td>
+<td>
+
+<p>Initialization function; by default the hamlet internal function '.ga.initialize' is used. This function should format a set of valid solutions to produce the first generation in the beginning of the GA.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>progplot</code></td>
+<td>
+
+<p>Should progress be plotted. If true, in every generation index dividable by the parameter 'progress', a function of fitnesses over the generations is plotted. The plot shows development of solution cost quantiles over time.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>plot</code></td>
+<td>
+
+<p>Should the function plot the final quantiles over all the generations.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verb</code></td>
+<td>
+
+<p>Level of verbosity; -1 indicates omitting of verbal output, 0 indicates normal level, and +1 indicates debugging/additional information.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>progress</code></td>
+<td>
+
+<p>How often should the function plot and print intermediate information on the progress.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+
+<p>Additional parameters for the internal GA functions.
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The Genetic Algorithm (GA) is a form of an evolutionary optimization algorithm, where a population (a group of solutions to an optimization tasks) reproduce among themselves, die, mutate, and live on in a simulated environment. As the GA is a generic framework of solution approaches, it has many adjustable parameters and user may wish to explore many different options for the populations (for example in population size, mutation frequencies, fitness functions, drift etc) and also the evolutionary mechanics (such as breeding technique, types of mutations, and suitability for reproducing). Here, general default options and mechanics are provided, but it is advisable to explore different parameters for the particular optimization task in hand to find optimal solutions. If the user wishes to explore the implementation of the default mechanics, the function implementations are internally available in the hamlet-package. For example, the mutation function is accessible with the command: ' hamlet::.ga.mutate '.
+</p>
+
+
+<h3>Value</h3>
+
+<p>The returned list compromises of:
+</p>
+
+<ul>
+<li>
+<p> A list of solutions; a matrix 'pops' which contains the population of solutions in the final generation of the algorithm, a vector 'fitnesses' which portrait the corresponding fitnesses to the columns of 'pops', and 'weights' which were the corresponding probabilities to events in the GA.
+</p>
+</li>
+<li>
+<p> A vector 'bestsol', for which the fitness function obtained minimum (or maximum) value during the algorithm.
+</p>
+</li>
+<li>
+<p> A value 'best', which is the optimum solution cost value observed during the algorithm.
+</p>
+</li>
+</ul>
+<h3>Note</h3>
+
+<p>Notice that end quality of the matching based allocation is heavily dependent on providing a feasible matrix D. One should carefully consider choice and tuning of the similarity metric. For example, Euclidean distance without standardization is often not a good choice as it does not normalize the variance of each variable and emphasis is on baseline variables that have a large relative variance.
+</p>
+<p>Note that the R-package 'GA' offers a wide range of generalized GA-related tools.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Teemu Daniel Laajala &lt;teelaa@utu.fi&gt;
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>match.bb</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Set up a distance matrix and add dummies, then run GA
+data(vcapwide)
+
+# Construct an Euclidean distance example distance matrix using 15 observations from the VCaP study
+d &lt;- as.matrix(dist(vcapwide[1:15,c("PSAWeek10", "BWWeek10")]))
+# Or rather, z-score transform all input variables first
+d2 &lt;- as.matrix(dist(scale(vcapwide[1:15,c("PSAWeek10", "BWWeek10")])))
+
+# Notice that random simulations take place, so we will fix the RNG seed for reproducibility
+set.seed(1)
+# Resulting genetic algorithm progression is plotted by default
+ga &lt;- match.ga(d2, g=3, generations=60)
+str(ga)
+# Submatches, i.e. similar individuals that ought to be allocated to separate groups
+ga[[2]]
+
+</code></pre>
+
+
+</div>

@@ -1,0 +1,85 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>plural_phrasing</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>List of values to use when change is plural (or singular)</h2>
+
+<h3>Description</h3>
+
+<p><code>plural_phrasing()</code> returns a list object describing the value
+to use when display when <code>x - y</code> is 1 (single) or not one (multiple or
+fraction). This helps write "1 person" vs "2 people"
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">plural_phrasing(single, multi)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>single</code></td>
+<td>
+<p>string to use when delta = 1</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>multi</code></td>
+<td>
+<p>string to use when delta &gt; 1</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p><code>plural_phrasing()</code> will primarily be used in <code>headline()</code> and
+passed along to <code>compare_conditions()</code>. Similar to <code>trend_terms()</code>.
+Plural phrases can be passed in a list. See examples below.
+</p>
+
+
+<h3>Value</h3>
+
+<p>Returns a list object.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">plural_phrasing(single = "person", multi = "people")
+
+headline(
+  x = 1:2,
+  y = 0,
+  headline = "a difference of {delta} {people}",
+  plural_phrases = list(people = plural_phrasing("person", "people"))
+)
+
+
+# a complex example passing multiple trends and plural phrases
+headline(
+  35, 30,
+  headline =
+    "We had {an_increase} of {delta} {people}.
+    That is {delta} {more} {employees} \\
+    than the same time last year ({orig_values}).",
+  trend_phrases = list(
+    an_increase = trend_terms("an increase", "a decrease"),
+    more = trend_terms("more", "less")
+  ),
+  plural_phrases =
+    list(
+      people = plural_phrasing("person", "people"),
+      employees = plural_phrasing("employee", "employees")
+    )
+)
+</code></pre>
+
+
+</div>

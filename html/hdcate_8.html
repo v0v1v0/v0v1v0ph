@@ -1,0 +1,124 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>HDCATE.set_first_stage</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Set user-defined first-stage estimating methods</h2>
+
+<h3>Description</h3>
+
+<p>Set user-defined ML methods (such as random forests, elastic-net, boosting) to run the first-stage estimation.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">HDCATE.set_first_stage(
+  model,
+  fit.treated,
+  fit.untreated,
+  fit.propensity,
+  predict.treated,
+  predict.untreated,
+  predict.propensity
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>model</code></td>
+<td>
+<p>an object created via HDCATE</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fit.treated</code></td>
+<td>
+<p>function that accepts a data.frame as the only argument, fits the treated expectation function, and returns a fitted object</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fit.untreated</code></td>
+<td>
+<p>function that accepts a data.frame as the only argument, fits the untreated expectation function, and returns a fitted object</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fit.propensity</code></td>
+<td>
+<p>function that accepts a data.frame as the only argument, fits the propensity function, and return a fitted object</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>predict.treated</code></td>
+<td>
+<p>function that accepts the returned object of <code>fit.treated</code> and a data.frame as arguments, and returns the predicted vector of that data.frame</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>predict.untreated</code></td>
+<td>
+<p>function that accepts the returned object of <code>fit.untreated</code> and a data.frame as arguments, and returns the predicted vector that data.frame</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>predict.propensity</code></td>
+<td>
+<p>function that accepts the returned object of <code>fit.propensity</code> and a data.frame as arguments, and returns the predicted vector that data.frame</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>None.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># get simulation data
+n_obs &lt;- 500  # Num of observations
+n_var &lt;- 100  # Num of observed variables
+n_rel_var &lt;- 4  # Num of relevant variables
+data &lt;- HDCATE.get_sim_data(n_obs, n_var, n_rel_var)
+# conditional expectation model is misspecified
+x_formula &lt;- paste(paste0('X', c(2:n_var)), collapse ='+')
+# propensity score model is misspecified
+# x_formula &lt;- paste(paste0('X', c(1:(n_var-1))), collapse ='+')
+
+# create a new HDCATE model
+model &lt;- HDCATE(data=data, y_name='Y', d_name='D', x_formula=x_formula)
+
+# manually define a lasso method
+my_lasso_fit_exp &lt;- function(df) {
+  hdm::rlasso(as.formula(paste0('Y', "~", x_formula)), df)
+}
+my_lasso_predict_exp &lt;- function(fitted_model, df) {
+  predict(fitted_model, df)
+}
+my_lasso_fit_ps &lt;- function(df) {
+  hdm::rlassologit(as.formula(paste0('D', "~", x_formula)), df)
+}
+my_lasso_predict_ps &lt;- function(fitted_model, df) {
+  predict(fitted_model, df, type="response")
+}
+
+# Apply the "my-lasso" apporach to the first stage
+HDCATE.set_first_stage(
+  model,
+  my_lasso_fit_exp,
+  my_lasso_fit_exp,
+  my_lasso_fit_ps,
+  my_lasso_predict_exp,
+  my_lasso_predict_exp,
+  my_lasso_predict_ps
+)
+
+</code></pre>
+
+
+</div>

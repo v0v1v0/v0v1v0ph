@@ -1,0 +1,147 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hset</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+<code>hset</code> data structure for the R language</h2>
+
+<h3>Description</h3>
+
+<p>Functions to construct and access objects of class <code>"hset"</code>, that implements sets and multisets.</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hset(members = NULL, multiplicities = NULL, generalized = FALSE)
+
+is.hset(x)
+as.hset(x)
+
+is.generalized(hset)
+as.generalized(hset, suppress.warning = FALSE)
+as.not.generalized(hset, suppress.warning = FALSE)
+
+clone.of.hset(current.hset, generalized = NA_integer_)
+refer.to.hset(current.hset, generalized = NA_integer_)
+
+members(hset)
+multiplicities(hset)
+size.support(hset)
+cardinality(hset)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>members</code></td>
+<td>
+<p>collection of elements of the set.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>multiplicities</code></td>
+<td>
+<p>collection of multiplicities of the elements in <code>members</code>, argument used only when <code>generalized</code> is <code>TRUE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>generalized</code></td>
+<td>
+<p>logical value indicating whether the returned object is a set, or a multiset.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>object to be coerced or tested.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>hset</code></td>
+<td>
+<p>object of class <code>"hset"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>suppress.warning</code></td>
+<td>
+<p>avoid warning when <code>hset</code> is already generalized, or is already not generalized.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>current.hset</code></td>
+<td>
+<p>object of class <code>"hset"</code> to be copied, or referred to</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p><code>hset</code> is the constructor of a set or a multiset, implemented using the hash table from package <code>"hash"</code>.
+</p>
+<p>For multisets, the arguments <code>members</code> and <code>multiplicities</code> have to be compatible. If the latter is <code>NULL</code> all members have multiplicity <code>1</code> by default, otherwise the two arguments must have the same length. If <code>multiplicities</code> is not <code>NULL</code>, it must be a vector of class <code>"numeric"</code> with the same length of <code>members</code>. The valid classes for the argument <code>members</code> are <code>"NULL"</code>, <code>"hset"</code>, or <code>"vector"</code>, in the third case, <code>members</code> can be of sub-class <code>"atomic"</code>, or of sub-class <code>"list"</code> containing objects of the classes indicated so far. The recursive definition of <code>"list"</code> objects allows the definition of elements of a set or a multiset that are themselves sets.
+</p>
+<p>The function <code>is.hset</code> is used to check whether the object <code>x</code> is of class <code>"hset"</code>, whereas  <code>as.hset</code> is used to coerce <code>x</code> to an <code>"hset"</code> object.
+</p>
+<p>The function <code>is.generalized</code> is used to check whether an object of class <code>"hset"</code> is a set or a multiset, <code>as.generalized</code> and <code>as.not.generalized</code> convert a set to a multiset and viceversa.
+</p>
+<p>The functions <code>clone.of.hset</code> and <code>refer.to.hset</code> are used to copy an object of class <code>"hset"</code>, and refer to it, respectively.
+</p>
+<p>The functions <code>members</code> and <code>multiplicities</code> return a vector of elements, with their corresponding multiplicities, respectively. The functions <code>size.support</code> and <code>cardinality</code> return the number of elements and the sum of the multiplicities, respectively.
+</p>
+
+
+<h3>Value</h3>
+
+<p>Functions <code>hset</code>, <code>as.hset</code>, <code>as.generalized</code>, <code>as.not.generalized</code>, <code>clone.of.hset</code>, and <code>refer.to.hset</code> return an object of class <code>"hset"</code>; <code>is.hset</code> and <code>is.generalized</code> return a one dimensional <code>logical</code> value; <code>members</code> and <code>multiplicities</code> return a vector of class <code>"character"</code>; <code>size.support</code> and <code>cardinality</code> return a number.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## create an empty set and an empty multiset
+hset() # equivalent to hset(NULL), as.hset(list()), or hset(list())
+hset(generalized = TRUE)
+
+## create set {1,3,4} and multiset {1[2], 3[1], 4[.5]}
+hset(c(1,3,4)) # equivalent to hset(c(1,1,3,4)) or hset(c(1,4,3))
+hset(c(1,3,4), c(2,1,.5)) # equivalent to hset(c(1,1,3,4), c(1,1,1,.5))
+
+## recursive definition of sets
+hset(hset()) # equivalent to hset(list(list()))
+hset(list(1, list(1,list()) )) # {{{},1},1}
+
+## check and coerce hset objects
+is.hset(hset())
+as.hset(list())
+# note that hset(hset()) and as.hset(hset()) are not equivalent
+
+## canonical map from sets to multisets, and vice versa
+hs &lt;- hset(); is.generalized(hs)
+as.generalized(hs); is.generalized(hs)
+as.not.generalized(hs); is.generalized(hs)
+# note reference semantic of hs
+
+## value and reference semantics
+hs &lt;- hset(c(1,3,4))
+hsc &lt;- clone.of.hset(hs)
+hsc &lt;- union(hsc, hset(c(4,5)))
+hsc; hs # value semantic
+hsr &lt;- refer.to.hset(hs) # equivalent to: hsr &lt;- hs, or hsr = hs
+hsc &lt;- union(hsc, hset(c(4,5)))
+hsr; hs # they refer to the same updated object in memory
+
+## information extraction about hset objects
+hm &lt;- hset(c(1,4,3), c(2,.5,1), generalized = TRUE)
+members(hm)
+multiplicities(hm)
+size.support(hm)
+cardinality(hm)
+</code></pre>
+
+
+</div>

@@ -1,0 +1,326 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hetsurr.fun</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Assess and test for heterogeneity in the utility of a surrogate
+</h2>
+
+<h3>Description</h3>
+
+<p>This function assesses and tests for heterogeneity in the utility of a surrogate with respect to a continuous or discrete baseline covariate. The method is nonparametric and focuses on estimation of the proportion of the treatment effect that is explained by the surrogate marker. Inference information is provided including a confidence band for the proportion and results from formal testing for heterogeneity. When the baseline covariate is continuous, two tests are performed - an omnibus test and a trend test; when the baseline covariate is discrete, only one test is performed - an omnibus test. 
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hetsurr.fun(y1, y0, s1, s0, w1, w0, wf.grd = NULL, h0 = NULL, h1 = NULL, h2 = NULL, 
+h3 = NULL, h4 = NULL, var.want = FALSE, type = "cont", test.want = FALSE, c.adj = 1)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>y1</code></td>
+<td>
+
+<p>the primary outcome in the treatment group
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>y0</code></td>
+<td>
+
+<p>the primary outcome in the control group
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>s1</code></td>
+<td>
+
+<p>the surrogate marker in the treatment group
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>s0</code></td>
+<td>
+
+<p>the surrogate marker in the control group
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>w1</code></td>
+<td>
+
+<p>the baseline covariate of interest in the treatment group
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>w0</code></td>
+<td>
+
+<p>the baseline covariate of interest in the control group
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>wf.grd</code></td>
+<td>
+
+<p>the grid of the baseline covariate where estimates are wanted; if this is not specified, this will bet set equal to 50 equally spaced points between the 10th and 90th percentile of the union of w1 and w0 values (if continuous) or the set of unique categories (if discrete)
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>h0</code></td>
+<td>
+
+<p>bandwidth; if not specific, this is set to a value of appropriate order
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>h1</code></td>
+<td>
+
+<p>bandwidth; if not specific, this is set to a value of appropriate order
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>h2</code></td>
+<td>
+
+<p>bandwidth; if not specific, this is set to a value of appropriate order
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>h3</code></td>
+<td>
+
+<p>bandwidth; if not specific, this is set to a value of appropriate order
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>h4</code></td>
+<td>
+
+<p>bandwidth; if not specific, this is set to a value of appropriate order
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>var.want</code></td>
+<td>
+
+<p>TRUE or FALSE; indicates whether variance estimate are wanted, default is FALSE
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>type</code></td>
+<td>
+
+<p>"cont" or "discrete"; indicates the form of the baseline covariate w, default is "cont"
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>test.want</code></td>
+<td>
+
+<p>TRUE or FALSE; indicates whether testing results are wanted, default is FALSE
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>c.adj</code></td>
+<td>
+
+<p>a multiplicative adjustment for the bandwidth; default is 1
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>This function calculates the treatment effect, Delta, the residual treatment effect, Delta_S, and the proportion of treatment effect explained R_S, as a function of the baseline covariate (if continuous) or stratified by category (if discrete). The estimation approach is nonparametric. Variance estimates can be requested including a confidence band for R_S. Results from formal testing for heterogeneity can also be requested. When the baseline covariate is continuous, two tests are performed - an omnibus test and a trend test; when the baseline covariate is discrete, only one test is performed - an omnibus test.
+</p>
+
+
+<h3>Value</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>w.values</code></td>
+<td>
+<p>values of the baseline covariate at which estimates are provided</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>delta.w</code></td>
+<td>
+<p>estimated treatment effect, Delta, at each w value</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>delta.w.s</code></td>
+<td>
+<p>estimated residual treatment effect, Delta_S, at each w value</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>R.w.s</code></td>
+<td>
+<p>estimated proportion of treatment effect explained, R_S, at each w value</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>se.delta.w</code></td>
+<td>
+<p>estimated standard error of Delta</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>se.delta.w.s</code></td>
+<td>
+<p>estimated standard error of Delta.S</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>se.R.w.s</code></td>
+<td>
+<p>estimated standard error of R.S</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>conf.delta.w.lower</code></td>
+<td>
+<p>lower bound of the confidence intervals for Delta</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>conf.delta.w.upper</code></td>
+<td>
+<p>upper bound of the confidence intervals for Delta</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>conf.delta.w.s.lower</code></td>
+<td>
+<p>lower bound of the confidence intervals for Delta.S</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>conf.delta.w.s.upper</code></td>
+<td>
+<p>upper bound of the confidence intervals for Delta.S</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>conf.R.w.s.lower</code></td>
+<td>
+<p>lower bound of the confidence intervals for R.S</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>conf.R.w.s.upper</code></td>
+<td>
+<p>upper bound of the confidence intervals for R.S</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>band.R.w.s.lower</code></td>
+<td>
+<p>lower bound of the confidence band for R.S</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>band.R.w.s.upper</code></td>
+<td>
+<p>upper bound of the confidence band for R.S</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>omnibus.test.statistic</code></td>
+<td>
+<p>test statistic from omnibus test; for a continuous baseline covariate only </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>omnibus.p.value</code></td>
+<td>
+<p>p-value from omnibus test, testing for evidence of heterogeneity; for a continuous baseline covariate only</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>trend.test.statistic</code></td>
+<td>
+<p>test statistic from the trend test; for a continuous baseline covariate only</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>trend.p.value</code></td>
+<td>
+<p>p-value from trend test, testing for evidence of heterogeneity; for a continuous baseline covariate only</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>test.statistic</code></td>
+<td>
+<p>p-value from the test testing for evidence of heterogeneity; for a discrete baseline covariate only</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>p.value</code></td>
+<td>
+<p>p-value from the test testing for evidence of heterogeneity; for a discrete baseline covariate only</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>Layla Parast
+</p>
+
+
+<h3>References</h3>
+
+<p>Parast, L., Cai, T., Tian L (2021). Testing for Heterogeneity in the Utility of a Surrogate Marker. Biometrics, In press. 
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">	data(example.data)
+	names(example.data)
+	#computationally intensive
+	
+	het.ob = hetsurr.fun(y1=example.data$y1, y0=example.data$y0, s1=example.data$s1, 
+	s0=example.data$s0, w1=example.data$w1, w0=example.data$w0, wf.grd = seq(0.25, 1.75, 
+	length=50), var.want =FALSE, type = "cont")
+	het.ob = hetsurr.fun(y1=example.data$y1, y0=example.data$y0, s1=example.data$s1, 
+	s0=example.data$s0, w1=example.data$w1, w0=example.data$w0, wf.grd = seq(0.25, 1.75, 
+	length=50), var.want =TRUE,  test.want = TRUE, type = "cont")
+	
+	#reducing dimension of example data to provide a computationally faster example
+	het.ob = hetsurr.fun(y1=example.data$y1[1:500], y0=example.data$y0[1:500],
+	s1=example.data$s1[1:500], s0=example.data$s0[1:500], w1=example.data$w1[1:500],
+	w0=example.data$w0[1:500], wf.grd = seq(0.25, 1.75, length=5), var.want =FALSE, 
+	type = "cont")
+
+</code></pre>
+
+
+</div>

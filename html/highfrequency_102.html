@@ -1,0 +1,65 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>sampleTData</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Sample of cleaned trades for stock XXX for 2 days</h2>
+
+<h3>Description</h3>
+
+<p>A <code>data.table</code> object containing the trades for the pseudonymized stock XXX for 2 days, in the typical NYSE TAQ database format.
+This is the cleaned version of the data sample <code>sampleTDataRaw</code>, using <code>tradesCleanupUsingQuotes</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">sampleTData
+</code></pre>
+
+
+<h3>Format</h3>
+
+<p>A data.table object.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+# The code to create the sampleTData dataset from raw data is
+sampleQData &lt;- quotesCleanup(qDataRaw = sampleQDataRaw,
+                                         exchanges = "N", type = "standard", report = FALSE)
+
+tradesAfterFirstCleaning &lt;- tradesCleanup(tDataRaw = sampleTDataRaw, 
+                                          exchanges = "N", report = FALSE)
+
+sampleTData &lt;- tradesCleanupUsingQuotes(
+  tData = tradesAfterFirstCleaning,
+  qData = sampleQData,
+  lagQuotes = 0)[, c("DT", "EX", "SYMBOL", "PRICE", "SIZE")]
+# Only some columns are included. These are the ones that were historically included.
+
+# For most applications, we recommend aggregating the data at a high frequency
+# For example, every second.
+aggregated &lt;- aggregatePrice(sampleTData[, list(DT, PRICE)],
+              alignBy = "seconds", alignPeriod = 1)
+acf(diff(aggregated[as.Date(DT) == "2018-01-02", PRICE]))
+acf(diff(aggregated[as.Date(DT) == "2018-01-03", PRICE]))
+
+signature &lt;- function(x, q){
+res &lt;- x[, (rCov(diff(log(PRICE), lag = q, differences = 1))/q), by = as.Date(DT)]
+return(res[[2]])
+}
+rvAgg &lt;- matrix(nrow = 100, ncol = 2)
+for(i in 1:100) rvAgg[i, ] &lt;- signature(aggregated, i)
+plot(rvAgg[,1], type = "l")
+plot(rvAgg[,2], type = "l")
+
+## End(Not run)
+
+</code></pre>
+
+
+</div>

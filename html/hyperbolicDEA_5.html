@@ -1,0 +1,156 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>wrDEA</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Estimation of DEA efficiency scores with linear input or output orientation and trade-off weight restrictions</h2>
+
+<h3>Description</h3>
+
+<p>Linear DEA estimation including the possibility of trade-off weight restrictions,
+external referencing, and super-efficiency scores. Furthermore, in a second stage slacks can be estimated.
+The function returns efficiency scores and adjusted lambdas according to the imposed weight restrictions and slack estimation. Additionally, 
+mus are returned if weight restrictions are imposed that highlight binding restrictions for DMUs and the absolute slack values 
+if slack-based estimation is applied.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">wrDEA(
+  X,
+  Y,
+  ORIENTATION = "out",
+  RTS = "vrs",
+  WR = NULL,
+  XREF = NULL,
+  YREF = NULL,
+  SUPEREFF = FALSE,
+  SLACK = FALSE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>X</code></td>
+<td>
+<p>Vector, matrix or dataframe with DMUs as rows and inputs as columns</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Y</code></td>
+<td>
+<p>Vector, matrix or dataframe with DMUs as rows and outputs as columns</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ORIENTATION</code></td>
+<td>
+<p>Character string indicating the orientation of the DEA model, e.g. "in", "out"</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>RTS</code></td>
+<td>
+<p>Character string indicating the returns-to-scale, e.g. "crs", "vrs", "ndrs", "nirs", "fdh"</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>WR</code></td>
+<td>
+<p>Matrix with one row per homogeneous linear weight restriction in standard form. The columns are 
+ncol(WR) = ncol(Y) + ncol(X). Hence the first ncol(Y) columns are the restrictions on outputs and the last ncol(X) columns are the 
+restrictions on inputs.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>XREF</code></td>
+<td>
+<p>Vector, matrix or dataframe with firms defining the technology as rows and inputs as columns</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>YREF</code></td>
+<td>
+<p>Vector, matrix or dataframe with firms defining the technology as rows and outputs as columns</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>SUPEREFF</code></td>
+<td>
+<p>Boolean variable indicating whether super-efficiencies shall be estimated</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>SLACK</code></td>
+<td>
+<p>Boolean variable indicating whether slack-based estimation should be applied</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A list object containing the following information:
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>eff</code></td>
+<td>
+<p>Are the estimated efficiency scores for the DMUs under observation stored 
+in a vector with the length nrow(X).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lambdas</code></td>
+<td>
+<p>Estimated values for the composition of the respective Benchmarks.
+The lambdas are stored in a matrix with the dimensions nrow(X) x nrow(X), where
+the row is the DMU under observation and the columns the peers used for the Benchmark. NOTE:
+Lambdas are automatically slack optimized.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mus</code></td>
+<td>
+<p>If WR != NULL, the estimated decision variables for the imposed weight restrictions
+are stored in a matrix with the dimensions nrow(X) x nrow(WR), where the rows are the DMUs and 
+columns the weight restrictions. If the values are positive, the WR is binding for the respective DMU.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>slack</code></td>
+<td>
+<p>If SLACK = TRUE, the slacks are estimated and stored in a matrix with the dimensions
+nrow(X) x (ncol(X) + ncol(Y)). Showing the Slack of each DMU (row) for each input and output
+(column).</p>
+</td>
+</tr>
+</table>
+<h3>Examples</h3>
+
+<pre><code class="language-R">X &lt;- c(1,1,2,4,1.5,2,4,3)
+Y &lt;- c(1,2,4,4,0.5,2.5,3.5,4)
+
+# Two weight restrictions in standard form first on output then input.
+# The first WR shows the trade-off that inputs can be reduced by one unit
+# which reduces outputs by four units. The second WR shows that outputs can 
+# be increased by one unit when inputs are increased by four units.
+
+WR &lt;- matrix(c(-4,-1,1,4), nrow = 2, byrow = TRUE)
+
+wrDEA(X, Y, ORIENTATION = "in", RTS="vrs", WR = WR)
+
+# For an estimation just focusing on one DMU one can for example use 
+# XREF and YREF to define the technology and then estimate the efficiency for 
+# the DMU under observation (here DMU 1). Let's additionally estimate the slacks. 
+
+wrDEA(X[1], Y[1], ORIENTATION = "in", RTS="vrs", XREF = X, YREF = Y, SLACK = TRUE, WR = WR)
+
+</code></pre>
+
+
+</div>

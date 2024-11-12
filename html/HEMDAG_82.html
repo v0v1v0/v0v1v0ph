@@ -1,0 +1,257 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>tpr.dag.cv</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>TPR-DAG cross-validation experiments</h2>
+
+<h3>Description</h3>
+
+<p>Correct the computed scores in a hierarchy according to the a <code>TPR-DAG</code> ensemble variant.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">tpr.dag.cv(
+  S,
+  g,
+  ann,
+  norm = FALSE,
+  norm.type = NULL,
+  positive = "children",
+  bottomup = "threshold",
+  topdown = "gpav",
+  W = NULL,
+  parallel = FALSE,
+  ncores = 1,
+  threshold = seq(from = 0.1, to = 0.9, by = 0.1),
+  weight = 0,
+  kk = 5,
+  seed = 23,
+  metric = "auprc",
+  n.round = NULL
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>S</code></td>
+<td>
+<p>a named flat scores matrix with examples on rows and classes on columns.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>g</code></td>
+<td>
+<p>a graph of class <code>graphNEL</code>. It represents the hierarchy of the classes.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ann</code></td>
+<td>
+<p>an annotation matrix: rows correspond to examples and columns to classes. <code class="reqn">ann[i,j]=1</code> if example <code class="reqn">i</code> belongs to
+class <code class="reqn">j</code>, <code class="reqn">ann[i,j]=0</code> otherwise. <code>ann</code> matrix is necessary to maximize the hyper-parameter(s) of the chosen parametric
+<code>TPR-DAG</code> ensemble variant respect to the metric selected in <code>metric</code>. For the parametric-free ensemble variant set <code>ann=NULL</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>norm</code></td>
+<td>
+<p>a boolean value. Should the flat score matrix be normalized? By default <code>norm=FALSE</code>. If <code>norm=TRUE</code> the matrix <code>S</code>
+is normalized according to the normalization type selected in <code>norm.type</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>norm.type</code></td>
+<td>
+<p>a string character. It can be one of the following values:
+</p>
+
+<ol>
+<li> <p><code>NULL</code> (def.): none normalization is applied (<code>norm=FALSE</code>)
+</p>
+</li>
+<li> <p><code>maxnorm</code>: each score is divided for the maximum value of each class (<code>scores.normalization</code>);
+</p>
+</li>
+<li> <p><code>qnorm</code>: quantile normalization. <span class="pkg">preprocessCore</span> package is used (<code>scores.normalization</code>);
+</p>
+</li>
+</ol>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>positive</code></td>
+<td>
+<p>choice of the <em>positive</em> nodes to be considered in the bottom-up strategy. Can be one of the following values:
+</p>
+
+<ul>
+<li> <p><code>children</code> (<code>def.</code>): positive children are are considered for each node;
+</p>
+</li>
+<li> <p><code>descendants</code>: positive descendants are are considered for each node;
+</p>
+</li>
+</ul>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>bottomup</code></td>
+<td>
+<p>strategy to enhance the flat predictions by propagating the positive predictions from leaves to root. It can be one of the following values:
+</p>
+
+<ul>
+<li> <p><code>threshold.free</code>: positive nodes are selected on the basis of the <code>threshold.free</code> strategy;
+</p>
+</li>
+<li> <p><code>threshold</code> (<code>def.</code>): positive nodes are selected on the basis of the <code>threshold</code> strategy;
+</p>
+</li>
+<li> <p><code>weighted.threshold.free</code>: positive nodes are selected on the basis of the <code>weighted.threshold.free</code> strategy;
+</p>
+</li>
+<li> <p><code>weighted.threshold</code>: positive nodes are selected on the basis of the <code>weighted.threshold</code> strategy;
+</p>
+</li>
+<li> <p><code>tau</code>: positive nodes are selected on the basis of the <code>tau</code> strategy.
+NOTE: <code>tau</code> is only a <code>DESCENS</code> variant. If you select <code>tau</code> strategy you must set <code>positive=descendants</code>;
+</p>
+</li>
+</ul>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>topdown</code></td>
+<td>
+<p>strategy to make the scores hierarchy-consistent. It can be one of the following values:
+</p>
+
+<ul>
+<li> <p><code>htd</code>: <code>HTD-DAG</code> strategy is applied (<code>htd</code>);
+</p>
+</li>
+<li> <p><code>gpav</code> (<code>def.</code>): <code>GPAV</code> strategy is applied (<code>gpav</code>);
+</p>
+</li>
+</ul>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>W</code></td>
+<td>
+<p>vector of weight relative to a single example. If <code>W=NULL</code> (def.) it is assumed that <code>W</code> is a unitary vector of the same length
+of the columns' number of the matrix <code>S</code> (root node included). Set <code>W</code> only if <code>topdown=gpav</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>parallel</code></td>
+<td>
+<p>a boolean value:
+</p>
+
+<ul>
+<li> <p><code>TRUE</code>: execute the parallel implementation of GPAV (<code>gpav.parallel</code>);
+</p>
+</li>
+<li> <p><code>FALSE</code> (def.): execute the sequential implementation of GPAV (<code>gpav.over.examples</code>);
+</p>
+</li>
+</ul>
+<p>Use <code>parallel</code> only if <code>topdown=gpav</code>; otherwise set <code>parallel=FALSE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ncores</code></td>
+<td>
+<p>number of cores to use for parallel execution. Set <code>ncores=1</code> if <code>parallel=FALSE</code>, otherwise set <code>ncores</code> to the
+desired number of cores. Set <code>ncores</code> if <code>topdown=gpav</code>, otherwise set <code>ncores=1</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>threshold</code></td>
+<td>
+<p>range of threshold values to be tested in order to find the best threshold (<code>def:</code> <code>from:0.1</code>, <code>to:0.9</code>, <code>by:0.1</code>).
+The denser the range is, the higher the probability to find the best threshold is, but the execution time will be higher.
+For the <em>threshold-free</em> variants, set <code>threshold=0</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>weight</code></td>
+<td>
+<p>range of weight values to be tested in order to find the best weight (<code>def:</code> <code>from:0.1</code>, <code>to:0.9</code>, <code>by:0.1</code>).
+The denser the range is, the higher the probability to find the best threshold is, but the execution time will be higher.
+For the <em>weight-free</em> variants, set <code>weight=0</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>kk</code></td>
+<td>
+<p>number of folds of the cross validation (<code>def: kk=5</code>) on which tuning the parameters <code>threshold</code>, <code>weight</code> and <code>tau</code> of
+the parametric ensemble variants. For the parametric-free variants (i.e. if <code>bottomup = threshold.free</code>), set <code>kk=NULL</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>seed</code></td>
+<td>
+<p>initialization seed for the random generator to create folds (<code>def. 23</code>). If <code>seed=NULL</code> folds are generated without seed
+initialization. If <code>bottomup=threshold.free</code>, set <code>seed=NULL</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>metric</code></td>
+<td>
+<p>a string character specifying the performance metric on which maximizing the parametric ensemble variant. It can be one of the following values:
+</p>
+
+<ol>
+<li> <p><code>auprc</code> (def.): the parametric ensemble variant is maximized on the basis of AUPRC (<code>auprc</code>);
+</p>
+</li>
+<li> <p><code>fmax</code>: the parametric ensemble variant is maximized on the basis of Fmax (<code>multilabel.F.measure</code>;
+</p>
+</li>
+<li> <p><code>NULL</code>: <code>threshold.free</code> variant is parameter-free, so none optimization is needed.
+</p>
+</li>
+</ol>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n.round</code></td>
+<td>
+<p>number of rounding digits (def. <code>3</code>) to be applied to the hierarchical scores matrix for choosing the best threshold on the basis of
+the best Fmax. If <code>bottomup==threshold.free</code> or <code>metric="auprc"</code>, set <code>n.round=NULL</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The parametric hierarchical ensemble variants are cross-validated maximizing the parameter on the metric selected in <code>metric</code>.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A named matrix with the scores of the functional terms corrected according to the chosen <code>TPR-DAG</code> ensemble algorithm.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(graph);
+data(scores);
+data(labels);
+S.tpr &lt;- tpr.dag.cv(S, g, ann=NULL, norm=FALSE, norm.type=NULL, positive="children",
+bottomup="threshold.free", topdown="gpav", W=NULL, parallel=FALSE, ncores=1,
+threshold=0, weight=0, kk=NULL, seed=NULL, metric=NULL, n.round=NULL);
+</code></pre>
+
+
+</div>

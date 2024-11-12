@@ -1,0 +1,67 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>highlight-package</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Syntax Highlighter for R</h2>
+
+<h3>Description</h3>
+
+<p>Syntax highlighter for R based on output from the R parser
+</p>
+
+
+<h3>See Also</h3>
+
+<p>The main function of the package is <code>highlight</code>. 
+</p>
+<p><code>highlight</code> delegates rendering the document to 
+<code>renderer</code>s, such as the <code>renderer_latex</code> 
+or <code>renderer_html</code> and is helped by a
+detective to make sense of the results
+from the parser. The package ships a <code>simple_detective</code>. 
+</p>
+<p>The package also defines a custom sweave driver 
+(<code>HighlightWeaveLatex</code>) for latex based 
+on the standard sweave latex driver (<code>RweaveLatex</code>)
+using <code>highlight</code> to perform syntax 
+highlighting of R code chunks.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+tf &lt;- tempfile()
+dump( "glm" , file = tf )
+
+# rendering in html
+highlight( tf, output = stdout(), 
+	renderer = renderer_html() )
+
+# rendering in latex
+highlight( tf, output = stdout(), 
+	renderer = renderer_latex() )
+
+# Sweave driver using syntax highlighting
+if( require( grid ) ){
+	v &lt;- vignette( "grid", package = "grid" )$file
+	file.copy( v, "grid.Snw" )
+	Sweave( "grid.Snw", driver= HighlightWeaveLatex() )
+	system( "pdflatex grid.tex" )
+	if (.Platform$OS.type == "windows"){ 
+		shell.exec( "grid.pdf" )
+	} else {
+		system(paste(shQuote(getOption("pdfviewer")), "grid.pdf" ), 
+			wait = FALSE)
+	}
+}
+
+unlink( tf )
+
+## End(Not run)
+</code></pre>
+
+
+</div>

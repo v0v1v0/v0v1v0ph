@@ -1,0 +1,145 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>aggregateTS</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Aggregate a time series</h2>
+
+<h3>Description</h3>
+
+<p>Aggregate a time series as <code>xts</code> or <code>data.table</code> object. 
+It can handle irregularly spaced time series and returns a regularly spaced one.
+Use univariate time series as input for this function and check out <code>aggregateTrades</code>
+and <code>aggregateQuotes</code> to aggregate Trade or Quote data objects.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">aggregateTS(
+  ts,
+  FUN = "previoustick",
+  alignBy = "minutes",
+  alignPeriod = 1,
+  weights = NULL,
+  dropna = FALSE,
+  tz = NULL,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>ts</code></td>
+<td>
+<p><code>xts</code> or <code>data.table</code> object to aggregate.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>FUN</code></td>
+<td>
+<p>function to apply over each interval. By default, previous tick aggregation is done. 
+Alternatively one can set e.g. FUN = "mean".
+In case weights are supplied, this argument is ignored and a weighted average is taken.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alignBy</code></td>
+<td>
+<p>character, indicating the time scale in which <code>alignPeriod</code> is expressed. Possible values are: "secs", "seconds", "mins", "minutes", "hours", "days", "weeks", "ticks".</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alignPeriod</code></td>
+<td>
+<p>positive numeric, indicating the number of periods to aggregate over. For example, to aggregate
+based on a 5 minute frequency, set <code>alignPeriod</code> to 5 and <code>alignBy</code> to <code>"minutes"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>weights</code></td>
+<td>
+<p>By default, no weighting scheme is used. 
+When you assign an <code>xts</code> object with weights to this argument, a weighted mean is taken over each interval. 
+Of course, the weights should have the same time stamps as the supplied time series.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dropna</code></td>
+<td>
+<p>boolean, which determines whether empty intervals should be dropped.
+By default, an NA is returned in case an interval is empty, except when the user opts
+for previous tick aggregation, by setting <code>FUN = "previoustick"</code> (default).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tz</code></td>
+<td>
+<p>character denoting which timezone the output should be in. Defaults to <code>NULL</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>extra parameters passed on to <code>FUN</code></p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The time stamps of the new time series are the closing times and/or days of the intervals. 
+For example, for a weekly aggregation the new time stamp is the last day in that particular week (namely Sunday).
+</p>
+<p>In case of previous tick aggregation, 
+for <code>alignBy</code> is either <code>"seconds"</code> <code>"minutes"</code>, or <code>"hours"</code>,
+the element of the returned series with e.g. timestamp 09:35:00 contains 
+the last observation up to that point, including the value at 09:35:00 itself.
+</p>
+<p>Please note: In case an interval is empty, by default an NA is returned.. In case e.g. previous 
+tick aggregation it makes sense to fill these NAs by the function <code>na.locf</code>
+(last observation carried forward) from the <span class="pkg">zoo</span> package.
+</p>
+<p>In case <code>alignBy = "ticks"</code>, the sampling is done such the sampling starts on the first tick and the last tick is always included.
+For example, if 14 observations are made on one day, and these are 1, 2, 3, ... 14.
+Then, with <code>alignBy = "ticks"</code> and <code>alignPeriod = 3</code>, the output will be 1, 4, 7, 10, 13, 14.
+</p>
+
+
+<h3>Value</h3>
+
+<p>An <code>xts</code> object containing the aggregated time series.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Load sample price data
+## Not run: 
+library(xts)
+ts &lt;- as.xts(sampleTData[, list(DT, PRICE, SIZE)])
+
+# Previous tick aggregation to the 5-minute sampling frequency:
+tsagg5min &lt;- aggregateTS(ts, alignBy = "minutes", alignPeriod = 5)
+head(tsagg5min)
+# Previous tick aggregation to the 30-second sampling frequency:
+tsagg30sec &lt;- aggregateTS(ts, alignBy = "seconds", alignPeriod = 30)
+tail(tsagg30sec)
+tsagg3ticks &lt;- aggregateTS(ts, alignBy = "ticks", alignPeriod = 3)
+
+## End(Not run)
+
+
+</code></pre>
+
+
+</div>

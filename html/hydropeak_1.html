@@ -1,0 +1,84 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>all_metrics</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Event Based Fluctuation Flow Parameters</h2>
+
+<h3>Description</h3>
+
+<p>Given an event with equal flow trend, all metrics implemented in
+the package <span class="pkg">hydropeak</span> are computed and combined to a data frame.
+It includes also an identifier of the gauging station provided by the user
+and the starting time of the event.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">all_metrics(x, id, event_type)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>Data frame (time series) from an event with equal flow trend. The
+data frame must contain a date-time column (<code>Time</code>) and a flow rate
+column (<code>Q</code>) and must be in a compatible format
+(see <code>flow()</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>id</code></td>
+<td>
+<p>Character string which refers to the identifier of the gauging
+station (in Austria: HZBCODE).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>event_type</code></td>
+<td>
+<p>Numeric value which indicates the event type. By using
+<code>get_events()</code>, this is internally computed.
+If metrics for a single event
+have to be computed individually, the event type has to be provided as an
+argument or can be computed with <code>event_type()</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A data frame including all computed metrics, IDs of gauging stations,
+event type (see <code>event_type()</code> for an overview of
+possible event types), and starting time of an event <code>x</code>.
+Included metrics are <code>amp()</code>, <code>mafr()</code>,
+<code>mefr()</code>, <code>dur()</code>, <code>ratio()</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(Q)
+# decreasing event:
+Q4 &lt;- flow(Q[3:4, ])
+all_metrics(Q4, id = Q$ID[1], event_type = 4)
+all_metrics(Q4, id = Q$ID[1], event_type = event_type(Q4))
+
+# increasing event:
+Q2 &lt;- flow(Q[486:487, ])
+all_metrics(Q2, id = Q$ID[1], event_type = 2)
+all_metrics(Q2, id = Q$ID[1], event_type = event_type(Q2))
+
+# constant event (at beginning or after NA event):
+Q0 &lt;- flow(Q[1:3, ])
+all_metrics(Q0, id = Q$ID[1], event_type = 0)
+all_metrics(Q0, id = Q$ID[1], event_type = event_type(Q0))
+</code></pre>
+
+
+</div>

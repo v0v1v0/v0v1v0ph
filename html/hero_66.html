@@ -1,0 +1,134 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>prepare.array</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Prepare data array for sandwich smooth</h2>
+
+<h3>Description</h3>
+
+<p><code>prepare.array</code> prepares a data matrix for the
+sandwich smooth.  The dimensionality of <code>data</code> and
+the length of <code>x</code> must match.  Specifically,
+<code>length(dim(data))</code> must equal
+<code>length(x)</code>.     The dimensionality of
+<code>data</code> and  the length of <code>splines</code> must match.
+Specifically, <code>length(dim(data))</code> must equal
+<code>length(splines)</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">## S3 method for class 'array'
+prepare(data, x, splines, m = 2, sparse = TRUE, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>A data array</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>A list of univariate, equidistant
+sequences.  These should correspond to where the data
+are observed.  Equidistant spacing between 0 and 1 is
+assumed if not supplied.  See Details.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>splines</code></td>
+<td>
+<p>A list of spline-related objects, e.g.,
+produced by <code>bspline</code>.  Splines are
+automatically created if not supplied.  See Details.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>m</code></td>
+<td>
+<p>A positive integer indicating order of the difference penalty.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sparse</code></td>
+<td>
+<p>A logical value indicating if the result
+should be a sparse version of the
+<code>Matrix-class</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Not currently implemented.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>For a typical sandwich smooth, for data with <code class="reqn">d</code>
+dimensions, <code>Y[i1, i2, ...,id]</code> is assumed to be
+observed at position <code>x[[1]][i1]</code>,
+<code>x[[2]][i2]</code>, ..., <code>x[[d]][id]</code>.
+Consequently, <code>dim(data)[i]</code> should equal
+<code>length(x[[i]])</code> for all <code>i</code> in
+<code>seq_len(d)</code>.
+</p>
+<p>If <code>x</code> is not supplied, then
+<code>default.evalargs</code> is used to create it
+automatically.
+</p>
+<p>If <code>splines</code> is not supplied, then a B-spline basis
+is automatically created for each dimension using
+<code>default.splines</code>.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A <code>prepared_array</code> object.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Joshua French.  Based off code by Luo Xiao (see
+References).
+</p>
+
+
+<h3>References</h3>
+
+<p>Xiao, L. , Li, Y. and Ruppert, D. (2013),
+Fast bivariate P-splines: the sandwich smoother. J. R.
+Stat. Soc. B, 75: 577-599. &lt;doi:10.1111/rssb.12007&gt;
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>bspline</code>,
+<code>default.evalargs</code>,
+<code>default.splines</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># generate and prepare 3d data
+set.seed(9)
+dat = generate.data3d()
+obj = prepare(dat$data3d, x = dat$x)
+</code></pre>
+
+
+</div>

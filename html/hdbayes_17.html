@@ -1,0 +1,151 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>glm.logml.pp</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Log marginal likelihood of a GLM under power prior (PP)</h2>
+
+<h3>Description</h3>
+
+<p>Uses Markov chain Monte Carlo (MCMC) and bridge sampling to estimate the logarithm of the marginal
+likelihood of a GLM under the power prior (PP).
+</p>
+<p>The arguments related to MCMC sampling are utilized to draw samples from the power prior (PP).
+These samples are then used to compute the logarithm of the normalizing constant of the PP using only historical
+data sets.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">glm.logml.pp(
+  post.samples,
+  bridge.args = NULL,
+  iter_warmup = 1000,
+  iter_sampling = 1000,
+  chains = 4,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>post.samples</code></td>
+<td>
+<p>output from <code>glm.pp()</code> giving posterior samples of a GLM under the power prior (PP), with
+an attribute called 'data' which includes the list of variables specified in the data block
+of the Stan program.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>bridge.args</code></td>
+<td>
+<p>a <code>list</code> giving arguments (other than <code>samples</code>, <code>log_posterior</code>, <code>data</code>, <code>lb</code>, and <code>ub</code>) to
+pass onto <code>bridgesampling::bridge_sampler()</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>iter_warmup</code></td>
+<td>
+<p>number of warmup iterations to run per chain. Defaults to 1000. See the argument <code>iter_warmup</code>
+in <code>sample()</code> method in cmdstanr package.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>iter_sampling</code></td>
+<td>
+<p>number of post-warmup iterations to run per chain. Defaults to 1000. See the argument <code>iter_sampling</code>
+in <code>sample()</code> method in cmdstanr package.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>chains</code></td>
+<td>
+<p>number of Markov chains to run. Defaults to 4. See the argument <code>chains</code> in <code>sample()</code> method
+in cmdstanr package.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>arguments passed to <code>sample()</code> method in cmdstanr package (e.g., <code>seed</code>, <code>refresh</code>, <code>init</code>).</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>If all of the power prior parameters (<code class="reqn">a_0</code>'s) are equal to zero, or if the posterior samples are obtained from using only
+one data set (the current data), then the function will return the same result as the output from <code>glm.logml.post()</code>.
+</p>
+<p>If at least one of the power prior parameters (<code class="reqn">a_0</code>'s) is non-zero, the function will return a <code>list</code> with the following objects
+</p>
+
+<dl>
+<dt>model</dt>
+<dd>
+<p>"PP"</p>
+</dd>
+<dt>logml</dt>
+<dd>
+<p>the estimated logarithm of the marginal likelihood</p>
+</dd>
+<dt>bs</dt>
+<dd>
+<p>an object of class <code>bridge</code> or <code>bridge_list</code> containing the output from using <code>bridgesampling::bridge_sampler()</code>
+to compute the logarithm of the normalizing constant of the power prior (PP) using all data sets</p>
+</dd>
+<dt>bs.hist</dt>
+<dd>
+<p>an object of class <code>bridge</code> or <code>bridge_list</code> containing the output from using
+<code>bridgesampling::bridge_sampler()</code> to compute the logarithm of the normalizing constant of the PP using historical
+data sets</p>
+</dd>
+<dt>min_ess_bulk</dt>
+<dd>
+<p>the minimum estimated bulk effective sample size of the MCMC sampling</p>
+</dd>
+<dt>max_Rhat</dt>
+<dd>
+<p>the maximum Rhat</p>
+</dd>
+</dl>
+<h3>References</h3>
+
+<p>Chen, M.-H. and Ibrahim, J. G. (2000). Power prior distributions for Regression Models. Statistical Science, 15(1).
+</p>
+<p>Gronau, Q. F., Singmann, H., and Wagenmakers, E.-J. (2020). bridgesampling: An r package for estimating normalizing constants. Journal of Statistical Software, 92(10).
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">if (instantiate::stan_cmdstan_exists()) {
+  data(actg019)
+  data(actg036)
+  ## take subset for speed purposes
+  actg019 = actg019[1:100, ]
+  actg036 = actg036[1:50, ]
+  data_list = list(currdata = actg019, histdata = actg036)
+  formula = cd4 ~ treatment + age + race
+  family = poisson('log')
+  a0 = 0.5
+  d.pp = glm.pp(
+    formula = formula, family = family,
+    data.list = data_list,
+    a0.vals = a0,
+    chains = 1, iter_warmup = 500, iter_sampling = 1000
+  )
+  glm.logml.pp(
+    post.samples = d.pp,
+    bridge.args = list(silent = TRUE),
+    chains = 1, iter_warmup = 1000, iter_sampling = 2000
+  )
+}
+</code></pre>
+
+
+</div>

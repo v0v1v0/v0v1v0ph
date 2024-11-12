@@ -1,0 +1,124 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>snpSampleSize</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Sample size calculations for a single SNP</h2>
+
+<h3>Description</h3>
+
+<p>Sample size calculations for a single SNP. Allows for sample size calculations of several combinations simultaneously.</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">snpSampleSize(fam.cases, fam.controls, fraction = 0.5,
+RR, MAF, alpha = 0.05, power = 0.80)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>fam.cases</code></td>
+<td>
+<p>A character vector of the case family design. The possible family designs are <code>"mfc"</code> (full triad), <code>"mc"</code> (mother-child dyad), <code>"fc"</code> (father-child dyad) and <code>"c"</code> (a single case child).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fam.controls</code></td>
+<td>
+<p>A character vector of the control family design. The possible family designs are <code>"mfc"</code> (full triad), <code>"mc"</code> (mother-child-dyad), <code>"fc"</code> (father-child dyad), <code>"mf"</code> (mother-father dyad), <code>"c"</code> (a single control child), <code>"m"</code> (a single control mother), <code>"f"</code> (a single control father) or <code>"no_controls"</code> (no control families).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fraction</code></td>
+<td>
+<p>A numeric vector of the proportion of case families. Equals 0.5 by default, i.e. there are as many case families as control families. If <code>fam.controls</code> equals <code>"no_controls"</code>, <code>fraction</code> is automatically set to 1.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>RR</code></td>
+<td>
+<p>A numeric vector of the relative risks (the effect sizes of interest).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>MAF</code></td>
+<td>
+<p>A numeric vector of the minor allele frequencies.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alpha</code></td>
+<td>
+<p>A numeric vector of the Type I Errors. Equals 0.05 by default.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>power</code></td>
+<td>
+<p>A numeric vector of the desired probability of identifying a difference in the relative risks. Default is 0.80.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p><code>snpSampleSize</code> computes the number of case and control families required for a single SNP to attain the desired power. 
+It assumes a multiplicative dose-response model.
+<code>snpSampleSize</code> calculates the fraction of case alleles corresponding to the given family designs 
+and then uses the asymptotic normal approximation for the natural logarithm of the odds ratio for calculating the sample sizes 
+(the relative risks and odds ratios are used interchangeably due to the "rare disease assumption").<br></p>
+<p><code>snpSampleSize</code> allows for sample size calculations of several combinations of the input variables at once. The Examples section provides further details. 
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>snpSampleSize</code> returns a data frame containing the combinations of input variables and the corresponding sample size calculations.</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Miriam Gjerdevik,<br>
+with Hakon K. Gjessing<br>
+Professor of Biostatistics<br>
+Division of Epidemiology<br>
+Norwegian Institute of Public Health<br></p>
+<p><a href="mailto:hakon.gjessing@uib.no">hakon.gjessing@uib.no</a></p>
+
+
+<h3>References</h3>
+
+<p>Skare O, Jugessur A, Lie RT, Wilcox AJ, Murray JC, Lunde A, Nguyen TT, Gjessing HK. Application of a novel hybrid study design to explore gene-environment interactions in orofacial clefts. Annals of Human Genetics (2012) 76, pp. 221-236.<br></p>
+<p>Web Site: <a href="https://haplin.bitbucket.io">https://haplin.bitbucket.io</a>
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>haplin</code>, <code>snpPower</code></p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+## Compute sample sizes for a single SNP,
+## when the specified case family design is a full triad, there are no control families,
+## RR = 1.1, MAF = 0.1, alpha = 0.05 and power = 0.9
+snpSampleSize(fam.cases = "mfc", fam.controls = "no_controls", 
+RR = 1.1, MAF = 0.1, alpha = 0.05, power = 0.9)
+
+## Compute sample sizes for a single SNP,
+## for the combination of case triads, control triads, fraction = 0.5, RR = 1.2, 
+## MAF = 0.1, alpha = 0.05 and power = 0.8, and also for the combination of case triads,
+## control children, fraction = 0.5, RR = 1.2, MAF = 0.1, alpha = 0.05 and power = 0.9
+snpSampleSize(fam.cases = "mfc", fam.controls = c("mfc", "c"), 
+RR = 1.2, MAF = 0.1, alpha = 0.05, power = c(0.8, 0.9))
+
+</code></pre>
+
+
+</div>

@@ -1,0 +1,209 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>cde.bandwidths</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Bandwidth calculation for conditional density estimation</h2>
+
+<h3>Description</h3>
+
+<p>Calculates bandwidths for kernel conditional density estimates. Methods
+described in Bashtannyk and Hyndman (2001) and Hyndman and Yao (2002).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">cde.bandwidths(
+  x,
+  y,
+  deg = 0,
+  link = "identity",
+  method = 1,
+  y.margin,
+  passes = 2,
+  ngrid = 8,
+  min.a = NULL,
+  ny = 25,
+  use.sample = FALSE,
+  GCV = TRUE,
+  b = NULL,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>Numerical vector: the conditioning variable.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+<p>Numerical vector: the response variable.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>deg</code></td>
+<td>
+<p>Degree of local polynomial used in estimation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>link</code></td>
+<td>
+<p>Link function used in estimation. Default "identity". The other
+possibility is "log" which is recommended if degree &gt; 0.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+
+<dl>
+<dt>method = 1:</dt>
+<dd>
+<p>Hyndman-Yao algorithm if deg&gt;0; Bashtannyk-Hyndman algorithm if deg=0;</p>
+</dd>
+<dt>method = 2:</dt>
+<dd>
+<p>Normal reference rules;</p>
+</dd>
+<dt>method = 3:</dt>
+<dd>
+<p>Bashtannyk-Hyndman regression method if deg=0;</p>
+</dd>
+<dt>method = 4:</dt>
+<dd>
+<p>Bashtannyk-Hyndman bootstrap method if deg=0.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>y.margin</code></td>
+<td>
+<p>Values in y-space on which conditional density is
+calculated. If not specified, an equi-spaced grid of 50 values over the
+range of y is used.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>passes</code></td>
+<td>
+<p>Number of passes through Bashtannyk-Hyndman algorithm.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ngrid</code></td>
+<td>
+<p>Number of values of smoothing parameter in grid.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>min.a</code></td>
+<td>
+<p>Smallest value of a to consider if method=1.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ny</code></td>
+<td>
+<p>Number of values to use for y margin if <code>y.margin</code> is
+missing.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>use.sample</code></td>
+<td>
+<p>Used when regression method (3) is chosen.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>GCV</code></td>
+<td>
+<p>Generalized cross-validation. Used only if method=1 and deg&gt;0. If
+GCV=FALSE, method=1 and deg=0, then the AIC is used instead.  The argument
+is ignored if deg=0 or method&gt;1.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>b</code></td>
+<td>
+<p>Value of b can be specified only if method=1 and deg&gt;0. For deg=0
+or method&gt;1, this argument is ignored.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Other arguments control details for individual methods.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Details of the various algorithms are in Bashtannyk and Hyndman (2001) and
+Hyndman and Yao (2002).
+</p>
+
+
+<h3>Value</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>a</code></td>
+<td>
+<p>Window width in <code>x</code> direction.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>b</code></td>
+<td>
+<p>Window width
+in <code>y</code> direction.</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>Rob J Hyndman
+</p>
+
+
+<h3>References</h3>
+
+<p>Hyndman, R.J., Bashtannyk, D.M. and Grunwald, G.K. (1996)
+"Estimating and visualizing conditional densities". <em>Journal of
+Computational and Graphical Statistics</em>, <b>5</b>, 315-336.
+</p>
+<p>Bashtannyk, D.M., and Hyndman, R.J. (2001) "Bandwidth selection for kernel
+conditional density estimation". <em>Computational statistics and data
+analysis</em>, <b>36</b>(3), 279-298.
+</p>
+<p>Hyndman, R.J. and Yao, Q. (2002) "Nonparametric estimation and symmetry
+tests for conditional density functions". <em>Journal of Nonparametric
+Statistics</em>, <b>14</b>(3), 259-278.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>cde</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">bands &lt;- cde.bandwidths(faithful$waiting,faithful$eruptions,method=2)
+plot(cde(faithful$waiting,faithful$eruptions,a=bands$a,b=bands$b))
+</code></pre>
+
+
+</div>

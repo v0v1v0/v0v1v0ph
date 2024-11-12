@@ -1,0 +1,420 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>PlotMapOutput</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Plot function for HYPE map results.</h2>
+
+<h3>Description</h3>
+
+<p>Draw HYPE map results, with pretty scale discretizations and color ramp defaults for select HYPE variables.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">PlotMapOutput(
+  x,
+  map = NULL,
+  map.subid.column = 1,
+  var.name = "",
+  map.type = "default",
+  shiny.data = FALSE,
+  plot.legend = TRUE,
+  legend.pos = "right",
+  legend.title = NULL,
+  legend.signif = 2,
+  col = "auto",
+  col.ramp.fun,
+  col.breaks = NULL,
+  col.labels = NULL,
+  col.rev = FALSE,
+  plot.scale = TRUE,
+  scale.pos = "br",
+  plot.arrow = TRUE,
+  arrow.pos = "tr",
+  weight = 0.15,
+  opacity = 0.75,
+  fillOpacity = 0.5,
+  outline.color = "black",
+  na.color = "#808080",
+  plot.searchbar = FALSE,
+  plot.label = FALSE,
+  plot.label.size = 2.5,
+  plot.label.geometry = c("centroid", "surface"),
+  file = "",
+  width = NA,
+  height = NA,
+  units = c("in", "cm", "mm", "px"),
+  dpi = 300,
+  vwidth = 1424,
+  vheight = 1000,
+  html.name = "",
+  map.adj = 0,
+  legend.outer = FALSE,
+  legend.inset = c(0, 0),
+  par.cex = 1,
+  par.mar = rep(0, 4) + 0.1,
+  add = FALSE,
+  sites = NULL,
+  sites.subid.column = NULL
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>HYPE model results, typically 'map output' results. Data frame object with two columns, first column containing SUBIDs and
+second column containing model results to plot. See details.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>map, sites</code></td>
+<td>
+<p>A <code>SpatialPolygonsDataFrame</code> or <code>sf</code> object. Typically an imported sub-basin vector polygon file. Import of vector polygons
+requires additional packages, e.g. sf::st_read. For interactive Leaflet maps a small/simplified polygon file should be used as larger
+files can take an excessive amount of time to render.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>map.subid.column, sites.subid.column</code></td>
+<td>
+<p>Integer, column index in the <code>map</code> 'data' <code>slot</code> holding SUBIDs (sub-catchment IDs).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>var.name</code></td>
+<td>
+<p>Character string. HYPE variable name to be plotted. Mandatory for automatic color ramp selection of pre-defined
+HYPE variables (<code>col = "auto"</code>). Not case-sensitive. See details.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>map.type</code></td>
+<td>
+<p>Map type keyword string. Choose either <code>"default"</code> for the default static plots or <code>"leaflet"</code> for interactive Leaflet maps. Use <code>"legacy"</code> for deprecated static plots.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>shiny.data</code></td>
+<td>
+<p>Logical, if <code>map.type</code> is <code>"leaflet"</code>, then should the output be a list containing the basemap, formatted data, legend colors, and legend labels? Typically set to <code>FALSE</code> unless using <code>PlotMapOutput</code> to create Shiny apps or custom Leaflet maps.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>plot.legend</code></td>
+<td>
+<p>Logical, plot a legend along with the map.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>legend.pos</code></td>
+<td>
+<p>Keyword string for legend position. For static plots, one of: <code>"none"</code>, <code>"left"</code>, <code>"right"</code>,
+<code>"bottom"</code>, <code>"top"</code>, or a two-element numeric vector. For interactive Leaflet maps, one of: <code>"topleft"</code>, <code>"topright"</code>, <code>"bottomright"</code>, <code>"bottomleft"</code>. For legacy static plots, one of: <code>"left"</code>, <code>"topleft"</code>, <code>"topright"</code>,
+<code>"right"</code>, <code>"bottomright"</code>, <code>"bottomleft"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>legend.title</code></td>
+<td>
+<p>Character string or mathematical expression. An optional title for the legend. If none is provided here, <code>var.name</code>
+is used as legend title string. For select HYPE variables, pretty legend titles are in-built.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>legend.signif</code></td>
+<td>
+<p>Integer, number of significant digits to display in legend labels.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>col</code></td>
+<td>
+<p>Colors to use on the map. One of the following: </p>
+
+<ul>
+<li> <p><code>"auto"</code> to allow for automatic selection from tailored color ramp palettes and break points based on argument <code>var.name</code>,
+see details
+</p>
+</li>
+<li>
+<p> A color ramp palette function, e.g. as returned from a call to <code>colorRampPalette</code>. A number of tailored functions are
+available in <code>HYPEtools</code>, see <code>CustomColors</code>
+</p>
+</li>
+<li>
+<p> A vector of colors. This can be a character vector of R's built-in color names or hexadecimal strings as returned by
+<code>rgb</code>, or an integer vector of current <code>palette</code> indices.
+</p>
+</li>
+</ul>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>col.ramp.fun</code></td>
+<td>
+<p>DEPRECATED, for backwards compatibility only.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>col.breaks</code></td>
+<td>
+<p>A numeric vector, specifying break points for discretization of model result values into classes. Used if a color palette is specified with <code>col</code> argument.
+Class boundaries will be interpreted as right-closed, i.e upper boundaries included in class. Lowest class boundary included in lowest class as well.
+Meaningful results require the lowest and uppermost breaks to bracket all model result values, otherwise there will be
+unclassified white spots on the map plot. Not mandatory, can optionally
+be combined with one of the pre-defined palettes, including <code>"auto"</code> selection. Per default, a generic
+classification will be applied (see details).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>col.labels</code></td>
+<td>
+<p>A character vector, specifying custom labels to be used for each legend item. Works with <code>map.type</code> set to <code>default</code> or <code>leaflet</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>col.rev</code></td>
+<td>
+<p>Logical, If <code>TRUE</code>, then color palette will be reversed.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>plot.scale</code></td>
+<td>
+<p>Logical, plot a scale bar on map. NOTE: Scale bar may be inaccurate for geographic coordinate systems (Consider switching to projected coordinate system).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>scale.pos</code></td>
+<td>
+<p>Keyword string for scalebar position for static maps. One of <code>bl</code>, <code>br</code>, <code>tr</code>, or <code>tl</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>plot.arrow</code></td>
+<td>
+<p>Logical, plot a North arrow in static maps.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>arrow.pos</code></td>
+<td>
+<p>Keyword string for north arrow position for static maps. One of <code>bl</code>, <code>br</code>, <code>tr</code>, or <code>tl</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>weight</code></td>
+<td>
+<p>Numeric, weight of subbasin boundary lines. See ggplot2::geom_sf for static maps and leaflet::addPolygons for Leaflet maps.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>opacity</code></td>
+<td>
+<p>Numeric, opacity of subbasin boundary lines in Leaflet maps. See leaflet::addPolygons.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fillOpacity</code></td>
+<td>
+<p>Numeric, opacity of subbasin polygons in Leaflet maps. See leaflet::addPolygons.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>outline.color</code></td>
+<td>
+<p>Character string of color to use to for subbasin polygon outlines. Use <code>NA</code> to hide the outlines.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>na.color</code></td>
+<td>
+<p>Character string of color to use to symbolize subbasin polygons in maps which correspond to <code>NA</code> values.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>plot.searchbar</code></td>
+<td>
+<p>Logical, if <code>TRUE</code>, then a search bar will be included within Leaflet maps. See leaflet.extras::addSearchFeatures.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>plot.label</code></td>
+<td>
+<p>Logical, if <code>TRUE</code>, then labels will be displayed on default static maps and in Leaflet maps when the cursor hovers over subbasins.
+See ggplot2::geom_sf_text for default maps and leaflet::addPolygons for Leaflet maps.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>plot.label.size</code></td>
+<td>
+<p>Numeric, size of text for labels on default static plots. See ggplot2::geom_sf_text.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>plot.label.geometry</code></td>
+<td>
+<p>Keyword string to select where plot labels should be displayed on the default static plots. Either <code>centroid</code> to use sf::st_centroid or <code>surface</code> to use sf::st_point_on_surface.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>file</code></td>
+<td>
+<p>Save map to an image file by specifying the path to the desired output file using this argument. File extension must be specified. See ggplot2::ggsave for static maps and
+mapview::mapshot for Leaflet maps. You may need to run <code>webshot::install_phantomjs()</code> the first time you save a Leaflet map to an image file. See webshot::install_phantomjs.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>width</code></td>
+<td>
+<p>Numeric, width of output plot for static maps in units of <code>units</code>. See ggplot2::ggsave.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>height</code></td>
+<td>
+<p>Numeric, height of output plot for static maps in units of <code>units</code>. See ggplot2::ggsave.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>units</code></td>
+<td>
+<p>Keyword string for units to save static map. One of <code>"in"</code>, <code>"cm"</code>, <code>"mm"</code>, <code>"px"</code>. See ggplot2::ggsave.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dpi</code></td>
+<td>
+<p>Integer, resolution to save static map. See ggplot2::ggsave.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>vwidth</code></td>
+<td>
+<p>Numeric, width of the exported Leaflet map image in pixels. See mapview::mapshot.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>vheight</code></td>
+<td>
+<p>Numeric, height of the exported Leaflet map image in pixels. See mapview::mapshot.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>html.name</code></td>
+<td>
+<p>Save Leaflet map to an interactive HTML file by specifying the path to the desired output file using this argument.
+File extension must be specified. See htmlwidgets::saveWidget.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>map.adj</code></td>
+<td>
+<p>Numeric, map adjustment in direction where it is smaller than the plot window. A value of <code>0</code> means left-justified
+or bottom-justified, <code>0.5</code> (the default) means centered, and <code>1</code> means right-justified or top-justified. Only used for default maps.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>legend.outer</code></td>
+<td>
+<p>Logical. If <code>TRUE</code>, outer break point values will be plotted in legend.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>legend.inset</code></td>
+<td>
+<p>Numeric, inset distance(s) from the margins as a fraction of the plot region for legend, scale and north arrow.
+See <code>legend</code> and details below.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>par.cex</code></td>
+<td>
+<p>Numeric, character expansion factor. See description of <code>cex</code> in <code>par</code>. Only used for default maps.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>par.mar</code></td>
+<td>
+<p>Plot margins as in <code>par</code> argument <code>mar</code>. Defaults to a nearly margin-less plot.
+In standard use cases of this function, plot margins do not need to be changed. Only used for default maps.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>add</code></td>
+<td>
+<p>Logical, default <code>FALSE</code>. If <code>TRUE</code>, add to existing plot. In that case <code>map.adj</code> has no effect. Only used for default maps.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p><code>PlotMapOutput</code> plots HYPE results from 'map[variable name].txt' files, typically imported using <code>ReadMapOutput</code>.
+<code>x</code> arguments <strong>must</strong> contain the variable of interest in the second column. For map results with multiple columns, i.e.
+several time periods, pass index selections to <code>x</code>, e.g. <code>mymapresult[, c(1, 3)]</code>.
+</p>
+<p><code>PlotMapOutput</code> can return static plots or interactive Leaflet maps depending on value provided for the argument <code>map.type</code>.
+For backwards compatibility, legacy static plots can still be generated by setting <code>map.type</code> to <code>legacy</code>. For legacy plots, <code>legend.pos</code> and
+<code>map.adj</code> should be chosen so that legend and map do not overlap, and the legend position can be fine-tuned using
+argument <code>legend.inset</code>. This is particularly useful for legend titles with more than one line. In order to move map and legend closer to each other, change the plot device width.
+For details on inset specification for the default maps, see <code>inset</code> in <code>legend</code>.
+</p>
+<p>Mapped variables are visualized using color-coded data intervals. <code>HYPEtools</code> provides a number of color ramps functions for HYPE variables,
+see <code>CustomColors</code>. These are either single-color ramps with less saturated colors for smaller values
+and more saturated values for higher values, suitable for e.g. concentration or volume ranges, or multi-color ramps suitable for calculated
+differences, e.g. between two model runs.
+</p>
+<p>Break points between color classes of in-built or user-provided color ramp palettes can optionally be provided in argument
+<code>col.breaks</code>. This is particularly useful when specific pretty class boundaries are needed, e.g. for publication figures. Per default,
+break points for internal single color ramps and user-provided ramps are calculated based on 10\
+<code>x</code>. Default break points for internal color ramp <code>ColDiffGeneric</code> are based on an equal distance classification of log-scaled
+<code>x</code> ranges, centered around zero. For internal color ramp <code>ColDiffTemp</code>, they are breaks in an interval from -7.5 to 7.5 K.
+</p>
+<p>For select common HYPE variables, given in argument <code>var.name</code>, an automatic color ramp selection including pretty breaks and legend titles
+is built into <code>PlotMapOutput</code>. These are 'CCTN', 'CCTP', 'COUT', and 'TEMP'. Automatic selection is activated by choosing keyword
+<code>"auto"</code> in <code>col</code>. All other HYPE variables will be plotted using a generic color ramp palette and generic break points with
+<code>"auto"</code> color selection.
+</p>
+
+
+<h3>Value</h3>
+
+<p>For default static maps, <code>PlotMapOutput</code> returns an object of class <code>ggplot</code>. This plot can also be assigned to a variable in the environment.
+For interactive Leaflet maps, <code>PlotMapOutput</code> returns an object of class <code>leaflet</code>. For legacy static plots, <code>PlotMapOutput</code> returns a plot to the
+currently active plot device, and invisibly an object of class <code>SpatialPolygonsDataFrame</code> as provided in argument <code>map</code>, with plotted values and color codes added as columns
+in the data slot.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>ReadMapOutput</code> for HYPE result import; <code>PlotMapPoints</code> for plotting HYPE results at points, e.g. sub-basin outlets.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+# Import plot data and subbasin polygons
+require(sf)
+te1 &lt;- ReadMapOutput(filename = system.file("demo_model",
+"results", "mapCRUN.txt", package = "HYPEtools"), dt.format = NULL)
+te2 &lt;- st_read(dsn = system.file("demo_model",
+"gis", "Nytorp_map.gpkg", package = "HYPEtools"))
+# plot runoff map
+PlotMapOutput(x = te1, map = te2, map.subid.column = 25,
+var.name = "CRUN", col = ColQ)
+
+
+
+</code></pre>
+
+
+</div>

@@ -1,0 +1,109 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>SpecMulTest</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Statistical inference for high-dimensional spectral density matrix</h2>
+
+<h3>Description</h3>
+
+<p><code>SpecMulTest()</code> implements a new multiple test proposed in
+Chang, Jiang, McElroy and Shao (2023) for the <code class="reqn">Q</code> hypothesis testing problems: 
+</p>
+<p style="text-align: center;"><code class="reqn">H_{0,q}:f_{i,j}(\omega)=0\mathrm{\ for\ any\ }(i,j)\in\mathcal{I}^{(q)}\mathrm{\ and\ }
+\omega\in\mathcal{J}^{(q)}\mathrm{\ \ versus\ \ }
+H_{1,q}:H_{0,q}\mathrm{\ is\ not\ true.} </code>
+</p>
+
+<p>for <code class="reqn">q\in\{1,\dots,Q\}</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">SpecMulTest(Q, PVal, alpha = 0.05, seq_len = 0.01)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>Q</code></td>
+<td>
+<p>Number of the hypothesis tests.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>PVal</code></td>
+<td>
+<p>P-values for the <code class="reqn">Q</code> hypothesis tests, a <code class="reqn">Q</code> vector.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alpha</code></td>
+<td>
+<p>The prescribed significance level. Default is 0.05.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>seq_len</code></td>
+<td>
+<p>Length used to take discrete points between 0 and 
+<code class="reqn">\sqrt(2\times\log(Q)-2\times\log(\log(Q))</code>. Default is 0.01.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>An object of class "hdtstest" is a list containing the following
+components:
+</p>
+<table><tr style="vertical-align: top;">
+<td><code>MultiTest</code></td>
+<td>
+<p>Logical vector with length Q. If the element is <code>TRUE</code>, 
+it means rejecting the corresponding sub-null hypothesis, otherwise it means 
+not rejecting the corresponding sub-null hypothesis.</p>
+</td>
+</tr></table>
+<h3>References</h3>
+
+<p>Chang, J., Jiang, Q., McElroy, T. &amp; Shao, X. (2023). 
+<em>Statistical inference for high-dimensional spectral density matrix</em>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">n &lt;- 200
+p &lt;- 10
+flag_c &lt;- 0.8
+B &lt;- 1000
+burn &lt;- 1000
+z.sim &lt;- matrix(rnorm((n+burn)*p),p,n+burn)
+phi.mat &lt;- 0.4*diag(p)
+x.sim &lt;- phi.mat %*% z.sim[,(burn+1):(burn+n)]
+x &lt;- x.sim - rowMeans(x.sim)
+Q &lt;- 4
+ISET &lt;- list()
+ISET[[1]] &lt;- matrix(c(1,2),ncol=2)
+ISET[[2]] &lt;- matrix(c(1,3),ncol=2)
+ISET[[3]] &lt;- matrix(c(1,4),ncol=2)
+ISET[[4]] &lt;- matrix(c(1,5),ncol=2)
+JSET &lt;- as.list(2*pi*seq(0,3)/4 - pi)
+PVal &lt;- rep(NA,Q)
+for (q in 1:Q) {
+  cross.indices &lt;- ISET[[q]]
+  J.set &lt;- JSET[[q]]
+  temp.q &lt;- SpecTest(t(x), J.set, cross.indices, B, flag_c)
+  PVal[q] &lt;- temp.q$p.value
+}  # Q
+res &lt;- SpecMulTest(Q, PVal)
+res
+
+</code></pre>
+
+
+</div>

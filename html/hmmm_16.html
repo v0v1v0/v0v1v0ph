@@ -1,0 +1,130 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>loglin.model</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>define a log-linear model</h2>
+
+<h3>Description</h3>
+
+<p>Function to specify a hierarchical log-linear model. This is a particular case of a hmm model. 
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">loglin.model(lev, int = NULL, strata = 1, dismarg = 0, type = "b", 
+D = TRUE, c.gen = TRUE, printflag = FALSE, names = NULL, formula = NULL)</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>lev</code></td>
+<td>
+<p>Vector of number of categories of variables</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>int</code></td>
+<td>
+<p>Generating class of the log-linear model (must be a list) or list of all the interactions included</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>strata</code></td>
+<td>
+<p>Number of strata</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dismarg</code></td>
+<td>
+<p>List of interactions constrained by inequalities - see ‘hmmm.model’</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>type</code></td>
+<td>
+<p>"b" for baseline logits, "l" for local logits</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>D</code></td>
+<td>
+<p>Input argument for inequalities - see ‘hmmm.model’</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>c.gen</code></td>
+<td>
+<p>If FALSE the input int must be the list of the minimal interaction sets to be excluded</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>printflag</code></td>
+<td>
+<p>If TRUE information on the included and excluded interactions are given</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>names</code></td>
+<td>
+<p>A character vector whose elements are the names of the variables</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>formula</code></td>
+<td>
+<p>A formula describing a log-linear model</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>This function simplifies ‘hmmm.model’ in the case of log-linear models. If <code>formula</code> is employed, <code>c.gen</code> and <code>int</code> 
+must not be declared while <code>names</code> must be specified.</p>
+
+
+<h3>Value</h3>
+
+<p>An object of the class <code>hmmmmod</code> defining a log-linear model that can be estimated by ‘hmmm.mlfit’.</p>
+
+
+<h3>Note</h3>
+
+<p>If <code>int</code> and <code>formula</code> are not supplied a saturated log-linear model is defined. For log-linear models where the parameters 
+depend on covariates first define a saturated log-linear model and then use the function ‘create.XMAT’.
+</p>
+
+
+<h3>References</h3>
+
+<p>Agresti A (2012) Categorical data Analysis, (3ed), Wiley, New York.
+</p>
+<p>Bergsma W, Croon M, Hagenaars JA (2009) Marginal Models for Dependent, Clustered, and Longitudinal Categorical Data. Springer.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>hmmm.model</code>, <code>hmmm.mlfit</code>, <code>create.XMAT</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(madsen)
+y&lt;-getnames(madsen)
+names&lt;-c("Infl","Sat","Co","Ho")
+
+f&lt;-~Co*Ho+Sat*Co+Infl*Co+Sat*Ho+Infl*Sat
+model&lt;-loglin.model(lev=c(3,3,2,4),formula=f,names=names)
+mod&lt;-hmmm.mlfit(y,model,maxit=3000)
+print(mod,printflag=TRUE)
+</code></pre>
+
+
+</div>

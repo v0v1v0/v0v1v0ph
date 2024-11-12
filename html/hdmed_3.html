@@ -1,0 +1,182 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>mediate_hdmm</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>High-dimensional Multivariate Mediation Analysis with
+Principal Directions of Mediation</h2>
+
+<h3>Description</h3>
+
+<p><code>mediate_hdmm</code> estimates the first  "direction of mediation" in the
+causal mediation mechanism of an exposure <code>A</code>, an outcome <code>Y</code>, and high-dimensional
+mediators <code>M</code> as proposed by Chén et al. (2018).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">mediate_hdmm(
+  A,
+  M,
+  Y,
+  sims = 1000,
+  boot_ci_type = "bca",
+  ci_level = 0.95,
+  tol = 10^-5,
+  theta = rep(1, 5),
+  w1 = rep(1, ncol(M)),
+  interval = 10^6,
+  step = 10^4,
+  imax = 100
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>A</code></td>
+<td>
+<p>numeric vector containing exposure variable.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>M</code></td>
+<td>
+<p>numeric matrix of high-dimensional mediators. It is not recommended
+to supply a matrix with more mediators than observations.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Y</code></td>
+<td>
+<p>numeric vector containing continuous outcome variable.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sims</code></td>
+<td>
+<p>number of Monte Carlo draws for nonparametric bootstrap or
+quasi-Bayesian approximation. See <code>mediate</code>. Default is 1000.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>boot_ci_type</code></td>
+<td>
+<p>a character string indicating the type of bootstrap
+confidence intervals for when <code>boot = TRUE</code>. If <code>"bca"</code>,
+bias-corrected and accelerated (BCa) confidence intervals will be estimated.
+If <code>"perc"</code>, percentile confidence intervals will be estimated
+(see <code>mediation::mediate()</code>). Default is "bca".</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ci_level</code></td>
+<td>
+<p>the designated confidence level. Default 0.95.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tol</code></td>
+<td>
+<p>tolerance. Default 10^-5.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>theta</code></td>
+<td>
+<p>numeric vector of length 5 describing starting value of pathway
+coefficients. Default is a vector of 1's.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>w1</code></td>
+<td>
+<p>numeric vector of the same length of <code>A</code> specifying PDM
+starting values. Default is a vector of 1's.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>interval</code></td>
+<td>
+<p>numeric vector proportional to the intervals from where the
+smoothing parameter is searched. Default is 10^6.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>step</code></td>
+<td>
+<p>numerical number specifying step width for smoothing parameter
+search. Default is 10^4.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>imax</code></td>
+<td>
+<p>integer specifying the maximum number of iterations allowed.
+Default is 100.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>HDMM provides latent variable approach to high-dimensional mediation analysis.
+The function <code>mediate_hdmm</code> uses a likelihood-based approach to compute
+principal directions of mediation (PDMs), which are loading weights used to linearly
+combine the inputted mediators to form a single, latent variable that replaces
+the original mediators in the analysis. Though HDMM cannot be used to estimate
+the global mediation effect or the contributions of specific mediators, it can
+still can be useful for inferring whether there is mediation occurring through
+the set of mediators as a joint system. See the provided reference for more
+details.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A list containing:
+</p>
+
+<ul>
+<li> <p><code>pdm</code>: the first direction of mediation by which mediators are
+weighted.
+</p>
+</li>
+<li> <p><code>mediator</code>: the latent mediator corresponding to the first direction
+of mediation.
+</p>
+</li>
+<li> <p><code>effects</code>: a data frame containing the estimates, confidence
+intervals, and p-values of the mediation effects.
+</p>
+</li>
+</ul>
+<h3>Source</h3>
+
+<p><a href="https://github.com/oliverychen/PDM">https://github.com/oliverychen/PDM</a>
+</p>
+
+
+<h3>References</h3>
+
+<p>Chén, O. Y. et al. High-dimensional multivariate mediation with
+application to neuroimaging data. Biostatistics 19, 121-136 (2018).
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">A &lt;- as.numeric(scale(med_dat$A)) # can help to standardize
+M &lt;- scale(med_dat$M[,1:8])
+Y &lt;- as.numeric(scale(med_dat$Y))
+
+out &lt;- mediate_hdmm(A, M, Y, sims = 5, tol = 10^-3, imax = 50)
+out$effects
+
+</code></pre>
+
+
+</div>

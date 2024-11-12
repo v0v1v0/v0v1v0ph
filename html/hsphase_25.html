@@ -1,0 +1,79 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>pogc</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Parent Offspring Group Constructor
+</h2>
+
+<h3>Description</h3>
+
+<p>Assign offsprings to the parents.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">pogc(oh, genotypeError)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>oh</code></td>
+<td>
+ <p><code>integer</code> opposing homozygotes matrix (Output of <code>ohg</code>)
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>genotypeError</code></td>
+<td>
+<p><code>integer</code>
+number of genotypeing error allowed in the <code>oh</code> matrix
+</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>Return a data frame with two columns. The first column is the animal ID and the second column is the parent ID.  
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>ohg</code>, <code>hss</code> and <code>rpoh</code> 
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">set.seed(100)
+chr &lt;- list()
+sire &lt;- list()
+set.seed(1)
+chr &lt;- list()
+for(i in 1:5)
+{
+	chr[[i]] &lt;- .simulateHalfsib(numInd = 20, numSNP = 5000, recbound = 1:10)
+	sire[[i]] &lt;- ssp(bmh(chr[[i]]), chr[[i]])
+	sire[[i]] &lt;- sire[[i]][1,] + sire[[i]][2,]
+	sire[[i]][sire[[i]] == 18] &lt;- 9
+}
+
+Genotype &lt;- do.call(rbind, chr)
+rownames(Genotype) &lt;- 6:(nrow(Genotype) + 5)
+sire &lt;- do.call(rbind, sire)
+rownames(sire) &lt;- 1:5
+Genotype &lt;- rbind(sire, Genotype)
+oh &lt;- ohg(Genotype)  # creating the Opposing Homozygote matrix
+pogc(oh, 5)
+</code></pre>
+
+
+</div>

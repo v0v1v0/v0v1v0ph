@@ -1,0 +1,127 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>mediate_hilma</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>High-Dimensional Linear Mediation Analysis</h2>
+
+<h3>Description</h3>
+
+<p><code>mediate_hilma</code> applies high-dimensional linear mediation
+analysis (HILMA) as proposed by Zhou et al. (2020).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">mediate_hilma(
+  A,
+  M,
+  Y,
+  aic_tuning = FALSE,
+  nlambda = 5,
+  lambda_minmax_ratio = 0.1,
+  center = TRUE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>A</code></td>
+<td>
+<p>length <code>n</code> numeric vector containing a single exposure variable
+or size <code>n x q</code> numeric matrix containing multiple exposures. If a matrix,
+should be low-dimensional (<code>q &lt;&lt; n</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>M</code></td>
+<td>
+<p><code>n x p</code> numeric matrix of high-dimensional mediators.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Y</code></td>
+<td>
+<p>length <code>n</code> numeric vector containing continuous outcome variable.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>aic_tuning</code></td>
+<td>
+<p>logical flag for whether to select the tuning parameter using
+AIC. Default is <code>FALSE</code> as this was not the preferred approach by the
+HILMA authors (see references for more detail).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nlambda</code></td>
+<td>
+<p>number of candidate lambdas for AIC tuning. Default is 5. If
+<code>aic_tuning=F</code> this parameter is ignored.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lambda_minmax_ratio</code></td>
+<td>
+<p>ratio of the minimum lambda attempted in
+AIC tuning to the maximum. If <code>aic_tuning=F</code>, ignored.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>center</code></td>
+<td>
+<p>logical flag for whether the variables should be centered. Default
+is <code>TRUE</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p><code>mediate_hilma</code> is a wrapper function for the <code>freebird::hilma()</code> function,
+which fits the "high-dimensional linear mediation analysis" model proposed by
+Zhou et al. (2020) for mediation settings when there are high-dimensional
+mediators and one or several exposures. The function returns estimates of
+the direct effect, total effect, and global mediation effect, the last of which
+is tested for statistical significance with a reported p-value. For additional
+detail, see the attached reference as well as the <code>freebird::hilma()</code>
+documentation.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A list containing, for each exposure, a data frame of
+the estimated direct, total, and global mediation effects. A p-value is
+provided for the global mediation effect.
+</p>
+
+
+<h3>References</h3>
+
+<p>Zhou, R. R., Wang, L. &amp; Zhao, S. D. Estimation and inference for
+the indirect effect in high-dimensional linear mediation models. Biometrika
+107, 573-589 (2020)
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">A &lt;- med_dat$A
+M &lt;- med_dat$M
+Y &lt;- med_dat$Y
+
+# Implement HILMA with one exposure
+out &lt;- mediate_hilma(A, M, Y)
+out$a1
+
+
+
+</code></pre>
+
+
+</div>

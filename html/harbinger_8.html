@@ -1,0 +1,74 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hanc_ml</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Anomaly detector based on machine learning classification</h2>
+
+<h3>Description</h3>
+
+<p>Anomaly detection using daltoolbox classification.
+A training and test set should be used. The training set must contain labeled events.
+A set of preconfigured of classification methods are described in <a href="https://cefet-rj-dal.github.io/daltoolbox/">https://cefet-rj-dal.github.io/daltoolbox/</a>.
+They include: cla_majority, cla_dtree, cla_knn, cla_mlp, cla_nb, cla_rf, cla_svm
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hanc_ml(model)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table><tr style="vertical-align: top;">
+<td><code>model</code></td>
+<td>
+<p>DALToolbox classification model</p>
+</td>
+</tr></table>
+<h3>Value</h3>
+
+<p><code>hanc_ml</code> object
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">library(daltoolbox)
+
+#loading the example database
+data(examples_anomalies)
+
+#Using example tt
+dataset &lt;- examples_anomalies$tt
+dataset$event &lt;- factor(dataset$event, labels=c("FALSE", "TRUE"))
+slevels &lt;- levels(dataset$event)
+
+# separating into training and test
+train &lt;- dataset[1:80,]
+test &lt;- dataset[-(1:80),]
+
+# normalizing the data
+norm &lt;- minmax()
+norm &lt;- fit(norm, train)
+train_n &lt;- transform(norm, train)
+
+# establishing decision tree method
+model &lt;- hanc_ml(cla_dtree("event", slevels))
+
+# fitting the model
+model &lt;- fit(model, train_n)
+
+# evaluating the detections during testing
+test_n &lt;- transform(norm, test)
+
+detection &lt;- detect(model, test_n)
+print(detection[(detection$event),])
+
+</code></pre>
+
+
+</div>

@@ -1,0 +1,272 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>singleModalityAdmm</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>High-dimensional Single Modality Mediation Models</h2>
+
+<h3>Description</h3>
+
+<p>High-dimensional Single Modality Mediation Models
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">singleModalityAdmm(
+  X,
+  Y,
+  M1,
+  rho = 1,
+  lambda1a,
+  lambda1b,
+  lambda1g,
+  lambda2a,
+  lambda2b,
+  penalty = "ElasticNet",
+  penaltyParameterList = list(),
+  SIS = FALSE,
+  SISThreshold = 2,
+  maxIter = 3000L,
+  tol = 0.001,
+  verbose = FALSE,
+  verboseOptions = list(numIter = 10L, numAlpha = 1L, numBeta = 1L, numGamma = 1L)
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>X</code></td>
+<td>
+<p>The matrix of independent variables (exposure/treatment/group).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Y</code></td>
+<td>
+<p>The vector of dependent variable (outcome response).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>M1</code></td>
+<td>
+<p>The single-modality mediator.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rho</code></td>
+<td>
+<p>The augmented Lagrangian parameter for ADMM.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lambda1a</code></td>
+<td>
+<p>The L1-norm penalty for the effect between mediator and independent variables.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lambda1b</code></td>
+<td>
+<p>The L1-norm penalty for the effect between mediator and dependent variable.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lambda1g</code></td>
+<td>
+<p>The L1-norm penalty for the direct effect. Default is <strong>10</strong> to adress overestimate issue.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lambda2a</code></td>
+<td>
+<p>The L2-norm penalty for the effect between mediator and independent variables.
+It's not used when Penalty is <code>PathwayLasso</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lambda2b</code></td>
+<td>
+<p>The L2-norm penalty for the effect between mediator and dependent variable.
+It's not used when Penalty is <code>PathwayLasso</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>penalty</code></td>
+<td>
+<p>A string to specify the penalty. Default is <code>ElasticNet</code>. Possible methods are
+Elastic Net (<code>ElasticNet</code>), Pathway Lasso (<code>PathywayLasso</code>), and  Network-constrained Penalty (<code>Network</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>penaltyParameterList</code></td>
+<td>
+
+<ul>
+<li>
+<p> Penalty=<code>PathwayLasso</code> needs two parameters.
+</p>
+
+<ul>
+<li>
+<p> kappa The L1-norm penalty for pathway Lasso.
+</p>
+</li>
+<li>
+<p> nu The L2-norm penalty for pathway Lasso.
+</p>
+</li>
+</ul>
+</li>
+<li>
+<p> Penalty=<code>Network</code> needs one parameter.
+</p>
+
+<ul><li>
+<p> laplacianMatrix The Laplacian matrix applied on network penalty.
+</p>
+</li></ul>
+</li>
+<li>
+<p> Penalty=<code>ElasticNet</code> don't need other parameters.
+</p>
+</li>
+</ul>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>SIS</code></td>
+<td>
+<p>A logical value to specify whether to perform sure independence screening (SIS).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>SISThreshold</code></td>
+<td>
+<p>The threshold value for the target reduced dimension for mediators. The default is "2," which reduces the dimension to 2*n/log(n).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>maxIter</code></td>
+<td>
+<p>The maximum iterations. Default is <code>3000</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tol</code></td>
+<td>
+<p>The tolerence of convergence threshold. Default is <code>1e-3</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p>A logical value to specify whether to print the iteration process.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verboseOptions</code></td>
+<td>
+<p>A list of values:
+</p>
+
+<ul>
+<li> <p><code>numIter</code>: The number of iterations to print.
+</p>
+</li>
+<li> <p><code>numAlpha</code>: The number of <code>alpha</code> to print.
+</p>
+</li>
+<li> <p><code>numBeta</code>: The number of <code>beta</code> to print.
+</p>
+</li>
+<li> <p><code>numGamma</code>: The number of <code>gamma</code> to print.
+</p>
+</li>
+</ul>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A object, SingleModalityAdmm, with three elements.
+</p>
+
+<ul>
+<li>
+<p> gamma: estimated direct effect.
+</p>
+</li>
+<li>
+<p> alpha: estimate effect between mediator and independent variables.
+</p>
+</li>
+<li>
+<p> beta : estimate effect between mediator and dependent variable.
+</p>
+</li>
+</ul>
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Generate Empirical Data
+simuData &lt;- modalityMediationDataGen(seed = 20231201, generateLaplacianMatrix = TRUE)
+
+## Parameter Estimation for ElasticNet penalty
+modelElasticNet &lt;- singleModalityAdmm(
+  X = simuData$MediData$X, Y = simuData$MediData$Y, M1 = simuData$MediData$M1,
+  rho = 1, lambda1a = 1, lambda1b = 0.1, lambda1g = 2, lambda2a = 1, lambda2b = 1,
+  penalty = "ElasticNet"
+)
+
+# fitted &amp; predict
+fitted(modelElasticNet)
+predict(modelElasticNet, matrix(c(0, 1), ncol=1))
+
+## Parameter Estimation for Pathway Lasso penalty
+modelPathwayLasso &lt;- singleModalityAdmm(
+  X = simuData$MediData$X, Y = simuData$MediData$Y, M1 = simuData$MediData$M1,
+  rho = 1, lambda1a = 1, lambda1b = 0.1, lambda1g = 2, lambda2a = 1, lambda2b = 1,
+  penalty = "PathwayLasso", penaltyParameterList = list(kappa = 1, nu = 2)
+)
+
+## Parameter Estimation for Network penalty
+modelNetwork &lt;- singleModalityAdmm(
+  X = simuData$MediData$X, Y = simuData$MediData$Y, M1 = simuData$MediData$M1,
+  rho = 1, lambda1a = 1, lambda1b = 0.1, lambda1g = 2, lambda2a = 1, lambda2b = 1,
+  penalty = "Network", penaltyParameterList = list(laplacianMatrix = simuData$Info$laplacianMatrix)
+)
+
+## Parameter Estimation for Network penalty with a customized Laplacian matrix
+set.seed(20231201)
+p &lt;- ncol(simuData$MediData$M1)
+W &lt;- matrix(0, nrow = p, ncol = p)
+W[lower.tri(W)] &lt;- runif(p*(p-1)/2, 0, 1)
+W[upper.tri(W)] &lt;- t(W)[upper.tri(W)]
+diag(W) &lt;- 1
+L &lt;- weightToLaplacian(W)
+modelNetwork &lt;- singleModalityAdmm(
+  X = simuData$MediData$X, Y = simuData$MediData$Y, M1 = simuData$MediData$M1,
+  rho = 1, lambda1a = 1, lambda1b = 0.1, lambda1g = 2, lambda2a = 1, lambda2b = 1,
+  penalty = "Network", penaltyParameterList = list(laplacianMatrix = L)
+)
+
+## With sure independence screening
+## Generate Empirical Data
+simuData &lt;- modalityMediationDataGen(n = 50, p = 1000, seed = 20231201)
+
+## Parameter Estimation for ElasticNet penalty
+modelElasticNetSIS &lt;- singleModalityAdmm(
+  X = simuData$MediData$X, Y = simuData$MediData$Y, M1 = simuData$MediData$M1,
+  rho = 1, lambda1a = 1, lambda1b = 0.1, lambda1g = 2, lambda2a = 1, lambda2b = 1,
+  penalty = "ElasticNet", SIS = TRUE
+)
+fitted(modelElasticNetSIS)
+predict(modelElasticNetSIS, matrix(c(0, 1), ncol=1))
+</code></pre>
+
+
+</div>

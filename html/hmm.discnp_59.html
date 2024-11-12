@@ -1,0 +1,114 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hydroDat</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Canadian hydrological data sets.
+</h2>
+
+<h3>Description</h3>
+
+<p>Five data sets obtained from the “HYDAT” database,
+Environment and Climate Change Canada's database of historical
+hydrometric data.  The data were obtained using the <code>tidyhydat</code>
+package.  The data have been trimmed so that there are no gaps in
+the observation dates and are presented in “raw” form and in
+discretised form as deciles of the residuals (difference between
+raw values and the daily mean over years).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">    data("linLandFlows")
+    data("ftLiardFlows")
+    data("portMannFlows")
+    data("portMannSedLoads")
+    data("portMannSedCon")
+</code></pre>
+
+
+<h3>Format</h3>
+
+<p>Data frames with observations on the following 3 variables.
+</p>
+
+<dl>
+<dt><code>Date</code></dt>
+<dd>
+<p>Dates on which observations were made.</p>
+</dd>
+<dt><code>Value</code></dt>
+<dd>
+<p>Numeric vector of observation values.</p>
+</dd>
+<dt><code>mean</code></dt>
+<dd>
+<p>The mean over years of <code>Value</code>.</p>
+</dd>
+<dt><code>resid</code></dt>
+<dd>
+<p>The difference <code>Value - mean</code>.</p>
+</dd>
+<dt><code>deciles</code></dt>
+<dd>
+<p>A factor with levels <code>d1</code>, ..., <code>d10</code>,
+which are the deciles of the variable <code>resid</code></p>
+</dd>
+</dl>
+<h3>Details</h3>
+
+<p>The variable <code>mean</code> was calculated as follows:
+</p>
+<pre>
+        yday &lt;- as.POSIXlt(X$Date)$yday
+        mn   &lt;- tapply(X$Value,yday,mean,na.rm=TRUE)
+        mean &lt;- mn[as.character(yday)]
+   </pre>
+<p>where <code>X</code> is the data set being processed.
+</p>
+<p>The data set <code>linLandFlows</code> originally consisted of 2008 observations;
+there were 1980 observations after “trimming”.
+The data set <code>ftLiardFlows</code> originally consisted of 22364 observations;
+there were 11932 observations after “trimming”.
+The data set <code>portMannFlows</code> originally consisted of 6455 observations;
+there were 3653 observations after “trimming”.
+The data set <code>portMannSedLoads</code> consists of 2771 observations;
+no observations were trimmed.
+The data set <code>portMannSedCon</code> consists of 4597 observations;
+no observations were trimmed.
+</p>
+<p>The units of the “Flows” variables are cubic metres per
+second (<code class="reqn">m^3/s</code>); the units of “portMannSedLoads”
+are tonnes; the units of “portMannSedCon” are milligrams
+per litre (mg/l).
+</p>
+<p>The “linLandFlows” data were obtained at the Lindberg
+Landing hydrometric station on the Liard River in the Northwest
+Territories of Canada.  The “ftLiardFlows” data were
+obtained at the Fort Liard hydrometric station on the Liard River
+in the Northwest Territories of Canada.  The “portMann”
+data were obtained at the hydrometric station located at the
+Port Mann pumping station on the Fraser River in the Province
+of British Columbia in Canada.
+</p>
+
+
+<h3>Source</h3>
+
+<p>Environment and Climate Change Canada's database “HYDAT”,
+a database of historical hydrometric data.  The data were obtained
+vis the <code>tidyhydat</code> package, which is available from “CRAN”,
+<code>https://cran.r-project.org</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">fit &lt;- hmm(linLandFlows$deciles,K=4,itmax=10)
+</code></pre>
+
+
+</div>

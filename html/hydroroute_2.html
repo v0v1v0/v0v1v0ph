@@ -1,0 +1,142 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>extract_AE</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Extract Associated Events</h2>
+
+<h3>Description</h3>
+
+<p>For given relation and event data return the
+associated events which comply with the conditions specified in
+the settings.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">extract_AE(
+  relation_path,
+  events_path,
+  settings_path,
+  unique = c("time", "metric"),
+  inputdec = ".",
+  inputsep = ",",
+  saveResults = FALSE,
+  outdir = tempdir(),
+  TimeFormat = "%Y-%m-%d %H:%M",
+  tz = "Etc/GMT-1"
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>relation_path</code></td>
+<td>
+<p>Character string containing the path of the file where
+the relation file is to be read from with
+<code>utils::read.csv()</code>. The file must contain a
+column <code>ID</code> that contains the gauging station ID's in the file have to be
+in order of their location in downstream direction.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>events_path</code></td>
+<td>
+<p>Character string containing the path of the directory
+where the event files corresponding to the 'relation' file are located. Only
+relevant files in this directory will be used, i.e., files that are related to
+the 'relation' file.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>settings_path</code></td>
+<td>
+<p>Character string containing the path of the file where
+the settings file is to be read from with
+<code>utils::read.csv()</code>. The file must be in the format
+of the output of <code>peaktrace()</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>unique</code></td>
+<td>
+<p>Character string specifying if the potential AEs which
+meet the <code>timeLag</code> and <code>metricLag</code> condition should
+be filtered to contain only unique events using <code>"time"</code>,
+i.e., by selecting those where the time difference is smallest
+compared to the specified factor of the mean translation time, or using
+<code>"metric"</code>, i.e., by selecting those where the relative
+difference in amplitude is smallest (default: <code>"time"</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>inputdec</code></td>
+<td>
+<p>Character string for decimal points in input data.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>inputsep</code></td>
+<td>
+<p>Field separator character string for input data.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>saveResults</code></td>
+<td>
+<p>A logical. If <code>FALSE</code> (default), the extracted AEs are not saved.
+Otherwise the extracted AEs are written to a csv file.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>outdir</code></td>
+<td>
+<p>Character string naming a directory where the extraced AEs
+should be saved to.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>TimeFormat</code></td>
+<td>
+<p>Character string giving the date-time format of the
+date-time column in the input data frame (default: "%Y-%m-%d %H:%M").</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tz</code></td>
+<td>
+<p>Character string specifying the time zone to be used for the
+conversion (default: "Etc/GMT-1").</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A data frame containing “real” AEs (i.e., events
+where the time differences and the relative difference in
+amplitude is within the limits and cut points provided by the
+file in <code>settings_path</code>). If no AEs can be found between the first
+two neighboring stations, <code>NULL</code> is returned. Otherwise the function
+returns all “real” AEs that could be found along the river section
+specified in the file from <code>relation_path</code>. A warning is issued when
+the extraction is stopped early and shows the <code>IDs</code> for which no
+AEs are determined.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">relation_path &lt;- system.file("testdata", "relation.csv", package = "hydroroute")
+events_path &lt;- system.file("testdata", "Events", package = "hydroroute")
+settings_path &lt;- system.file("testdata", "Q_event_2_AMP-LAG_aut_settings.csv",
+                                   package = "hydroroute")
+real_AE &lt;- extract_AE(relation_path, events_path, settings_path)
+</code></pre>
+
+
+</div>

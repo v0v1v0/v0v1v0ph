@@ -1,0 +1,115 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hai_umap_plot</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>UMAP and K-Means Cluster Visualization</h2>
+
+<h3>Description</h3>
+
+<p>Create a UMAP Projection plot.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hai_umap_plot(.data, .point_size = 2, .label = TRUE)
+
+umap_plt(.data, .point_size = 2, .label = TRUE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>.data</code></td>
+<td>
+<p>The data from the <code>umap_list()</code> function.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.point_size</code></td>
+<td>
+<p>The desired size for the points of the plot.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.label</code></td>
+<td>
+<p>Should <code>ggrepel::geom_label_repel()</code> be used to display cluster
+user labels.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>This takes in <code>umap_kmeans_cluster_results_tbl</code> from the <code>umap_list()</code>
+function output.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A ggplot2 UMAP Projection with clusters represented by colors.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Steven P. Sanderson II, MPH
+</p>
+
+
+<h3>See Also</h3>
+
+
+<ul>
+<li> <p><a href="https://cran.r-project.org/package=uwot">https://cran.r-project.org/package=uwot</a> (CRAN)
+</p>
+</li>
+<li> <p><a href="https://github.com/jlmelville/uwot">https://github.com/jlmelville/uwot</a> (GitHub)
+</p>
+</li>
+<li> <p><a href="https://github.com/jlmelville/uwot">https://github.com/jlmelville/uwot</a> (arXiv paper)
+</p>
+</li>
+</ul>
+<p>Other UMAP: 
+<code>hai_umap_list()</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">library(healthyR.data)
+library(dplyr)
+library(broom)
+library(ggplot2)
+
+data_tbl &lt;- healthyR_data %&gt;%
+  filter(ip_op_flag == "I") %&gt;%
+  filter(payer_grouping != "Medicare B") %&gt;%
+  filter(payer_grouping != "?") %&gt;%
+  select(service_line, payer_grouping) %&gt;%
+  mutate(record = 1) %&gt;%
+  as_tibble()
+
+uit_tbl &lt;- hai_kmeans_user_item_tbl(
+  .data = data_tbl,
+  .row_input = service_line,
+  .col_input = payer_grouping,
+  .record_input = record
+)
+
+kmm_tbl &lt;- hai_kmeans_mapped_tbl(uit_tbl)
+
+ump_lst &lt;- hai_umap_list(.data = uit_tbl, kmm_tbl, 3)
+
+hai_umap_plot(.data = ump_lst, .point_size = 3)
+
+</code></pre>
+
+
+</div>

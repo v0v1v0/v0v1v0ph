@@ -1,0 +1,121 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>merge_time</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Merge Events</h2>
+
+<h3>Description</h3>
+
+<p>Given two event data frames of neighboring stations
+<code class="reqn">S_{x}</code> and <code class="reqn">S_{y}</code> that consist of flow
+fluctuation events and computed metrics (see
+<code>hydropeak::get_events()</code>),
+the translation time indicated by the relation file as well as
+<code>timeLag</code> between these two stations is subtracted from
+<code class="reqn">S_{y}</code> and events are merged where matches according
+to differences allowed to <code>timeLag</code> can be found.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">merge_time(
+  Sx,
+  Sy,
+  relation,
+  timeLag = c(1, 1, 1),
+  TimeFormat = "%Y-%m-%d %H:%M",
+  tz = "Etc/GMT-1"
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>Sx</code></td>
+<td>
+<p>Data frame that consists of flow fluctuation events and computed
+metrics (see <code>hydropeak::get_events()</code>)
+of an upstream hydrograph <code class="reqn">S_{x}</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Sy</code></td>
+<td>
+<p>Data frame that consists of flow fluctuation events and computed
+metrics (see <code>hydropeak::get_events()</code>)
+of a downstream hydrograph <code class="reqn">S_{y}</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>relation</code></td>
+<td>
+<p>Data frame that contains the relation between upstream and
+downstream hydrograph. Must only contain two rows (one for each hydrograph)
+in order of their location in downstream direction.
+See the appended example data <code>relation.csv</code> or vignette for details on
+the structure. See <code>get_lag()</code> for further information
+about the relation and the lag between the hydrographs.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>timeLag</code></td>
+<td>
+<p>Numeric vector specifying factors to alter the interval to capture
+events from the downstream hydrograph. By default it is
+<code>timeLag = c(1, 1, 1)</code>, this refers to matches within a time slot
+<code class="reqn">\pm</code> the mean translation time from <code>relation</code>. For exact time
+matches, <code>timeLag = c(0, 1, 0)</code> must be specified.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>TimeFormat</code></td>
+<td>
+<p>Character string giving the date-time format of the
+date-time column in the input data frame  (default: "%Y-%m-%d %H:%M").</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tz</code></td>
+<td>
+<p>Character string specifying the time zone to be used for the
+conversion (default: "Etc/GMT-1").</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>Data frame that has a matched event at <code class="reqn">S_{x}</code> and
+<code class="reqn">S_{y}</code> in each row. If no matches are detected,
+<code>NULL</code> is returned.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">Sx &lt;- system.file("testdata", "Events", "100000_2_2014-01-01_2014-02-28.csv",
+                  package = "hydroroute")
+Sy &lt;- system.file("testdata", "Events", "200000_2_2014-01-01_2014-02-28.csv",
+                  package = "hydroroute")
+relation &lt;- system.file("testdata", "relation.csv", package = "hydroroute")
+# read data
+Sx &lt;- utils::read.csv(Sx)
+Sy &lt;- utils::read.csv(Sy)
+relation &lt;- utils::read.csv(relation)
+relation &lt;- relation[1:2, ]
+
+# exact matches
+merged &lt;- merge_time(Sx, Sy, relation, timeLag = c(0, 1, 0))
+head(merged)
+
+# matches within +/- mean translation time
+merged &lt;- merge_time(Sx, Sy, relation)
+head(merged)
+</code></pre>
+
+
+</div>

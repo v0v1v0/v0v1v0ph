@@ -1,0 +1,278 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>lm.case</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2> case statistics for regression analysis</h2>
+
+<h3>Description</h3>
+
+<p>Case statistics for regression analysis.
+<code>case.lm</code> calculates the statistics.
+<code>plot.case</code> plots the cases, one statistic per panel, and
+illustrates and flags all observations for which the standard
+thresholds are exceeded.  <code>plot.case</code> returns an object with
+class <code>c("trellis.case", "trellis")</code>
+containing the plot and the row.names of the
+flagged observations.  The object is printed by a method which
+displays the set of graphs and prints the list of flagged cases.
+<code>panel.case</code> is a panel function for <code>plot.case</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">case(fit, ...)
+## S3 method for class 'lm'
+case(fit, lms = summary.lm(fit), lmi = lm.influence(fit), ...)
+
+## S3 method for class 'case'
+plot(x, fit,
+          which=c("stu.res","si","h","cook","dffits",
+            dimnames(x)[[2]][-(1:8)]),  ##DFBETAS
+          between.in=list(y=4, x=9),
+          cex.threshold=1.2,
+          main.in=list(
+            paste(deparse(fit$call), collapse=""),
+            cex=main.cex),
+          sigma.in=summary.lm(fit)$sigma,
+          p.in=summary.lm(fit)$df[1]-1,
+          main.cex=NULL,
+          ...)
+
+panel.case(x, y, subscripts, rownames, group.names,
+           thresh, case.large,
+           nn, pp, ss, cex.threshold,
+           ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>fit</code></td>
+<td>
+<p><code>"lm"</code> object computed with <code>x=TRUE</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lms</code></td>
+<td>
+<p><code>summary.lm(fit)</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lmi</code></td>
+<td>
+<p><code>lm.influence(fit)</code></p>
+</td>
+</tr>
+</table>
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>In <code>plot.case</code>, the matrix output from <code>case.lm</code>
+containing case diagnostics on each observation in the original
+dataset.
+In <code>panel.case</code>, the x variable to be plotted</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>which</code></td>
+<td>
+<p>In <code>plot.case</code>, the names of the columns of x
+that are to be graphed.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>between.in</code></td>
+<td>
+<p><code>between</code> trellis/lattice argument.</p>
+</td>
+</tr>
+</table>
+<table>
+<tr style="vertical-align: top;">
+<td><code>cex.threshold</code></td>
+<td>
+<p>Multiplier for <code>cex</code> for the threshold values.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>main.in</code></td>
+<td>
+<p><code>main</code> title for <code>xyplot</code>. The default main title
+displays the linear model formula from <code>fit</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sigma.in</code></td>
+<td>
+<p>standard error for the <code>fit</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>p.in</code></td>
+<td>
+<p>The number of degrees of freedom associated with the fitted
+model.</p>
+</td>
+</tr>
+</table>
+<table>
+<tr style="vertical-align: top;">
+<td><code>main.cex</code></td>
+<td>
+<p><code>cex</code> for main title.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>other arguments to <code>xyplot</code></p>
+</td>
+</tr>
+</table>
+<table>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+<p>the y variable to be plotted.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>thresh</code></td>
+<td>
+<p>Named list of lists.  Each list contains the components
+threshold ($y$-locations where a reference line will be drawn),
+thresh.label (the right-axis labels for the reference lines), thresh.id
+(the bounds defining "Noteworthy Observations").</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>case.large</code></td>
+<td>
+<p>Named list of "Noteworthy Observations".</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nn</code></td>
+<td>
+<p>Number of rows in original dataset.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pp</code></td>
+<td>
+<p>The number of degrees of freedom associated with the fitted model.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ss</code></td>
+<td>
+<p>Standard error for the <code>fit</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>subscripts</code></td>
+<td>
+<p>trellis/lattice argument, position in the reshaped
+dataset constructed by <code>plot.case</code> before calling <code>xyplot</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rownames</code></td>
+<td>
+<p>row name in the original data.frame.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>group.names</code></td>
+<td>
+<p>names of the individual statistics.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p><code>lm.influence</code> is part of S-Plus and R
+<code>case.lm</code> and <code>plot.case</code> are based on:
+Section 4.3.3 "Influence of Individual Obervations
+in Chambers and Hastie", <em>Statistical Models in S</em>.
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>case.lm</code> returns a matrix, with one row for each observation
+in the original dataset.  The columns contain the diagnostic statistics:
+<code>e</code> (residuals),
+<code>h</code>* (hat diagonals),
+<code>si</code>* (deleted standard deviation),
+<code>sta.res</code> (standardized residuals),
+<code>stu.res</code>* (Studentized deleted resididuals),
+<code>dffit</code> (difference in fits, change in predicted y when
+observation i is deleted),
+<code>dffits</code>* (standardized difference in fits, standardized change
+in predicted y when observation i is deleted),
+<code>cook</code>* (Cook's distance),
+and DFBETAs* (standardized difference in regression coefficients when
+observation i is deleted, one for each column of the x-matrix,
+including the intercept).
+</p>
+<p><code>plot.case</code> returns a <code>c("trellis.case", "trellis")</code> object
+containing the plot
+(including the starred columns by default) and also retains the
+row.names of the flagged observations in the
+<code>$panel.args.common$case.large</code>
+component.  The print method for the <code>c("trellis.case",
+    "trellis")</code>
+object prints the graph and the list of flagged observations.
+</p>
+<p><code>panel.case</code> is a panel function for <code>plot.case</code>.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p> Richard M. Heiberger &lt;rmh@temple.edu&gt; </p>
+
+
+<h3>References</h3>
+
+<p>Heiberger, Richard M. and Holland, Burt (2015).
+<em>Statistical Analysis and Data Display: An Intermediate Course with Examples in R</em>.
+Second Edition.
+Springer-Verlag, New York.
+<a href="https://link.springer.com/book/10.1007/978-1-4939-2122-5">https://link.springer.com/book/10.1007/978-1-4939-2122-5</a>
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>lm.influence</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(kidney)
+
+kidney2.lm &lt;- lm(clearance ~ concent + age + weight + concent*age,
+                 data=kidney,
+                 na.action=na.exclude)  ## recommended
+
+kidney2.case &lt;- case(kidney2.lm)
+
+## this picture looks much better in portrait, specification is device dependent
+
+plot(kidney2.case, kidney2.lm, par.strip.text=list(cex=.9),
+     layout=c(2,3))
+</code></pre>
+
+
+</div>

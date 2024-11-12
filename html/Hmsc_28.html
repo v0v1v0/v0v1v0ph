@@ -1,0 +1,194 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>sampleMcmc</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>sampleMCMC</h2>
+
+<h3>Description</h3>
+
+<p>Samples the posterior with block-conditional Gibbs MCMC sampler
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">sampleMcmc(
+  hM,
+  samples,
+  transient = 0,
+  thin = 1,
+  initPar = NULL,
+  verbose,
+  adaptNf = rep(transient, hM$nr),
+  nChains = 1,
+  nParallel = 1,
+  useSocket = TRUE,
+  dataParList = NULL,
+  updater = list(),
+  fromPrior = FALSE,
+  alignPost = TRUE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>hM</code></td>
+<td>
+<p>a fitted <code>Hmsc</code> model object</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>samples</code></td>
+<td>
+<p>the number of MCMC samples to be obtained in each chain</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>transient</code></td>
+<td>
+<p>the number of MCMC steps that are executed before starting recording posterior samples</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>thin</code></td>
+<td>
+<p>the number of MCMC steps between each recording of samples from the posterior</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>initPar</code></td>
+<td>
+<p>a named list of parameter values used for
+initialization of MCMC states, or alternatively text
+<code>"fixed effects"</code> to use linear Maximum Likelihood model
+instead of randomizing from prior; the <code>"fixed effects"</code>
+can shorten the transient phase of sampling, but will
+initialize all chains to the same starting values</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p>the interval between MCMC steps printed to the console (default is an interval that prints ca. 50 reports)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>adaptNf</code></td>
+<td>
+<p>a vector of length <code class="reqn">n_r</code> with number of MCMC steps at which the adaptation of the
+number of latent factors is conducted</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nChains</code></td>
+<td>
+<p>number of independent MCMC chains to be run</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nParallel</code></td>
+<td>
+<p>number of parallel processes by which the chains
+are executed.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>useSocket</code></td>
+<td>
+<p>(logical) use socket clusters in parallel
+processing; in Windows this is the only option, but in other
+operating systems fork clusters are a better alternative, and
+this should be set <code>FALSE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dataParList</code></td>
+<td>
+<p>a named list with pre-computed <code>Qg</code>, <code>iQg</code>, <code>RQg</code>, <code>detQg</code>, <code>rLPar</code>
+parameters</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>updater</code></td>
+<td>
+<p>a named list, specifying which conditional updaters should be ommitted</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fromPrior</code></td>
+<td>
+<p>whether prior (TRUE) or posterior (FALSE) is to be sampled</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alignPost</code></td>
+<td>
+<p>boolean flag indicating whether the posterior of each chains should be aligned</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The exact number of samples to be recorded in order to get a proper estimate of the full posterior with
+Gibbs MCMC algorithms, as well as the required thinning and cut-off of transient is very problem-specific and
+depends both on the model structure and the data itself. Therefore, in general it is very challenging to a priori
+provide an informed recommendation on what values should be used for a particular problem. A common recommended
+strategy involves executing the posterior sampling with MCMC with some guess of the values for these arguments,
+checking the properties of the obtained samples (primarily potential scale reduction factor and effective sample
+size), and adjusting the guess accordingly.
+</p>
+<p>The value of 1 for <code>thin</code> argument means that at each MCMC step after the transient a sample is recorded.
+</p>
+<p>Typically, the value of <code>nParallel</code> equal to <code>nChains</code> leads to most efficient usage of available
+parallelization capacities. However, this may be not the case if R is configured with multi-tread linear
+algebra libraries. For debug and test purposes, the <code>nParallel</code> should be set to 1, since only in this case a
+details of the potentially encountered errors would be available.
+</p>
+<p>The <code>dataParList</code> argument may be handy for large problems that needs to be refitted multiple times, e.g.
+with different prior values. In that case, the data parameters that are precomputed for the Hmsc sampling
+scheme may require an undesirably lot of storage space if they are saved for each of the model.
+Instead, they could be computed only once and then directly reused, therefore reducing the storing redundancy.
+</p>
+<p>Some of the available conditional updaters partially duplicate each other. In certain cases, the usage of all
+of them may lead to suboptimal performance, compared to some subset of those. Then, it is possible to manually
+disable some of them, by adding a <code>$UPDATER_NAME=FALSE</code> pair to the updater argument. Another usage of
+this argument involves cases when some of the model parameters are known and have to be fixed. However, such
+tweaks of the sampling scheme should be done with caution, as if compromized they would lead to erroneuos
+results.
+</p>
+
+
+<h3>Value</h3>
+
+<p>An <code>Hmsc</code>-class object with chains of posterior samples added to the <code>postList</code> field
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>Hmsc</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## you need 1000 or more samples, but that will take too long
+## in an example
+m = sampleMcmc(TD$m, samples=10)
+
+## Not run: 
+## Record 1000 posterior samples while skipping 1 MCMC step between samples
+## from 2 chains after discarding the first 500 MCMC steps
+m = sampleMcmc(TD$m, samples=1000, transient=500, thin=2, nChains=2, nParallel=1)
+
+## End(Not run)
+
+</code></pre>
+
+
+</div>

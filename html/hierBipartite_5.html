@@ -1,0 +1,160 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hierBipartite</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Bipartite Graph-based Hierarchical Clustering</h2>
+
+<h3>Description</h3>
+
+<p>Main bipartite graph-based hierarchial clustering algorithm. Visit <a href="https://calvintchi.github.io/html/hierBipartite">here</a> for vignette on using the
+hierBipartite package.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hierBipartite(
+  X,
+  Y,
+  groups,
+  link = "ward.D2",
+  n_subsample = 1,
+  subsampling_ratio = 1,
+  p.value = FALSE,
+  n_perm = 100,
+  parallel = FALSE,
+  maxCores = 7,
+  p_cutoff = 0.1
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>X</code></td>
+<td>
+<p>an n x p matrix of variable set 1 (e.g. gene expression)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Y</code></td>
+<td>
+<p>an n x q matrix of variable set 2 (e.g. drug sensitivity)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>groups</code></td>
+<td>
+<p>a list of starting group membership (e.g. list("1" = c(1,2,3), "2" = c(4,5,6)) means group 1 has samples 1, 2, 3, and group 2 has samples 4, 5, 6.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>link</code></td>
+<td>
+<p>string indicating link function as input to hclust(). One of "ward.D", "ward.D2", "single", "complete", "average", "mcquitty", "median", "centroid".</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n_subsample</code></td>
+<td>
+<p>number of subsampling to generate matrix B (see paper)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>subsampling_ratio</code></td>
+<td>
+<p>fraction of samples to sample for subsampling to generate matrix B (see paper)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>p.value</code></td>
+<td>
+<p>boolean for whether to generate p-values for each merge</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n_perm</code></td>
+<td>
+<p>number of permutations for generating p-values. Ignored if p.value = FALSE</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>parallel</code></td>
+<td>
+<p>boolean for whether to parallelize subsampling and p-value generation step</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>maxCores</code></td>
+<td>
+<p>maximum number of cores to use (only applicable when parallel = TRUE)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>p_cutoff</code></td>
+<td>
+<p>p-value cutoff that determines whether merge is significant. If p-value &gt; p_cutoff, p-values will not be calculated for future merges involving current group. Ignored if p.value = FALSE.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>list of results from bipartite graph-based hierarchical clustering, containing up to
+</p>
+
+<ul>
+<li>
+<p> hclustObj: hclust object
+</p>
+</li>
+<li>
+<p> groupMerges: list of clusters after each merge, in order of merge.
+Each cluster is indicated by a vector of cell line groups
+</p>
+</li>
+<li>
+<p> nodePvals: list of p-value of each new merge,
+in order of merge. Only available if p.value = TRUE
+</p>
+</li>
+<li>
+<p> D: dissimilarity matrix
+</p>
+</li>
+</ul>
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Get a small subset of the test dataset
+data(ctrp2)
+
+groups = ctrp2$groups
+X = ctrp2$X
+Y = ctrp2$Y
+
+groupNames = names(groups)
+groupSmall = groups[groupNames[1:3]]
+
+## Not run: 
+# Basic call of hierBipartite() on small test dataset
+result0 = hierBipartite(X, Y, groupSmall)
+
+# Calling hierBipartite() with subsampling
+result1 = hierBipartite(X, Y, groupSmall, n_subsample = 100, subsampling_ratio = 0.90)
+
+# Calling hierBipartite() with p-value generation
+result2 = hierBipartite(X, Y, groupSmall, n_perm = 100, p.value = TRUE, p_cutoff = 0.10)
+
+# Calling hierBipartite() with both subsampling and p-value generation (expensive)
+result3 = hierBipartite(X, Y, groupSmall, n_subsample = 100, subsampling_ratio = 0.90,
+                        n_perm = 100, p.value = TRUE, p_cutoff = 0.10)
+
+## End(Not run)
+
+</code></pre>
+
+
+</div>

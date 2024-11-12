@@ -1,0 +1,62 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>write_disk</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Control where the response body is written.</h2>
+
+<h3>Description</h3>
+
+<p>The default behaviour is to use <code>write_memory()</code>, which caches
+the response locally in memory. This is useful when talking to APIs as
+it avoids a round-trip to disk. If you want to save a file that's bigger
+than memory, use <code>write_disk()</code> to save it to a known path.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">write_disk(path, overwrite = FALSE)
+
+write_memory()
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>path</code></td>
+<td>
+<p>Path to content to.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>overwrite</code></td>
+<td>
+<p>Will only overwrite existing <code>path</code> if TRUE.</p>
+</td>
+</tr>
+</table>
+<h3>Examples</h3>
+
+<pre><code class="language-R">tmp &lt;- tempfile()
+r1 &lt;- GET("https://www.google.com", write_disk(tmp))
+readLines(tmp)
+
+# The default
+r2 &lt;- GET("https://www.google.com", write_memory())
+
+# Save a very large file
+## Not run: 
+GET(
+  "http://www2.census.gov/acs2011_5yr/pums/csv_pus.zip",
+  write_disk("csv_pus.zip"), progress()
+)
+
+## End(Not run)
+</code></pre>
+
+
+</div>

@@ -1,0 +1,96 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>ellipseParam</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Lengths Of The Semi-Axes Of Hotelling Ellipse</h2>
+
+<h3>Description</h3>
+
+<p>Compute the lengths of the semi-axes of Hotelling ellipse.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">ellipseParam(data, k = 2, pcx = 1, pcy = 2)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>Data frame or tibble of PCA, PLS, or ICA scores, or from other feature projection methods.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>k</code></td>
+<td>
+<p>Integer specifying the number of components (by default 2).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pcx</code></td>
+<td>
+<p>Integer specifying which component is on the x-axis (by default 1).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pcy</code></td>
+<td>
+<p>Integer specifying which component is on the y-axis (by default 2).</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>Returns a list that includes:
+</p>
+
+<ol>
+<li> <p><strong>Tsquare</strong> Data frame containing the T-squared statistic.
+</p>
+</li>
+<li> <p><strong>Ellipse</strong> Data frame containing the lengths of the semi-minor and semi-major axes.
+</p>
+</li>
+<li> <p><strong>cutoff.99pct</strong> Number corresponding to the T-square cutoff at 99% confidence level.
+</p>
+</li>
+<li> <p><strong>cutoff.95pct</strong> Number corresponding to the T-square cutoff at 95% confidence level.
+</p>
+</li>
+</ol>
+<h3>Author(s)</h3>
+
+<p>Christian L. Goueguel,
+christian.goueguel@gmail.com
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Principal components analysis (PCA)
+library(dplyr)
+set.seed(123)
+pca_mod &lt;- specData %&gt;%
+  dplyr::select(where(is.numeric)) %&gt;%
+  FactoMineR::PCA(scale.unit = FALSE, graph = FALSE)
+
+## Extract PCA scores
+pca_scores &lt;- pca_mod %&gt;%
+   purrr::pluck("ind", "coord") %&gt;%
+   tibble::as_tibble()
+
+## Get Hotelling T2-value and the lengths of the ellipse semi-axes
+library(HotellingEllipse)
+T2 &lt;- ellipseParam(data = pca_scores, k = 2, pcx = 1, pcy = 2)
+
+</code></pre>
+
+
+</div>

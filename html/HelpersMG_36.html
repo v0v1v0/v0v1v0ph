@@ -1,0 +1,118 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>index.periodic</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Estimate indices in periodic timeseries based on anchored minimum and maximum</h2>
+
+<h3>Description</h3>
+
+<p>Estimate indices in periodic timeseries based on anchored minimum and maximum.<br>
+The data.frame minmax can be generated manually. It should have three columns (time, index, SD),
+with all the successive minimum and maximum indices.<br>
+It can be used with sun.info() to get the time of minimum and maximum air temperature or
+with getTide() to reconstruct the sea level.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">index.periodic(minmax, time = NULL, replicates = 100, progressbar = FALSE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>minmax</code></td>
+<td>
+<p>A data.frame returned by minmax.periodic</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>time</code></td>
+<td>
+<p>The time at which produced the estimate</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>replicates</code></td>
+<td>
+<p>Number of replicates to estimate SD</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>progressbar</code></td>
+<td>
+<p>Does a progression bar must be shown</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>index.periodic estimate indices in periodic timeseries based on anchored minimum and maximum
+</p>
+
+
+<h3>Value</h3>
+
+<p>A data.frame with a column time and a column index
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Marc Girondot <a href="mailto:marc.girondot@gmail.com">marc.girondot@gmail.com</a>
+</p>
+
+
+<h3>See Also</h3>
+
+<p>Other Periodic patterns of indices: 
+<code>minmax.periodic()</code>,
+<code>moon.info()</code>,
+<code>sun.info()</code>,
+<code>tide.info()</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+# Generate a timeserie of time
+time.obs &lt;- NULL
+for (i in 0:9) time.obs &lt;- c(time.obs, c(0, 6, 12, 18)+i*24)
+# For these time, generate a timeseries of temperatures
+temp.obs &lt;- rep(NA, length(time.obs))
+temp.obs[3+(0:9)*4] &lt;- rnorm(10, 25, 3)
+temp.obs[1+(0:9)*4] &lt;- rnorm(10, 10, 3)
+for (i in 1:(length(time.obs)-1)) 
+  if (is.na(temp.obs[i])) 
+  temp.obs[i] &lt;- mean(c(temp.obs[i-1], temp.obs[i+1]))
+  if (is.na(temp.obs[length(time.obs)])) 
+  temp.obs[length(time.obs)] &lt;- temp.obs[length(time.obs)-1]/2
+observed &lt;- data.frame(time=time.obs, temperature=temp.obs)
+# Search for the minimum and maximum values
+r &lt;- minmax.periodic(time.minmax.daily=c(Min=2, Max=15), 
+observed=observed, period=24, colname.index="temperature")
+
+# Estimate all the temperatures for these values
+t &lt;- index.periodic(minmax=r)
+
+plot_errbar(x=t[,"time"], y=t[,"index"],
+errbar.y=ifelse(is.na(t[,"sd"]), 0, 2*t[,"sd"]),
+type="l", las=1, bty="n", errbar.y.polygon = TRUE, 
+xlab="hours", ylab="Temperatures", ylim=c(0, 35), 
+errbar.y.polygon.list = list(col="grey"))
+
+plot_add(x=t[,"time"], y=t[,"index"], type="l")
+
+plot_add(observed$time, observed$temperature, pch=19, cex=0.5)
+
+## End(Not run)
+</code></pre>
+
+
+</div>

@@ -1,0 +1,100 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hypervolume_prune</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Removes small hypervolumes from a HypervolumeList
+</h2>
+
+<h3>Description</h3>
+
+<p>Identifies hypervolumes characterized either by a  number of uniformly random points or a volume below a user-specified value and removes them from a <code>HypervolumeList</code>. 
+</p>
+<p>This function is useful for removing small features that can occur stochastically during segmentation after set operations or hole detection. 
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hypervolume_prune(hvlist, num.points.min = NULL, volume.min = NULL, return.ids=FALSE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>hvlist</code></td>
+<td>
+
+<p>A <code>HypervolumeList</code> object.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>num.points.min</code></td>
+<td>
+
+<p>The minimum number of points in each input hypervolume.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>volume.min</code></td>
+<td>
+
+<p>The minimum volume in each input hypervolume
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>return.ids</code></td>
+<td>
+
+<p>If <code>TRUE</code>, returns indices of input list as well as a pruned hypervolume list
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Either <code>minnp</code> or <code>minvol</code> (but not both) must be specified.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A <code>HypervolumeList</code> pruned to only those hypervolumes of sizes above the desired value. If <code>returnids=TRUE</code>, instead returns a list structure with first item being the <code>HypervolumeList</code> and the second item being the indices of the retained hypervolumes.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>hypervolume_holes</code>, <code>hypervolume_segment</code> 
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+data(penguins,package='palmerpenguins')
+penguins_no_na = as.data.frame(na.omit(penguins))
+penguins_adelie = penguins_no_na[penguins_no_na$species=="Adelie",
+                    c("bill_length_mm","bill_depth_mm","flipper_length_mm")]
+
+hv = hypervolume_gaussian(penguins_adelie,name='Adelie')
+
+hv_segmented &lt;- hypervolume_segment(hv, 
+                          num.points.max=200, distance.factor=1,
+                          check.memory=FALSE) # intentionally under-segment
+hv_segmented_pruned &lt;- hypervolume_prune(hv_segmented, 
+                          num.points.min=20)
+plot(hv_segmented_pruned)
+
+## End(Not run)
+</code></pre>
+
+
+</div>

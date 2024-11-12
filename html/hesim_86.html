@@ -1,0 +1,142 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>define_rng</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Define and evaluate random number generation expressions</h2>
+
+<h3>Description</h3>
+
+<p>Random number generation expressions are used to
+randomly sample model parameters from suitable distributions for probabilistic
+sensitivity analysis. These functions are typically used when evaluating
+an object of class <code>model_def</code> defined using <code>define_model()</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">define_rng(expr, n = 1, ...)
+
+eval_rng(x, params = NULL, check = TRUE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>expr</code></td>
+<td>
+<p>An expression used to randomly draw variates for each parameter of
+interest in the model. Braces should be used so that the result
+of the last expression within the braces is evaluated. The expression must
+return a list where each element is either a <code>vector</code> or tabular object
+( <code>matrix</code>, <code>data.frame</code>, or <code>data.table</code>). The length of the vector must
+either be or <code>n</code> and the number of rows in the tabular object must be <code>n</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n</code></td>
+<td>
+<p>Number of samples of the parameters to draw.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Additional arguments to pass to the environment used to evaluate
+<code>expr</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>An object of class <code>rng_def</code> created with <code>define_rng()</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>params</code></td>
+<td>
+<p>A list containing the values of parameters for random number
+generation. Each element of the list should either be a <code>vector</code>,
+<code>matrix</code>, <code>data.frame</code>, or <code>data.table</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>check</code></td>
+<td>
+<p>Whether to check the returned output so that (i) it returns a list
+and (ii) each element has the correct length or number of rows. Default is <code>TRUE</code>,
+meaning that any output can be returned. This is always <code>TRUE</code> when used inside
+<code>define_model()</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p><code>hesim</code> contains a number of random number generation functions
+that return parameter samples in convenient formats
+and do not typically require the number of samples, <code>n</code>, as arguments
+(see <code>rng_distributions</code>). The random number generation expressions
+are evaluated using <code>eval_rng()</code> and used within <code>expr</code>
+in <code>define_rng()</code>. If a multivariate object is returned by <code>eval_rng()</code>,
+then the rows are random samples and columns are
+distinct parameters (e.g., costs for each health state, elements of a
+transition probability matrix).
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>define_rng()</code> returns an object of class <code>rng_def</code>,
+which is a list containing the unevaluated random number generation
+expressions passed  to <code>expr</code>, <code>n</code>, and any additional arguments passed to
+<code>...</code> . <code>eval_rng()</code> evaluates the <code>rng_def</code> object and
+returns an <code>eval_rng</code> object containing the evaluated expression.
+</p>
+
+
+<h3>See Also</h3>
+
+<p>Parameters can be conveniently sampled from probability distributions
+using a number of random number generation functions (see <code>rng_distributions</code>).
+An economic model can be created with <code>create_CohortDtstm()</code> by using
+<code>define_rng()</code> (or a previously evaluated <code>eval_rng</code> object)
+alongside <code>define_tparams()</code> to define a model with <code>define_model()</code>.
+It can be useful to summarize an evaluated expression with <code>summary.eval_rng()</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"> 
+params &lt;- list(
+  alpha = matrix(c(75, 25, 33, 67), byrow = TRUE, ncol = 2),
+  inptcost_mean = c(A = 900, B = 1500, C = 2000),
+  outptcost_mean = matrix(c(300, 600, 800,
+                            400, 700, 700),
+                           ncol = 3, byrow = TRUE)
+)
+rng_def &lt;- define_rng({
+  aecost_mean &lt;- c(500, 800, 1000) # Local object not 
+                                   # not returned by eval_rng()
+  list( # Sampled values of parameters returned by eval_rng()
+    p = dirichlet_rng(alpha), # Default column names
+    inptcost = gamma_rng(mean = inptcost_mean, # Column names based on 
+                         sd = inptcost_mean),  # named vector
+    outptcost = outptcost_mean, # No column names because
+                                # outptcost_mean has none.
+    aecost = gamma_rng(mean = aecost_mean, # Explicit naming of columns
+                       sd = aecost_mean,
+                       names = aecost_colnames)
+  )
+}, n = 2, aecost_colnames = c("A", "B", "C")) # Add aecost_colnames to environment
+params_sample &lt;- eval_rng(x = rng_def, params)
+summary(params_sample)
+params_sample
+</code></pre>
+
+
+</div>

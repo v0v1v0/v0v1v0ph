@@ -1,0 +1,294 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>validate</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Validate high-dimensional Cox models with time-dependent AUC</h2>
+
+<h3>Description</h3>
+
+<p>Validate high-dimensional Cox models with time-dependent AUC
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">validate(
+  x,
+  time,
+  event,
+  model.type = c("lasso", "alasso", "flasso", "enet", "aenet", "mcp", "mnet", "scad",
+    "snet"),
+  alpha,
+  lambda,
+  pen.factor = NULL,
+  gamma,
+  lambda1,
+  lambda2,
+  method = c("bootstrap", "cv", "repeated.cv"),
+  boot.times = NULL,
+  nfolds = NULL,
+  rep.times = NULL,
+  tauc.type = c("CD", "SZ", "UNO"),
+  tauc.time,
+  seed = 1001,
+  trace = TRUE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>Matrix of training data used for fitting the model;
+on which to run the validation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>time</code></td>
+<td>
+<p>Survival time.
+Must be of the same length with the number of rows as <code>x</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>event</code></td>
+<td>
+<p>Status indicator, normally 0 = alive, 1 = dead.
+Must be of the same length with the number of rows as <code>x</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>model.type</code></td>
+<td>
+<p>Model type to validate. Could be one of <code>"lasso"</code>,
+<code>"alasso"</code>, <code>"flasso"</code>, <code>"enet"</code>, <code>"aenet"</code>,
+<code>"mcp"</code>, <code>"mnet"</code>, <code>"scad"</code>, or <code>"snet"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alpha</code></td>
+<td>
+<p>Value of the elastic-net mixing parameter alpha for
+<code>enet</code>, <code>aenet</code>, <code>mnet</code>, and <code>snet</code> models.
+For <code>lasso</code>, <code>alasso</code>, <code>mcp</code>, and <code>scad</code> models,
+please set <code>alpha = 1</code>.
+<code>alpha=1</code>: lasso (l1) penalty; <code>alpha=0</code>: ridge (l2) penalty.
+Note that for <code>mnet</code> and <code>snet</code> models,
+<code>alpha</code> can be set to very close to 0 but not 0 exactly.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lambda</code></td>
+<td>
+<p>Value of the penalty parameter lambda to use in the
+model fits on the resampled data. From the fitted Cox model.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pen.factor</code></td>
+<td>
+<p>Penalty factors to apply to each coefficient.
+From the fitted <em>adaptive lasso</em> or <em>adaptive elastic-net</em> model.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>gamma</code></td>
+<td>
+<p>Value of the model parameter gamma for
+MCP/SCAD/Mnet/Snet models.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lambda1</code></td>
+<td>
+<p>Value of the penalty parameter lambda1 for fused lasso model.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lambda2</code></td>
+<td>
+<p>Value of the penalty parameter lambda2 for fused lasso model.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+<p>Validation method.
+Could be <code>"bootstrap"</code>, <code>"cv"</code>, or <code>"repeated.cv"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>boot.times</code></td>
+<td>
+<p>Number of repetitions for bootstrap.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nfolds</code></td>
+<td>
+<p>Number of folds for cross-validation and
+repeated cross-validation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rep.times</code></td>
+<td>
+<p>Number of repeated times for repeated cross-validation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tauc.type</code></td>
+<td>
+<p>Type of time-dependent AUC.
+Including <code>"CD"</code> proposed by Chambless and Diao (2006).,
+<code>"SZ"</code> proposed by Song and Zhou (2008).,
+<code>"UNO"</code> proposed by Uno et al. (2007).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tauc.time</code></td>
+<td>
+<p>Numeric vector. Time points at which to evaluate
+the time-dependent AUC.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>seed</code></td>
+<td>
+<p>A random seed for resampling.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>trace</code></td>
+<td>
+<p>Logical. Output the validation progress or not.
+Default is <code>TRUE</code>.</p>
+</td>
+</tr>
+</table>
+<h3>References</h3>
+
+<p>Chambless, L. E. and G. Diao (2006).
+Estimation of time-dependent area under the ROC curve for long-term
+risk prediction.
+<em>Statistics in Medicine</em> 25, 3474–3486.
+</p>
+<p>Song, X. and X.-H. Zhou (2008).
+A semiparametric approach for the covariate specific ROC curve with
+survival outcome.
+<em>Statistica Sinica</em> 18, 947–965.
+</p>
+<p>Uno, H., T. Cai, L. Tian, and L. J. Wei (2007).
+Evaluating prediction rules for t-year survivors with censored
+regression models.
+<em>Journal of the American Statistical Association</em> 102, 527–537.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(smart)
+x &lt;- as.matrix(smart[, -c(1, 2)])[1:500, ]
+time &lt;- smart$TEVENT[1:500]
+event &lt;- smart$EVENT[1:500]
+y &lt;- survival::Surv(time, event)
+
+fit &lt;- fit_lasso(x, y, nfolds = 5, rule = "lambda.1se", seed = 11)
+
+# Model validation by bootstrap with time-dependent AUC
+# Normally boot.times should be set to 200 or more,
+# we set it to 3 here only to save example running time.
+val.boot &lt;- validate(
+  x, time, event,
+  model.type = "lasso",
+  alpha = 1, lambda = fit$lambda,
+  method = "bootstrap", boot.times = 3,
+  tauc.type = "UNO", tauc.time = seq(0.25, 2, 0.25) * 365,
+  seed = 1010
+)
+
+# Model validation by 5-fold cross-validation with time-dependent AUC
+val.cv &lt;- validate(
+  x, time, event,
+  model.type = "lasso",
+  alpha = 1, lambda = fit$lambda,
+  method = "cv", nfolds = 5,
+  tauc.type = "UNO", tauc.time = seq(0.25, 2, 0.25) * 365,
+  seed = 1010
+)
+
+# Model validation by repeated cross-validation with time-dependent AUC
+val.repcv &lt;- validate(
+  x, time, event,
+  model.type = "lasso",
+  alpha = 1, lambda = fit$lambda,
+  method = "repeated.cv", nfolds = 5, rep.times = 3,
+  tauc.type = "UNO", tauc.time = seq(0.25, 2, 0.25) * 365,
+  seed = 1010
+)
+
+# bootstrap-based discrimination curves has a very narrow band
+print(val.boot)
+summary(val.boot)
+plot(val.boot)
+
+# k-fold cv provides a more strict evaluation than bootstrap
+print(val.cv)
+summary(val.cv)
+plot(val.cv)
+
+# repeated cv provides similar results as k-fold cv
+# but more robust than k-fold cv
+print(val.repcv)
+summary(val.repcv)
+plot(val.repcv)
+# # Test fused lasso, SCAD, and Mnet models
+#
+# data(smart)
+# x = as.matrix(smart[, -c(1, 2)])[1:500,]
+# time = smart$TEVENT[1:500]
+# event = smart$EVENT[1:500]
+# y = survival::Surv(time, event)
+#
+# set.seed(1010)
+# val.boot = validate(
+#   x, time, event, model.type = "flasso",
+#   lambda1 = 5, lambda2 = 2,
+#   method = "bootstrap", boot.times = 10,
+#   tauc.type = "UNO", tauc.time = seq(0.25, 2, 0.25) * 365,
+#   seed = 1010)
+#
+# val.cv = validate(
+#   x, time, event, model.type = "scad",
+#   gamma = 3.7, alpha = 1, lambda = 0.05,
+#   method = "cv", nfolds = 5,
+#   tauc.type = "UNO", tauc.time = seq(0.25, 2, 0.25) * 365,
+#   seed = 1010)
+#
+# val.repcv = validate(
+#   x, time, event, model.type = "mnet",
+#   gamma = 3, alpha = 0.3, lambda = 0.05,
+#   method = "repeated.cv", nfolds = 5, rep.times = 3,
+#   tauc.type = "UNO", tauc.time = seq(0.25, 2, 0.25) * 365,
+#   seed = 1010)
+#
+# print(val.boot)
+# summary(val.boot)
+# plot(val.boot)
+#
+# print(val.cv)
+# summary(val.cv)
+# plot(val.cv)
+#
+# print(val.repcv)
+# summary(val.repcv)
+# plot(val.repcv)
+</code></pre>
+
+
+</div>

@@ -1,0 +1,93 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hicp.data</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Download HICP data</h2>
+
+<h3>Description</h3>
+
+<p>These functions are simple wrappers of functions in the <code>restatapi</code> package. Function <code>hicp.datasets()</code> lists all available HICP datasets in Eurostat's public database, while <code>hicp.datafilters()</code> gives the allowed values that can be used for filtering a dataset. <code>hicp.dataimport()</code> downloads a specific dataset with filtering on key parameters and time, if supplied.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hicp.datasets()
+
+hicp.datafilters(id)
+
+hicp.dataimport(id, filters=list(), date.range=NULL, flags=FALSE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>id</code></td>
+<td>
+<p>A dataset identifier, which can be obtained from <code>hicp.datasets()</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>filters</code></td>
+<td>
+<p>A named list of filters to be applied to the data request. Allowed values for filtering can be retrieved from <code>hicp.datafilters()</code>. For HICP data, typical filter variables are the index reference period (<code>unit: I96, I05, I15</code>), the country (<code>geo: EA, DE, FR,...</code>), or the COICOP code (<code>coicop: CP00, CP01, SERV, ...</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>date.range</code></td>
+<td>
+<p>A vector of start and end date used for filtering on time dimension. These must follow the pattern <code>YYYY(-MM)?</code>. An open interval can be defined by setting one date to <code>NA</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>flags</code></td>
+<td>
+<p>A logical indicating if data flags should be returned or not.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A data.table.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Sebastian Weinand</p>
+
+
+<h3>Source</h3>
+
+<p>See Eurostat's public database at <a href="https://ec.europa.eu/eurostat/web/main/data/database">https://ec.europa.eu/eurostat/web/main/data/database</a>.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>get_eurostat_toc</code>, <code>get_eurostat_dsd</code>, <code>get_eurostat_data</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># set cores for testing on CRAN:
+library(restatapi)
+options(restatapi_cores=1)
+
+# view available datasets:
+hicp.datasets()
+
+# get allowed filters for item weights:
+hicp.datafilters(id="prc_hicp_inw")
+
+# download item weights for euro area from 2015 on:
+hicp.dataimport(id="prc_hicp_inw", filters=list("geo"="EA"), date.range=c("2015", NA))
+</code></pre>
+
+
+</div>

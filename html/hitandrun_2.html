@@ -1,0 +1,132 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>bbReject</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Bounding box rejection sampler
+</h2>
+
+<h3>Description</h3>
+
+<p>Generates uniform random variates over a convex polytope defined by a set of linear constraints by generating uniform variates over a bounding box and rejecting those outside the polytope.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">bbReject(lb, ub, constr, N, homogeneous=FALSE, transform=NULL)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>lb</code></td>
+<td>
+<p>Lower bound for each dimension (not including homogeneous coordinate)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ub</code></td>
+<td>
+<p>Upper bound for each dimension (not including homogeneous coordinate)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>constr</code></td>
+<td>
+<p>Constraint definition (see details)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>N</code></td>
+<td>
+<p>Number of samples to generate</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>homogeneous</code></td>
+<td>
+<p>Whether constr and transform are given in homogeneous coordinate representation (see details)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>transform</code></td>
+<td>
+<p>Transformation matrix to apply to the generated samples (optional)</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>See <code>har</code> for a description of the constraint definition and the homogeneous coordinate representation.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A list, containing:
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>samples</code></td>
+<td>
+<p>A matrix containing the generated samples as rows.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rejectionRate</code></td>
+<td>
+<p>The mean number of samples rejected for each accepted sample.</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>Gert van Valkenhoef
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>createBoundBox</code>
+</p>
+<p><code>harConstraints</code>
+<code>simplex.createTransform</code>
+<code>simplex.createConstraints</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># constraints: x_1 &gt;= 0, x_2 &gt;= 0, x_1 + x_2 &lt;= 1
+A &lt;- rbind(c(-1, 0), c(0, -1), c(1, 1))
+b &lt;- c(0, 0, 1)
+d &lt;- c("&lt;=", "&lt;=", "&lt;=")
+constr &lt;- list(constr=A, rhs=b, dir=d)
+
+# create a bounding box that contains the polytope
+lb &lt;- c(0, 0)
+ub &lt;- c(1, 1)
+
+# sample 10,000 points
+samples &lt;- bbReject(lb, ub, constr, 1E4)$samples
+
+# Check dimension of result
+stopifnot(dim(samples) == c(1E4, 2))
+
+# Check that x_i &gt;= 0
+stopifnot(samples &gt;= 0)
+
+# Check that x_1 + x_2 &lt;= 1
+stopifnot(samples[,1] + samples[,2] &lt;= 1)
+
+plot(samples)
+
+</code></pre>
+
+
+</div>

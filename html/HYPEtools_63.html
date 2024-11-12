@@ -1,0 +1,70 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>MergeXobs</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Merge two Xobs data frames</h2>
+
+<h3>Description</h3>
+
+<p>Function to merge two Xobs data frames, with handling of overlapping time periods and time periods gaps
+as well as merging of common columns.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">MergeXobs(x, y, comment = "")
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x, y</code></td>
+<td>
+<p>Data frames of class <code>HypeXobs</code>, including additional attributes <code>comment</code>,
+<code>variable</code>, <code>subid</code>, and <code>timestep</code>, typically imported using <code>ReadXobs</code>.
+For details on attribute format, see the class description. Class attribute not formally necessary.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>comment</code></td>
+<td>
+<p>Character string, will be added to the result as attribute <code>comment</code>. If empty,
+comment attributes from <code>x</code> and <code>y</code> will be merged to new comment string.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p><code>MergeXobs</code> handles time steps of different lengths (e.g. daily, hourly), but requires identical time
+step lengths from both inputs data frames. The functions expects data frames of class <code>HypeXobs</code>
+or data frames with comparable structure and will throw a warning if the class attribute is missing.
+</p>
+<p>In case of common columns (identical observation variable and SUBID combinations in <code>x</code> and <code>y</code>),
+values from columns in <code>x</code> will take precedence, and values from <code>y</code> will only be added if
+<code>x</code> values are missing
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>MergeXobs</code> returns a data frame with attributes for Xobs data.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Import dummy data, add new observations to second Xobs table
+te1 &lt;- ReadXobs(filename = system.file("demo_model", "Xobs.txt", package = "HYPEtools"))
+te2 &lt;- ReadXobs(filename = system.file("demo_model", "Xobs.txt", package = "HYPEtools"))
+te2$WSTR_40541[1:10] &lt;- runif(n = 10, 50, 100)
+MergeXobs(x = te1, y = te2)
+
+</code></pre>
+
+
+</div>

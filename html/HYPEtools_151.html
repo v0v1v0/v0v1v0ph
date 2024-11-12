@@ -1,0 +1,277 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>GOF</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Goodness of Fit Functions</h2>
+
+<h3>Description</h3>
+
+<p>Numerical goodness-of-fit measures between sim and obs, with treatment of missing values.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">gof(sim, obs, ...)
+
+## Default S3 method:
+gof(
+  sim,
+  obs,
+  na.rm = TRUE,
+  do.spearman = FALSE,
+  s = c(1, 1, 1),
+  method = c("2009", "2012"),
+  start.month = 1,
+  digits = 2,
+  fun = NULL,
+  ...,
+  epsilon.type = c("none", "Pushpalatha2012", "otherFactor", "otherValue"),
+  epsilon.value = NA
+)
+
+valindex(sim, obs, ...)
+
+## Default S3 method:
+valindex(sim, obs, ...)
+
+rPearson(sim, obs, ...)
+
+## Default S3 method:
+rPearson(
+  sim,
+  obs,
+  fun = NULL,
+  ...,
+  epsilon.type = c("none", "Pushpalatha2012", "otherFactor", "otherValue"),
+  epsilon.value = NA
+)
+
+sKGE(sim, obs, ...)
+
+## Default S3 method:
+sKGE(
+  sim,
+  obs,
+  s = c(1, 1, 1),
+  na.rm = TRUE,
+  method = c("2009", "2012"),
+  start.month = 1,
+  out.PerYear = FALSE,
+  fun = NULL,
+  ...,
+  epsilon.type = c("none", "Pushpalatha2012", "otherFactor", "otherValue"),
+  epsilon.value = NA
+)
+
+KGE(sim, obs, ...)
+
+## Default S3 method:
+KGE(
+  sim,
+  obs,
+  s = c(1, 1, 1),
+  na.rm = TRUE,
+  method = c("2009", "2012", "2021"),
+  out.type = c("single", "full"),
+  fun = NULL,
+  ...,
+  epsilon.type = c("none", "Pushpalatha2012", "otherFactor", "otherValue"),
+  epsilon.value = NA
+)
+
+NSE(sim, obs, ...)
+
+## Default S3 method:
+NSE(
+  sim,
+  obs,
+  na.rm = TRUE,
+  fun = NULL,
+  ...,
+  epsilon.type = c("none", "Pushpalatha2012", "otherFactor", "otherValue"),
+  epsilon.value = NA
+)
+
+pbias(sim, obs, ...)
+
+## Default S3 method:
+pbias(
+  sim,
+  obs,
+  na.rm = TRUE,
+  dec = 1,
+  fun = NULL,
+  ...,
+  epsilon.type = c("none", "Pushpalatha2012", "otherFactor", "otherValue"),
+  epsilon.value = NA
+)
+
+mae(sim, obs, ...)
+
+## Default S3 method:
+mae(
+  sim,
+  obs,
+  na.rm = TRUE,
+  fun = NULL,
+  ...,
+  epsilon.type = c("none", "Pushpalatha2012", "otherFactor", "otherValue"),
+  epsilon.value = NA
+)
+
+VE(sim, obs, ...)
+
+## Default S3 method:
+VE(
+  sim,
+  obs,
+  na.rm = TRUE,
+  fun = NULL,
+  ...,
+  epsilon.type = c("none", "Pushpalatha2012", "otherFactor", "otherValue"),
+  epsilon.value = NA
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>sim</code></td>
+<td>
+<p>numeric, vector of simulated values</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>obs</code></td>
+<td>
+<p>numeric, vector of observed values</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>further arguments passed to/from other methods.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>na.rm</code></td>
+<td>
+<p>a logical value indicating whether 'NA' should be stripped before the computation proceeds.
+When an 'NA' value is found at the i-th position in obs OR sim, the i-th value of obs AND sim are removed before the computation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>do.spearman</code></td>
+<td>
+<p>logical, indicates if the Spearman correlation should be computed. The default is <code>FALSE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>s</code></td>
+<td>
+<p>argument passed to the <code>KGE</code> function.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+<p>argument passed to the <code>KGE</code> function.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>start.month</code></td>
+<td>
+<p>argument passed to the <code>sKGE</code> function.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>digits</code></td>
+<td>
+<p>integer, numer of decimal places used for rounding the goodness of fit indexes.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fun</code></td>
+<td>
+<p>function to be applied to <code>sim</code> and <code>obs</code> in order to obtain transformed values thereof before applying any goodness-of-fit function</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>epsilon.type</code></td>
+<td>
+<p>argument used to define a numeric value to be added to both <code>sim</code> and <code>obs</code> before applying fun. It was designed to allow the use of
+logarithm and other similar functions that do not work with zero values. It must be one of the following possible values:
+</p>
+
+<ul>
+<li>
+<p><em>none</em>: no value added to <code>sim</code> or <code>obs</code>.
+</p>
+</li>
+<li>
+<p><em>Pushpalatha2012</em>: one hundredth of the mean observed values is added to both <code>sim</code> and <code>obs</code> as described in Pushpalatha et al., 2012.
+</p>
+</li>
+<li>
+<p><em>otherFactor</em>: the numeric value defined in <code>epsilon.value</code> is used to multiply the mean observed values instead of the one hundredth (1/100)
+described in Pushpalatha et al., (2012). The resulting value is then added to both <code>sim</code> and <code>obs</code>.
+</p>
+</li>
+<li>
+<p><em>otherValue</em>: the numeric value defined in <code>epsilon.value</code> is directly added to both <code>sim</code> and <code>obs</code>.
+</p>
+</li>
+</ul>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>epsilon.value</code></td>
+<td>
+<p>numeric, value to be added to both <code>sim</code> and <code>obs</code> when <code>epsilon</code> = "otherValue".</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>out.PerYear</code></td>
+<td>
+<p>logical, argument passed to the <code>sKGE</code> function.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>out.type</code></td>
+<td>
+<p>argument passed to the <code>KGE</code> function.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dec</code></td>
+<td>
+<p>argument passed to the <code>pbias</code> function.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The <code>gof</code>, <code>mae</code>, <code>pbias</code>, <code>NSE</code>, <code>rPearson</code>, <code>sKGE</code>, and <code>KGE</code> functions are provided to calculate goodness of fit statistics.
+The functions were adapted from the hydroGOF package <a href="https://github.com/hzambran/hydroGOF">https://github.com/hzambran/hydroGOF</a>.
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>gof</code> Returns a matrix of goodness of fit statistics. <code>mae</code>, <code>pbias</code>, <code>NSE</code>, <code>rPearson</code>, <code>sKGE</code>, and <code>KGE</code> return a numeric of the goodness of fit statistic.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">gof(sim = sample(1:100), obs = sample(1:100))
+
+</code></pre>
+
+
+</div>

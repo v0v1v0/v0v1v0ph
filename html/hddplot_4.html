@@ -1,0 +1,262 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>cvscores</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>For high-dimensional data with known groups, derive scores for plotting</h2>
+
+<h3>Description</h3>
+
+<p>This is designed to used with the output from
+<code>cvdisc</code>.  Test and training scores from successive
+cross-validation steps determine, via a principal components
+calculation, a low-dimensional global space onto which test scores are
+projected, in order to plot them.</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">cvscores(cvlist, nfeatures, ndisc = NULL, cl.other,
+         x.other, keepcols = NULL, print.progress = TRUE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>cvlist</code></td>
+<td>
+<p>Output object from <code>cvdisc</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nfeatures</code></td>
+<td>
+<p>Number of features to use</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ndisc</code></td>
+<td>
+<p>Dimension of space in which scores will be formed, at most
+one less than the number of groups</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cl.other</code></td>
+<td>
+<p>Classifies additional observations that are to be
+projected onto the same low-dimensional space</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x.other</code></td>
+<td>
+<p>Matrix from which additional observations will be taken</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>keepcols</code></td>
+<td>
+<p>Number of sets of principal component scores to use in
+discriminant calculations and consequent evaluation of scores that will
+determine the low-dimensional global space</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>print.progress</code></td>
+<td>
+<p>Set to <code>TRUE</code> (default) for printing out,
+as calculations proceed, the number of the current fold</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>scores</code></td>
+<td>
+<p>Scores that can be plotted</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cl</code></td>
+<td>
+<p>Factor that was used to classify observations into groups</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>other.scores</code></td>
+<td>
+<p>Other scores, if any, for plotting</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cl.other</code></td>
+<td>
+<p>Factor that was used to classify the 'other' data into groups</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nfeatures</code></td>
+<td>
+<p>Number of features used</p>
+</td>
+</tr>
+</table>
+<h3>Note</h3>
+
+<p>The methodology used here has developed beyond that described in
+Maindonald and Burden (2005)
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>John Maindonald</p>
+
+
+<h3>References</h3>
+
+<p>J. H. Maindonald and C. J. Burden, 2005. Selection bias in plots of
+microarray or other data that have been sampled from a high-dimensional space.
+In R. May and A.J. Roberts, eds., <em>Proceedings of 12th
+Computational Techniques and Applications Conference CTAC-2004</em>, volume 46,
+pp. C59–C74.
+</p>
+<p><a href="https://journal.austms.org.au/V46/CTAC2004/Main/home.html">https://journal.austms.org.au/V46/CTAC2004/Main/home.html</a> [March 15, 2005]</p>
+
+
+<h3>See Also</h3>
+
+<p>See also <code>cvdisc</code>, <code>scoreplot</code></p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Use first 500 rows (expression values) of Golub, for demonstration.
+data(Golub)
+data(golubInfo)
+attach(golubInfo)
+miniG.BM &lt;- Golub[1:500, BM.PB=="BM"]  # 1st 500 rows only
+cancer.BM &lt;- cancer[BM.PB=="BM"]
+miniG.cv &lt;- cvdisc(miniG.BM, cl=cancer.BM, nfeatures=1:10,
+                    nfold=c(3,1))
+miniG.scores &lt;- cvscores(cvlist=miniG.cv, nfeatures=4,
+                         cl.other=NULL)
+detach(golubInfo)
+
+## The function is currently defined as
+function(cvlist, nfeatures, ndisc=NULL, cl.other, x.other,
+           keepcols=NULL, print.progress=TRUE
+           ){
+    library(MASS)
+    foldids &lt;- cvlist$foldids
+    nfold &lt;- c(length(unique(foldids)), dim(foldids)[2])
+
+    ugenes &lt;- unique(as.vector(cvlist$genelist[1:nfeatures, ,]))
+    df &lt;- cvlist$xUsed[, ugenes]
+    cl &lt;- cvlist$cl
+    if(!length(cl)==dim(df)[1])
+      stop(paste("length(cl) =", length(cl),"does not equal",
+                 "dim(cvlist$df)[1] =", dim(df)[1]))
+    levnames &lt;- levels(cl)
+    if(is.null(ndisc))ndisc &lt;- length(levnames)-1
+    ngp &lt;- length(levnames)
+    nobs &lt;- dim(df)[1]
+    allscores &lt;- array(0, dim=c(nrow=nobs, ncol=ndisc*nfold[1], nleaf=nfold[2]))
+    if(!is.null(cl.other)){
+      cl.other &lt;- factor(cl.other)
+      if(is.null(dim(x.other)))stop("x.other must have dimension 2")
+      if(!length(cl.other)==dim(x.other)[2])
+        stop(paste("length(cl.other) =", length(cl.other),"does not equal",
+                   "dim(x.other)[2] =", dim(x.other)[2]))
+      df.other &lt;- data.frame(t(x.other[ugenes, ,drop=FALSE]))
+      colnames(df.other) &lt;- ugenes
+    }
+    else other.scores &lt;- NULL
+    for(k in 1:nfold[2]){
+      foldk &lt;- foldids[,k]
+      ufold &lt;- sort(unique(foldk))
+      j &lt;- 0
+      for(i in ufold){
+        j &lt;- j+1
+        if(print.progress)cat(paste(if(j&gt;1) ":" else "", i,sep=""))
+        testi &lt;- (1:nobs)[foldk==i]
+        traini &lt;- (1:nobs)[foldk!=i]
+        ntest &lt;- length(testi)
+        ntrain &lt;- nobs-ntest
+        genes.i &lt;- cvlist$genelist[1:nfeatures, i, k]
+        dfi &lt;- as.data.frame(df[-testi, genes.i, drop=FALSE])
+        newdfi &lt;- as.data.frame(df[testi, genes.i, drop=FALSE])
+        cli &lt;- cl[-testi]
+        xy.xda &lt;- lda(cli~., data=dfi)
+        allscores[, ((i-1)*ndisc)+(1:ndisc), k] &lt;-
+          predict(xy.xda, newdata=df, dimen=ndisc)$x
+      }
+    }
+    cat("\n")
+    dim(allscores) &lt;- c(nobs, ndisc*prod(nfold))
+    if(is.null(keepcols))keepcols &lt;- min(nfeatures, dim(allscores)[2])
+    allscores.pcp &lt;- data.frame(pcp(allscores, varscores=FALSE)$g[, 1:keepcols])
+    globals &lt;- predict(lda(cl ~ ., data=allscores.pcp))$x[,1:ndisc]
+    fitscores &lt;- array(0, dim=c(nrow=nobs, ncol=ndisc, nleaf=nfold[2]))
+    for(k in 1:nfold[2]){
+      foldk &lt;- foldids[,k]
+      ufold &lt;- sort(unique(foldk))
+##      ntimes.genes &lt;- table(cvlist$genelist[1:nfeatures,,k])
+      av &lt;- colMeans(df)
+      j &lt;- 0
+      for(i in ufold){
+        j &lt;- j+1
+        cat(paste(if (j&gt;1) ":" else "", i,sep=""))
+        testi &lt;- (1:nobs)[foldk==i]
+        traini &lt;- (1:nobs)[foldk!=i]
+        genes.i &lt;- cvlist$genelist[1:nfeatures, i, k]
+        dfi &lt;- data.frame(df[-testi, genes.i, drop=FALSE])
+        newdfi &lt;- data.frame(df[testi, genes.i, drop=FALSE])
+        cli &lt;- cl[-testi]
+        traini.xda &lt;- lda(cli~., data=dfi)
+        scorei &lt;- predict(traini.xda)$x[,1:ndisc]
+        newpred.xda &lt;- predict(traini.xda, newdata=newdfi)
+        scorei.out &lt;- newpred.xda$x[, 1:ndisc, drop=FALSE]
+        scorei.all &lt;- globals[-testi, 1:ndisc]
+        avcol &lt;- colMeans(scorei.all)
+        scorei.all &lt;- sweep(scorei.all, 2, avcol,"-")
+        avi &lt;- colMeans(scorei)
+        scorei &lt;- sweep(scorei, 2, avi,"-")
+        trans &lt;- qr.solve(scorei, scorei.all)
+        scorei.out &lt;- sweep(scorei.out, 2, avi, "-")
+        fitscores[testi, , k] &lt;- sweep(scorei.out%*%trans, 2, avcol, "+")
+      }
+    }
+    fitscores &lt;- apply(fitscores, 1:2, mean)
+
+    if(!is.null(cl.other)){
+      Fmatrix &lt;- cvlist$Fmatrix
+      ord &lt;- order(Fmatrix)[1:nfeatures]
+      rowcol &lt;- cbind(as.vector(row(Fmatrix))[ord],as.vector(col(Fmatrix))[ord])
+      ugenes &lt;- unique(as.vector(cvlist$genelist[rowcol]))
+      df &lt;- cvlist$xUsed[, ugenes]
+      xy.xda &lt;- lda(cl~., data=df)
+      train.scores &lt;- predict(xy.xda, dimen=ndisc)$x
+      other.scores &lt;- predict(xy.xda, newdata=df.other,
+                              dimen=ndisc)$x
+      avcol &lt;- colMeans(globals)
+      all.scores &lt;- sweep(globals, 2, avcol,"-")
+      av.train &lt;- colMeans(train.scores)
+      train.scores &lt;- sweep(train.scores, 2, av.train, "-")
+      trans &lt;- qr.solve(train.scores, all.scores)
+      other.scores &lt;- sweep(other.scores%*%trans, 2, avcol, "+")
+    }
+    if(print.progress)cat("\n")
+    invisible(list(scores=fitscores, cl=cl, other=other.scores,
+                   cl.other=cl.other, nfeatures=nfeatures))
+  }
+</code></pre>
+
+
+</div>

@@ -1,0 +1,107 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>if_date</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Interpret if any n elements drawn from a date vector could be some days apart within some time span</h2>
+
+<h3>Description</h3>
+
+<p>Given a vector of dates x, interpret if there could be at least one set of n elements taken from x satisfy that adjacent elements in the set are at least certain days apart AND the dates in the set are within the specified time span. When identifying events/diseases from administrative data, definitions often require, e.g., n diagnoses that are at least some days apart within some years. This function is intended for such use and optimized to avoid looping through all n-size combinations in x. This function does not work with remote table input.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">if_date(
+  x,
+  n,
+  apart = NULL,
+  within = NULL,
+  detail = FALSE,
+  align = c("left", "right"),
+  dup.rm = TRUE,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>A character or Date vector</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n</code></td>
+<td>
+<p>An integer for the size of a draw</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>apart</code></td>
+<td>
+<p>An integer specifying the minimum gap (in days) between adjacent dates in a draw.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>within</code></td>
+<td>
+<p>An integer specifying the maximum time span (in days) of a draw.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>detail</code></td>
+<td>
+<p>Logical for whether return result per element of x.The default is FALSE, which returns one logical summarized by any(). Detail is not available if <code>apart</code> was supplied without <code>within</code> because sets that satisfied the condition could overlap, and records within a set may be far apart; thus, no unambiguous way to label by element.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>align</code></td>
+<td>
+<p>Character, define if the time span for each record should start ("left") or end ("right") at its current date. Defaults to "left". See 'flag_at' argument in <code>restrict_date()</code> for detail.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dup.rm</code></td>
+<td>
+<p>Logical for whether multiple records on the same date should be count as one in calculation. Only applicable when <code>within</code> is supplied without <code>apart</code>; duplicated dates have no impact when <code>apart</code> is present as the n dates must be distinct if they were apart. Default is TRUE.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Additional argument passing to <code>data.table::as.IDate()</code> for date conversion.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>Single or a vector of logical for whether there is any draw from x satisfied the conditions
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>restrict_date()</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">dates_of_records &lt;- sample(seq(as.Date("2015-01-01"), as.Date("2021-12-31"), 7), 10)
+
+# whether there is any 3 records at least 30 days apart within 2 years
+if_date(dates_of_records, n = 3, apart = 30, within = 365 * 2)
+
+# specified either apart or within or both
+if_date(dates_of_records, n = 2, within = 365)
+
+</code></pre>
+
+
+</div>

@@ -1,0 +1,281 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>utilize_pc8</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>A possible utilization of harmonized PC8 products codes</h2>
+
+<h3>Description</h3>
+
+<p>Provide an application of the data frames obtained by the main function, <code>harmonize_pc8</code>. To use these additional functions, data on firm-level is required, which is data that is not provided by the package.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">utilize_pc8(b, e, firm_data, harmonized_data = NULL,
+            progress = TRUE, output = "merged.firm.data",
+            value = FALSE, base = "PC8")
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>b</code></td>
+<td>
+<p>first year of interest</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>e</code></td>
+<td>
+<p>last year of interest</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>firm_data</code></td>
+<td>
+<p>Data on firm level which must provide the following columns: "firmID", "year" and "PC8".</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>harmonized_data</code></td>
+<td>
+<p>Harmonized data of PC8 product codes. Provided by harmonize_pc8(). By default <em>NULL</em>; the function computes the needed harmonized data.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>progress</code></td>
+<td>
+<p>logical, determines whether progress is printed in console or not.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>output</code></td>
+<td>
+<p>Defines which dataframe is returned. It may take the following values:
+</p>
+
+<ul>
+<li>
+<p>"product.changes", returns all changed PC8 product codes per firm per year (see description of (a) below)
+</p>
+</li>
+<li>
+<p>"merged.firm.data", returns entered firm data, extended by harmonized data (see description of (b) below)
+</p>
+</li>
+<li>
+<p>"all", returns both dataframes as a list
+</p>
+</li>
+</ul>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>value</code></td>
+<td>
+<p>logical, determines whether value is calculated for same/new/dropped products. Only possible if data contains a column: "value". Value may contain different quantities (e.g. sales [Euro] or weight [kg]).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>base</code></td>
+<td>
+<p>Defines which plus-codes are used as a base for calculating added/dropped/same products and their corresponding values. It may take the following values:
+</p>
+
+<ul>
+<li>
+<p>"PC8", uses CN8plus codes for computation.
+</p>
+</li>
+<li>
+<p>"HS6", uses HS6plus codes for computation.
+</p>
+</li>
+</ul>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>Provides two possible data frames: </p>
+
+<dl>
+<dt>(a)</dt>
+<dd>
+<p> One dataframe that contains all changed PC8 product codes per firm per year. In more detail, this means how many products remained the same, were added or dropped - the value of the same/added/dropped products - how many products were produced by a certain firm in a given year, and how many products were produced in the year after. As a base of this computation PC8plus codes or HS6plus codes can be used.</p>
+</dd>
+<dt>(b)</dt>
+<dd>
+<p> One dataframe that is based on the entered firm data. The entered firm data is extended by harmonized data (that is "PC8plus", "flag", "flagyear", "HS6plus", "BEC", "BEC_agr", "SNA_basic_class").</p>
+</dd>
+</dl>
+<p>Table that summarizes the output, described by the notation (a) above:
+</p>
+
+<table>
+<tr>
+<td style="text-align: left;">
+Variable </td>
+<td style="text-align: left;">	Explanation </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+<code>firmID</code>	</td>
+<td style="text-align: left;"> character;	specific code that describes a firm over the years (this code does not change over time) </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+<code>period_UL</code>	</td>
+<td style="text-align: left;"> character;	lower limit of the time period </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+<code>period</code>	</td>
+<td style="text-align: left;"> character;	time period in which the product was produced </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+<code>gap</code>	</td>
+<td style="text-align: left;"> numeric;	indicating if the time period is greater than one (i.e. upper limit - lower limit &gt; 1) </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+<code>same_products</code> </td>
+<td style="text-align: left;"> numeric;	number of products that were produced in both years (i.e. remained in the product portfolio of this firm) </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+<code>value_same_products</code> </td>
+<td style="text-align: left;"> numeric;	value of products that were produced in both years (i.e. remained in the product portfolio of this firm); the value is calculated in the upper limit of the time period </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+<code>new_products</code>	</td>
+<td style="text-align: left;"> numeric;	number of added products in the upper limit of the time period (i.e. added to the product portfolio of this firm) </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+<code>value_new_products</code>	</td>
+<td style="text-align: left;"> numeric;	value of added products in the upper limit of the time period (i.e. added to the product portfolio of this firm) </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+<code>dropped_products</code>	</td>
+<td style="text-align: left;"> numeric;	number of dropped products in the upper limit of the time period (i.e. removed of the product portfolio of this firm) </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+<code>value_dropped_products</code>	</td>
+<td style="text-align: left;"> numeric;	value of dropped products in the upper limit of the time period (i.e. removed of the product portfolio of this firm); the value is calculated in the lower limit of the time period </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+<code>nbr_of_products_period_LL</code>	</td>
+<td style="text-align: left;"> numeric;	number of all products produced in the lower limit of the time period (i.e. entire product portfolio of this firm) </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+<code>nbr_of_products_period_UL</code>	</td>
+<td style="text-align: left;"> numeric;	number of all products produced in the upper limit of the time period (i.e. entire product portfolio of this firm)
+</td>
+</tr>
+</table>
+<p>Table that summarizes the output, described by the notation (b) above:
+</p>
+
+<table>
+<tr>
+<td style="text-align: left;">
+Variable	</td>
+<td style="text-align: left;">	Explanation </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+<code>firmID</code>	</td>
+<td style="text-align: left;"> character;	specific code that describes a firm over the years (this code does not change over time, provided by user) </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+<code>year</code>	</td>
+<td style="text-align: left;"> numeric;	year in which the firm produced a product (provided by user) </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+<code>PC8</code>	</td>
+<td style="text-align: left;"> character;	PC8 code of firm product (provided by user) </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+<code>(value)</code>	</td>
+<td style="text-align: left;"> numeric; value of the corresponding product code (may be provided by user) </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+<code>...</code>	</td>
+<td style="text-align: left;"> character;	additional columns from original firm data (provided by user) </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+<code>PC8plus</code>	</td>
+<td style="text-align: left;"> character;	final harmonization, which refers to the last year of the time period </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+<code>flag</code>	</td>
+<td style="text-align: left;"> numeric;	integer from 0 to 3; 1 indicates that this code remained the same in notation over the whole time period but was split or merged in addition; 2 indicates that this code is either new or was dropped during the period of interest; 3 indicates the code had at least one simple change, but is not associated with a family </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+<code>flagyear</code> </td>
+<td style="text-align: left;"> numeric;	indicates the first year in which the flag was set </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+<code>HS6</code>	</td>
+<td style="text-align: left;"> character;	provides the HS6 classification of the PC8plus code </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+<code>HS6plus</code>	</td>
+<td style="text-align: left;"> character;	also adjusts for the change lists of HS6 </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+<code>BEC</code>	</td>
+<td style="text-align: left;"> character;	provides the BEC classification on a high aggregated level (1 digit) </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+<code>BEC_agr</code>	</td>
+<td style="text-align: left;"> character;	provides the BEC classification on a less aggregated level (up to 3 digits) </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+<code>SNA</code>	</td>
+<td style="text-align: left;"> character;	provides information if the code is classified as consumption, capital or intermediate good in BEC
+</td>
+</tr>
+</table>
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+sampledata &lt;- read.table(paste0(system.file("extdata", package = "harmonizer"),
+                         "/sampledata/pc8sample.txt"), sep = ";",
+                         header = TRUE , colClasses = "character")
+
+newdata &lt;- utilize_pc8(b = 2011, e = 2013, firm_data = sampledata)
+
+newdata &lt;- utilize_pc8(b = 2011, e = 2013, firm_data = sampledata,
+                       output = "all")
+changes &lt;- newdata[[1]]
+merged_data &lt;- newdata[[2]]
+
+</code></pre>
+
+
+</div>

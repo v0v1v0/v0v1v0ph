@@ -1,0 +1,94 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>reconcileTransitionProbability</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Reconciliation of Transition Probability</h2>
+
+<h3>Description</h3>
+
+<p>This is the main function for creating reconciliation plots and tables which 
+helps in comparing the transition probabilities calculated manually and from markovchain function
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">reconcileTransitionProbability(
+  df,
+  hmap_type = NULL,
+  cellid_column,
+  time_column
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>df</code></td>
+<td>
+<p>Data frame. The input data frame should contain two columns, cell ID from scoreHVT function and timestamp of that dataset.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>hmap_type</code></td>
+<td>
+<p>Character. ('self_state', 'without_self_state', or 'All')</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cellid_column</code></td>
+<td>
+<p>Character. Name of the column containing cell IDs.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>time_column</code></td>
+<td>
+<p>Character. Name of the column containing timestamps</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A list of plotly heatmap objects and tables representing the transition probability heatmaps.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>PonAnuReka Seenivasan &lt;ponanureka.s@mu-sigma.com&gt;, Vishwavani &lt;vishwavani@mu-sigma.com&gt;
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>trainHVT</code> <br><code>scoreHVT</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">dataset &lt;- data.frame(date = as.numeric(time(EuStockMarkets)),
+                      DAX = EuStockMarkets[, "DAX"],
+                      SMI = EuStockMarkets[, "SMI"],
+                      CAC = EuStockMarkets[, "CAC"],
+                      FTSE = EuStockMarkets[, "FTSE"])
+
+hvt.results&lt;- trainHVT(dataset,n_cells = 60, depth = 1, quant.err = 0.1,
+                       distance_metric = "L1_Norm", error_metric = "max",
+                       normalize = TRUE,quant_method = "kmeans")
+scoring &lt;- scoreHVT(dataset, hvt.results)
+cell_id &lt;- scoring$scoredPredictedData$Cell.ID
+time_stamp &lt;- dataset$date
+dataset &lt;- data.frame(cell_id, time_stamp)
+
+reconcileTransitionProbability(dataset, hmap_type = "All", 
+cellid_column = "cell_id", time_column = "time_stamp")
+</code></pre>
+
+
+</div>

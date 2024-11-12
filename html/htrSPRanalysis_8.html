@@ -1,0 +1,281 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>process_input</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Process user input files and obtain options for fitting.</h2>
+
+<h3>Description</h3>
+
+<p>Performs all functions selected in sample information, such as
+automated dissociation window detection, automated concentration range, automated bulk shift detection and
+returns a list object with the titration time series, processed sample information, all user inputs directing
+file outputs and fitting options
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">process_input(
+  sample_sheet_path = NULL,
+  data_file_path = NULL,
+  output_file_path = NULL,
+  output_pdf = NULL,
+  output_csv = NULL,
+  error_pdf = NULL,
+  num_cores = NULL,
+  min_allowed_kd = 10^(-5),
+  max_iterations = 1000,
+  ptol = 10^(-10),
+  ftol = 10^(-10),
+  min_RU_tol = 20,
+  max_RU_tol = 300
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>sample_sheet_path</code></td>
+<td>
+<p>The full path to the sample information file.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>data_file_path</code></td>
+<td>
+<p>The full path to the titration data file.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>output_file_path</code></td>
+<td>
+<p>The full path where output should be stored. This directory needs to exist.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>output_pdf</code></td>
+<td>
+<p>The name of the file for the pdf output.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>output_csv</code></td>
+<td>
+<p>The name of the file for the csv output.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>error_pdf</code></td>
+<td>
+<p>The name of the file for error output.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>num_cores</code></td>
+<td>
+<p>The number of cores to use for parallel processing. The default is( the number of cores detected by <code>parallel::detectCores()</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>min_allowed_kd</code></td>
+<td>
+<p>The minimum value for the dissociation constant. The default is 10^(-5).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>max_iterations</code></td>
+<td>
+<p>The maximum number of iterations for curve fitting. The default is 1000.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ptol</code></td>
+<td>
+<p>Curve fitting parameter. If the proposed changes in parameters is smaller than this value, the optimization is considered converged. The default is 10^(-10)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ftol</code></td>
+<td>
+<p>Curve fitting parameter. If the squared error between observed and predicted values is smaller than ftol, the optimization is considered converged. The default is 10^(-10)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>min_RU_tol</code></td>
+<td>
+<p>Minimum RU required for dissociation window detection</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>max_RU_tol</code></td>
+<td>
+<p>Maximum RU required for dissociation window detection. Also used in curve fitting.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A list object containing the following
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>expanded_sample_sheet</code></td>
+<td>
+<p>The sample sheet expanded to include all spots that are represented, expanding the short-hand entries for Position/Block/Channel</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sample_info</code></td>
+<td>
+<p>The expanded sample sheet with only the rows that are to be fit</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sample_info_fits</code></td>
+<td>
+<p>The sample_info without rows that have encountered errors in initial processing</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Time</code></td>
+<td>
+<p>The dataframe whose columns are the Time values for the input titration data. This only includes columns selected for analysis.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>RU</code></td>
+<td>
+<p>The dataframe whose columns are the RU values for the input titration data. Only the columns for the samples to be analyzed are included</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>correctedRU</code></td>
+<td>
+<p>The <code>RU</code> dataframe after baseline correction</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>keep_concentrations</code></td>
+<td>
+<p>A vector containing the indices of the columns from <code>Time</code> and <code>correctedRU</code> to be used in curve fitting</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>all_concentrations_values</code></td>
+<td>
+<p>A vector containing the concentration values corresponding to the columns of the <code>Time</code> and <code>RU</code> dataframes</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>incl_concentrations_values</code></td>
+<td>
+<p>A vector containing the concentration values corresponding to the <code>Time</code> and <code>correctedRU</code> columns chosen for curve fitting</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n_time_points</code></td>
+<td>
+<p>The maximum length of titration time series</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>max_RU_tol</code></td>
+<td>
+<p>The maximum RU for dissociation window trimming to be automated</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>min_RU_tol</code></td>
+<td>
+<p>The minimum RU for dissociation window trimming to be automated</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>min_RU_tol</code></td>
+<td>
+<p>The minimum RU for dissociation window trimming to be automated</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nwells</code></td>
+<td>
+<p>The number of rows in the <code>sample_info</code> dataframe</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n_fit_wells</code></td>
+<td>
+<p>The number of rows in the <code>sample_info_fits</code> dataframe</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ftol</code></td>
+<td>
+<p>The ftol parameter passed to the <code>nls.lm</code> function</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ptol</code></td>
+<td>
+<p>The ptol parameter passed to the <code>nls.lm</code> function</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ptol</code></td>
+<td>
+<p>The ptol parameter passed to the <code>nls.lm</code> function</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>output_pdf</code></td>
+<td>
+<p>The full pathname for the output pdf file</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>output_csv</code></td>
+<td>
+<p>The full pathname for the output csv file</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>error_pdf</code></td>
+<td>
+<p>The full pathname for the pdf error file. This is where errors in processing can be found.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>error_idx_concentrations</code></td>
+<td>
+<p>If there is an issue in determining the concentration window for some spots, they will be logged here</p>
+</td>
+</tr>
+</table>
+<h3>Examples</h3>
+
+<pre><code class="language-R"># set up file paths for example
+
+ sample_sheet_path &lt;- system.file("extdata",
+ "sample_sheet.xlsx", package="htrSPRanalysis")
+
+fn &lt;- paste0("https://gitlab.oit.duke.edu/janice/htrspranalysis/",
+        "-/raw/master/inst/extdata/titration_data.xlsx?ref_type=heads")
+
+download.file(fn,
+      destfile = paste0(tempdir(),"/titration_data.xlsx"),
+      mode = "wb")
+
+data_file_path &lt;- paste0(tempdir(), "/titration_data.xlsx")
+
+# process the input
+processed_input &lt;- process_input(sample_sheet_path = sample_sheet_path,
+  data_file_path = data_file_path,
+   num_cores = 2)
+</code></pre>
+
+
+</div>

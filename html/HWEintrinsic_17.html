@@ -1,0 +1,152 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hwe.ibf.plot</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Plot of an Hardy-Weinberg Testing Analysis</h2>
+
+<h3>Description</h3>
+
+<p>Plot of the null posterior probability of a Hardy-Weinberg testing problem based on intrinsic priors as described in Consonni et al. (2011).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hwe.ibf.plot(y, t.vec, M = 1e+05, bf = FALSE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+<p>an object of class "HWEdata".</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>t.vec</code></td>
+<td>
+<p>vector of training sample sizes.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>M</code></td>
+<td>
+<p>number of Monte Carlo iterations.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>bf</code></td>
+<td>
+<p>logical: if TRUE the plot reports the Bayes factor based on intrinsic priors.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>This function allows to create a plot of the null posterior probability versus a given set of training sample sizes. It simply performs a repeated analysis using <code>hwe.ibf.mc</code> on each of the training sample sizes contained in <code>t.vec</code>.
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>hwe.ibf.plot</code> returns as the output an invisible list with the following components:
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>mc</code></td>
+<td>
+<p>matrix containing the Monte Carlo estimates of the Bayes factor and the null posterior probability for each training sample size in <code>t.vec</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>std</code></td>
+<td>
+<p>vector containing the standard Bayes factor and the null posterior probability for the data in hand.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>exact</code></td>
+<td>
+<p>matrix containing the exact values of the Bayes factor and the null posterior probability for each training sample size in <code>t.vec</code>; available only for the two alleles case.</p>
+</td>
+</tr>
+</table>
+<h3>Note</h3>
+
+<p>The Bayes factor computed here is for the unrestricted model (<code class="reqn">M_1</code>) against the Hardy-Weinberg case (<code class="reqn">M_0</code>).
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Sergio Venturini <a href="mailto:sergio.venturini@unicatt.it">sergio.venturini@unicatt.it</a> </p>
+
+
+<h3>References</h3>
+
+<p>Consonni, G., Moreno, E., and Venturini, S. (2011). "Testing Hardy-Weinberg equilibrium: an objective Bayesian analysis". Statistics in Medicine, <b>30</b>, 62–74. <a href="https://onlinelibrary.wiley.com/doi/10.1002/sim.4084/abstract">https://onlinelibrary.wiley.com/doi/10.1002/sim.4084/abstract</a>
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>hwe.ibf</code>, 
+<code>hwe.ibf.mc</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># The following code reproduces Figure 4 in Consonni et al. (2011) #
+## Not run: 
+# ATTENTION: it may take a long time to run! #
+
+data(simdata)
+n &lt;- sum(dataset1@data.vec, na.rm = TRUE)
+f &lt;- c(.1,.5,1)
+t &lt;- round(f*n)
+p11 &lt;- p21 &lt;- seq(0,1,length.out=100)
+ip &lt;- array(NA,c(length(f),length(p11),length(p21)))
+for (k in 1:length(f)) {
+	ip[k,,] &lt;- outer(X = p11, Y = p21, FUN = Vectorize(ip.tmp), t[k])
+	print(paste(k," / ",length(f),sep=""), quote = FALSE)
+}
+
+r &lt;- 2
+R &lt;- r*(r + 1)/2
+l &lt;- 4
+tables &lt;- matrix(NA, nrow = R, ncol = l)
+tables[, 1] &lt;- dataset1@data.vec
+tables[, 2] &lt;- dataset2@data.vec
+tables[, 3] &lt;- dataset3@data.vec
+tables[, 4] &lt;- dataset4@data.vec
+lik &lt;- array(NA, c(l, length(p11), length(p21)))
+M &lt;- 300000
+par(mfrow = c(4, 4))
+for (k in 1:l) {
+	y &lt;- new("HWEdata", data = tables[, k])
+	lik[k,,] &lt;- lik.multin(y, p11, p21)
+	
+	nlev &lt;- 10
+	for (q in 1:length(f)) {
+		contour(p11, p21, ip[q,,], xlab = expression(p[11]),
+				ylab = expression(p[21]), nlevels = nlev, col = gray(0),
+				main = "", cex.axis = 1.75, cex.lab = 1.75, labcex = 1.4)
+		lines(p11^2, 2*p11*(1 - p11), lty = "longdash", col = gray(0), lwd = 2)
+		contour(p11, p21, lik[k,,], nlevels = nlev, add = TRUE,
+				col = gray(.7), labcex = 1.2)
+		abline(a = 1, b = -1, lty = 3, col = gray(.8))
+	}
+	hwe.ibf.plot(y = y, t.vec = seq(1,n,1), M = M)
+}
+
+## End(Not run)
+</code></pre>
+
+
+</div>

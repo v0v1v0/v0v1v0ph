@@ -1,0 +1,107 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>get_apicarto_rpg</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Apicarto RPG (Registre Parcellaire Graphique)</h2>
+
+<h3>Description</h3>
+
+<p>Implementation of the "RPG" module from the
+<a href="https://apicarto.ign.fr/api/doc/rpg">IGN's apicarto</a>. This function
+is a wrapper around version 1 and 2 of the API.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">get_apicarto_rpg(x,
+                 annee,
+                 code_cultu = list(NULL),
+                 dTolerance = 0)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>Object of class <code>sf</code>. Needs to be located in France.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>annee</code></td>
+<td>
+<p>numeric between 2010 and 2021</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>code_cultu</code></td>
+<td>
+<p>character corresponding to code culture, see detail.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dTolerance</code></td>
+<td>
+<p>numeric; tolerance parameter. The value of <code>dTolerance</code>
+must be specified in meters, see detail.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Since 2014 the culture code has changed its format. Before it should be
+a value ranging from "01" to "28", after it should be a trigram (ex : "MIE").
+More info can be found at the
+<a href="https://apicarto.ign.fr/api/doc/pdf/docUser_moduleRPG.pdf">documentation page</a>
+</p>
+<p><code>dTolerance</code> is needed when geometry are too complex. Its the same parameter
+found in <code>sf::st_simlplify</code>.
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>list</code> or object of class <code>sf</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+library(sf)
+
+penmarch &lt;- get_apicarto_cadastre("29158", type = "commune")
+
+# failure with too complex geom
+rpg &lt;- get_apicarto_rpg(penmarch, 2020)
+
+# avoid complex data by setting dTolerance
+rpg &lt;- get_apicarto_rpg(penmarch, 2020, dTolerance = 10)
+
+# multiple years after 2014
+rpg &lt;- get_apicarto_rpg(x, 2020:2021, dTolerance = 10)
+
+# years before and after 2014
+# list is returned because attributs are different
+rpg &lt;- get_apicarto_rpg(x, c(2010, 2021), dTolerance = 10)
+
+# filter by code_cultu
+rpg &lt;- get_apicarto_rpg(x, 2021, code_cultu = "MIE", dTolerance = 10)
+
+# all "MIE" from 2020 and all "PPH" from 2021
+rpg &lt;- get_apicarto_rpg(x, 2020:2021, code_cultu = c("MIE", "PPH"), dTolerance = 10)
+
+# vectorization : all "MIE" from 2020 and 2021
+rpg &lt;- get_apicarto_rpg(x, 2020:2021, code_cultu = "MIE", dTolerance = 10)
+
+## End(Not run)
+
+</code></pre>
+
+
+</div>

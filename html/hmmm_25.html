@@ -1,0 +1,92 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>recursive</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+recursive marginal interactions
+</h2>
+
+<h3>Description</h3>
+
+<p>A function to define logits of recursive (or nested) type.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">recursive(...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table><tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>As many inputs as there are variables in the multi-way table. Each input is a matrix of values -1,0,1 to define recursive logits or 0 for logits of different type</p>
+</td>
+</tr></table>
+<h3>Details</h3>
+
+<p>This function is used when logits of type "r" are used for at least one variable.
+An input argument for each categorical variable is necessary. Inputs are ordered according
+to the order of the variables.
+</p>
+<p>For a categorical variable with k categories, k-1 recursive logits can be defined using a matrix 
+with k-1 rows and k columns. 
+The rows of this matrix specify the categories whose probabilities constitute numerator and 
+denominator of every recursive logit. Specifically,  
+in every row, a value among -1,0,1 is associated to every category: value 1 (-1) corresponds to the category whose probability 
+is cumulated at the numerator (denominator), 0 if the 
+category is not involved.</p>
+
+
+<h3>Value</h3>
+
+<p>A zero-one matrix to be assigned to the <code>cocacontr</code> input argument in defining a model by ‘hmmm.model’ when logits "r" 
+are used for at least one variable in the multi-way table.
+</p>
+
+
+<h3>References</h3>
+
+<p>Cazzaro M, Colombi R (2008) Modelling two way contingency tables with recursive logits and odds ratios. Statistical Methods and Applications, 17, 435-453.
+</p>
+<p>Cazzaro M, Colombi R (2013)
+Marginal nested interactions for contingency tables. Communications in Statistics - Theory and Methods, to appear.
+</p>
+<p>Colombi R, Giordano S, Cazzaro M (2014) hmmm: An R Package for hierarchical multinomial marginal models. Journal of Statistical Software, 59(11), 1-25, URL http://www.jstatsoft.org/v59/i11/.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>hmmm.model</code>, <code>create.XMAT</code>, <code>hmmm.model.X</code></p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(kentucky)
+# 1 = injury 2 = restraint 3 = year
+y&lt;-getnames(kentucky,st=4)
+
+marglist&lt;-marg.list(c("m-m-l","m-l-l","r-l-l"),mflag="m")
+R1&lt;-matrix(c(1,1,1,-1,-1,
+             0,0,0,1,-1,
+             1,1,-1,0,0,
+             1,-1,0,0,0),4,5,byrow=TRUE)
+# logits of recursive (or nested) type for variable 1:
+# log p(injury&lt;=3)/p(injury&gt;3); log p(injury=4)/p(injury=5);
+# log p(injury&lt;=2)/p(injury=3); log p(injury=1)/p(injury=2);
+rec&lt;-recursive(R1,0,0) # only variable 1 has recursive logits 
+
+# additive effect of variables 2,3 on the recursive logits of variable 1
+model&lt;-hmmm.model(marg=marglist,lev=c(5,2,5),sel=c(34:49),cocacontr=rec)
+mod&lt;-hmmm.mlfit(y,model)
+print(mod,printflag=TRUE)
+</code></pre>
+
+
+</div>

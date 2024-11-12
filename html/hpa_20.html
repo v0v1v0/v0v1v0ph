@@ -1,0 +1,161 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hpaDist0</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Fast pdf and cdf for standardized univariate PGN distribution</h2>
+
+<h3>Description</h3>
+
+<p>This function uses fast algorithms to calculate densities
+and probabilities (along with their derivatives) related to standardized 
+PGN distribution.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">dhpa0(
+  x,
+  pc,
+  mean = 0,
+  sd = 1,
+  is_parallel = FALSE,
+  log = FALSE,
+  is_validation = TRUE,
+  is_grad = FALSE
+)
+
+phpa0(
+  x,
+  pc,
+  mean = 0,
+  sd = 1,
+  is_parallel = FALSE,
+  log = FALSE,
+  is_validation = TRUE,
+  is_grad = FALSE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>numeric vector of functions arguments.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pc</code></td>
+<td>
+<p>polynomial coefficients without the first term.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mean</code></td>
+<td>
+<p>expected value (mean) of the distribution.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sd</code></td>
+<td>
+<p>standard deviation of the distribution.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>is_parallel</code></td>
+<td>
+<p>logical; if TRUE then multiple cores will be used for 
+some calculations. Currently unavailable.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>log</code></td>
+<td>
+<p>logical; if <code>TRUE</code> then probabilities p are given as log(p)
+or derivatives will be given respect to log(p).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>is_validation</code></td>
+<td>
+<p>logical value indicating whether function input 
+arguments should be validated.  Set it to <code>FALSE</code> for slight
+performance boost (default value is <code>TRUE</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>is_grad</code></td>
+<td>
+<p>logical; if <code>TRUE</code> (default) then function returns 
+gradients respect to <code>x</code> and <code>pc</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Functions <code>dhpa0</code> and 
+<code>phpa0</code> are similar to <code>dhpa</code> and
+<code>phpa</code> correspondingly. However there are two key
+differences. First, <code>dhpa0</code> and <code>phpa0</code>
+are deal with univariate PGN distribution only. Second, this distribution
+is standardized to zero mean and unit variances. Moreover <code>pc</code> is 
+similar to <code>pol_coefficients</code> argument of <code>dhpa</code> but
+without the first component i.e. <code>pc=pol_coefficients[-1]</code>. Also
+<code>mean</code> and <code>sd</code> are not the arguments of the normal density
+but actual mean and standard deviation of the resulting distribution. So
+if these arguments are different from <code>0</code> and <code>1</code> correspondingly
+then standardized PGN distribution will be linearly transformed to have
+mean <code>mean</code> and standard deviation <code>sd</code>.
+</p>
+
+
+<h3>Value</h3>
+
+<p>Both functions return a list.
+Function <code>dhpa0</code> returns a list with element named
+<code>"den"</code> that is a numeric vector of density values. 
+Function <code>phpa0</code> returns a list with element named
+<code>"prob"</code> that is a numeric vector of probabilities. 
+</p>
+<p>If <code>is_grad = TRUE</code> then elements <code>"grad_x"</code> and <code>"grad_pc"</code>
+will be add to the list containing gradients respect to input argument
+<code>x</code> and parameters <code>pc</code> correspondingly. If <code>log = TRUE</code> then
+additional elements will be add to the list containing density, probability
+and gradient values for logarithms of corresponding functions. These
+elements will be named as <code>"grad_x_log"</code>, <code>"grad_pc_log"</code>,
+<code>"grad_prob_log"</code> and <code>"grad_den_log"</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Calculate density and probability of standartized PGN
+# distribution
+  # distribution parameters
+pc &lt;- c(0.5, -0.2)
+  # function arguments
+x &lt;- c(-0.3, 0.8, 1.5)
+  # probability density function
+dhpa0(x, pc)
+  # cumulative distribution function
+phpa0(x, pc)
+
+# Additionally calculate gradients respect to arguments
+# and parameters of the PGN distribution
+dhpa0(x, pc, is_grad = TRUE)
+phpa0(x, pc, is_grad = TRUE)
+
+# Let's denote by X standardized PGN random variable and repeat
+# calculations for 2 * X + 1
+dhpa0(x, pc, is_grad = TRUE, mean = 1, sd = 2)
+phpa0(x, pc, is_grad = TRUE, mean = 1, sd = 2)
+</code></pre>
+
+
+</div>

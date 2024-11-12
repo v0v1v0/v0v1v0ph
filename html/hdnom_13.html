@@ -1,0 +1,78 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>fit_lasso</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Model selection for high-dimensional Cox models with lasso penalty</h2>
+
+<h3>Description</h3>
+
+<p>Automatic model selection for high-dimensional Cox models
+with lasso penalty, evaluated by penalized partial-likelihood.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">fit_lasso(x, y, nfolds = 5L, rule = c("lambda.min", "lambda.1se"), seed = 1001)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>Data matrix.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+<p>Response matrix made by <code>Surv</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nfolds</code></td>
+<td>
+<p>Fold numbers of cross-validation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rule</code></td>
+<td>
+<p>Model selection criterion, <code>"lambda.min"</code> or
+<code>"lambda.1se"</code>. See <code>cv.glmnet</code>
+for details.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>seed</code></td>
+<td>
+<p>A random seed for cross-validation fold division.</p>
+</td>
+</tr>
+</table>
+<h3>Examples</h3>
+
+<pre><code class="language-R">data("smart")
+x &lt;- as.matrix(smart[, -c(1, 2)])
+time &lt;- smart$TEVENT
+event &lt;- smart$EVENT
+y &lt;- survival::Surv(time, event)
+
+fit &lt;- fit_lasso(x, y, nfolds = 5, rule = "lambda.1se", seed = 11)
+
+nom &lt;- as_nomogram(
+  fit, x, time, event,
+  pred.at = 365 * 2,
+  funlabel = "2-Year Overall Survival Probability"
+)
+
+plot(nom)
+</code></pre>
+
+
+</div>

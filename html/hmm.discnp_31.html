@@ -1,0 +1,1249 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hmm</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Fit a hidden Markov model to discrete data.
+</h2>
+
+<h3>Description</h3>
+
+<p>Effects a maximum likelihood fit of a hidden Markov model
+to discrete data where the observations come from one of a
+number of finite discrete distributions, depending on the
+(hidden) state of the Markov chain.  These distributions (the
+“emission probabilities”) are specified non-parametrically.
+The observations may be univariate, independent bivariate,
+or dependent bivariate.  By default this function uses the EM
+algorithm.  In the univariate setting it may alternatively use
+a “brute force” method.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hmm(y, yval=NULL, par0=NULL, K=NULL, rand.start=NULL,
+    method=c("EM","bf","LM","SD"), hglmethod=c("fortran","oraw","raw"),
+    optimiser=c("nlm","optim"), optimMethod=NULL, stationary=cis,
+    mixture=FALSE, cis=TRUE, indep=NULL, tolerance=1e-4, digits=NULL,
+    verbose=FALSE, itmax=200, crit=c("PCLL","L2","Linf","ABSGRD"),
+    X=NULL,keep.y=FALSE, keep.X=keep.y,
+    addIntercept=TRUE, lmc=10, hessian=FALSE,...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+
+<p>A vector or a list of vectors, or one or two column matrix
+(bivariate setting) or a list of such matrices; missing values
+are allowed.  If <code>y</code> is a vector, or list of vectors (of
+discrete data) these vectors are coerced to one column matrices.
+The entries of these vectors or matrices may be numeric or
+character and are assumed to constitute  discrete data.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>yval</code></td>
+<td>
+
+<p>A vector (of length <code>m</code>, say) of possible values for the
+data or a list of two such vectors (of lengths <code>m1</code> and
+<code>m2</code>, say, one for each of the two variates in the bivariate
+settings).  These vectors default to the sorted unique values of
+the respective variates as provided in <code>y</code>.  If <code>yval</code>
+is supplied and any value of <code>y</code> does not match some value
+of <code>yval</code>, then an error is thrown.
+</p>
+<p>The argument <code>yval</code> is provided so as to allow for fitting
+of models to data in which some of the data values “of interest”
+were never observed.  The estimated emission probabilities of such
+“never observed” values will of course be zero.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>par0</code></td>
+<td>
+
+<p>An optional (<em>named</em>) list of starting values for the
+parameters of the model, with components <code>tpm</code> (transition
+probability matrix), <em>optionally</em> <code>ispd</code> (initial state
+probability distribution) and <code>Rho</code>.  The object <code>Rho</code>
+specifies the probability that the observations take on each of
+the possible  values of the variate or variates, given the state
+of the hidden Markov chain.  See <b>Details</b>.  Note that in
+the case of independent bivariate data <code>Rho</code> is a list
+of two matrices.  These matrices may (and in general will)
+have different row dimensions, but must have identical column
+dimensions (equal to <code>K</code>, the number of states; see below).
+</p>
+<p>If the model is stationary (i.e. if <code>stationary</code> is
+<code>TRUE</code>) then you should almost surely not specify the
+<code>ispd</code> component of <code>par0</code>.  If you do specify it,
+it really only makes sense to specify it to be the stationary
+distribution determined by <code>tpm</code> and this is a waste of
+time since this is what the code will take <code>ispd</code> to be if
+you leave it unspecified.
+</p>
+<p>If <code>par0</code> is not specified, starting values are created by
+the (undocumented) function <code>init.all()</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>K</code></td>
+<td>
+
+<p>The number of states in the hidden Markov chain; if <code>par0</code>
+is not specified <code>K</code> <em>MUST</em> be; if <code>par0</code> is
+specified, <code>K</code> is ignored.
+</p>
+<p>Note that <code>K=1</code> is acceptable; if <code>K</code> is 1 then
+all observations are treated as being independent and the
+non-parametric estimate of the distribution of the observations
+is calculated in the “obvious” way.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rand.start</code></td>
+<td>
+
+<p>Either a logical scalar or a list consisting of two logical
+scalars which must be named <code>tpm</code> and <code>Rho</code>.  If the
+former, it is converted internally into a list with entries
+named <code>tpm</code> and <code>Rho</code>, both having the same value as
+the original argument.  If <code>tpm</code> is TRUE then the function
+init.all() chooses entries for the starting value of <code>tpm</code>
+at random; likewise for <code>Rho</code>.  If left <code>NULL</code>, this
+argument defaults to <code>list(tpm=FALSE,Rho=FALSE)</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+
+<p>Character string, either <code>"bf"</code>, <code>"EM"</code>,
+<code>"LM"</code> or <code>"SD"</code> (i.e. use numerical maximisation
+via either <code>nlm()</code> or <code>optim()</code>, the EM algorithm, the
+Levenberg-Marquardt algorithm, or the method of steepest descent).
+May be abbreviated.  Currently the <code>"bf"</code>, <code>"LM"</code> and
+<code>"SD"</code> methods can be used only in the univariate setting,
+handle only stationary models (see below) and do not do mixtures.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>hglmethod</code></td>
+<td>
+
+<p>Character string; one of <code>"fortran"</code>, <code>"oraw"</code> or
+<code>"raw"</code>.  May be abbreviated. This argument determines the
+procedure by which the hessian, gradient and log likelihood of
+the model and data are calculated.  If this is argument is equal
+to <code>"fortran"</code> (the default) then (obviously!) dynamically
+loaded fortran subroutines are used.  The other two possibilities
+effect the calculations in raw R; <code>"oraw"</code> (“o”
+for “original” uses code that is essentially a direct
+transcription of the fortran code, do-loops being replaced by
+for-loops.  With method <code>"raw"</code> the for-loops are eliminated
+and matrix-vector calculations are applied.  The <code>"oraw"</code>
+method is about 25 times slower than the <code>"fortran"</code> method
+and the <code>"raw"</code> method is (surprisingly?) even worse;
+it is more than 30 times slower.  The “raw” methods are
+present mainly for debugging purposes and would not usually be
+used in practice.  This argument is used only if the <code>method</code>
+is <code>"LM"</code> or <code>"SD"</code> (and is involved only peripherally
+in the latter instance).  It is ignored otherwise.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>optimiser</code></td>
+<td>
+
+<p>Character string specifying the optimiser to use when the
+“<code>"bf"</code>” method of optimisation is chosen.  It should be
+one of <code>"nlm"</code> or <code>"optim"</code>, and may be abbreviated.
+Ignored unless <code>method="bf"</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>optimMethod</code></td>
+<td>
+
+<p>Character string specifying the optimisation method to be used by
+<code>optim()</code>.  Should be one of <code>"Nelder-Mead"</code>,
+<code>"BFGS"</code>, <code>"CG"</code>, <code>"L-BFGS-B"</code>, <code>"SANN"</code>, or
+<code>"Brent"</code>.  Ignored if the <code>method</code> is not <code>"bf"</code>
+or if the optimiser is not <code>"optim"</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>stationary</code></td>
+<td>
+
+<p>Logical scalar.  If <code>TRUE</code> then the model is fitted under
+the stationarity assumption, i.e. that the Markov chain was in
+steady state at the time that observations commenced. In this
+case  the initial state probability distribution is estimated
+as the stationary distribution determined by the (estimated)
+transition probability matrix.  Otherwise if <code>cis</code> (see
+below) is <code>TRUE</code> the initial state probability distribution
+is estimated as the mean of the vectors of conditional
+probabilities of the states, given the observation sequences,
+at time <code>t=1</code>.  If <code>stationary</code> is <code>TRUE</code> and
+<code>cis</code> is <code>FALSE</code> an error is thrown.  Currently if
+the method is <code>"bf"</code>, <code>"LM"</code> or <code>"SD"</code>, and
+<code>stationary</code> is <code>FALSE</code>, then an error is thrown.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mixture</code></td>
+<td>
+
+<p>A logical scalar; if TRUE then a mixture model (all rows of the
+transition probability matrix are identical) is fitted rather
+than a general hidden Markov model.  Currently an error is
+thrown if <code>mixture=TRUE</code> and the method is
+<code>"bf"</code>, <code>"LM"</code> or <code>"SD"</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cis</code></td>
+<td>
+
+<p>A logical scalar specifying whether there should be a
+<b>constant</b> <b>initial</b> <b>state</b> probability
+distribution.  If <code>stationary</code> is <code>FALSE</code> and <code>cis</code>
+is <code>FALSE</code> then the initial state probability distribution
+for a given observation sequence is equal to 1 where the (first)
+maximum of the vector of conditional probabilities of the states,
+given the observation sequences, at time <code>t=1</code>, occurs,
+and is 0 elsewhere.  If <code>stationary</code> is <code>TRUE</code> and
+<code>cis</code> is <code>FALSE</code> an error is given.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>indep</code></td>
+<td>
+
+<p>Logical scalar.  Should the bivariate model be fitted under the
+assumption that the two variables are (conditionally) independent
+give the state?  If this argument is left as <code>NULL</code> its
+value is inferred from the structure of <code>Rho</code> in <code>par0</code>
+if the latter is supplied.  If the data are bivariate and neither
+<code>indep</code> nor <code>par0</code> is supplied, then an error is given.
+If the data are bivariate and if the value of <code>indep</code>
+is inconsistent with the structure of <code>par0$Rho</code> then an
+error is given. If the data are univariate then <code>indep</code>
+is ignored.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tolerance</code></td>
+<td>
+
+<p>If the value of the quantity used for the stopping criterion
+is less than tolerance then the algorithm is considered to
+have converged.  Ignored if <code>method="bf"</code>.  Defaults to
+<code>1e-4</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>digits</code></td>
+<td>
+
+<p>Integer scalar.  The number of digits to which to print out
+“progress reports” (when <code>verbose</code> is <code>TRUE</code>).
+There is a “sensible” default (calculated from
+<code>tolerance</code>).  Not used if the method is <code>"bf"</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+
+<p>A logical scalar determining whether to print out details of
+the progress of the algorithm.  If the method is <code>"EM"</code>,
+<code>"LM"</code> or <code>"SD"</code> then when <code>verbose</code> is <code>TRUE</code>
+information about the convergence criteria is printed out at
+every step that the algorithm takes.  If <code>method="bf"</code> then
+the value of <code>verbose</code> determines the value of the argument
+<code>print.level</code> of <code>nlm()</code> or the value of the
+argument <code>trace</code> of <code>optim()</code>.  In the first
+case, if <code>verbose</code> is <code>TRUE</code> then <code>print.level</code>
+is set to 2, otherwise it is set to 0.  In the second case,
+if <code>verbose</code> is <code>TRUE</code> then <code>trace</code> is set to 6,
+otherwise it is set to 0.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>itmax</code></td>
+<td>
+
+<p>When the method is <code>"EM"</code>, <code>"LM"</code> or <code>"SD"</code>
+this is the maximum number of steps that the algorithm takes.
+If the convergence criterion has not been met by the time
+<code>itmax</code> steps have been performed, a warning message
+is printed out, and the function stops.  A value is returned by
+the function anyway, with the logical component <code>converged</code> set
+to <code>FALSE</code>.  When <code>method="bf"</code> the <code>itmax</code> argument
+is passed to <code>nlm()</code> as the value of <code>iterlim</code>
+or to <code>optim()</code> as the value of <code>maxit</code>.  If the
+(somewhat obscure) convergence criteria of <code>nlm()</code> or
+<code>optim()</code>  have not been met by the time <code>itmax</code>
+“iterations” have been performed, the algorithm ceases.
+In this case, if <code>nlm()</code> is used.  the value of <code>code</code>
+in the object returned set equal to 4 and if <code>optim()</code>
+is used then the value of <code>convergence</code> returned is set
+equal to 1.  Note that the value of <code>code</code>, respectively
+<code>convergence</code> is returned as the <code>converged</code> component
+of the object returned by <code>hmm()</code>.  A value of 1 indicates
+successful completion of the <code>nlm()</code> procedure.  A value of
+0 indicates successful completion of the <code>optim()</code> procedure.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>crit</code></td>
+<td>
+
+<p>The name of the stopping criterion used.  When <code>method="EM"</code>
+it must be one of <code>"PCLL"</code> (percent change in log-likelihood;
+the default), <code>"L2"</code> (L-2 norm, i.e.  square root of sum of
+squares of change in coefficients), or <code>"Linf"</code> (L-infinity
+norm, i.e.  maximum absolute value of change in coefficients).
+When <code>method="LM"</code> or <code>method="SD"</code> there is a fourth
+possibility, namely <code>"ABSGRD"</code> the (maximum) absolute value
+of the gradient.  It may not be advisable to use this criterion
+in the current context (i.e. that of discrete non-parametric
+distributions).  See <b>Warnings</b>.  This argument defaults
+to <code>"PCLL"</code>.  It is ignored if <code>method="bf"</code>.
+(The <code>nlm()</code> and <code>optim()</code> functions have their own
+obscure stopping criteria.)
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>X</code></td>
+<td>
+<p>An optional <em>numeric</em> matrix, or a list of such
+matrices, of “auxiliary” <em>predictors</em>.  The use of
+such predictors is (currently, at least) applicable only in the
+univariate emissions setting.  If <code>X</code> is a list it must be
+of the same length as <code>y</code> and all entries of this list must
+have the same number of columns.  If the columns of any entry
+of the list are named, then they must be named for <em>all</em>
+entries, and the column names must be the <em>same</em> for all
+entries. The number of rows of each entry must be equal to the
+length of the corresponding entry of <code>y</code>. If <code>X</code> is
+a matrix then <code>y</code> should be a vector or one-column matrix
+(or a list with a single entry equal to such).
+</p>
+<p>There may be at most one constant column in <code>X</code> or the
+components thereof.  If there are <em>any</em> constant columns
+there must be precisely one (in all components of <code>X</code>),
+it must be the first column and all of its entries must be equal
+to <code>1</code>.  If the columns have names, the names of this first
+column must be <code>"Intercept"</code>.
+</p>
+<p>Note that <code>X</code> (or its entries) must be a <em>numeric</em>
+matrix (or must be numeric matrices) — not data frames!  Factor
+predictors are not permitted.  It may be possible to use factor
+predictors by supplying <code>X</code> or its entries as the output of
+<code>model.matrix()</code>; this will depend on circumstances.
+</p>
+<p>The fitted coefficients that are produced when <code>X</code> is supplied,
+are (to put it mildly) a bit difficult to interpret.  See
+<b>Fitted Coefficients of Auxiliary Predictors</b> for
+some discussion.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>keep.y</code></td>
+<td>
+
+<p>Logical scalar; should the observations <code>y</code> be returned as
+a component of the value of this function?
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>keep.X</code></td>
+<td>
+
+<p>Logical scalar; should the predictors <code>X</code> be returned as
+a component of the value of this function?  Note that the
+value of <code>keep.X</code> will be silently set equal to <code>FALSE</code>
+unless it actually “makes sense” to keep <code>X</code>.  I.e.
+unless the observations are <em>univariate</em>
+and <code>X</code> is actually supplied, i.e. is
+not <code>NULL</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>addIntercept</code></td>
+<td>
+
+<p>Logical scalar.  Should a column of ones, corresponding to
+an intercept term, be prepended to each of the matrices in
+the list <code>X</code>?   If each of these matrices already has an
+initial column of ones, then setting <code>addIntercept=TRUE</code>
+results in an error being thrown.  If this is not the case,
+then by default an initial column of ones is added.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lmc</code></td>
+<td>
+
+<p>Numeric scalar.  The (initial) “Levenberg-Marquardt
+correction” parameter.  Used only if <code>method="LM"</code>,
+otherwise ignored.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>hessian</code></td>
+<td>
+
+<p>Logical scalar.  Should the hessian matrix be
+returned?  This argument is relevant only if <code>method="bf"</code>
+(in which case it is passed along to <code>hmmNumOpt()</code>) and is
+ignored otherwise.  This argument should be set to <code>TRUE</code>
+only if you <em>really</em> want the hessian matrix.  Setting it
+to <code>TRUE</code> causes a substantial delay between the time when
+<code>hmm()</code> finishes its iterations and when it actually returns
+a value.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+
+<p>Additional arguments passed to <code>hmmNumOpt()</code>.
+There is one noteworthy argument <code>useAnalGrad</code> which is used
+“directly” by <code>hmmNumOpt()</code>.  This argument is a
+logical scalar and if it is <code>TRUE</code> then calls to <code>nlm()</code>
+or <code>optim()</code> are structured so that an analytic calculation
+of the gradient vector (implemented by the internal function
+<code>get.gl()</code> is applied.  If it is <code>FALSE</code> then finite
+difference methods are used to calculate the gradient vector.
+If this argument is not specified it defaults to <code>FALSE</code>.
+Note that the name of this argument <b>cannot be abbreviated</b>.
+</p>
+<p>Other “additional arguments” may be supplied for the
+control of <code>nlm()</code> and are passed on appropriately
+to <code>nlm()</code>.  These are used only if <code>method="bf"</code>
+and if <code>optimiser="nlm"</code>.  These “...” arguments
+might typically include <code>gradtol</code>, <code>stepmax</code> and
+<code>steptol</code>.  They should <b>NOT</b> include <code>print.level</code>
+or <code>iterlim</code>.  The former argument is automatically passed
+to <code>nlm()</code> as <code>0</code> if <code>verbose</code> is <code>FALSE</code>
+and as <code>2</code> if <code>verbose</code> is <code>TRUE</code>.  The latter
+argument is automatically passed to <code>nlm()</code> with the value
+of <code>itmax</code>.
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+
+<ul>
+<li> <p><b>Univariate case:</b>
+In the univariate case the emission probabilities are specified by
+means of a data frame <code>Rho</code>.  The first column of <code>Rho</code>,
+named <code>"y"</code>, is a factor consisting of the possible values
+of the emissions, repeated <code>K</code> times (where <code>K</code> is
+the number of states).  The second column, named <code>states</code>,
+is a factor consisting of integer values <code>1, 2, ..., K</code>.
+Each of these values is repeated <code>m</code> times where <code>m</code>
+is the length of <code>yval</code>.   Further columns of <code>Rho</code>
+are numeric and consist of coefficients of the linear predictor of
+the probabilities of the various values of <code>y</code>.  If <code>X</code>
+is <code>NULL</code> then <code>Rho</code> has only one further column named
+<code>Intercept</code>.
+</p>
+<p>If <code>X</code> is not <code>NULL</code> then the <code>Intercept</code>
+column is present only if <code>addIntercept</code> is <code>TRUE</code>.
+There as many (other, in addition to the possible <code>Intercept</code>
+column) numeric columns as there are columns in <code>X</code> or in
+the matrices in the list <code>X</code>.  The names of these columns
+are taken to be the column names of <code>X</code> or the <em>first</em>
+entry of <code>X</code> if such column names are present.  Otherwise the
+names default to <code>V1</code>, <code>V2</code> ....
+</p>
+<p>The probabilities of the emissions taking on their
+various possible values are given by
+</p>
+<p style="text-align: center;"><code class="reqn">\Pr(Y = y_i | \boldsymbol{x}, \textrm{state}=S) =
+   \ell_i/\sum_{j=1}^m \ell_j</code>
+</p>
+
+<p>where <code class="reqn">\ell_j</code> is the <code class="reqn">j\textrm{th}</code>
+entry of <code class="reqn">\boldsymbol{\beta}^{\top}\boldsymbol{x}</code>
+and  where in turn <code class="reqn">\boldsymbol{x}</code> is the vector
+of predictors and <code class="reqn">\boldsymbol{\beta}</code> is the
+coefficient vector in the linear predicator that corresponds to
+<code class="reqn">y_i</code> and the hidden state <code class="reqn">S</code>.  For identifiability the
+vectors <code class="reqn">\boldsymbol{\beta}</code> corresponding to
+the first value of <code class="reqn">Y</code> (the first level of <code>Rho$y</code>) are
+set equal to the zero vector for all values of the state <code class="reqn">S</code>.
+</p>
+<p>Note that the <code>Rho</code> component of the starting values
+<code>par0</code> may be specified as a <em>matrix</em> of probabilities,
+with rows corresponding to possible values of the observations and
+columns corresponding to states.  That is the <code>Rho</code> component
+of <code>par0</code> may be provided in the form <code class="reqn">\textrm{Rho} =
+   [\rho_{ij}]</code> where <code class="reqn">\rho_{ij} = \Pr(Y = y_i
+   | S = j)</code>.  This is permissible
+as long as <code>X</code> is <code>NULL</code> and may be found to be more
+convenient and intuitive.  If the starting value for <code>Rho</code>
+is provided in matrix form it is (silently) converted internally
+into the data frame form, by the (undocumented) function
+<code>cnvrtRho()</code>.
+</p>
+<p>When argument <code>X</code> is <em>not</em> <code>NULL</code>, it is
+difficult to specify a “reasonable” value for the
+<code>Rho</code> component of <code>par0</code>.  One might try to specify
+<code>par0$Rho</code> in the data frame form.  The question of how
+to specify the columns of <code>par0$Rho</code> corresponding to the
+auxiliary predictors (columns of <code>X</code> or of the entries of
+<code>X</code>) is a thorny one.
+</p>
+<p>It is permissible in these circumstances to specify
+<code>par0$Rho</code> as a matrix of probabilities, just as one
+would do if <code>X</code> were <code>NULL</code>.  In this setting the
+(undocumented) function <code>checkStartVal()</code> converts the
+matrix of probabilities to data frame form and then appends
+columns, all of whose entries are 0, corresponding to the
+auxiliary predictors.  When <code>par0</code> is unspecified, the
+(undocumented) function <code>init.all()</code> performs similar
+construction to accommodate a non-<code>NULL</code> value of <code>X</code>.
+Whether the resulting starting value for <code>Rho</code> makes any
+real sense, is questionable.  However little else can be done.
+</p>
+</li>
+<li> <p><b>Independent bivariate case:</b> the emission
+probabilities are specified by a list of two matrices.
+In this setting <code class="reqn">\Pr(Y_1,Y_2) = (y_{i1},y_{i2}) | S = j) =
+   \rho^{(1)}_{i_1,j} \rho^{(2)}_{i_2,j}</code> where <code class="reqn">R^{(k)} =
+   [\rho^{(k)}_{ij}]</code> (<code class="reqn">k = 1,2</code>) are the
+two emission probability matrices.
+</p>
+</li>
+<li> <p><b>Dependent bivariate case:</b> the emission probabilities
+are specified by a three dimensional array.  In this setting
+<code class="reqn">\Pr((Y_1,Y_2) = (y_{i1},y_{i2}) | S = j) = \rho_{i_1,i_2,j}</code> where
+<code class="reqn">R = [\rho_{ijk}]</code> is the emission probability array.
+</p>
+</li>
+</ul>
+<p>The hard work of calculating the recursive probabilities used
+to fit the model is done by a Fortran subroutine <code>recurse</code>
+(actually coded in Ratfor) which is dynamically loaded.  In the
+univariate case, when <code>X</code> is provided, the estimation of the
+“linear predictor” vectors <code class="reqn">\boldsymbol{\beta}</code>
+is handled by the function <code>multinom()</code> from the <code>nnet</code>
+package.  Note that this is a “Recommended” package
+and is thereby automatically available (i.e. does not have to
+be installed).
+</p>
+
+
+<h3>Value</h3>
+
+<p>A list with components:
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>Rho</code></td>
+<td>
+
+<p>The fitted value of the data frame, list of two matrices,
+or array <code>Rho</code> (in the case of a univariate model, a
+bivariate independent model or a bivariate dependent model
+respectively) specifying the distributions of the observations
+(the “emission” probabilities).
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Rho.matrix</code></td>
+<td>
+
+<p>Present <em>only</em> in the univariate setting.  A matrix
+whose entries are the (fitted) emission probabilities,
+row corresponding to values of the emissions and columns
+to states.  The columns sum to 1.  This component provides
+the same information as <code>Rho</code>, but in a more readily
+interpretable form.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tpm</code></td>
+<td>
+
+<p>The fitted value of the transition probability matrix <code>tpm</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>stationary</code></td>
+<td>
+
+<p>Logical scalar; the value of the <code>stationary</code> argument.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ispd</code></td>
+<td>
+
+<p>The fitted initial state probability distribution, or a matrix
+of initial state probability distributions, one (column) of
+<code>ispd</code> for each observation sequence.
+</p>
+<p>If <code>stationary</code> is <code>TRUE</code> then <code>ispd</code> is assumed
+to be the (unique) stationary distribution for the chain,
+and thereby determined by the transition probability matrix
+<code>tpm</code>.  If <code>stationary</code> is <code>FALSE</code> and <code>cis</code>
+is <code>TRUE</code> then <code>ispd</code> is estimated as the mean of the
+vectors of conditional probabilities of the states, given the
+observation sequences, at time <code>t=1</code>.
+</p>
+<p>If <code>cis</code> is <code>FALSE</code> then <code>ispd</code> is a matrix
+whose columns are the vectors of conditional probabilities of
+the states, given the observation sequences, at time <code>t=1</code>,
+as described above.  (If there is only one observation sequence,
+then this — one-column — matrix is converted into a vector.)
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>log.like</code></td>
+<td>
+
+<p>The final (maximal, we hope!) value of the log likelihood, as
+determined by the maximisation procedure.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>grad</code></td>
+<td>
+
+<p>The gradient of the log likelihood.  Present only if the
+method is <code>"LM"</code> or <code>"bf"</code> and in the latter
+case then only if the optimiser is <code>nlm()</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>hessian</code></td>
+<td>
+
+<p>The hessian of the log likelihood.  Present only if the
+method is <code>"LM"</code> or <code>"bf"</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>stopCrit</code></td>
+<td>
+
+<p>A vector of the (final) values of the stopping criteria, with
+names <code>"PCLL"</code>, <code>"L2"</code>, <code>"Linf"</code> unless the method
+is <code>"LM"</code> or <code>"SD"</code> in which case this vector has a
+fourth entry named <code>"ABSGRD"</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>par0</code></td>
+<td>
+
+<p>The starting values used by the algorithms.  Either the argument
+<code>par0</code>, or a similar object with either or both components
+(<code>tpm</code> and <code>Rho</code>) being created by <code>rand.start()</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>npar</code></td>
+<td>
+
+<p>The number of parameters in the fitted model.  Equal to
+<code>nispar + ntpmpar + nrhopar</code> where (1) <code>nispar</code> is
+<code>0</code> if <code>stationary</code> is <code>TRUE</code> and is <code>K-1</code>
+otherwise; (2) <code>ntpmpar</code> is <code>K*(K-1)</code> (3) <code>nrhopar</code>
+is
+</p>
+
+<ul>
+<li> <p><code>(nrow(Rho) - K)*(ncol(Rho)-2)</code> for univariate models
+</p>
+</li>
+<li> <p><code>K*(sum(sapply(Rho,nrow))-K)</code> for bivariate independent models
+</p>
+</li>
+<li> <p><code>prod(dim(Rho))-K</code> for bivariate dependent models.
+</p>
+</li>
+</ul>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>bicm</code></td>
+<td>
+
+<p>Numeric scalar.  The number by which <code>npar</code> is multiplied
+to form the <code>BIC</code> criterion.  It is essentially the log
+of the number of observations.  See the code of <code>hmm()</code>
+for details.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>converged</code></td>
+<td>
+
+<p>A logical scalar indicating whether the algorithm converged.
+If the EM, LM or steepest descent algorithm was used it simply
+indicates whether the stopping criterion was met before
+the maximum number (<code>itmax</code>) of steps was exceeded.
+If <code>method="bf"</code> then <code>converged</code> is based on the
+<code>code</code> component of the object returned by the optimiser
+when <code>nlm()</code> was used, or on the <code>convergence</code>
+component when <code>optim()</code> was used.  In these
+cases <code>converged</code> has an <em>attribute</em> (<code>code</code>
+or <code>convergence</code> respectively) giving the (integer) value
+of the relevant component.
+</p>
+<p>Note that in the <code>nlm()</code> case a value of <code>code</code>
+equal to 2 indicates “probable” convergence, and a value
+of 3 indicates “possible” convergence.  However in this
+context <code>converged</code> is set equal to <code>TRUE</code> <em>only</em>
+if <code>code</code> is 1.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nstep</code></td>
+<td>
+
+<p>The number of steps performed by the algorithm if the method
+was <code>"EM"</code>, <code>"LM"</code> or <code>"SD"</code>.  The value of
+<code>nstep</code> is set equal to the <code>iterations</code> component of
+the value returned by <code>nlm()</code> if <code>method="bf"</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>prior.emsteps</code></td>
+<td>
+
+<p>The number of EM steps that were taken before the method was
+switched from <code>"EM"</code> to <code>"bf"</code> or to <code>"LM"</code>.
+Present only in values returned under the <code>"bf"</code> or
+<code>"LM"</code> methods after a switch from <code>"EM"</code> and is
+equal to <code>0</code> if either of these methods was specified in
+the initial call (rather than arising as the result of a switch).
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ylengths</code></td>
+<td>
+
+<p>Integer vector of the lengths of the observation sequences
+(number of rows if the observations are in the form of
+one or two column matrices).
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nafrac</code></td>
+<td>
+
+<p>A real number between 0 and 1 or a pair (two dimensional vector)
+of such numbers.  Each number is the the fraction of missing values
+if the corresponding components of the observations.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+
+<p>An object of class <code>"tidyList"</code>.  It is a tidied up version
+of the observations; i.e. the observations <code>y</code> after the
+application of the undocumented function <code>tidyList()</code>.
+Present only if <code>keep.y</code> is <code>TRUE</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>X</code></td>
+<td>
+
+<p>An object of class <code>"tidyList"</code>.  It is tidied up version
+of the predictor matrix or list of predictor matrices; i.e. the
+argument <code>X</code> after the application of <code>tidyList()</code>
+(with argument <code>rp</code> set to <code>"predictor"</code>.  Present only
+if <code>X</code> is supplied, is an appropriate argument, and if
+<code>keep.X</code> is <code>TRUE</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>parity</code></td>
+<td>
+
+<p>Character string; <code>"univar"</code> if the data were univariate,
+<code>"bivar"</code> if they were bivariate.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>numeric</code></td>
+<td>
+
+<p>Logical scalar; <code>TRUE</code> if the (original) data were numeric,
+<code>FALSE</code> otherwise.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>AIC</code></td>
+<td>
+
+<p>The value of AIC <code>= -2*log.like + 2*npar</code> for the fitted
+model.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>BIC</code></td>
+<td>
+
+<p>The value of BIC <code>= -2*log.like + log(nobs)*npar</code> for the fitted
+model.  In the forgoing <code>nobs</code> is the number of observations.
+This is the number of <em>non-missing</em> values in <code>unlist(y)</code>
+in the univariate setting and one half of this number in the
+bivariate setting.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>args</code></td>
+<td>
+
+<p>A list of argument values supplied.  This component is
+returned in the interest of making results reproducible.
+It is also needed to facilitate the updating of a model
+via the update method for the class <code>hmm.discnp</code>,
+<code>update.hmm.discnp()</code>.
+</p>
+<p>It has components:
+</p>
+
+<ul>
+<li> <p><code>method</code>
+</p>
+</li>
+<li> <p><code>optimiser</code>
+</p>
+</li>
+<li> <p><code>optimMethod</code>
+</p>
+</li>
+<li> <p><code>stationary</code>
+</p>
+</li>
+<li> <p><code>mixture</code>
+</p>
+</li>
+<li> <p><code>cis</code>
+</p>
+</li>
+<li> <p><code>tolerance</code>
+</p>
+</li>
+<li> <p><code>itmax</code>
+</p>
+</li>
+<li> <p><code>crit</code>
+</p>
+</li>
+<li> <p><code>addIntercept</code>
+</p>
+</li>
+</ul>
+</td>
+</tr>
+</table>
+<h3>Thanks</h3>
+
+<p>A massive nest of bugs was eliminated in the transition from version
+3.0-8 to version 3.0-9.  These bugs arose in the context of using
+auxiliary predictor variables (argument <code>X</code>).  The handling of
+such auxiliary predictors was completely messed up.  I am grateful
+to Leah Walker for pointing out the problem to me.
+</p>
+
+
+<h3>Warnings</h3>
+
+<p>The ordering of the (hidden) states can be arbitrary.  What the
+estimation procedure decides to call “state 1” may not be
+what <em>you</em> think of as being state number 1.  The ordering
+of the states will be affected by the starting values used.
+</p>
+<p>Some experiences with using the <code>"ABSGRD"</code> stopping
+criterion indicate that it may be problematic in the context of
+discrete non-parametric distributions.  For example a value of
+1854.955 was returned after 200 LM steps in one (non-convergent,
+of course!)  attempt at fitting a model.  The stopping criterion
+<code>"PCLL"</code> in this example took the “reasonable”
+value of 0.03193748 when iterations ceased.
+</p>
+
+
+<h3>Notes — Various</h3>
+
+<p>This function <em>used</em> to have an argument <code>newstyle</code>,
+a logical scalar (defaulting to <code>TRUE</code>) indicating whether
+(in the univariate setting) the emission probabilities
+should be represented in “logistic” form.   (See
+<b>Details</b>, <b>Univariate case:</b>, above.)  Now the
+emission probabilities are <em>always</em> represented in the
+“logistic” form.   The component <code>Rho</code> of the
+starting parameter values <code>par0</code> may still be supplied
+as a matrix of probabilities (with columns summing to 1), but
+this component is converted (internally, silently) to the
+logistic form.
+</p>
+<p>The object returned by this function also has (in the univariate
+setting), in addition to the component <code>Rho</code>, a component
+<code>Rho.matrix</code> giving the emission probabilities in the
+more readily interpretable matrix-of-probabilities form. (See
+<b>Value</b> above.)
+</p>
+<p>The package <em>used</em> to require the argument <code>y</code> to
+be a <em>matrix</em> in the case of multiple observed sequences.
+If the series were of unequal length the user was expected to
+pad them out with NAs to equalize the lengths.
+</p>
+<p>The old matrix format for multiple observation sequences was
+permitted for a while (and the matrix was internally changed into
+a list) but this is no longer allowed.  If <code>y</code> is indeed
+given as a matrix then this corresponds to a single observation
+sequence and it must have one (univariate setting) or two
+(bivariate setting) columns which constitute the observations
+of the respective variates.
+</p>
+<p>If <code>K=1</code> then <code>tpm</code>, <code>ispd</code>, <code>converged</code>,
+and <code>nstep</code> are all set equal to <code>NA</code> in the list
+returned by this function.
+</p>
+<p>The estimate of <code>ispd</code> in the non-stationary setting
+is inevitably very poor, unless the number of sequences of
+observations (the length of the list <code>y</code>) is very large.
+We have in effect “less than one” relevant observation for
+each such sequence.
+</p>
+<p>The returned values of <code>tpm</code> and <code>Rho</code> (or the entries
+of <code>Rho</code> when <code>Rho</code> is a list) have dimension names.
+These are formed from the argument <code>yval</code> if this is
+supplied, otherwise from the sorted unique values of the
+observations in <code>y</code>.  Likewise the returned value of
+<code>ispd</code> is a named vector, the names being the same as the
+row (and column) names of <code>tpm</code>.
+</p>
+<p>If <code>method</code> is equal to <code>"EM"</code> there may be a
+<em>decrease</em> (!!!) in the log likelihood at some EM step.
+This is “theoretically impossible” but can occur in
+practice due to an intricacy in the way that the EM algorithm
+treats <code>ispd</code> when <code>stationary</code> is <code>TRUE</code>.
+It turns out to be effectively impossible to maximise the expected
+log likelihood unless the term in that quantity corresponding
+to <code>ispd</code> is ignored (whence it <em>is</em> ignored).
+Ignoring this term is “asymptotically negligible” but
+can have the unfortunate effect of occasionally leading to a
+decrease in the log likelihood.
+</p>
+<p>If such a decrease is detected, then the algorithm terminates
+and issues a message to the effect that the decrease occurred.
+The message suggests that another method be used and that perhaps
+the results from the penultimate EM step (which are returned by
+this function) be used as starting values.
+</p>
+<p>It seems to me that it <em>should</em> be the case that such a
+decrease in the log likelihood can occur only if <code>stationary</code>
+is <code>TRUE</code>.  However I have encountered instances in which
+a decrease occurred when <code>stationary</code> was <code>FALSE</code>.
+I have yet to figure out/track down what is going on here.
+</p>
+
+
+<h3>Note on <code>method</code>
+</h3>
+
+<p>If the <code>method</code> is <code>"EM"</code> it is actually possible
+for the log likelihood to <em>decrease</em> at some EM step.
+This is “impossible in an ideal world” but can happen
+to the fact the EM algorithm, as implemented in this package
+at least, cannot maximise the expected log likelihood if the
+component corresponding to the initial state probability
+distribution is taken into consideration.  This component
+should ideally be maximised subject to the constraint that
+<code>t(P)%*%ispd = ispd</code>, but this constraint seems to
+effectively impossible to impose.  Lagrangian multipliers
+don't cut it.  Hence the summand in question is ignored at
+the M-step.  This usually works alright since the summand
+is asymptotically negligible, but things can sometimes go
+wrong.  If such a decrease occurs, an error is thrown.
+</p>
+<p>In previous versions of this package, instead of throwing
+an error the <code>hmm()</code> function would automatically switch
+to either the <code>"bf"</code> or the <code>"LM"</code> method, depending
+whether a matrix <code>X</code> of auxiliary predictors is supplied,
+starting from the penultimate parameter estimates produced
+by the EM algorithm.   However this appears not to be a good
+idea; those “penultimate estimates” appear not to be
+good starting values for the other methods.  Hence an error
+is now thrown and the user is explicitly instructed to invoke
+a different method, “starting from scratch”.
+</p>
+
+
+<h3>Fitted Coefficients of the Predictors</h3>
+
+<p>It is of course of interest to understand the meaning of the
+coefficients that are fitted to the predictors in the model.
+If <code>X</code> is supplied then the number of predictors is (as a rule)
+one (for the intercept) plus the number of columns in each entry
+of <code>X</code>.  We say “as a rule” because, e.g., the entries
+of <code>X</code> could each have an “intercept” column, or the
+<code>addIntercept</code> argument could be <code>FALSE</code>.  If <code>X</code>
+is not supplied there is only one predictor, named <code>Intercept</code>.
+</p>
+<p>The interpretation of these predictor coefficients is a bit subtle.
+To get an idea of what it's all about, consider the output from
+example <code>4</code>.  (See <b>Examples</b>).  The fitted coefficients
+in question are to be found in columns 3 and onward of the component
+<code>Rho</code> of the object returned by <code>hmm()</code>.  In the context
+of example <code>4</code>, this object is <code>fit.wap</code>.  (The suffix
+<code>wap</code> stands for “with auxiliary predictors”.)
+</p>
+<pre>
+  fit.wap$Rho
+       y state Intercept     ma.com      nh.com     bo.com
+  1   lo     1 1.3810463  0.4527982 -3.27161353 -1.9563915
+  2  mlo     1 0.1255631 -1.1402546 -1.37713744  0.5946980
+  3    m     1 0.7356526  0.1523734 -2.70841817 -0.1794645
+  4  mhi     1 0.8479798 -0.2438988 -1.12544989 -0.9650320
+  5   hi     1 0.0000000  0.0000000  0.00000000  0.0000000
+  6   lo     2 3.9439410 -0.8355306 -0.77702276  1.4963631
+  7  mlo     2 2.6189880 -1.9373885 -0.09190623  0.8316870
+  8    m     2 2.1457317 -1.7276183  0.19524655 -0.3249485
+  9  mhi     2 1.8834139 -1.3760011 -0.59806309  1.2828365
+  10  hi     2 0.0000000  0.0000000  0.00000000  0.0000000
+</pre>
+<p>If you multiply the matrix consisting of the predictor coefficients
+(columns 3 to 6 of <code>Rho</code> in this instance) times a vector of
+predictors you get, for each state, the “exponential form”
+of the probabilities (“pre-probabilities”) for each of the
+possible <code>y</code>-values, given the vector of predictors.
+</p>
+<p>E.g. set <code>x &lt;- c(1,1,0,0)</code>. This vector picks up the intercept
+and indicates that the Malabar outfall has been commissioned,
+the North Head outfall has not been commissioned, and the Bondi
+Offshore outfall has not been commissioned.
+</p>
+<p>Now set:
+</p>
+<pre>
+    pp1 &lt;- (as.matrix(fit.wap$Rho)[,3:6]%*%x)[1:5]
+    pp2 &lt;- (as.matrix(fit.wap$Rho)[,3:6]%*%x)[6:10]
+</pre>
+<p>Note that <code>pp1</code> consists of “exponential
+probabilities” corresponding to state 1, and <code>pp2</code>
+consists of “exponential probabilities” corresponding
+to state 2.  To convert the foregoing pre-probabilities to the
+actual probabilities of the <code>y</code>-values, we apply the —
+undocumented — function <code>expForm2p()</code>:
+</p>
+<pre>
+    p1 &lt;- expForm2p(pp1)
+    p2 &lt;- expForm2p(pp2)
+</pre>
+<p>The value of <code>p1</code> is
+</p>
+<pre>
+[1] 0.52674539 0.03051387 0.20456767 0.15400019 0.08417288
+</pre>
+<p>and that of <code>p2</code> is
+</p>
+<pre>
+[1] 0.78428283 0.06926632 0.05322204 0.05819340 0.03503541
+</pre>
+<p>Note that <code>p1</code> and <code>p2</code> each sum to 1, as they should/must
+do.  This says, e.g., that when the system is in state 2, and
+Malabar has been commissioned but North Head and Bondi Offshore
+have not, the (estimated) probability that <code>y</code> is <code>"mhi"</code>
+(medium-high) is 0.05819340.
+</p>
+<p>It may be of some interest to test the hypothesis that the predictors
+have any actual predictive power at all:
+</p>
+<pre>
+    fit.nap &lt;- hmm(xxx,yval=Yval,K=2,verb=TRUE)
+    # "nap" &lt;--&gt; no aux. preds
+</pre>
+<p>There is a bit of a problem here, in that the likelihood <em>decreases</em>
+at EM step 65.  (See the warning message.)
+</p>
+<p>We can check on this problem by refitting using method="LM".
+</p>
+<pre>
+    fit.nap.lm &lt;- hmm(xxx,yval=Yval,par0=fit.nap,method="LM",verb=TRUE)
+</pre>
+<p>Doing so produces only a small improvement in the log likelihood
+(from -1821.425 to -1820.314), so we really could have ignored the
+problem. We can now do <code>anova(fit.wap,fit.nap)</code> which gives
+</p>
+<pre>
+    $stat
+    [1] 153.5491
+
+    $df
+    [1] 24
+
+    $pvalue
+    [1] 7.237102e-21
+</pre>
+<p>Thus the p-value is effectively zero, saying that in this instance
+the auxiliary predictors appear to have a “significant” impact on
+the fit.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Rolf Turner
+<a href="mailto:r.turner@auckland.ac.nz">r.turner@auckland.ac.nz</a><br></p>
+
+
+<h3>References</h3>
+
+<p>Rabiner, L. R., "A tutorial on hidden Markov models and selected
+applications in speech recognition," Proc. IEEE vol. 77,
+pp. 257 – 286, 1989.
+</p>
+<p>Zucchini, W. and Guttorp, P., "A hidden Markov model for
+space-time precipitation," Water Resources Research vol.  27,
+pp. 1917-1923, 1991.
+</p>
+<p>MacDonald, I. L., and Zucchini, W., "Hidden Markov and Other
+Models for Discrete-valued Time Series", Chapman &amp; Hall,
+London, 1997.
+</p>
+<p>Liu, Limin, "Hidden Markov Models for Precipitation in a Region
+of Atlantic Canada", Master's Report, University of New Brunswick,
+1997.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>rhmm()</code>, <code>mps()</code>,
+<code>viterbi()</code></p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># TO DO: Create one or more bivariate examples.
+#
+# The value of itmax in the following examples is so much
+# too small as to be risible.  This is just to speed up the
+# R CMD check process.
+# 1.
+Yval &lt;- LETTERS[1:10]
+Tpm  &lt;- matrix(c(0.75,0.25,0.25,0.75),ncol=2,byrow=TRUE)
+Rho  &lt;- cbind(c(rep(1,5),rep(0,5)),c(rep(0,5),rep(1,5)))/5
+rownames(Rho) &lt;- Yval
+set.seed(42)
+xxx  &lt;- rhmm(ylengths=rep(1000,5),nsim=1,tpm=Tpm,Rho=Rho,yval=Yval,drop=TRUE)
+fit  &lt;- hmm(xxx,par0=list(tpm=Tpm,Rho=Rho),itmax=10)
+print(fit$Rho) # A data frame
+print(cnvrtRho(fit$Rho)) # A matrix of probabilities
+                         # whose columns sum to 1.
+
+# 2.
+# See the help for logLikHmm() for how to generate y.num.
+## Not run: 
+   fit.num     &lt;- hmm(y.num,K=2,verb=TRUE,itmax=10)
+   fit.num.mix &lt;- hmm(y.num,K=2,verb=TRUE,mixture=TRUE,itmax=10)
+   print(fit.num[c("tpm","Rho")])
+
+## End(Not run)
+# Note that states 1 and 2 get swapped.
+
+# 3.
+xxx &lt;- with(SydColDisc,split(y,f=list(locn,depth)))
+Yval &lt;- c("lo","mlo","m","mhi","hi")
+# Two states: above and below the thermocline.
+fitSydCol &lt;- hmm(xxx,yval=Yval,K=2,verb=TRUE,itmax=10)
+
+# 4.
+X &lt;- split(SydColDisc[,c("ma.com","nh.com","bo.com")],
+           f=with(SydColDisc,list(locn,depth)))
+X &lt;- lapply(X,function(x){
+                 as.matrix(as.data.frame(lapply(x,as.numeric)))-1})
+fit.wap &lt;- hmm(xxx,yval=Yval,K=2,X=X,verb=TRUE,itmax=10)
+# wap &lt;--&gt; with auxiliary predictors.
+
+# 5.
+## Not run:  # Takes too long.
+fitlm &lt;- hmm(xxx,yval=Yval,K=2,method="LM",verb=TRUE)
+fitem &lt;- hmm(xxx,yval=Yval,K=2,verb=TRUE)
+# Algorithm terminates due to a decrease in the log likelihood
+# at EM step 64.
+newfitlm &lt;- hmm(xxx,yval=Yval,par0=fitem,method="LM",verb=TRUE)
+# The log likelihood improves from -1900.988 to -1820.314
+
+## End(Not run)
+
+# 6.
+fitLesCount &lt;- hmm(lesionCount,K=2,itmax=10) # Two states: relapse and remission.
+</code></pre>
+
+
+</div>

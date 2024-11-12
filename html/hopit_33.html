@@ -1,0 +1,114 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>standardizeCoef</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Standardization of the coefficients</h2>
+
+<h3>Description</h3>
+
+<p>Calculate standardized the coefficients (e.g. disability weights for the health variables) using
+the predicted latent measure obtained from the model.<br>
+In the self-rated health example the standardized coefficients are called disability weights Jurges (2007)
+and are calculated for each health variable to provide information about the impact of a specific health measure on the latent index
+(see <code>latentIndex</code>). The disability weight for a health variable is equal to the ratio of the corresponding health coefficient
+and the difference between the lowest and the highest values of the predicted latent health. In other words, the disability weight reduces
+the latent index by some given amount or percentage (i.e., the latent index of every individual is reduced by the same amount if the person had a heart attack or other
+heart problems)(Jurges 2007).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">standardizeCoef(model, namesf = identity)
+
+standardiseCoef(model, namesf = identity)
+
+disabilityWeights(model, namesf = identity)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>model</code></td>
+<td>
+<p>a fitted <code>hopit</code> model.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>namesf</code></td>
+<td>
+<p>a vector of the names of coefficients or one argument function that modifies the names of coefficients.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>a vector with standardized coefficients.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Maciej J. Danko
+</p>
+
+
+<h3>References</h3>
+
+<p>Jurges H (2007).
+“True health vs response styles: exploring cross-country differences in self-reported health.”
+<em>Health Economics</em>, <b>16</b>(2), 163-178.
+<a href="https://doi.org/10.1002/hec.1134">doi:10.1002/hec.1134</a>.<br><br>
+Oksuzyan A, Danko MJ, Caputo J, Jasilionis D, Shkolnikov VM (2019).
+“Is the story about sensitive women and stoical men true? Gender differences in health after adjustment for reporting behavior.”
+<em>Social Science &amp; Medicine</em>, <b>228</b>, 41-50.
+<a href="https://doi.org/10.1016/j.socscimed.2019.03.002">doi:10.1016/j.socscimed.2019.03.002</a>.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>latentIndex</code>, <code>getCutPoints</code>, <code>getLevels</code>, <code>hopit</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># DATA
+data(healthsurvey)
+
+# the order of response levels decreases from the best health to
+# the worst health; hence the hopit() parameter decreasing.levels
+# is set to TRUE
+levels(healthsurvey$health)
+
+# Example 1 ---------------------
+
+# fit a model
+model1 &lt;- hopit(latent.formula = health ~ hypertension + high_cholesterol +
+                heart_attack_or_stroke + poor_mobility + very_poor_grip +
+                depression + respiratory_problems +
+                IADL_problems + obese + diabetes + other_diseases,
+              thresh.formula = ~ sex + ageclass + country,
+              decreasing.levels = TRUE,
+              control = list(trace = FALSE),
+              data = healthsurvey)
+
+# a function that modifies the coefficient names.
+txtfun &lt;- function(x) gsub('_',' ',substr(x,1,nchar(x)-3))
+
+# calculate and plot the disability weights
+sc &lt;- standardizeCoef(model1, namesf = txtfun)
+sc
+
+summary(sc)
+
+plot(sc)
+</code></pre>
+
+
+</div>

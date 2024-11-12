@@ -1,0 +1,147 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>har</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+"Hit and Run" sampler
+</h2>
+
+<h3>Description</h3>
+
+<p>The "Hit and Run" method generates a Markov Chain whose stable state converges on the uniform distribution over a convex polytope defined by a set of linear constraints.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">har(x0, constr, N, thin=1, homogeneous=FALSE, transform=NULL)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x0</code></td>
+<td>
+<p>Starting point (must be in the polytope)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>constr</code></td>
+<td>
+<p>Constraint definition (see details)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>N</code></td>
+<td>
+<p>Number of iterations to run</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>thin</code></td>
+<td>
+<p>Thinning factor (keep every 'thin'-th sample)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>homogeneous</code></td>
+<td>
+<p>Whether x0, constr and transform are given in homogeneous coordinate representation (see details)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>transform</code></td>
+<td>
+<p>Transformation matrix to apply to the generated samples (optional)</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The constraints, starting point and transformation matrix can be given in homogeneous coordinate representation (an extra component is added to each vector, equal to 1.0).
+This enables affine transformations (such as translation) to be applied to the coordinate vectors by the constraint and transformation matrices.
+Be aware that while non-affine (perspective) transformations are also possible, they will not in general preserve uniformity of the generated samples.
+</p>
+<p>Constraints are given as a list(constr=A, rhs=b, dir=d), where d should contain only "&lt;=".
+See <code>hitandrun</code> for a "Hit and Run" sampler that also supports equality constraints.
+The constraints define the polytope as usual for linear programming: <code class="reqn">Ax \leq b</code>.
+In particular, it must be true that <code class="reqn">A x_0 \leq b</code>.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A list, containing:
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>samples</code></td>
+<td>
+<p>A matrix containing the generated samples as rows.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>xN</code></td>
+<td>
+<p>The last generated sample, untransformed. Can be used as the starting point for a continuation of the chain.</p>
+</td>
+</tr>
+</table>
+<h3>Note</h3>
+
+<p>"Hit and Run" is a Markov Chain Monte Carlo (MCMC) method, so generated samples form a correlated time series. To get a uniform sample, you need <code class="reqn">O^*(n^3)</code> samples, where n is the dimension of the sampling space.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Gert van Valkenhoef
+</p>
+
+
+<h3>References</h3>
+
+<p>Smith, R. L. (1984) "Efficient Monte Carlo Procedures for Generating Points Uniformly Distributed over Bounded Regions". <em>Operations Research</em> 32(6): 1296-1308. doi: <a href="https://doi.org/10.1287/opre.32.6.1296">10.1287/opre.32.6.1296</a>
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>harConstraints</code>
+<code>hitandrun</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># constraints: x_1 &gt;= 0, x_2 &gt;= 0, x_1 + x_2 &lt;= 1
+A &lt;- rbind(c(-1, 0), c(0, -1), c(1, 1))
+b &lt;- c(0, 0, 1)
+d &lt;- c("&lt;=", "&lt;=", "&lt;=")
+constr &lt;- list(constr=A, rhs=b, dir=d)
+
+# take a point x0 within the polytope
+x0 &lt;- c(0.25, 0.25)
+
+# sample 10,000 points
+samples &lt;- har(x0, constr, 1E4)$samples
+
+# Check dimension of result
+stopifnot(dim(samples) == c(1E4, 2))
+
+# Check that x_i &gt;= 0
+stopifnot(samples &gt;= 0)
+
+# Check that x_1 + x_2 &lt;= 1
+stopifnot(samples[,1] + samples[,2] &lt;= 1)
+
+plot(samples)
+
+</code></pre>
+
+
+</div>

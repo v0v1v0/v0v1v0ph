@@ -1,0 +1,239 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>define_case</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Identify diseases/events from administrative records</h2>
+
+<h3>Description</h3>
+
+<p>This function is a composite of <code>identify_row()</code>, <code>exclude()</code>, <code>restrict_n()</code>, and <code>restrict_date()</code>. It is aimed to implement common case definitions in epidemiological studies using administrative database as a one-shot big query. The intended use case is for definitions in the form of, e.g., two or more physician visits with some diagnostic code at least 30 days apart within two years. The component functions mentioned above are chained in the following order if all arguments were supplied: <code>identify_row(vals) %&gt;% exclude(identify_row(excl_vals), by = clnt_id) %&gt;% restrict_n() %&gt;% restrict_date()</code>. Only necessary steps in the chain will be ran if some arguments are missing, see the verbose output for what was done. Note that if <code>date_var</code> is supplied, <code>n_per_clnt</code> will be counted by distinct dates instead of number of records.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">define_case(
+  data,
+  vars,
+  match = "in",
+  vals,
+  clnt_id,
+  n_per_clnt = 1,
+  date_var = NULL,
+  apart = NULL,
+  within = NULL,
+  uid = NULL,
+  excl_vals = NULL,
+  excl_args = NULL,
+  keep = c("all", "first", "last"),
+  if_all = FALSE,
+  mode = c("flag", "filter"),
+  force_collect = FALSE,
+  verbose = getOption("healthdb.verbose"),
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>Data.frames or remote tables (e.g., from <code>dbplyr::tbl_sql()</code>)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>vars</code></td>
+<td>
+<p>An expression passing to <code>dplyr::select()</code>. It can be quoted/unquoted column names, or helper functions, such as <code>dplyr::starts_with()</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>match</code></td>
+<td>
+<p>One of "in", "start", "regex", "like", "between", and "glue_sql". It determines how values would be matched. See <code>identify_row()</code> for detail.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>vals</code></td>
+<td>
+<p>Depending on <code>match</code>, it takes different input. See <code>identify_row()</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>clnt_id</code></td>
+<td>
+<p>Grouping variable (quoted/unquoted).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n_per_clnt</code></td>
+<td>
+<p>A single number specifying the minimum number of group size.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>date_var</code></td>
+<td>
+<p>Variable name (quoted/unquoted) for the dates to be interpreted.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>apart</code></td>
+<td>
+<p>An integer specifying the minimum gap (in days) between adjacent dates in a draw.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>within</code></td>
+<td>
+<p>An integer specifying the maximum time span (in days) of a draw.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>uid</code></td>
+<td>
+<p>Variable name for a unique row identifier. It is necessary for SQL to produce consistent result based on sorting.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>excl_vals</code></td>
+<td>
+<p>Same as <code>vals</code> but clients/groups with these values are going to be removed from the result. This is intended for exclusion criteria of a case definition.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>excl_args</code></td>
+<td>
+<p>A named list of arguments passing to the second <code>identify_row()</code> call for <code>excl_vals</code>. If not supplied, <code>var</code>, <code>match</code> and <code>if_all</code> of the first call will be re-used.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>keep</code></td>
+<td>
+<p>One of:
+</p>
+
+<ul>
+<li>
+<p> "first" (keeping each client's earliest record),
+</p>
+</li>
+<li>
+<p> "last" (keeping the latest),
+</p>
+</li>
+<li>
+<p> and "all" (keeping all relevant records, default).
+</p>
+</li>
+<li>
+<p> Note that "first"/"last" should not be used with "flag" mode.
+</p>
+</li>
+</ul>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>if_all</code></td>
+<td>
+<p>A logical for whether combining the predicates (if multiple columns were selected by vars) with AND instead of OR. Default is FALSE, e.g., var1 in vals OR var2 in vals.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mode</code></td>
+<td>
+<p>Either:
+</p>
+
+<ul>
+<li>
+<p> "flag" - add new columns starting with "flag_" indicating if the client met the condition,
+</p>
+</li>
+<li>
+<p> or "filter" - remove clients that did not meet the condition from the data.
+</p>
+</li>
+<li>
+<p> This will be passed to both <code>restrict_n()</code> AND <code>restrict_date()</code>. Default is "flag".
+</p>
+</li>
+</ul>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>force_collect</code></td>
+<td>
+<p>A logical for whether force downloading the result table if it is not a local data.frame. Downloading data could be slow, so the user has to opt in; default is FALSE.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p>A logical for whether printing explanation for the operation. Default is fetching from options. Use <code>options(healthdb.verbose = FALSE)</code> to suppress once and for all.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Additional arguments, e.g., <code>mode</code>, passing to <code>restrict_date()</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A subset of input data satisfied the specified case definition.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">sample_size &lt;- 30
+df &lt;- data.frame(
+  clnt_id = rep(1:3, each = 10),
+  service_dt = sample(seq(as.Date("2020-01-01"), as.Date("2020-01-31"), by = 1),
+    size = sample_size, replace = TRUE
+  ),
+  diagx = sample(letters, size = sample_size, replace = TRUE),
+  diagx_1 = sample(c(NA, letters), size = sample_size, replace = TRUE),
+  diagx_2 = sample(c(NA, letters), size = sample_size, replace = TRUE)
+)
+
+# define from one source
+define_case(df,
+  vars = starts_with("diagx"), "in", vals = letters[1:4],
+  clnt_id = clnt_id, date_var = service_dt,
+  excl_args = list(if_all = TRUE),
+  # remove non-case
+  mode = "filter",
+  # keeping the first record
+  keep = "first"
+)
+
+# multiple sources with purrr::pmap
+# arguments with length = 1 will be recycle to match the number of sources
+# wrap expressions/unquoted variables with bquote(),
+# or rlang:exprs() to prevent immediate evaluation,
+# or just use quoted variable names
+purrr::pmap(
+  list(
+    data = list(df, df),
+    vars = rlang::exprs(starts_with("diagx")),
+    match = c("in", "start"),
+    vals = list(letters[1:4], letters[5:10]),
+    clnt_id = list(bquote(clnt_id)), n_per_clnt = c(2, 3),
+    date_var = "service_dt",
+    excl_vals = list(letters[11:13], letters[14:16]),
+    excl_args = list(list(if_all = TRUE), list(if_all = FALSE))
+  ),
+  define_case
+)
+</code></pre>
+
+
+</div>

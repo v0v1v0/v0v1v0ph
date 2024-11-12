@@ -1,0 +1,173 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>haplo.group</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Frequencies for Haplotypes by Grouping Variable
+</h2>
+
+<h3>Description</h3>
+
+<p>Calculate maximum likelihood estimates of haplotype probabilities for 
+the entire dataset and separately for each subset defined by the
+levels of a group variable.  Only autosomal loci are considered.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">haplo.group(group, geno, locus.label=NA, 
+            miss.val=0, weight=NULL, 
+            control=haplo.em.control())
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>group</code></td>
+<td>
+
+<p>Group can be of logical, numeric, character, or factor class type.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>geno</code></td>
+<td>
+
+<p>Matrix of alleles, such that each locus has a pair of
+adjacent columns of alleles, and the order of columns
+corresponds to the order of loci on a chromosome.  If
+there are K loci, then geno has 2*K columns. Rows represent all
+observed alleles for each subject.  
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>locus.label </code></td>
+<td>
+
+<p>Vector of labels for loci, of length K (see definition of geno matrix).
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>miss.val </code></td>
+<td>
+
+<p>Vector of codes for allele missing values.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>weight</code></td>
+<td>
+
+<p>weights for observations (rows of geno matrix). One reason to use is
+to adjust for disproportionate sample of sub-groups.  Weights only
+used in the frequency calculation for the pooled subject.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>control</code></td>
+<td>
+
+<p>list of control parameters for haplo.em (see haplo.em.control).
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Haplo.em is used to compute the maximum likelihood estimates of 
+the haplotype frequencies for the total sample, then for each of 
+the groups separately.  
+</p>
+
+
+<h3>Value</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>list</code></td>
+<td>
+
+<p>A list as an object of the haplo.group class.  The three
+elements of the list are described below.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>group.df</code></td>
+<td>
+
+<p>A data frame with the columns described as follows.
+-haplotype:
+Names for the K columns for the K alleles in the haplotypes.
+-total:
+Estimated frequencies for haplotypes from the total sample.
+-group.name.i:
+Estimated haplotype frequencies for the haplotype
+if it occurs in the group referenced by 'i'.  Frequency is NA 
+if it doesn't occur for the group.  The column name is the actual 
+variable name joined with the ith level of that variable.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>group.count</code></td>
+<td>
+
+<p>Vector containing the number of subjects for each level of the 
+grouping variable.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n.loci</code></td>
+<td>
+
+<p>Number of loci occuring in the geno matrix.
+</p>
+</td>
+</tr>
+</table>
+<h3>References</h3>
+
+<p>Schaid DJ, Rowland CM, Tines DE, Jacobson RM,  Poland  GA.
+"Score tests for association of traits with haplotypes when
+linkage phase is ambiguous." Amer J Hum Genet. 70 (2002):  425-434.
+</p>
+
+
+<h3>See Also</h3>
+
+<p>print.haplo.group, haplo.em
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">  data(hla.demo)
+  geno &lt;- as.matrix(hla.demo[,c(17,18,21:24)])
+
+# remove any subjects with missing alleles for faster examples, 
+# but you may keep them in practice
+  keep &lt;- !apply(is.na(geno) | geno==0, 1, any)
+  hla.demo &lt;- hla.demo[keep,]
+  geno &lt;- geno[keep,]
+  attach(hla.demo)
+  
+  y.ord &lt;- as.numeric(resp.cat)
+  y.bin &lt;-ifelse(y.ord==1,1,0)
+  group.bin &lt;- haplo.group(y.bin, geno, miss.val=0)
+  print.haplo.group(group.bin)
+</code></pre>
+
+
+</div>

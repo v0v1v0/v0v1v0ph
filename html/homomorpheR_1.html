@@ -1,0 +1,52 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>homomorpheR</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>homomorpheR: Homomorphic computations in R</h2>
+
+<h3>Description</h3>
+
+<p><code>homomorpheR</code> is a start at a rudimentary package for
+homomorphic computations in R. The goal is to collect homomorphic
+encryption schemes in this package for privacy-preserving
+distributed computations; for example, applications of the sort
+immplemented in package <code>distcomp</code>.
+</p>
+
+
+<h3>Details</h3>
+
+<p>At the moment, only one scheme is implemented, the Paillier
+scheme. The current implementation makes no pretense at efficiency
+and also uses direct translations of other implementations,
+particularly the one in Javascript.
+</p>
+<p>For a quick overview of the features, read the
+<code>homomorpheR</code> vignette by running
+<code>vignette("homomorpheR")</code>.
+</p>
+
+
+<h3>References</h3>
+
+<p><a href="https://en.wikipedia.org/wiki/Homomorphic_encryption">https://en.wikipedia.org/wiki/Homomorphic_encryption</a>
+</p>
+<p><a href="https://mhe.github.io/jspaillier/">https://mhe.github.io/jspaillier/</a>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">keys &lt;- PaillierKeyPair$new(1024) # Generate new key pair
+encryptAndDecrypt &lt;- function(x) keys$getPrivateKey()$decrypt(keys$pubkey$encrypt(x))
+a &lt;- gmp::as.bigz(1273849)
+identical(a + 10L, encryptAndDecrypt(a+10L))
+x &lt;- lapply(1:100, function(x) random.bigz(nBits = 512))
+edx &lt;- lapply(x, encryptAndDecrypt)
+identical(x, edx)
+</code></pre>
+
+
+</div>

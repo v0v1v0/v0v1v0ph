@@ -1,0 +1,126 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>make_htrx</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Generate haplotype data</h2>
+
+<h3>Description</h3>
+
+<p>Generate the feature data, either the genotype data for single nucleotide polymorphisms (SNPs) (<code>make_snp</code>),
+the feature data for Haplotype Trend Regression (HTR) (<code>make_htr</code>), or
+the feature data for Haplotype Trend Regression with eXtra flexibility (HTRX) (<code>make_htrx</code>).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">make_htrx(
+  hap1,
+  hap2 = hap1,
+  rareremove = FALSE,
+  rare_threshold = 0.001,
+  fixedfeature = NULL,
+  max_int = NULL
+)
+
+make_htr(hap1, hap2 = hap1, rareremove = FALSE, rare_threshold = 0.001)
+
+make_snp(hap1, hap2 = hap1, rareremove = FALSE, rare_threshold = 0.001)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>hap1</code></td>
+<td>
+<p>a data frame of the SNPs' genotype of the first genome. The genotype of a SNP for each individual is either 0 (reference allele) or 1 (alternative allele).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>hap2</code></td>
+<td>
+<p>a data frame of the SNPs' genotype of the second genome.
+The genotype of a SNP for each individual is either 0 (reference allele) or 1 (alternative allele).
+By default, <code>hap2=hap1</code> representing haploid.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rareremove</code></td>
+<td>
+<p>logical. Remove rare SNPs and haplotypes or not. By default, <code>rareremove=FALSE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rare_threshold</code></td>
+<td>
+<p>a numeric number below which the haplotype or SNP is removed.
+This only works when <code>rareremove=TRUE</code>. By default, <code>rare_threshold=0.001</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fixedfeature</code></td>
+<td>
+<p>a character consisted of the names of haplotypes.
+This parameter can be <code>NULL</code> (by default) if all the haplotypes are used as variables.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>max_int</code></td>
+<td>
+<p>a positive integer which specifies the maximum number of SNPs that can interact.
+If no value is given, interactions between all the SNPs will be considered.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>If there are n SNPs, there are 2<sup>n</sup> different haplotypes created by HTR,
+and 3<sup>n</sup>-1 different haplotypes created by HTRX.
+</p>
+<p>When the data is haploid, please use the default setting <code>hap2=hap1</code>.
+</p>
+
+
+<h3>Value</h3>
+
+<p>a data frame of the feature data (either for SNPs, HTR or HTRX).
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## create SNP data for both genomes (diploid data)
+hap1=as.data.frame(matrix(0,nrow=100,ncol=4))
+hap2=as.data.frame(matrix(0,nrow=100,ncol=4))
+colnames(hap1)=colnames(hap2)=c('a','b','c','d')
+p=runif(4,0.01,0.99)
+for(j in 1:4){
+  hap1[,j]=rbinom(100,1,p[j])
+  hap2[,j]=rbinom(100,1,p[j])
+}
+
+## create the SNP data without removing rare SNPs
+make_snp(hap1,hap2)
+
+## create feature data for "HTR" removing haplotypes rarer than 0.5%
+make_htr(hap1,hap2,rareremove=TRUE,0.005)
+
+## create feature data for "HTRX"
+## retaining haplotypes with interaction across at most 3 SNPs
+make_htrx(hap1,hap2,max_int=3)
+
+## create feature data for feature "01XX" and "X101"
+## without removing haplotypes
+make_htrx(hap1,hap2,fixedfeature=c("01XX","X101"))
+
+## If the data is haploid instead of diploid
+## create feature data for "HTRX" without removing haplotypes
+make_htrx(hap1,hap1)
+</code></pre>
+
+
+</div>

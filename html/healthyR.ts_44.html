@@ -1,0 +1,183 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>ts_auto_recipe</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Build a Time Series Recipe</h2>
+
+<h3>Description</h3>
+
+<p>Automatically builds generic time series recipe objects from a given
+tibble.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">ts_auto_recipe(
+  .data,
+  .date_col,
+  .pred_col,
+  .step_ts_sig = TRUE,
+  .step_ts_rm_misc = TRUE,
+  .step_ts_dummy = TRUE,
+  .step_ts_fourier = TRUE,
+  .step_ts_fourier_period = 365/12,
+  .K = 1,
+  .step_ts_yeo = TRUE,
+  .step_ts_nzv = TRUE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>.data</code></td>
+<td>
+<p>The data that is going to be modeled. You must supply a tibble.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.date_col</code></td>
+<td>
+<p>The column that holds the date for the time series.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.pred_col</code></td>
+<td>
+<p>The column that is to be predicted.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.step_ts_sig</code></td>
+<td>
+<p>A Boolean indicating should the <code>timetk::step_timeseries_signature()</code>
+be added, default is TRUE.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.step_ts_rm_misc</code></td>
+<td>
+<p>A Boolean indicating should the following items be removed from
+the time series signature, default is TRUE.
+</p>
+
+<ul>
+<li>
+<p> iso$
+</p>
+</li>
+<li>
+<p> xts$
+</p>
+</li>
+<li>
+<p> hour
+</p>
+</li>
+<li>
+<p> min
+</p>
+</li>
+<li>
+<p> sec
+</p>
+</li>
+<li>
+<p> am.pm
+</p>
+</li>
+</ul>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.step_ts_dummy</code></td>
+<td>
+<p>A Boolean indicating if all_nominal_predictors() should
+be dummied and with one hot encoding.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.step_ts_fourier</code></td>
+<td>
+<p>A Boolean indicating if <code>timetk::step_fourier()</code> should
+be added to the recipe.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.step_ts_fourier_period</code></td>
+<td>
+<p>A number such as 365/12, 365/4 or 365 indicting
+the period of the fourier term. The numeric period for the oscillation frequency.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.K</code></td>
+<td>
+<p>The number of orders to include for each sine/cosine fourier series.
+More orders increase the number of fourier terms and therefore the variance
+of the fitted model at the expense of bias. See details for examples of K
+specification.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.step_ts_yeo</code></td>
+<td>
+<p>A Boolean indicating if the <code>recipes::step_YeoJohnson()</code> should
+be added to the recipe.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.step_ts_nzv</code></td>
+<td>
+<p>A Boolean indicating if the <code>recipes::step_nzv()</code> should be run
+on all predictors.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>This will build out a couple of generic recipe objects and return those items
+in a list.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Steven P. Sanderson II, MPH
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">suppressPackageStartupMessages(library(dplyr))
+suppressPackageStartupMessages(library(rsample))
+
+data_tbl &lt;- ts_to_tbl(AirPassengers) %&gt;%
+  select(-index)
+
+splits &lt;- initial_time_split(
+ data_tbl
+ , prop = 0.8
+)
+
+ts_auto_recipe(
+    .data = data_tbl
+    , .date_col = date_col
+    , .pred_col = value
+)
+
+ts_auto_recipe(
+  .data = training(splits)
+  , .date_col = date_col
+  , .pred_col = value
+)
+
+</code></pre>
+
+
+</div>

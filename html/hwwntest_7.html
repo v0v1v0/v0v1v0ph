@@ -1,0 +1,211 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>genwwn.test</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>White noise test using general wavelets.
+</h2>
+
+<h3>Description</h3>
+
+<p>Performs test for white noise using a general wavelet
+decomposition of a normalized periodogram.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">genwwn.test(x, away.from = "standard", lowlev = 0, plot.it = FALSE,
+	stopeveryscale = FALSE, filter.number = 10,
+	family = "DaubExPhase", mc.method = p.adjust.methods,
+	mac.spread = 10, verbose = FALSE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>The time series you wish to test (of dyadic length).
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>away.from</code></td>
+<td>
+<p>Number of fine scales to stay away from, see details below.
+If "standard" then this is automatically computed for sample sizes
+up to length of 1024. If you have a longer series then the test
+will still work but might not be quite as powerful (but probably
+not too bad either).
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lowlev</code></td>
+<td>
+<p>The coarsest coefficient to evaluate. This should
+always be left at 0. 
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>plot.it</code></td>
+<td>
+<p>If TRUE then a series of plots similar to the ones produced
+in the <code>hwwn.test</code> function is produced. See that help
+page for further details on what the plots show.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>stopeveryscale</code></td>
+<td>
+<p>If TRUE then if <code>plot.it=TRUE</code> then a
+‘scan’ is issued after every plot. Just hit RETURN to continue.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>filter.number</code></td>
+<td>
+<p>The number of vanishing moments of the wavelet
+used to compute coefficients that are then evaluated to see whether
+they are zero. In principle, best compression for a sparse evaluation
+of the normalized spectrum should mean we use the smoothest wavelets
+with the highest number of vanishing moments which is ten. The
+other components of the function are optimized for ten vanishing
+moments. The function will still work for other numbers of vanishing
+moments but maybe with slightly reduced power.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>family</code></td>
+<td>
+<p>Wavelet family to go with <code>filter.number</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mc.method</code></td>
+<td>
+<p>The type of multiple hypothesis correction, see
+<code>p.adjust</code> for details.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mac.spread</code></td>
+<td>
+<p>Horizontal range for plotting of wavelet coefficients,
+only used if <code>plot.it=TRUE</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p>If <code>TRUE</code> some information messages are printed.
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>This function computes the normalized periodogram, and then
+subjects it to a wavelet transform with respect to any wavelet
+(in wavethresh). Under the null hypothesis of white noise
+the coefficients should all close to zero and this function
+works out, for each coefficient, how close statistically it is
+to zero by assuming a Gaussian null distribution with mean zero
+and variance one. Then the multiple p-values from each of these
+tests are adjusted for multiple hypothesis test by using the
+<code>p.adjust</code> function before returning an overall p-value
+for the test. The test has been optimized for using the
+<code>filter.number=10</code> wavelet and <code>away.from="standard"</code>,
+but should work pretty well for other wavelets and even away.from
+values of more than 2-3 for moderate numbers of scales, and potentially
+higher for longer data sets. 
+</p>
+<p>An approximation to the theoretical power of this test
+can be obtained using the <code>genwwn.thpower</code> function.
+</p>
+
+
+<h3>Value</h3>
+
+<p>An object of class <code>htest</code> with the following components.
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>p.val.collector</code></td>
+<td>
+<p>All the of unadjusted p-values</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>p.val.adjust</code></td>
+<td>
+<p>All of the adjusted p-values</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>p.value</code></td>
+<td>
+<p>The overall p-value of the test</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+<p>A text string describing the test</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>Delyan Savchev and Guy Nason
+</p>
+
+
+<h3>References</h3>
+
+<p>Nason, G.P. and Savchev, D. (2014) White noise testing using
+wavelets. <em>Stat</em>, <b>3</b>, 351-362.
+<a href="https://doi.org/10.1002/sta4.69">doi:10.1002/sta4.69</a>
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>compute.rejection</code>,
+<code>genwwn.thpower</code> </p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">#
+# Generate test set, of dyadic length
+#
+x &lt;- rnorm(64)
+#
+# Do the test:
+#
+answer &lt;- genwwn.test(x)
+#
+# What do we get?
+#
+#answer
+#
+#	Wavelet Test of White Noise
+#
+#data:  
+#p-value = 0.4629
+</code></pre>
+
+
+</div>

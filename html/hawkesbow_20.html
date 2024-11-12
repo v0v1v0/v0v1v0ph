@@ -1,0 +1,103 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>plot.hawkes</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Plot of a Hawkes process</h2>
+
+<h3>Description</h3>
+
+<p>Plots the realisation of a Hawkes process and either its cluster representation (<code>intensity=FALSE</code>, only available for a simulated Hawkes process) or its intensity function (<code>intensity=TRUE</code>).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">## S3 method for class 'hawkes'
+plot(
+  x,
+  intensity = FALSE,
+  precision = 1000,
+  fun = NULL,
+  repr = NULL,
+  family = NULL,
+  M = NULL,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>Either: a numeric vector, sorted in ascending order; or an object of class "hawkes" output by function <code>hawkes</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>intensity</code></td>
+<td>
+<p>(default = FALSE) A boolean - whether to represent the cluster representation (<code>FALSE</code>) or the intensity function (<code>TRUE</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>precision</code></td>
+<td>
+<p>(default = 1e3) Number of points to plot.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fun</code></td>
+<td>
+<p>(default = NULL) A numeric function - intensity (function) of the immigrant process.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>repr</code></td>
+<td>
+<p>(default = NULL) A non-negative numeric value - mean number of offsprings.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>family</code></td>
+<td>
+<p>(default = NULL) A character string "name" naming a distribution with corresponding distribution function <code>dname</code>, or directly the distribution function.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>M</code></td>
+<td>
+<p>(default = NULL) A non-negative numeric value - upper bound on <code>fun</code>(ignored if <code>fun</code> is a numeric value).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Additional arguments passed on to the random generation function <code>dname</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>None
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Simulate an exponential Hawkes process with baseline intensity 1,
+# reproduction mean 0.5 and exponential fertility function with rate 2.
+x &lt;- hawkes(10, fun=1, repr=0.5, family="exp", rate=2)
+plot(x)
+# Simulate a Hawkes process with baseline intensity function 1 + sin(x),
+# reproduction mean 0.5 and custom [0,1]-triangular fertility function.
+x &lt;- hawkes(10, fun=function(y) {1+sin(y)}, M=2, repr=0.5,
+            family=function(n) {1 - sqrt(1 - runif(n))})
+plot(x, intensity=TRUE, family=function(y) ifelse(y&gt;0 &amp; y&lt;1, 2-2*y, 0))
+</code></pre>
+
+
+</div>

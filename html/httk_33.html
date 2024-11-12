@@ -1,0 +1,172 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>calc_half_life</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Calculates the half-life for a one compartment model.</h2>
+
+<h3>Description</h3>
+
+<p>This function calculates the half life from the three compartment
+steady state model where elimination is entirely due to metabolism by the
+liver and glomerular filtration in the kidneys.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">calc_half_life(
+  chem.cas = NULL,
+  chem.name = NULL,
+  dtxsid = NULL,
+  parameters = NULL,
+  species = "Human",
+  suppress.messages = TRUE,
+  default.to.human = FALSE,
+  restrictive.clearance = TRUE,
+  adjusted.Funbound.plasma = TRUE,
+  regression = TRUE,
+  well.stirred.correction = TRUE,
+  clint.pvalue.threshold = 0.05,
+  minimum.Funbound.plasma = 1e-04
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>chem.cas</code></td>
+<td>
+<p>Either the cas number or the chemical name must be specified.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>chem.name</code></td>
+<td>
+<p>Either the chemical name or the cas number must be specified.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dtxsid</code></td>
+<td>
+<p>EPA's 'DSSTox Structure ID (<a href="https://comptox.epa.gov/dashboard">https://comptox.epa.gov/dashboard</a>)
+the chemical must be identified by either CAS, name, or DTXSIDs</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>parameters</code></td>
+<td>
+<p>Chemical parameters from parameterize_steadystate or
+1compartment function, overrides chem.name and chem.cas.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>species</code></td>
+<td>
+<p>Species desired (either "Rat", "Rabbit", "Dog", "Mouse", or
+default "Human").</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>suppress.messages</code></td>
+<td>
+<p>Whether or not the output message is suppressed.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>default.to.human</code></td>
+<td>
+<p>Substitutes missing animal values with human values
+if true.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>restrictive.clearance</code></td>
+<td>
+<p>In calculating elimination rate, protein
+binding is not taken into account (set to 1) in liver clearance if FALSE.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>adjusted.Funbound.plasma</code></td>
+<td>
+<p>Uses adjusted Funbound.plasma when set to
+TRUE along with partition coefficients calculated with this value.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>regression</code></td>
+<td>
+<p>Whether or not to use the regressions in calculating
+partition coefficients.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>well.stirred.correction</code></td>
+<td>
+<p>Uses correction in calculation of hepatic
+clearance for -stirred model if TRUE.  This assumes clearance relative
+to amount unbound in whole blood instead of plasma, but converted to use
+with plasma concentration.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>clint.pvalue.threshold</code></td>
+<td>
+<p>Hepatic clearance for chemicals where the in
+vitro clearance assay result has a p-values greater than the threshold are
+set to zero.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>minimum.Funbound.plasma</code></td>
+<td>
+<p>Monte Carlo draws less than this value are set 
+equal to this value (default is 0.0001 – half the lowest measured Fup in our
+dataset).</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Half life is calculated by dividing the natural-log of 2 by the elimination
+rate from the one compartment model.
+</p>
+
+
+<h3>Value</h3>
+
+<table><tr style="vertical-align: top;">
+<td><code>Half life</code></td>
+<td>
+<p>Units of h.</p>
+</td>
+</tr></table>
+<h3>Author(s)</h3>
+
+<p>Sarah E. Davidson
+</p>
+
+
+<h3>See Also</h3>
+
+<p>[calc_elimination_rate()] for the elimination rate calculation
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+calc_half_life(chem.name="Bisphenol A")
+
+calc_half_life(chem.name="Bisphenol A",species="Rat")
+calc_half_life(chem.cas="80-05-7")
+
+
+</code></pre>
+
+
+</div>

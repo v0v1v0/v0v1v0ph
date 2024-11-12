@@ -1,0 +1,130 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>find_optimal_occupancy_thin</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Find optimal parameters to calculate occupancy
+</h2>
+
+<h3>Description</h3>
+
+<p>The <code>find_optimal_occupancy_thin()</code> function is used to find the optimal parameters for
+<code>hypervolume_n_occupancy()</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">find_optimal_occupancy_thin(..., 
+                            verbose = TRUE, 
+                            sequence = seq(0, 1, 0.1), 
+                            n = 10, 
+                            res_type = "raw")
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+
+<p>Parameters to be used to run <code>hypervolume_n_occupancy()</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+
+<p>Logical value; print diagnostic output if <code>TRUE</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sequence</code></td>
+<td>
+
+<p>Quantiles to be tested.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n</code></td>
+<td>
+
+<p>Number of seeds to be tested.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>res_type</code></td>
+<td>
+
+<p>If <code>raw</code> print all the seeds and quantiles tested together with the resulting root mean square error (RMSE). If <code>summary</code> print RMSE mean and standard deviation for each quantile.
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The <code>find_optimal_occupancy_thin()</code> function searches for the optimal parameters for running <code>hypervolume_n_occupancy()</code>. It works by testing different quantiles and <code>n</code> seeds for random number generation (the same set of n seeds is tested for each quantile). RMSE is returned as the measure of the goodness of fit and results are ordered by increasing RMSE when <code>res_type = "raw"</code>. Quantile equal to 0 correspond to no thin. The obtained parameters can be used to feed arguments <code>quant.thin</code> and <code>seed</code> within the function <code>hypervolume_n_occupancy()</code>.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A <code>data.frame</code>.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>hypervolume_n_occupancy</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+data(penguins,package='palmerpenguins')
+penguins_no_na = as.data.frame(na.omit(penguins))
+
+# split the dataset on species and sex
+penguins_no_na_split = split(penguins_no_na, 
+                             paste(penguins_no_na$species, penguins_no_na$sex, sep = "_"))
+
+# calculate the hypervolume for each element of the splitted dataset
+hv_list = mapply(function(x, y) 
+  hypervolume_gaussian(x[, c("bill_length_mm","bill_depth_mm","flipper_length_mm")],
+                       samples.per.point=100, name = y), 
+  x = penguins_no_na_split, 
+  y = names(penguins_no_na_split))
+
+
+# transform the list into an HypervolumeList
+hv_list = hypervolume_join(hv_list)
+
+# find optimal parameters
+opt_par = find_optimal_occupancy_thin(hv_list, 
+                                       classification = rep(c("female", "male"), 3),
+                                       n = 20)
+
+head(opt_par)
+
+unoptimized_hv_occ = hypervolume_n_occupancy(hv_list, 
+                        classification = rep(c("female", "male"), 3))
+
+optimized_hv_occ = hypervolume_n_occupancy(hv_list, 
+                        classification = rep(c("female", "male"), 3), 
+                        quant.thin = opt_par[1, 2], seed = opt_par[1, 1])
+
+
+## End(Not run)
+</code></pre>
+
+
+</div>

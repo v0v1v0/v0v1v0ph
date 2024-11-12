@@ -1,0 +1,190 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>Inspect</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Informative sparse projection for estimating change-points (Inspect)</h2>
+
+<h3>Description</h3>
+
+<p>R wrapper for C function implementing a Narrowest-Over-Threshold variant of Inspect Wang and Samworth (2018) as specified in Appendix C in Moen et al. (2023). Note that the algorithm is only implemented for <code class="reqn">\mathcal{S} = \mathcal{S}_2</code>, in the notation of Moen et al. (2023).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">Inspect(
+  X,
+  lambda = NULL,
+  xi = NULL,
+  alpha = 1.5,
+  K = 5,
+  eps = 1e-10,
+  empirical = FALSE,
+  maxiter = 10000,
+  N = 100,
+  tol = 1/100,
+  rescale_variance = TRUE,
+  debug = FALSE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>X</code></td>
+<td>
+<p>Matrix of observations, where each row contains a time series</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lambda</code></td>
+<td>
+<p>Manually specified value of <code class="reqn">\lambda</code> (can be <code>NULL</code>, in which case <code class="reqn">\lambda \gets \sqrt{\log(p\log n)/2}</code>)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>xi</code></td>
+<td>
+<p>Manually specified value of <code class="reqn">\xi</code> (can be NULL, in which case <code class="reqn">\xi \gets 4\sqrt{\log(np)}</code>)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alpha</code></td>
+<td>
+<p>Parameter for generating seeded intervals</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>K</code></td>
+<td>
+<p>Parameter for generating seeded intervals</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>eps</code></td>
+<td>
+<p>Threshold for declaring numerical convergence of the power method</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>empirical</code></td>
+<td>
+<p>If <code>TRUE</code>, the detection threshold <code class="reqn">xi</code> is based on Monte Carlo simulation using <code>Inspect_calibrate</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>maxiter</code></td>
+<td>
+<p>Maximum number of iterations for the power method</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>N</code></td>
+<td>
+<p>If <code>empirical=TRUE</code>, <code>N</code> is the number of Monte Carlo samples used</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tol</code></td>
+<td>
+<p>If <code>empirical=TRUE</code>, <code>tol</code> is the false error probability tolerance</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rescale_variance</code></td>
+<td>
+<p>If <code>TRUE</code>, each row of the data is re-scaled by a MAD estimate using <code>rescale_variance</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>debug</code></td>
+<td>
+<p>If <code>TRUE</code>, diagnostic prints are provided during execution</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A list containing 
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>changepoints</code></td>
+<td>
+<p>vector of estimated change-points</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>changepointnumber</code></td>
+<td>
+<p>number of changepoints</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>CUSUMval</code></td>
+<td>
+<p>vector with the sparse projected CUSUMs corresponding to <code>changepoints</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>coordinates</code></td>
+<td>
+<p>a matrix of zeros and ones indicating which time series are affected by a change in mean, with each row corresponding to the change-point in <code>changepoints</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>scales</code></td>
+<td>
+<p>vector of estimated noise level for each series</p>
+</td>
+</tr>
+</table>
+<h3>References</h3>
+
+<p>Moen PAJ, Glad IK, Tveten M (2023).
+“Efficient sparsity adaptive changepoint estimation.”
+Arxiv preprint, 2306.04702, <a href="https://doi.org/10.48550/arXiv.2306.04702">https://doi.org/10.48550/arXiv.2306.04702</a>.<br><br> Wang T, Samworth RJ (2018).
+“High dimensional change point estimation via sparse projection.”
+<em>Journal of the Royal Statistical Society: Series B (Statistical Methodology)</em>, <b>80</b>(1), 57–83.
+ISSN 1467-9868, <a href="https://doi.org/10.1111/rssb.12243">doi:10.1111/rssb.12243</a>, <a href="https://rss.onlinelibrary.wiley.com/doi/abs/10.1111/rssb.12243">https://rss.onlinelibrary.wiley.com/doi/abs/10.1111/rssb.12243</a>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">library(HDCD)
+n = 50
+p = 50
+set.seed(100)
+# Generating data
+X = matrix(rnorm(n*p), ncol = n, nrow=p)
+# Adding a single sparse change-point:
+X[1:5, 26:n] = X[1:5, 26:n] +1
+
+# Vanilla Inspect:
+res = Inspect(X)
+res$changepoints
+
+# Manually setting leading constants for \lambda(t) and \gamma(t)
+res = Inspect(X, 
+              lambda = sqrt(log(p*log(n))/2),
+              xi = 4*sqrt(log(n*p))
+)
+res$changepoints #estimated change-point locations
+
+# Empirical choice of thresholds:
+res = Inspect(X, empirical=TRUE, N = 100, tol = 1/100)
+res$changepoints
+
+# Manual empirical choice of thresholds (equivalent to the above)
+thresholds_emp = Inspect_calibrate(n,p, N=100, tol=1/100)
+res = Inspect(X, xi = thresholds_emp$max_value)
+res$changepoints
+</code></pre>
+
+
+</div>

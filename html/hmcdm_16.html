@@ -1,0 +1,108 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>sim_RT</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Simulate item response times based on Wang et al.'s (2018) joint model of response times and accuracy in learning</h2>
+
+<h3>Description</h3>
+
+<p>Simulate a cube of subjects' response times across time points according to a variant of the logNormal model
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">sim_RT(alphas, Q_matrix, Design_array, RT_itempars, taus, phi, G_version)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>alphas</code></td>
+<td>
+<p>An N-by-K-by-T <code>array</code> of attribute patterns of all persons across T time points</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Q_matrix</code></td>
+<td>
+<p>A J-by-K  Q-matrix for the test</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Design_array</code></td>
+<td>
+<p>A N-by-J-by-L array indicating whether item j is administered to examinee i at l time point.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>RT_itempars</code></td>
+<td>
+<p>A J-by-2 <code>matrix</code> of item time discrimination and time intensity parameters</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>taus</code></td>
+<td>
+<p>A length N <code>vector</code> of latent speed of each person</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>phi</code></td>
+<td>
+<p>A <code>scalar</code> of slope of increase in fluency over time due to covariates (G)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>G_version</code></td>
+<td>
+<p>An <code>int</code> of the type of covariate for increased fluency (1: G is dichotomous depending on whether all skills required for
+current item are mastered; 2: G cumulates practice effect on previous items using mastered skills; 3: G is a time block effect invariant across
+subjects with different attribute trajectories)</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A <code>cube</code> of response times of subjects on each item across time
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">N = dim(Design_array)[1]
+J = nrow(Q_matrix)
+K = ncol(Q_matrix)
+L = dim(Design_array)[3]
+class_0 &lt;- sample(1:2^K, N, replace = TRUE)
+Alphas_0 &lt;- matrix(0,N,K)
+mu_thetatau = c(0,0)
+Sig_thetatau = rbind(c(1.8^2,.4*.5*1.8),c(.4*.5*1.8,.25))
+Z = matrix(rnorm(N*2),N,2)
+thetatau_true = Z%*%chol(Sig_thetatau)
+thetas_true = thetatau_true[,1]
+taus_true = thetatau_true[,2]
+G_version = 3
+phi_true = 0.8
+for(i in 1:N){
+  Alphas_0[i,] &lt;- inv_bijectionvector(K,(class_0[i]-1))
+}
+lambdas_true &lt;- c(-2, .4, .055)     
+Alphas &lt;- sim_alphas(model="HO_joint", 
+                     lambdas=lambdas_true, 
+                     thetas=thetas_true, 
+                     Q_matrix=Q_matrix, 
+                     Design_array=Design_array)
+RT_itempars_true &lt;- matrix(NA, nrow=J, ncol=2)
+RT_itempars_true[,2] &lt;- rnorm(J,3.45,.5)
+RT_itempars_true[,1] &lt;- runif(J,1.5,2)
+ETAs &lt;- ETAmat(K,J,Q_matrix)
+L_sim &lt;- sim_RT(Alphas,Q_matrix,Design_array,RT_itempars_true,taus_true,phi_true,G_version)
+</code></pre>
+
+
+</div>

@@ -1,0 +1,83 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>Extract</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Extracting columns and generating required interaction effects from data<br>
+</h2>
+
+<h3>Description</h3>
+
+<p>This function simplifies the data preparation process by enabling users to
+extract specific columns from their dataset <code>X</code>, and automatically
+generating any necessary interaction effects based on <code>varind</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">Extract(X, varind, interaction.ind = NULL)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>X</code></td>
+<td>
+<p>Input data. An optional data frame, or numeric matrix of dimension
+<code>n</code> observations by <code>p</code> main effects. Note that the interaction
+effects should not be included in <code>X</code> because this function
+automatically generates the corresponding interaction effects if needed.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>varind</code></td>
+<td>
+<p>A numeric vector that specifies the indices of variables to be
+extracted from <code>X</code>. Duplicated values are not allowed. See Example
+for details.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>interaction.ind</code></td>
+<td>
+<p>A two-column numeric matrix. Each row represents a unique
+interaction pair, with the columns indicating the index numbers of the variables
+involved in each interaction. Note that <code>interaction.ind</code> must be generated
+outside of this function using <code>t(utils::combn(p,2))</code>. See Example section for
+details.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A numeric matrix is returned.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Generate interaction.ind
+interaction.ind &lt;- t(combn(4,2))
+
+# Generate data
+set.seed(0)
+X &lt;- matrix(rnorm(20), ncol = 4)
+y &lt;- X[, 2] + rnorm(5)
+
+# Extract X1 and X1X2 from X1, ..., X4
+Extract(X, varind = c(1,5), interaction.ind)
+
+# Extract X5 from X1, ..., X4
+Extract(X, varind = 5, interaction.ind)
+
+# Extract using duplicated values
+try(Extract(X, varind = c(1,1), interaction.ind)) # this will not run
+
+</code></pre>
+
+
+</div>

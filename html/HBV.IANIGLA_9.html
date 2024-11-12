@@ -1,0 +1,310 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>SnowGlacier_HBV</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Snow and ice-melt models</h2>
+
+<h3>Description</h3>
+
+<p>Allows you to simulate snow accumulation and melting processes
+using a temperature index approach. The function also incorporates options
+for clean and debris covered glacier surface mass balance simulations.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">SnowGlacier_HBV(
+       model,
+       inputData,
+       initCond,
+       param
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>model</code></td>
+<td>
+<p>numeric indicating which model you will use:
+</p>
+
+<ul>
+<li>
+<p> 1: temperature index model.
+</p>
+</li>
+<li>
+<p> 2: temperature index model with a variable snow cover area as input data
+(as in the Snowmelt Runoff Model - SRM).
+</p>
+</li>
+<li>
+<p> 3: temperature index model with a variable glacier area as input data.
+</p>
+</li>
+</ul>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>inputData</code></td>
+<td>
+<p>numeric matrix being columns the input variables. As in the whole
+package functions, <code>NA_real_</code>  values are forbidden. When speaking about model
+options we refer to the <strong><code>model</code></strong> argument.
+</p>
+<p><strong>Model 1:</strong> </p>
+
+<ul>
+<li> <p><code>column_1</code>: air temperature series <code class="reqn">[°C/\Delta t]</code>.
+</p>
+</li>
+<li> <p><code>column_2</code>: precipitation series <code class="reqn">[mm/\Delta t]</code>.
+</p>
+</li>
+</ul>
+<p><strong>Model 2:</strong> </p>
+
+<ul>
+<li> <p><code>column_1</code>: air temperature <code class="reqn">[°C/\Delta t]</code>.
+</p>
+</li>
+<li> <p><code>column_2</code>: precipitation <code class="reqn">[mm/\Delta t]</code>.
+</p>
+</li>
+<li> <p><code>column_3</code>: snow cover area. Values between [0 ; 1] <code class="reqn">[-]</code>.
+</p>
+</li>
+</ul>
+<p><strong>Model 3:</strong> </p>
+
+<ul>
+<li> <p><code>column_1</code>: air temperature  <code class="reqn">[°C/\Delta t]</code>.
+</p>
+</li>
+<li> <p><code>column_2</code>: precipitation  <code class="reqn">[mm/\Delta t]</code>.
+</p>
+</li>
+<li> <p><code>column_3</code>: glacier cover area. This area values are relative to the
+total surface area of the basin <code class="reqn">[-]</code>.
+</p>
+</li>
+</ul>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>initCond</code></td>
+<td>
+<p>numeric vector with the following values.
+</p>
+
+<ul>
+<li> <p><code>SWE0</code>: initial snow water equivalent <code class="reqn">[mm]</code>.
+</p>
+</li>
+<li>
+<p> numeric integer indicating the surface type. <em>1</em>: clean ice; <em>2</em>: soil;
+<em>3</em>: debris-covered ice.
+</p>
+</li>
+<li>
+<p> area of the glacier(s) (in the elevation band) relative to the basin; e.g.: 0.1 <code class="reqn">[-]</code>.
+This option is required in <em>Model 1</em> and <em>Model 2</em> when surface is a glacier.
+</p>
+</li>
+</ul>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>param</code></td>
+<td>
+<p>numeric vector with the following values:
+</p>
+
+<ol>
+<li> <p><code>SFCF</code>: snowfall correction factor <code class="reqn">[-]</code>.
+</p>
+</li>
+<li> <p><code>Tr</code>: solid and liquid precipitation threshold temperature <code class="reqn">[ºC]</code>.
+</p>
+</li>
+<li> <p><code>Tt</code>: melt temperature <code class="reqn">[ºC]</code>.
+</p>
+</li>
+<li> <p><code>fm</code>: snowmelt factor <code class="reqn">[mm/°C.\Delta t]</code>.
+</p>
+</li>
+<li> <p><code>fi</code>: icemelt factor <code class="reqn">[mm/°C.\Delta t]</code>.
+</p>
+</li>
+<li> <p><code>fic</code>: debris-covered ice-melt factor <code class="reqn">[mm/°C.\Delta t]</code>.
+</p>
+</li>
+</ol>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>Numeric matrix with the following columns:
+</p>
+<p><strong>Model 1</strong>
+</p>
+<p>** if surface is soil,
+</p>
+
+<ol>
+<li> <p><code>Prain</code>: precip. as rainfall.
+</p>
+</li>
+<li> <p><code>Psnow</code>: precip. as snowfall.
+</p>
+</li>
+<li> <p><code>SWE</code>: snow water equivalent.
+</p>
+</li>
+<li> <p><code>Msnow</code>: melted snow.
+</p>
+</li>
+<li> <p><code>Total</code>: <code>Prain</code> + <code>Msnow</code>.
+</p>
+</li>
+</ol>
+<p>** if surface is ice,
+</p>
+
+<ol>
+<li> <p><code>Prain</code>: precip. as rainfall.
+</p>
+</li>
+<li> <p><code>Psnow</code>: precip. as snowfall.
+</p>
+</li>
+<li> <p><code>SWE</code>: snow water equivalent.
+</p>
+</li>
+<li> <p><code>Msnow</code>: melted snow.
+</p>
+</li>
+<li> <p><code>Mice</code>: melted ice.
+</p>
+</li>
+<li> <p><code>Mtot</code>: <code>Msnow</code> + <code>Mice</code>.
+</p>
+</li>
+<li> <p><code>Cum</code>: <code>Psnow</code> - <code>Mtot</code>.
+</p>
+</li>
+<li> <p><code>Total</code>: <code>Prain</code> + <code>Mtot</code>.
+</p>
+</li>
+<li> <p><code>TotScal</code>: <code>Total</code> * initCond[3].
+</p>
+</li>
+</ol>
+<p><strong>Model 2</strong>
+</p>
+<p>** if surface is soil,
+</p>
+
+<ol>
+<li> <p><code>Prain</code>: precip. as rainfall.
+</p>
+</li>
+<li> <p><code>Psnow</code>: precip. as snowfall.
+</p>
+</li>
+<li> <p><code>SWE</code>: snow water equivalent.
+</p>
+</li>
+<li> <p><code>Msnow</code>: melted snow.
+</p>
+</li>
+<li> <p><code>Total</code>: <code>Prain</code> + <code>Msnow</code>.
+</p>
+</li>
+<li> <p><code>TotScal</code>: <code>Msnow</code> * <code>SCA</code> + <code>Prain</code>.
+</p>
+</li>
+</ol>
+<p>** if surface is ice -&gt; as in <em>Model 1</em>
+</p>
+<p><strong>Model 3</strong>
+</p>
+<p>** if surface is soil -&gt; as in <em>Model 1</em>
+</p>
+<p>** if surface is ice,
+</p>
+
+<ol>
+<li> <p><code>Prain</code>: precip. as rainfall.
+</p>
+</li>
+<li> <p><code>Psnow</code>: precip. as snowfall.
+</p>
+</li>
+<li> <p><code>SWE</code>: snow water equivalent.
+</p>
+</li>
+<li> <p><code>Msnow</code>: melted snow.
+</p>
+</li>
+<li> <p><code>Mice</code>: melted ice.
+</p>
+</li>
+<li> <p><code>Mtot</code>: <code>Msnow</code> + <code>Mice</code>.
+</p>
+</li>
+<li> <p><code>Cum</code>: <code>Psnow</code> - <code>Mtot</code>.
+</p>
+</li>
+<li> <p><code>Total</code>: <code>Prain</code> + <code>Mtot</code>.
+</p>
+</li>
+<li> <p><code>TotScal</code>: <code>Total</code> *  inputData[i, 3].
+</p>
+</li>
+</ol>
+<h3>References</h3>
+
+<p>Bergström, S., Lindström, G., 2015. Interpretation of runoff processes in hydrological
+modelling—experience from the HBV approach. Hydrol. Process. 29, 3535–3545.
+https://doi.org/10.1002/hyp.10510
+</p>
+<p>DeWalle, D. R., &amp; Rango, A. (2008). Principles of Snow Hydrology.
+</p>
+<p>Parajka, J., Merz, R., Blöschl, G., 2007. Uncertainty and multiple objective calibration
+in regional water balance modelling: case study in 320 Austrian catchments.
+Hydrol. Process. 21, 435–446. https://doi.org/10.1002/hyp.6253
+</p>
+<p>Seibert, J., Vis, M.J.P., 2012. Teaching hydrological modeling with a user-friendly
+catchment-runoff-model software package. Hydrol Earth Syst Sci 16, 3315–3325.
+https://doi.org/10.5194/hess-16-3315-2012
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># The following is a toy example. I strongly recommend to see
+# the package vignettes in order to improve your skills on HBV.IANIGLA
+
+## Debris-covered ice
+ObsTemp   &lt;- sin(x = seq(0, 10*pi, 0.1))
+ObsPrecip &lt;- runif(n = 315, max = 50, min = 0)
+ObsGCA    &lt;- seq(1, 0.8, -0.2/314)
+
+## Fine debris covered layer assumed. Note that the ice-melt factor is cumpulsory but harmless.
+DebrisCovGlac &lt;- SnowGlacier_HBV(model = 3,
+                                 inputData = cbind(ObsTemp, ObsPrecip, ObsGCA),
+                                 initCond = c(10, 3, 1),
+                                 param = c(1, 1, 0, 3, 1, 6))
+
+</code></pre>
+
+
+</div>

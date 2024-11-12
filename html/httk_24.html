@@ -1,0 +1,218 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>calc_analytic_css_pbtk</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Calculate the analytic steady state plasma concentration for model pbtk.</h2>
+
+<h3>Description</h3>
+
+<p>This function calculates the analytic steady state concentration (mg/L) as a result
+of constant oral infusion dosing. 
+Concentrations are returned for plasma by default, but various
+tissues or blood concentrations can also be given as specified.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">calc_analytic_css_pbtk(
+  chem.name = NULL,
+  chem.cas = NULL,
+  dtxsid = NULL,
+  parameters = NULL,
+  dosing = list(daily.dose = 1),
+  hourly.dose = NULL,
+  dose.units = "mg",
+  concentration = "plasma",
+  suppress.messages = FALSE,
+  recalc.blood2plasma = FALSE,
+  tissue = NULL,
+  restrictive.clearance = TRUE,
+  bioactive.free.invivo = FALSE,
+  Caco2.options = list(),
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>chem.name</code></td>
+<td>
+<p>Either the chemical name, CAS number, or the parameters must 
+be specified.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>chem.cas</code></td>
+<td>
+<p>Either the chemical name, CAS number, or the parameters must 
+be specified.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dtxsid</code></td>
+<td>
+<p>EPA's 'DSSTox Structure ID (<a href="https://comptox.epa.gov/dashboard">https://comptox.epa.gov/dashboard</a>)
+the chemical must be identified by either CAS, name, or DTXSIDs</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>parameters</code></td>
+<td>
+<p>Chemical parameters from parameterize_pbtk (for model = 
+'pbtk'), parameterize_3comp (for model = '3compartment), 
+parameterize_1comp(for model = '1compartment') or parameterize_steadystate 
+(for model = '3compartmentss'), overrides chem.name and chem.cas.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dosing</code></td>
+<td>
+<p>List of dosing metrics used in simulation, which includes
+the namesake entries of a model's associated dosing.params. For steady-state
+calculations this is likely to be either "daily.dose" for oral exposures or
+"Cinhaled" for inhalation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>hourly.dose</code></td>
+<td>
+<p>Hourly dose rate mg/kg BW/h.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dose.units</code></td>
+<td>
+<p>The units associated with the dose received.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>concentration</code></td>
+<td>
+<p>Desired concentration type, 'blood', 'tissue', or default 'plasma'.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>suppress.messages</code></td>
+<td>
+<p>Whether or not the output message is suppressed.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>recalc.blood2plasma</code></td>
+<td>
+<p>Recalculates the ratio of the amount of chemical 
+in the blood to plasma using the input parameters. Use this if you have 
+altered hematocrit, Funbound.plasma, or Krbc2pu.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tissue</code></td>
+<td>
+<p>Desired tissue conentration (defaults to whole body 
+concentration.)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>restrictive.clearance</code></td>
+<td>
+<p>If TRUE (default), then only the fraction of
+chemical not bound to protein is available for metabolism in the liver. If 
+FALSE, then all chemical in the liver is metabolized (faster metabolism due
+to rapid off-binding).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>bioactive.free.invivo</code></td>
+<td>
+<p>If FALSE (default), then the total concentration is treated
+as bioactive in vivo. If TRUE, the the unbound (free) plasma concentration is treated as 
+bioactive in vivo. Only works with tissue = NULL in current implementation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Caco2.options</code></td>
+<td>
+<p>A list of options to use when working with Caco2 apical to
+basolateral data <code>Caco2.Pab</code>, default is Caco2.options = list(Caco2.Pab.default = 1.6,
+Caco2.Fabs = TRUE, Caco2.Fgut = TRUE, overwrite.invivo = FALSE, keepit100 = FALSE). Caco2.Pab.default sets the default value for 
+Caco2.Pab if Caco2.Pab is unavailable. Caco2.Fabs = TRUE uses Caco2.Pab to calculate
+fabs.oral, otherwise fabs.oral = <code>Fabs</code>. Caco2.Fgut = TRUE uses Caco2.Pab to calculate 
+fgut.oral, otherwise fgut.oral = <code>Fgut</code>. overwrite.invivo = TRUE overwrites Fabs and Fgut in vivo values from literature with 
+Caco2 derived values if available. keepit100 = TRUE overwrites Fabs and Fgut with 1 (i.e. 100 percent) regardless of other settings.
+See <code>get_fbio</code> for further details.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Additional parameters passed to parameterize function if 
+parameters is NULL.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The PBTK model (Pearce et al. 2017) predicts the amount of chemical in
+various tissues of the body. A system of ordinary
+differential equations describes how the amounts in each tissue change as 
+a function of time. The analytic steady-state equation was found by 
+algebraically solving for the tissue concentrations that result in each
+equation being zero – thus determining the concentration at which there is no change
+over time as the result of a fixed infusion dose rate. 
+</p>
+<p>The analytical solution is:
+</p>
+<p style="text-align: center;"><code class="reqn">C^{ss}_{ven} = \frac{dose rate * \frac{Q_{liver} + Q_{gut}}{\frac{f_{up}}{R_{b:p}}*Cl_{metabolism} + (Q_{liver}+Q_{gut})}}{Q_{cardiac} - \frac{(Q_{liver} + Q_{gut})^2}{\frac{f_{up}}{R_{b:p}}*Cl_{metabolism} + (Q_{liver}+Q_{gut})} - \frac{(Q_{kidney})^2}{\frac{f_{up}}{R_{b:p}}*Q_{GFR}+Q_{kideny}}-Q_{rest}}</code>
+</p>
+
+<p style="text-align: center;"><code class="reqn">C^{ss}_{plasma} = \frac{C^{ss}_{ven}}{R_{b:p}}</code>
+</p>
+
+<p style="text-align: center;"><code class="reqn">C^{ss}_{tissue} = \frac{K_{tissue:fuplasma}*f_{up}}{R_{b:p}}*C^{ss}_{ven}</code>
+</p>
+
+<p>where Q_cardiac is the cardiac output, Q_gfr is the glomerular filtration
+rate in the kidney, other Q's indicate blood flows to various tissues, 
+Cl_metabolism is the chemical-specific whole liver metabolism clearance,
+f_up is the chemical-specific fraction unbound in plasma, R_b2p is the 
+chemical specific ratio of concentrations in blood:plasma, K_tissue2fuplasma
+is the chemical- and tissue-specific equilibrium partition coefficient
+and dose rate has  units of mg/kg/day.
+</p>
+
+
+<h3>Value</h3>
+
+<p>Steady state plasma concentration in mg/L units
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Robert Pearce and John Wambaugh
+</p>
+
+
+<h3>References</h3>
+
+<p>Pearce RG, Setzer RW, Strope CL, Wambaugh JF, Sipes NS (2017).
+“Httk: R package for high-throughput toxicokinetics.”
+<em>Journal of Statistical Software</em>, <b>79</b>(4), 1.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>calc_analytic_css</code>
+</p>
+<p><code>parameterize_pbtk</code>
+</p>
+
+
+</div>

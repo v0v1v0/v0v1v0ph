@@ -1,0 +1,88 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>generate.data</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Data Generation</h2>
+
+<h3>Description</h3>
+
+<p>Data Generation
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">generate.data(N,Mu0.list,Theta0.list,Sigma0.list)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>N</code></td>
+<td>
+<p>K0 * 1 vector, the sample sizes of subgroups.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Mu0.list</code></td>
+<td>
+<p>A list including K0 mean vectors (p * 1).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Theta0.list</code></td>
+<td>
+<p>A list including K0 precision matrices (p * p).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Sigma0.list</code></td>
+<td>
+<p>A list including K0 correlation matrices (p * p).</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>The simulated data and the true parameters.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">n &lt;- 200              # The sample size of each subgroup
+p &lt;- 20               # The dimension of the precision matrix
+K0 &lt;- 3               # The true number of subgroups
+N &lt;- rep(n,K0)        # The sample sizes of K0 subgroups
+
+################ The true parameters ################
+mue &lt;- 1.5
+nonnum &lt;- 4
+mu01 &lt;- c(rep(mue,nonnum),rep(-mue,nonnum),rep(0,p-2*nonnum))
+mu02 &lt;- c(rep(mue,2*nonnum),rep(0,p-2*nonnum))
+mu03 &lt;- c(rep(-mue,2*nonnum),rep(0,p-2*nonnum))
+
+# Power law network
+set.seed(2)
+A.list &lt;- Power.law.network(p,s=5,I2=c(1),I3=c(2))
+Theta01 &lt;- A.list$A1
+Theta02 &lt;- A.list$A2
+Theta03 &lt;- A.list$A3
+sigma01 &lt;- solve(Theta01)
+sigma02 &lt;- solve(Theta02)
+sigma03 &lt;- solve(Theta03)
+Mu0.list &lt;- list(mu01,mu02,mu03)
+Sigma0.list &lt;- list(sigma01,sigma02,sigma03)
+Theta0.list &lt;- list(Theta01,Theta02,Theta03)
+
+################ Generating simulated data ################
+whole.data &lt;- generate.data(N,Mu0.list,Theta0.list,Sigma0.list)
+
+</code></pre>
+
+
+</div>

@@ -1,0 +1,174 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>ordertrans</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Order transformation</h2>
+
+<h3>Description</h3>
+
+<p>Given an order vector, shuffle so that the players appear in a specified
+order. 
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">ordertrans(x,players)
+ordertransplot(ox,oy,plotlims, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>A (generalized) order vector</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>players</code></td>
+<td>
+<p>A character vector specifying the order in which the
+players will be listed; if missing, use <code>sort(names(x))</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ox,oy</code></td>
+<td>
+<p>Rank vectors</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>plotlims</code></td>
+<td>
+<p>Length two numeric vector giving x and y plot limits.
+If missing, use sensible default</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Further arguments, passed to <code>plot()</code></p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The best way to describe this function is with an example:
+</p>
+<pre>
+&gt; x &lt;- c(d=2,a=3,b=1,c=4)
+&gt; x
+d a b c 
+2 3 1 4 
+</pre>
+<p>In the above, we see <code>x</code> is an order vector showing that <code>d</code>
+came second, <code>a</code> came third, <code>b</code> came first, and <code>c</code> came
+fourth.  This is difficult to deal with because one has to search
+through the vector to find a particular competitor, or a particular
+rank.  This would be harder if the vector was longer.
+If we wish to answer the question “where did competitor <code>a</code>
+come?  where did <code>b</code> come?” we would want an <em>order</em> vector
+in which the competitors are in alphabetical order.  This is
+accomplished by <code>ordertrans()</code>:
+</p>
+<pre>
+&gt; o &lt;- ordertrans(x)
+&gt; o
+a b c d 
+3 1 4 2 
+</pre>
+<p>(this is equivalent to <code>o &lt;- x[order(names(x))]</code>).  Object <code>o</code>
+contains the same information as <code>x</code>, but presented differently.
+This says that <code>a</code> came third, <code>b</code> came first, <code>c</code> came
+fourth, and <code>d</code> came second.  In particular, the Plackett-Luce
+order statistic is identical:
+</p>
+<pre>
+&gt; ordervec2supp(x) == ordervec2supp(o)
+&gt; [1] TRUE
+</pre>
+<p>There is a nice example of <code>ordertrans()</code> in
+<code>inst/eurovision.Rmd</code>, and package vignette <code>ordertrans</code>
+provides further discussion and examples.
+</p>
+<p>Function <code>ordertrans()</code> takes a second argument which allows the
+user to arrange an order vector into the order specified.
+</p>
+<p>Function <code>ordertrans()</code> also works in the context of <code>hyper3</code>
+objects:
+</p>
+<pre>
+x &lt;- c(d=2,a=3,b=1,a=4)
+x
+d a b a 
+2 3 1 4 
+ordertrans(x)
+a a b d 
+3 4 1 2 
+</pre>
+<p>Object <code>x</code> shows that <code>d</code> came second, <code>a</code> came third and
+fourth, and <code>b</code> came first.  We can see that <code>ordertrans()</code>
+gives the same information in a more intelligible format.  This
+functionality is useful in the context of <code>hyper3</code> likelihood
+functions.
+</p>
+
+
+<h3>Value</h3>
+
+<p>Returns a named vector</p>
+
+
+<h3>Note</h3>
+
+<p>The argument to <code>ordertrans()</code> is technically an order vector
+because it answers the question “where did the first-named
+competitor come?” (see the discussion at rrank).  But it is
+not a helpful order vector because you have to go searching through
+the names—which can appear in any order—for the competitor you are
+interested in.  I guess “generalised order vector” might be a
+better description of the argument.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Robin K. S. Hankin</p>
+
+
+<h3>See Also</h3>
+
+<p><code>rrank</code></p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+x &lt;- c(e=4L,a=7L,c=6L,b=1L,f=2L,g=3L,h=5L,i=8L,d=9L)
+x
+ordertrans(x,letters[1:9])
+
+o &lt;- skating_table[,1]
+names(o) &lt;- rownames(skating_table)
+o
+ordertrans(o)
+
+ordertrans(sample(icons_maxp),icons)
+
+
+rL &lt;- volvo_maxp   # rL is "ranks Likelihood"
+rL[] &lt;- rank(-volvo_maxp)
+
+r1 &lt;- volvo_table[,1]  # ranks race 1
+names(r1) &lt;- rownames(volvo_table)
+ordertransplot(rL,r1,xlab="likelihood rank, all races",ylab="rank, race 1")
+
+</code></pre>
+
+
+</div>

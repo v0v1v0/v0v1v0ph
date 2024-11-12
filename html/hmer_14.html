@@ -1,0 +1,196 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>Emulator</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Bayes Linear Emulator</h2>
+
+<h3>Description</h3>
+
+<p>Creates a univariate emulator object.
+</p>
+<p>The structure of the emulator is <code>f(x) = g(x) * beta + u(x)</code>, for
+regression functions <code>g(x)</code>, regression coefficients <code>beta</code>,
+and correlation structure <code>u(x)</code>. An emulator can be created with
+or without data; the preferred method is to create an emulator based on
+prior specifications in the absence of data, then use that emulator
+with data to generate a new one (see examples).
+</p>
+
+
+<h3>Constructor</h3>
+
+<p><code>Emulator$new(basis_f, beta, u, ranges, ...)</code>
+</p>
+
+
+<h3>Arguments</h3>
+
+<p>Required:
+</p>
+<p><code>basis_f</code> A list of basis functions to be used. The constant function
+<code>function(x) 1</code> should be provided as the first element.
+</p>
+<p><code>beta</code> The specification for the regression parameters. This should
+be provided in the form <code>list(mu, sigma)</code>, where <code>mu</code> are the
+expectations of the coefficients (aligning with the ordering of <code>basis_f</code>)
+and <code>sigma</code> the corresponding covariance matrix.
+</p>
+<p><code>u</code> The specifications for the correlation structure. This should
+be specified in the form <code>list(sigma, corr)</code>, where <code>sigma</code> is
+a single-valued object, and <code>corr</code> is a Correlator object.
+</p>
+<p><code>ranges</code> A named list of ranges for the input parameters, provided as
+a named list of length-two numeric vectors.
+</p>
+<p>Optional:
+</p>
+<p><code>data</code> A <code>data.frame</code> consisting of the data with which to adjust
+the emulator, consisting of input values for each parameter and the output.
+</p>
+<p><code>out_name</code> The name of the output variable.
+</p>
+<p><code>a_vars</code> A logical vector indicating which variables are active for
+this emulator.
+</p>
+<p><code>discs</code> Model discrepancies: does not include observational error. Ideally
+split into <code>list(internal = ..., external = ...)</code>.
+</p>
+<p>Internal:
+</p>
+<p><code>model</code> If a linear model, or otherwise, has been fitted to the data,
+it lives here.
+</p>
+<p><code>original_em</code> If the emulator has been adjusted, the unadjusted
+<code>Emulator</code> object is stored, for use of <code>set_sigma</code> or similar.
+</p>
+<p><code>multiplier</code> A multiplicative factor to be applied to u_sigma. Typically
+equal to 1, unless changes have been made by, for example, <code>mult_sigma</code>.
+</p>
+
+
+<h3>Constructor Details</h3>
+
+<p>The constructor must take, as a minimum: a list of vectorised basis
+functions, whose length is equal to the number of regression
+coefficients; a correlation structure, which can be non-stationary;
+and the parameter ranges, used to scale all inputs to the range [-1,1].
+</p>
+<p>The construction of a correlation structure is detailed in the documentation
+for Correlator.
+</p>
+
+
+<h3>Accessor Methods</h3>
+
+<p><code>get_exp(x, include_c)</code> Returns the emulator expectation at a point,
+or at a collection of points. If <code>include_c = FALSE</code>, the contribution
+made by the correlation structure is not included.
+</p>
+<p><code>get_cov(x, xp = NULL, full = FALSE, include_c)</code> Returns the covariance between
+collections of points <code>x</code> and <code>xp</code>. If <code>xp</code> is not supplied,
+then this is equivalent to <code>get_cov(x, x, ...)</code>; if <code>full = TRUE</code>,
+then the full covariance matrix is calculated - this is FALSE by default
+due to most built-in uses requiring only the diagonal terms, and allows us
+to take advantage of computational tricks for efficiency.
+</p>
+<p><code>implausibility(x, z, cutoff = NULL)</code> Returns the implausibility for a
+collection of points <code>x</code>. The implausibility is the distance between the
+emulator expectation and a desired output value, weighted by the emulator
+variance and any external uncertainty. The target, z, should be specified
+as a named pair <code>list(val, sigma)</code>, or a single numeric value.
+If <code>cutoff = NULL</code>, the output is a numeric <code>I</code>; if <code>cutoff</code>
+is a numeric value, then the output is boolean corresponding to
+<code>I &lt;= cutoff</code>.
+</p>
+<p><code>get_exp_d(x, p)</code> Returns the expectation of the derivative of the emulated
+function, E[f'(x)]. Similar in structure to <code>get_exp</code> but for the additional
+parameter <code>p</code>, which indicates which of the input dimensions the derivative
+is performed with respect to.
+</p>
+<p><code>get_cov_d(x, p1, xp = NULL, p2 = NULL, full = FALSE)</code> Returns the variance of
+the derivative of the emulated function, Var[f'(x)]. The arguments are similar to
+that of <code>get_cov</code>, but for the addition of parameters <code>p1</code> and <code>p2</code>,
+which indicate the derivative directions. Formally, the output of this function is
+equivalent to Cov[df/dp1, df/dp2].
+</p>
+<p><code>print(...)</code> Returns a summary of the emulator specifications.
+</p>
+<p><code>plot(...)</code> A wrapper for <code>emulator_plot</code> for a single Emulator object.
+</p>
+
+
+<h3>Object Methods</h3>
+
+<p><code>adjust(data, out_name)</code> Performs Bayes Linear Adjustment, given <code>data</code>.
+The data should contain all input parameters, even inactive ones, and the
+single output that we wish to emulate. <code>adjust</code> creates a new <code>Emulator</code>
+object with the adjusted expectation and variance resulting from Bayes
+Linear adjustment, allowing for the requisite predictions to be made using
+<code>get_exp</code> and <code>get_cov</code>.
+</p>
+<p><code>set_sigma(sigma)</code> Modifies the (usually constant) global variance of
+the correlation structure, <code>Var[u(X)]</code>. If the emulator has been trained,
+the original emulator is modified and Bayes Linear adjustment is again performed.
+</p>
+<p><code>mult_sigma(m)</code> Modifies the global variance of the correlation structure via
+a multiplicative factor. As with <code>set_sigma</code>, this change will chain through
+any prior emulators if the emulator in question is Bayes Linear adjusted.
+</p>
+<p><code>set_hyperparams(hp, nugget)</code> Modifies the underlying correlator for <code>u(x)</code>.
+Behaves in a similar way to <code>set_sigma</code> as regards trained emulators. See
+the Correlator documentation for details of <code>hp</code> and <code>nugget</code>.
+</p>
+
+
+<h3>References</h3>
+
+<p>Goldstein &amp; Wooff (2007) &lt;ISBN: 9780470065662&gt;
+</p>
+<p>Craig, Goldstein, Seheult &amp; Smith (1998) &lt;doi:10.1111/1467-9884.00115&gt;
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">basis_functions &lt;- list(function(x) 1, function(x) x[[1]], function(x) x[[2]])
+beta &lt;- list(mu = c(1,2,3),
+             sigma = matrix(c(0.5, -0.1, 0.2, -0.1, 1, 0, 0.2, 0, 1.5), nrow = 3))
+u &lt;- list(mu = function(x) 0, sigma = 3, corr = Correlator$new('exp_sq', list(theta = 0.1)))
+ranges &lt;- list(a = c(-0.5, 0.5), b = c(-1, 2))
+em &lt;- Emulator$new(basis_functions, beta, u, ranges)
+em
+# Individual evaluations of points
+# Points should still be declared in a data.frame
+em$get_exp(data.frame(a = 0.1, b = 0.1)) #&gt; 0.6
+em$get_cov(data.frame(a = 0.1, b = 0.1)) #&gt; 9.5
+# 4x4 grid of points
+sample_points &lt;- expand.grid(a = seq(-0.5, 0.5, length.out = 4), b = seq(-1, 2, length.out = 4))
+em$get_exp(sample_points) # Returns 16 expectations
+em$get_cov(sample_points) # Returns 16 variances
+sample_points_2 &lt;- expand.grid(a = seq(-0.5, 0.5, length.out = 3),
+                               b = seq(-1, 2, length.out = 4))
+em$get_cov(sample_points, xp = sample_points_2, full = TRUE) # Returns a 16x12 matrix of covariances
+
+
+fake_data &lt;- data.frame(a = runif(10, -0.5, 0.5), b = runif(10, -1, 2))
+fake_data$c &lt;- fake_data$a + 2*fake_data$b
+newem &lt;- em$adjust(fake_data, 'c')
+all(round(newem$get_exp(fake_data[,names(ranges)]),5) == round(fake_data$c,5)) #&gt;TRUE
+
+matern_em &lt;- Emulator$new(basis_f = c(function(x) 1, function(x) x[[1]], function(x) x[[2]]),
+ beta = list(mu = c(1, 0.5, 2), sigma = diag(0, nrow = 3)),
+ u = list(corr = Correlator$new('matern', list(nu = 1.5, theta = 0.4))),
+ ranges = list(x = c(-1, 1), y = c(0, 3)))
+matern_em$get_exp(data.frame(x = 0.4, y = 2.3))
+
+newem_data &lt;- Emulator$new(basis_functions, beta, u, ranges, data = fake_data)
+all(round(newem$get_exp(fake_data[,names(ranges)]),5)
+   == round(newem_data$get_exp(fake_data[,names(ranges)]), 5)) #&gt;TRUE
+newem$get_exp_d(sample_points, 'a')
+newem$get_cov_d(sample_points, 'b', p2 = 'a')
+</code></pre>
+
+
+</div>

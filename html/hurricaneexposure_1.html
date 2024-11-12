@@ -1,0 +1,132 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>county_distance</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Hurricane exposure by distance for counties</h2>
+
+<h3>Description</h3>
+
+<p>This function takes a list of US counties,based on their 5-digit Federal
+Information Processing Standard (FIPS) codes, boundaries on
+the range of years to be considered, and thresholds for distance between each
+county and the storm track for the county to be considered "exposed" to the
+storm. Based on these inputs, the function returns a dataframe with the
+subset of Atlantic basin storms meeting those criteria for each of the listed
+counties.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">county_distance(counties, start_year, end_year, dist_limit)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>counties</code></td>
+<td>
+<p>Character vector of the five-digit Federal Information
+Processing Standard (FIPS) codes for counties for which the user wants to
+determine storm exposure.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>start_year</code></td>
+<td>
+<p>Four-digit integer with first year to consider.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>end_year</code></td>
+<td>
+<p>Four-digit integer with last year to consider.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dist_limit</code></td>
+<td>
+<p>Maximum distance, in kilometers, of how close the storm
+track must come to the county's population mean center to classify
+the county as "exposed" to the storm.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>For more information on how distances between counties and storm
+tracks are calculated for this function, see the documentation for the
+<code>closest_dist</code> dataset that comes with this package.
+</p>
+
+
+<h3>Value</h3>
+
+<p>Returns a dataframe with a row for each county-storm
+pair and with columns for:
+</p>
+
+<ul>
+<li>
+<p><code>storm_id</code>: Unique storm identifier with the storm name and year,
+separated by a hyphen(e.g., "Alberto-1988",
+"Katrina-2005")
+</p>
+</li>
+<li>
+<p><code>fips</code>: County's 5-digit Federal Information Processing Standard
+(FIPS) code
+</p>
+</li>
+<li>
+<p><code>closest_date</code>: Date (based on local time) of the closest
+approach of the storm to the county's population
+mean center.
+</p>
+</li>
+<li>
+<p><code>storm_dist</code>: Minimum distance (in kilometers) between the storm's
+track and the county's population mean center.
+</p>
+</li>
+<li>
+<p><code>local_time</code>: Local time of the closest approach of the storm to the
+county's population mean center, based on storm tracks
+linearly interpolated to 15-minute increments.
+</p>
+</li>
+<li>
+<p><code>closest_time_utc</code>: Time, in UTC, of the closest approach of the
+storm to the county's population mean center,
+based on storm tracks linearly interpolated to
+15-minute increments.
+</p>
+</li>
+</ul>
+<h3>Note</h3>
+
+<p>Only counties in states in the eastern half of the United States can
+be processed by this function.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Ensure that data package is available before running the example.
+#  If it is not, see the `hurricaneexposure` package vignette for details
+# on installing the required data package.
+if (requireNamespace("hurricaneexposuredata", quietly = TRUE)) {
+
+  county_distance(counties = c("22071", "51700"),
+              start_year = 1995, end_year = 2005,
+              dist_limit = 75)
+
+}
+</code></pre>
+
+
+</div>

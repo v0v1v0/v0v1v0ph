@@ -1,0 +1,181 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>standardize_address</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Standard address</h2>
+
+<h3>Description</h3>
+
+<p>Standardize an address from a free text expression into its
+components as used in the PSMA (formerly, "Public Sector for Mapping Agencies")
+database.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">standardize_address(
+  Address,
+  AddressLine2 = NULL,
+  return.type = c("data.table", "integer"),
+  integer_StreetType = FALSE,
+  hash_StreetName = FALSE,
+  check = 1L,
+  nThread = getOption("healthyAddress.nThread", 1L)
+)
+
+standard_address2(Address, nThread = getOption("healthyAddres.nThread", 1L))
+
+standard_address3(Line1, Line2, Postcode = NULL, KeepStreetName = FALSE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>Address</code></td>
+<td>
+<p>A character vector, either a full address or (if <code>AddressLine2</code>
+is not <code>NULL</code>) the first line of an Australian address.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>AddressLine2</code></td>
+<td>
+<p>Either <code>NULL</code> (the default) or a character vector,
+the same length as <code>Address</code> giving the second line of the Address.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>return.type</code></td>
+<td>
+<p>Either <code>"data.table"</code> or <code>"integer"</code>.
+<code>"data.table"</code> implies a table of columns separating the address components.
+<code>"integer"</code> means an integer vector creating a bijection between the
+address and the <code>PSMA</code> internal id.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>integer_StreetType</code></td>
+<td>
+<p>Should the street type be returned as an integer
+vector?</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>hash_StreetName</code></td>
+<td>
+<p>Should <code>STREET_NAME</code> be returned as an integer hash,
+as in <code>HashStreetName</code>?</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>check</code></td>
+<td>
+<p>An integer, whether the inputs should be checked for possibly
+invalid addresses or addresses that may not be parsed correctly.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nThread</code></td>
+<td>
+<p>Number of threads to use.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Line1, Line2, Postcode</code></td>
+<td>
+<p>For addresses split by line. <code>Line1</code> is
+assumed to end with the street type. The second line is only used to determine
+<code>Postcode</code>, and then only if it is <code>NULL</code>, the default.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>KeepStreetName</code></td>
+<td>
+<p>Should an additional character vector be included in
+the result of the street name?</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>By convention observed in the PSMA, street names such as 'THE ESPLANADE' have
+a street name of 'THE ESPLANADE' and an absent street type code.
+</p>
+<p>Non-addresses passed have unspecified behaviour, though usually the
+numbers of the standard address will be 0 or NA. Postcodes may be negative
+in some circumstances where a postcode is not detected,
+though this should not be relied on.
+</p>
+<p>For maximum performance, consider setting <code>integer_StreetType</code> and
+<code>hash_StreetName</code> to <code>TRUE</code>. It has been observed that joining
+two tables together has been faster when using the hash of the standardized
+street name, rather than the street name, even when taking into account
+the hashing process.
+</p>
+<p>For performance reasons, addresses with more than 32 words are not supported.
+</p>
+<p>If a postcode-like number exists at the end of a <code>Address</code>, but is not
+in fact a postcode, then <code>NA</code> will be in each field, except postcode,
+which will have the value -1.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A <code>data.table</code> containing columns indicating the components of the standard address:
+</p>
+
+<dl>
+<dt><code>FLAT_NUMBER</code></dt>
+<dd>
+<p>The flat or unit number. This includes things like SHOP number.</p>
+</dd>
+<dt><code>NUMBER_FIRST</code></dt>
+<dd>
+<p>As used in the PSMA, this identified the first (or only) number
+in the address range.</p>
+</dd>
+<dt><code>NUMBER_LAST</code></dt>
+<dd>
+<p>As used in the PSMA, if an address is marked as having
+a range of street numbers, the last of the range.</p>
+</dd>
+<dt><code>NUMBER_SUFFIX</code></dt>
+<dd>
+<p>A <code>raw</code> vector. The suffix observed after the numbers. The PSMA
+technically has multiple suffixes for each number component.</p>
+</dd>
+<dt><code>H0</code></dt>
+<dd>
+<p>If <code>hash_StreetName = TRUE</code>, the DJB2 hash (as used in
+<code>HashStreetName</code> of the street name.). Observed to have performance
+benefits.</p>
+</dd>
+<dt><code>STREET_NAME</code></dt>
+<dd>
+<p>The (uppercase) of the street name. Streets such
+as 'THE ESPLANADE' or 'THE AVENUE' are treated as entirely made up of a street
+name and have a <code>STREET_TYPE_CODE</code> of zero.</p>
+</dd>
+<dt><code>STREET_TYPE_CODE</code></dt>
+<dd>
+<p>An integer, the street type code marking the type
+of street such as ROAD, STREET, AVENUE, etc. They code corresponds approximately
+to the rank of their frequency in addresses.</p>
+</dd>
+<dt><code>STREET_TYPE</code></dt>
+<dd>
+<p>If <code>integer_StreetType = FALSE</code>, then the (uppercase)
+standard name of the street type.</p>
+</dd>
+<dt><code>POSTCODE</code></dt>
+<dd>
+<p>An integer vector, the postcode observed.</p>
+</dd>
+</dl>
+</div>

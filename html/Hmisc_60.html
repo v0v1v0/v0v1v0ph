@@ -1,0 +1,93 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>completer</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>completer</h2>
+
+<h3>Description</h3>
+
+<p>Create imputed dataset(s) using <code>transcan</code> and <code>aregImpute</code> objects
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">completer(a, nimpute, oneimpute = FALSE, mydata)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>a</code></td>
+<td>
+<p>An object of class <code>transcan</code> or <code>aregImpute</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nimpute</code></td>
+<td>
+<p>A numeric vector between 1 and <code>a$n.impute</code>. For <code>transcan</code> object, this is set to 1. For <code>aregImpute</code> object, returns a list of <code>nimpute</code> datasets when <code>oneimpute</code> is set to <code>FALSE</code> (default).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>oneimpute</code></td>
+<td>
+<p>A logical vector. When set to <code>TRUE</code>, returns a single completed dataset for the imputation number specified by <code>nimpute</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mydata</code></td>
+<td>
+<p>A data frame in which its missing values will be imputed.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Similar in function to <code>mice::complete</code>, this function uses <code>transcan</code> and <code>aregImpute</code> objects to impute missing data
+and returns the completed dataset(s) as a dataframe or a list.
+It assumes that <code>transcan</code> is used for single regression imputation.
+</p>
+
+
+<h3>Value</h3>
+
+<div class="sourceCode"><pre>      A single or a list of completed dataset(s).
+</pre></div>
+
+
+<h3>Author(s)</h3>
+
+<div class="sourceCode"><pre>      Yong-Hao Pua, Singapore General Hospital
+</pre></div>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+mtcars$hp[1:5]    &lt;- NA
+mtcars$wt[1:10]   &lt;- NA
+myrform &lt;- ~ wt + hp + I(carb)
+mytranscan  &lt;- transcan( myrform,  data = mtcars, imputed = TRUE,
+  pl = FALSE, pr = FALSE, trantab = TRUE, long = TRUE)
+myareg      &lt;- aregImpute(myrform, data = mtcars, x=TRUE, n.impute = 5)
+completer(mytranscan)                    # single completed dataset
+completer(myareg, 3, oneimpute = TRUE)
+# single completed dataset based on the `n.impute`th set of multiple imputation
+completer(myareg, 3)
+# list of completed datasets based on first `nimpute` sets of multiple imputation
+completer(myareg)
+# list of completed datasets based on all available sets of multiple imputation
+# To get a stacked data frame of all completed datasets use
+# do.call(rbind, completer(myareg, data=mydata))
+# or use rbindlist in data.table
+
+## End(Not run)
+</code></pre>
+
+
+</div>

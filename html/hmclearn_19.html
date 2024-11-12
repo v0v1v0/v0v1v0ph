@@ -1,0 +1,105 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>leapfrog</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Leapfrog Algorithm for Hamiltonian Monte Carlo</h2>
+
+<h3>Description</h3>
+
+<p>Runs a single iteration of the leapfrog algorithm.  Typically called directly from <code>hmc</code>
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">leapfrog(
+  theta_lf,
+  r,
+  epsilon,
+  glogPOSTERIOR,
+  Minv,
+  constrain,
+  lastSTEP = FALSE,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>theta_lf</code></td>
+<td>
+<p>starting parameter vector</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>r</code></td>
+<td>
+<p>starting momentum vector</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>epsilon</code></td>
+<td>
+<p>Step-size parameter for <code>leapfrog</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>glogPOSTERIOR</code></td>
+<td>
+<p>Function to calculate and return the gradient of the log posterior given a vector of values of <code>theta</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Minv</code></td>
+<td>
+<p>Inverse Mass matrix</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>constrain</code></td>
+<td>
+<p>Optional vector of which parameters in <code>theta</code> accept positive values only.  Default is that all parameters accept all real numbers</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lastSTEP</code></td>
+<td>
+<p>Boolean indicating whether to calculate the last half-step of the momentum update</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Additional parameters passed to glogPOSTERIOR</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>List containing two elements:  <code>theta.new</code> the ending value of theta and <code>r.new</code> the ending value of the momentum
+</p>
+
+
+<h3>References</h3>
+
+<p>Neal, Radford. 2011. <em>MCMC Using Hamiltonian Dynamics.</em> In Handbook of Markov Chain Monte Carlo, edited by Steve Brooks, Andrew Gelman, Galin L. Jones, and Xiao-Li Meng, 116–62. Chapman; Hall/CRC.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">set.seed(321)
+X &lt;- cbind(1, rnorm(10))
+y &lt;- rnorm(10)
+p &lt;- runif(3) - 0.5
+leapfrog(rep(0,3), p, 0.01, g_linear_posterior,
+         diag(3), FALSE, X=X, y=y)
+</code></pre>
+
+
+</div>

@@ -1,0 +1,137 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>viterbiTraining</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Inferring the parameters of a Hidden Markov Model via Viterbi-training</h2>
+
+<h3>Description</h3>
+
+<p>For an initial Hidden Markov Model (HMM) and a given sequence of observations, the
+Viterbi-training algorithm infers optimal parameters to the HMM. Viterbi-training
+usually converges much faster than the Baum-Welch algorithm, but the underlying
+algorithm is theoretically less justified. Be careful: The algorithm converges to
+a local solution which might not be the optimum. 
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">viterbiTraining(hmm, observation, maxIterations=100, delta=1E-9, pseudoCount=0)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>hmm           </code></td>
+<td>
+<p> A Hidden Markov Model.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>observation   </code></td>
+<td>
+<p> A sequence of observations.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>maxIterations </code></td>
+<td>
+<p> The maximum number of iterations in the Viterbi-training algorithm.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>delta         </code></td>
+<td>
+<p> Additional termination condition, if the transition
+and emission matrices converge, before reaching the maximum
+number of iterations (<code>maxIterations</code>). The difference
+of transition and emission parameters in consecutive iterations
+must be smaller than <code>delta</code> to terminate the algorithm.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pseudoCount   </code></td>
+<td>
+<p> Adding this amount of pseudo counts in the estimation-step
+of the Viterbi-training algorithm.</p>
+</td>
+</tr>
+</table>
+<h3>Format</h3>
+
+<p>Dimension and Format of the Arguments.
+</p>
+
+<dl>
+<dt>hmm         </dt>
+<dd>
+<p>A valid Hidden Markov Model, for example instantiated by <code>initHMM</code>.</p>
+</dd>
+<dt>observation </dt>
+<dd>
+<p>A vector of observations.</p>
+</dd>
+</dl>
+<h3>Value</h3>
+
+<p>Return Values:
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>hmm        </code></td>
+<td>
+<p>The inferred HMM. The representation is equivalent to the
+representation in <code>initHMM</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>difference </code></td>
+<td>
+<p>Vector of differences calculated from consecutive transition and emission
+matrices in each iteration of the Viterbi-training.
+The difference is the sum of the distances between consecutive
+transition and emission matrices in the L2-Norm.</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>Lin Himmelmann &lt;hmm@linhi.com&gt;, Scientific Software Development
+</p>
+
+
+<h3>References</h3>
+
+<p>For details see: Lawrence R. Rabiner: A Tutorial on Hidden Markov Models and Selected Applications
+in Speech Recognition. Proceedings of the IEEE 77(2) p.257-286, 1989.
+</p>
+
+
+<h3>See Also</h3>
+
+<p>See <code>baumWelch</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Initial HMM
+hmm = initHMM(c("A","B"),c("L","R"),
+	transProbs=matrix(c(.9,.1,.1,.9),2),
+	emissionProbs=matrix(c(.5,.51,.5,.49),2))
+print(hmm)
+# Sequence of observation
+a = sample(c(rep("L",100),rep("R",300)))
+b = sample(c(rep("L",300),rep("R",100)))
+observation = c(a,b)
+# Viterbi-training
+vt = viterbiTraining(hmm,observation,10)
+print(vt$hmm)
+</code></pre>
+
+
+</div>

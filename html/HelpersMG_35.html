@@ -1,0 +1,198 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>IC_threshold_matrix</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Calculate correlation matrix</h2>
+
+<h3>Description</h3>
+
+<p>This function calculates the matrix of correlations thresholded using partial correlation.<br>
+If the threshold is not given, the object that is produced can be used later for thresholding.<br>
+For model OAT: The link between A and B is “remarkable” if and only if the total correlation between them is higher than a given threshold and if the partial correlation between A and B in respect to any other variable C is also higher in absolute values than this threshold and with the same sign as the total correlation.
+For model AAT: A correlation is retained if it is higher than the threshold and the partial correlation is lower than the threshold. In this case, no missing value is accepted.<br>
+The use and method parameters are used by cor() function. The function uses by default a parallel computing in Unix or MacOSX systems.
+If progress is TRUE and the package pbmcapply is present, a progress bar is displayed. If debug is TRUE, some informations are shown during the process but parallel computing is not used.<br><code>https://fr.wikipedia.org/wiki/Iconographie_des_corrélations</code>
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">IC_threshold_matrix(
+  data = stop("A dataframe or an IconoCorel object is required"),
+  threshold = NULL,
+  use = c("pairwise.complete.obs", "everything", "all.obs", "complete.obs",
+    "na.or.complete"),
+  method = c("pearson", "kendall", "spearman"),
+  model = c("OAT", "ATT"),
+  significance.level = FALSE,
+  correction.multiple.comparisons = "fdr",
+  progress = TRUE,
+  debug = FALSE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>A dataframe or an IconoCorel object from a previous run of IC_threshold_matrix</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>threshold</code></td>
+<td>
+<p>threshold for partial and full correlations</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>use</code></td>
+<td>
+<p>an optional character string giving a method for computing covariances in the presence of missing values. This must be (an abbreviation of) one of the strings "everything", "all.obs", "complete.obs", "na.or.complete", or "pairwise.complete.obs".</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+<p>a character string indicating which correlation coefficient (or covariance) is to be computed. One of "pearson" (default), "kendall", or "spearman": can be abbreviated.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>model</code></td>
+<td>
+<p>a character string indicating if linear model uses all variables at a time (AAT) or one at a time (OAT).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>significance.level</code></td>
+<td>
+<p>if FALSE, does not use significance level; or use this significance level.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>correction.multiple.comparisons</code></td>
+<td>
+<p>"holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr", or "none".</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>progress</code></td>
+<td>
+<p>show a progress bar</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>debug</code></td>
+<td>
+<p>display information about progression of computing</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>IC_threshold_matrix calculates correlation matrix thresholed by partial correlation
+</p>
+
+
+<h3>Value</h3>
+
+<p>A list
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Marc Girondot <a href="mailto:marc.girondot@gmail.com">marc.girondot@gmail.com</a>
+</p>
+
+
+<h3>References</h3>
+
+<p>Lesty, M., 1999. Une nouvelle approche dans le choix des régresseurs de la régression multiple en présence d’interactions et de colinéarités. Revue de Modulad 22, 41-77.
+</p>
+
+
+<h3>See Also</h3>
+
+<p>Other Iconography of correlations: 
+<code>IC_clean_data()</code>,
+<code>IC_correlation_simplify()</code>,
+<code>plot.IconoCorel()</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+library("HelpersMG")
+es &lt;- structure(list(Student = c("e1", "e2", "e3", "e4", "e5", "e6", "e7", "e8"), 
+                 Mass = c(52, 59, 55, 58, 66, 62, 63, 69), 
+                 Age = c(12, 12.5, 13, 14.5, 15.5, 16, 17, 18), 
+                 Assiduity = c(12, 9, 15, 5, 11, 15, 12, 9), 
+                 Note = c(5, 5, 9, 5, 13.5, 18, 18, 18)), 
+                 row.names = c(NA, -8L), class = "data.frame")
+
+es
+
+df_clean &lt;- IC_clean_data(es, debug = TRUE)
+cor_matrix &lt;- IC_threshold_matrix(data=df_clean, threshold = NULL, progress=FALSE)
+cor_threshold &lt;- IC_threshold_matrix(data=df_clean, threshold = 0.3)
+plot(cor_threshold, show.legend.strength=FALSE, show.legend.direction = FALSE)
+cor_threshold_Note &lt;- IC_correlation_simplify(matrix=cor_threshold, variable="Note")
+plot(cor_threshold_Note)
+
+cor_threshold &lt;- IC_threshold_matrix(data=df_clean, threshold = 0.8, progress=FALSE)
+gr &lt;- plot(cor_threshold, plot=FALSE)
+ly &lt;- getFromNamespace("layout_nicely", ns="igraph")(gr)
+plot(cor_threshold, 
+layout=matrix(data=c(53, 53, 55, 55, 
+                     55, 53, 55, 53), ncol=2, byrow=FALSE), 
+show.legend.direction = FALSE,
+show.legend.strength = FALSE, xlim=c(-2, 2), ylim=c(-2, 2))
+
+# Using significance level
+
+cor_threshold &lt;- IC_threshold_matrix(data=df_clean, 
+                                     significance.level=0.05, debug=TRUE)
+plot(cor_threshold, show.legend.strength=FALSE, show.legend.direction = FALSE)
+cor_threshold_Note &lt;- IC_correlation_simplify(matrix=cor_threshold, variable="Note")
+plot(cor_threshold_Note)
+
+# Using the model All at a time
+
+cor_threshold_AAT &lt;- IC_threshold_matrix(data=df_clean, threshold = 0.3, model="AAT")
+par(mar=c(1,1,1,1))
+set.seed(4)
+plot(cor_threshold_AAT, show.legend.strength="bottomleft")
+
+
+
+############
+dta &lt;- structure(list(Student = c("e1", "e2", "e3", "e4", "e5", "e6", "e7", "e8"), 
+                     Mass = c(52, 59, 55, 58, 66, 62, 63, 69), 
+                     Age = c(12, 12.5, 13, 14.5, 15.5, 16, 17, 18), 
+                     Assiduity = c(12, 9, 15, 5, 11, 15, 12, 9), 
+                     Note = c(5, 5, 9, 5, 13.5, 18, 18, 18)), 
+                     row.names = c(NA, -8L), class = "data.frame")
+
+dta0 &lt;- dta[, 2:ncol(dta)]
+ic0 &lt;- IC_threshold_matrix(data = dta0)
+cor_threshold &lt;- IC_threshold_matrix(data=ic0, threshold = 0.3)
+par(mar=c(1,1,1,1))
+set.seed(4)
+library("igraph")
+
+plot(cor_threshold, vertex.color="red", show.legend.strength = FALSE)
+plot(IC_correlation_simplify(matrix=cor_threshold), 
+     show.legend.strength = FALSE, show.legend.direction = FALSE)
+
+
+## End(Not run)
+</code></pre>
+
+
+</div>

@@ -1,0 +1,129 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>prepare.list</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Prepare data array for sandwich smooth</h2>
+
+<h3>Description</h3>
+
+<p><code>prepare.list</code> prepares a list of data for the
+sandwich smooth.  The class of each element of
+the list must be identical.
+The dimensionality of <code>data[[i]]</code> and
+the length of <code>x</code> must match.  Specifically,
+<code>length(dim(data[[i]]))</code> must equal
+<code>length(x)</code>.     The dimensionality of
+<code>data[[i]]</code> and  the length of <code>splines</code> must match.
+Specifically, <code>length(dim(data[[i]]))</code> must equal
+<code>length(splines)</code>.      Note: If the splines
+are preassembled, these can be passed using the argument
+<code>assembled</code> so that this computation is not reperformed.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">## S3 method for class 'list'
+prepare(data, x, splines, m = 2, sparse = TRUE, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>A list of <code>numeric</code>, <code>matrix</code>, or
+<code>array</code> objects.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>A list of values at which to evaluate the basis
+functions.  See Examples and Details.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>splines</code></td>
+<td>
+<p>A list of spline objects
+(<code>hero_bspline</code> and <code>hero_radspline</code>).  See
+Examples and Details.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>m</code></td>
+<td>
+<p>A positive integer indicating order of the difference penalty.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sparse</code></td>
+<td>
+<p>A logical value indicating if the result
+should be a sparse version of the
+<code>Matrix-class</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Not currently implemented.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>This function applies the functions
+<code>prepare.numeric</code>,
+<code>prepare.matrix</code>, and
+<code>prepare.array</code> to each element of the list,
+so relevant restrictions in the arguments may be
+found there.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A <code>prepared_list</code> object.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Joshua French.
+</p>
+
+
+<h3>References</h3>
+
+<p>Xiao, L. , Li, Y. and Ruppert, D. (2013),
+Fast bivariate P-splines: the sandwich smoother. J. R.
+Stat. Soc. B, 75: 577-599. &lt;doi:10.1111/rssb.12007&gt;
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>prepare.numeric</code>, <code>prepare.matrix</code>,
+<code>prepare.array</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># generate and prepare 3d data
+set.seed(9)
+dat = lapply(1:3, function (i) generate.data3d())
+x = dat[[1]]$x
+data = lapply(dat, getElement, name = "data3d")
+obj = prepare(data, x = x)
+h = hero(obj)
+</code></pre>
+
+
+</div>

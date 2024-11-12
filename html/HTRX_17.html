@@ -1,0 +1,366 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>do_cv</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Two-stage HTRX: Model selection on short haplotypes</h2>
+
+<h3>Description</h3>
+
+<p>Two-step cross-validation used to select the best HTRX model.
+It can be applied to select haplotypes based on HTR, or select single nucleotide polymorphisms (SNPs).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">do_cv(
+  data_nosnp,
+  featuredata,
+  train_proportion = 0.5,
+  sim_times = 5,
+  featurecap = dim(featuredata)[2],
+  usebinary = 1,
+  method = "simple",
+  criteria = "BIC",
+  gain = TRUE,
+  nmodel = 3,
+  dataseed = 1:sim_times,
+  runparallel = FALSE,
+  mc.cores = 6,
+  fold = 10,
+  kfoldseed = 123,
+  returnwork = FALSE,
+  verbose = FALSE
+)
+
+do_cv_step1(
+  data_nosnp,
+  featuredata,
+  train_proportion = 0.5,
+  featurecap = dim(featuredata)[2],
+  usebinary = 1,
+  method = "simple",
+  criteria = "BIC",
+  nmodel = 3,
+  splitseed = 123,
+  runparallel = FALSE,
+  mc.cores = 6,
+  verbose = FALSE
+)
+
+infer_step1(
+  data_nosnp,
+  featuredata,
+  train,
+  criteria = "BIC",
+  featurecap = dim(featuredata)[2],
+  usebinary = 1,
+  nmodel = nmodel,
+  runparallel = FALSE,
+  mc.cores = 6,
+  verbose = FALSE
+)
+
+infer_fixedfeatures(
+  data_nosnp,
+  featuredata,
+  train = (1:nrow(data_nosnp))[-test],
+  test,
+  features,
+  coefficients = NULL,
+  gain = TRUE,
+  usebinary = 1,
+  R2only = FALSE,
+  verbose = FALSE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>data_nosnp</code></td>
+<td>
+<p>a data frame with outcome (the outcome must be the first column with colnames(data_nosnp)[1]="outcome"),
+fixed covariates (for example, sex, age and the first 18 PCs) if there are,
+and without SNPs or haplotypes.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>featuredata</code></td>
+<td>
+<p>a data frame of the feature data, e.g. haplotype data created by HTRX or SNPs.
+These features exclude all the data in <code>data_nosnp</code>, and will be selected using 2-step cross-validation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>train_proportion</code></td>
+<td>
+<p>a positive number between 0 and 1 giving
+the proportion of the training dataset when splitting data into 2 folds.
+By default, <code>train_proportion=0.5</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sim_times</code></td>
+<td>
+<p>an integer giving the number of simulations in Step 1 (see details).
+By default, <code>sim_times=5</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>featurecap</code></td>
+<td>
+<p>a positive integer which manually sets the maximum number of independent features.
+By default, <code>featurecap=40</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>usebinary</code></td>
+<td>
+<p>a non-negative number representing different models.
+Use linear model if <code>usebinary=0</code>,
+use logistic regression model via <code>fastglm</code> if <code>usebinary=1</code> (by default),
+and use logistic regression model via <code>glm</code> if <code>usebinary&gt;1</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+<p>the method used for data splitting, either <code>"simple"</code> (default) or <code>"stratified"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>criteria</code></td>
+<td>
+<p>the criteria for model selection, either <code>"BIC"</code> (default), <code>"AIC"</code> or <code>"lasso"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>gain</code></td>
+<td>
+<p>logical. If <code>gain=TRUE</code> (default), report the variance explained in addition to fixed covariates;
+otherwise, report the total variance explained by all the variables.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nmodel</code></td>
+<td>
+<p>a positive integer specifying the number of candidate models
+that the criterion selects. By default, <code>nmodel=3</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dataseed</code></td>
+<td>
+<p>a vector of the seed that each simulation in Step 1 (see details) uses.
+The length of <code>dataseed</code> must be the same as <code>sim_times</code>.
+By default, <code>dataseed=1:sim_times</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>runparallel</code></td>
+<td>
+<p>logical. Use parallel programming based on <code>mclapply</code> function from R package <code>"parallel"</code> or not.
+Note that for Windows users, <code>mclapply</code> doesn't work, so please set <code>runparallel=FALSE</code> (default).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mc.cores</code></td>
+<td>
+<p>an integer giving the number of cores used for parallel programming.
+By default, <code>mc.cores=6</code>.
+This only works when <code>runparallel=TRUE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fold</code></td>
+<td>
+<p>a positive integer specifying how many folds
+the data should be split into for cross-validation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>kfoldseed</code></td>
+<td>
+<p>a positive integer specifying the seed used to
+split data for k-fold cross validation. By default, <code>kfoldseed=123</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>returnwork</code></td>
+<td>
+<p>logical. If <code>returnwork=TRUE</code>, return a vector of the maximum number
+of features that are assessed in each simulation, excluding the fixed covariates.
+This is used to assess how much computational 'work' is done in Step 1(2) of HTRX (see details).
+By default, <code>returnwork=FALSE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p>logical. If <code>verbose=TRUE</code>, print out the inference steps. By default, <code>verbose=FALSE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>splitseed</code></td>
+<td>
+<p>a positive integer giving the seed of data split.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>train</code></td>
+<td>
+<p>a vector of the indexes of the training data.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>test</code></td>
+<td>
+<p>a vector of the indexes of the test data.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>features</code></td>
+<td>
+<p>a character of the names of the fixed features, excluding the intercept.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>coefficients</code></td>
+<td>
+<p>a vector giving the coefficients of the fixed features, including the intercept.
+If the fixed features don't have fixed coefficients, set <code>coefficients=NULL</code> (default).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>R2only</code></td>
+<td>
+<p>logical. If <code>R2only=TRUE</code>, function <code>infer_fixedfeatures</code> only
+returns the variance explained in the test data.
+By default, <code>R2only=FALSE</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Function <code>do_cv</code> is the main function used for selecting haplotypes from HTRX or SNPs.
+It is a two-step algorithm and is used for alleviating overfitting.
+</p>
+<p>Step 1: select candidate models. This is to address the model search problem,
+and is chosen to obtain a set of models more diverse than
+traditional bootstrap resampling.
+</p>
+<p>(1) Randomly sample a subset (50
+Specifically, when the outcome is binary,
+stratified sampling is used to ensure the subset has approximately
+the same proportion of cases and controls as the whole data;
+</p>
+<p>(2) If <code>criteria="AIC"</code> or <code>criteria="BIC"</code>,
+start from a model with fixed covariates (e.g. 18 PCs, sex and age),
+and perform forward regression on the subset,
+i.e. iteratively choose a feature (in addition to the fixed covariates)
+to add whose inclusion enables the model to explain the largest variance,
+and select s models with the lowest Akaike information criterion (AIC) or
+Bayesian Information Criteria (BIC)
+to enter the candidate model pool;
+If <code>criteria="lasso"</code>, using least absolute shrinkage and selection operator (lasso)
+to directly select the best s models to enter the candidate model pool;
+</p>
+<p>(3) repeat (1)-(2) B times, and select all the different models in the candidate model pool
+as the candidate models.
+</p>
+<p>Step 2: select the best model using k-fold cross-validation.
+</p>
+<p>(1) Randomly split the whole data into k groups with approximately equal sizes,
+using stratified sampling when the outcome is binary;
+</p>
+<p>(2) In each of the k folds, use a fold as the validation dataset, a fold as the test dataset,
+and the remaining folds as the training dataset.
+Then, fit all the candidate models on the training dataset,
+and use these fitted models to compute the additional variance explained by features
+(out-of-sample variance explained) in the validation and test dataset.
+Finally, select the candidate model with the biggest
+average out-of-sample variance explained in the validation set as the best model,
+and report the out-of-sample variance explained in the test set.
+</p>
+<p>Function <code>do_cv_step1</code> is the Step 1 (1)-(2) described above.
+Function <code>infer_step1</code> is the Step 1 (2) described above.
+Function <code>infer_fixedfeatures</code> is used to fit all the candidate models on the training dataset,
+and compute the additional variance explained by features (out-of-sample R2) in the test dataset,
+as described in the Step 2 (2) above.
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>do_cv</code> returns a list containing the best model selected,
+and the out-of-sample variance explained in each test set.
+</p>
+<p><code>do_cv_step1</code> and <code>infer_step1</code> return a list of three candidate models selected by a single simulation.
+</p>
+<p><code>infer_fixedfeatures</code> returns a list of the variance explained in the test set if <code>R2only=TRUE</code>,
+otherwise, it returns a list of the variance explained in the test set, the model including all the variables,
+and the null model, i.e. the model with outcome and fixed covariates only.
+</p>
+
+
+<h3>References</h3>
+
+<p>Yang Y, Lawson DJ. HTRX: an R package for learning non-contiguous haplotypes associated with a phenotype. Bioinformatics Advances 3.1 (2023): vbad038.
+</p>
+<p>Barrie, W., Yang, Y., Irving-Pease, E.K. et al. Elevated genetic risk for multiple sclerosis emerged in steppe pastoralist populations. Nature 625, 321–328 (2024).
+</p>
+<p>Eforn, B. "Bootstrap methods: another look at the jackknife." The Annals of Statistics 7 (1979): 1-26.
+</p>
+<p>Schwarz, Gideon. "Estimating the dimension of a model." The annals of statistics (1978): 461-464.
+</p>
+<p>McFadden, Daniel. "Conditional logit analysis of qualitative choice behavior." (1973).
+</p>
+<p>Akaike, Hirotugu. "A new look at the statistical model identification." IEEE transactions on automatic control 19.6 (1974): 716-723.
+</p>
+<p>Tibshirani, Robert. "Regression shrinkage and selection via the lasso." Journal of the Royal Statistical Society: Series B (Methodological) 58.1 (1996): 267-288.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## use dataset "example_hap1", "example_hap2" and "example_data_nosnp"
+## "example_hap1" and "example_hap2" are
+## both genomes of 8 SNPs for 5,000 individuals (diploid data)
+## "example_data_nosnp" is an example dataset
+## which contains the outcome (binary), sex, age and 18 PCs
+
+## visualise the covariates data
+## we will use only the first two covariates: sex and age in the example
+head(HTRX::example_data_nosnp)
+
+## visualise the genotype data for the first genome
+head(HTRX::example_hap1)
+
+## we perform HTRX on the first 4 SNPs
+## we first generate all the haplotype data, as defined by HTRX
+HTRX_matrix=make_htrx(HTRX::example_hap1[1:300,1:4],
+                      HTRX::example_hap2[1:300,1:4])
+
+## If the data is haploid, please set
+## HTRX_matrix=make_htrx(HTRX::example_hap1[1:300,1:4],
+##                       HTRX::example_hap1[1:300,1:4])
+
+## then perform HTRX using 2-step cross-validation in a single small example
+## to compute additional variance explained by haplotypes
+## If you want to compute total variance explained, please set gain=FALSE
+CV_results &lt;- do_cv(HTRX::example_data_nosnp[1:300,1:2],
+                    HTRX_matrix,train_proportion=0.5,
+                    sim_times=1,featurecap=4,usebinary=1,
+                    method="simple",criteria="BIC",
+                    gain=TRUE,runparallel=FALSE,verbose=TRUE)
+
+#This result would be more precise when setting larger sim_times and featurecap
+</code></pre>
+
+
+</div>

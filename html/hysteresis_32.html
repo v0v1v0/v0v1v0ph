@@ -1,0 +1,236 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>mloop</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Simulate (Make) a Hysteresis Loop
+</h2>
+
+<h3>Description</h3>
+
+<p>Simulate a hysteresis loop with a variety of possible parameters.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">mloop(cx = 0, cy = 0, retention = 0.2, b.x = 0.6, b.y = 0.8,n = 1, m = 1, 
+     sd.x = 0, sd.y = 0, phase.angle = 0, n.points = 24, 
+    period = 24,extended.classical=FALSE,seed=NULL)  
+mloop2r(cx=0,cy=0,retention.above=0.2,retention.below=0.15,b.x=0.6,b.y=0.8,n=1,
+        m=1,sd.x=0,sd.y=0,phase.angle=0,n.points=24,period=24,
+        extended.classical=FALSE,seed=NULL)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>n</code></td>
+<td>
+
+<p>Positive integer for the split line parameter. If n=1, split line is linear; If n is even, split line has a u shape; If n is odd and higher than 1, split line has a chair or classical shape.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>m</code></td>
+<td>
+
+<p>Positive odd integer for the bulging parameter, indicates degree of outward curving (1=highest level of bulging). 
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>b.x</code></td>
+<td>
+
+<p>number. Saturation point x coordinate. Horizontal distance from the center to the maximum value of the input challenge.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>b.y</code></td>
+<td>
+
+<p>number. Saturation point y coordinate. Vertical distance from the center to the point where the input is at its maximum. 
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>phase.angle</code></td>
+<td>
+
+<p>number in degrees. Defines the starting point of the loop. The initial angle of the input function at its origin. 
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cx</code></td>
+<td>
+
+<p>number. Center of input x.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cy</code></td>
+<td>
+
+<p>number. Center of output y.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>retention</code></td>
+<td>
+
+<p>number. Split point, represents vertical distance from center to upper loop trajectory. 
+It is the intersection of the loop and the output axis characterizing the distortion in 
+the response at the average input challenge. Assumes symmetrical curve above and below split line.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>retention.above</code></td>
+<td>
+
+<p>number. Retention above the split line. <code>mloop2r</code> creates a loop where retention above and below the split line may be different.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>retention.below</code></td>
+<td>
+
+<p>number. Retention below the split line.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sd.x</code></td>
+<td>
+
+<p>number. Standard deviation of the normally distributed variation in the input vector x. </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sd.y</code></td>
+<td>
+
+<p>number. Standard deviation of the normally distributed variation in the output vector y. </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n.points</code></td>
+<td>
+
+<p>number of points on loop.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>period</code></td>
+<td>
+
+<p>number of equally spaced points required to make a full loop.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>extended.classical</code></td>
+<td>
+
+<p>logical. If true, fit a classical hysteresis loop regardless of n. Uses </p>
+<p style="text-align: center;"><code class="reqn">y_t=sign(cos(2*pi*t/period))*b.y*abs(cos(2*pi*t/period))^n + retention*sin(2*pi*t/period)^m+cy+e_{y,t}</code>
+</p>
+<p> instead of 
+</p>
+<p style="text-align: center;"><code class="reqn">y_t=b.y*cos(2*pi*t/period)^n+retention*sin(2*pi*t/period)^m+cy+e_{y,t}</code>
+</p>
+
+<p>Allows the user to fit classical loops with any n&gt;1 instead of just odd numbered n. Default is false.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>seed</code></td>
+<td>
+
+<p>integer. Starting seed.
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Simulates input and output variables x and y that form a hysteresis loop of the form </p>
+<p style="text-align: center;"><code class="reqn">x_t=b.x*cos(2pi*t/period+phase.angle)+cx+e_{x,t}</code>
+</p>
+ <p style="text-align: center;"><code class="reqn">y_t=b.y*cos(2pi*t/period+phase.angle)^n+retention*sin(2pi*t/period+phase.angle)^m+cy+e_{y,t}</code>
+</p>
+<p>  where </p>
+<p style="text-align: center;"><code class="reqn">t=0,...,n.points-1 if times='equal'</code>
+</p>
+<p> and the error terms e are normally distributed. Also produces a vector of derived values.</p>
+
+
+<h3>Value</h3>
+
+<p>mloop returns an object of class <code>hysteresisloop</code>.
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>values</code></td>
+<td>
+<p>estimated values of various coefficients and derived parameters of the hysteresis loop. See <code>loop.parameters</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>the input x.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+<p>the output y.</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>Spencer Maynes, Fan Yang, and Anne Parkhurst.
+</p>
+
+
+<h3>References</h3>
+
+<p>Lapshin, R. (1995) Analytical model for the approximation of hysteresis loop and its application to the scanning tunneling microscope.
+</p>
+
+
+<h3>See Also</h3>
+
+<p>Fit a hysteresis loop with the function <code>floop</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">#Simulate a loop with n=3, m=1, retention=0.9
+loop1 &lt;- mloop(cx=5,cy=8,retention=0.9,sd.x=0.01,sd.y=0.05,n=3,m=1)
+loopmodel &lt;- floop(loop1$x,loop1$y,n=3,m=1)
+loopmodel 
+##Plot hysteresis loop.
+plot(loopmodel,main="Simulated Hysteresis Loop n=3 m=1",xlab="Input",
+ylab="Output",values="hysteresis.all")
+
+</code></pre>
+
+
+</div>

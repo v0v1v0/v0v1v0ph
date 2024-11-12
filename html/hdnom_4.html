@@ -1,0 +1,176 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>calibrate_external</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Externally calibrate high-dimensional Cox models</h2>
+
+<h3>Description</h3>
+
+<p>Externally calibrate high-dimensional Cox models
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">calibrate_external(
+  object,
+  x,
+  time,
+  event,
+  x_new,
+  time_new,
+  event_new,
+  pred.at,
+  ngroup = 5
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>object</code></td>
+<td>
+<p>Model object fitted by <code>hdnom::fit_*()</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>Matrix of training data used for fitting the model.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>time</code></td>
+<td>
+<p>Survival time of the training data.
+Must be of the same length with the number of rows as <code>x</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>event</code></td>
+<td>
+<p>Status indicator of the training data,
+normally 0 = alive, 1 = dead.
+Must be of the same length with the number of rows as <code>x</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x_new</code></td>
+<td>
+<p>Matrix of predictors for the external validation data.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>time_new</code></td>
+<td>
+<p>Survival time of the external validation data.
+Must be of the same length with the number of rows as <code>x_new</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>event_new</code></td>
+<td>
+<p>Status indicator of the external validation data,
+normally 0 = alive, 1 = dead.
+Must be of the same length with the number of rows as <code>x_new</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pred.at</code></td>
+<td>
+<p>Time point at which external calibration should take place.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ngroup</code></td>
+<td>
+<p>Number of groups to be formed for external calibration.</p>
+</td>
+</tr>
+</table>
+<h3>Examples</h3>
+
+<pre><code class="language-R">library("survival")
+
+# Load imputed SMART data
+data(smart)
+# Use the first 1000 samples as training data
+# (the data used for internal validation)
+x &lt;- as.matrix(smart[, -c(1, 2)])[1:1000, ]
+time &lt;- smart$TEVENT[1:1000]
+event &lt;- smart$EVENT[1:1000]
+
+# Take the next 1000 samples as external calibration data
+# In practice, usually use data collected in other studies
+x_new &lt;- as.matrix(smart[, -c(1, 2)])[1001:2000, ]
+time_new &lt;- smart$TEVENT[1001:2000]
+event_new &lt;- smart$EVENT[1001:2000]
+
+# Fit Cox model with lasso penalty
+fit &lt;- fit_lasso(
+  x, Surv(time, event),
+  nfolds = 5, rule = "lambda.1se", seed = 11
+)
+
+# External calibration
+cal.ext &lt;- calibrate_external(
+  fit, x, time, event,
+  x_new, time_new, event_new,
+  pred.at = 365 * 5, ngroup = 5
+)
+
+print(cal.ext)
+summary(cal.ext)
+plot(cal.ext, xlim = c(0.6, 1), ylim = c(0.6, 1))
+# # Test fused lasso, MCP, and Snet models
+# data(smart)
+# # Use first 500 samples as training data
+# # (the data used for internal validation)
+# x &lt;- as.matrix(smart[, -c(1, 2)])[1:500, ]
+# time &lt;- smart$TEVENT[1:500]
+# event &lt;- smart$EVENT[1:500]
+#
+# # Take 1000 samples as external validation data.
+# # In practice, usually use data collected in other studies.
+# x_new &lt;- as.matrix(smart[, -c(1, 2)])[1001:2000, ]
+# time_new &lt;- smart$TEVENT[1001:2000]
+# event_new &lt;- smart$EVENT[1001:2000]
+#
+# flassofit &lt;- fit_flasso(x, survival::Surv(time, event), nfolds = 5, seed = 11)
+# scadfit &lt;- fit_mcp(x, survival::Surv(time, event), nfolds = 5, seed = 11)
+# mnetfit &lt;- fit_snet(x, survival::Surv(time, event), nfolds = 5, seed = 11)
+#
+# cal.ext1 &lt;- calibrate_external(
+#   flassofit, x, time, event,
+#   x_new, time_new, event_new,
+#   pred.at = 365 * 5, ngroup = 5)
+#
+# cal.ext2 &lt;- calibrate_external(
+#   scadfit, x, time, event,
+#   x_new, time_new, event_new,
+#   pred.at = 365 * 5, ngroup = 5)
+#
+# cal.ext3 &lt;- calibrate_external(
+#   mnetfit, x, time, event,
+#   x_new, time_new, event_new,
+#   pred.at = 365 * 5, ngroup = 5)
+#
+# print(cal.ext1)
+# summary(cal.ext1)
+# plot(cal.ext1)
+#
+# print(cal.ext2)
+# summary(cal.ext2)
+# plot(cal.ext2)
+#
+# print(cal.ext3)
+# summary(cal.ext3)
+# plot(cal.ext3)
+</code></pre>
+
+
+</div>

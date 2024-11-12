@@ -1,0 +1,234 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hm_build_generic</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Load native data files automatically</h2>
+
+<h3>Description</h3>
+
+<p>The method allows you to automatically load your native data
+inside the <code>hydromet_station</code> slots.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hm_build_generic(
+  obj,
+  path,
+  file_name,
+  slot_name,
+  by = "none",
+  out_name = NULL,
+  sheet = NULL,
+  FUN,
+  ...
+)
+
+## S4 method for signature 'hydromet_station'
+hm_build_generic(
+  obj,
+  path,
+  file_name,
+  slot_name,
+  by = "none",
+  out_name = NULL,
+  sheet = NULL,
+  FUN,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>obj</code></td>
+<td>
+<p>a valid <code>hydromet_station</code> class object.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>path</code></td>
+<td>
+<p>string vector with the path(s) to the <code>file_name</code> argument.
+If you set a single string it will be recycled for all the files.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>file_name</code></td>
+<td>
+<p>string vector with the native file(s) name(s).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>slot_name</code></td>
+<td>
+<p>string vector with the slot(s) where to set the file(s) or sheet(s).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>by</code></td>
+<td>
+<p>string vector with the time step of the series (e.g.: 'month',
+day', '6 hour', '3 hour', '1 hour', '15 min' ). If you set it as <code>"none"</code>,
+the function will ignore automatic gap filling. If you set a single string,
+it will be recycled for all the files.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>out_name</code></td>
+<td>
+<p>optional. A list containing string vectors with user
+defined variable(s) column(s) name(s). The list length should be
+equal to the <code>slot_name</code> length.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sheet</code></td>
+<td>
+<p>Sheet to read (only excel files). Either a string vector
+(the name of a sheet) or an integer vector (the position of the sheet).
+This argument just make sense for excel files.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>FUN</code></td>
+<td>
+<p>function name for reading the data (e.g.: <code>read_csv()</code>). The method
+will always use the <code>path + file</code> as first argument(s) to <code>FUN</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p><code>FUN</code> arguments to pass.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A <code>hydromet_station</code> object with the required data loaded inside.
+</p>
+
+
+<h3>Functions</h3>
+
+
+<ul><li> <p><code>hm_build_generic(hydromet_station)</code>: build method for hydromet station object
+</p>
+</li></ul>
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+# you can download the data from:
+# https://gitlab.com/ezetoum27/hydrotoolbox/-/tree/master/my_data
+
+# set the data path
+my_path &lt;- "./home/my_folder/my_data"
+
+#///////////////////////////////
+# Rectangular data
+# txt, csv, csv2 and others.
+# See readr package.
+#///////////////////////////////
+
+library(readr)
+#* Case 1: single file - many numeric variables
+
+hm_create() %&gt;%
+hm_build_generic(path = my_path,
+                 file_name = "ianigla_cuevas.csv",
+                 slot_name = c("tair", "rh", "patm",
+                              "precip", "wspd", "wdir",
+                              "kin", "hsnow", "tsoil"),
+                 by = c("hour"),
+                 FUN = read_csv,
+                 col_select = !Est &amp; !YJday &amp; !hh.mm.ss &amp; !bat.Volts
+                ) %&gt;%
+ hm_show()
+
+#* Case 2: multiple files (one per observation)
+hm_create() %&gt;%
+ hm_build_generic(path = my_path,
+                  file_name = c("h_relativa_cuevas.csv",
+                                "p_atm_cuevas.csv",
+                                "precip_total_cuevas.csv",
+                                "temp_aire_cuevas.csv",
+                                "vel_viento_cuevas.csv"),
+                  slot_name = c("rh", "patm", "precip",
+                                "tair", "wspd"),
+                  by = c("hour", "45 min", "30 min", "1 hour", "15 min"),
+                  FUN = read_csv  ) %&gt;%
+ hm_show()
+
+#///////////////////////////////
+# Excel files
+# Recommended package =&gt; readxl
+#///////////////////////////////
+
+library(readxl)
+
+
+#* Case 1: single file - one sheet - many numeric variables
+
+hm_create() %&gt;%
+ hm_build_generic(path = my_path,
+                  file_name = "mnemos_guido.xlsx",
+                  slot_name = c("qd"),
+                  by = c("day"),
+                  FUN = read_excel,
+                  sheet = 1L,
+                  skip = 3,
+                  out_name = list("q_m3/s")
+ ) %&gt;% hm_show()
+
+
+
+#* Case 2: single file - multiple sheets (one per variable)
+
+hm_create() %&gt;%
+ hm_build_generic(path = my_path,
+                  file_name = "mnemos_guido.xlsx",
+                  slot_name = c("qd", "evap", "tair",
+                                "tmax", "tmin"),
+                  by = c(q = "day", evap =  "day", tair = "6 hour",
+                         tmax = "day", tmin = "day"),
+                  FUN = read_excel,
+                  sheet = c(1L:5L),
+                  skip = 3,
+                  out_name = list( c("q_m3/s", "flag"),
+                                   c("evap_mm", "flag"),
+                                   c("tair", "flag"),
+                                   c("tmax", "flag"),
+                                   c("tmin", "flag")
+                  )
+ ) %&gt;%
+ hm_show()
+
+#* Case 3: multiple files - one sheet per file
+
+hm_create() %&gt;%
+  hm_build_generic(path = my_path,
+                   file_name = c("discharge_daily.xlsx",
+                                 "air_teperature_subdaily.xlsx"),
+                   slot_name = c("qd", "tair"),
+                   by = c(q = "day", tair = "6 hour"),
+                   FUN = read_excel,
+                   sheet = c(1L, 1L),
+                   skip = 3,
+                   out_name = list( c("q_m3/s", "flag"),
+                                    c("tair", "flag"))
+  ) %&gt;%
+  hm_show()
+
+
+## End(Not run)
+
+</code></pre>
+
+
+</div>

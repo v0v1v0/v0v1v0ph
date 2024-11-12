@@ -1,0 +1,72 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>simpleM</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Calculation of effective number of independent tests</h2>
+
+<h3>Description</h3>
+
+<p>Adapted simpleM method which considers theoretical correlation
+between SNP pairs instead of composite LD values. Principal component
+decomposition yields the effective number of independent tests. This value
+is needed for the Bonferroni correction of type-I error when testing SNP
+effects based on a single-marker model.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">simpleM(mat, quant = 0.995)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>mat</code></td>
+<td>
+<p>correlation matrix</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>quant</code></td>
+<td>
+<p>percentage cutoff, variation of SNP data explained by
+eigenvalues; default value 0.995</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>effective number of independent tests
+</p>
+
+
+<h3>References</h3>
+
+<p>Gao, Starmer &amp; Martin (2008) A multiple testing correction method for
+genetic association studies using correlated single nucleotide
+polymorphisms. Genetic Epidemiology 32:361-369.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">  ### correlation matrix (should depend on sire haplotypes)
+  R &lt;- AR1(100, rho = 0.1)
+  ### effective number of tests
+  Meff &lt;- simpleM(R)
+  ### relative effect size given heritability and number of QTL signals
+  h2 &lt;- 0.2
+  nqtl &lt;- 2
+  betaSE &lt;- sqrt(h2 / (nqtl - nqtl * h2))
+  ### optimal sample size in a single-marker approach
+  pwr::pwr.t.test(d = betaSE, sig.level = 0.01 / Meff, power = 0.8,
+   alternative = "two.sided", type = "one.sample")
+</code></pre>
+
+
+</div>

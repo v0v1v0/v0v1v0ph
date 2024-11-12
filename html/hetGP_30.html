@@ -1,0 +1,239 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>IMSPE_optim</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>IMSPE optimization</h2>
+
+<h3>Description</h3>
+
+<p>Search for the best value of the IMSPE criterion, possibly using a h-steps lookahead strategy to favor designs with replication
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">IMSPE_optim(
+  model,
+  h = 2,
+  Xcand = NULL,
+  control = list(tol_dist = 1e-06, tol_diff = 1e-06, multi.start = 20, maxit = 100),
+  Wijs = NULL,
+  seed = NULL,
+  ncores = 1
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>model</code></td>
+<td>
+<p><code>homGP</code> or <code>hetGP</code> model</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>h</code></td>
+<td>
+<p>horizon for multi-step ahead framework.
+The decision is made between:
+</p>
+
+<ul>
+<li>
+<p> sequential crit search starting by a new design (optimized first) then adding <code>h</code> replicates
+</p>
+</li>
+<li>
+<p> sequential crit searches starting by <code>1</code> to <code>h</code> replicates before adding a new point
+</p>
+</li>
+</ul>
+<p>Use <code>h = 0</code> for the myopic criterion, i.e., not looking ahead.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Xcand</code></td>
+<td>
+<p>optional discrete set of candidates (otherwise a maximin LHS is used to initialise continuous search)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>control</code></td>
+<td>
+<p>list in case <code>Xcand == NULL</code>, with elements <code>multi.start</code>,
+to perform a multi-start optimization based on <code>optim</code>, with <code>maxit</code> iterations each.
+Also, <code>tol_dist</code> defines the minimum distance to an existing design for a new point to be added, otherwise the closest existing design is chosen.
+In a similar fashion, <code>tol_dist</code> is the minimum relative change of IMSPE for adding a new design.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Wijs</code></td>
+<td>
+<p>optional previously computed matrix of Wijs, see <code>Wij</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>seed</code></td>
+<td>
+<p>optional seed for the generation of designs with <code>maximinSA_LHS</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ncores</code></td>
+<td>
+<p>number of CPU available (&gt; 1 mean parallel TRUE), see <code>mclapply</code></p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The domain needs to be [0, 1]^d for now.
+</p>
+
+
+<h3>Value</h3>
+
+<p>list with elements:
+</p>
+
+<ul>
+<li> <p><code>par</code>: best first design,
+</p>
+</li>
+<li> <p><code>value</code>: IMSPE h-steps ahead starting from adding <code>par</code>,
+</p>
+</li>
+<li> <p><code>path</code>: list of elements list(<code>par</code>, <code>value</code>, <code>new</code>) at each step <code>h</code>
+</p>
+</li>
+</ul>
+<h3>References</h3>
+
+<p>M. Binois, J. Huang, R. B. Gramacy, M. Ludkovski (2019), 
+Replication or exploration? Sequential design for stochastic simulation experiments,
+Technometrics, 61(1), 7-23.<br> 
+Preprint available on arXiv:1710.03206.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">###############################################################################
+## Bi-variate example (myopic version)
+###############################################################################
+
+nvar &lt;- 2 
+
+set.seed(42)
+ftest &lt;- function(x, coef = 0.1) return(sin(2*pi*sum(x)) + rnorm(1, sd = coef))
+
+n &lt;- 25 # must be a square
+xgrid0 &lt;- seq(0.1, 0.9, length.out = sqrt(n))
+designs &lt;- as.matrix(expand.grid(xgrid0, xgrid0))
+X &lt;- designs[rep(1:n, sample(1:10, n, replace = TRUE)),]
+Z &lt;- apply(X, 1, ftest)
+
+model &lt;- mleHomGP(X, Z, lower = rep(0.1, nvar), upper = rep(1, nvar))
+
+ngrid &lt;- 51
+xgrid &lt;- seq(0,1, length.out = ngrid)
+Xgrid &lt;- as.matrix(expand.grid(xgrid, xgrid))
+
+preds &lt;- predict(x = Xgrid, object =  model)
+
+## Initial plots
+contour(x = xgrid,  y = xgrid, z = matrix(preds$mean, ngrid),
+        main = "Predicted mean", nlevels = 20)
+points(model$X0, col = 'blue', pch = 20)
+
+IMSPE_grid &lt;- apply(Xgrid, 1, crit_IMSPE, model = model)
+filled.contour(x = xgrid, y = xgrid, matrix(IMSPE_grid, ngrid),
+               nlevels = 20, color.palette = terrain.colors, 
+               main = "Initial IMSPE criterion landscape",
+plot.axes = {axis(1); axis(2); points(model$X0, pch = 20)})
+
+## Sequential IMSPE search
+nsteps &lt;- 1 # Increase for better results
+
+for(i in 1:nsteps){
+  res &lt;- IMSPE_optim(model, control = list(multi.start = 30, maxit = 30))
+  newX &lt;- res$par
+  newZ &lt;- ftest(newX)
+  model &lt;- update(object = model, Xnew = newX, Znew = newZ)
+}
+
+## Final plots
+contour(x = xgrid,  y = xgrid, z = matrix(preds$mean, ngrid),
+        main = "Predicted mean", nlevels = 20)
+points(model$X0, col = 'blue', pch = 20)
+
+IMSPE_grid &lt;- apply(Xgrid, 1, crit_IMSPE, model = model)
+filled.contour(x = xgrid, y = xgrid, matrix(IMSPE_grid, ngrid),
+               nlevels = 20, color.palette = terrain.colors, 
+               main = "Final IMSPE criterion landscape",
+plot.axes = {axis(1); axis(2); points(model$X0, pch = 20)})
+
+###############################################################################
+## Bi-variate example (look-ahead version)
+###############################################################################
+## Not run:  
+nvar &lt;- 2 
+
+set.seed(42)
+ftest &lt;- function(x, coef = 0.1) return(sin(2*pi*sum(x)) + rnorm(1, sd = coef))
+
+n &lt;- 25 # must be a square
+xgrid0 &lt;- seq(0.1, 0.9, length.out = sqrt(n))
+designs &lt;- as.matrix(expand.grid(xgrid0, xgrid0))
+X &lt;- designs[rep(1:n, sample(1:10, n, replace = TRUE)),]
+Z &lt;- apply(X, 1, ftest)
+
+model &lt;- mleHomGP(X, Z, lower = rep(0.1, nvar), upper = rep(1, nvar))
+
+ngrid &lt;- 51
+xgrid &lt;- seq(0,1, length.out = ngrid)
+Xgrid &lt;- as.matrix(expand.grid(xgrid, xgrid))
+
+nsteps &lt;- 5 # Increase for more steps
+
+# To use parallel computation (turn off on Windows)
+library(parallel)
+parallel &lt;- FALSE #TRUE #
+if(parallel) ncores &lt;- detectCores() else ncores &lt;- 1
+
+for(i in 1:nsteps){
+  res &lt;- IMSPE_optim(model, h = 3, control = list(multi.start = 100, maxit = 50),
+   ncores = ncores)
+  
+  # If a replicate is selected
+  if(!res$path[[1]]$new) print("Add replicate")
+  
+  newX &lt;- res$par
+  newZ &lt;- ftest(newX)
+  model &lt;- update(object = model, Xnew = newX, Znew = newZ)
+  
+  ## Plots 
+  preds &lt;- predict(x = Xgrid, object =  model)
+  contour(x = xgrid,  y = xgrid, z = matrix(preds$mean, ngrid),
+          main = "Predicted mean", nlevels = 20)
+  points(model$X0, col = 'blue', pch = 20)
+  points(newX, col = "red", pch = 20)
+  
+  ## Precalculations
+  Wijs &lt;- Wij(mu1 = model$X0, theta = model$theta, type = model$covtype)
+  
+  IMSPE_grid &lt;- apply(Xgrid, 1, crit_IMSPE, Wijs = Wijs, model = model)
+  filled.contour(x = xgrid, y = xgrid, matrix(IMSPE_grid, ngrid),
+                 nlevels = 20, color.palette = terrain.colors,
+  plot.axes = {axis(1); axis(2); points(model$X0, pch = 20)})
+}
+
+## End(Not run)
+</code></pre>
+
+
+</div>

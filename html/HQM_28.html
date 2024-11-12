@@ -1,0 +1,120 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>R_K</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Bandwidth selection score R</h2>
+
+<h3>Description</h3>
+
+<p>Calculates a part for the K-fold cross validation score.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">R_K(h_xt_mat_list, int_X, size_X_grid, Yi, Ni, n)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>h_xt_mat_list</code></td>
+<td>
+<p>A list of matrices for all cross validation data sets. Each matrix contains the estimator with the future conditional hazard rate for all values <code>x</code> and <code>t</code> and the respected data set.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>int_X</code></td>
+<td>
+<p>Vector of the position of the observed marker values in the grid for marker values.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>size_X_grid</code></td>
+<td>
+<p>Numeric value indicating the number of grid points for marker values.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Yi</code></td>
+<td>
+<p>A matrix made by <code>make_Yi</code> indicating the exposure. </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Ni</code></td>
+<td>
+<p>A matrix made by <code>make_Ni</code> indicating the occurence. </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n</code></td>
+<td>
+<p>Number of individuals.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The function implements the estimator
+</p>
+<p style="text-align: center;"><code class="reqn">\hat{R}_K =  \sum_{j = 1}^K\sum_{i \in I_j} \int_0^T  g^{-I_j}_i(t)  dN_i(t),</code>
+</p>
+
+<p>where <code class="reqn">\hat{g}^{-I_j}_i(t) = \int_0^t Z_i(s) \hat{h}^{-I_j}_{X_i(s)}(t-s) ds,</code> and <code class="reqn">\hat{h}^{-I_j}</code> is estimated without information from all counting processes <code class="reqn">i</code> with <code class="reqn">i \in I_j</code>.
+This function estimates
+</p>
+<p style="text-align: center;"><code class="reqn">R =  \sum_{i = 1}^N \int_0^T \int_s^T Z_i(t)Z_i(s)\hat{h}_{X_i(s)}(t-s) h_{X_i(s)}(t-s) dt ds .</code>
+</p>
+
+<p>where <code class="reqn">\hat{h}</code> is the hqm estimator, <code class="reqn">Z</code> the exposure and <code class="reqn">X</code> the marker.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A matrix with <code class="reqn">\hat{g}^{-I_j}_i(t)</code> for all individuals <code>i</code> and time grid points <code>t</code>.
+</p>
+
+
+<h3>See Also</h3>
+
+ <p><code>b_selection</code> </p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">pbc2_id = to_id(pbc2)
+n = max(as.numeric(pbc2$id))
+b = 1.5
+I = 104
+h_xt_mat_list = prep_cv(pbc2, pbc2_id, 'serBilir', 'years', 'year', 'status2', n, I, b)
+
+
+size_s_grid &lt;- size_X_grid &lt;- 100
+s = pbc2$year
+X = pbc2$serBilir
+br_s = seq(0, max(s), max(s)/( size_s_grid-1))
+br_X = seq(min(X), max(X), (max(X)-min(X))/( size_X_grid-1))
+
+ss &lt;- pbc2_id$years
+delta &lt;- pbc2_id$status2
+
+X_lin = lin_interpolate(br_s, pbc2_id$id, pbc2$id, X, s)
+int_X &lt;- findInterval(X_lin, br_X)
+int_s = rep(1:length(br_s), n)
+
+Yi &lt;- make_Yi(pbc2, pbc2_id, X_lin, br_X, br_s,
+              size_s_grid, size_X_grid, int_s, int_X, 'years', n)
+Ni  &lt;- make_Ni(br_s, size_s_grid, ss, delta, n)
+
+R = R_K(h_xt_mat_list, int_X, size_X_grid, Yi, Ni, n)
+R
+</code></pre>
+
+
+</div>

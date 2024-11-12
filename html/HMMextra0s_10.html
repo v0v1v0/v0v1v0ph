@@ -1,0 +1,144 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>sim.hmm0norm2d</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Simulation of a Bivariate HMM with Extra Zeros
+</h2>
+
+<h3>Description</h3>
+
+<p>Simulates the observed process and the associated binary variable of a bivariate HMM with extra zeros.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">sim.hmm0norm2d(mu, sig, pie, gamma, delta, nsim = 1, mc.hist = NULL, seed = NULL)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>pie</code></td>
+<td>
+<p>is a vector of length <code class="reqn">m</code>, the <code class="reqn">j</code>th element of which is the probability of <code class="reqn">Z=1</code> when the process is in state <code class="reqn">j</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>gamma</code></td>
+<td>
+<p>is the transition probability matrix (<code class="reqn">m * m</code>) of the hidden Markov chain.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mu</code></td>
+<td>
+<p>is an <code class="reqn">m * 2</code> matrix, the <code class="reqn">j</code>th row of which is the mean of the bivariate (Gaussian) distribution of the observations in state <code class="reqn">j</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sig</code></td>
+<td>
+<p>is a <code class="reqn">2 * 2 * m</code> array. The matrix <code>sig[,,j]</code> is the variance-covariance matrix of the bivariate (Gaussian) distribution of the observations in state <code class="reqn">j</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>delta</code></td>
+<td>
+<p>is a vector of length <code class="reqn">m</code>, the initial distribution vector of the Markov chain.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nsim</code></td>
+<td>
+<p>is an integer, the number of observations to simulate.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mc.hist</code></td>
+<td>
+<p>is a vector containing the history of the hidden Markov chain. This is mainly used for forecasting. If we fit an HMM to the data, and obtained the Viterbi path for the data, we can let <code>mc.hist</code> equal to the Viterbi path and then forecast futrue steps by simulation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>seed</code></td>
+<td>
+<p>is the seed for simulation. Default <code>seed=NULL</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>is the simulated observed process.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>z</code></td>
+<td>
+<p>is the simulated binary data with the value 1 indicating that an event was observed and 0 otherwise.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mcy</code></td>
+<td>
+<p>is the simulated hidden Markov chain.</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>Ting Wang
+</p>
+
+
+<h3>References</h3>
+
+
+<p>Wang, T., Zhuang, J., Buckby, J., Obara, K. and Tsuruoka, H. (2018) Identifying the recurrence patterns of non-volcanic tremors using a 2D hidden Markov model with extra zeros. Journal of Geophysical Research, doi: <a href="https://doi.org/10.1029/2017JB015360">10.1029/2017JB015360</a>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Simulating a sequence of data without using any history.
+pie &lt;- c(0.002,0.2,0.4)
+gamma &lt;- matrix(c(0.99,0.007,0.003,
+                  0.02,0.97,0.01,
+                  0.04,0.01,0.95),byrow=TRUE, nrow=3)
+mu &lt;- matrix(c(35.03,137.01,
+               35.01,137.29,
+               35.15,137.39),byrow=TRUE,nrow=3)
+sig &lt;- array(NA,dim=c(2,2,3))
+sig[,,1] &lt;- matrix(c(0.005, -0.001,
+                   -0.001,0.01),byrow=TRUE,nrow=2)
+sig[,,2] &lt;- matrix(c(0.0007,-0.0002,
+                    -0.0002,0.0006),byrow=TRUE,nrow=2)
+sig[,,3] &lt;- matrix(c(0.002,0.0018,
+                     0.0018,0.003),byrow=TRUE,nrow=2)
+delta &lt;- c(1,0,0)
+y &lt;- sim.hmm0norm2d(mu,sig,pie,gamma,delta, nsim=5000)
+
+
+## Forecast future tremor occurrences and locations when tremor occurs.
+R &lt;- y$x
+Z &lt;- y$z
+HMMEST &lt;- hmm0norm2d(R, Z, pie, gamma, mu, sig, delta)
+Viterbi3 &lt;- Viterbi.hmm0norm2d(R,Z,HMMEST)
+y &lt;- sim.hmm0norm2d(mu,sig,pie,gamma,delta,nsim=2,mc.hist=Viterbi3$y)
+# This only forecasts two steps forward when we use nsim=2. 
+# One can increase nsim to get longer simulated forecasts.
+</code></pre>
+
+
+</div>

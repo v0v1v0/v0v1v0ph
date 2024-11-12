@@ -1,0 +1,160 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>BaumWelch</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Estimation Using Baum-Welch Algorithm</h2>
+
+<h3>Description</h3>
+
+<p>Estimates the parameters of a hidden Markov model. The Baum-Welch algorithm (Baum et al, 1970) referred to in the HMM literature is a version of the EM algorithm (Dempster et al, 1977). See Hartley (1958) for an earlier application of the EM methodology, though not referred to as such.</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">BaumWelch(object, control, ...)
+## S3 method for class 'dthmm'
+BaumWelch(object, control = bwcontrol(), ...)
+## S3 method for class 'mmglm0'
+BaumWelch(object, control = bwcontrol(), ...)
+## S3 method for class 'mmglm1'
+BaumWelch(object, control = bwcontrol(), ...)
+## S3 method for class 'mmglmlong1'
+BaumWelch(object, control = bwcontrol(), PSOCKcluster=NULL,
+          tmpfile=NULL, ...)
+## S3 method for class 'mmpp'
+BaumWelch(object, control = bwcontrol(), ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>object</code></td>
+<td>
+<p>an object of class <code>"dthmm"</code>, <code>"mmglm0"</code>, <code>"mmglm1"</code>, <code>"mmglmlong1"</code>, or <code>"mmpp"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>control</code></td>
+<td>
+<p>a list of control settings for the iterative process. These can be changed by using the function <code>bwcontrol</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>PSOCKcluster</code></td>
+<td>
+<p>see section below called “Parallel Processing”.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tmpfile</code></td>
+<td>
+<p>name of a file (.Rda) into which estimates are written at each 10th iteration. The model object is called <code>object</code>. If <code>NULL</code> (default), no file is created.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>other arguments.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The initial parameter values used by the EM algorithm are those that are contained within the input <code>object</code>.
+</p>
+<p>The code for the methods <code>"dthmm"</code>, <code>"mmglm0"</code>, <code>"mmglm1"</code>,<code>"mmglmlong1"</code> and <code>"mmpp"</code> can be viewed by appending <code>BaumWelch.dthmm</code>, <code>BaumWelch.mmglm0</code>, <code>BaumWelch.mmglm1</code>, <code>BaumWelch.mmglmlong1</code>  or <code>BaumWelch.mmpp</code>, respectively, to <code>HiddenMarkov:::</code>, on the <span style="font-family: Courier New, Courier; color: #666666;"><b>R</b></span> command line; e.g. <code>HiddenMarkov:::dthmm</code>. The three colons are needed because these method functions are not in the exported NAMESPACE.
+</p>
+
+
+<h3>Value</h3>
+
+<p>The output object (a <code>list</code>) with have the same class as the input, and will have the same components. The parameter values will be replaced by those estimated by this function. The object will also contain additional components. 
+</p>
+<p>An object of class <code>"dthmm"</code> will also contain
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>u</code></td>
+<td>
+<p>an <code class="reqn">n \times m</code> matrix containing estimates of the conditional expectations. See “Details” in <code>Estep</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>v</code></td>
+<td>
+<p>an <code class="reqn">n \times m \times m</code> array containing estimates of the conditional expectations. See “Details” in <code>Estep</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>LL</code></td>
+<td>
+<p>value of log-likelihood at the end.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>iter</code></td>
+<td>
+<p>number of iterations performed.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>diff</code></td>
+<td>
+<p>difference between final and previous log-likelihood.</p>
+</td>
+</tr>
+</table>
+<h3>Parallel Processing</h3>
+
+<p>In longitudinal models, the forward and backward equations need to be calculated for each individual subject. These can be done independently, the results being concatenated to be used in the E-step. If the argument <code>PSOCKcluster</code> is set, subjects are divided equally between each node in the cluster for the calculation of the forward and backward equations. This division is very basic, and assumes that all nodes run at a roughly comparable speed.
+</p>
+<p>If the communication between nodes is slow and the dataset is small, then the time taken to allocate the work to the various nodes may in fact take more time than simply using one processor to perform all of the calculations.
+</p>
+<p>The required steps in initiating parallel processing are as follows.
+</p>
+<pre>
+#   load the "parallel" package
+library(parallel)
+
+#   define the SNOW cluster object, e.g. a SOCK cluster
+#   where each node has the same R installation.
+cl &lt;- makePSOCKcluster(c("localhost", "horoeka.localdomain", 
+                         "horoeka.localdomain", "localhost"))
+
+#   A more general setup: Totara is Fedora, Rimu is Debian:
+#   Use 2 processors on Totara, 1 on Rimu:
+totara  &lt;- list(host="localhost",
+                rscript="/usr/lib/R/bin/Rscript",
+                snowlib="/usr/lib/R/library")
+rimu    &lt;- list(host="rimu.localdomain",
+                rscript="/usr/lib/R/bin/Rscript",
+                snowlib="/usr/local/lib/R/site-library")
+cl &lt;- makeCluster(list(totara, totara, rimu), type="SOCK")
+
+#   then define the required model object
+#   say the model object is called x
+BaumWelch(x, PSOCKcluster=cl)
+
+#   stop the R jobs on the slave machines
+stopCluster(cl)
+</pre>
+<p>Note that the communication method does not need to be <code>SOCKS</code>; see the <span class="pkg">parallel</span> package documentation, topic <code>makeCluster</code>, for other options. Further, if some nodes are on other machines, the firewalls may need to be tweaked. The master machine initiates the <span style="font-family: Courier New, Courier; color: #666666;"><b>R</b></span> jobs on the slave machines by communicating through port 22 (use of security keys are needed rather than passwords), and subsequent communications through port 10187. Again, these details can be tweaked in the options settings within the <span class="pkg">parallel</span> package.
+</p>
+
+
+<h3>References</h3>
+
+<p>Cited references are listed on the HiddenMarkov manual page.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>logLik</code>, <code>residuals</code>, <code>simulate</code>, <code>summary</code>, <code>neglogLik</code></p>
+
+
+</div>

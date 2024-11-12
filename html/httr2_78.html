@@ -1,0 +1,74 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>req_throttle</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Rate limit a request by automatically adding a delay</h2>
+
+<h3>Description</h3>
+
+<p>Use <code>req_throttle()</code> to ensure that repeated calls to <code>req_perform()</code> never
+exceed a specified rate.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">req_throttle(req, rate, realm = NULL)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>req</code></td>
+<td>
+<p>A httr2 request object.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rate</code></td>
+<td>
+<p>Maximum rate, i.e. maximum number of requests per second.
+Usually easiest expressed as a fraction,
+<code>number_of_requests / number_of_seconds</code>, e.g. 15 requests per minute
+is <code>15 / 60</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>realm</code></td>
+<td>
+<p>A string that uniquely identifies the throttle pool to use
+(throttling limits always apply <em>per pool</em>). If not supplied, defaults
+to the hostname of the request.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A modified HTTP request.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>req_retry()</code> for another way of handling rate-limited APIs.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Ensure we never send more than 30 requests a minute
+req &lt;- request(example_url()) |&gt;
+  req_throttle(rate = 30 / 60)
+
+resp &lt;- req_perform(req)
+throttle_status()
+resp &lt;- req_perform(req)
+throttle_status()
+</code></pre>
+
+
+</div>

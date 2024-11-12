@@ -1,0 +1,191 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>as.matrix.listOfNamedMatrices</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Convert a list of numeric matrices to a single matrix</h2>
+
+<h3>Description</h3>
+
+<p>Convert a list of numeric matrices to a single matrix.  This function is used
+to improve legibility of the printed object.  The
+<code>as.matrix.listOfNamedMatrices</code> display is easier to read when the rownames
+are very long, as in the example illustrated here.  Because the
+default print of the matrix repeats the rownames several times, with
+only a few columns of the data shown in each repetition, the actual
+matrix structure of the data values is obscured.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">## S3 method for class 'listOfNamedMatrices'
+as.matrix(x, abbreviate = TRUE, minlength = 4, ...)
+is.listOfNamedMatrices(x,  xName=deparse(substitute(x)))
+## S3 method for class 'listOfNamedMatrices'
+as.data.frame(x, ...)
+as.listOfNamedMatrices(x,  xName=deparse(substitute(x)), ...)
+## S3 method for class 'listOfNamedMatrices'
+x[...]
+## S3 method for class 'array'
+as.listOfNamedMatrices(x, xName=deparse(substitute(x)), ...)
+## S3 method for class 'list'
+as.listOfNamedMatrices(x, xName=deparse(substitute(x)), ...)
+## S3 method for class 'MatrixList'
+as.listOfNamedMatrices(x, xName=deparse(substitute(x)), ...)
+## S3 method for class 'listOfNamedMatrices'
+print(x, ...)
+
+as.MatrixList(x)
+## S3 method for class 'array'
+as.MatrixList(x)
+## S3 method for class 'MatrixList'
+print(x, ...)
+
+as.likertDataFrame(x, xName=deparse(substitute(x)))
+## S3 method for class 'listOfNamedMatrices'
+as.likertDataFrame(x, xName=deparse(substitute(x)))
+## S3 method for class 'array'
+as.likertDataFrame(x, xName=deparse(substitute(x)))
+
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>Named list of numeric matrices.  All matrices in the list
+should have the same number of columns and the same column names.
+The names of the list items will normally be long; NA, as
+introduced by the <code>addNA</code>, is a valid name.  The
+row names will normally be long.  The number of rows and their names
+will normally differ across the matrices.  Each named item in the
+list may be a vector, matrix, array, data.frame, two-dimensional
+table, two-dimensional ftable, or two-dimensional structable.  For
+the <code>as.MatrixList</code> methods, an array.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Other arguments.  Not used.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>abbreviate</code></td>
+<td>
+
+<p>Logical.  If <code>TRUE</code>, then use the
+<code>abbreviate</code>
+function on the item names and row names.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>minlength</code></td>
+<td>
+<p>the minimum length of the abbreviations.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>xName</code></td>
+<td>
+<p>Name of the argument in its original environment.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>The result of <code>as.listOfNamedMatrices</code> is a list with
+<code>class=c("listOfNamedMatrices", "list")</code>.
+</p>
+<p>The result of <code>as.matrix.listOfNamedMatrices</code> is an <code>rbind</code> of
+the individual matrices in the argument list <code>x</code>.  The rownames of
+the result matrix are constructed by pasting the abbreviation of the
+list item names with the abbreviation of the individual matrix rownames.
+The original names are retained as the <code>"Subtables.Rows"</code>
+attribute.
+</p>
+<p>The result of <code>is.listOfNamedMatrices</code> is logical value.
+</p>
+<p><code>print.listOfNamedMatrices</code> prints
+<code>as.matrix.listOfNamedMatrices</code> of its argument and returns the
+original argument.
+</p>
+<p><code>as.data.frame.listOfNamedMatrices(x, ...)</code> is an unfortunate
+kluge.  The result is the original <code>x</code> that has NOT been
+transformed to a <code>data.frame</code>.  A <code>warning</code> message is
+generated that states that the conversion has not taken place.  This
+kluge is needed to use <code>"listOfNamedMatrices"</code> objects with the
+<code>Commander</code> package because <code>Rcmdr</code> follows
+its calls to the R <code>data</code> function with an attempt,
+futile in this case, to force the resulting object to be a <code>data.frame</code>.
+</p>
+<p>The <code>as.MatrixList</code> methods construct a list of matrices from an
+array.  Each matrix has the first two dimensions of the array.  The
+result list is itself an array defined by all but the first two
+dimensions of the argument array.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p> Richard M. Heiberger &lt;rmh@temple.edu&gt; </p>
+
+
+<h3>See Also</h3>
+
+<p><code>likert</code></p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(ProfChal)
+
+tmp &lt;- data.matrix(ProfChal[,1:5])
+rownames(tmp) &lt;- ProfChal$Question
+ProfChal.list &lt;- split.data.frame(tmp, ProfChal$Subtable)
+
+## Original list of matrices is difficult to read because
+## it is displayed on too many lines.
+ProfChal.list[2:3]
+
+## Single matrix with long list item names and long row names
+## of argument list retained as an attribute.
+as.listOfNamedMatrices(ProfChal.list[2:3], minlength=6)
+
+## Not run: 
+## NA as a dimname value
+tmp &lt;- structure(c(0, 0, 0, 6293, 18200, 2122,
+                   0, 0, 0, 2462, 7015, 5589, 
+                   6908, 5337, 842, 0, 0, 0),
+                 .Dim = c(3L, 2L, 3L),
+                 .Dimnames = list(c("A", "B", "C"),
+                                  c("D", "E"),
+                                  c("F", "G", NA)))
+tmp
+as.MatrixList(tmp)
+
+## End(Not run)
+
+## Not run: 
+sapply(as.MatrixList(tmp3), as.likert, simplify=FALSE)  ## odd number of levels.
+
+data(NZScienceTeaching)
+likert(Question ~ ., NZScienceTeaching)
+likert(Question ~ . | Subtable, data=NZScienceTeaching)
+likert(Question ~ . | Subtable, data=NZScienceTeaching,
+       layout=c(1,2), scales=list(y=list(relation="free")))
+
+
+
+## End(Not run)
+</code></pre>
+
+
+</div>

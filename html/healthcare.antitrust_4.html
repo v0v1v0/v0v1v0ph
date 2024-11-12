@@ -1,0 +1,161 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>div_calc</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Diversion Ratio Calculator</h2>
+
+<h3>Description</h3>
+
+<p>Calculates provider-level diversion ratios, once cells have been
+defined.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">div_calc(
+  data,
+  cell = "cell",
+  provider_id = "provider_id",
+  provider = "provider",
+  sys_id = "sys_id",
+  focal_sys_id = NULL,
+  party_ind = "party_ind",
+  count = "count",
+  dropDegenerateCell = TRUE,
+  hosp_id = NA,
+  hospital = NA
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>Dataset of patient choices, with required variables:
+<code>cell</code>, <code>provider_id</code>, <code>hospital</code>, <code>sys_id</code>,
+<code>party_ind</code>, <code>count</code>. Use other function arguments to
+indicate alternative variable names to the default names.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cell</code></td>
+<td>
+<p>Name of variable specifying cell to which each observation
+has been allocated. Default variable name is <code>cell</code>. Can be
+created by <code>cell_defn</code> function.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>provider_id</code></td>
+<td>
+<p>Name of variable specifying (numeric) provider
+identifier. Default variable name is <code>provider_id</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>provider</code></td>
+<td>
+<p>Name of variable specifying (string) provider name.
+Default variable name is <code>provider</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sys_id</code></td>
+<td>
+<p>Name of variable specifying (numeric) system identifier.
+Default variable name is <code>sys_id</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>focal_sys_id</code></td>
+<td>
+<p>numeric; list of sys_id's specifying systems of interest
+for which diversions will be calculated from. For a merger, this will
+typically be the system identifies of the merging parties.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>party_ind</code></td>
+<td>
+<p>deprecated; use focal_sys_id instead.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>count</code></td>
+<td>
+<p>Name of variable indicating the number of admissions
+represented by the observation. Set = 1 for every row if each
+observation represents one admission.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dropDegenerateCell</code></td>
+<td>
+<p>logical; specifies how to treat cells with a
+100 percent within-system share. If TRUE, observations in degenerate, 100
+percent share cells will be ignored in the diversion ratio calculation.
+If FALSE, any such individuals will be assigned to the outside option,
+but still included in the denominator, so that the inside-option diversion
+will total less than 100  percent.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>hosp_id</code></td>
+<td>
+<p>deprecated; use provider_id instead.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>hospital</code></td>
+<td>
+<p>deprecated; use provider instead.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>For system-to-system diversions, set <code>provider_id</code> and
+<code>provider</code> equal to corresponding system-level identifiers.
+Diversions then reflect that patients are not allowed to divert to
+within-system alternative providers
+</p>
+<p>For more details see the example vignette by typing:
+<code>vignette("semipar_example", package = "healthcare.antitrust")</code>
+</p>
+
+
+<h3>Value</h3>
+
+<p>A list with two components. The first component, <code>provider_level</code>,
+is a matrix giving provider-level diversions from party providers to
+all other providers The second object, <code>sys_level</code>, is a matrix that
+aggregates party providers to systems, thus giving diversions from party
+systems to all other providers
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(discharge_data, package = "healthcare.antitrust")
+
+list1 &lt;- c("drg","age","zip5")
+layers &lt;- list(list1)
+th &lt;- 15
+discharge_data$count &lt;- 1
+
+outList &lt;- cell_defn(discharge_data,th,layers)
+D0 &lt;- outList$assigned
+
+out &lt;- div_calc(D0, provider_id = "hosp_id", provider = "hospital",
+          focal_sys_id = c(1,5))
+
+</code></pre>
+
+
+</div>

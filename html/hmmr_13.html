@@ -1,0 +1,146 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hmm</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Fit hidden Markov and latent class models.
+</h2>
+
+<h3>Description</h3>
+
+<p><code>hmm</code> fits a hidden Markov model to its first argument.  
+<code>lca</code> fits a latent class model or mixture model to its first
+argument.  
+</p>
+<p>Both functions provide an easy user-interface to the functions
+provided in <span class="pkg">depmixS4</span> by automagically setting some argument values.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">
+hmm(data, nstates, fit = TRUE, ntimes = NULL, family = NULL, verbose=FALSE, ...)
+lca(data, nclasses, fit = TRUE, family = NULL, verbose=FALSE, ...)
+
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>(columns of) a <code>data.frame</code> or <code>matrix</code> like
+object.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nstates</code></td>
+<td>
+<p>the required number of states of the hidden Markov
+model.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nclasses</code></td>
+<td>
+<p>the required number of classes of the mixture or latent
+class model.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fit</code></td>
+<td>
+<p><code>logical</code> indicating whether the model needs to be
+fitted or returned unfitted; the latter is necessary if one wants to
+set constraints on the parameters, which then requires using the
+<code>fit</code> function from <span class="pkg">depmixS4</span>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ntimes</code></td>
+<td>
+<p>the lengths of time series in argument <code>data</code>; it
+defaults to assuming a single time series of length <code>nrow(data)</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>family</code></td>
+<td>
+<p>(a list of) name(s) of the distribution(s) to be used in
+fitting; if provided, it should have length of the number of the number
+of columns in <code>data</code>, see Details.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p><code>logical</code>; when <code>TRUE</code> iteration information
+of the fitting process is printed.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>not currently used.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The distributions used in fitting models are the <code>multinomial</code> for
+<code>factor</code> data columns and <code>gaussian</code> for <code>numeric</code> data
+columns.  Data columns are treated as conditionally independent variables.
+Use <code>makeDepmix</code> in the <span class="pkg">depmixS4</span> package to specify multivariate
+distributions.
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>hmm</code> returns a <code>depmix</code> or <code>depmix.fitted</code> object depending
+on the value of the <code>fit</code> argument; <code>lca</code> similarly returns
+either a <code>mix</code> or <code>mix.fitted</code> object.
+</p>
+<p>All these can be <code>print</code>'ed and <code>summary</code>'zed.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Ingmar Visser
+</p>
+
+
+<h3>References</h3>
+
+<p>Visser, I., &amp; Speekenbrink, M. (2010).  depmixS4: an R-package for hidden
+Markov models.  Journal of Statistical Software, 36(7), 1-21.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+data(conservation)
+
+set.seed(1)
+m2 &lt;- lca(conservation$"r1", nclasses=2)
+m2
+summary(m2)
+
+data(speed1)
+
+set.seed(1)
+hm2 &lt;- hmm(speed1$"RT", nstates=2)
+hm2
+summary(hm2)
+
+</code></pre>
+
+
+</div>

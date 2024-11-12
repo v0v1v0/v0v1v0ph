@@ -1,0 +1,105 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>h5Read</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Read data from an existing HDF5 link</h2>
+
+<h3>Description</h3>
+
+<p>Function to read data from an existing HDF5 group.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">h5Read(x, name = NULL, ...)
+
+## S3 method for class 'H5Group'
+h5Read(x, name = NULL, transpose = FALSE, toS4.func = NULL, ...)
+
+## S3 method for class 'H5File'
+h5Read(x, name = NULL, transpose = FALSE, toS4.func = NULL, ...)
+
+## S3 method for class 'character'
+h5Read(x, name = NULL, transpose = FALSE, toS4.func = NULL, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>An <code>H5File</code>, <code>H5Group</code> or a 
+path name of HDF5 file.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>name</code></td>
+<td>
+<p>Name of the HDF5 link to be read.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Arguments passed to <code>h5ReadDataset</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>transpose</code></td>
+<td>
+<p>Whether or not to transpose the read matrix. Only works for 
+a 2-dimension array-like data.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>toS4.func</code></td>
+<td>
+<p>A function to convert the read R list into an S4 object.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>The load R object. Currently support <code>vector</code>, <code>matrix</code>, 
+<code>data.frame</code>, <code>list</code> and sparse matrix (<code>dgCMatrix</code> and 
+<code>dgRMatrix</code>).
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">file &lt;- system.file("extdata", "pbmc_small.h5ad", package = "hdf5r.Extra")
+
+# Read a matrix
+x &lt;- h5Read(file, name = "X")
+x &lt;- h5Read(file, name = "X", transpose = TRUE)
+x &lt;- h5Read(file, name = "X", idx_list = list(1:10, 1:20))
+x &lt;- h5Read(
+  file, 
+  name = "X", 
+  idx_list = list(1:10, 1:20), 
+  transpose = TRUE
+)
+
+# Read a dgCMatrix
+x &lt;- h5Read(file, name = "raw/X")
+x &lt;- h5Read(file, name = "raw/X", transpose = TRUE)
+
+# Read a data.frame
+x &lt;- h5Read(file, name = "obs")
+x &lt;- h5Read(file, name = "raw/var") # Read a data.frame with empty column
+
+# Read a list
+x &lt;- h5Read(file)
+x &lt;- h5Read(file, "raw")
+x &lt;- h5Read(file, "obsm")
+
+</code></pre>
+
+
+</div>

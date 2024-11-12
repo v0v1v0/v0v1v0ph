@@ -1,0 +1,109 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>rQPVar</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Realized quad-power variation of intraday returns</h2>
+
+<h3>Description</h3>
+
+<p>Calculate the realized quad-power variation, defined in Andersen et al. (2012).
+</p>
+<p>Assume there are <code class="reqn">N</code> equispaced returns <code class="reqn">r_{t,i}</code> in period <code class="reqn">t</code>, <code class="reqn">i=1, \ldots,N</code>. Then, the rQPVar is given by
+</p>
+<p style="text-align: center;"><code class="reqn">
+   \mbox{rQPVar}_{t}=N*\frac{N}{N-3} \left(\frac{\pi^2}{4} \right)^{-4} \mbox({|r_{t,i}|} {|r_{t,i-1}|} {|r_{t,i-2}|} {|r_{t,i-3}|})
+ </code>
+</p>
+
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">rQPVar(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>rData</code></td>
+<td>
+<p>an <code>xts</code> or <code>data.table</code> object containing returns or prices, possibly for multiple assets over multiple days</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alignBy</code></td>
+<td>
+<p>character, indicating the time scale in which <code>alignPeriod</code> is expressed. 
+Possible values are: <code>"ticks"</code>, <code>"secs"</code>, <code>"seconds"</code>, <code>"mins"</code>, <code>"minutes"</code>, <code>"hours"</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alignPeriod</code></td>
+<td>
+<p>positive numeric, indicating the number of periods to aggregate over. For example, to aggregate
+based on a 5-minute frequency, set <code>alignPeriod = 5</code> and <code>alignBy = "minutes"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>makeReturns</code></td>
+<td>
+<p>boolean, should be <code>TRUE</code> when <code>rData</code> contains prices instead of returns. <code>FALSE</code> by default.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>used internally, do not change.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+
+<ul>
+<li>
+<p> In case the input is an <code>xts</code> object with data from one day, a numeric of the same length as the number of assets.
+</p>
+</li>
+<li>
+<p> If the input data spans multiple days and is in <code>xts</code> format, an <code>xts</code> will be returned.
+</p>
+</li>
+<li>
+<p> If the input data is a <code>data.table</code> object, the function returns a <code>data.table</code> with the same column names as the input data, containing the date and the realized measures.
+</p>
+</li>
+</ul>
+<h3>Author(s)</h3>
+
+<p>Giang Nguyen, Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
+</p>
+
+
+<h3>References</h3>
+
+<p>Andersen, T. G., Dobrev, D., and Schaumburg, E. (2012). Jump-robust volatility estimation using nearest neighbor truncation. <em>Journal of Econometrics</em>, 169, 75-93.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>IVar</code> for a list of implemented estimators of the integrated variance.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+qpv &lt;- rQPVar(rData= sampleTData[, list(DT, PRICE)], alignBy= "minutes",
+              alignPeriod =5, makeReturns= TRUE)
+qpv
+
+</code></pre>
+
+
+</div>

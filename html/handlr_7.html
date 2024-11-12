@@ -1,0 +1,135 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>cff_writer</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Citation File Format (cff) writer</h2>
+
+<h3>Description</h3>
+
+<p>Citation File Format (cff) writer
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">cff_writer(z, path = NULL)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>z</code></td>
+<td>
+<p>an object of class <code>handl</code>; see handl for more</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>path</code></td>
+<td>
+<p>a file path or connection; default: <code>stdout()</code></p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>uses <code>yaml::write_yaml</code> to write to yaml format that
+CFF uses
+</p>
+
+
+<h3>Value</h3>
+
+<p>text if one cff citation or list of many
+</p>
+
+
+<h3>Converting to CFF from other formats</h3>
+
+<p>CFF has required fields that can't be missing. This means that
+converting from other citation types to CFF will likely require
+adding the required CFF fields manually. Adding fields to a
+<code>handl</code> object is easy: it's really just an R list so add
+named elements to it. The required CFF fields are:
+</p>
+
+<ul>
+<li>
+<p> cff-version: add <code>cff_version</code>
+</p>
+</li>
+<li>
+<p> message: add <code>message</code>
+</p>
+</li>
+<li>
+<p> version: add <code>software_version</code>
+</p>
+</li>
+<li>
+<p> title: add <code>title</code>
+</p>
+</li>
+<li>
+<p> authors: add <code>author</code>
+</p>
+</li>
+<li>
+<p> date-released: add <code>date_published</code>
+</p>
+</li>
+</ul>
+<h3>References</h3>
+
+<p>CFF format:
+https://github.com/citation-file-format/citation-file-format
+</p>
+
+
+<h3>See Also</h3>
+
+<p>Other writers: 
+<code>bibtex_writer()</code>,
+<code>citeproc_writer()</code>,
+<code>codemeta_writer()</code>,
+<code>rdf_xml_writer()</code>,
+<code>ris_writer()</code>,
+<code>schema_org_writer()</code>
+</p>
+<p>Other cff: 
+<code>cff_reader()</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">(z &lt;- system.file('extdata/citation.cff', package = "handlr"))
+res &lt;- cff_reader(x = z)
+res
+unclass(res)
+cff_writer(res)
+cat(cff_writer(res))
+f &lt;- tempfile()
+cff_writer(res, f)
+readLines(f)
+unlink(f)
+
+# convert from a different citation format
+## see "Converting to CFF from other formats" above
+z &lt;- system.file('extdata/citeproc.json', package = "handlr")
+w &lt;- citeproc_reader(x = z)
+# cff_writer(w) # fails unless we add required fields
+w$cff_version &lt;- "1.1.0"
+w$message &lt;- "Please cite the following works when using this software."
+w$software_version &lt;- "2.5"
+w$title &lt;- "A cool library"
+w$date_published &lt;- "2017-12-18"
+cff_writer(w)
+cat(cff_writer(w))
+</code></pre>
+
+
+</div>

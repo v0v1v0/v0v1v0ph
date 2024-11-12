@@ -1,0 +1,86 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hmmvbFindModes</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Find density modes with HMM-VB</h2>
+
+<h3>Description</h3>
+
+<p>This function finds the density modes with HMM-VB. First, for each data point it finds an optimal state sequence
+using Viterbi algorithm. Next, it uses Modal Baum-Welch algorithm (MBW) to find the modes
+of distinct Viterbi state sequences. Data points associated the same modes form clusters.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hmmvbFindModes(data, model = NULL, nthread = 1, bicObj = NULL)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>A numeric vector, matrix, or data frame of observations.
+Categorical values are not allowed. If a matrix or data frame, rows 
+correspond to observations and columns correspond to variables.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>model</code></td>
+<td>
+<p>An object of class 'HMMVB' that contains trained HMM-VB obtained 
+by the call to function <code>hmmvbTrain</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nthread</code></td>
+<td>
+<p>An integer specifying the number of threads used in clustering.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>bicObj</code></td>
+<td>
+<p>An object of class 'HMMVBBIC' which stores results of model selection. 
+If provided, argument <code>model</code> is ignored.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>An object of class 'HMMVBclust'.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>HMMVB-class</code>, <code>HMMVBclust-class</code>, <code>hmmvbTrain</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># find modes using trained HMM-VB
+Vb &lt;- vb(1, dim=4, numst=2)
+set.seed(12345)
+hmmvb &lt;- hmmvbTrain(iris[,1:4], VbStructure=Vb)
+modes &lt;- hmmvbFindModes(iris[,1:4], model=hmmvb)
+show(modes)
+
+
+# find modes using HMMVBBIC object obtained in model selection
+Vb &lt;- vb(1, dim=4, numst=1)
+set.seed(12345)
+modelBIC &lt;- hmmvbBIC(iris[,1:4], VbStructure=Vb)
+modes &lt;- hmmvbClust(iris[,1:4], bicObj=modelBIC)
+show(modes)
+</code></pre>
+
+
+</div>

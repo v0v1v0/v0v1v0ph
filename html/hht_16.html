@@ -1,0 +1,128 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>PlotIMFs</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Display IMFs</h2>
+
+<h3>Description</h3>
+
+<p>This function displays IMFs generated using <code>Sig2IMF</code>, <code>EEMDCompile.</code> or <code>EEMDResift</code></p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">PlotIMFs(sig, time.span = NULL, imf.list = NULL, original.signal = TRUE, 
+    residue = TRUE, fit.line = FALSE, lwd = 1, cex = 1, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>sig</code></td>
+<td>
+<p>Data structure returned by <code>Sig2IMF</code>, <code>EEMDCompile</code>, or <code>EEMDResift</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>time.span</code></td>
+<td>
+<p>Time span over which to plot IMFs.  <code>NULL</code> will draw the entire signal.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>imf.list</code></td>
+<td>
+<p>Which IMFs to plot, <code>NULL</code> plots all of them.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>original.signal</code></td>
+<td>
+<p>whether or not to plot the original signal.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>residue</code></td>
+<td>
+<p>whether to plot the residue of the EMD method.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fit.line</code></td>
+<td>
+<p>whether to add a red line to the original signal trace showing how much of the original signal is contained in the selected IMFs and/or residual.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lwd</code></td>
+<td>
+<p>Line weight.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cex</code></td>
+<td>
+<p>Text size.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Pass additional graphics parameters to IMF plotter</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>This function plots the IMF decomposition of a signal.
+It can show the original signal and also the residue left over when the IMFs are removed from the signal.
+The plotter can use data from both EMD and EEMD runs.
+When it plots EEMD data, it shows the averaged IMFs from the trials processed by <code>EEMDCompile</code>.
+</p>
+
+
+<h3>Note</h3>
+
+<p>It is very important to inspect the IMF set prior to rendering Hilbert spectrograms.
+Oftentimes, problems with the EMD are obvious when the IMFs are plotted.
+The <code>fit.line</code> option can help with this.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Daniel Bowman <a href="mailto:danny.c.bowman@gmail.com">danny.c.bowman@gmail.com</a></p>
+
+
+<h3>See Also</h3>
+
+<p><code>HHGramImage</code></p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(PortFosterEvent)
+
+#Run EMD
+emd.result &lt;- Sig2IMF(sig, tt, sm = "polynomial")
+
+#Plot the first 4 IMFs of the EEMD of a signal.
+time.span &lt;- c(5, 10)
+imf.list &lt;- 1:4
+original.signal &lt;- TRUE
+residue &lt;- TRUE
+
+PlotIMFs(emd.result, time.span, imf.list, original.signal, residue)
+
+#Check how much contribution IMFs 2 and 3 make to the complete signal
+imf.list &lt;- c(2, 3)
+fit.line &lt;- TRUE
+PlotIMFs(emd.result, time.span, imf.list, original.signal, residue, fit.line)
+</code></pre>
+
+
+</div>

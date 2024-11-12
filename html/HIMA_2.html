@@ -1,0 +1,179 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>dblassoHIMA</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>This is the function for high-dimensional mediation analysis using de-biased lasso
+HIMA with de-biased lasso</h2>
+
+<h3>Description</h3>
+
+<p><code>dblassoHIMA</code> is used to estimate and test high-dimensional mediation effects using de-biased lasso penalty.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">dblassoHIMA(
+  X,
+  Y,
+  M,
+  COV = NULL,
+  Y.family = c("gaussian", "binomial"),
+  topN = NULL,
+  scale = TRUE,
+  FDRcut = 0.05,
+  verbose = FALSE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>X</code></td>
+<td>
+<p>a vector of exposure.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Y</code></td>
+<td>
+<p>a vector of outcome. Can be either continuous or binary (0-1).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>M</code></td>
+<td>
+<p>a <code>data.frame</code> or <code>matrix</code> of high-dimensional mediators. Rows represent samples, columns represent variables.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>COV</code></td>
+<td>
+<p>a <code>data.frame</code> or <code>matrix</code> of covariates dataset for testing the association M ~ X and Y ~ M.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Y.family</code></td>
+<td>
+<p>either 'gaussian' (default) or 'binomial', depending on the data type of outcome (<code>Y</code>). This parameter is passed 
+to function <code>lasso.proj</code> in R package <code>hdi</code> for de-biased lasso penalization.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>topN</code></td>
+<td>
+<p>an integer specifying the number of top markers from sure independent screening. 
+Default = <code>NULL</code>. If <code>NULL</code>, <code>topN</code> will be either <code>ceiling(n/log(n))</code> if 
+<code>Y.family = 'gaussian'</code>, or <code>ceiling(n/(2*log(n)))</code> if <code>Y.family = 'binomial'</code>, 
+where <code>n</code> is the sample size. If the sample size is greater than topN (pre-specified or calculated), all 
+mediators will be included in the test (i.e. low-dimensional scenario).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>scale</code></td>
+<td>
+<p>logical. Should the function scale the data? Default = <code>TRUE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>FDRcut</code></td>
+<td>
+<p>HDMT pointwise FDR cutoff applied to select significant mediators. Default = <code>0.05</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p>logical. Should the function be verbose? Default = <code>FALSE</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A data.frame containing mediation testing results of significant mediators (FDR &lt;<code>FDRcut</code>). 
+</p>
+
+<dl>
+<dt>Index: </dt>
+<dd>
+<p>mediation name of selected significant mediator.</p>
+</dd>
+<dt>alpha_hat: </dt>
+<dd>
+<p>coefficient estimates of exposure (X) –&gt; mediators (M) (adjusted for covariates).</p>
+</dd>
+<dt>alpha_se: </dt>
+<dd>
+<p>standard error for alpha.</p>
+</dd>
+<dt>beta_hat: </dt>
+<dd>
+<p>coefficient estimates of mediators (M) –&gt; outcome (Y) (adjusted for covariates and exposure).</p>
+</dd>
+<dt>beta_se: </dt>
+<dd>
+<p>standard error for beta.</p>
+</dd>
+<dt>IDE: </dt>
+<dd>
+<p>mediation (indirect) effect, i.e., alpha*beta.</p>
+</dd>
+<dt>rimp: </dt>
+<dd>
+<p>relative importance of the mediator.</p>
+</dd>
+<dt>pmax: </dt>
+<dd>
+<p>joint raw p-value of selected significant mediator (based on HDMT pointwise FDR method).</p>
+</dd>
+</dl>
+<h3>References</h3>
+
+<p>Perera C, Zhang H, Zheng Y, Hou L, Qu A, Zheng C, Xie K, Liu L. 
+HIMA2: high-dimensional mediation analysis and its application in epigenome-wide DNA methylation data. 
+BMC Bioinformatics. 2022. DOI: 10.1186/s12859-022-04748-1. PMID: 35879655; PMCID: PMC9310002
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+# Note: In the following examples, M1, M2, and M3 are true mediators.
+data(himaDat)
+
+# When Y is continuous and normally distributed
+# Example 1 (continuous outcome): 
+head(himaDat$Example1$PhenoData)
+
+dblassohima.fit &lt;- dblassoHIMA(X = himaDat$Example1$PhenoData$Treatment, 
+                               Y = himaDat$Example1$PhenoData$Outcome, 
+                               M = himaDat$Example1$Mediator,
+                               COV = himaDat$Example1$PhenoData[, c("Sex", "Age")],
+                               Y.family = 'gaussian',
+                               scale = FALSE, # Disabled only for simulation data
+                               verbose = TRUE) 
+dblassohima.fit
+
+# When Y is binary (should specify Y.family)
+# Example 2 (binary outcome): 
+head(himaDat$Example2$PhenoData)
+
+dblassohima.logistic.fit &lt;- dblassoHIMA(X = himaDat$Example2$PhenoData$Treatment,
+                                        Y = himaDat$Example2$PhenoData$Disease,
+                                        M = himaDat$Example2$Mediator,
+                                        COV = himaDat$Example2$PhenoData[, c("Sex", "Age")],
+                                        Y.family = 'binomial',
+                                        scale = FALSE, # Disabled only for simulation data
+                                        verbose = TRUE)
+dblassohima.logistic.fit
+
+## End(Not run)
+
+</code></pre>
+
+
+</div>

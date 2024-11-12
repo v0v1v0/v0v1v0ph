@@ -1,0 +1,98 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>diagplots</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Diagnostic plots for <code>hmclearn</code>
+</h2>
+
+<h3>Description</h3>
+
+<p>Plots histograms of the posterior estimates.  Optionally, displays the 'actual'
+values given a simulated dataset.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">diagplots(
+  object,
+  burnin = NULL,
+  plotfun = 2,
+  comparison.theta = NULL,
+  cols = NULL,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>object</code></td>
+<td>
+<p>an object of class <code>hmclearn</code>, usually a result of a call to <code>mh</code> or <code>hmc</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>burnin</code></td>
+<td>
+<p>optional numeric parameter for the number of initial MCMC samples to omit from the summary</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>plotfun</code></td>
+<td>
+<p>integer 1 or 2 indicating which plots to display.  1 shows trace plots.  2 shows a histogram</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>comparison.theta</code></td>
+<td>
+<p>optional numeric vector of true parameter values</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cols</code></td>
+<td>
+<p>optional integer index indicating which parameters to display</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>currently unused</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>Returns a customized <code>ggplot</code> object
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Linear regression example
+set.seed(522)
+X &lt;- cbind(1, matrix(rnorm(300), ncol=3))
+betavals &lt;- c(0.5, -1, 2, -3)
+y &lt;- X%*%betavals + rnorm(100, sd=.2)
+
+f &lt;- hmc(N = 1000,
+          theta.init = c(rep(0, 4), 1),
+          epsilon = 0.01,
+          L = 10,
+          logPOSTERIOR = linear_posterior,
+          glogPOSTERIOR = g_linear_posterior,
+          varnames = c(paste0("beta", 0:3), "log_sigma_sq"),
+          param=list(y=y, X=X), parallel=FALSE, chains=1)
+
+diagplots(f, burnin=300, comparison.theta=c(betavals, 2*log(.2)))
+
+</code></pre>
+
+
+</div>

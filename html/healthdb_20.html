@@ -1,0 +1,166 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>restrict_date</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Remove or flag groups failed to meet conditions based on dates</h2>
+
+<h3>Description</h3>
+
+<p>For each client or group, interpret if they have n records that are at least certain days apart AND within a specified time span. When identifying events/diseases from administrative data, definitions often require, e.g., n diagnoses that are at least some days apart within some years. This function is intended for such use and optimized to avoid looping through all n-size combinations of dates per client.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">restrict_date(
+  data,
+  clnt_id,
+  date_var,
+  n,
+  apart = NULL,
+  within = NULL,
+  uid = NULL,
+  mode = c("flag", "filter"),
+  flag_at = c("left", "right"),
+  dup.rm = TRUE,
+  force_collect = FALSE,
+  verbose = getOption("healthdb.verbose"),
+  check_missing = FALSE,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>Data frames or remote tables (e.g., from <code>dbplyr::tbl_sql()</code>)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>clnt_id</code></td>
+<td>
+<p>Grouping variable (quoted/unquoted).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>date_var</code></td>
+<td>
+<p>Variable name (quoted/unquoted) for the dates to be interpreted.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n</code></td>
+<td>
+<p>An integer for the size of a draw.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>apart</code></td>
+<td>
+<p>An integer specifying the minimum gap (in days) between adjacent dates in a draw.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>within</code></td>
+<td>
+<p>An integer specifying the maximum time span (in days) of a draw.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>uid</code></td>
+<td>
+<p>Variable name for a unique row identifier. It is necessary for SQL to produce consistent result based on sorting.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mode</code></td>
+<td>
+<p>Either:
+</p>
+
+<ul>
+<li>
+<p> "flag" - add a new column 'flag_restrict_date' indicating if the condition was met (flag = 1 if the time period starting or ending at the current record satisfied the apart-within condition),
+</p>
+</li>
+<li>
+<p> or "filter" - remove clients without any qualified record from the data. Default is "flag".
+</p>
+</li>
+</ul>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>flag_at</code></td>
+<td>
+<p>Character, define if the flag should be placed at the start ("left") or end ("right") of a time period that contains n qualified records. Defaults to "left". Note that this would impact the first and last qualified/diagnosed dates of a client, e.g., using "right" will have the first flag not at the earliest but the date which the client became qualified. For example, if the condition was 2 records within a year, for <code>c("2023-01-01", "2023-04-01", "2024-05-01")</code>, flag will be <code>c(0, 1, 0)</code> for "right" while <code>c(1,0,0)</code> for "left".</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dup.rm</code></td>
+<td>
+<p>Logical for whether multiple records on the same date should be count as one in calculation. Only applicable when <code>within</code> is supplied without <code>apart</code>; duplicated dates have no impact when <code>apart</code> is present as the n dates must be distinct if they were apart. Default is TRUE.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>force_collect</code></td>
+<td>
+<p>A logical for whether force downloading remote table if <code>apart</code> is not NULL. For remote table only, because <code>apart</code> is implemented for local data frame only. Downloading data could be slow, so the user has to opt in; default FALSE will stop with error.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p>A logical for whether to explain the query and report how many groups were removed. Default is fetching from options. Use <code>options(healthdb.verbose = FALSE)</code> to suppress once and for all. Reporting is not for remote tables as the query is not executed immediately, thus no result is available for summary without adding an extra run (may be slow) of the query.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>check_missing</code></td>
+<td>
+<p>A logical for whether to check and remove missing entries in <code>date_var</code> before applying the conditions. Default is FALSE for faster run time.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Additional argument passing to <code>data.table::as.IDate()</code> for date conversion.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A subset of input data satisfied the dates requirement, or raw input data with an new flag column.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>if_date()</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">sample_size &lt;- 30
+df &lt;- data.frame(
+  clnt_id = sample(1:sample_size, sample_size, replace = TRUE),
+  service_dt = sample(seq(as.Date("2020-01-01"), as.Date("2020-01-31"), by = 1),
+    size = sample_size, replace = TRUE
+  ),
+  diagx = sample(letters, size = sample_size, replace = TRUE),
+  diagx_1 = sample(c(NA, letters), size = sample_size, replace = TRUE),
+  diagx_2 = sample(c(NA, letters), size = sample_size, replace = TRUE)
+)
+
+# Keep clients with 2 records that were 1 week apart within 1 month
+restrict_date(df, clnt_id, service_dt, n = 2, apart = 7, within = 30)
+</code></pre>
+
+
+</div>

@@ -1,0 +1,206 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>HWChisq</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Chi square tests for Hardy Weinberg equilibrium</h2>
+
+<h3>Description</h3>
+
+<p><code>HWChisq</code> performs the chi-square test for Hardy-Weinberg
+equilibrium both for autosomal and X-chromosomal markers; it can dealt both with bi-allelic and multi-allelic variants.  
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">HWChisq(X, cc = 0.5, verbose = TRUE, x.linked = FALSE, phifixed = NULL) 
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>X</code></td>
+<td>
+<p>For bi-allelic variants, <code>X</code> is a vector containg the genotypic counts (AA,AB,BB for
+autosomal markers c(A,B,AA,AB,BB) for X-chromosomal markers). For multi-allelic variants, <code>X</code> is a
+lower triangular matrix with genotype counts, homozygotes on the diagonal and heterozygotes below the diagonal.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cc</code></td>
+<td>
+<p><code>cc</code> the continuity correction parameter, the correction is only applied to bi-allelic markers (default
+<code>cc = 0.5</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+ <p><code>verbose = TRUE</code> prints results, <code>verbose = FALSE</code>
+is silent.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x.linked</code></td>
+<td>
+ <p><code>x.linked=FALSE</code> indicates the marker is
+autosomal (default), and <code>x.linked=TRUE</code> indicates it resides
+on the X-chromosome.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>phifixed</code></td>
+<td>
+<p>(For X-chromosomal markers only)
+<code>phifixed=NULL</code> indicates that the fraction of males
+(females) should be estimated from the data (default). If set to any
+other value (e.g. <code>phifixed=0.5</code>) then the sample is assumed to
+come from a population with the specified fraction of males.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p><code>HWChisq</code> does a chi-square test for Hardy-Weinberg equilibrium,
+and by default applies a continuity correction. For extreme allele
+frequencies, the continuity correction can lead to excessive type 1
+error rates, and is better turned off in that case. The continuity
+correction can be turned off by specifying <code>cc=0</code>.
+</p>
+<p><code>HWChisq</code> can do the chi-square test for both autosomal and
+X-chrosomal markers. By setting <code>x.linked = TRUE</code> the marker
+will be assumed to be on the X-chromosome, and the count vector
+supplied should have 5 elements instead of 3 elements for an
+autosomal marker. For X-chromsomal markers argument <code>phifixed</code>
+is in general best left to its default value (<code>NULL</code>). Only in
+specific situations where the theoretical population sex ratio is known (e.g. in
+simulation studies where a universe with known gender ratio is
+sampled) <code>phifixed</code> could be set to the theoretical ratio of interest.   
+</p>
+<p>With bi-allelic variants, when <code>alternative</code> is set to <code>less</code>, a one-sided test for
+against a negative inbreeding coefficient (heterozygote excess) is
+performed. When <code>alternative</code> is set to <code>greater</code> a one-sided test for
+against a positive inbreeding coefficient (lack of heterozygotes) is
+performed.
+</p>
+<p>For multi-allelic variants, which typically do have some rare alleles and rare genotypes, the asymptotic chi-square test is in
+general not recommended, and exact test procedures or permutation tests are recommended (see <code>HWExact</code> or <code>HWPerm.mult</code>).
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>HWChisq</code> returns a list with the components:
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>chisq </code></td>
+<td>
+<p>value of the chi-square statistic. NA is returned if the marker is monomorphic.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pval </code></td>
+<td>
+<p>p-value of the chi-square test for Hardy-Weinberg equilibrium.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>D </code></td>
+<td>
+<p>Half the deviation from Hardy-Weinberg equilibrium for the AB genotype.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>p </code></td>
+<td>
+<p>the allele frequency of A.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>f </code></td>
+<td>
+<p>the inbreeding coefficient.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>expected </code></td>
+<td>
+<p>the expected counts under Hardy-Weinberg equilibrium.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>chi.contrib </code></td>
+<td>
+<p>the contributions of the different genotypes to the chi-square statistic.</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p> Jan Graffelman <a href="mailto:jan.graffelman@upc.edu">jan.graffelman@upc.edu</a> </p>
+
+
+<h3>References</h3>
+
+<p>Weir, B.S. (1996) Genetic data analysis II. Sinauer
+Associates, Massachusetts. See Chapter3.
+</p>
+<p>For the chi-square test for X-linked markers:
+</p>
+<p>Graffelman, J. &amp; Weir, B.S. (2016) Testing for Hardy-Weinberg
+equilibrium at bi-allelic genetic markers on the X chromosome. 
+<em>Heredity</em> 116(6) pp. 558–568. <a href="https://doi.org/10.1038/hdy.2016.20">doi:10.1038/hdy.2016.20</a>
+</p>
+
+
+<h3>See Also</h3>
+
+ <p><code>HWLratio</code>, <code>HWChisqStats</code> </p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">#
+# Test for an autosomal blood group marker
+#
+x &lt;- c(MM=298,MN=489,NN=213)
+HW.test &lt;- HWChisq(x,verbose=TRUE)
+#
+# Same test without continuity correction
+#
+HW.test &lt;- HWChisq(x,cc=0,verbose=TRUE)
+#
+# Test for X-chromsomal SNPs.
+#
+rs5968922 &lt;-  c(A=392, B=212, AA=275, AB=296, BB=80)
+HW.test &lt;- HWChisq(rs5968922,cc=0,x.linked=TRUE,verbose=TRUE)
+#
+#
+#
+y &lt;- c(GG=48, CG=209, CC=277, G=129, C=337) 
+HWChisq(y,x.linked=TRUE,cc=0)
+#
+# Test a multi-allelic microsatellite
+#
+data(NistSTRs)
+A1 &lt;- NistSTRs[,1]
+A2 &lt;- NistSTRs[,2]
+GC &lt;- AllelesToTriangular(A1,A2)
+HW.test &lt;- HWChisq(GC)
+#
+# retaining only the three  most common alleles
+#
+ii &lt;- (A1 == 10 | A1 == 11 | A1 == 12) &amp; (A2 == 10 | A2 == 11 | A2 == 12)
+A1s &lt;- A1[ii]
+A2s &lt;- A2[ii]
+GC &lt;- AllelesToTriangular(A1s,A2s)
+HW.test &lt;- HWChisq(GC)
+</code></pre>
+
+
+</div>

@@ -1,0 +1,342 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>solve_fetal_pbtk</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Solve_fetal_PBTK</h2>
+
+<h3>Description</h3>
+
+<p>This function solves for the amounts or concentrations in uM of a chemical
+in different tissues of a maternofetal system as functions of time based on
+the dose and dosing frequency.
+In this PBTK formulation. <code class="reqn">C_{tissue}</code> is the concentration in tissue at 
+time t. Since the perfusion limited partition coefficients describe 
+instantaneous equilibrium between the tissue and the free fraction in 
+plasma, the whole plasma concentration is 
+<code class="reqn">C_{tissue,plasma} = \frac{1}{f_{up}*K_{tissue2fup}}*C_{tissue}</code>. 
+Note that we use a single, 
+constant value of <code class="reqn">f_{up}</code> across all tissues. Corespondingly the free 
+plasma 
+concentration is modeled as 
+<code class="reqn">C_{tissue,free plasma} = \frac{1}{K_{tissue2fup}}*C_tissue</code>. 
+The amount of blood flowing from tissue x is <code class="reqn">Q_{tissue}</code> (L/h) at a 
+concentration 
+<code class="reqn">C_{x,blood} = \frac{R_{b2p}}{f_{up}*K_{tissue2fup}}*C_{tissue}</code>, where 
+we use a 
+single <code class="reqn">R_{b2p}</code> value throughout the body.
+Metabolic clearance is modelled as being from the total plasma 
+concentration here, though it is restricted to the free fraction in 
+<code>calc_hep_clearance</code> by default. Renal clearance via 
+glomerulsr filtration is from the free plasma concentration.
+The maternal compartments used in this model are the gut lumen, gut, liver, 
+venous blood, arterial blood, lung, adipose tissue, kidney, thyroid, 
+and rest of body. A placenta is modeled as a joint organ shared by mother
+and fetus, through which chemical exchange can occur with the fetus. Fetal
+compartments include arterial blood, venous blood, kidney, thyroid, liver,
+lung, gut, brain, and rest of body. 
+The extra compartments include the amounts or concentrations metabolized by
+the liver and excreted by the kidneys through the tubules.
+AUC is the area under the curve of the plasma concentration.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">solve_fetal_pbtk(
+  chem.name = NULL,
+  chem.cas = NULL,
+  dtxsid = NULL,
+  times = seq(13 * 7, 40 * 7, 1),
+  parameters = NULL,
+  days = NULL,
+  species = "human",
+  tsteps = 4,
+  dose = NULL,
+  dosing.matrix = NULL,
+  daily.dose = NULL,
+  doses.per.day = NULL,
+  initial.values = NULL,
+  plots = FALSE,
+  suppress.messages = FALSE,
+  iv.dose = FALSE,
+  input.units = "mg/kg",
+  output.units = NULL,
+  default.to.human = FALSE,
+  recalc.blood2plasma = FALSE,
+  recalc.clearance = FALSE,
+  adjusted.Funbound.plasma = TRUE,
+  regression = TRUE,
+  restrictive.clearance = TRUE,
+  minimum.Funbound.plasma = 1e-04,
+  monitor.vars = NULL,
+  atol = 1e-08,
+  rtol = 1e-08,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>chem.name</code></td>
+<td>
+<p>Either the chemical name, CAS number, or the parameters
+must be specified.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>chem.cas</code></td>
+<td>
+<p>Either the chemical name, CAS number, or the parameters must
+be specified.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dtxsid</code></td>
+<td>
+<p>EPA's DSSTox Structure ID (<a href="https://comptox.epa.gov/dashboard">https://comptox.epa.gov/dashboard</a>)
+the chemical must be identified by either CAS, name, or DTXSIDs</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>times</code></td>
+<td>
+<p>Optional time sequence in days. Dosing sequence begins at the
+beginning of times. Default is from 13th week of pregnancy to 40th due to 
+data constraints.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>parameters</code></td>
+<td>
+<p>Chemical parameters from parameterize_fetal_pbtk function,
+overrides chem.name and chem.cas.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>days</code></td>
+<td>
+<p>Length of the simulation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>species</code></td>
+<td>
+<p>Included for compatibility with other functions, but the model
+will not run for non-human species (default "Human").</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tsteps</code></td>
+<td>
+<p>The number time steps per hour. Default of 4.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dose</code></td>
+<td>
+<p>Amount of a single, initial oral dose in mg/kg BW.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dosing.matrix</code></td>
+<td>
+<p>A matrix of either one column (or row) with a set of
+dosing times or with two columns (or rows) correspondingly named "dose" and
+"time" containing the time and amount, in mg/kg BW, of each dose.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>daily.dose</code></td>
+<td>
+<p>Total daily dose, mg/kg BW.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>doses.per.day</code></td>
+<td>
+<p>Number of doses per day.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>initial.values</code></td>
+<td>
+<p>Vector containing the initial concentrations or
+amounts of the chemical in specified tissues with units corresponding to
+compartment.units.  Defaults are zero.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>plots</code></td>
+<td>
+<p>Plots all outputs if true.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>suppress.messages</code></td>
+<td>
+<p>Whether or not the output message is suppressed.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>iv.dose</code></td>
+<td>
+<p>Simulates a single i.v. dose if true.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>input.units</code></td>
+<td>
+<p>Input units of interest assigned to dosing, defaults to
+mg/kg BW</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>output.units</code></td>
+<td>
+<p>A named vector of output units expected for the model
+results. Default, NULL, returns model results in units specified in the
+'modelinfo' file. See table below for details.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>default.to.human</code></td>
+<td>
+<p>Substitutes missing animal values with human values
+if true (hepatic intrinsic clearance or fraction of unbound plasma).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>recalc.blood2plasma</code></td>
+<td>
+<p>Recalculates the ratio of the amount of chemical
+in the blood to plasma using the input parameters, calculated with
+hematocrit, Funbound.plasma, and Krbc2pu.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>recalc.clearance</code></td>
+<td>
+<p>Recalculates the the hepatic clearance
+(Clmetabolism) with new million.cells.per.gliver parameter.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>adjusted.Funbound.plasma</code></td>
+<td>
+<p>Uses adjusted Funbound.plasma when set to
+TRUE along with partition coefficients calculated with this value.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>regression</code></td>
+<td>
+<p>Whether or not to use the regressions in calculating
+partition coefficients.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>restrictive.clearance</code></td>
+<td>
+<p>Protein binding not taken into account (set to
+1) in liver clearance if FALSE.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>minimum.Funbound.plasma</code></td>
+<td>
+<p>Monte Carlo draws less than this value are set 
+equal to this value (default is 0.0001 – half the lowest measured Fup in our
+dataset).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>monitor.vars</code></td>
+<td>
+<p>Which variables to track by default</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>atol</code></td>
+<td>
+<p>Absolute tolerance used by integrator (deSolve) to determine
+numerical precision– defaults to 1e-8.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rtol</code></td>
+<td>
+<p>Relative tolerance used by integrator (deSolve) to determine 
+numerical precision – defaults to 1e-8.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Additional arguments passed to the integrator.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The stage of pregnancy simulated here begins by default at the 13th week due
+to a relative lack of data to support parameterization prior, in line with 
+the recommendations of Kapraun et al. 2019 ("Empirical models for anatomical
+and physiological..."), and ends at the 40th week of pregnancy.
+</p>
+<p>Note that the model parameters have units of hours while the model output is
+in days. Dose is in mg, not scaled for body weight.
+</p>
+<p>Default NULL value for doses.per.day solves for a single dose.
+</p>
+<p>This gestational model is only parameterized for humans.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A matrix of class deSolve with a column for time(in days), each
+compartment, the area under the curve, and plasma concentration and a row
+for each time point.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>John Wambaugh, Mark Sfeir, and Dustin Kapraun
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>solve_model</code>
+</p>
+<p><code>parameterize_fetal_pbtk</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+out = solve_fetal_pbtk(chem.name = 'bisphenol a', daily.dose = 1,
+doses.per.day = 3)
+
+# With adjustement to fraction unbound plasma for fetus:
+fetal_parms_fup_adjusted &lt;- 
+  parameterize_fetal_pbtk(chem.name = "triclosan")
+head(solve_fetal_pbtk(parameters = fetal_parms_fup_adjusted))
+ 
+# Without adjustement to fraction unbound plasma for fetus:
+fetal_parms_fup_unadjusted &lt;-  
+  parameterize_fetal_pbtk(chem.name = "triclosan",
+                          fetal_fup_adjustment = FALSE)
+head(solve_fetal_pbtk(parameters = fetal_parms_fup_unadjusted))
+
+</code></pre>
+
+
+</div>

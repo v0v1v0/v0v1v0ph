@@ -1,0 +1,288 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>calc_css</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Find the steady state concentration and the day it is reached.</h2>
+
+<h3>Description</h3>
+
+<p>This function finds the day a chemical comes within the specified range of
+the analytical steady state venous blood or plasma concentration(from
+calc_analytic_css) for the multiple compartment, three compartment, and one
+compartment models, the fraction of the true steady state value reached on
+that day, the maximum concentration, and the average concentration at the
+end of the simulation.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">calc_css(
+  chem.name = NULL,
+  chem.cas = NULL,
+  dtxsid = NULL,
+  parameters = NULL,
+  species = "Human",
+  f = 0.01,
+  daily.dose = 1,
+  doses.per.day = 3,
+  dose.units = "mg/kg",
+  route = "oral",
+  days = 21,
+  output.units = "uM",
+  suppress.messages = FALSE,
+  tissue = NULL,
+  model = "pbtk",
+  default.to.human = FALSE,
+  f.change = 1e-05,
+  adjusted.Funbound.plasma = TRUE,
+  regression = TRUE,
+  well.stirred.correction = TRUE,
+  restrictive.clearance = TRUE,
+  dosing = NULL,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>chem.name</code></td>
+<td>
+<p>Either the chemical name, CAS number, or parameters must be
+specified.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>chem.cas</code></td>
+<td>
+<p>Either the chemical name, CAS number, or parameters must be
+specified.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dtxsid</code></td>
+<td>
+<p>EPA's DSSTox Structure ID (<a href="https://comptox.epa.gov/dashboard">https://comptox.epa.gov/dashboard</a>)
+the chemical must be identified by either CAS, name, or DTXSIDs</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>parameters</code></td>
+<td>
+<p>Chemical parameters from parameterize_pbtk function,
+overrides chem.name and chem.cas.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>species</code></td>
+<td>
+<p>Species desired (either "Rat", "Rabbit", "Dog", "Mouse", or
+default "Human").</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>f</code></td>
+<td>
+<p>Fractional distance from the final steady state concentration that
+the average concentration must come within to be considered at steady state.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>daily.dose</code></td>
+<td>
+<p>Total daily dose, mg/kg BW.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>doses.per.day</code></td>
+<td>
+<p>Number of oral doses per day.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dose.units</code></td>
+<td>
+<p>The units associated with the dose received.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>route</code></td>
+<td>
+<p>Route of exposure (either "oral", "iv", or "inhalation"
+default "oral").</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>days</code></td>
+<td>
+<p>Initial number of days to run simulation that is multiplied on
+each iteration.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>output.units</code></td>
+<td>
+<p>Units for returned concentrations, defaults to uM
+(specify units = "uM") but can also be mg/L.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>suppress.messages</code></td>
+<td>
+<p>Whether or not to suppress messages.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tissue</code></td>
+<td>
+<p>Desired tissue concentration (default value is NULL, will
+depend on model – see <code>steady.state.compartment</code> in model.info file for
+further details.)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>model</code></td>
+<td>
+<p>Model used in calculation, 'pbtk' for the multiple compartment
+model,'3compartment' for the three compartment model, and '1compartment' for
+the one compartment model.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>default.to.human</code></td>
+<td>
+<p>Substitutes missing animal values with human values
+if true (hepatic intrinsic clearance or fraction of unbound plasma).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>f.change</code></td>
+<td>
+<p>Fractional change of daily steady state concentration
+reached to stop calculating.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>adjusted.Funbound.plasma</code></td>
+<td>
+<p>Uses adjusted Funbound.plasma when set to
+TRUE along with partition coefficients calculated with this value.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>regression</code></td>
+<td>
+<p>Whether or not to use the regressions in calculating
+partition coefficients.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>well.stirred.correction</code></td>
+<td>
+<p>Uses correction in calculation of hepatic
+clearance for well-stirred model if TRUE for model 1compartment elimination
+rate.  This assumes clearance relative to amount unbound in whole blood
+instead of plasma, but converted to use with plasma concentration.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>restrictive.clearance</code></td>
+<td>
+<p>Protein binding not taken into account (set to
+1) in liver clearance if FALSE.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dosing</code></td>
+<td>
+<p>The dosing object for more complicated scenarios. Defaults to
+repeated <code>daily.dose</code> spread out over <code>doses.per.day</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Additional arguments passed to model solver (default of
+<code>solve_pbtk</code>).</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>frac</code></td>
+<td>
+<p>Ratio of the mean concentration on the day steady state
+is reached (baed on doses.per.day) to the analytical Css (based on infusion
+dosing).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>max</code></td>
+<td>
+<p>The maximum concentration of the simulation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>avg</code></td>
+<td>
+<p>The average concentration on the final day of the simulation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>the.day</code></td>
+<td>
+<p>The day the average concentration comes within 100 * p
+percent of the true steady state concentration.</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>Robert Pearce, John Wambaugh
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>calc_analytic_css</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+calc_css(chem.name='Bisphenol-A',doses.per.day=5,f=.001,output.units='mg/L')
+
+
+parms &lt;- parameterize_3comp(chem.name='Bisphenol-A')
+parms$Funbound.plasma &lt;- .07
+calc_css(chem.name='Bisphenol-A',parameters=parms,model='3compartment')
+
+out &lt;- solve_pbtk(chem.name = "Bisphenol A",
+  days = 50,                                   
+  daily.dose=1,
+  doses.per.day = 3)
+plot.data &lt;- as.data.frame(out)
+
+css &lt;- calc_analytic_css(chem.name = "Bisphenol A")
+library("ggplot2")
+c.vs.t &lt;- ggplot(plot.data,aes(time, Cplasma)) + geom_line() +
+geom_hline(yintercept = css) + ylab("Plasma Concentration (uM)") +
+xlab("Day") + theme(axis.text = element_text(size = 16), axis.title =
+element_text(size = 16), plot.title = element_text(size = 17)) +
+ggtitle("Bisphenol A")
+
+print(c.vs.t)
+ 
+
+</code></pre>
+
+
+</div>

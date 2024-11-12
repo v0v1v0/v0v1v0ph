@@ -1,0 +1,97 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>trainControl</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Parameters for HMM-VB training.</h2>
+
+<h3>Description</h3>
+
+<p>This function creates a list with parameters for estimating an HMM-VB,
+which is used as an argument for <code>hmmvbTrain</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">trainControl(
+  ninit0 = 1,
+  ninit1 = 0,
+  ninit2 = 0,
+  epsilon = 1e-04,
+  diagCov = FALSE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>ninit0</code></td>
+<td>
+<p>The number of initializations for default scheme 0, under
+which the k-means clustering for entire dataset is used to initialize the model.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ninit1</code></td>
+<td>
+<p>The number of initializations for default scheme 1, under
+which the k-means clustering for a subset of data is used to initialize the model.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ninit2</code></td>
+<td>
+<p>The number of initializations for default scheme 2, under
+which a random subset of data is used as cluster centroids to initialize the model.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>epsilon</code></td>
+<td>
+<p>Stopping criteria for Baum-Welch algorithm. Should be a small number in 
+range (0,1).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>diagCov</code></td>
+<td>
+<p>A logical value indicating whether or not variable block covariance matrices
+will be diagonal.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>The named list with parameters.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>hmmvbTrain</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># setting up multiple initialization schemes
+Vb &lt;- vb(1, dim=4, numst=2)
+set.seed(12345)
+hmmvb &lt;- hmmvbTrain(iris[,1:4], VbStructure=Vb, 
+          trControl=trainControl(ninit0=2, ninit1=2, ninit2=2))
+show(hmmvb)
+
+# forcing diagonal covariance matrices
+Vb &lt;- vb(1, dim=4, numst=2)
+set.seed(12345)
+hmmvb &lt;- hmmvbTrain(iris[,1:4], VbStructure=Vb, 
+          trControl=trainControl(diagCov=TRUE))
+show(hmmvb)
+</code></pre>
+
+
+</div>

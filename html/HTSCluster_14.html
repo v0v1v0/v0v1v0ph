@@ -1,0 +1,124 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>PoisMixMean</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Calculate the conditional per-cluster mean of each observation
+</h2>
+
+<h3>Description</h3>
+
+<p>This function is used to calculate the conditional per-cluster mean expression for all observations. This value corresponds to
+<code class="reqn">\boldsymbol{\mu} = (\mu_{ijlk}) = (\hat{w}_i \hat{\lambda}_{jk})</code>
+for the PMM-I model and
+<code class="reqn">\boldsymbol{\mu} = (\mu_{ijlk}) = (\hat{w}_i s_{jl} \hat{\lambda}_{jk})</code>
+for the PMM-II model.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">PoisMixMean(y, g, conds, s, lambda)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+
+<p>(<em>n</em> x <em>q</em>) matrix of observed counts for <em>n</em> observations and <em>q</em> variables
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>g</code></td>
+<td>
+
+<p>Number of clusters
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>conds</code></td>
+<td>
+
+<p>Vector of length <em>q</em> defining the condition (treatment group) for each variable (column) in <code>y</code>
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>s</code></td>
+<td>
+
+<p>Estimate of normalized per-variable library size
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lambda</code></td>
+<td>
+
+<p>(<em>d</em> x <code>g</code>) matrix containing the current estimate of lambda, where <em>d</em> is the number of conditions (treatment groups) and <code>g</code> is the number of clusters
+</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A list of length <code>g</code> containing the (<em>n</em> x <em>q</em>) matrices of mean expression for all observations, conditioned on each of the <code>g</code> clusters
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Andrea Rau
+</p>
+
+
+<h3>References</h3>
+
+<p>Rau, A., Maugis-Rabusseau, C., Martin-Magniette, M.-L., Celeux G. (2015). Co-expression analysis of high-throughput transcriptome sequencing data with Poisson mixture models. Bioinformatics, 31(9):1420-1427.
+</p>
+<p>Rau, A., Celeux, G., Martin-Magniette, M.-L., Maugis-Rabusseau, C. (2011). Clustering high-throughput sequencing data with Poisson mixture models. Inria Research Report 7786. Available at <a href="https://inria.hal.science/inria-00638082">https://inria.hal.science/inria-00638082</a>.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>PoisMixClus</code> for Poisson mixture model estimation and model selection
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+set.seed(12345)
+
+## Simulate data as shown in Rau et al. (2011)
+## Library size setting "A", high cluster separation
+## n = 200 observations
+
+simulate &lt;- PoisMixSim(n = 200, libsize = "A", separation = "high")
+y &lt;- simulate$y
+conds &lt;- simulate$conditions
+s &lt;- colSums(y) / sum(y) 	## TC estimate of lib size
+
+## Run the PMM-II model for g = 3
+## "TC" library size estimate, EM algorithm
+
+run &lt;- PoisMixClus(y, g = 3, norm = "TC", conds = conds) 
+pi.est &lt;- run$pi
+lambda.est &lt;- run$lambda
+
+## Calculate the per-cluster mean for each observation
+means &lt;- PoisMixMean(y, g = 3, conds, s, lambda.est) 
+
+</code></pre>
+
+
+</div>

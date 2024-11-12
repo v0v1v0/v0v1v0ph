@@ -1,0 +1,153 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>enhance</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Enhance penalty value</h2>
+
+<h3>Description</h3>
+
+<p><code>enhance</code> enhances the sandwich smoother by choosing
+the optimal penalty value that minimizes the GCV
+statistic.    The <code>optimx</code> function
+is used to do the optimization.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">enhance(
+  obj,
+  par = rep(0, length(obj$n)),
+  lower = rep(-20, length(par)),
+  upper = rep(20, length(par)),
+  method = "L-BFGS-B",
+  control = list(),
+  prepare = TRUE,
+  loggcv = FALSE,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>obj</code></td>
+<td>
+<p>A <code>prepared_*</code> object from a
+<code>prepare</code> function.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>par</code></td>
+<td>
+<p>a vector of initial values for the parameters 
+for which optimal values are to be found. Names on the elements
+of this vector are preserved and used in the results data frame.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lower, upper</code></td>
+<td>
+<p>Bounds on the variables for methods such as <code>"L-BFGS-B"</code> that can
+handle box (or bounds) constraints.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+<p>The method to be used for optimization. The
+default is <code>L-BFGS-B</code>, which allows for
+constraints on the parameters to optimize.  See
+<code>optimx</code> for all available methods.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>control</code></td>
+<td>
+<p>A list of control parameters. See ‘Details’.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>prepare</code></td>
+<td>
+<p>A logical value.  The default is <code>TRUE</code>,
+indicating that a <code>prepared_data</code> object should be
+returned.  If <code>FALSE</code>, then the results of the
+call to the <code>optimx</code> function is
+returned.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>loggcv</code></td>
+<td>
+<p>A logical value indicating whether the log
+of the GCV statistic should be used.  Useful for very large
+data sets.  Default is <code>TRUE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Additional arguments to pass to to the
+<code>optimx</code> function.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Internally, the <code>loglambda2gcv</code> is  used as
+the objective function for the
+<code>optimx</code> function. Many different
+optimization methods are available.  The default is
+<code>L-BFGS-B</code>, which allows for constraints on the
+parameters to optimize.  Another excellent choice is the
+<code>nlminb</code> algorithm, which also allows for parameter
+constraints.
+</p>
+
+
+<h3>Value</h3>
+
+<p>By default, a <code>prepared_data</code> object with
+the optimal <code>loglambda</code> values that minimize the
+GCV, along with an additional component,
+<code>results</code>, that contains the optimization results.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Joshua French
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># create b-splines
+x1 = bspline(nbasis = 10)
+x2 = bspline(nbasis = 12)
+
+# observed data locations
+evalarg1 = seq(0, 1, len = 60)
+evalarg2 = seq(0, 1, len = 80)
+
+# construct "true" data
+mu = matrix(0, nrow = 60, ncol = 80)
+for(i in seq_len(60)) {
+   for(j in seq_len(80)) {
+      mu[i, j] =  sin(2*pi*(evalarg1[i]-.5)^3)*cos(4*pi*evalarg2[j])
+   }
+}
+# construct noisy data
+data = mu + rnorm(60 * 80)
+
+obj = prepare(data, list(evalarg1, evalarg2), list(x1, x2))
+enhance(obj)
+</code></pre>
+
+
+</div>

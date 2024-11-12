@@ -1,0 +1,195 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>get_lag_file</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Get Lag from Input File</h2>
+
+<h3>Description</h3>
+
+<p>Given a file path it reads a data frame (time series)
+of measurements which combines several gauging station ID's and calls
+<code>get_lag()</code>. The relation (ID's) of
+gauging stations is read from a file (provided through the file path).
+The file with <code>Q</code> data and the relation file need to 
+have the same separator (<code>inputsep</code>) and character for
+decimal points (<code>inputdec</code>). Gauging station ID's have to
+be in order of their location in downstream direction. The
+resulting lag is appended to the relation file. This can be
+saved to a file.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">get_lag_file(
+  Q_file,
+  relation_file,
+  steplength = 15,
+  lag.max = 20,
+  na.action = na.pass,
+  tz = "Etc/GMT-1",
+  format = "%Y.%m.%d %H:%M",
+  cols = c(1, 2, 3),
+  inputsep = ";",
+  inputdec = ".",
+  save = FALSE,
+  outfile = file.path(tempdir(), "relation.csv"),
+  mc.cores = getOption("mc.cores", 2L),
+  overwrite = FALSE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>Q_file</code></td>
+<td>
+<p>Data frame or character string. If it is a data
+frame, it corresponds to the <code>Q</code> data frame in
+<code>get_lag()</code>.  It contains at least a
+column with the gauging station ID's (default: column index 1), a
+column with date-time values in character representation
+(default: column index 2) and a column with flow measurements
+(default: column index 3). If the column indices differ from
+<code>c(1, 2, 3)</code>, they have to be specified as <code>cols</code>
+argument in the format <code>c(i, j, k)</code>. If it is a character
+string, it contains the path to the corresponding file which is
+then read within the function with
+<code>utils::read.csv()</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>relation_file</code></td>
+<td>
+<p>A character string containing the path to the
+relation file. It is read within the function with
+<code>utils::read.csv()</code>.  The file must
+contain a column <code>ID</code> that contains the gauging station
+ID's in order of their location in downstream direction. The
+lag will then be appended as column to the data frame. For more
+details on the relation file, see the vignette.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>steplength</code></td>
+<td>
+<p>Numeric value that specifies the length between
+time steps in minutes (default: <code>15</code> minutes). As time
+steps have to be equispaced, this is used by
+<code>hydropeak::flow()</code> to get a
+compatible format and fill missing time steps with <code>NA</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lag.max</code></td>
+<td>
+<p>Maximum lag at which to calculate the ccf in
+<code>stats::ccf()</code> (default: <code>20</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>na.action</code></td>
+<td>
+<p>Function to be called to handle missing values in
+<code>stats::ccf()</code> (default:
+<code>na.pass</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tz</code></td>
+<td>
+<p>Character string specifying the time zone to be used for
+internal conversion (default: <code>Etc/GMT-1</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>format</code></td>
+<td>
+<p>Character string giving the date-time format of the
+date-time column in the input data frame <code>Q</code>. This is
+passed to <code>hydropeak::flow()</code>, to
+get a compatible format (default: <code>YYYY.mm.dd HH:MM</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cols</code></td>
+<td>
+<p>Integer vector specifying column indices in the input
+data frame which contain gauging station ID, date-time and flow
+rate to be renamed. The default indices are 1 (ID), 2
+(date-time) and 3 (flow rate, Q).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>inputsep</code></td>
+<td>
+<p>Character string for the field separator in input
+data.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>inputdec</code></td>
+<td>
+<p>Character string for decimal points in input data.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>save</code></td>
+<td>
+<p>A logical. If <code>FALSE</code> (default) the lag, appended
+to the relation file, is not written to a file, otherwise it is
+written to <code>outfile</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>outfile</code></td>
+<td>
+<p>A character string naming a file path and name where the
+output file should be written to.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mc.cores</code></td>
+<td>
+<p>Number of cores to use with
+<code>parallel::mclapply()</code>. On
+Windows, this is set to 1.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>overwrite</code></td>
+<td>
+<p>A logical. If <code>FALSE</code> (default), it produces
+an error if a <code>LAG</code> column already exists in the
+<code>relation</code> file. Otherwise, it overwrites an existing
+column.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>Returns invisibly the data frame of the relation data with
+the estimated cumulative lag between neighboring gauging
+stations in the format <code>HH:MM</code> appended.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">Q_file &lt;- system.file("testdata", "Q.csv", package = "hydroroute")
+relation_file &lt;- system.file("testdata", "relation.csv",
+                             package = "hydroroute")
+get_lag_file(Q_file, relation_file, inputsep = ",", inputdec = ".",
+             format = "%Y-%m-%d %H:%M", save = FALSE, overwrite = TRUE)
+
+Q_file &lt;- read.csv(Q_file)
+get_lag_file(Q_file, relation_file, inputsep = ",", inputdec = ".",
+             format = "%Y-%m-%d %H:%M", save = FALSE, overwrite = TRUE)
+</code></pre>
+
+
+</div>

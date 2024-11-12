@@ -1,0 +1,155 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>Mutation</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Performing mutation<br>
+</h2>
+
+<h3>Description</h3>
+
+<p>This function gives mutant from parents.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">Mutation(
+  myParent,
+  EVAoutput,
+  r1,
+  r2,
+  initial.temp = 1000,
+  cooling.rate = 0.95,
+  X,
+  y,
+  heredity = "Strong",
+  sigma,
+  varind = NULL,
+  interaction.ind = NULL,
+  lambda = 10
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>myParent</code></td>
+<td>
+<p>A numeric matrix with dimension <code>numElite</code> by <code>r1 + r2</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>EVAoutput</code></td>
+<td>
+<p>The output from function <code>EVA</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>r1</code></td>
+<td>
+<p>At most how many main effects do you want to include in your model?.
+For high-dimensional data, <code>r1</code> cannot be larger than the number of
+screened main effects.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>r2</code></td>
+<td>
+<p>At most how many interaction effects do you want to include in your model?</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>initial.temp</code></td>
+<td>
+<p>Initial temperature. Default is 1000.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cooling.rate</code></td>
+<td>
+<p>A numeric value represents the speed at which the
+temperature decreases. Default is 0.95.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>X</code></td>
+<td>
+<p>Input data. An optional data frame, or numeric matrix of dimension
+<code>n</code> observations by <code>p</code> main effects.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+<p>Response variable. A <code>n</code>-dimensional vector.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>heredity</code></td>
+<td>
+<p>Whether to enforce Strong, Weak, or No heredity. Default is "Strong".</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sigma</code></td>
+<td>
+<p>The standard deviation of the noise term. In practice, sigma is usually
+unknown. Users can estimate sigma from function <code>selectiveInference::estimateSigma</code>,
+then use the output as the sigma value.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>varind</code></td>
+<td>
+<p>A numeric vector that specifies the indices of variables to be extracted from <code>X</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>interaction.ind</code></td>
+<td>
+<p>A two-column numeric matrix. Each row represents a unique
+interaction pair, with the columns indicating the index numbers of the variables
+involved in each interaction. Note that interaction.ind must be generated
+outside of this function using <code>t(utils::combn(p,2))</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lambda</code></td>
+<td>
+<p>A numeric value defined by users. The number needs to satisfy the condition:
+<code class="reqn">\lambda\geq 5.1/log(2)</code>. Default is 10.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>Mutant. A numeric matrix with dimensions <code>numElite</code> by <code>r1+r2</code>.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>EVA</code>, <code>Initial</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">set.seed(0)
+interaction.ind &lt;- t(combn(10,2))
+X &lt;- matrix(rnorm(100*10,1,0.1), 100, 10)
+epl &lt;- rnorm(100,0,0.01)
+y &lt;- 1+X[,1]+X[,2]+X[,3]+X[,1]*X[,2]+X[,1]*X[,3]+epl
+EVAoutput &lt;- EVA(X, y, r1 = 5, sigma = 0.01,
+  interaction.ind = interaction.ind)
+myParent &lt;- Initial(X = X, y = y, EVAoutput, r1 = 5, r2 = 2)
+Mutation(myParent, EVAoutput, r1 = 5, r2 = 2, X = X, y = y,
+  sigma = 0.1, interaction.ind = interaction.ind)
+</code></pre>
+
+
+</div>

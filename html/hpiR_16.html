@@ -1,0 +1,89 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>createKFoldData</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Create data for KFold error test</h2>
+
+<h3>Description</h3>
+
+<p>Generic method for creating KFold testing data
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">createKFoldData(score_ids, full_data, pred_df)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>score_ids</code></td>
+<td>
+<p>Vector of row ids to be included in scoring data</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>full_data</code></td>
+<td>
+<p>Complete dataset (class 'hpidata“) of this model type (rt or hed)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pred_df</code></td>
+<td>
+<p>Data to be used for prediction</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>list of length 2 containing:
+</p>
+
+<dl>
+<dt>train</dt>
+<dd>
+<p>Training data.frame</p>
+</dd>
+<dt>score</dt>
+<dd>
+<p>Scoring data.frame</p>
+</dd>
+</dl>
+<h3>Further Details</h3>
+
+<p>Called from 'calcKFoldError()“
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+ # Load Data
+ data(ex_sales)
+
+ # Create RT Data
+ rt_data &lt;- rtCreateTrans(trans_df = ex_sales,
+                          prop_id = 'pinx',
+                          trans_id = 'sale_id',
+                          price = 'sale_price',
+                          periodicity = 'monthly',
+                          date = 'sale_date')
+ # Create folds
+ k_folds &lt;- split(x = 1:nrow(rt_data),
+                  f = sample(1:10, nrow(rt_data), replace = TRUE))
+
+ # Create data from folds
+ kfold_data &lt;- createKFoldData(score_ids = k_folds[[1]],
+                               full_data = rt_data,
+                               pred_df = rt_data)
+
+</code></pre>
+
+
+</div>

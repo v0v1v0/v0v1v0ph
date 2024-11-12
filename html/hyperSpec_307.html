@@ -1,0 +1,159 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>spc.fit.poly</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Polynomial Baseline Fitting
+These functions fit polynomal baselines.</h2>
+
+<h3>Description</h3>
+
+<p>Both functions fit polynomials to be used as baselines. If <code>apply.to</code>
+is <code>NULL</code>, a <code>hyperSpec</code> object with the polynomial coefficients
+is returned, otherwise the polynomials are evaluated on the spectral range
+of <code>apply.to</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">spc.fit.poly(
+  fit.to,
+  apply.to = NULL,
+  poly.order = 1,
+  offset.wl = !(is.null(apply.to))
+)
+
+spc.fit.poly.below(
+  fit.to,
+  apply.to = fit.to,
+  poly.order = 1,
+  npts.min = max(round(nwl(fit.to) * 0.05), 3 * (poly.order + 1)),
+  noise = 0,
+  offset.wl = FALSE,
+  max.iter = nwl(fit.to),
+  stop.on.increase = FALSE,
+  debuglevel = hy.getOption("debuglevel")
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>fit.to</code></td>
+<td>
+<p><code>hyperSpec</code> object on which the baselines are fitted</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>apply.to</code></td>
+<td>
+<p><code>hyperSpec</code> object on which the baselines are evaluted
+If <code>NULL</code>, a <code>hyperSpec</code> object containing the polynomial
+coefficients rather than evaluted baselines is returned.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>poly.order</code></td>
+<td>
+<p>order of the polynomial to be used</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>offset.wl</code></td>
+<td>
+<p>should the wavelength range be mapped to -&gt; [0, delta wl]?
+This enhances numerical stability.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>npts.min</code></td>
+<td>
+<p>minimal number of points used for fitting the polynomial</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>noise</code></td>
+<td>
+<p>noise level to be considered during the fit. It may be given
+as one value for all the spectra, or for each spectrum separately.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>max.iter</code></td>
+<td>
+<p>stop at the latest after so many iterations.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>stop.on.increase</code></td>
+<td>
+<p>additional stopping rule: stop if the number of support points would increase, 
+regardless whether npts.min was reached or not.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>debuglevel</code></td>
+<td>
+<p>additional output:
+<code>1</code> shows <code>npts.min</code>, 
+<code>2</code> plots support points for the final baseline of 1st spectrum, 
+<code>3</code> plots support points for 1st spectrum,
+<code>4</code> plots support points for all spectra.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p><code>spc.fit.poly</code> calculates the least squares fit of order
+<code>poly.order</code> to the <em>complete</em> spectra given in <code>fit.to</code>.
+Thus <code>fit.to</code> needs to be cut appropriately.
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>hyperspec</code> object containing the baselines in the spectra
+matrix, either as polynomial coefficients or as polynomials evaluted on
+the spectral range of <code>apply.to</code>
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>C. Beleites
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>vignette ("baseline", package = "hyperSpec")</code>
+</p>
+<p>see <code>options</code> for more on <code>debuglevel</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+## Not run: vignette ("baseline", package = "hyperSpec")
+
+spc &lt;- chondro [1 : 10]
+baselines &lt;- spc.fit.poly(spc [,, c (625 ~ 640, 1785 ~ 1800)], spc)
+plot(spc - baselines)
+
+
+baselines &lt;- spc.fit.poly.below (spc)
+plot (spc - baselines)
+
+spc.fit.poly.below(chondro [1:3], debuglevel = 1)
+spc.fit.poly.below(chondro [1:3], debuglevel = 2)
+spc.fit.poly.below(chondro [1:3], debuglevel = 3, noise = sqrt (rowMeans (chondro [[1:3]])))
+
+</code></pre>
+
+
+</div>

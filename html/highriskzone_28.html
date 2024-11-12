@@ -1,0 +1,122 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>eval_hrz</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Evaluation of the high-risk zone.</h2>
+
+<h3>Description</h3>
+
+<p>Evaluation of the high-risk zone, which is only possible with simulated or thinned data or if the locations
+of the unobserved events have been revealed..
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">eval_hrz(hrz, unobspp, obspp = NULL)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>hrz</code></td>
+<td>
+<p>High-risk zone of class owin based on a binary mask (see <code>area.owin</code>)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>unobspp</code></td>
+<td>
+<p>Unobserved spatial point process</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>obspp</code></td>
+<td>
+<p>Observed spatial point process</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>An object of class "<code>hrzeval</code>", which is a list of
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code> numbermiss </code></td>
+<td>
+<p> number of unobserved events outside the high-risk zone </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code> numberunobserved </code></td>
+<td>
+<p> number of events in the unobserved point pattern </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code> missingfrac </code></td>
+<td>
+<p> fraction of unobserved events outside the high-risk zone (numbermiss/numberunobserved) </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code> arearegion </code></td>
+<td>
+<p> area of the high-risk zone </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code> numberobs </code></td>
+<td>
+<p> number of events in the observed point pattern </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code> out </code></td>
+<td>
+<p> subset of the unobserved events, which are outside the high-risk zone </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code> insd </code></td>
+<td>
+<p> subset of the unobserved events, which are inside the high-risk zone </p>
+</td>
+</tr>
+</table>
+<h3>See Also</h3>
+
+<p><code>inside.owin</code>, <code>area.owin</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"> data(craterB)
+ # thin data
+ set.seed(100)
+ thdata &lt;- thin(craterB, nxprob=0.1)
+ 
+ # determine hrz for the "observed events"
+ hrz &lt;- det_hrz(thdata$observed, type = "dist", criterion = "area", cutoff = 1500000, nxprob = 0.1)
+ 
+ # evaluate the hrz
+ evaluation &lt;- eval_hrz(hrz = hrz$zone, unobspp = thdata$unobserved, obspp = thdata$observed)
+ evaluation$missingfrac
+ 
+ op &lt;- par(mar=c(1, 4, 1, 6) , xpd=TRUE)
+ plot(evaluation, hrz = hrz, obspp = thdata$observed, plothrz = TRUE, plotobs = TRUE, 
+ insidecol = "magenta", outsidecol = "magenta", obscol = "blue", insidepch = 1, 
+ outsidepch = 19, main = "Evaluation visualized")
+ legend(2400, 2456.4061, c("observed", "unobs inside", "unobs outside"), 
+ col = c("blue", "magenta", "magenta"), yjust=1, pch=c(1, 1, 19), cex=0.8)
+ par(op)
+</code></pre>
+
+
+</div>

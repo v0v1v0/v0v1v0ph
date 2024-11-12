@@ -1,0 +1,438 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>do_cumulative_htrx</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Cumulative HTRX on long haplotypes</h2>
+
+<h3>Description</h3>
+
+<p>Two-step cross-validation used to select the best HTRX model for longer haplotypes,
+i.e. include at least 7 single nucleotide polymorphisms (SNPs).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">do_cumulative_htrx(
+  data_nosnp,
+  hap1,
+  hap2 = hap1,
+  train_proportion = 0.5,
+  sim_times = 5,
+  featurecap = 40,
+  usebinary = 1,
+  randomorder = TRUE,
+  fixorder = NULL,
+  method = "simple",
+  criteria = "BIC",
+  gain = TRUE,
+  nmodel = 3,
+  runparallel = FALSE,
+  mc.cores = 6,
+  rareremove = FALSE,
+  rare_threshold = 0.001,
+  L = 6,
+  dataseed = 1:sim_times,
+  fold = 10,
+  kfoldseed = 123,
+  htronly = FALSE,
+  max_int = NULL,
+  returnwork = FALSE,
+  verbose = FALSE
+)
+
+do_cumulative_htrx_step1(
+  data_nosnp,
+  hap1,
+  hap2 = hap1,
+  train_proportion = 0.5,
+  featurecap = 40,
+  usebinary = 1,
+  randomorder = TRUE,
+  fixorder = NULL,
+  method = "simple",
+  criteria = "BIC",
+  nmodel = 3,
+  splitseed = 123,
+  gain = TRUE,
+  runparallel = FALSE,
+  mc.cores = 6,
+  rareremove = FALSE,
+  rare_threshold = 0.001,
+  L = 6,
+  htronly = FALSE,
+  max_int = NULL,
+  verbose = FALSE
+)
+
+extend_haps(
+  data_nosnp,
+  featuredata,
+  train,
+  featurecap = dim(featuredata)[2],
+  usebinary = 1,
+  gain = TRUE,
+  runparallel = FALSE,
+  mc.cores = 6,
+  verbose = FALSE
+)
+
+make_cumulative_htrx(
+  hap1,
+  hap2 = hap1,
+  featurename,
+  rareremove = FALSE,
+  rare_threshold = 0.001,
+  htronly = FALSE,
+  max_int = NULL
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>data_nosnp</code></td>
+<td>
+<p>a data frame with outcome (the outcome must be the first column with colnames(data_nosnp)[1]="outcome"),
+fixed covariates (for example, sex, age and the first 18 PCs) if there are,
+and without SNPs or haplotypes.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>hap1</code></td>
+<td>
+<p>a data frame of the SNPs' genotype of the first genome. The genotype of a SNP for each individual is either 0 (reference allele) or 1 (alternative allele).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>hap2</code></td>
+<td>
+<p>a data frame of the SNPs' genotype of the second genome.
+The genotype of a SNP for each individual is either 0 (reference allele) or 1 (alternative allele).
+By default, <code>hap2=hap1</code> representing haploid.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>train_proportion</code></td>
+<td>
+<p>a positive number between 0 and 1 giving
+the proportion of the training dataset when splitting data into 2 folds.
+By default, <code>train_proportion=0.5</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sim_times</code></td>
+<td>
+<p>an integer giving the number of simulations in Step 1 (see details).
+By default, <code>sim_times=5</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>featurecap</code></td>
+<td>
+<p>a positive integer which manually sets the maximum number of independent features.
+By default, <code>featurecap=40</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>usebinary</code></td>
+<td>
+<p>a non-negative number representing different models.
+Use linear model if <code>usebinary=0</code>,
+use logistic regression model via <code>fastglm</code> if <code>usebinary=1</code> (by default),
+and use logistic regression model via <code>glm</code> if <code>usebinary&gt;1</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>randomorder</code></td>
+<td>
+<p>logical. If <code>randomorder=TRUE</code> (default),
+use random order of all the SNPs to add SNPs in cumulative HTRX.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fixorder</code></td>
+<td>
+<p>a vector of the fixed order of SNPs to be added in cumulative HTRX.
+This only works by setting <code>randomorder=FALSE</code>. Otherwise, <code>fixorder=NULL</code> (default).
+The length of <code>fixorder</code> can be smaller than the total number of SNPs,
+i.e. users can specify the order of some instead of all of the SNPs.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+<p>the method used for data splitting, either <code>"simple"</code> (default) or <code>"stratified"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>criteria</code></td>
+<td>
+<p>the criteria for model selection, either <code>"BIC"</code> (default), <code>"AIC"</code> or <code>"lasso"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>gain</code></td>
+<td>
+<p>logical. If <code>gain=TRUE</code> (default), report the variance explained in addition to fixed covariates;
+otherwise, report the total variance explained by all the variables.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nmodel</code></td>
+<td>
+<p>a positive integer specifying the number of candidate models
+that the criterion selects. By default, <code>nmodel=3</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>runparallel</code></td>
+<td>
+<p>logical. Use parallel programming based on <code>mclapply</code> function from R package <code>"parallel"</code> or not.
+Note that for Windows users, <code>mclapply</code> doesn't work, so please set <code>runparallel=FALSE</code> (default).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mc.cores</code></td>
+<td>
+<p>an integer giving the number of cores used for parallel programming.
+By default, <code>mc.cores=6</code>.
+This only works when <code>runparallel=TRUE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rareremove</code></td>
+<td>
+<p>logical. Remove rare SNPs and haplotypes or not. By default, <code>rareremove=FALSE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rare_threshold</code></td>
+<td>
+<p>a numeric number below which the haplotype or SNP is removed.
+This only works when <code>rareremove=TRUE</code>. By default, <code>rare_threshold=0.001</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>L</code></td>
+<td>
+<p>a positive integer. The cumulative HTRX starts with haplotypes templates comtaining L SNPs.
+By default, <code>L=6</code>. Let nsnp be the number of SNPs in total, <code>L</code> must be smaller than nsnp-1.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dataseed</code></td>
+<td>
+<p>a vector of the seed that each simulation in Step 1 (see details) uses.
+The length of <code>dataseed</code> must be the same as <code>sim_times</code>.
+By default, <code>dataseed=1:sim_times</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fold</code></td>
+<td>
+<p>a positive integer specifying how many folds
+the data should be split into for cross-validation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>kfoldseed</code></td>
+<td>
+<p>a positive integer specifying the seed used to
+split data for k-fold cross validation. By default, <code>kfoldseed=123</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>htronly</code></td>
+<td>
+<p>logical. If <code>htronly=TRUE</code>, only haplotypes with interaction
+between all the SNPs will be selected. Please set <code>max_int=NULL</code> when <code>htronly=TRUE</code>.
+By default, <code>htronly=FALSE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>max_int</code></td>
+<td>
+<p>a positive integer which specifies the maximum number of SNPs that can interact.
+If no value is given, interactions between all the SNPs will be considered.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>returnwork</code></td>
+<td>
+<p>logical. If <code>returnwork=TRUE</code>, return a vector of the maximum number
+of features that are assessed in each simulation, excluding the fixed covariates.
+This is used to assess how much computational 'work' is done in Step 1(2) of HTRX (see details).
+By default, <code>returnwork=FALSE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p>logical. If <code>verbose=TRUE</code>, print out the inference steps. By default, <code>verbose=FALSE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>splitseed</code></td>
+<td>
+<p>a positive integer giving the seed that a single simulation in Step 1 (see details) uses.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>featuredata</code></td>
+<td>
+<p>a data frame of the feature data, e.g. haplotype data created by HTRX or SNPs.
+These features exclude all the data in <code>data_nosnp</code>, and will be selected using 2-step cross-validation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>train</code></td>
+<td>
+<p>a vector of the indexes of the training data.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>featurename</code></td>
+<td>
+<p>a character giving the names of features (haplotypes).</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Longer haplotypes are important for discovering interactions.
+However, there are 3<sup>k</sup>-1 haplotypes in HTRX
+if the region contains k SNPs,
+making HTRX (<code>do_cv</code>) unrealistic to apply on for regions with large numbers of SNPs.
+To address this issue, we proposed "cumulative HTRX" (<code>do_cumulative_htrx</code>)
+that enables HTRX to run on longer haplotypes,
+i.e. haplotypes which include at least 7 SNPs (we recommend).
+There are 2 steps to implement cumulative HTRX.
+</p>
+<p>Step 1: extend haplotypes and select candidate models.
+</p>
+<p>(1) Randomly sample a subset (50
+use stratified sampling when the outcome is binary.
+This subset is used for all the analysis in (2) and (3);
+</p>
+<p>(2) Start with L randomly chosen SNPs from the entire k SNPs,
+and keep the top M haplotypes that are chosen from the forward regression.
+Then add another SNP to the M  haplotypes to create 3M+2 haplotypes.
+There are 3M haplotypes obtained by adding "0", "1" or "X" to the previous M haplotypes,
+as well as 2 bases of the added SNP, i.e. "XX...X0" and "XX...X1"
+(as "X" was implicitly used in the previous step).
+The top M haplotypes from them are then selected using forward regression.
+Repeat this process until obtaining M haplotypes which include k-1 SNPs;
+</p>
+<p>(3) Add the last SNP to create 3M+2 haplotypes.
+Afterwards, if <code>criteria="AIC"</code> or <code>criteria="BIC"</code>,
+start from a model with fixed covariates (e.g. 18 PCs, sex and age),
+and perform forward regression on the subset,
+i.e. iteratively choose a feature (in addition to the fixed covariates)
+to add whose inclusion enables the model to explain the largest variance,
+and select s models with the lowest Akaike information criterion (AIC) or
+Bayesian Information Criteria (BIC)
+to enter the candidate model pool;
+If <code>criteria="lasso"</code>, using least absolute shrinkage and selection operator (lasso)
+to directly select the best s models to enter the candidate model pool;
+</p>
+<p>(4) repeat (1)-(3) B times, and select all the different models
+in the candidate model pool as the candidate models.
+</p>
+<p>Step 2: select the best model using k-fold cross-validation.
+</p>
+<p>(1) Randomly split the whole data into k groups with approximately equal sizes,
+using stratified sampling when the outcome is binary;
+</p>
+<p>(2) In each of the k folds, use a fold as the validation dataset, a fold as the test dataset,
+and the remaining folds as the training dataset.
+Then, fit all the candidate models on the training dataset,
+and use these fitted models to compute the additional variance explained by features
+(out-of-sample variance explained) in the validation and test dataset.
+Finally, select the candidate model with the biggest
+average out-of-sample variance explained in the validation set as the best model,
+and report the out-of-sample variance explained in the test set.
+</p>
+<p>Function <code>do_cumulative_htrx_step1</code> is the Step 1 (1)-(3) described above.
+Function <code>extend_haps</code> is used to select haplotypes in the Step 1 (2) described above.
+Function <code>make_cumulative_htrx</code> is used to generate the haplotype data
+(by adding a new SNP into the haplotypes) from M haplotypes to 3M+2 haplotypes,
+which is also described in the Step 1 (2)-(3).
+</p>
+<p>When investigating haplotypes with interactions between at most 2 SNPs, L is suggested
+to be no bigger than 10. When investigating haplotypes with interactions between at most 3 SNPs,
+L should not be bigger than 9. If haplotypes with interactions between more than 4 SNPs
+are investigated, L is suggested to be 6 (which is the default value).
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>do_cumulative_htrx</code> returns a list containing the best model selected,
+and the out-of-sample variance explained in each test set.
+</p>
+<p><code>do_cv_step1</code> returns a list of three candidate models selected by a single simulation.
+</p>
+<p><code>extend_haps</code> returns a character of the names of the selected features.
+</p>
+<p><code>make_cumulative_htrx</code> returns a data frame of the haplotype matrix.
+</p>
+
+
+<h3>References</h3>
+
+<p>Yang Y, Lawson DJ. HTRX: an R package for learning non-contiguous haplotypes associated with a phenotype. Bioinformatics Advances 3.1 (2023): vbad038.
+</p>
+<p>Barrie, W., Yang, Y., Irving-Pease, E.K. et al. Elevated genetic risk for multiple sclerosis emerged in steppe pastoralist populations. Nature 625, 321–328 (2024).
+</p>
+<p>Eforn, B. "Bootstrap methods: another look at the jackknife." The Annals of Statistics 7 (1979): 1-26.
+</p>
+<p>Schwarz, Gideon. "Estimating the dimension of a model." The annals of statistics (1978): 461-464.
+</p>
+<p>McFadden, Daniel. "Conditional logit analysis of qualitative choice behavior." (1973).
+</p>
+<p>Akaike, Hirotugu. "A new look at the statistical model identification." IEEE transactions on automatic control 19.6 (1974): 716-723.
+</p>
+<p>Tibshirani, Robert. "Regression shrinkage and selection via the lasso." Journal of the Royal Statistical Society: Series B (Methodological) 58.1 (1996): 267-288.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## use dataset "example_hap1", "example_hap2" and "example_data_nosnp"
+## "example_hap1" and "example_hap2" are
+## both genomes of 8 SNPs for 5,000 individuals (diploid data)
+## "example_data_nosnp" is a simulated dataset
+## which contains the outcome (binary), sex, age and 18 PCs
+
+## visualise the covariates data
+## we will use only the first two covariates: sex and age in the example
+head(HTRX::example_data_nosnp)
+
+## visualise the genotype data for the first genome
+head(HTRX::example_hap1)
+
+## we perform cumulative HTRX on all the 8 SNPs using 2-step cross-validation
+## to compute additional variance explained by haplotypes
+## If the data is haploid, please set hap2=HTRX::example_hap1
+## If you want to compute total variance explained, please set gain=FALSE
+## For Linux/MAC users, we recommend setting runparallel=TRUE
+
+cumu_CV_results &lt;- do_cumulative_htrx(HTRX::example_data_nosnp[1:500,1:3],
+                                      HTRX::example_hap1[1:500,],
+                                      HTRX::example_hap2[1:500,],
+                                      train_proportion=0.5,sim_times=1,
+                                      featurecap=10,usebinary=1,
+                                      randomorder=TRUE,method="stratified",
+                                      criteria="BIC",gain=TRUE,
+                                      runparallel=FALSE,verbose=TRUE)
+
+#This result would be more precise when setting larger sim_times and featurecap
+</code></pre>
+
+
+</div>

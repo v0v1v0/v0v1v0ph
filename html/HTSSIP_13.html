@@ -1,0 +1,110 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>delta_BD</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>delta_BD calculation</h2>
+
+<h3>Description</h3>
+
+<p>Calculate delta_BD as described in
+<a href="http://www.ncbi.nlm.nih.gov/pmc/articles/PMC4867679/">Pepe-Ranney et al., 2016</a>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">delta_BD(physeq, control_expr, n = 20, BD_min = NULL, BD_max = NULL)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>physeq</code></td>
+<td>
+<p>Phyloseq object</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>control_expr</code></td>
+<td>
+<p>An expression for identifying unlabeled control
+samples in the phyloseq object (eg., "Substrate=='12C-Con'")</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n</code></td>
+<td>
+<p>How many evenly-spaced buoyant density values to use for linear
+interpolation of abundances.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>BD_min</code></td>
+<td>
+<p>The minimum BD value of the BD range used for OTU abundance interpolation.
+If NULL, then BD_min will be the minimum of all BD values in the phyloseq object.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>BD_max</code></td>
+<td>
+<p>The maximum BD value of the BD range used for OTU abundance interpolation.
+If NULL, then BD_max will be the maximum of all BD values in the phyloseq object.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Basically, the abundance of each OTU is interpolated at specific BD values in order to
+have abundance values at consistent points across gradients (gradient fraction BDs
+normally vary from gradient to gradient). The center of mass (CM) is calculcated from these
+interpolated values, which is the weighted mean BD with interpolated OTU abundances
+used as weights (ie., where in the density gradient contains the 'center' of the OTU
+abundance distribution). Delta_BD is then calculated by substracting the CM for the
+unlabeled control gradient from the labeled treatment gradient.
+</p>
+<p>The delta_BD calculation will be a comparison between unlabled control and labeled
+treatment samples. These samples are distinguished from each other with the
+'control_expr' parameter. NOTE: if multiple gradients fall into the control or
+treatment category, they will be treated as one gradient (which may be OK if
+you want to combine replicate gradients).
+</p>
+<p>NaN values may occur due low abundances.
+</p>
+<p>The BD range used for interpolation is set by the min/max of all buoyant density
+values in the phyloseq object (standardize across).
+</p>
+
+
+<h3>Value</h3>
+
+<p>data.frame with delta_BD values for each OTU. 'CM' stands for 'center of mass'.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(physeq_S2D2_l)
+# just selecting 1 treatment-control comparison
+physeq = physeq_S2D2_l[[1]]
+
+## Not run: 
+# calculating delta_BD
+df = delta_BD(physeq, control_expr='Substrate=="12C-Con"')
+head(df)
+
+# In this example, the replicate gradients will be combined for treatments/controls
+data(physeq_rep3)
+df = delta_BD(physeq_rep3, control_expr='Treatment=="12C-Con"')
+head(df)
+
+## End(Not run)
+
+</code></pre>
+
+
+</div>

@@ -1,0 +1,110 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>preference</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Decision on preferences between loss distributions
+</h2>
+
+<h3>Description</h3>
+
+<p>This function implements the total ordering on losses, based on treating the moment sequences as hyperreal numbers, and returns the lesser of the loss distribution representatives in the hyperreal space.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">preference(x, y, verbose = FALSE, weights, points = 512)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+
+<p>a loss, being either a number,a distribution or list of distributions (objects of class <code>mosg.lossdistribution</code>)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+
+<p>a loss, being either a number,a distribution or list of distributions (objects of class <code>mosg.lossdistribution</code>)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>weights</code></td>
+<td>
+
+<p>a vector of <code>n = length(x) = length(y)</code> nonzero numbers (not necessarily summing up to 1), used only if <code>x</code> and <code>y</code> are lists of <code>mosg.lossdistribution</code> objects corresponding to <code class="reqn">n&gt;1</code> goals. In that case,
+the i-th goal gets assigend the weight (priority) <code>weights[[i]]</code>. Defaults to all goals having equal priority if the parameter is missing (<code>weights = rep(1/length(x), length(x))</code>).
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+
+<p>if set to <code>TRUE</code>, the function returns the preferred of its arguments directly (thus, giving back <code>x</code> or <code>y</code>). If set to <code>FALSE</code> (default), then it returns the argument index (1 = <code>x</code>, 2 = <code>y</code>) or 0 in case that <code class="reqn">x=y</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>points</code></td>
+<td>
+
+<p>the number of points at which the distributions are evaluated numerically to determine the preference.
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Deciding the preference ordering defined in terms of moment sequence as proposed in (Rass, 2015). To avoid having to compute all moments up to an unknown order, this function decides by looking at the tails of the distribution, returning the one with faster decaying tail as the preferred distribution. This method delivers exact decisions for discrete distributions, but is only an approximate approach for continous densities.
+</p>
+
+
+<h3>Value</h3>
+
+<p>the result is either a copy of the input parameter <code>x</code> or <code>y</code>, depending on which distribution is preferred. 
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Stefan Rass
+</p>
+
+
+<h3>References</h3>
+
+<p>S. Rass. On Game-Theoretic Risk Management (Part One). Towards a Theory of
+Games with Payoffs that are Probability-Distributions. ArXiv e-prints, June 2015.
+http://arxiv.org/abs/1506.07368.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>lossDistribution</code>, <code>lossDistribution.mosg</code>, <code>print.mosg.lossdistribution</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># use data from CVSS risk assessments
+cvss1base &lt;- c(10,6.4,9,7.9,7.1,9)
+cvss2base &lt;- c(10,7.9,8.2,7.4,10,8.5,9,9,8.7)
+ld1 &lt;- lossDistribution(cvss1base)
+ld2 &lt;- lossDistribution(cvss2base)
+lowerRisk &lt;- preference(ld1, ld2) # get the result for later use
+preference(ld1, ld2, verbose=TRUE) # view the detailed answer
+</code></pre>
+
+
+</div>

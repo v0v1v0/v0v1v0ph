@@ -1,0 +1,106 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hf.bt</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>hf.bt</h2>
+
+<h3>Description</h3>
+
+<p>Denoises a Gaussian contaminated vector using a version of the wavelet-based “greedy tree" algorithm by Baraniuk, see references. 
+Note: this function does not actually do any Haar-Fisz transform, it is
+a homogeneous variance Gaussian denoising function, which is used by
+the <span class="pkg">haarfisz</span> package.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hf.bt(x, filter.number = 1, family = "DaubExPhase", min.level = 3, noise.level = NULL) 
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>The noisy vector, its length must be a power of 2.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>filter.number</code></td>
+<td>
+<p>The filter number of the analysing wavelet. Can be set to 1, 2, ..., 10 for <code>family == "DaubExPhase"</code>, or to 4, 5, ..., 10 for <code>family == "DaubLeAsymm"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>family</code></td>
+<td>
+<p>The family of wavelet bases from which the wavelet <code>filter.number</code> is chosen. Can be set to "DaubExPhase" or "DaubLeAsymm".</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>min.level</code></td>
+<td>
+<p>The minimum level thresholded.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>noise.level</code></td>
+<td>
+<p>Standard deviation of the noise, can be set to a positive number or NULL; in the latter case it will be estimated using MAD.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>Denoised version of <code>x</code>.</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Piotr Fryzlewicz</p>
+
+
+<h3>References</h3>
+
+<p>Baraniuk, R. G. (1999) Optimal tree approximation with wavelets.
+Pages 206-214 of Unser, M.A., Aldroubi, A. and Laine, A.F. (eds),
+<em>Wavelet Applications in Signal and Image Processing VII</em>,
+Proceedings of SPIE <b>3813</b>. SPIE.
+<a href="https://doi.org/10.1117/12.366780">doi:10.1117/12.366780</a>
+</p>
+<p>Fryzlewicz, P. and Nason, G.P. (2004) A Haar-Fisz algorithm for Poisson
+intensity estimation.
+<em>Journal of Computational and Graphical Statistics</em>,
+<b>13</b>, 621-638. <a href="https://doi.org/10.1198/106186004X2697">doi:10.1198/106186004X2697</a>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">#
+# Generate simple sinusoidal test signal
+#
+test.sig &lt;- sin(seq(from=0, to=6*pi, length=128))
+#
+# Invent simulated noisy signal
+#
+test.dat &lt;- test.sig + rnorm(128, sd=0.2)
+#
+# Denoise using hf.bt
+#
+test.est &lt;- hf.bt(test.dat)
+#
+# Now plot the results: the truth, the noisy signal, the estimate
+#
+ts.plot(test.dat)
+lines(test.est, col=2)
+lines(test.sig, col=3, lty=2)
+</code></pre>
+
+
+</div>

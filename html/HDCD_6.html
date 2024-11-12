@@ -1,0 +1,148 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>ESAC_test_calibrate</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Generates empirical penalty function <code class="reqn">\gamma(t)</code> for single change-point testing using Monte Carlo simulation</h2>
+
+<h3>Description</h3>
+
+<p>R wrapper for C function choosing the penalty function <code class="reqn">\gamma(t)</code> by Monte Carlo simulation, as described in Appendix B in Moen et al. (2023), for testing for a single change-point.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">ESAC_test_calibrate(
+  n,
+  p,
+  bonferroni = TRUE,
+  N = 1000,
+  tol = 1/1000,
+  fast = FALSE,
+  rescale_variance = TRUE,
+  debug = FALSE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>n</code></td>
+<td>
+<p>Number of observations</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>p</code></td>
+<td>
+<p>Number time series</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>bonferroni</code></td>
+<td>
+<p>If <code>TRUE</code>, a Bonferroni correction applied and the empirical penalty function <code class="reqn">\gamma(t)</code> is chosen by simulating leading constants of <code class="reqn">r(t)</code> through Monte Carlo simulation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>N</code></td>
+<td>
+<p>Number of Monte Carlo samples used</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tol</code></td>
+<td>
+<p>False positive probability tolerance</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fast</code></td>
+<td>
+<p>If <code>TRUE</code>, ESAC only tests for a change-point at the midpoint of the interval <code class="reqn">(0,\ldots,n]</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rescale_variance</code></td>
+<td>
+<p>If <code>TRUE</code>, each row of the data is re-scaled by a MAD estimate using <code>rescale_variance</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>debug</code></td>
+<td>
+<p>If <code>TRUE</code>, diagnostic prints are provided during execution</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A list containing a vector of values of <code class="reqn">\gamma(t)</code> for <code class="reqn">t \in \mathcal{T}</code> decreasing (element #1), a vector of corresponding values of the threshold <code class="reqn">a(t)</code> (element # 3), a vector of corresponding values of <code class="reqn">\nu_{a(t)}</code>
+</p>
+<p>A list containing 
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>without_partial</code></td>
+<td>
+<p> a vector of values of <code class="reqn">\gamma(t)</code> for <code class="reqn">t \in \mathcal{T}</code> decreasing in <code class="reqn">t</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>with_partial</code></td>
+<td>
+<p>same as <code>without_partial</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>as</code></td>
+<td>
+<p>vector of threshold values <code class="reqn">a(t)</code> for <code class="reqn">t \in \mathcal{T}</code> decreasing in <code class="reqn">t</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nu_as</code></td>
+<td>
+<p>vector of conditional expectations <code class="reqn">\nu_{a(t)}</code> of a thresholded Gaussian, for <code class="reqn">t \in \mathcal{T}</code> decreasing in <code class="reqn">t</code></p>
+</td>
+</tr>
+</table>
+<h3>References</h3>
+
+<p>Moen PAJ, Glad IK, Tveten M (2023).
+“Efficient sparsity adaptive changepoint estimation.”
+Arxiv preprint, 2306.04702, <a href="https://doi.org/10.48550/arXiv.2306.04702">https://doi.org/10.48550/arXiv.2306.04702</a>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">library(HDCD)
+n = 50
+p = 50
+
+set.seed(100)
+thresholds_emp = ESAC_test_calibrate(n,p, bonferroni=TRUE,N=100, tol=1/100)
+set.seed(100)
+thresholds_emp_without_bonferroni = ESAC_test_calibrate(n,p, bonferroni=FALSE,N=100, tol=1/100)
+thresholds_emp[[1]] # vector of \gamma(t) for t = p,...,1
+thresholds_emp_without_bonferroni[[1]] # vector of \gamma(t) for t = p,...,1
+
+# Generating data
+X = matrix(rnorm(n*p), ncol = n, nrow=p)
+Y = matrix(rnorm(n*p), ncol = n, nrow=p)
+
+# Adding a single sparse change-point to X (and not Y):
+X[1:5, 26:n] = X[1:5, 26:n] +2
+resX = ESAC_test(X, thresholds = thresholds_emp[[1]])
+resX
+resY = ESAC_test(Y,  thresholds = thresholds_emp[[1]])
+resY
+</code></pre>
+
+
+</div>

@@ -1,0 +1,98 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>define_part_surv</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Define Partitioned Survival</h2>
+
+<h3>Description</h3>
+
+<p>Define a partitioned survival model with progression-free
+survival and overall survival.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">define_part_surv(
+  pfs,
+  os,
+  state_names,
+  terminal_state = FALSE,
+  cycle_length = 1
+)
+
+define_part_surv_(pfs, os, state_names, cycle_length = 1)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>pfs, os</code></td>
+<td>
+<p>Either results from
+<code>flexsurv::flexsurvreg()</code> or
+<code>define_surv_dist()</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>state_names</code></td>
+<td>
+<p>named character vector, length 3 or 4.
+State names for progression-free state, progression,
+(optionally terminal) and death respectively. Elements
+should be named <code>"progression_free"</code>,
+<code>"progression"</code>, (optionally <code>"terminal"</code>),
+and <code>"death"</code>. See examples.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>terminal_state</code></td>
+<td>
+<p>Should a terminal state be
+included? Only used when state names are not provided.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cycle_length</code></td>
+<td>
+<p>The value of a Markov cycle in
+absolute time units.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A <code>part_surv</code> object.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">dist_pfs &lt;- define_surv_dist("exp", rate = 1)
+dist_os &lt;- define_surv_dist("exp", rate = .5)
+
+define_part_surv(
+  pfs = dist_pfs,
+  os = dist_os,
+  state_names = c(
+    progression_free = "A",
+    progression = "B",
+    terminal = "C",
+    death = "D"
+  )
+)
+# identical to:
+define_part_surv(
+  pfs = dist_pfs,
+  os = dist_os,
+  terminal_state = TRUE
+)
+
+</code></pre>
+
+
+</div>

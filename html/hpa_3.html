@@ -1,0 +1,163 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>bspline</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>B-splines generation, estimation and combination</h2>
+
+<h3>Description</h3>
+
+<p>Function <code>bsplineGenerate</code> generates a list
+of all basis splines with appropriate <code>knots</code> vector and <code>degree</code>.
+Function <code>bsplineComb</code> allows to get linear combinations
+of these b-splines with particular <code>weights</code>. 
+Function <code>bsplineEstimate</code> estimates the spline at
+points <code>x</code>. The structure of this spline should be provided via
+<code>m</code> and <code>knots</code> arguments.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">bsplineGenerate(knots, degree, is_names = TRUE)
+
+bsplineEstimate(x, m, knots)
+
+bsplineComb(splines, weights)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>knots</code></td>
+<td>
+<p>sorted in ascending order numeric vector representing
+knots of the spline.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>degree</code></td>
+<td>
+<p>positive integer representing degree of the spline.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>is_names</code></td>
+<td>
+<p>logical; if TRUE (default) then rows and columns of the
+spline matrices will have a names. Set it to FALSE in order to get notable 
+speed boost.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>numeric vector representing the points at which the 
+spline should be estimated.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>m</code></td>
+<td>
+<p>numeric matrix which rows correspond to spline intervals
+while columns represent variables powers. Therefore the element 
+in i-th row and j-th column represents the coefficient associated with
+the variable that 1) belongs to the i-th interval i.e. between i-th and
+(i + 1)-th knots 2) raised to the power of (j - 1).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>splines</code></td>
+<td>
+<p>list being returned by the 
+<code>bsplineGenerate</code> function or a manually constructed
+list with b-splines knots and matrices entries.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>weights</code></td>
+<td>
+<p>numeric vector of the same length as <code>splines</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>In contrast to <code>bs</code> function 
+<code>bsplineGenerate</code> generates a splines basis in a form
+of a list containing information concerning these b-splines structure.
+In order to evaluate one of these b-splines at particular points
+<code>bsplineEstimate</code> function should be applied.
+</p>
+
+
+<h3>Value</h3>
+
+<p>Function <code>bsplineGenerate</code> returns a list. Each
+element of this list is a list containing the following
+information concerning b-spline structure:
+</p>
+
+<ul>
+<li> <p><code>knots</code> - knots vector of the b-spline. 
+</p>
+</li>
+<li> <p><code>m</code> - matrix representing polynomial coefficients for each
+interval of the spline in the same manner as for <code>m</code> argument
+(see this argument description above).
+</p>
+</li>
+<li> <p><code>ind</code> - index of the b-spline.</p>
+</li>
+</ul>
+<p>Function <code>bsplineComb</code> returns a list with the following arguments:
+</p>
+
+<ul>
+<li> <p><code>knots</code> - knots vector of the <code>splines</code>. 
+</p>
+</li>
+<li> <p><code>m</code> - linear combination of the <code>splines</code> matrices; 
+coefficients of this linear combination are given 
+via <code>weights</code> argument.</p>
+</li>
+</ul>
+<p>Function <code>bsplineGenerate</code> returns a numeric
+vector of values being calculated at points <code>x</code> via splines with 
+<code>knots</code> vector and matrix <code>m</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Let's generate all b-splines of degree 3 with knots 
+# vector (-2.1, 1.5, 1.5, 2.2, 3.7, 4.2, 5)
+b &lt;- bsplineGenerate(knots = c(-2.1, 1.5, 1.5, 2.2, 3.7, 4.2, 5), 
+                     degree = 3)
+
+# Get the first of these b-splines
+b[[1]]
+
+# Take a linear combination of these splines with 
+# weights 1.6, -1.2 and 3.2.
+b_comb &lt;- bsplineComb(splines = b, weights = c(1.6, -1.2, 3.2))
+
+# Estimate this spline value at points (-3, 0.7, 2.5, 3.8, 10)
+b_values &lt;- bsplineEstimate(x = c(-3, 0.7, 2.5, 3.8, 10),  
+                            knots = b_comb$knots, 
+                            m = b_comb$m)
+
+# Visualize the spline
+s &lt;- seq(from = 0, to = 5, length = 1000)
+b_values_s &lt;- bsplineEstimate(x = s,  
+                              knots = b_comb$knots, 
+                              m = b_comb$m)
+plot(s, b_values_s)
+
+</code></pre>
+
+
+</div>

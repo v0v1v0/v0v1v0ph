@@ -1,0 +1,149 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>leadLag</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Lead-Lag estimation</h2>
+
+<h3>Description</h3>
+
+<p>Function that estimates whether one series leads (or lags) another.
+</p>
+<p>Let <code class="reqn">X_{t}</code> and <code class="reqn">Y_{t}</code> be two observed price over the time interval <code class="reqn">[0,1]</code>.
+</p>
+<p>For every integer <code class="reqn">k \in \cal{Z}</code>, we form the shifted time series
+</p>
+<p style="text-align: center;"><code class="reqn">
+   Y_{\left(k+i\right)/n},  \quad i = 1, 2, \dots
+</code>
+</p>
+
+<p><code class="reqn">H=\left(\underline{H},\overline{H}\right]</code> is an interval for <code class="reqn">\vartheta\in\Theta</code>, define the shift interval <code class="reqn">H_{\vartheta}=H+\vartheta=\left(\underline{H}+\vartheta,\overline{H}+\vartheta\right]</code> then let
+</p>
+<p style="text-align: center;"><code class="reqn">
+    X\left(H\right)_{t}=\int_{0}^{t}1_{H}\left(s\right)\textrm{d}X_{s}
+</code>
+</p>
+
+<p>Which will be abbreviated:
+</p>
+<p style="text-align: center;"><code class="reqn">
+    X\left(H\right)=X\left(H\right)_{T+\delta}=\int_{0}^{T+\delta}1_{H}\left(s\right)\textrm{d}X_{s}
+</code>
+</p>
+
+<p>Then the shifted HY contrast function is:
+</p>
+<p style="text-align: center;"><code class="reqn">
+    \tilde{\vartheta}\rightarrow U^{n}\left(\tilde{\vartheta}\right)= \\
+    1_{\tilde{\vartheta}\geq0}\sum_{I\in{\cal{I}},J\in{\cal{J}},\overline{I}\leq T}X\left(I\right)Y\left(J\right)1_{\left\{ I\cap J_{-\tilde{\vartheta}}\neq\emptyset\right\}} \\
+    +1_{\tilde{\vartheta}&lt;0}\sum_{I\in{\cal{I}},J\in{\cal{J}},\overline{J}\leq T}X\left(I\right)Y\left(Y\right)1_{\left\{ J\cap I_{\tilde{\vartheta}}\neq\emptyset\right\} }
+</code>
+</p>
+
+<p>This contrast function is then calculated for all the lags passed in the argument <code>lags</code>
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">leadLag(
+  price1 = NULL,
+  price2 = NULL,
+  lags = NULL,
+  resolution = "seconds",
+  normalize = TRUE,
+  parallelize = FALSE,
+  nCores = NA
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>price1</code></td>
+<td>
+<p><code>xts</code> or <code>data.table</code> containing prices in levels, in case of data.table,
+use a column DT to denote the date-time in POSIXct format, and a column PRICE to denote the price</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>price2</code></td>
+<td>
+<p><code>xts</code> or <code>data.table</code> containing prices in levels, in case of data.table,
+use a column DT to denote the date-time in POSIXct format, and a column PRICE to denote the price</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lags</code></td>
+<td>
+<p>a numeric denoting which lags (in units of <code>resolution</code>) should be tested as leading or lagging</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>resolution</code></td>
+<td>
+<p>the resolution at which the lags is measured. 
+The default is "seconds", use this argument to gain 1000 times resolution by setting it to either "ms", "milliseconds", or "milli-seconds".</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>normalize</code></td>
+<td>
+<p>logical denoting whether the contrasts should be normalized by the product of the L2 norms of both the prices. Default = TRUE. 
+This does not change the value of the lead-lag-ratio.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>parallelize</code></td>
+<td>
+<p>logical denoting whether to use a parallelized version of the C++ code (parallelized using OPENMP). Default = FALSE</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nCores</code></td>
+<td>
+<p>integer valued numeric denoting how many cores to use for the lead-lag estimation procedure in case parallelize is TRUE. 
+Default is NA, which does not parallelize the code.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The lead-lag-ratio (LLR) can be used to see if one asset leads the other. If LLR &lt; 1, then price1 MAY be leading price2 and vice versa if LLR &gt; 1.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A list with class <code>leadLag</code> which contains <code>contrasts</code>, <code>lead-lag-ratio</code>, and <code>lags</code>, denoting the estimated values for each lag calculated,
+the lead-lag-ratio, and the tested lags respectively.
+</p>
+
+
+<h3>References</h3>
+
+<p>Hoffmann, M., Rosenbaum, M., and Yoshida, N. (2013). Estimation of the lead-lag parameter from non-synchronous data. <em>Bernoulli</em>, 19, 1-37.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+# Toy example to show the usage
+# Spread prices
+spread &lt;- spreadPrices(sampleMultiTradeData[SYMBOL %in% c("ETF", "AAA")])
+# Use lead-lag estimator
+llEmpirical &lt;- leadLag(spread[!is.na(AAA), list(DT, PRICE = AAA)], 
+                       spread[!is.na(ETF), list(DT, PRICE = ETF)], seq(-15,15))
+plot(llEmpirical)
+
+## End(Not run)
+
+</code></pre>
+
+
+</div>

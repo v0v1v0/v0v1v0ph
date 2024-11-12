@@ -1,0 +1,165 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>write_hdd</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Saves or appends a data set into a HDD file</h2>
+
+<h3>Description</h3>
+
+<p>This function saves in-memory/HDD data sets into HDD repositories. Useful to
+append several data sets.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">write_hdd(
+  x,
+  dir,
+  chunkMB = Inf,
+  rowsPerChunk,
+  compress = 50,
+  add = FALSE,
+  replace = FALSE,
+  showWarning,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>A data set.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dir</code></td>
+<td>
+<p>The HDD repository, i.e. the directory where the HDD data is.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>chunkMB</code></td>
+<td>
+<p>If the data has to be split in several files of <code>chunkMB</code>
+sizes. Default is <code>Inf</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rowsPerChunk</code></td>
+<td>
+<p>Integer, default is missing. Alternative to the argument
+<code>chunkMB</code>. If provided, the data will be split in several files of <code>rowsPerChunk</code>
+rows.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>compress</code></td>
+<td>
+<p>Compression rate to be applied by <code>write_fst</code>.
+Default is 50.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>add</code></td>
+<td>
+<p>Should the file be added to the existing repository? Default is <code>FALSE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>replace</code></td>
+<td>
+<p>If <code>add = FALSE</code>, should any existing document be replaced?
+Default is <code>FALSE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>showWarning</code></td>
+<td>
+<p>If the data <code>x</code> has no observation, then a warning is
+raised if <code>showWarning = TRUE</code>. By default, it occurs only if <code>write_hdd</code>
+is NOT called within a function.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Not currently used.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Creating a HDD data set with this function always create an additional file named
+“_hdd.txt” in the HDD folder. This file contains summary information on
+the data: the number of rows, the number of variables, the first five lines and
+a log of how the HDD data set has been created. To access the log directly from
+<code>R</code>, use the function <code>origin</code>.
+</p>
+
+
+<h3>Value</h3>
+
+<p>This function does not return anything in R. Instead it creates a folder
+on disk containing <code>.fst</code> files. These files represent the data that has been
+converted to the <code>hdd</code> format.
+</p>
+<p>You can then read the created data with the function <code>hdd()</code>.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Laurent Berge
+</p>
+
+
+<h3>See Also</h3>
+
+<p>See <code>hdd</code>, <code>sub-.hdd</code> and <code>cash-.hdd</code>
+for the extraction and manipulation of out of memory data. For importation of
+HDD data sets from text files: see <code>txt2hdd</code>.
+</p>
+<p>See <code>hdd_slice</code> to apply functions to chunks of data (and create
+HDD objects) and <code>hdd_merge</code> to merge large files.
+</p>
+<p>To create/reshape HDD objects from memory or from other HDD objects, see
+<code>write_hdd</code>.
+</p>
+<p>To display general information from HDD objects: <code>origin</code>,
+<code>summary.hdd</code>, <code>print.hdd</code>,
+<code>dim.hdd</code> and <code>names.hdd</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+# Toy example with iris data
+
+# Let's create a HDD data set from iris data
+hdd_path = tempfile() # =&gt; folder where the data will be saved
+write_hdd(iris, hdd_path)
+# Let's add data to it
+for(i in 1:10) write_hdd(iris, hdd_path, add = TRUE)
+
+base_hdd = hdd(hdd_path)
+summary(base_hdd) # =&gt; 11 files, 1650 lines, 48.7KB on disk
+
+# Let's save the iris data by chunks of 1KB
+# we use replace = TRUE to delete the previous data
+write_hdd(iris, hdd_path, chunkMB = 0.001, replace = TRUE)
+
+base_hdd = hdd(hdd_path)
+summary(base_hdd) # =&gt; 8 files, 150 lines, 10.2KB on disk
+
+</code></pre>
+
+
+</div>

@@ -1,0 +1,280 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>plotHit</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Visualization of a cross-species hit
+</h2>
+
+<h3>Description</h3>
+
+<p>For each cross-species hit the function plots the similarity within that area together with an optional annotation and coverage track.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">  plotHit(hits, flanking=1, window=NULL, annot=TRUE, coverage=FALSE,
+          smoothPara=NULL, diagonal=0.25, verbose=TRUE, output=FALSE,
+          hitSpecies=NULL, hitSpeciesAssembly=NULL, origSpecies=NULL,
+          origSpeciesAssembly=NULL, fastaFolder=NULL, origAnnot=NULL,
+          hitAnnot=NULL, nTick=5, which=NULL, figureFolder=NULL,
+          figurePrefix=NULL, indexOffset=0, bamFolder=NULL, bamFiles=NULL,
+          groupIndex=NULL, groupColor=NULL, countWindow=NULL)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>hits</code></td>
+<td>
+<p>The hit object to be plotted.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>flanking</code></td>
+<td>
+<p>Allowed flanking site in Mb.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>window</code></td>
+<td>
+<p>Moving window size of similarity measure.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>annot</code></td>
+<td>
+<p>Logical, add annotation track</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>coverage</code></td>
+<td>
+<p>Logical, add coverage track</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>smoothPara</code></td>
+<td>
+<p>Smoothing parameter for coverage</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>diagonal</code></td>
+<td>
+<p>Threshold for allowed diagonal similarity</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p>Logical, shall the function give status updates</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>output</code></td>
+<td>
+<p>Logical, shall numerical results be given</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>hitSpecies</code></td>
+<td>
+<p>Scientific identifier of the hit species.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>hitSpeciesAssembly</code></td>
+<td>
+<p>Version of the hit species assembly</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>origSpecies</code></td>
+<td>
+<p>Scientific name of the original species</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>origSpeciesAssembly</code></td>
+<td>
+<p>Version of the original species</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fastaFolder</code></td>
+<td>
+<p>Location of the fasta files</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>origAnnot</code></td>
+<td>
+<p>Annotation object of the original species</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>hitAnnot</code></td>
+<td>
+<p>Annotation object of the hit species</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nTick</code></td>
+<td>
+<p>Number of ticks on the annotation track</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>which</code></td>
+<td>
+<p>Which hits should be plotted</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>figureFolder</code></td>
+<td>
+<p>Folder where Figures should be stored</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>figurePrefix</code></td>
+<td>
+<p>Prefix of the figure filenames</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>indexOffset</code></td>
+<td>
+<p>Offset of the running index of the filenames</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>bamFolder</code></td>
+<td>
+<p>Folder with the bam-files</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>bamFiles</code></td>
+<td>
+<p>Filenames of the bam-files</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>groupIndex</code></td>
+<td>
+<p>Index of subgroups in the bamfiles</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>groupColor</code></td>
+<td>
+<p>Vector with colors, one for each subgroup</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>countWindow</code></td>
+<td>
+<p>Window size to count the reads from bam-files.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>This function is the workhorse of hoardeR and visualizes the findings of the blast and intersection runs. It is really flexibel to handle the hits and  
+hence there are many different options. The required options are <code>hits</code>, <code>hitSpecies</code>, <code>origSpecies</code> and <code>fastaFolder</code>.
+</p>
+<p>The hit object is an object as provided by <code>intersectXMLAnnot</code> and contains all intersections of interest (=intersections that are in close
+proximity of a gene in the hit species). Naturally the hit and the original species have to be specified as well as the folder, where the required fasta
+files are stored, or to where they should  be downloaded. If the species are the default species from Ensembl (as can be seen in the data.frame
+<code>species</code>), the annotation and assembly will be automatically downloaded to the specified location on the harddrive. Changes from that
+version can be adjusted with the the <code>hitSpeciesAssembly</code> and <code>origSpeciesAssembly</code> options, but the filenames have still to match the convention, as they
+are provided by NCBI. 
+</p>
+<p>If in  addition to the similarity also a coverage track should be added, the option <code>coverage</code> has to be set to <code>TRUE</code>. The option 
+<code>smoothPara</code> sets then the level of smoothing of the coverage. By default no smoothing will be applied. 
+</p>
+<p>In case an annotation track is requested (<code>annot=TRUE</code>), the annotation objects need to be provided to the <code>origAnnot</code> and <code>hitAnnot</code> options.
+</p>
+<p>The option <code>diagonal</code> defines the minimum level of similarity so that a (diagonal) match will be plotted. The colors are then towards green for
+total similarity and towards red for total disagree, based on a nucleotide mismatch matrix.
+</p>
+<p>If the option <code>verbose=TRUE</code> is set, the function gives a verbose output while running. Further, if <code>output=TRUE</code> then, in addition to the
+figure also a data.frame with the numerical results is provided. 
+</p>
+<p>In case that <code>hits</code> contains more than one hit, the <code>plotHit</code> function plots for each hit a figure. In that case a folder should be
+provided to where the figures should be stored, this can be done with the <code>figureFolder</code> and <code>figurePrefix</code> options. In case only
+asserted hits of <code>hits</code> shall be plotted, they can be selected with the <code>which</code> option.
+</p>
+<p>The function can also plot a coverage track over the similarity. For that, the option <code>coverage=TRUE</code> has to be set and a folder that 
+contains the necessary bam-files has to be specified in <code>bamFolder</code>. By default all bam files in that folder are used, if only a subset
+is requested, the filenames can be specified in <code>bamFiles</code>. In case several bam-files are given, the average coverage at each loci is used.
+Further, if the data contains subgroups (e.g. case/control), the vector <code>groupIndex</code> gives the group labels. Naturally its length should be
+similar to <code>bamFiles</code> (or similar to the total amount of files in the bam-folder). In case that more than one group is plotted in the
+coverage track, their colors can be defined in <code>groupColor</code>. Of course, this vector has to be as long as the number of groups are defined. 
+The option <code>countWindow</code> controls the moving window length in which the number of counts is calculated. The default is the same length as the
+hit.
+</p>
+
+
+<h3>Value</h3>
+
+<p>Optional, a table with intersection loci.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Daniel Fischer
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+pigInter.flank &lt;- list()
+for(i in 1:nrow(pigHits)){
+   pigInter.flank[[i]] &lt;- intersectXMLAnnot(pigHits[i,], ssannot, flanking=100)
+}
+# Basic usage:
+plotHit(hits=pigInter.flank,
+        flanking=100,
+        hitSpecies = "Sus scrofa",
+        origSpecies = "Bos taurus",
+        fastaFolder = "/home/user/fasta/",
+        figureFolder = "/home/user/figures/") 
+
+# Annotation tracks added:
+plotHit(hits=pigInter.flank,
+        flanking=100,
+        hitSpecies = "Sus scrofa",
+        origSpecies = "Bos taurus",
+        fastaFolder = "/home/user/fasta/",
+        figureFolder = "/home/user/figures/",
+        origAnnot=btannot,
+        hitAnnot=ssannot)
+        
+# Annotation and coverage added:
+plotHit(hits=pigInter.flank,
+        flanking=100,
+        hitSpecies = "Sus scrofa",
+        origSpecies = "Bos taurus",
+        fastaFolder = "/home/daniel/fasta/",
+        figureFolder = "/home/user/figures/",
+        origAnnot=btannot,
+        hitAnnot=ssannot
+        coverage=TRUE,
+        bamFolder = "/home/users/bams/") 
+
+## End(Not run)
+</code></pre>
+
+
+</div>

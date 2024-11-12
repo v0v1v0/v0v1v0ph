@@ -1,0 +1,436 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hdda</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>High Dimensional Discriminant Analysis</h2>
+
+<h3>Description</h3>
+
+<p>HDDA is a model-based discriminant analysis method assuming each class of the dataset live in a proper Gaussian subspace which is much smaller than the original one, the hdda.learn function calculates the parameters of each subspace in order to predict  the class of new observation of this kind.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hdda(
+  data,
+  cls,
+  model = "AkjBkQkDk",
+  graph = FALSE,
+  d_select = "Cattell",
+  threshold = 0.2,
+  com_dim = NULL,
+  show = getHDclassif.show(),
+  scaling = FALSE,
+  cv.dim = 1:10,
+  cv.threshold = c(0.001, 0.005, 0.05, 1:9 * 0.1),
+  cv.vfold = 10,
+  LOO = FALSE,
+  noise.ctrl = 1e-08,
+  d
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>A matrix or a data frame of observations, assuming the rows are the observations and the columns the variables. Note that NAs are not allowed.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cls</code></td>
+<td>
+<p>The vector of the class of each observations, its type can be numeric or string.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>model</code></td>
+<td>
+<p>A character string vector, or an integer vector indicating the models to be used. The available models are: "AkjBkQkDk" (default), "AkBkQkDk", "ABkQkDk", "AkjBQkDk", "AkBQkDk", "ABQkDk", "AkjBkQkD", "AkBkQkD", "ABkQkD", "AkjBQkD", "AkBQkD", "ABQkD", "AjBQD", "ABQD". It is not case sensitive and integers can be used instead of names, see details for more information. Several models can be used, if it is, only the results of the one which maximizes the BIC criterion is kept. To run all models, use model="ALL".</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>graph</code></td>
+<td>
+<p>It is for comparison sake only, when several estimations are run at the same time (either when using several models, or when using cross-validation to select the best dimension/threshold). If graph = TRUE, the plot of the results of all estimations is displayed. Default is FALSE.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>d_select</code></td>
+<td>
+<p>Either “Cattell” (default), “BIC” or “CV”. See details for more information. This parameter selects which method to use to select the intrinsic dimensions.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>threshold</code></td>
+<td>
+<p>A float stricly within 0 and 1. It is the threshold used in the Cattell's Scree-Test.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>com_dim</code></td>
+<td>
+<p>It is used only for common dimensions models. The user can give the common dimension s/he wants. If used, it must be an integer. Its default is set to NULL.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>show</code></td>
+<td>
+<p>Single logical. To diplay summary information on the results after the algorithm is done: set it to <code>TRUE</code>. By default it takes the value of <code>getHDclassif.show</code> which is FALSE at the loading of the package. To permanently have <code>show=TRUE</code>, use <code>setHDclassif.show(TRUE)</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>scaling</code></td>
+<td>
+<p>Logical: whether to scale the dataset (mean=0 and standard-error=1 for each variable) or not. By default the data is not scaled.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cv.dim</code></td>
+<td>
+<p>A vector of integers. Only when d_select=“CV”. Gives the dimensions for which the CV is to be done. Note that if some dimensions are greater than what it is possible to have, those are taken off.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cv.threshold</code></td>
+<td>
+<p>A vector of floats strictly within 0 and 1. Only when d_select=“CV”. Gives the thresholds for which the CV is to be done.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cv.vfold</code></td>
+<td>
+<p>An integer. Only when d_select=“CV”. It gives the number of different subsamples in which the dataset is split. If “cv.vfold” is greater than the number of observations, then the program equalize them.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>LOO</code></td>
+<td>
+<p>If TRUE, it returns the results (classes and posterior probabilities) for leave-one-out cross-validation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>noise.ctrl</code></td>
+<td>
+<p>This parameter avoids to have a too low value of the 'noise' parameter b. It garantees that the dimension selection process do not select too many dimensions (which leads to a potential too low value of the noise parameter b). When selecting the intrinsic dimensions using Cattell's scree-test or BIC, the function doesn't use the eigenvalues inferior to noise.ctrl, so that the intrinsic dimensions selected can't be higher or equal to the order of these eigenvalues.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>d</code></td>
+<td>
+<p>DEPRECATED. This parameter is kept for retro compatibility. Now please use the parameter d_select.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Some information on the signification of the model names:
+</p>
+
+<dl>
+<dt>Akj are the parameters of the classes subspaces:</dt>
+<dd>
+
+<ul>
+<li>
+<p>if Akj: each class has its parameters and there is one parameter for each dimension
+</p>
+</li>
+<li>
+<p>if Ak: the classes have different parameters but there is only one per class
+</p>
+</li>
+<li>
+<p>if Aj: all the classes have the same parameters for each dimension (it's a particular case with a common orientation matrix)
+</p>
+</li>
+<li>
+<p>if A: all classes have the same one parameter
+</p>
+</li>
+</ul>
+</dd>
+<dt>Bk are the noises of the classes subspaces:</dt>
+<dd>
+
+<ul>
+<li>
+<p>If Bk: each class has its proper noise
+</p>
+</li>
+<li>
+<p>if B:  all classes have the same noise
+</p>
+</li>
+</ul>
+</dd>
+<dt>Qk is the orientation matrix of each class:</dt>
+<dd> 
+
+<ul>
+<li>
+<p>if Qk: all classes have its proper orientation matrix
+</p>
+</li>
+<li>
+<p>if Q: all classes have the same orientation matrix
+</p>
+</li>
+</ul>
+</dd>
+<dt>Dk is the intrinsic dimension of each class:</dt>
+<dd> 
+
+<ul>
+<li>
+<p>if Dk: the dimensions are free and proper to each class
+</p>
+</li>
+<li>
+<p>if D: the dimension is common to all classes
+</p>
+</li>
+</ul>
+</dd>
+</dl>
+<p>The model “all” will compute all the models, give their BIC and keep the model with the highest BIC value.
+Instead of writing the model names, they can also be specified using an integer.  1 represents the most general model (“AkjBkQkDk”) while 14 is the most constrained (“ABQD”), the others  number/name matching are given below. Note also that several models can be run at once, by using a vector of models (e.g. model = c("AKBKQKD","AKJBQKDK","AJBQD") is equivalent to model = c(8,4,13); to run the 6 first models, use model=1:6). If all the models are to be run, model="all" is faster than model=1:14. 
+</p>
+
+<table>
+<tr>
+<td style="text-align: left;">
+AkjBkQkDk </td>
+<td style="text-align: center;">   1   </td>
+<td style="text-align: center;">   </td>
+<td style="text-align: left;">  AkjBkQkD </td>
+<td style="text-align: center;">   7   </td>
+</tr>
+<tr>
+<td style="text-align: left;"> 
+AkBkQkDk </td>
+<td style="text-align: center;">   2   </td>
+<td style="text-align: center;"> </td>
+<td style="text-align: left;">  AkBkQkD </td>
+<td style="text-align: center;">   8   </td>
+</tr>
+<tr>
+<td style="text-align: left;">   
+ABkQkDk </td>
+<td style="text-align: center;">   3   </td>
+<td style="text-align: center;">  </td>
+<td style="text-align: left;"> ABkQkD </td>
+<td style="text-align: center;">   9   </td>
+</tr>
+<tr>
+<td style="text-align: left;">   
+AkjBQkDk </td>
+<td style="text-align: center;">   4   </td>
+<td style="text-align: center;">  </td>
+<td style="text-align: left;">  AkjBQkD </td>
+<td style="text-align: center;">   10   </td>
+</tr>
+<tr>
+<td style="text-align: left;">   
+AkBQkDk </td>
+<td style="text-align: center;">   5   </td>
+<td style="text-align: center;">  </td>
+<td style="text-align: left;">  AkBQkD </td>
+<td style="text-align: center;">   11   </td>
+</tr>
+<tr>
+<td style="text-align: left;">   
+ABQkDk </td>
+<td style="text-align: center;">   6   </td>
+<td style="text-align: center;">  </td>
+<td style="text-align: left;">  ABQkD </td>
+<td style="text-align: center;">   12  </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+AjBQD </td>
+<td style="text-align: center;"> 13 </td>
+<td style="text-align: center;">  </td>
+<td style="text-align: left;"> ABQD </td>
+<td style="text-align: center;"> 14
+</td>
+</tr>
+</table>
+<p>The parameter d, is used to select the intrinsic dimensions of the subclasses. Here are his definictions:
+</p>
+
+<ul>
+<li>
+<p>“Cattell”:
+The Cattell's scree-test is used to gather the intrinsic dimension of each class. If the model is of common dimension (models 7 to 14), the scree-test is done on the covariance matrix of the whole dataset.
+
+</p>
+</li>
+<li>
+<p>“BIC”:
+The intrinsic dimensions are selected with the BIC criterion. See Bouveyron <em>et al.</em> (2010) for a discussion of this topic.
+For common dimension models, the procedure is done on the covariance matrix of the whole dataset.
+
+</p>
+</li>
+<li>
+<p>“CV”:
+A V-fold cross-validation (CV) can be done in order to select the best threshold (for all models) or the best common dimensions (models 7 to 14).  
+The V-fold cross-validation is done for each dimension (respectively threshold) in the argument “cv.dim” (resp. “cv.threshold”), then the dimension (resp. threshold) that gives the best good classification rate is kept.  
+The dataset is split in “cv.vfold” (default is 10) <em>random</em> subsamples, then CV is done for each sample: each of them is used as validation data while the remaining data is used as training data. For sure, if “cv.vfold” equals the number of observations, then this CV is equivalent to a leave-one-out.
+
+</p>
+</li>
+</ul>
+<h3>Value</h3>
+
+<p>hdda returns an 'hdc' object; it's a list containing:
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code> model </code></td>
+<td>
+<p>The name of the model.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code> k </code></td>
+<td>
+<p>The number of classes.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code> d </code></td>
+<td>
+<p>The dimensions of each class.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code> a </code></td>
+<td>
+<p>The parameters of each class subspace.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code> b </code></td>
+<td>
+<p>The noise of each class subspace.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code> mu </code></td>
+<td>
+<p>The mean of each variable for each class.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code> prop </code></td>
+<td>
+<p>The proportion of each class.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code> ev </code></td>
+<td>
+<p>The eigen values of the var/covar matrix.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code> Q </code></td>
+<td>
+<p>The orthogonal matrix of orientation of each class.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code> kname </code></td>
+<td>
+<p>The name of each class.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code> BIC </code></td>
+<td>
+<p>The BIC value of the model used.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code> scaling </code></td>
+<td>
+<p>The centers and the standard deviation of the original dataset.</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>Laurent Berge, Charles Bouveyron and Stephane Girard
+</p>
+
+
+<h3>References</h3>
+
+<p>Bouveyron, C. Girard, S. and Schmid, C. (2007) “High Dimensional Discriminant Analysis”, <em>Communications in Statistics: Theory and Methods</em>, vol. <b>36</b> (14), pp. 2607–2623
+</p>
+<p>Bouveyron, C. Celeux, G. and Girard, S. (2010) “Intrinsic dimension estimation by maximum likelihood in probabilistic PCA”, Technical Report 440372, Universite Paris 1 Pantheon-Sorbonne
+</p>
+<p>Berge, L. Bouveyron, C. and Girard, S. (2012) “HDclassif: An R Package 
+for Model-Based Clustering and Discriminant Analysis of High-Dimensional Data”, 
+<em>Journal of Statistical Software</em>, <b>46</b>(6), 1–29, url: 
+<a href="https://doi.org/10.18637/jss.v046.i06">doi:10.18637/jss.v046.i06</a>
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>hddc</code>, <code>predict.hdc</code>, <code>plot.hdc</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Example 1:
+data&lt;-simuldata(1000, 1000, 50, K=5)
+X &lt;- data$X
+clx &lt;- data$clx
+Y &lt;- data$Y
+cly &lt;- data$cly
+# we get the HDDA parameters:
+prms1 &lt;- hdda(X, clx)         
+
+cl1 &lt;- predict(prms1, Y, cly)
+# the class vector of Y estimated with HDDA:
+cl1$class                     
+
+# another model is used:
+prms1 &lt;- hdda(X, clx, model=12)
+#model=12 is equivalent to model="ABQkD"     
+cl1 &lt;- predict(prms1, Y, cly) 
+
+# Example 2:
+data(wine)
+a &lt;- wine[,-1]
+z &lt;- wine[,1]
+prms2 &lt;- hdda(a, z, model='all', scaling=TRUE, d_select="bic", graph=TRUE)
+cl2 &lt;- predict(prms2, a, z)
+
+# getting the best dimension
+# using a common dimension model
+# we do LOO-CV using cv.vfold=nrow(a)
+prms3 &lt;- hdda(a, z, model="akjbkqkd", d_select="CV", cv.vfold=nrow(a), scaling=TRUE, graph=TRUE)
+
+cl3 &lt;- predict(prms3, a, z)
+
+# Example 3:
+# Validation with LOO
+prms4 = hdda(a, z, LOO=TRUE, scaling=TRUE)
+sum(prms4$class==z) / length(z)
+
+</code></pre>
+
+
+</div>

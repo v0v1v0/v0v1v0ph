@@ -1,0 +1,121 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>z_sim</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Simulate the threshold/control variable Z</h2>
+
+<h3>Description</h3>
+
+<p>This is a function you can use to simulate time series data
+for a threshold variable of the HysTAR model. The time series is a (co)sine
+wave, such that thresholds are crossed in a predictable way.
+This function is designed to be used in combination with <code>hystar_sim()</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">z_sim(n_t, n_switches, start_regime = 0, start_hyst = FALSE, range = c(-1, 1))
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>n_t</code></td>
+<td>
+<p>The desired length of the simulated time series of <code>z</code>. The actual
+vector that is returned will contain 10 more time points, see Details.
+Note that <code>n_t</code> will also be the length of <code>y</code>, when you feed <code>z</code> to <code>hystar_sim</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n_switches</code></td>
+<td>
+<p>A scalar indicating the desired number of regime switches.
+Basically, it is the number of times the variable moves to (and reaches) its
+minimum or to its maximum. If the thresholds are within the range of <code>z</code>,
+as they should, this will guarantee the same number of regime switches when
+the delay parameter of the HysTAR model is greater or equal than the highest order.
+See Details.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>start_regime</code></td>
+<td>
+<p>The starting regime of the HysTAR model, 0 (default) or 1.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>start_hyst</code></td>
+<td>
+<p>Logical, should <code>z</code> start in the hysteresis zone? Of course, this also
+depends on <code>r</code>, and <code>r</code> is not yet specified in this function. Rather, setting <code>start_hyst</code>
+to <code>TRUE</code> makes <code>z</code> start at in the middle of its range, which makes it easy to
+set the threshold values "around" the first values of <code>z</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>range</code></td>
+<td>
+<p>A numeric vector of length 2 indicating the desired range (min, max) of <code>z</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The first value of <code>y</code> that can be predicted in the HysTAR model is
+at time point <code class="reqn">\max\{d, p\} + 1</code>, where <code class="reqn">p = \max\{p_0, p_1\}</code>.
+This is because we need to observe <code class="reqn">y_{t - p}</code> and <code class="reqn">z_{t - d}</code>.
+So the first observed value of <code>z</code> that determines a regime
+is at time point <code class="reqn">\max\{d, p\} + 1 - d</code>.
+To make sure that this time point corresponds to the start that you request,
+<code>z_sim()</code> starts with 10 extra time points. In this way, <code>hystar_sim</code> can
+select the appropriate time points, based on <code>d</code> and <code>p0</code>, <code>p1</code>.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A numeric vector of length <code>n_t</code>. This vector has two attributes
+<code>"start_regime"</code> and <code>"start_hyst"</code> corresponding to the values you provided.
+These attributes are used by <code>hystar_sim()</code>.
+</p>
+
+
+<h3>The HysTAR model</h3>
+
+<p>The HysTAR model is defined as:
+</p>
+<p><code class="reqn"> y_t = \begin{cases} \phi_{00} + \phi_{01} y_{t-1} + \cdots +
+  \phi_{0 p_0} y_{t-p_0} + \sigma_{0} \epsilon_{t} \quad \mathrm{if}~R_{t} = 0 \\
+  \phi_{10} + \phi_{11} y_{t-1} + \cdots + \phi_{1 p_1} y_{t-p_1} + \sigma_{1} \epsilon_{t}
+  \quad \mathrm{if}~R_{t} = 1, \\ \end{cases} </code>
+</p>
+<p>with <code class="reqn"> R_t = \begin{cases} 0 \quad \quad \mathrm{if} \, z_{t-d} \in (-\infty, r_{0}] \\
+  R_{t-1} \quad \mathrm{if} \, z_{t-d} \in (r_0, r_1] \\ 1 \quad \quad \mathrm{if} \, z_{t-d}
+  \in (r_1, \infty), \\ \end{cases} </code>
+</p>
+<p>where <code class="reqn">p_j</code> denotes the order of regime <code class="reqn">j \in \{0,1\}</code> with
+coefficients <code class="reqn">\phi_{j0}, \dots, \phi_{j p_j \in (-1, 1)}</code>,
+<code class="reqn">\sigma_{j}</code> is the standard deviation of the residuals, and <code class="reqn">d \in
+  \{0, 1, 2, \dots\}</code> is a delay parameter. The parameters of primary interest are
+the thresholds <code class="reqn">r_0 \le r_1</code>. We let <code class="reqn">t = 0, 1, 2, ..., T</code>, where <code class="reqn">T</code>
+is the number of observations.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">z &lt;- z_sim(n_t = 200, n_switches = 5, start_regime = 1)
+sim &lt;- hystar_sim(z = z, r = c(-.5, .5), d = 2, phi_R0 = c(0, .6), phi_R1 = 1)
+plot(sim)
+fit &lt;- hystar_fit(sim$data)
+summary(fit)
+</code></pre>
+
+
+</div>

@@ -1,0 +1,274 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>ts_wfs_prophet_reg</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Auto PROPHET Regression Workflowset Function</h2>
+
+<h3>Description</h3>
+
+<p>This function is used to quickly create a workflowsets object.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">ts_wfs_prophet_reg(
+  .model_type = "all_engines",
+  .recipe_list,
+  .growth = NULL,
+  .changepoint_num = 25,
+  .changepoint_range = 0.8,
+  .seasonality_yearly = "auto",
+  .seasonality_weekly = "auto",
+  .seasonality_daily = "auto",
+  .season = "additive",
+  .prior_scale_changepoints = 25,
+  .prior_scale_seasonality = 1,
+  .prior_scale_holidays = 1,
+  .logistic_cap = NULL,
+  .logistic_floor = NULL,
+  .trees = 50,
+  .min_n = 10,
+  .tree_depth = 5,
+  .learn_rate = 0.01,
+  .loss_reduction = NULL,
+  .stop_iter = NULL
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>.model_type</code></td>
+<td>
+<p>This is where you will set your engine. It uses
+<code>modeltime::prophet_reg()</code> under the hood and can take one of the following:
+</p>
+
+<ul>
+<li>
+<p> "prophet"
+Or <code>modeltime::prophet_boost()</code> under the hood and can take one of the following:
+</p>
+</li>
+<li>
+<p> "prophet_xgboost"
+You can also choose:
+</p>
+</li>
+<li>
+<p> "all_engines" - This will make a model spec for all available engines.
+</p>
+</li>
+</ul>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.recipe_list</code></td>
+<td>
+<p>You must supply a list of recipes. list(rec_1, rec_2, ...)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.growth</code></td>
+<td>
+<p>String 'linear' or 'logistic' to specify a linear or logistic trend.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.changepoint_num</code></td>
+<td>
+<p>Number of potential changepoints to include for modeling trend.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.changepoint_range</code></td>
+<td>
+<p>Adjusts the flexibility of the trend component by
+limiting to a percentage of data before the end of the time series. 0.80
+means that a changepoint cannot exist after the first 80% of the data.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.seasonality_yearly</code></td>
+<td>
+<p>One of "auto", TRUE or FALSE. Set to FALSE for <code>prophet_xgboost</code>.
+Toggles on/off a seasonal component that models year-over-year seasonality.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.seasonality_weekly</code></td>
+<td>
+<p>One of "auto", TRUE or FALSE. Toggles on/off a
+seasonal component that models week-over-week seasonality. Set to FALSE for <code>prophet_xgboost</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.seasonality_daily</code></td>
+<td>
+<p>One of "auto", TRUE or FALSE. Toggles on/off a
+seasonal componet that models day-over-day seasonality. Set to FALSE for <code>prophet_xgboost</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.season</code></td>
+<td>
+<p>'additive' (default) or 'multiplicative'.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.prior_scale_changepoints</code></td>
+<td>
+<p>Parameter modulating the flexibility of the
+automatic changepoint selection. Large values will allow many changepoints,
+small values will allow few changepoints.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.prior_scale_seasonality</code></td>
+<td>
+<p>Parameter modulating the strength of the
+seasonality model. Larger values allow the model to fit larger seasonal
+fluctuations, smaller values dampen the seasonality.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.prior_scale_holidays</code></td>
+<td>
+<p>Parameter modulating the strength of the holiday
+components model, unless overridden in the holidays input.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.logistic_cap</code></td>
+<td>
+<p>When growth is logistic, the upper-bound for "saturation".</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.logistic_floor</code></td>
+<td>
+<p>When growth is logistic, the lower-bound for "saturation"</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.trees</code></td>
+<td>
+<p>An integer for the number of trees contained in the ensemble.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.min_n</code></td>
+<td>
+<p>An integer for the minimum number of data points in a node
+that is required for the node to be split further.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.tree_depth</code></td>
+<td>
+<p>An integer for the maximum depth of the tree
+(i.e. number of splits) (specific engines only).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.learn_rate</code></td>
+<td>
+<p>A number for the rate at which the boosting algorithm
+adapts from iteration-to-iteration (specific engines only).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.loss_reduction</code></td>
+<td>
+<p>A number for the reduction in the loss function
+required to split further (specific engines only).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.stop_iter</code></td>
+<td>
+<p>The number of iterations without improvement before
+stopping (xgboost only).</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>This function expects to take in the recipes that you want to use in
+the modeling process. This is an automated workflow process. There are sensible
+defaults set for the <code>prophet</code> and <code>prophet_xgboost</code> model specification,
+but if you choose you can set them yourself if you have a good understanding
+of what they should be.
+</p>
+
+
+<h3>Value</h3>
+
+<p>Returns a workflowsets object.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Steven P. Sanderson II, MPH
+</p>
+
+
+<h3>See Also</h3>
+
+<p><a href="https://workflowsets.tidymodels.org/">https://workflowsets.tidymodels.org/</a>(workflowsets)
+</p>
+<p><a href="https://business-science.github.io/modeltime/reference/prophet_reg.html">https://business-science.github.io/modeltime/reference/prophet_reg.html</a>
+</p>
+<p><a href="https://business-science.github.io/modeltime/reference/prophet_boost.html">https://business-science.github.io/modeltime/reference/prophet_boost.html</a>
+</p>
+<p>Other Auto Workflowsets: 
+<code>ts_wfs_arima_boost()</code>,
+<code>ts_wfs_auto_arima()</code>,
+<code>ts_wfs_ets_reg()</code>,
+<code>ts_wfs_lin_reg()</code>,
+<code>ts_wfs_mars()</code>,
+<code>ts_wfs_nnetar_reg()</code>,
+<code>ts_wfs_svm_poly()</code>,
+<code>ts_wfs_svm_rbf()</code>,
+<code>ts_wfs_xgboost()</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">suppressPackageStartupMessages(library(modeltime))
+suppressPackageStartupMessages(library(timetk))
+suppressPackageStartupMessages(library(dplyr))
+suppressPackageStartupMessages(library(rsample))
+
+data &lt;- AirPassengers %&gt;%
+  ts_to_tbl() %&gt;%
+  select(-index)
+
+splits &lt;- time_series_split(
+   data
+  , date_col
+  , assess = 12
+  , skip = 3
+  , cumulative = TRUE
+)
+
+rec_objs &lt;- ts_auto_recipe(
+ .data = training(splits)
+ , .date_col = date_col
+ , .pred_col = value
+)
+
+wf_sets &lt;- ts_wfs_prophet_reg("all_engines", rec_objs)
+wf_sets
+
+</code></pre>
+
+
+</div>

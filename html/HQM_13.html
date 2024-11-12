@@ -1,0 +1,130 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>h_xt_vec</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Hqm estimator on the marker grid</h2>
+
+<h3>Description</h3>
+
+<p>Computes the hqm estimator on the marker grid.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">h_xt_vec(br_X, br_s, size_s_grid, alpha, t, b, Yi, int_X, n)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>br_X</code></td>
+<td>
+<p>Marker value grid points that will be used in the evaluatiuon.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>br_s</code></td>
+<td>
+<p>Time value grid points that will be used in the evaluatiuon.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>size_s_grid</code></td>
+<td>
+<p>Size of the time grid.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alpha</code></td>
+<td>
+<p>Marker-hazard obtained from <code>get_alpha</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>t</code></td>
+<td>
+<p>Numeric value of the time the function should be evaluated.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>b</code></td>
+<td>
+<p>Bandwidth.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Yi</code></td>
+<td>
+<p>A matrix made by <code>make_Yi</code> indicating the exposure. </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>int_X</code></td>
+<td>
+<p>Position of the linear interpolated marker values on the marker grid.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n</code></td>
+<td>
+<p>Number of individuals.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The function implements the future conditional hazard estimator
+</p>
+<p style="text-align: center;"><code class="reqn">\hat{h}_x(t) = \frac{\sum_{i=1}^n \int_0^T\hat{\alpha}_i(X_i(t+s))Z_i(t+s)Z_i(s)K_{b}(x-X_i(s))\mathrm {d}s}{\sum_{i=1}^n\int_0^TZ_i(t+s)Z_i(s)K_{b}(x-X_i(s))\mathrm {d}s},</code>
+</p>
+
+<p>for every <code class="reqn">x</code> on the marker grid where <code class="reqn">X</code> is the marker, <code class="reqn">Z</code> is the exposure and <code class="reqn">\alpha(z)</code> is the marker-only hazard, see <code>get_alpha</code> for more details.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A vector of <code class="reqn">\hat{h}_{x}(t)</code> for all values <code class="reqn">x</code> on the marker grid.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">pbc2_id = to_id(pbc2)
+size_s_grid &lt;- size_X_grid &lt;- 100
+n = max(as.numeric(pbc2$id))
+s = pbc2$year
+X = pbc2$serBilir
+XX = pbc2_id$serBilir
+ss &lt;- pbc2_id$years
+delta &lt;- pbc2_id$status2
+br_s = seq(0, max(s), max(s)/( size_s_grid-1))
+br_X = seq(min(X), max(X), (max(X)-min(X))/( size_X_grid-1))
+
+X_lin = lin_interpolate(br_s, pbc2_id$id, pbc2$id, X, s)
+
+int_X &lt;- findInterval(X_lin, br_X)
+int_s = rep(1:length(br_s), n)
+
+N &lt;- make_N(pbc2, pbc2_id, br_X, br_s, ss, XX, delta)
+Y &lt;- make_Y(pbc2, pbc2_id, X_lin, br_X, br_s,
+            size_s_grid, size_X_grid, int_s, int_X, event_time = 'years', n)
+
+b = 1.7
+alpha&lt;-get_alpha(N, Y, b, br_X, K=Epan )
+
+Yi &lt;- make_Yi(pbc2, pbc2_id, X_lin, br_X, br_s,
+              size_s_grid, size_X_grid, int_s, int_X, event_time = 'years', n)
+
+t = 2
+
+h_xt_vec(br_X, br_s, size_s_grid, alpha, t, b, Yi, int_X, n)
+</code></pre>
+
+
+</div>

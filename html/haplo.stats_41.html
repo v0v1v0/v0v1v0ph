@@ -1,0 +1,104 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>haplo.score.merge</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Merge haplo.score And haplo.group Objects
+</h2>
+
+<h3>Description</h3>
+
+<p>Combine information from returned objects of haplo.score and 
+haplo.group, 'score' and 'group' respectively.  'score' and
+'group' are sorted differently and 'score' keeps a subset of 
+all the haplotypes while 'group' has all of them.  To combine
+results from the two objects, merge them by haplotype and sort 
+by score of the haplotype. The merged object includes all haplotypes; 
+i.e. those appearing in 'group', but the print default only shows 
+haplotypes which have a score.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">haplo.score.merge(score, group)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>score</code></td>
+<td>
+
+<p>Object returned from haplo.score of class "haplo.score". 
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>group</code></td>
+<td>
+
+<p>Object returned from haplo.group of class "haplo.group".
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Haplo.score returns score statistic and p-value for haplotypes with
+an overall frequency above the user-specified threshold, skip.haplo.  
+For haplotypes with frequencies below the threshold, the score and 
+p-value will be NA.  Overall haplotype frequencies and for sub-groups
+are estimated by haplo.group.    
+</p>
+
+
+<h3>Value</h3>
+
+<p>Data frame including haplotypes, score-statistics, score p-value, 
+estimated haplotype frequency for all subjects, and haplotype 
+frequency from group subsets.
+</p>
+
+
+<h3>Side Effects</h3>
+
+<p>Warning:  The merge will not detect if the group and score objects
+resulted from different subject phenotypes selected by memory-usage
+parameters, rm.geno.na and enum.limit.  Users must use the same values
+for these parameters in haplo.score and haplo.group so the merged
+objects are consistent.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>haplo.score</code>,
+<code>haplo.group</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">  data(hla.demo)
+  geno &lt;- as.matrix(hla.demo[,c(17,18,21:24)])
+  keep &lt;- !apply(is.na(geno) | geno==0, 1, any)
+  hla.demo &lt;- hla.demo[keep,]
+  geno &lt;- geno[keep,]
+  attach(hla.demo)
+  y.ord &lt;- as.numeric(resp.cat)
+  y.bin &lt;-ifelse(y.ord==1,1,0)
+  
+  group.bin &lt;- haplo.group(y.bin, geno, miss.val=0)
+  score.bin &lt;- haplo.score(y.bin, geno, trait.type="binomial")
+  score.merged &lt;- haplo.score.merge(score.bin, group.bin)
+
+  print(score.merged)
+</code></pre>
+
+
+</div>

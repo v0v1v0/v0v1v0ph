@@ -1,0 +1,101 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hypervolume_segment</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Segments a hypervolume into multiple separate hypervolumes.
+</h2>
+
+<h3>Description</h3>
+
+<p>Performs hierarchical clustering (using the 'single' method described in <code>fastcluster::hclust</code>) on the input hypervolume to determine which sets of points are closest to others, then cuts the resulting tree at a height equal to the characteristic distance between points multiplied by a distance factor. Random points in the input hypervolume corresponding to each distinct cluster are assigned to distinct output hypervolumes.
+</p>
+<p>Because clustering algorithms scale quadratically with the number of input points, this algorithm can run slowly. Therefore by default, the function can thin the input hypervolume to a reduced number of random points before analysis. This causes some loss of resolution but improves runtimes. 
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hypervolume_segment(hv, distance.factor = 1, num.points.max = NULL,
+                 verbose = TRUE, check.memory = TRUE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>hv</code></td>
+<td>
+
+<p>An input <code>Hypervolume</code> class object.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>distance.factor</code></td>
+<td>
+
+<p>A numeric value characterizing the distance multiplication factor. Larger values result in fewer distinct output hypervolumes; smaller values result in more.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>num.points.max</code></td>
+<td>
+
+<p>A numeric value describing the maximum number of random points to be retained in the input; passed to <code>hypervolume_thin</code> before analysis. Set to <code>NULL</code> to disable thinning.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+
+<p>Logical value; print diagnostic output if <code>TRUE</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>check.memory</code></td>
+<td>
+
+<p>Logical value; returns information about expected memory usage if true.
+</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A <code>HypervolumeList</code> object.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>hypervolume_thin</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># low sample sizes to meet CRAN time requirements
+data(penguins,package='palmerpenguins')
+penguins_no_na = as.data.frame(na.omit(penguins))
+penguins_adelie = penguins_no_na[penguins_no_na$species=="Adelie",
+                    c("bill_length_mm","bill_depth_mm","flipper_length_mm")]
+
+# intentionally make a holey shape for segmentation example
+hv = hypervolume_gaussian(penguins_adelie,name='Adelie',
+  kde.bandwidth=estimate_bandwidth(penguins_adelie)/3) 
+
+hv_segmented &lt;- hypervolume_segment(hv, 
+                          num.points.max=200, distance.factor=1.25,
+                          check.memory=FALSE) # intentionally under-segment
+plot(hv_segmented,show.contour=FALSE)
+</code></pre>
+
+
+</div>

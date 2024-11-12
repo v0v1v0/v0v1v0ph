@@ -1,0 +1,112 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>getFastaFromBed</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Get fasta information based on locations in bed-format
+</h2>
+
+<h3>Description</h3>
+
+<p>For a given fasta and a bed file this function can extract the nucleotide sequences and stores them as fasta file.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">  getFastaFromBed(bed, species=NULL, assembly = NULL, fastaFolder=NULL,
+                  verbose=TRUE, export=NULL, fileName=NULL)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>bed</code></td>
+<td>
+<p>The location in bed format, see details.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>species</code></td>
+<td>
+<p>Define the species.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>assembly</code></td>
+<td>
+<p>Assembly identifier.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fastaFolder</code></td>
+<td>
+<p>Location of the fasta files.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p>Logical, should informative status updates be given.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>export</code></td>
+<td>
+<p>Foldername.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fileName</code></td>
+<td>
+<p>Filename to store the FA object.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Function expects as an input a <code>data.frame</code> in bed format. This means, the first column should contain the chromosome, the second
+the start-coordinates, the third the end-coordinates. The forth column contains the ID of the loci. 
+</p>
+<p>If a standard species is used (as defined in the <code>species</code> data frame), the function automatically downloads the required files
+from NCBI, takes the loci and extracts then the nucleotide sequences from it. If the corresponding assemly is not available from NCBI
+an own fasta file can be provided. For that the fa-file needs to be in the fastaFolder and follow the same naming system as the NCBI 
+files are labelled. In that case, the function suggests the correct filename for an unknown assembly.
+</p>
+<p>The export function, specifies then a folder to where the fasta file should be stored. If no filename is provided, the filename is then
+the object name passed to the <code>bed</code> function.
+</p>
+
+
+<h3>Value</h3>
+
+<p>An <code>fa</code> object containing the nucleotide sequences in fasta format.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Daniel Fischer
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+
+myBed &lt;- data.frame(chr=c(1,2),
+                    start=c(235265,12356742),
+                    end=c(435265,12386742),
+                    gene=c("LOC1", "LOC2"))
+
+myFA &lt;- getFastaFromBed(myBed, species="Homo sapiens", fastaFolder="/home/user/fasta/", export=TRUE)
+
+## End(Not run)
+</code></pre>
+
+
+</div>

@@ -1,0 +1,161 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>IVinference</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Function returns the value, the standard error and the confidence band of the integrated variance (IV) estimator.</h2>
+
+<h3>Description</h3>
+
+<p>This function supplies information about standard error and confidence band of integrated variance (IV) estimators under Brownian semimartingales model such as: bipower variation, rMinRV, rMedRV. 
+Depending on users' choices of estimator (integrated variance (IVestimator), integrated quarticity (IQestimator)) and confidence level, the function returns the result.(Barndorff (2002))
+Function returns three outcomes: 1.value of IV estimator 2.standard error of IV estimator and 3.confidence band of IV estimator. 
+</p>
+<p>Assume there is <code class="reqn">N</code> equispaced returns in period <code class="reqn">t</code>.
+</p>
+<p>Then the IVinference is given by: 
+</p>
+<p style="text-align: center;"><code class="reqn">
+\mbox{standard error}= \frac{1}{\sqrt{N}} *sd
+</code>
+</p>
+
+<p style="text-align: center;"><code class="reqn">
+\mbox{confidence band}= \hat{IV} \pm cv*se
+</code>
+</p>
+
+<p>in which,
+</p>
+<p style="text-align: center;"><code class="reqn">
+\mbox{sd}= \sqrt{\theta \times \hat{IQ}} 
+</code>
+</p>
+
+<p><code class="reqn">cv:</code> critical value. 
+</p>
+<p><code class="reqn">se:</code> standard error.
+</p>
+<p><code class="reqn">\theta:</code> depending on IQestimator, <code class="reqn">\theta</code> can take different value (Andersen et al. (2012)). 
+</p>
+<p><code class="reqn">\hat{IQ}</code> integrated quarticity estimator.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">IVinference(
+  rData,
+  IVestimator = "RV",
+  IQestimator = "rQuar",
+  confidence = 0.95,
+  alignBy = NULL,
+  alignPeriod = NULL,
+  makeReturns = FALSE,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>rData</code></td>
+<td>
+<p><code>xts</code> object containing all returns in period t for one asset.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>IVestimator</code></td>
+<td>
+<p>can be chosen among integrated variance estimators: RV, BV, rMinRV or rMedRV. RV by default.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>IQestimator</code></td>
+<td>
+<p>can be chosen among integrated quarticity estimators: rQuar, realized tri-power quarticity (TPQ), quad-power quarticity (QPQ), rMinRQuar or rMedRQuar. TPQ by default.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>confidence</code></td>
+<td>
+<p>confidence level set by users. 0.95 by default.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alignBy</code></td>
+<td>
+<p>character, indicating the time scale in which <code>alignPeriod</code> is expressed. 
+Possible values are: <code>"ticks"</code>, <code>"secs"</code>, <code>"seconds"</code>, <code>"mins"</code>, <code>"minutes"</code>, <code>"hours"</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alignPeriod</code></td>
+<td>
+<p>positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate
+based on a 5 minute frequency, set <code>alignPeriod</code> to 5 and <code>alignBy</code> to <code>"minutes"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>makeReturns</code></td>
+<td>
+<p>boolean, should be <code>TRUE</code> when <code>rData</code> contains prices instead of returns. <code>FALSE</code> by default.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>additional arguments.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The theoretical framework is the logarithmic price process <code class="reqn">X_t</code> belongs to the class of Brownian semimartingales, which can be written as:
+</p>
+<p style="text-align: center;"><code class="reqn">
+\mbox{X}_{t}=  \int_{0}^{t} a_udu + \int_{0}^{t}\sigma_{u}dW_{u}
+</code>
+</p>
+
+<p>where <code class="reqn">a</code> is the drift term, <code class="reqn">\sigma</code> denotes the spot vivInferenceolatility process, <code class="reqn">W</code> is a standard Brownian motion (assume that there are no jumps).
+</p>
+
+
+<h3>Value</h3>
+
+<p>list
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Giang Nguyen, Jonathan Cornelissen and Kris Boudt
+</p>
+
+
+<h3>References</h3>
+
+<p>Andersen, T. G., Dobrev, D., and Schaumburg, E. (2012). Jump-robust volatility estimation using nearest neighbor truncation. <em>Journal of Econometrics</em>, 169, 75-93.
+</p>
+<p>Barndorff-Nielsen, O. E. (2002). Econometric analysis of realized volatility and its use in estimating stochastic volatility models. <em>Journal of the Royal Statistical Society: Series B (Statistical Methodology)</em>, 64, 253-280.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+library("xts") # This function only accepts xts data currently
+ivInf &lt;- IVinference(as.xts(sampleTData[, list(DT, PRICE)]), IVestimator= "rMinRV",
+                     IQestimator = "rMedRQ", confidence = 0.95, makeReturns = TRUE)
+ivInf
+
+## End(Not run)
+            
+</code></pre>
+
+
+</div>

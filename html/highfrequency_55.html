@@ -1,0 +1,287 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>rBACov</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>rBACov</h2>
+
+<h3>Description</h3>
+
+<p>The Beta Adjusted Covariance (BAC) equals the pre-estimator plus a minimal adjustment matrix such that the covariance-implied stock-ETF beta equals a target beta.
+</p>
+<p>The BAC estimator works by applying a minimum correction factor to a pre-estimated covariance matrix such that a target beta derived from the ETF is reached.
+</p>
+<p>Let 
+</p>
+<p style="text-align: center;"><code class="reqn">
+    \bar{\beta}
+</code>
+</p>
+ 
+<p>denote the implied beta derived from the pre-estimator, and
+</p>
+<p style="text-align: center;"><code class="reqn">
+    \beta_{\bullet}
+</code>
+</p>
+
+<p>denote the target beta, then the correction factor is calculated as:
+</p>
+<p style="text-align: center;"><code class="reqn">
+ L\left(\bar{\beta}-\beta_{\bullet}\right),
+</code>
+</p>
+
+<p>where
+</p>
+<p style="text-align: center;"><code class="reqn">
+    L=\left(I_{d^{2}}-\frac{1}{2}{\cal Q}\right)\bar{W}^{\prime}\left(I_{d^{2}}\left(\sum_{k=1}^{d}\frac{\sum_{k=1}^{n_{k}}\left(w_{t_{m-1}^{k}}^{k}\right)^{2}}{n_{k}}\right)-\frac{\bar{W}{\cal Q}\bar{W}^{\prime}}{2}\right)^{-1},
+</code>
+</p>
+
+<p>where <code class="reqn">d</code> is the number of assets in the ETF, and <code class="reqn">n_{k}</code> is the number of trades in the <code class="reqn">k</code>th asset, and
+</p>
+<p style="text-align: center;"><code class="reqn">
+    \bar{W}^{k}=\left(0_{\left(k-1\right)d}^{\prime},\frac{1}{n_{1}}\sum_{m=1}^{n_{1}}w_{t_{m-1}^{1}}^{1},\dots,\frac{1}{n_{d}}\sum_{m=1}^{n_{d}}w_{t_{m-1}^{d}}^{d},0_{\left(d-k\right)d}^{\prime}\right),
+</code>
+</p>
+
+<p>where <code class="reqn">w_{t_{m-1}^{k}}^{k}</code> is the weight of the <code class="reqn">k</code>th asset in the ETF. 
+</p>
+<p>and 
+</p>
+<p style="text-align: center;"><code class="reqn">
+     {\cal Q}^{\left(i-1\right)d+j}
+</code>
+</p>
+ 
+<p>is defined by the following two cases:
+</p>
+<p><code class="reqn">
+    \left(0_{\left(i-1\right)d+j-1}^{\prime},1,0_{\left(d-i+1\right)d-j}^{\prime}\right)+\left(0_{\left(j-1\right)d+i-1}^{\prime},-1,0_{\left(d-j+1\right)d-i}^{\prime}\right) \quad \textrm{if }i\neq j;
+</code>
+</p>
+<p><code class="reqn">
+    0_{d^{2}}^{\prime} \quad \textrm{otherwise}.
+</code>
+</p>
+<p><code class="reqn">\bar{W}^k</code> has dimensions <code class="reqn">d \times d^2</code> and <code class="reqn">{\cal Q}^{\left(i-1\right)d+j}</code> has dimensions <code class="reqn">d^2 \times d^2</code>.
+</p>
+<p>The Beta-Adjusted Covariance is then 
+</p>
+<p style="text-align: center;"><code class="reqn">
+\Sigma^{\textrm{BAC}} = \Sigma - L\left(\bar{\beta}-\beta_{\bullet}\right),
+</code>
+</p>
+
+<p>where <code class="reqn">\Sigma</code> is the pre-estimated covariance matrix.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">rBACov(
+  pData,
+  shares,
+  outstanding,
+  nonEquity,
+  ETFNAME = "ETF",
+  unrestricted = TRUE,
+  targetBeta = c("HY", "VAB", "expert"),
+  expertBeta = NULL,
+  preEstimator = "rCov",
+  noiseRobustEstimator = rTSCov,
+  noiseCorrection = FALSE,
+  returnL = FALSE,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>pData</code></td>
+<td>
+<p>a named list. Each list-item contains an <code>xts</code> or <code>data.table</code> object with the intraday price data of an ETF and it's component stocks. <code>xts</code> objects are turned into <code>data.table</code>s</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>shares</code></td>
+<td>
+<p>a <code>numeric</code> with length corresponding to the number of component stocks in the ETF. The entries are the stock holdings of the ETF in the corresponding stock. The order of these entries should correspond to the order the stocks are listed in the <code>list</code> passed in the <code>pData</code> argument.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>outstanding</code></td>
+<td>
+<p>number of shares outstanding of the ETF</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nonEquity</code></td>
+<td>
+<p>aggregated value of the additional components (like cash, money-market funds, bonds, etc.) of the ETF which are not included in the components in <code>pData</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ETFNAME</code></td>
+<td>
+<p>a <code>character</code> denoting which entry in the <code>pData</code> list is the ETF. Default is <code>"ETF"</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>unrestricted</code></td>
+<td>
+<p>a <code>logical</code> denoting whether to use the unrestricted estimator, which is an extension that also affects the diagonal. Default is <code>FALSE</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>targetBeta</code></td>
+<td>
+<p>a <code>character</code>, one of <code>c("HY", "VAB", "expert")</code> (default) denoting which target beta to use, only the first entry will be used. A value <code>"HY"</code> means using the Hayashi-Yoshida estimator to estimate the
+empirical beta. A value of <code>"VAB"</code> denotes using the variance adjusted beta. A value of <code>"expert"</code> denotes using a user-supplied target beta, which can be supplied in the <code>expertBeta</code> argument.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>expertBeta</code></td>
+<td>
+<p>a <code>numeric</code> containing the user supplied expert beta used when <code>targetBeta</code> is <code>"expert"</code>. The <code>expertBeta</code> must be of length equal to the number of assets in the ETF. Default is <code>NULL</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>preEstimator</code></td>
+<td>
+<p>a <code>function</code> which estimates the integrated covariance matrix. Default is <code>rCov</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>noiseRobustEstimator</code></td>
+<td>
+<p>a <code>function</code> which estimates the integrated (co)variance and is robust to microstructure noise (only the diagonal will be estimated).
+This function is only used when <code>noiseCorrection</code> is <code>TRUE</code>. Default is <code>rTSCov</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>noiseCorrection</code></td>
+<td>
+<p>a <code>logical</code> which denotes whether to use the extension of the estimator which corrects for microstructure noise by using the <code>noiseRobustEstimator</code> function. Default is <code>FALSE</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>returnL</code></td>
+<td>
+<p>a <code>logical</code> which denotes whether to return the <code>L</code> matrix. Default is <code>FALSE</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>extra arguments passed to <code>preEstimator</code> and <code>noiseRobustEstimator</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>Emil Sjoerup, (Kris Boudt and Kirill Dragun for the Python version)
+</p>
+
+
+<h3>References</h3>
+
+<p>Boudt, K., Dragun, K., Omauri, S., and Vanduffel, S. (2021) Beta-Adjusted Covariance Estimation (working paper).
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>ICov</code> for a list of implemented estimators of the integrated covariance.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+# Since we don't have any data in this package that is of the required format we must simulate it.
+library(xts)
+library(highfrequency)
+# The mvtnorm package is needed for this example
+# Please install this package before running this example
+library("mvtnorm")
+# Set the seed for replication
+set.seed(123)
+iT &lt;- 23400 # Number of observations
+# Simulate returns
+rets &lt;- rmvnorm(iT * 3 + 1, mean = rep(0,4), 
+                sigma = matrix(c(0.1, -0.03 , 0.02, 0.04,
+                                -0.03, 0.05, -0.03, 0.02,
+                                 0.02, -0.03, 0.05, -0.03,  
+                                 0.04, 0.02, -0.03, 0.08), ncol = 4))
+# We assume that the assets don't trade in a synchronous manner
+w1 &lt;- rets[sort(sample(1:nrow(rets), size = nrow(rets) * 0.5)), 1]
+w2 &lt;- rets[sort(sample(1:nrow(rets), size = nrow(rets) * 0.75)), 2]
+w3 &lt;- rets[sort(sample(1:nrow(rets), size = nrow(rets) * 0.65)), 3]
+w4 &lt;- rets[sort(sample(1:nrow(rets), size = nrow(rets) * 0.8)), 4]
+w5 &lt;- rnorm(nrow(rets) * 0.9, mean = 0, sd = 0.005)
+timestamps1 &lt;- seq(34200, 57600, length.out = length(w1))
+timestamps2 &lt;- seq(34200, 57600, length.out = length(w2))
+timestamps3 &lt;- seq(34200, 57600, length.out = length(w3))
+timestamps4 &lt;- seq(34200, 57600, length.out = length(w4))
+timestamps4 &lt;- seq(34200, 57600, length.out = length(w4))
+timestamps5 &lt;- seq(34200, 57600, length.out = length(w5))
+
+w1 &lt;- xts(w1 * c(0,sqrt(diff(timestamps1) / (max(timestamps1) - min(timestamps1)))),
+          as.POSIXct(timestamps1, origin = "1970-01-01"), tzone = "UTC")
+w2 &lt;- xts(w2 * c(0,sqrt(diff(timestamps2) / (max(timestamps2) - min(timestamps2)))),
+          as.POSIXct(timestamps2, origin = "1970-01-01"), tzone = "UTC")
+w3 &lt;- xts(w3 * c(0,sqrt(diff(timestamps3) / (max(timestamps3) - min(timestamps3)))),
+          as.POSIXct(timestamps3, origin = "1970-01-01"), tzone = "UTC")
+w4 &lt;- xts(w4 * c(0,sqrt(diff(timestamps4) / (max(timestamps4) - min(timestamps4)))),
+          as.POSIXct(timestamps4, origin = "1970-01-01"), tzone = "UTC")
+w5 &lt;- xts(w5 * c(0,sqrt(diff(timestamps5) / (max(timestamps5) - min(timestamps5)))),
+          as.POSIXct(timestamps5, origin = "1970-01-01"), tzone = "UTC")
+
+p1  &lt;- exp(cumsum(w1))
+p2  &lt;- exp(cumsum(w2))
+p3  &lt;- exp(cumsum(w3))
+p4  &lt;- exp(cumsum(w4))
+
+weights &lt;- runif(4) * 1:4
+weights &lt;- weights / sum(weights)
+p5 &lt;- xts(rowSums(cbind(w1 * weights[1], w2 * weights[2], w3 * weights[3], w4 * weights[4]),
+                   na.rm = TRUE),
+                   index(cbind(p1, p2, p3, p4)))
+p5 &lt;- xts(cumsum(rowSums(cbind(p5, w5), na.rm = TRUE)), index(cbind(p5, w5)))
+
+p5 &lt;- exp(p5[sort(sample(1:length(p5), size = nrow(rets) * 0.9))])
+
+
+BAC &lt;- rBACov(pData = list(
+                     "ETF" = p5, "STOCK 1" = p1, "STOCK 2" = p2, "STOCK 3" = p3, "STOCK 4" = p4
+                   ), shares = 1:4, outstanding = 1, nonEquity = 0, ETFNAME = "ETF", 
+                   unrestricted = FALSE, preEstimator = "rCov", noiseCorrection = FALSE, 
+                   returnL = FALSE, K = 2, J = 1)
+
+# Noise robust version of the estimator
+noiseRobustBAC &lt;- rBACov(pData = list(
+                     "ETF" = p5, "STOCK 1" = p1, "STOCK 2" = p2, "STOCK 3" = p3, "STOCK 4" = p4
+                   ), shares = 1:4, outstanding = 1, nonEquity = 0, ETFNAME = "ETF", 
+                   unrestricted = FALSE, preEstimator = "rCov", noiseCorrection = TRUE, 
+                   noiseRobustEstimator = rHYCov, returnL = FALSE, K = 2, J = 1)
+
+# Use the Variance Adjusted Beta method
+# Also use a different pre-estimator.
+VABBAC &lt;- rBACov(pData = list(
+                     "ETF" = p5, "STOCK 1" = p1, "STOCK 2" = p2, "STOCK 3" = p3, "STOCK 4" = p4
+                   ), shares = 1:4, outstanding = 1, nonEquity = 0, ETFNAME = "ETF", 
+                   unrestricted = FALSE, targetBeta = "VAB", preEstimator = "rHYov", 
+                   noiseCorrection = FALSE, returnL = FALSE, Lin = FALSE, L = 0, K = 2, J = 1)                    
+                   
+
+## End(Not run)
+</code></pre>
+
+
+</div>

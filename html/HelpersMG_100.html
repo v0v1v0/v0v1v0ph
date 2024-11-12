@@ -1,0 +1,163 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>tide.info</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Annual tide calendar for one particular location</h2>
+
+<h3>Description</h3>
+
+<p>Annual tide information.<br>
+The columns are: Location, Longitude, Latitude, Phase, DateTime.local, DateTime.UTC, Tide.meter<br>
+This function uses an API linking xtide software
+(https://flaterco.com/xtide/) with tide.info() function.<br>
+You must have a working internet connection for this function.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">tide.info(
+  location = NULL,
+  year = 2021,
+  longitude = NULL,
+  latitude = NULL,
+  force.tide.height = TRUE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>location</code></td>
+<td>
+<p>Textual information about location name</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>year</code></td>
+<td>
+<p>Year to get the calendar</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>longitude</code></td>
+<td>
+<p>Longitude to search for</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>latitude</code></td>
+<td>
+<p>Latitude to search for</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>force.tide.height</code></td>
+<td>
+<p>If FALSE, can return a current speed rather than tide height</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>tide.info gets the annual tide calendar for one particular location.
+</p>
+
+
+<h3>Value</h3>
+
+<p>Return a data.frame with annual tide calendar.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Marc Girondot <a href="mailto:marc.girondot@gmail.com">marc.girondot@gmail.com</a>
+</p>
+
+
+<h3>See Also</h3>
+
+<p>Other Periodic patterns of indices: 
+<code>index.periodic()</code>,
+<code>minmax.periodic()</code>,
+<code>moon.info()</code>,
+<code>sun.info()</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+library("HelpersMG")
+Location &lt;- "Les Hattes"
+Year &lt;- 2010
+tide &lt;- tide.info(Location, Year)
+plot(tide[, "DateTime.local"], tide[, "Tide.meter"], 
+     type="l", bty="n", las=1, 
+     main=tide[1, "Location"], 
+     xlab=as.character(Year), ylab="Tide level in meter")
+
+Location &lt;- "Hawaii"
+Year &lt;- 2010
+tide &lt;- tide.info(Location, Year)
+
+Location &lt;- "Hanamaulu Bay, Kauai Island, Hawaii"
+Year &lt;- 2010
+tide &lt;- tide.info(Location, Year)
+plot(tide[, "DateTime.local"], tide[, "Tide.meter"], 
+     type="l", bty="n", las=1, 
+     main=tide[1, "Location"], 
+     xlab=as.character(Year), ylab="Tide level in meter")
+     
+tide &lt;- tide.info(year=2010, longitude=-32, latitude=-4)
+library(maps)
+map(database = "world", regions = "Brazil", asp=1, 
+    xlim=c(-80, -30), ylim=c(-33, 5))
+points(tide[1, "Longitude"], tide[1, "Latitude"], col="red", pch=19)
+points(-32, -4, col="blue", pch=19)
+axis(1)
+axis(2, las=1)
+
+# Show the locations with data    
+library(maps)
+map(xlim=c(-180, 180), ylim=c(-90, 90))
+title("Locations with harmonics data")
+axis(1, at=seq(from=-180, to=180, by=45))
+axis(2, las=1, at=seq(from=-90, to=90, by=15))
+points(getFromNamespace(x="tide_location", ns="HelpersMG")[, c("longitude")], 
+       getFromNamespace(x="tide_location", ns="HelpersMG")[, c("latitude")], 
+       pch=".", col="red", cex=2)
+# Another example
+tikei_lon  &lt;- (-144.5465183)
+tikei_lat &lt;- -14.9505897
+Year &lt;- 2021
+tikei_tide &lt;- tide.info(year=Year, longitude=tikei_lon, latitude=tikei_lat)
+plot(tikei_tide[, "DateTime.local"], tikei_tide[, "Tide.meter"], 
+     type="l", bty="n", las=1, 
+     main=tikei_tide[1, "Location"], 
+     xlab=as.character(Year), ylab="Tide level in meter")
+## Another one
+tikei_lon &lt;- (-75.56861111)
+tikei_lat &lt;- 39.50083333
+Year &lt;- 2012
+tikei_tide &lt;- tide.info(year=Year, longitude=tikei_lon, latitude=tikei_lat)
+
+library(mapdata)
+map('worldHires', xlim=c(-77, -74), ylim=c(37, 40))
+points(x=tikei_lon, y=tikei_lat, pch=19, col="red", cex=1)
+points(x=tikei_tide$Longitude[1], y=tikei_tide$Latitude[2], 
+       pch=19, col="blue", cex=1)
+
+par(mar=c(4, 4, 2, 2))
+plot(tikei_tide$DateTime.local, tikei_tide$Tide.meter, type="l")
+
+## End(Not run)
+</code></pre>
+
+
+</div>

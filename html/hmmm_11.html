@@ -1,0 +1,146 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hmmm.mlfit</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>fit a hmm model</h2>
+
+<h3>Description</h3>
+
+<p>Function to estimate a hierarchical multinomial marginal model.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hmmm.mlfit(y, model, noineq = TRUE, maxit = 1000, 
+norm.diff.conv = 1e-05, norm.score.conv = 1e-05,
+y.eps = 0, chscore.criterion = 2,
+m.initial = y, mup = 1, step = 1)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+<p>A vector of frequencies of the contingency table</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>model</code></td>
+<td>
+<p>An object created by ‘hmmm.model’</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>noineq</code></td>
+<td>
+<p>If TRUE inequality constraints specified in the model are ignored</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>maxit</code></td>
+<td>
+<p>Maximum number of iterations</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>norm.diff.conv</code></td>
+<td>
+<p>Convergence criterium value on the parameters</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>norm.score.conv</code></td>
+<td>
+<p>Convergence criterium value on the constraints</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>y.eps</code></td>
+<td>
+<p>Non-negative constant to be  added 
+to the original counts in y</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>chscore.criterion</code></td>
+<td>
+<p>If equal to zero, convergence
+information are printed at every iteration</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>m.initial</code></td>
+<td>
+<p>Initial estimate of m (expected frequencies)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mup</code></td>
+<td>
+<p> Weight for the constraints penalty part of the merit function</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>step</code></td>
+<td>
+<p>Interval length for the line search</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>A sequential quadratic procedure is used to maximize the log-likelihood function
+under inequality and equality constraints. 
+This function calls the procedure ‘mphineq.fit’  which is a generalization of the procedure
+‘mph.fit’ by Lang (2004).</p>
+
+
+<h3>Value</h3>
+
+<p>An object of the class <code>hmmmfit</code>; an estimate of a marginal model defined by ‘hmmm.model’.
+The output can be displayed using ‘summary’ or ‘print’.</p>
+
+
+<h3>References</h3>
+
+<p> Bartolucci F, Colombi R, Forcina A (2007) An extended class of marginal link 
+functions for modelling contingency tables by equality
+and inequality constraints. Statistica Sinica, 17, 691-711.
+</p>
+<p>Bergsma WP, Rudas T (2002) Marginal models for categorical data. The Annals of Statistics, 30, 140-159. 
+</p>
+<p>Colombi R, Giordano S, Cazzaro M (2014) hmmm: An R Package for hierarchical multinomial marginal models. Journal of Statistical Software, 59(11), 1-25, URL http://www.jstatsoft.org/v59/i11/.
+</p>
+<p>Lang  JB (2004) Multinomial Poisson homogeneous models for contingency tables. The Annals of Statistics, 32, 340-383.</p>
+
+
+<h3>See Also</h3>
+
+<p><code>hmmm.model</code>, <code>hmmm.model.X</code>, <code>summary.hmmmfit</code>, <code>print.hmmmfit</code></p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(relpol)
+y&lt;-getnames(relpol,st=12)
+# 1 = Religion, 2 = Politics
+names&lt;-c("Rel","Pol")
+marglist&lt;-c("l-m","m-g","l-g")
+marginals&lt;-marg.list(marglist,mflag="m")
+
+# Hypothesis of stochastic independence: all log odds ratios are null 
+model&lt;-hmmm.model(marg=marginals,lev=c(3,7),sel=c(9:20),names=names)
+fitmodel&lt;-hmmm.mlfit(y,model)
+print(fitmodel, aname="Independence model",printflag=TRUE)
+summary(fitmodel)
+
+</code></pre>
+
+
+</div>

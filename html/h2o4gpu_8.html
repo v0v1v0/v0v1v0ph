@@ -1,0 +1,259 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>h2o4gpu.gradient_boosting_classifier</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Gradient Boosting Classifier</h2>
+
+<h3>Description</h3>
+
+<p>Gradient Boosting Classifier
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">h2o4gpu.gradient_boosting_classifier(loss = "deviance", learning_rate = 0.1,
+  n_estimators = 100L, subsample = 1, criterion = "friedman_mse",
+  min_samples_split = 2L, min_samples_leaf = 1L,
+  min_weight_fraction_leaf = 0, max_depth = 3L, min_impurity_decrease = 0,
+  min_impurity_split = NULL, init = NULL, random_state = NULL,
+  max_features = "auto", verbose = 0L, max_leaf_nodes = NULL,
+  warm_start = FALSE, presort = "auto", colsample_bytree = 1,
+  num_parallel_tree = 1L, tree_method = "gpu_hist", n_gpus = -1L,
+  predictor = "gpu_predictor", objective = "binary:logistic",
+  booster = "gbtree", n_jobs = 1L, gamma = 0L, min_child_weight = 1L,
+  max_delta_step = 0L, colsample_bylevel = 1L, reg_alpha = 0L,
+  reg_lambda = 1L, scale_pos_weight = 1L, base_score = 0.5,
+  missing = NULL, backend = "h2o4gpu", ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>loss</code></td>
+<td>
+<p>loss function to be optimized. 'deviance' refers to deviance (= logistic regression) for classification with probabilistic outputs. For loss 'exponential' gradient boosting recovers the AdaBoost algorithm.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>learning_rate</code></td>
+<td>
+<p>learning rate shrinks the contribution of each tree by <code>learning_rate</code>. There is a trade-off between learning_rate and n_estimators.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n_estimators</code></td>
+<td>
+<p>The number of boosting stages to perform. Gradient boosting is fairly robust to over-fitting so a large number usually results in better performance.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>subsample</code></td>
+<td>
+<p>The fraction of samples to be used for fitting the individual base learners. If smaller than 1.0 this results in Stochastic Gradient Boosting. <code>subsample</code> interacts with the parameter <code>n_estimators</code>. Choosing <code>subsample &lt; 1.0</code> leads to a reduction of variance and an increase in bias.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>criterion</code></td>
+<td>
+<p>The function to measure the quality of a split. Supported criteria are "friedman_mse" for the mean squared error with improvement score by Friedman, "mse" for mean squared error, and "mae" for the mean absolute error. The default value of "friedman_mse" is generally the best as it can provide a better approximation in some cases.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>min_samples_split</code></td>
+<td>
+<p>The minimum number of samples required to split an internal node:</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>min_samples_leaf</code></td>
+<td>
+<p>The minimum number of samples required to be at a leaf node:</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>min_weight_fraction_leaf</code></td>
+<td>
+<p>The minimum weighted fraction of the sum total of weights (of all the input samples) required to be at a leaf node. Samples have equal weight when sample_weight is not provided.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>max_depth</code></td>
+<td>
+<p>maximum depth of the individual regression estimators. The maximum depth limits the number of nodes in the tree. Tune this parameter for best performance; the best value depends on the interaction of the input variables.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>min_impurity_decrease</code></td>
+<td>
+<p>A node will be split if this split induces a decrease of the impurity greater than or equal to this value.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>min_impurity_split</code></td>
+<td>
+<p>Threshold for early stopping in tree growth. A node will split if its impurity is above the threshold, otherwise it is a leaf.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>init</code></td>
+<td>
+<p>An estimator object that is used to compute the initial predictions. <code>init</code> has to provide <code>fit</code> and <code>predict</code>. If NULL it uses <code>loss.init_estimator</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>random_state</code></td>
+<td>
+<p>If int, random_state is the seed used by the random number generator; If RandomState instance, random_state is the random number generator; If NULL, the random number generator is the RandomState instance used by <code>np.random</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>max_features</code></td>
+<td>
+<p>The number of features to consider when looking for the best split:</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p>Enable verbose output. If 1 then it prints progress and performance once in a while (the more trees the lower the frequency). If greater than 1 then it prints progress and performance for every tree.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>max_leaf_nodes</code></td>
+<td>
+<p>Grow trees with <code>max_leaf_nodes</code> in best-first fashion. Best nodes are defined as relative reduction in impurity. If NULL then unlimited number of leaf nodes.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>warm_start</code></td>
+<td>
+<p>When set to <code>TRUE</code>, reuse the solution of the previous call to fit and add more estimators to the ensemble, otherwise, just erase the previous solution.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>presort</code></td>
+<td>
+<p>Whether to presort the data to speed up the finding of best splits in fitting. Auto mode by default will use presorting on dense data and default to normal sorting on sparse data. Setting presort to true on sparse data will raise an error.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>colsample_bytree</code></td>
+<td>
+<p>Subsample ratio of columns when constructing each tree.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>num_parallel_tree</code></td>
+<td>
+<p>Number of trees to grow per round</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tree_method</code></td>
+<td>
+<p>The tree construction algorithm used in XGBoost Distributed and external memory version only support approximate algorithm. Choices: ‘auto’, ‘exact’, ‘approx’, ‘hist’, ‘gpu_exact’, ‘gpu_hist’ ‘auto’: Use heuristic to choose faster one. - For small to medium dataset, exact greedy will be used. - For very large-dataset, approximate algorithm will be chosen. - Because old behavior is always use exact greedy in single machine, - user will get a message when approximate algorithm is chosen to notify this choice. ‘exact’: Exact greedy algorithm. ‘approx’: Approximate greedy algorithm using sketching and histogram. ‘hist’: Fast histogram optimized approximate greedy algorithm. It uses some performance improvements such as bins caching. ‘gpu_exact’: GPU implementation of exact algorithm. ‘gpu_hist’: GPU implementation of hist algorithm.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n_gpus</code></td>
+<td>
+<p>Number of gpu's to use in GradientBoostingClassifier solver. Default is -1.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>predictor</code></td>
+<td>
+<p>The type of predictor algorithm to use. Provides the same results but allows the use of GPU or CPU. - 'cpu_predictor': Multicore CPU prediction algorithm. - 'gpu_predictor': Prediction using GPU. Default for 'gpu_exact' and 'gpu_hist' tree method.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>objective</code></td>
+<td>
+<p>Specify the learning task and the corresponding learning objective or a custom objective function to be used Note: A custom objective function can be provided for the objective parameter. In this case, it should have the signature objective(y_true, y_pred) -&gt; grad, hess:</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>booster</code></td>
+<td>
+<p>Specify which booster to use: gbtree, gblinear or dart.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n_jobs</code></td>
+<td>
+<p>Number of parallel threads used to run xgboost.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>gamma</code></td>
+<td>
+<p>Minimum loss reduction required to make a further partition on a leaf node of the tree.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>min_child_weight</code></td>
+<td>
+<p>Minimum sum of instance weight(hessian) needed in a child.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>max_delta_step</code></td>
+<td>
+<p>Maximum delta step we allow each tree’s weight estimation to be.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>colsample_bylevel</code></td>
+<td>
+<p>Subsample ratio of columns for each split, in each level.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>reg_alpha</code></td>
+<td>
+<p>L1 regularization term on weights</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>reg_lambda</code></td>
+<td>
+<p>L2 regularization term on weights</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>scale_pos_weight</code></td>
+<td>
+<p>Balancing of positive and negative weights.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>base_score</code></td>
+<td>
+<p>The initial prediction score of all instances, global bias.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>missing</code></td>
+<td>
+<p>Value in the data which needs to be present as a missing value. If NULL, defaults to np.nan.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>backend</code></td>
+<td>
+<p>Which backend to use. Options are 'auto', 'sklearn', 'h2o4gpu'. Saves as attribute for actual backend used.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Other parameters for XGBoost object. Full documentation of parameters can be found here: https://github.com/dmlc/xgboost/blob/master/doc/parameter.md</p>
+</td>
+</tr>
+</table>
+</div>

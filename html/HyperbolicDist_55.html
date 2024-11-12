@@ -1,0 +1,151 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>momIntegrated</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Moments Using Integration</h2>
+
+<h3>Description</h3>
+
+<p>Calculates moments and absolute moments about a given location for the
+generalized hyperbolic and related distributions.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">momIntegrated(densFn, order, param = NULL, about = 0, absolute = FALSE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>densFn</code></td>
+<td>
+<p>Character. The name of the density function whose
+moments are to be calculated. See <b>Details</b>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>order</code></td>
+<td>
+<p>Numeric. The order of the moment or absolute moment to be
+calculated.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>param</code></td>
+<td>
+<p>Numeric. A vector giving the parameter values for the
+distribution specified by <code>densFn</code>. If no <code>param</code> values
+are specified, then the default parameter values of each distribution
+are used instead.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>about</code></td>
+<td>
+<p>Numeric. The point about which the moment is to be calculated.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>absolute</code></td>
+<td>
+<p>Logical. Whether absolute moments or ordinary moments
+are to be calculated. Default is <code>FALSE</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Denote the density function by <code class="reqn">f</code>. Then if
+<code>order</code><code class="reqn">=k</code> and <code>about</code><code class="reqn">=a</code>,
+<code>momIntegrated</code> calculates
+</p>
+<p style="text-align: center;"><code class="reqn">\int_{-\infty}^\infty (x - a)^k f(x) dx</code>
+</p>
+
+<p>when <code>absolute = FALSE</code> and
+</p>
+<p style="text-align: center;"><code class="reqn">\int_{-\infty}^\infty |x - a|^k f(x) dx</code>
+</p>
+
+<p>when <code>absolute = TRUE</code>.
+</p>
+<p>Only certain density functions are permitted.
+</p>
+<p>When <code>densFn="ghyp"</code> or <code>"generalized hyperbolic"</code> the
+density used is <code>dghyp</code>. The default value for <code>param</code> is
+<code>c(1,1,0,1,0)</code>.
+</p>
+<p>When <code>densFn="hyperb"</code> or <code>"hyperbolic"</code> the density used is
+<code>dhyperb</code>. The default value for <code>param</code> is
+<code>c(0,1,1,0)</code>.
+</p>
+<p>When <code>densFn="gig"</code> or <code>"generalized inverse gaussian"</code> the
+density used is <code>dgig</code>. The default value for <code>param</code> is
+<code>c(1,1,1)</code>.
+</p>
+<p>When <code>densFn="gamma"</code> the density used is <code>dgamma</code>. The
+default value for <code>param</code> is <code>c(1,1)</code>.
+</p>
+<p>When <code>densFn="invgamma"</code> or <code>"inverse gamma"</code> the
+density used is the density of the inverse gamma distribution given by
+</p>
+<p style="text-align: center;"><code class="reqn">f(x) = \frac{u^\alpha e^{-u}}{x \Gamma(\alpha)}, %
+    \quad u = \theta/x</code>
+</p>
+
+<p>for <code class="reqn">x &gt; 0</code>, <code class="reqn">\alpha &gt; 0</code> and
+<code class="reqn">\theta &gt; 0</code>.  The parameter vector
+<code>param = c(shape,rate)</code> where <code>shape</code> <code class="reqn">=\alpha</code> and
+<code>rate</code><code class="reqn">=1/\theta</code>. The default value for
+<code>param</code> is <code>c(-1,1)</code>.
+</p>
+
+
+<h3>Value</h3>
+
+<p>The value of the integral as specified in <b>Details</b>.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>David Scott <a href="mailto:d.scott@auckland.ac.nz">d.scott@auckland.ac.nz</a>, 
+Christine Yang Dong <a href="mailto:c.dong@auckland.ac.nz">c.dong@auckland.ac.nz</a></p>
+
+
+<h3>See Also</h3>
+
+<p><code>dghyp</code>, <code>dhyperb</code>,
+<code>dgamma</code>, <code>dgig</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">### Calculate the mean of a generalized hyperbolic distribution
+### Compare the use of integration and the formula for the mean
+m1 &lt;- momIntegrated("ghyp", param = c(1/2,3,1,1,0), order = 1, about = 0)
+m1
+ghypMean(c(1/2,3,1,1,0))
+### The first moment about the mean should be zero
+momIntegrated("ghyp", order = 1, param = c(1/2,3,1,1,0), about = m1)
+### The variance can be calculated from the raw moments
+m2 &lt;- momIntegrated("ghyp", order = 2, param = c(1/2,3,1,1,0), about = 0)
+m2
+m2 - m1^2
+### Compare with direct calculation using integration
+momIntegrated("ghyp", order = 2, param = c(1/2,3,1,1,0), about = m1)
+momIntegrated("generalized hyperbolic", param = c(1/2,3,1,1,0), order = 2,
+              about = m1)
+### Compare with use of the formula for the variance
+ghypVar(c(1/2,3,1,1,0))
+</code></pre>
+
+
+</div>

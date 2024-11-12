@@ -1,0 +1,245 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>marker_h2</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Compute a marker-based estimate of heritability, given phenotypic observations
+at individual plant or plot level. 
+</h2>
+
+<h3>Description</h3>
+
+<p>Given a genetic relatedness matrix and phenotypic observations at individual
+plant or plot level, this function computes REML-estimates of the genetic and
+residual variance and their standard errors, using the AI-algorithm (Gilmour <em>et al.</em> 1995).
+Based on this, heritability estimates and confidence intervals are given
+(the estimator <code class="reqn">h_r^2</code> in Kruijer <em>et al.</em>).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">marker_h2(data.vector, geno.vector, covariates = NULL, K, alpha = 0.05,
+          eps = 1e-06, max.iter = 100, fix.h2 = FALSE, h2 = 0.5)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>data.vector</code></td>
+<td>
+
+<p>A vector of phenotypic observations. Needs to be of type numeric. May contain
+missing values.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>geno.vector</code></td>
+<td>
+
+<p>A vector of genotype labels, either a factor or character. This vector should
+correspond to <code>data.vector</code>, and hence needs to be of the same length.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>covariates</code></td>
+<td>
+
+<p>A data-frame or matrix with optional covariates, the rows corresponding to
+the phenotypic observations in <code>data.vector</code> and <code>geno.vector</code>.
+May contain missing values. Factors are not allowed, and need to be encoded by
+columns of type numeric or integer. The data-frame or matrix should not contain an intercept,
+which is included by default.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>K</code></td>
+<td>
+
+<p>A genetic relatedness or kinship matrix, typically marker-based.
+Must have row- and column-names corresponding to the levels of <code>geno.vector</code>
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alpha</code></td>
+<td>
+
+<p>Confidence level, for the 1-alpha confidence intervals.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>eps</code></td>
+<td>
+
+<p>Numerical precision, used as convergence criterion in the AI-algorithm.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>max.iter</code></td>
+<td>
+
+<p>Maximal number of iterations in the AI-algorithm.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fix.h2</code></td>
+<td>
+
+<p>Compute the log-likelihood and inverse AI-matrix for a fixed heritability value. Default is <code>FALSE</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>h2</code></td>
+<td>
+
+<p>When <code>fix.h2</code> is <code>TRUE</code>, the value of the heritability. Must be of type numeric, between 0 and 1.
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+
+
+<ul>
+<li>
+<p> Given phenotypic observations <code class="reqn">Y_{ij}</code> for genotypes <code class="reqn">i=1,...,n</code> and replicates
+<code class="reqn">j = 1,...,n_i</code>, the mixed model
+<code class="reqn">Y_{ij} = \mu + G_i + E_{ij}</code>
+is assumed. The vector of additive genetic effects <code class="reqn">(G_1,...,G_n)'</code> follows a
+multivariate normal distribution with mean zero and covariance <code class="reqn">\sigma_A^2 K</code>,
+where <code class="reqn">\sigma_A^2</code> is the additive genetic variance, and <code class="reqn">K</code> is a genetic relatedness matrix derived from a dense set of markers.
+The errors <code class="reqn">E_{ij}</code> are independent and normally distributed with variance <code class="reqn">\sigma_E^2</code>.
+Under certain assumptions (see Speed <em>et al.</em> 2012) the marker- or chip-heritability <code class="reqn">h^2 = \sigma_A^2 / (\sigma_A^2 + \sigma_E^2)</code>
+equals the narrow-sense heritability.
+
+</p>
+</li>
+<li>
+<p> It is assumed that the genetic relatedness matrix <code class="reqn">K</code> is scaled such that <code class="reqn">trace(P K P) = n - 1</code>, where
+<code class="reqn">P</code> is the projection matrix <code class="reqn">I_n - 1_n 1_n' / n</code>, for the identity matrix <code class="reqn">I_n</code> and <code class="reqn">1_n</code> being a column vector of ones.
+If this is not the case, <code class="reqn">K</code> is automatically scaled prior to fitting the mixed model.
+
+</p>
+</li>
+<li>
+<p> The model can optionally include a term <code class="reqn">X_{ij} \beta</code>, where <code class="reqn">X_{ij}</code>
+is the row vector with observations on <code class="reqn">k</code> extra covariates and the vector <code class="reqn">\beta</code> contains their effects.
+In this case the argument <code>covariates</code> should be the (N x k) matrix or
+data-frame with rows <code class="reqn">X_{ij}</code> (N being the total number of observations).
+Observations where either <code class="reqn">Y_{ij}</code> or any of the covariates is missing are discarded.
+
+</p>
+</li>
+<li>
+<p> Confidence intervals for heritability are constructed using the delta-method and the inverse AI-matrix.
+The delta-method can be applied either directly to the
+function <code class="reqn">(\sigma_A^2,\sigma_E^2) -&gt; \sigma_A^2 / (\sigma_A^2 + \sigma_E^2)</code> or to the function
+<code class="reqn">(\sigma_A^2,\sigma_E^2) -&gt; log(\sigma_A^2 / \sigma_E^2)</code>. In the latter case,
+a confidence interval for <code class="reqn">log(\sigma_A^2 / \sigma_E^2)</code> is obtained, which is back-transformed to a confidence interval for heritability.
+This approach (proposed in Kruijer <em>et al.</em>) has the advantage that intervals are always contained in the unit interval.
+
+</p>
+</li>
+<li>
+<p> The AI-algorithm is run for <code>max.iter</code> iterations. If by then there is no convergence a warning is printed and the current estimates are returned.
+</p>
+</li>
+</ul>
+<h3>Value</h3>
+
+<p>A list with the following components:
+</p>
+
+<ul>
+<li>
+<p>va:  REML-estimate of the (additive) genetic variance.
+</p>
+</li>
+<li>
+<p>ve:  REML-estimate of the residual variance.
+</p>
+</li>
+<li>
+<p>h2:  Plug-in estimate of heritability: <code class="reqn">va / (va + ve)</code>.
+</p>
+</li>
+<li>
+<p>conf.int1:  1-alpha confidence interval for heritability.
+</p>
+</li>
+<li>
+<p>conf.int2:  1-alpha confidence interval for heritability, obtained by
+application of the delta method on a logarithmic scale.
+</p>
+</li>
+<li>
+<p>inv.ai:  The inverse of the average information (AI) matrix.
+</p>
+</li>
+<li>
+<p>loglik:  The log-likelihood.
+</p>
+</li>
+</ul>
+<h3>Author(s)</h3>
+
+<p>Willem Kruijer.
+</p>
+
+
+<h3>References</h3>
+
+
+<ul>
+<li>
+<p> Gilmour <em>et al.</em> Gilmour, A.R., R. Thompson and B.R. Cullis (1995) Average Information REML: An Efficient Algorithm for Variance Parameter
+Estimation in Linear Mixed Models. <em>Biometrics</em>, volume 51, number 4, 1440-1450.
+</p>
+</li>
+<li>
+<p> Kruijer, W. <em>et al.</em> (2015) Marker-based estimation of heritability in immortal
+populations. <em>Genetics</em>, Vol. 199(2), p. 1-20.
+</p>
+</li>
+<li>
+<p> Speed, D., G. Hemani, M. R. Johnson, and D.J. Balding (2012) Improved heritability
+estimation from genome-wide snps. <em>the American journal of human genetics</em> 91: 1011-1021.
+</p>
+</li>
+</ul>
+<h3>See Also</h3>
+
+<p>For marker-based estimation of heritability using genotypic means, see
+<code>marker_h2_means</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(LD)
+data(K_atwell)
+# Heritability estimation for all observations:
+#out &lt;- marker_h2(data.vector=LD$LD,geno.vector=LD$genotype,
+#                 covariates=LD[,4:8],K=K_atwell)
+# Heritability estimation for a randomly chosen subset of 20 accessions:
+set.seed(123)
+sub.set &lt;- which(LD$genotype %in% sample(levels(LD$genotype),20))
+out &lt;- marker_h2(data.vector=LD$LD[sub.set],geno.vector=LD$genotype[sub.set],
+                 covariates=LD[sub.set,4:8],K=K_atwell)
+</code></pre>
+
+
+</div>

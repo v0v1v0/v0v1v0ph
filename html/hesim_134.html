@@ -1,0 +1,64 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>partsurvfit</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Partitioned survival regression object</h2>
+
+<h3>Description</h3>
+
+<p>Create a partitioned survival regression object of class <code>partsurvfit</code>. The object contains a list
+of fitted survival models fit using either <code>flexsurvreg</code> or <code>flexsurvspline</code> (i.e.,
+an object of class <code>flexsurvreg_list</code>) and the data frame used to perform the fit of each model.
+The same data frame must have been used for each fit.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">partsurvfit(object, data)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>object</code></td>
+<td>
+<p>An object of class <code>flexsurvreg_list</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>The data frame used to fit each survival model in <code>object</code>.
+<code>flexsurvreg</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>Returns an object of class <code>partsurvfit</code>, which is a list containing two elements.
+The first element, "models", contains the survival models passed to <code>object</code>, and the second
+element, "data" contains the data frame passed to <code>data</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">library("flexsurv")
+fit1 &lt;- flexsurv::flexsurvreg(formula = Surv(endpoint1_time, endpoint1_status) ~ age, 
+                              data = psm4_exdata$survival,
+                              dist = "weibull")
+fit2 &lt;- flexsurv::flexsurvreg(formula = Surv(endpoint2_time, endpoint2_status) ~ age, 
+                              data = psm4_exdata$survival, 
+                              dist = "weibull")
+fsreg_list &lt;- flexsurvreg_list(endpoint1 = fit1, endpoint2 = fit2)
+fits &lt;- partsurvfit(fsreg_list, data = psm4_exdata$survival)
+class(fits)
+</code></pre>
+
+
+</div>

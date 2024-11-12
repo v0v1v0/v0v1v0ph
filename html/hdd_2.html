@@ -1,0 +1,115 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>$.hdd</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Extracts a single variable from a HDD object</h2>
+
+<h3>Description</h3>
+
+<p>This method extracts a single variable from a hard drive data set (HDD). There is an automatic protection to avoid extracting too large data into memory. The bound is set by the function <code>setHdd_extract.cap</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">## S3 method for class 'hdd'
+x$name
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>A <code>HDD</code> object.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>name</code></td>
+<td>
+<p>The variable name to be extracted.Note that there is an automatic protection for not trying to import data that would not fit into memory. The extraction cap is set with the function <code>setHdd_extract.cap</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>By default if the expected size of the variable to extract is greater than the value given by <code>getHdd_extract.cap</code> an error is raised.
+For numeric variables, the expected size is exact. For non-numeric data, the expected size is a guess that considers all the non-numeric variables being of the same size. This may lead to an over or under estimation depending on the cases.
+In any case, if your variable is large and you don't want to change the extraction cap (<code>setHdd_extract.cap</code>), you can still extract the variable with <code>sub-.hdd</code> for which there is no such protection.
+</p>
+<p>Note that you cannot create variables with <code>$</code>, e.g. like <code>base_hdd$x_new &lt;- something</code>. To create variables, use the <code>[</code> instead (see <code>sub-.hdd</code>).
+</p>
+
+
+<h3>Value</h3>
+
+<p>It returns a vector.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Laurent Berge
+</p>
+
+
+<h3>See Also</h3>
+
+<p>See <code>hdd</code>, <code>sub-.hdd</code> and <code>cash-.hdd</code>
+for the extraction and manipulation of out of memory data. For importation of
+HDD data sets from text files: see <code>txt2hdd</code>.
+</p>
+<p>See <code>hdd_slice</code> to apply functions to chunks of data (and create
+HDD objects) and <code>hdd_merge</code> to merge large files.
+</p>
+<p>To create/reshape HDD objects from memory or from other HDD objects, see
+<code>write_hdd</code>.
+</p>
+<p>To display general information from HDD objects: <code>origin</code>,
+<code>summary.hdd</code>, <code>print.hdd</code>,
+<code>dim.hdd</code> and <code>names.hdd</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+# Toy example with iris data
+# We first create a hdd dataset with approx. 100KB
+hdd_path = tempfile() # =&gt; folder where the data will be saved
+write_hdd(iris, hdd_path)
+for(i in 1:10) write_hdd(iris, hdd_path, add = TRUE)
+
+base_hdd = hdd(hdd_path)
+summary(base_hdd) # =&gt; 11 files
+
+# we can extract the data from the 11 files with '$':
+pl = base_hdd$Sepal.Length
+
+#
+# Illustration of the protection mechanism:
+#
+
+# By default when extracting a variable with '$'
+# and the size exceeds the cap (default is greater than 3GB)
+# a confirmation is needed.
+# You can set the cap with setHdd_extract.cap.
+
+# Following asks for confirmation in interactive mode:
+setHdd_extract.cap(sizeMB = 0.005) # new cap of 5KB
+pl = base_hdd$Sepal.Length
+
+# To extract the variable without changing the cap:
+pl = base_hdd[, Sepal.Length] # =&gt; no size control is performed
+
+# Resetting the default cap
+setHdd_extract.cap()
+
+</code></pre>
+
+
+</div>

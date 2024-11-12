@@ -1,0 +1,204 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>ReadObs</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Read HYPE observation data files</h2>
+
+<h3>Description</h3>
+
+<p>Import single-variable HYPE observation files into R.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">ReadObs(
+  filename,
+  variable = "",
+  dt.format = NULL,
+  nrows = -1,
+  type = c("df", "dt"),
+  select = NULL,
+  obsid = NULL
+)
+
+ReadPTQobs(
+  filename,
+  variable = "",
+  dt.format = NULL,
+  nrows = -1,
+  type = c("df", "dt"),
+  select = NULL,
+  obsid = NULL
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>filename</code></td>
+<td>
+<p>Path to and file name of the file to import. Windows users: Note that
+Paths are separated by '/', not '\'.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>variable</code></td>
+<td>
+<p>Character string, HYPE variable ID of file contents. If <code>""</code> (default), the ID is extracted
+from <code>filename</code>, which only works with HYPE input data file names or file names including those names
+(e.g. 'Pobs_old.txt', 'testSFobs.txt'). Some of the observation data files have no corresponding HYPE variable ID.
+In these cases, a dummy ID is used, see table in Details. If automatic extraction fails, attribute <code>variable</code> is set
+to <code>"other"</code>. Alternatively, any other variable name can be provided.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dt.format</code></td>
+<td>
+<p>Optional date-time <code>format</code> string as in <code>strptime</code>. If <code>NULL</code>, then HYPEtools will try to identify
+the format automatically.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nrows</code></td>
+<td>
+<p>Number of rows to import. A value of <code>-1</code> indicates all rows, a positive integer gives the number of rows
+to import.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>type</code></td>
+<td>
+<p>Character, keyword for data type to return. <code>"df"</code> to return a standard data frame or <code>"dt"</code> to
+return a <code>data.table</code> object.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>select</code></td>
+<td>
+<p>Integer vector, column numbers to import. Note: first column with dates must be imported and will be added if missing.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>obsid</code></td>
+<td>
+<p>Integer vector, HYPE OBSIDs to import. Alternative to argument <code>select</code>, takes precedence if both are provided.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p><code>ReadObs</code> is a convenience wrapper function of <code>fread</code> from package
+data.table::data.table,
+with conversion of date-time strings to POSIX time representations. Observation IDs (SUBIDs or IDs connected to SUBIDs with a
+<a href="http://hype.smhi.net//wiki/doku.php?id=start:hype_file_reference:forckey.txt">ForcKey.txt file</a>) are returned as integer
+attribute <code>obsid</code> (directly accessible through <code>obsid</code>).
+</p>
+<p>Observation file types with automatic (dummy) <code>variable</code> attribute assignment:</p>
+
+<table>
+<tr>
+<td style="text-align: left;">
+   <strong>File</strong> </td>
+<td style="text-align: center;"> <strong>HYPE variable ID</strong> </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+    </td>
+<td style="text-align: center;"> (*: dummy ID) </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+   Pobs.txt </td>
+<td style="text-align: center;"> prec </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+   Tobs.txt </td>
+<td style="text-align: center;"> temp </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+   Qobs.txt </td>
+<td style="text-align: center;"> rout </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+   TMINobs.txt </td>
+<td style="text-align: center;"> tmin* </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+   TMAXobs.txt </td>
+<td style="text-align: center;"> tmax* </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+   VWobs.txt </td>
+<td style="text-align: center;"> vwnd* </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+   UWobs.txt </td>
+<td style="text-align: center;"> uwnd* </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+   SFobs.txt </td>
+<td style="text-align: center;"> snff* </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+   SWobs.txt </td>
+<td style="text-align: center;"> swrd* </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+   RHobs.txt </td>
+<td style="text-align: center;"> rhum* </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+   Uobs.txt </td>
+<td style="text-align: center;"> wind* </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p><code>ReadObs</code> returns a data frame or data table with additional attributes: <code>obsid</code> with observation IDs, <code>timestep</code>
+with a time step string, either <code>"day"</code> or <code>"nhour"</code> (only daily or n-hourly time steps supported), and <code>variable</code>
+with a HYPE variable ID string.
+</p>
+
+
+<h3>Note</h3>
+
+<p>For the conversion of date/time strings, time zone "UTC" is assumed. This is done to avoid potential daylight saving time
+side effects when working with the imported data (and e.g. converting to string representations during the process).
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>WriteObs</code>
+<code>ReadXobs</code> for multi-variable HYPE observation files
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">te &lt;- ReadObs(filename = system.file("demo_model", "Tobs.txt", package = "HYPEtools"))
+head(te)
+
+</code></pre>
+
+
+</div>

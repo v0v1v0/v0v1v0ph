@@ -1,0 +1,130 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>initialize</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Creating a hyperSpec Object</h2>
+
+<h3>Description</h3>
+
+<p>Like other S4 objects, a hyperSpec object can be created by <code>new</code>. The
+hyperSpec object is then <code>initialize</code>d using the given parameters.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">## S4 method for signature 'hyperSpec'
+initialize(.Object, spc = NULL, data = NULL, wavelength = NULL, labels = NULL)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>.Object</code></td>
+<td>
+<p>the new <code>hyperSpec</code> object.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>spc</code></td>
+<td>
+<p>the spectra matrix.
+</p>
+<p><code>spc</code> does not need to be a matrix, it is converted explicitly by
+<code>I (as.matrix (spc))</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p><code>data.frame</code>, possibly with the spectra in
+<code>data$spc</code>, and further variates in more columns.  A matrix can be
+entered as <em>one</em> column of a data frame by: <code>data.frame (spc =
+  I (as.matrix (spc)))</code>.
+</p>
+<p>However, it will usually be more convenient if the spectra are given in
+<code>spc</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>wavelength</code></td>
+<td>
+<p>The wavelengths corresponding to the columns of
+<code>data</code>. If no wavelengths are given, an appropriate vector is
+derived from the column names of <code>data$spc</code>. If this is not
+possible, <code>1 : ncol (data$spc)</code> is used instead.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>labels</code></td>
+<td>
+<p>A <code>list</code> containing the labels for the columns of the
+<code>data</code> slot of the <code>hyperSpec</code> object and for the wavelength
+(in <code>label$.wavelength</code>). The labels should be given in a form ready
+for the text-drawing functions (see <code>plotmath</code>).
+</p>
+<p>If <code>label</code> is not given, a list containing <code>NULL</code> for each of the
+columns of<code>data</code> and <code>wavelength</code> is used.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>If option <code>gc</code> is <code>TRUE</code>, the initialization will have frequent
+calls to <code>gc ()</code> which can help to avoid swapping or running out of
+memory.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>C.Beleites
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>new</code> for more information on creating and
+initializing S4 objects.
+</p>
+<p><code>plotmath</code> on expressions for math annotations as
+for slot <code>label</code>.
+</p>
+<p><code>hy.setOptions</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+new ("hyperSpec")
+
+spc &lt;- matrix (rnorm (12), ncol = 4)
+new ("hyperSpec", spc = spc)
+new ("hyperSpec", data = data.frame (x = letters[1:3]),
+     spc = spc)
+
+colnames (spc) &lt;- 600:603
+new ("hyperSpec", spc = spc)  # wavelength taken from colnames (spc)
+
+# given wavelengths precede over colnames of spc
+new ("hyperSpec", spc = spc, wavelength = 700:703)
+
+# specifying labels
+h &lt;- new ("hyperSpec", spc = spc, data = data.frame (pos = 1 : 3),
+          label = list (spc = "I / a.u.",
+                        .wavelength = expression (tilde (nu) / cm^-1),
+                        pos = expression ("/" (x, mu*m)))
+)
+
+plot (h)
+plotc (h, spc ~ pos)
+
+</code></pre>
+
+
+</div>

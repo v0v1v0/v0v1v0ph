@@ -1,0 +1,102 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>CovarEstim</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Covariance matrix estimator</h2>
+
+<h3>Description</h3>
+
+<p>It is a function dispatcher for covariance matrix estimation. One can choose
+between traditional and shrinkage-based estimators.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">CovarEstim(x, type = c("trad", "BGP14", "LW20"), ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>a p by n matrix or a data frame of asset returns. Rows represent
+different assets, columns – observations.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>type</code></td>
+<td>
+<p>a character. The estimation method to be used.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>arguments to pass to estimators</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The available estimation methods are:</p>
+
+<table>
+<tr>
+<td style="text-align: left;">
+   Function </td>
+<td style="text-align: left;"> Paper </td>
+<td style="text-align: left;"> Type </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+   <code>Sigma_sample_estimator</code> </td>
+<td style="text-align: left;">  </td>
+<td style="text-align: left;"> traditional </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+   <code>CovShrinkBGP14</code> </td>
+<td style="text-align: left;"> Bodnar et al 2014 </td>
+<td style="text-align: left;"> BGP14 </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+   <code>nonlin_shrinkLW</code> </td>
+<td style="text-align: left;"> Ledoit &amp; Wolf 2020 </td>
+<td style="text-align: left;"> LW20 </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>an object of class matrix
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">n&lt;-3e2 # number of realizations
+p&lt;-.5*n # number of assets
+
+x &lt;- matrix(data = rnorm(n*p), nrow = p, ncol = n)
+
+Mtrx_trad &lt;- CovarEstim(x, type="trad")
+
+TM &lt;- matrix(0, p, p)
+diag(TM) &lt;- 1
+Mtrx_bgp &lt;- CovarEstim(x, type="BGP14", TM=TM)
+
+Mtrx_lw &lt;- CovarEstim(x, type="LW20")
+</code></pre>
+
+
+</div>

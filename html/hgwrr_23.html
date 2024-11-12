@@ -1,0 +1,124 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>summary.hgwrm</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Summary an <code>hgwrm</code> object.</h2>
+
+<h3>Description</h3>
+
+<p>Summary an <code>hgwrm</code> object.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">## S3 method for class 'hgwrm'
+summary(object, ..., test_hetero = FALSE, verbose = 0)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>object</code></td>
+<td>
+<p>An <code>hgwrm</code> object returned from <code>hgwr()</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Other arguments passed from other functions.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>test_hetero</code></td>
+<td>
+<p>Logical/list value.
+Whether to test the spatial heterogeneity of local fixed effects.
+If it is set to <code>FALSE</code>, the test will not be executed.
+If it is set to <code>TRUE</code>, the test will be executed with default parameters (see details below).
+It accepts a list to enable the test with specified parameters.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p>An Integer value to control whether additional messages
+during testing spatial heterogeneity should be reported.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The parameters used to perform test of spatial heterogeneity are
+</p>
+
+<dl>
+<dt><code>bw</code></dt>
+<dd>
+<p>Bandwidth (unit: number of nearest neighbours) used to make spatial kernel density estimation. Default: <code>10</code>.</p>
+</dd>
+<dt><code>poly</code></dt>
+<dd>
+<p>The number of polynomial terms used in the local polynomial estimation. Default: <code>2</code>.</p>
+</dd>
+<dt><code>resample</code></dt>
+<dd>
+<p>Total resampling times. Default: <code>5000</code>.</p>
+</dd>
+<dt><code>kernel</code></dt>
+<dd>
+<p>The kernel function used in the local polynomial estimation. Options are <code>"gaussian"</code> and <code>"bisquared"</code>. Default: <code>"bisquared"</code>.</p>
+</dd>
+</dl>
+<h3>Value</h3>
+
+<p>A list containing summary informations of this <code>hgwrm</code> object
+with the following fields.
+</p>
+
+<dl>
+<dt><code>diagnostic</code></dt>
+<dd>
+<p>A list of diagnostic information.</p>
+</dd>
+<dt><code>random.stddev</code></dt>
+<dd>
+<p>The standard deviation of random effects.</p>
+</dd>
+<dt><code>random.corr</code></dt>
+<dd>
+<p>The correlation matrix of random effects.</p>
+</dd>
+<dt><code>residuals</code></dt>
+<dd>
+<p>The residual vector.</p>
+</dd>
+</dl>
+<h3>See Also</h3>
+
+<p><code>hgwr()</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(multisampling)
+m &lt;- hgwr(
+ formula = y ~ L(g1 + g2) + x1 + (z1 | group),
+ data = multisampling$data,
+ coords = multisampling$coords,
+ bw = 10
+)
+summary(m)
+summary(m, test_hetero = TRUE)
+summary(m, test_hetero = list(kernel = "gaussian"))
+
+</code></pre>
+
+
+</div>

@@ -1,0 +1,127 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>PoisMixSim</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Simulate data from a Poisson mixture model
+</h2>
+
+<h3>Description</h3>
+
+<p>This function simulates data from a Poisson mixture model, as described by Rau et al. (2011). Data are simulated with varying expression level (<code class="reqn">w_i</code>) for 4 clusters. Clusters may be simulated with “high” or “low” separation, and three different options are available for the library size setting: “equal”, “A”, and “B”, as described by Rau et al. (2011).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">PoisMixSim(n = 2000, libsize, separation)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>n</code></td>
+<td>
+
+<p>Number of observations
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>libsize</code></td>
+<td>
+
+<p>The type of library size difference to be simulated (“<code>equal</code>”, “<code>A</code>”, or “<code>B</code>”, as described by Rau et al. (2011))
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>separation</code></td>
+<td>
+
+<p>Cluster separation (“<code>high</code>” or “<code>low</code>”, as described by Rau et al. (2011))
+</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>y </code></td>
+<td>
+<p>(<em>n</em> x <em>q</em>) matrix of simulated counts for <em>n</em> observations and <em>q</em> variables</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>labels </code></td>
+<td>
+<p>Vector of length <em>n</em> defining the true cluster labels of the simulated data</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pi </code></td>
+<td>
+<p>Vector of length 4 (the number of clusters) containing the true value of <code class="reqn">\boldsymbol{\pi}</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lambda </code></td>
+<td>
+<p>(<em>d</em> x <em>4</em>) matrix of <code class="reqn">\boldsymbol{\lambda}</code> values for <em>d</em> conditions (3 in the case of <code>libsize =</code> “<code>equal</code>” or “<code>A</code>”, and 2 otherwise) in 4 clusters (see note below)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>w </code></td>
+<td>
+<p>Row sums of <code>y</code> (estimate of <code class="reqn">\hat{w}</code>)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>conditions </code></td>
+<td>
+<p>Vector of length <em>q</em> defining the condition (treatment group) for each variable (column) in <code>y</code></p>
+</td>
+</tr>
+</table>
+<h3>Note</h3>
+
+<p>If one or more observations are simulated such that all variables have a value of 0, those rows are removed from the data matrix; as such, in some cases the simulated data <code>y</code> may have less than <code>n</code> rows.
+</p>
+<p>The PMM-I model includes the parameter constraint <code class="reqn">\sum_k \lambda_{jk} r_j = 1</code>, where <code class="reqn">r_j</code> is the number of replicates in condition (treatment group) <code class="reqn">j</code>. Similarly, the parameter constraint in the PMM-II model is <code class="reqn">\sum_j \sum_l \lambda_{jk}s_{jl} = 1</code>, where <code class="reqn">s_{jl}</code> is the library size for replicate <em>l</em> of condition <em>j</em>. The value of <code>lambda</code> corresponds to that used to generate the simulated data, where the library sizes were set as described in Table 2 of Rau et al. (2011). However, due to variability in the simulation process, the actually library sizes of the data <code>y</code> are not exactly equal to these values; this means that the value of <code>lambda</code> may not be directly compared to an estimated value of <code class="reqn">\hat{\boldsymbol{\lambda}}</code> as obtained from the <code>PoisMixClus</code> function.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Andrea Rau
+</p>
+
+
+<h3>References</h3>
+
+<p>Rau, A., Celeux, G., Martin-Magniette, M.-L., Maugis-Rabusseau, C. (2011). Clustering high-throughput sequencing data with Poisson mixture models. Inria Research Report 7786. Available at <a href="https://inria.hal.science/inria-00638082">https://inria.hal.science/inria-00638082</a>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+set.seed(12345)
+
+## Simulate data as shown in Rau et al. (2011)
+## Library size setting "A", high cluster separation
+## n = 200 observations
+
+simulate &lt;- PoisMixSim(n = 200, libsize = "A", separation = "high")
+y &lt;- simulate$y
+conds &lt;- simulate$conditions
+
+</code></pre>
+
+
+</div>

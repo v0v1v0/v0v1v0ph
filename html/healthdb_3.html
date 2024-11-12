@@ -1,0 +1,65 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>bind_source</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Row-bind a list of data.frames or remote tables with variable selection and renaming</h2>
+
+<h3>Description</h3>
+
+<p>Row bind a list of data.frames or remote tables with variable selection and renaming.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">bind_source(data, ..., force_proceed = getOption("healthdb.force_proceed"))
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>A list of data.frame or remote tables, e.g., output from <code>execute_def()</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Named arguments for each variable included in the output. The argument name should be the new name in the output, and the right hand side of the argument is a character vector of the original names. The name vector and the list elements in <code>data</code> will be matched by position. if an output variable only came from some of the sources, fill the name vector to a length equal to the number of sources with NA, e.g., <code>var</code> only come from the second out of three sources, then <code>var = c(NA, 'nm_in_src2', NA)</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>force_proceed</code></td>
+<td>
+<p>A logical for whether to ask for user input in order to proceed when remote tables are needed to be collected for binding. The default is FALSE to let user be aware of that the downloading process may be slow. Use <code>options(healthdb.force_proceed = TRUE)</code> to suppress the prompt once and for all.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A data.frame or remote table containing combined rows of the input list with variables specified by ...
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">df1 &lt;- subset(iris, Species == "setosa")
+df2 &lt;- subset(iris, Species == "versicolor")
+df3 &lt;- subset(iris, Species == "virginica")
+
+bind_source(list(df1, df2, df3),
+  s_l = "Sepal.Length",
+  s_w = "Sepal.Width",
+  p_l_setosa = c("Petal.Length", NA, NA),
+  p_l_virginica = c(NA, NA, "Petal.Length")
+) %&gt;%
+head()
+</code></pre>
+
+
+</div>

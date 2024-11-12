@@ -1,0 +1,90 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>params_lm</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Parameters of a linear model</h2>
+
+<h3>Description</h3>
+
+<p>Create a list containing the parameters of a fitted linear regression model.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">params_lm(coefs, sigma = 1)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>coefs</code></td>
+<td>
+<p>Samples of the coefficients under sampling uncertainty.
+Must be a matrix or any object coercible to a matrix such as <code>data.frame</code>
+or <code>data.table</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sigma</code></td>
+<td>
+<p>A vector of samples of the standard error of the regression model.
+Default value is 1 for all samples. Only used if the model is
+used to randomly simulate values (rather than to predict means).</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Fitted linear models are used to predict values, <code class="reqn">y</code>,
+as a function of covariates, <code class="reqn">x</code>,
+</p>
+<p style="text-align: center;"><code class="reqn">y = x^T\beta + \epsilon.</code>
+</p>
+
+<p>Predicted means are given by <code class="reqn">x^T\hat{\beta}</code> where <code class="reqn">\hat{\beta}</code>
+is the vector of estimated regression coefficients. Random samples are obtained by
+sampling the error term from a normal distribution,
+<code class="reqn">\epsilon \sim N(0, \hat{\sigma}^2)</code>.
+</p>
+
+
+<h3>Value</h3>
+
+<p>An object of class <code>params_lm</code>, which is a list containing <code>coefs</code>,
+<code>sigma</code>, and <code>n_samples</code>. <code>n_samples</code> is equal to the
+number of rows in <code>coefs</code>. The <code>coefs</code> element is always converted into a
+matrix.
+</p>
+
+
+<h3>See Also</h3>
+
+<p>This parameter object is useful for modeling health state values
+when values can vary across patients and/or health states as a function of
+covariates. In many cases it will, however, be simpler, and more flexible to
+use a <code>stateval_tbl</code>. For an example use case see the documentation for
+<code>create_StateVals.lm()</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">library("MASS")
+n &lt;- 2
+params &lt;- params_lm(
+  coefs = mvrnorm(n, mu = c(.5,.6),
+                  Sigma = matrix(c(.05, .01, .01, .05), nrow = 2)),
+  sigma &lt;- rgamma(n, shape = .5, rate = 4)
+)
+summary(params)
+params
+
+</code></pre>
+
+
+</div>

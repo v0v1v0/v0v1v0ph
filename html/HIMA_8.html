@@ -1,0 +1,131 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>microHIMA</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>High-dimensional mediation analysis for compositional microbiome data</h2>
+
+<h3>Description</h3>
+
+<p><code>microHIMA</code> is used to estimate and test high-dimensional mediation effects for compositional microbiome data.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">microHIMA(X, Y, OTU, COV = NULL, FDRcut = 0.05, verbose = FALSE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>X</code></td>
+<td>
+<p>a vector of exposure.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Y</code></td>
+<td>
+<p>a vector of continuous outcome. Binary outcome is not allowed.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>OTU</code></td>
+<td>
+<p>a <code>data.frame</code> or <code>matrix</code> of high-dimensional Operational Taxonomic Unit (OTU) data (mediators). 
+Rows represent samples, columns represent variables.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>COV</code></td>
+<td>
+<p>a <code>data.frame</code> or <code>matrix</code> of adjusting covariates. Rows represent samples, columns represent 
+microbiome variables. Can be <code>NULL</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>FDRcut</code></td>
+<td>
+<p>Hommel FDR cutoff applied to select significant mediators. Default = <code>0.05</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p>logical. Should the function be verbose? Default = <code>FALSE</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A data.frame containing mediation testing results of significant mediators (FDR &lt;<code>FDRcut</code>). 
+</p>
+
+<dl>
+<dt>Index: </dt>
+<dd>
+<p>mediation name of selected significant mediator.</p>
+</dd>
+<dt>alpha_hat: </dt>
+<dd>
+<p>coefficient estimates of exposure (X) –&gt; mediators (M) (adjusted for covariates).</p>
+</dd>
+<dt>alpha_se: </dt>
+<dd>
+<p>standard error for alpha.</p>
+</dd>
+<dt>beta_hat: </dt>
+<dd>
+<p>coefficient estimates of mediators (M) –&gt; outcome (Y) (adjusted for covariates and exposure).</p>
+</dd>
+<dt>beta_se: </dt>
+<dd>
+<p>standard error for beta.</p>
+</dd>
+<dt>IDE: </dt>
+<dd>
+<p>mediation (indirect) effect, i.e., alpha*beta.</p>
+</dd>
+<dt>rimp: </dt>
+<dd>
+<p>relative importance of the mediator.</p>
+</dd>
+<dt>pmax: </dt>
+<dd>
+<p>joint raw p-value of selected significant mediator (based on Hommel FDR method).</p>
+</dd>
+</dl>
+<h3>References</h3>
+
+<p>1. Zhang H, Chen J, Feng Y, Wang C, Li H, Liu L. Mediation effect selection in high-dimensional and compositional microbiome data. 
+Stat Med. 2021. DOI: 10.1002/sim.8808. PMID: 33205470; PMCID: PMC7855955
+</p>
+<p>2. Zhang H, Chen J, Li Z, Liu L. Testing for mediation effect with application to human microbiome data. 
+Stat Biosci. 2021. DOI: 10.1007/s12561-019-09253-3. PMID: 34093887; PMCID: PMC8177450
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+# Note: In the following example, M1, M2, and M3 are true mediators.
+data(himaDat)
+
+head(himaDat$Example4$PhenoData)
+
+microHIMA.fit &lt;- microHIMA(X = himaDat$Example4$PhenoData$Treatment, 
+                           Y = himaDat$Example4$PhenoData$Outcome, 
+                           OTU = himaDat$Example4$Mediator, 
+                           COV = himaDat$Example4$PhenoData[, c("Sex", "Age")])
+microHIMA.fit
+
+## End(Not run)
+
+</code></pre>
+
+
+</div>

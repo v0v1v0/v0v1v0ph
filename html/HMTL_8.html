@@ -1,0 +1,200 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>Selection_HMTL</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Model Selection for Multi-task Feature Learning based on Bayesian Information Criterion (BIC)</h2>
+
+<h3>Description</h3>
+
+<p><code>Selection_HMTL</code> can be used to search the optimal candidate model based on Bayesian Information Criterion (BIC).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">Selection_HMTL(
+  y,
+  x,
+  lambda,
+  Kn,
+  p,
+  n,
+  beta = 0.1,
+  tau = 1.45,
+  Cont_Model = "adaptive Huber",
+  type = "Heterogeneity",
+  import_w = 1,
+  tol = 0.05,
+  max_iter = 100,
+  Complete = "True",
+  diagnostics = FALSE,
+  gamma = 1,
+  alpha = 1
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+<p>List. A list of responses vectors for all tasks. The order of the list put the continuous responses before the binary responses.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>List. Listing matrices of the predictors for all tasks align with the same order as in y.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lambda</code></td>
+<td>
+<p>Numeric. The penalty parameter used for block-wise regularization (<code class="reqn">\ell_{2,1}</code> norm).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Kn</code></td>
+<td>
+<p>Vector of two elements. First element is the number of tasks with continuous responses, and the second element is the number of tasks with binary responses.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>p</code></td>
+<td>
+<p>Numeric. The number of features.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n</code></td>
+<td>
+<p>Numeric or vector. If only one numeric value is provided, equal sample size will be assumed for each task. If a vector is provided, then the elements are the sample sizes for all tasks.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>beta</code></td>
+<td>
+<p>(<strong>optional</strong>). Numeric or matrix. An initial value or matrix of values <code class="reqn">p</code> by <code class="reqn">K</code> for the estimation. The default value is 0.1.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tau</code></td>
+<td>
+<p>Numeric or vector. The robustification parameter used for methods "Huber regression" or "Adaptive Huber". The default value is 1.45.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Cont_Model</code></td>
+<td>
+<p>Character("regression", "Huber regression", or "adaptive Huber"). The models used for tasks with continuous responses.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>type</code></td>
+<td>
+<p>Character("Heterogeneity", "Continuous" or "Binary"). <code>type = "Heterogeneity"</code> used for <code> MTL_hetero</code>; <code>type = "Continuous"</code> used for <code> MTL_reg</code>; and <code>type = "Binary"</code> used for <code> MTL_class</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>import_w</code></td>
+<td>
+<p>Numeric or vector. The weights assigned to different tasks. An equal weight is set as the default.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tol</code></td>
+<td>
+<p>(<strong>optional</strong>). Numeric. The tolerance level of optimation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>max_iter</code></td>
+<td>
+<p>(<strong>optional</strong>). Numeric. The maximum number of iteration steps.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Complete</code></td>
+<td>
+<p>Logic input. If the predictors in each task are all measured, set 'Complete == TRUE'; If some predictors in some but not all task are all measured, set'Complete == FALSE', and the missing values are imputed by column mean. The adjustment weights will be assigned based on the completeness of the predictors.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>diagnostics</code></td>
+<td>
+<p>Logic input. If 'diagnostics == TRUE', the function provides Bayesian information criterion, and the selected model performance is evalued by the MSE and MAE for tasks with continuous response and the AUC and deviance for tasks with binary responses.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>gamma</code></td>
+<td>
+<p>(<strong>optional</strong>). Numeric. Step size for each inner iteration. The default is equal to 1.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alpha</code></td>
+<td>
+<p>(<strong>optional</strong>). Numeric. A tuning parameter for BIC penalty. The default is equal to 1.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The Bayesian information criterion is given by
+</p>
+<p style="text-align: center;"><code class="reqn">  BIC(s) = 2\mathcal{L}_s(\hat{\theta}) + d_s^{*} \gamma_n, </code>
+</p>
+
+<p>where <code class="reqn">\hat{\theta}</code> is the estimated coefficients and <code class="reqn">s</code> is denoted the selected support set of <code class="reqn">\hat{\theta}</code>.
+In addition, <code class="reqn">\mathcal{L}_s(\hat{\theta})</code> denoted the estimated composite quasi-likelihood or adaptive Huber loss evaluated as the <code class="reqn">\hat{\theta}</code>.
+The degree of freedom <code class="reqn">d_s^{*}</code> can measure the model complexity, which is estimated by <code class="reqn">tr(H_s^{-1}(\hat{\theta}) J_s(\hat{\theta}) )</code>. The sensitivity matrix and specificity matrix can be given by <code class="reqn">H(\theta) = E(\nabla^2 \mathcal{L}( {\theta}))</code> and <code class="reqn">J(\theta) = -Cov(\nabla \mathcal{L}( {\theta}))</code>.
+The penalty term <code class="reqn">\gamma_n</code> can be defined by users.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A table of Bayesian Information Criterion (BIC)
+</p>
+
+<dl>
+<dt><code>lambda</code></dt>
+<dd>
+<p>A list of penalty parameters.</p>
+</dd>
+<dt><code>Compo_likelihood</code></dt>
+<dd>
+<p>Sum of empirical loss functions estimated based on the selected parameters .</p>
+</dd>
+<dt><code>Degree of freedom</code></dt>
+<dd>
+<p>Penalty component based on the selected parameters.</p>
+</dd>
+<dt><code>Info criterion</code></dt>
+<dd>
+<p>Bayesian Information Criterion (BIC): robust BIC or pseudo BIC.</p>
+</dd>
+</dl>
+<h3>References</h3>
+
+<p>Y. Zhong, W. Xu, and X. Gao (2023) Robust Multi-task Feature Learning. Submitted
+</p>
+<p>Gao, X and Carroll, R. J. (2017) Data integration with high dimensionality. Biometrika, 104, 2, pp. 251-272
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">lambda &lt;- c(1.2, 2.0, 2.3, 2.8)
+cv.mtl &lt;- Selection_HMTL(mockdata2,mockdata1, lambda =lambda, Kn = c(2,2), p=500,
+               n = c(500,250,250,250),gamma = 2, Complete = FALSE, diagnostics = TRUE, alpha = 2)
+plot_HMTL(cv.mtl)
+cv.mtl$Selection_Results
+</code></pre>
+
+
+</div>

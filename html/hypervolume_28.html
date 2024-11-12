@@ -1,0 +1,101 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hypervolume_distance</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Distance between two hypervolumes
+</h2>
+
+<h3>Description</h3>
+
+<p>Calculates the distance between two hypervolumes either defined as the Euclidean distance between centroids or as the minimum Euclidean distance between the random points comprising either hypervolume.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hypervolume_distance(hv1, hv2, type = "centroid", 
+  num.points.max = 1000, check.memory = TRUE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>hv1</code></td>
+<td>
+
+<p>A <code>Hypervolume</code> object.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>hv2</code></td>
+<td>
+
+<p>A <code>Hypervolume</code> object.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>type</code></td>
+<td>
+
+<p>If 'centroid', the centroid distance; if 'minimum', the minimum distance.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>num.points.max</code></td>
+<td>
+
+<p>The number of random points to subsample from each input hypervolume. Ignored if <code>type='centroid'</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>check.memory</code></td>
+<td>
+
+<p>If <code>TRUE</code>, prints expected memory usage and returns an error before allocating memory. Ignored if <code>type='centroid'</code>.
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Minimum distance calculations scale quadratically with <code>npmax</code> and may be computationally costly.
+</p>
+
+
+<h3>Value</h3>
+
+<p>The distance between the two hypervolumes.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+data(penguins,package='palmerpenguins')
+penguins_no_na = as.data.frame(na.omit(penguins))
+penguins_adelie = penguins_no_na[penguins_no_na$species=="Adelie",
+                    c("bill_length_mm","bill_depth_mm","flipper_length_mm")]
+penguins_chinstrap = penguins_no_na[penguins_no_na$species=="Chinstrap",
+                      c("bill_length_mm","bill_depth_mm","flipper_length_mm")]
+
+hv1 = hypervolume_gaussian(penguins_adelie)
+hv2 = hypervolume_gaussian(penguins_chinstrap)
+
+# note that minimum distance is smaller than centroid distance as expected
+hypervolume_distance(hv1, hv2, type='centroid')
+hypervolume_distance(hv1, hv2, type='minimum', num.points.max=500, check.memory=FALSE)
+
+## End(Not run)
+</code></pre>
+
+
+</div>

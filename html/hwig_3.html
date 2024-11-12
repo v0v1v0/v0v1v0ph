@@ -1,0 +1,68 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>DT</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Example data for input to 'hwig'</h2>
+
+<h3>Description</h3>
+
+<p>Example data for input to 'hwig'
+</p>
+
+
+<h3>Format</h3>
+
+<p>A data.table with 14297 rows and 3 variables: </p>
+
+<dl>
+<dt>ID</dt>
+<dd>
+<p>individual identifier</p>
+</dd>
+<dt>year</dt>
+<dd>
+<p>integer representing the year</p>
+</dd>
+</dl>
+<h3>Source</h3>
+
+<p># Load packages
+library(spatsoc)
+library(data.table)
+</p>
+<p># Read example data
+DT &lt;- fread(system.file("extdata", "DT.csv", package = "spatsoc"))
+</p>
+<p># Cast the character column to POSIXct
+DT[, datetime := as.POSIXct(datetime, tz = 'UTC')]
+</p>
+<p># Temporal grouping
+group_times(DT, datetime = 'datetime', threshold = '20 minutes')
+</p>
+<p># Spatial grouping with timegroup
+group_pts(
+DT,
+threshold = 5,
+id = 'ID',
+coords = c('X', 'Y'),
+timegroup = 'timegroup'
+)
+</p>
+<p>fwrite(DT[, .(id = ID, group, yr = year(datetime))],
+'inst/extdata/DT.csv')
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Load data.table
+library(data.table)
+
+# Read example data
+DT &lt;- fread(system.file("extdata", "DT.csv", package = "hwig"))
+</code></pre>
+
+
+</div>

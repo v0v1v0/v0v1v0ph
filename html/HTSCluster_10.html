@@ -1,0 +1,143 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>plot.HTSCluster</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Visualize results from clustering using a Poisson mixture model</h2>
+
+<h3>Description</h3>
+
+<p>A function to visualize the clustering results obtained from a Poisson mixture model.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">## S3 method for class 'HTSCluster'
+plot(x, file.name = FALSE, 
+    graphs = c("map", "map.bycluster", "lambda"), data=NA, ...)
+## S3 method for class 'HTSClusterWrapper'
+plot(x, file.name = FALSE,
+    graphs = c("capushe", "ICL", "BIC"), capushe.validation=NA, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p> An object of class <code>"HTSCluster"</code> or <code>"HTSClusterWrapper"</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>file.name</code></td>
+<td>
+<p> Optional file name if plots are to be saved in a PDF file.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>graphs</code></td>
+<td>
+<p> Type of graph to be included in plots. May be equal to
+<code>"map"</code>, <code>"may.bycluster"</code>, <code>"weighted.histograms"</code>, and/or <code>"lambda"</code> for objects
+of class <code>"HTSCluster"</code> and <code>c("ICL", "BIC")</code> for objects of class
+<code>"HTSClusterWrapper"</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>capushe.validation</code></td>
+<td>
+<p> Optional number of clusters to use for capushe validation (should be less than the maximum number of clusters
+specificed in the <code>"HTSClusterWrapper"</code> object).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+
+<p>(<em>n</em> x <em>q</em>) matrix of observed counts for <em>n</em> observations and <em>q</em> variables (only required for the plotting of weighted histograms)
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Additional arguments (mainly useful for plotting)</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>For objects of class <code>"HTSCluster"</code>, the plotting function provides the possibility for the following visualizations:
+</p>
+<p>1) A histogram of maximum conditional probabilities across all clusters.
+</p>
+<p>2) Per-cluster boxplots of maximum conditional probabilities.
+</p>
+<p>3) Weighted histograms of observation profiles (with weights equal to the 
+corresponding conditional probability for each observation in each cluster),
+plotted independently for each variable. Fitted densities after fitting the
+Poisson mixture model are overlaid in red.
+</p>
+<p>4) A global view of <code class="reqn">\boldsymbol{\lambda}</code> and <code class="reqn">\boldsymbol{\pi}</code> values for the selected model. When the
+number of conditions &lt;= 2, bar heights represent the value of <code class="reqn">\boldsymbol{\lambda}_k</code> for each
+cluster, and bar width corresponds to the value of <code class="reqn">\boldsymbol{\pi_k}</code>. 
+</p>
+<p>For objects of class <code>"HTSClusterWrapper"</code>, the plotting function provides the possibility for one or all of the following visualizations:
+</p>
+<p>1) ICL plot for all fitted models.
+</p>
+<p>2) BIC plot for all fitted models.
+</p>
+<p>5) Capushe diagnostic plots.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Andrea Rau</p>
+
+
+<h3>References</h3>
+
+<p>Rau, A., Maugis-Rabusseau, C., Martin-Magniette, M.-L., Celeux G. (2015). Co-expression analysis of high-throughput transcriptome sequencing data with Poisson mixture models. Bioinformatics, 31(9):1420-1427.
+</p>
+<p>Andrea Rau, Gilles Celeux, Marie-Laure Martin-Magniette, and Cathy Maugis-Rabusseau (2011). 
+Clustering high-throughput sequencing data with Poisson mixture models. <em>Technical report</em>
+RR-7786, Inria Saclay – Ile-de-France.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>PoisMixClus</code>, <code>PoisMixClusWrapper</code></p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+set.seed(12345)
+
+## Simulate data as shown in Rau et al. (2011)
+## Library size setting "A", high cluster separation
+## n = 2000 observations
+simulate &lt;- PoisMixSim(n = 200, libsize = "A", separation = "high")
+y &lt;- simulate$y
+conds &lt;- simulate$conditions
+
+## Run the PMM-II model for g = 3
+## "TC" library size estimate, EM algorithm
+run &lt;- PoisMixClus(y, g = 3, 
+    norm = "TC", conds = conds, init.type = "small-em")
+
+## Visualization of results (not run):
+## plot(run)
+
+
+</code></pre>
+
+
+</div>

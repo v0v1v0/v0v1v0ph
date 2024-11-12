@@ -1,0 +1,311 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>parameterize_steadystate</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Parameters for a three-compartment toxicokinetic model at steady-state</h2>
+
+<h3>Description</h3>
+
+<p>This function initializes the parameters needed in the functions
+<code>calc_mc_css</code>, <code>calc_mc_oral_equiv</code>, and 
+<code>calc_analytic_css</code> for the three
+compartment steady state model ('3compartmentss') as used in 
+Rotroff et al. (2010), Wetmore et al. (2012), Wetmore et al. (2015), and 
+elsewhere. By assuming that enough time has passed to reach steady-state, we
+eliminate the need for tissue-specific parititon coefficients because we 
+assume all tissues have come to equilibrium with the unbound concentration
+in plasma. However, we still use chemical properties to predict the 
+blood:plasma ratio for estimating first-pass hepatic metabolism for oral
+exposures.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">parameterize_steadystate(
+  chem.cas = NULL,
+  chem.name = NULL,
+  dtxsid = NULL,
+  species = "Human",
+  clint.pvalue.threshold = 0.05,
+  default.to.human = FALSE,
+  class.exclude = TRUE,
+  force.human.clint.fup = FALSE,
+  adjusted.Funbound.plasma = TRUE,
+  adjusted.Clint = TRUE,
+  restrictive.clearance = TRUE,
+  fup.lod.default = 0.005,
+  suppress.messages = FALSE,
+  minimum.Funbound.plasma = 1e-04,
+  Caco2.options = NULL,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>chem.cas</code></td>
+<td>
+<p>Chemical Abstract Services Registry Number (CAS-RN) – the 
+chemical must be identified by either CAS, name, or DTXISD</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>chem.name</code></td>
+<td>
+<p>Chemical name (spaces and capitalization ignored) –  the 
+chemical must be identified by either CAS, name, or DTXISD</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dtxsid</code></td>
+<td>
+<p>EPA's DSSTox Structure ID (<a href="https://comptox.epa.gov/dashboard">https://comptox.epa.gov/dashboard</a>)
+– the chemical must be identified by either CAS, name, or DTXSIDs</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>species</code></td>
+<td>
+<p>Species desired (either "Rat", "Rabbit", "Dog", "Mouse", or
+default "Human").</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>clint.pvalue.threshold</code></td>
+<td>
+<p>Hepatic clearances with clearance assays
+having p-values greater than the threshold are set to zero.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>default.to.human</code></td>
+<td>
+<p>Substitutes missing species-specific values with human values if
+TRUE (default is FALSE).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>class.exclude</code></td>
+<td>
+<p>Exclude chemical classes identified as outside of 
+domain of applicability by relevant modelinfo_[MODEL] file (default TRUE).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>force.human.clint.fup</code></td>
+<td>
+<p>Uses human hepatic intrinsic clearance and fraction
+of unbound plasma in calculation of partition coefficients for rats if true.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>adjusted.Funbound.plasma</code></td>
+<td>
+<p>Uses Pearce et al. (2017) lipid binding adjustment
+for Funbound.plasma (which impacts partition coefficients) when set to TRUE (Default).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>adjusted.Clint</code></td>
+<td>
+<p>Uses Kilford et al. (2008) hepatocyte incubation
+binding adjustment for Clint when set to TRUE (Default).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>restrictive.clearance</code></td>
+<td>
+<p>In calculating hepatic.bioavailability, protein
+binding is not taken into account (set to 1) in liver clearance if FALSE.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fup.lod.default</code></td>
+<td>
+<p>Default value used for fraction of unbound plasma for
+chemicals where measured value was below the limit of detection. Default
+value is 0.0005.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>suppress.messages</code></td>
+<td>
+<p>Whether or not the output message is suppressed.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>minimum.Funbound.plasma</code></td>
+<td>
+<p>Monte Carlo draws less than this value are set 
+equal to this value (default is 0.0001 – half the lowest measured Fup in our
+dataset).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Caco2.options</code></td>
+<td>
+<p>A list of options to use when working with Caco2 apical to
+basolateral data <code>Caco2.Pab</code>, default is Caco2.options = list(Caco2.Pab.default = 1.6,
+Caco2.Fabs = TRUE, Caco2.Fgut = TRUE, overwrite.invivo = FALSE, keepit100 = FALSE). Caco2.Pab.default sets the default value for 
+Caco2.Pab if Caco2.Pab is unavailable. Caco2.Fabs = TRUE uses Caco2.Pab to calculate
+fabs.oral, otherwise fabs.oral = <code>Fabs</code>. Caco2.Fgut = TRUE uses Caco2.Pab to calculate 
+fgut.oral, otherwise fgut.oral = <code>Fgut</code>. overwrite.invivo = TRUE overwrites Fabs and Fgut in vivo values from literature with 
+Caco2 derived values if available. keepit100 = TRUE overwrites Fabs and Fgut with 1 (i.e. 100 percent) regardless of other settings.
+See <code>get_fbio</code> for further details.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Other parameters</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>We model systemic oral bioavailability as 
+F<sub>bio</sub>=F<sub>abs</sub>*F<sub>gut</sub>*F<sub>hep</sub>.
+F<sub>hep</sub>
+is estimated from in vitro TK data using 
+<code>calc_hep_bioavailability</code>.
+If F<sub>bio</sub>
+has been measured in vivo and is found in
+table <code>chem.physical_and_invitro.data</code> then we set 
+F<sub>abs</sub>*F<sub>gut</sub> 
+to the measured value divided by 
+F<sub>hep</sub> 
+Otherwise, if Caco2 membrane permeability data or predictions
+are available F<sub>abs</sub> is estimated
+using <code>calc_fabs.oral</code>.
+Intrinsic hepatic metabolism is used to very roughly estimate
+F<sub>gut</sub>
+using <code>calc_fgut.oral</code>.
+</p>
+
+
+<h3>Value</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>Clint</code></td>
+<td>
+<p>Hepatic Intrinsic Clearance, uL/min/10^6 cells.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Fabsgut</code></td>
+<td>
+<p>Fraction of the oral dose absorbed and surviving gut metabolism, 
+that is, the fraction of the dose that enters the gutlumen.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Funbound.plasma</code></td>
+<td>
+<p>Fraction of plasma that is not bound.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Qtotal.liverc</code></td>
+<td>
+<p>Flow rate of blood exiting the liver, L/h/kg BW^3/4.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Qgfrc</code></td>
+<td>
+<p>Glomerular Filtration Rate, L/h/kg
+BW^3/4, volume of fluid filtered from kidney and excreted.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>BW</code></td>
+<td>
+<p>Body Weight, kg</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>MW</code></td>
+<td>
+<p>Molecular Weight, g/mol</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>million.cells.per.gliver</code></td>
+<td>
+<p>Millions cells per gram of liver tissue.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Vliverc</code></td>
+<td>
+<p>Volume of the liver per kg body weight, L/kg BW.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>liver.density</code></td>
+<td>
+<p>Liver tissue density, kg/L.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Fhep.assay.correction</code></td>
+<td>
+<p>The fraction of chemical unbound in hepatocyte
+assay using the method of Kilford et al. (2008)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>hepatic.bioavailability</code></td>
+<td>
+<p>Fraction of dose remaining after first pass
+clearance, calculated from the corrected well-stirred model.</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>John Wambaugh and Greg Honda
+</p>
+
+
+<h3>References</h3>
+
+<p>Pearce RG, Setzer RW, Strope CL, Wambaugh JF, Sipes NS (2017).
+“Httk: R package for high-throughput toxicokinetics.”
+<em>Journal of Statistical Software</em>, <b>79</b>(4), 1.
+</p>
+<p>Kilford PJ, Gertz M, Houston JB, Galetin A (2008).
+“Hepatocellular binding of drugs: correction for unbound fraction in hepatocyte incubations using microsomal binding or drug lipophilicity data.”
+<em>Drug Metabolism and Disposition</em>, <b>36</b>(7), 1194–1197.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>calc_analytic_css_3compss</code>
+</p>
+<p><code>apply_clint_adjustment</code>
+</p>
+<p><code>tissue.data</code>
+</p>
+<p><code>physiology.data</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+ parameters &lt;- parameterize_steadystate(chem.name='Bisphenol-A',species='Rat')
+ parameters &lt;- parameterize_steadystate(chem.cas='80-05-7')
+
+</code></pre>
+
+
+</div>

@@ -1,0 +1,105 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>quality_control</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Experiment quality control</h2>
+
+<h3>Description</h3>
+
+<p>Checks how the uncertainty changes in a function of 'out_time'.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">quality_control(dat, state_first, state_second, chosen_time, in_time)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>dat</code></td>
+<td>
+<p>data read by <code>read_hdx</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>state_first</code></td>
+<td>
+<p>state of the first peptide</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>state_second</code></td>
+<td>
+<p>state of the second peptide</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>chosen_time</code></td>
+<td>
+<p>chosen time point</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>in_time</code></td>
+<td>
+<p>'in' time</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The function calculates mean uncertainty of all peptides and its uncertainty (standard error) based on given 'in_time' and 'chosen_time' 
+as a function of 'out_time'. Both theoretical and experimental results for each state and their difference are supplied for comparison but only 
+experimental calculations depends on 'out_time' variable. The results are either in form of relative or absolute values depending on the 'relative' 
+parameter supplied by the user. 
+This data can be useful for general overview of the experiment and analyse of the chosen time parameters.
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>data.frame</code> with mean uncertainty per different 'out_time' value
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>read_hdx</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># load example data
+dat &lt;- read_hdx(system.file(package = "HaDeX", "HaDeX/data/KD_180110_CD160_HVEM.csv"))
+
+# calculate mean uncertainty 
+(result &lt;- quality_control(dat = dat,
+                           state_first = "CD160",
+                           state_second = "CD160_HVEM", 
+                           chosen_time = 1, 
+                           in_time = 0.001))    
+                           
+# load extra libraries
+library(ggplot2)
+library(tidyr)
+library(dplyr)
+
+# example of data visualization 
+gather(result, 2:7, key = 'type', value = 'value') %&gt;%
+filter(startsWith(type, "avg")) %&gt;%
+  ggplot(aes(x = factor(out_time), y = value, group = type)) +
+  geom_line(aes(color = type)) +
+  labs(x = "Out time", 
+       y = "Mean uncertainty")
+
+</code></pre>
+
+
+</div>

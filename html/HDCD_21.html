@@ -1,0 +1,97 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>single_SBS_calibrate</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Generates threshold <code class="reqn">\pi_T</code> for Sparsified Binary Segmentation for single change-point detection</h2>
+
+<h3>Description</h3>
+
+<p>R wrapper for function choosing empirical threshold <code class="reqn">\pi_T</code> using Monte Carlo simulation for single change-point Sparsified Binary Segmentation. More specifically, the function returns the empirical upper tol quantile of CUSUMs over <code class="reqn">p</code> time series, each of length <code class="reqn">n</code>, based on <code class="reqn">N</code> number of runs.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">single_SBS_calibrate(
+  n,
+  p,
+  N = 100,
+  tol = 1/100,
+  rescale_variance = TRUE,
+  debug = FALSE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>n</code></td>
+<td>
+<p>Number of observations</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>p</code></td>
+<td>
+<p>Number time series</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>N</code></td>
+<td>
+<p>Number of Monte Carlo samples used</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tol</code></td>
+<td>
+<p>False positive probability tolerance</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rescale_variance</code></td>
+<td>
+<p>If TRUE, each row of the data is rescaled by a MAD estimate</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>debug</code></td>
+<td>
+<p>If TRUE, diagnostic prints are provided during execution</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>Threshold
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">library(HDCD)
+n = 50
+p = 50
+set.seed(101)
+
+# Simulate threshold
+pi_T_squared = single_SBS_calibrate(n=n,p=p,N=100, tol=1/100, rescale_variance = TRUE)
+pi_T_squared
+
+
+# Generating data
+X = matrix(rnorm(n*p), ncol = n, nrow=p)
+# Adding a single sparse change-point:
+X[1:5, 26:n] = X[1:5, 26:n] +1
+
+# Run SBS
+res = single_SBS(X,threshold=sqrt(pi_T_squared),rescale_variance=TRUE)
+res$pos
+</code></pre>
+
+
+</div>

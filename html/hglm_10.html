@@ -1,0 +1,93 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>lrt</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Likelihood-ratio test for variance components in <code>hglm</code>
+</h2>
+
+<h3>Description</h3>
+
+<p>Likelihood-ratio test for the estimated variance components (or other dipersion parameters) in <code>hglm</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">lrt(hglm.obj1, hglm.obj2 = NULL)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>hglm.obj1</code></td>
+<td>
+<p>a fitted <code>hglm</code> object.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>hglm.obj2</code></td>
+<td>
+<p>optional, another fitted <code>hglm</code> object to be tested against <code>hglm.obj1</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>When <code>hglm.obj2 = NULL</code>, all the random effects variance components in <code>hglm.obj1</code> are tested against
+the null model with only fixed effects. The degree of freedom is determined by comparing the number of random
+effects terms in <code>hglm.obj1</code> and <code>hglm.obj2</code> or the null fixed-effects-only model. Note that the likelihood-
+ratio test statistic for variance estimates, which are bounded above zero, follows a 50:50 mixture distribution
+of chi-square with 0 and 1 degree of freedom (Self and Liang 1987 JASA).
+</p>
+
+
+<h3>Value</h3>
+
+<p>Printout summary of the likelihood-ratio test results. Test statistic, p-value, etc. are returned.
+</p>
+
+
+<h3>References</h3>
+
+<p>Self, S. G., &amp; Liang, K.-Y. (1987). Asymptotic Properties of Maximum Likelihood Estimators and Likelihood Ratio Tests Under Nonstandard Conditions. <em>Journal of the American Statistical Association</em>, <b>82</b>(398), 605-610.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">require(hglm)
+
+## Not run: 
+set.seed(911)
+x1 &lt;- rnorm(100)
+x2 &lt;- rnorm(100)
+x3 &lt;- rnorm(100)
+z1 &lt;- factor(rep(LETTERS[1:10], rep(10, 10)))
+z2 &lt;- factor(rep(letters[1:5], rep(20, 5)))
+Z1 &lt;- model.matrix(~ 0 + z1)
+Z2 &lt;- model.matrix(~ 0 + z2)
+u1 &lt;- rnorm(10, 0, sqrt(2))
+u2 &lt;- rnorm(5, 0, sqrt(3))
+y &lt;- 1 + 2*x1 + 3*x2 + Z1%*%u1 + Z2%*%u2 + rnorm(100, 0, sqrt(exp(x3)))
+dd &lt;- data.frame(x1 = x1, x2 = x2, x3 = x3, z1 = z1, z2 = z2, y = y)
+
+m20 &lt;- hglm(X = cbind(rep(1, 100), x1, x2), y = y, Z = Z1, 
+            calc.like = TRUE)
+
+lrt(m20)
+         
+m21 &lt;- hglm(X = cbind(rep(1, 100), x1, x2), y = y, Z = cbind(Z1, Z2), 
+             RandC = c(10, 5), calc.like = TRUE)
+
+lrt(m20, m21)
+
+
+## End(Not run)
+</code></pre>
+
+
+</div>

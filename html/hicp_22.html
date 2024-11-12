@@ -1,0 +1,275 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>index.aggregation</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Index number functions and aggregation</h2>
+
+<h3>Description</h3>
+
+<p>Lower-level price relatives or price indices can be aggregated into higher-level indices in a single step using one of the bilateral index number methods listed below. Function <code>aggregate()</code> uses these bilateral indices (or others defined by the user) for step-wise aggregation of lower-level subindices into the overall index following the COICOP hierarchy.</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R"># bilateral price indices:
+jevons(x, w0=NULL, wt=NULL)
+carli(x, w0=NULL, wt=NULL)
+harmonic(x, w0=NULL, wt=NULL)
+laspeyres(x, w0, wt=NULL)
+paasche(x, w0=NULL, wt)
+fisher(x, w0, wt)
+toernqvist(x, w0, wt)
+walsh(x, w0, wt)
+
+# step-wise index aggregation:
+aggregate(x, w0, wt, grp, index=laspeyres, add=list(), settings=list())
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>numeric vector of price relatives obtained by unchaining some HICP index series.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>w0, wt</code></td>
+<td>
+<p>numeric vector of weights in the base period <code>w0</code> (e.g., for the Laspeyres index) or current period <code>wt</code> (e.g., for the Paasche index), respectively.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>grp</code></td>
+<td>
+<p>grouping variable to be used. These must be valid COICOP codes according to <code>is.coicop()</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>index</code></td>
+<td>
+<p>a function or named list of functions specifying the index formula used for aggregation. Each function must have arguments <code>x</code>, <code>w0</code> and <code>wt</code>, even if <code>w0</code> and/or <code>wt</code> are not used (this can be indicated by setting this argument to <code>NULL</code>). Each function must return a scalar. The default is <code>index=laspeyres</code> since the HICP is calculated as a Laspeyres-type index.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>add</code></td>
+<td>
+<p>a named list of user-defined aggregates to be calculated. Each list element is a vector of ids that can be found in <code>grp</code>. See <code>settings$add.exact</code> for further specification of this argument.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>settings</code></td>
+<td>
+<p>A list of control settings to be used. The following settings are supported:
+</p>
+
+<ul>
+<li> <p><code>keep.lowest</code> : logical indicating if the lowest-level indices that form the base of all aggregation steps should be kept in the function output. The default is <code>TRUE</code>.
+</p>
+</li>
+<li> <p><code>add.exact</code> : logical indicating if the ids in <code>add</code> must <b>all</b> be present in <code>grp</code> for aggregation or not. If <code>FALSE</code>, aggregation is carried out using the available ids in <code>add</code>. If <code>TRUE</code> and some ids are missing in <code>add</code>, <code>NA</code> is returned. The default is <code>TRUE</code>.
+</p>
+</li>
+<li> <p><code>coicop.version</code> : the COICOP version to be used when checking for valid COICOP codes. See <code>coicop</code> for the allowed values.  The default is <code>getOption("hicp.coicop.version")</code>.
+</p>
+</li>
+<li> <p><code>unbundle</code> : logical indicating if COICOP bundles (e.g. 08X, 0531_2) as defined in <code>coicop.bundles</code> should be taken into account or not. The default is <code>getOption("hicp.unbundle")</code>.
+</p>
+</li>
+<li> <p><code>all.items.code</code> : character specifying the code internally used for the all-items index. The default is taken from <code>getOption("hicp.all.items.code")</code>.
+</p>
+</li>
+</ul>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The price indices currently available use price relatives <code>x</code>. The Dutot index is therefore not implemented.
+</p>
+<p>The functions <code>jevons()</code>, <code>carli()</code>, and <code>harmonic()</code> do not make use of any weights in the calculations. However, they are implemented in a way such that the weights <code>w0</code> are considered, that is, elements in <code>x</code> where the weight <code>w0</code> is <code>NA</code> are excluded from the calculations. This mimics the behavior of the weighted index functions like <code>laspeyres()</code> and can be useful in situations where indices are present but the weight is missing. If, for example, subindices are newly introduced, the index in December is usually set to 100 while the weight of this subindex is not available. The subindex's value in December can thus be excluded by using the weights <code>w0</code> also in the unweighted price indices.
+</p>
+
+
+<h3>Value</h3>
+
+<p>Functions <code>jevons()</code>, <code>carli()</code>, <code>harmonic()</code>, <code>laspeyres()</code>, <code>paasche()</code>, <code>fisher()</code>, <code>toernqvist()</code>, and <code>walsh()</code> return a single (aggregated) value.
+</p>
+<p>Function <code>aggregate()</code> returns a <code>data.table</code> of aggregated values at each <code>grp</code>-level with the following variables:
+</p>
+
+<table>
+<tr>
+<td style="text-align: right;">
+</td>
+<td style="text-align: left;"> <code>grp</code> </td>
+<td style="text-align: left;"> <em>character</em> </td>
+<td style="text-align: left;"> the grouping variable </td>
+</tr>
+<tr>
+<td style="text-align: right;">
+</td>
+<td style="text-align: left;"> <code>is_aggregated</code>  </td>
+<td style="text-align: left;"> <em>logical</em> </td>
+<td style="text-align: left;"> is the value an aggregate (<code>TRUE</code>) or not (<code>FALSE</code>); column available if <code>settings$keep.lowest=TRUE</code> </td>
+</tr>
+<tr>
+<td style="text-align: right;">
+</td>
+<td style="text-align: left;"> <code>w0, wt</code>  </td>
+<td style="text-align: left;"> <em>numeric</em> </td>
+<td style="text-align: left;"> sum of weights <code>w0</code> and <code>wt</code>; columns available if weights were provided </td>
+</tr>
+<tr>
+<td style="text-align: right;">
+</td>
+<td style="text-align: left;"> <code>index</code>  </td>
+<td style="text-align: left;"> <em>numeric</em> </td>
+<td style="text-align: left;"> aggregates for each <code>index</code> function
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>Sebastian Weinand</p>
+
+
+<h3>References</h3>
+
+<p>European Commission, Eurostat, <em>Harmonised Index of Consumer Prices (HICP) - Methodological Manual - 2024 edition</em>, Publications Office of the European Union, 2024, <a href="https://data.europa.eu/doi/10.2785/055028">https://data.europa.eu/doi/10.2785/055028</a>.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>unchain</code>, <code>chain</code>, <code>rebase</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">library(data.table)
+
+### EXAMPLE 1
+
+# data for two times periods:
+dt &lt;- data.table(
+  "time"=rep(1:2, each=5),
+  "coicop"=rep(c("01111","01112","0112","0113","021"), times=2),
+  "price"=c(105,103,102,99,120, 105,104,110,98,125),
+  "weight"=rep(c(0.05,0.15,0.3,0.2,0.3), times=2),
+  "weight_lag"=rep(c(0.03,0.12,0.33,0.2,0.32), times=2))
+
+# aggregate directly to overall index:
+dt[, laspeyres(x=price, w0=weight), by="time"]
+
+# gives identical results at top level as with stepwise
+# aggregation through all coicop levels:
+dt[, aggregate(x=price, w0=weight, grp=coicop, index=laspeyres), by="time"]
+
+# this is no longer the case for the superlative indices as shown
+# here for the walsh index:
+dt[, walsh(x=price, w0=weight, wt=weight_lag), by="time"]
+dt[, aggregate(x=price, w0=weight, wt=weight_lag, grp=coicop, index=walsh), by="time"]
+
+# see also for example Auer and Wengenroth (2017, p. 2)
+
+# apply user-defined function:
+dt[, aggregate(x=price, w0=weight, grp=coicop,
+               index=list("carli"=function(x,w0=NULL,wt=NULL) mean(x))),
+     by="time"]
+
+# add additional, user-defined aggregates (e.g. special aggregates):
+dt[, aggregate(x=price, w0=weight, grp=coicop,
+               add=list("FOOD"=c("01111","021"), "MISS"=c("021","09"))),
+     by="time"]
+     
+# aggregate 'MISS' is computed if settings$add.exact=FALSE:
+dt[, aggregate(x=price, w0=weight, grp=coicop,
+               add=list("FOOD"=c("01111","021"), "MISS"=c("021","09")),
+               settings=list("add.exact"=FALSE)),
+     by="time"]     
+
+### EXAMPLE 2: Index aggregation using published HICP data
+
+# set cores for testing on CRAN:
+library(restatapi)
+options(restatapi_cores=1)
+
+# import monthly price indices:
+prc &lt;- hicp.dataimport(id="prc_hicp_midx", filter=list(unit="I15", geo="EA"))
+prc[, "time":=as.Date(paste0(time, "-01"))]
+prc[, "year":=as.integer(format(time, "%Y"))]
+setnames(x=prc, old="values", new="index")
+
+# unchaining indices:
+prc[, "dec_ratio" := unchain(x=index, t=time), by="coicop"]
+
+# import item weights:
+inw &lt;- hicp.dataimport(id="prc_hicp_inw", filter=list(geo="EA"))
+inw[, "time":=as.integer(time)]
+setnames(x=inw, old=c("time","values"), new=c("year","weight"))
+
+# derive coicop tree:
+inw[grepl("^CP",coicop),
+    "tree":=tree(id=gsub("^CP","",coicop), w=weight, settings=list(w.tol=0.1)),
+    by=c("geo","year")]
+
+# except for rounding, we receive total weight of 1000 in each period:
+inw[tree==TRUE, sum(weight), by="year"]
+
+# merge price indices and item weights:
+hicp.data &lt;- merge(x=prc, y=inw, by=c("geo","coicop","year"), all.x=TRUE)
+hicp.data &lt;- hicp.data[year &lt;= year(Sys.Date())-1 &amp; grepl("^CP\\d+", coicop),]
+hicp.data[, "coicop" := gsub(pattern="^CP", replacement="", x=coicop)]
+
+# compute all-items HICP:
+hicp.own &lt;- hicp.data[tree==TRUE,
+                      list("laspey"=laspeyres(x=dec_ratio, w0=weight)),
+                      by="time"]
+setorderv(x=hicp.own, cols="time")
+hicp.own[, "chain_laspey" := chain(x=laspey, t=time, by=12)]
+hicp.own[, "chain_laspey_15" := rebase(x=chain_laspey, t=time, t.ref="2015")]
+
+# add published all-items HICP for comparison:
+hicp.own &lt;- merge(
+            x=hicp.own,
+            y=hicp.data[coicop=="00", list(time, index)],
+            by="time",
+            all.x=TRUE)
+plot(index-chain_laspey_15~time, data=hicp.own, type="l")
+head(hicp.own[abs(index-chain_laspey_15)&gt;0.1,])
+
+# compute all-items HICP stepwise through all higher-levels:
+hicp.own.all &lt;- hicp.data[, aggregate(x=dec_ratio, w0=weight, grp=coicop, index=laspeyres),
+                            by="time"]
+setorderv(x=hicp.own.all, cols="time")
+hicp.own.all[, "chain_laspey" := chain(x=laspeyres, t=time, by=12), by="grp"]
+hicp.own.all[, "chain_laspey_15" := rebase(x=chain_laspey, t=time, t.ref="2015"), by="grp"]
+
+# add published indices for compariosn:
+hicp.own.all &lt;- merge(
+                x=hicp.own.all,
+                y=hicp.data[, list(time,"grp"=coicop,index,weight)],
+                by=c("time","grp"),
+                all.x=TRUE)
+hicp.own.all[, "diff" := index-chain_laspey_15]
+head(hicp.own.all[abs(diff)&gt;0.1,])
+head(hicp.own.all[abs(w0-weight)&gt;0.1,])
+
+# compare all-items HICP from direct and step-wise aggregation:
+agg.comp &lt;- merge(
+        x=hicp.own.all[grp=="00", list(time, "index_stpwse"=chain_laspey_15)],
+        y=hicp.own[, list(time, "index_direct"=chain_laspey_15)],
+        by="time")
+
+# no differences -&gt; consistent in aggregation:
+head(agg.comp[abs(index_stpwse-index_direct)&gt;1e-4,])
+</code></pre>
+
+
+</div>

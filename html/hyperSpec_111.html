@@ -1,0 +1,165 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>decomposition</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Convert Principal Component Decomposition or the like into a hyperSpec
+Object</h2>
+
+<h3>Description</h3>
+
+<p>Decomposition of the spectra matrix is a common procedure in chemometric
+data analysis. <code>scores</code> and <code>loadings</code> convert the result matrices
+into new <code>hyperSpec</code> objects.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">decomposition(
+  object,
+  x,
+  wavelength = seq_len(ncol(x)),
+  label.wavelength,
+  label.spc,
+  scores = TRUE,
+  retain.columns = FALSE,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>object</code></td>
+<td>
+<p>A <code>hyperSpec</code> object.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>matrix with the new content for <code>object@data$spc</code>.
+</p>
+<p>Its size must correspond to rows (for <code>scores</code>) and to either columns
+or rows (for <code>loadings</code>) of <code>object</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>wavelength</code></td>
+<td>
+<p>for a scores-like <code>x</code>: the new
+<code>object@wavelength</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>label.wavelength</code></td>
+<td>
+<p>The new label for the wavelength axis (if <code>x</code>
+is scores-like). If not given, the label of <code>object</code> is kept.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>label.spc</code></td>
+<td>
+<p>The new label for the spectra matrix. If not given, the
+label of <code>object</code> is kept.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>scores</code></td>
+<td>
+<p>is <code>x</code> a scores-like matrix?</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>retain.columns</code></td>
+<td>
+<p>for loading-like decompostition (i.e. <code>x</code> holds
+loadings, pure component spectra or the like), the data columns need
+special attention.
+</p>
+<p>Columns with different values across the rows will be set to <code>NA</code> if
+<code>retain.columns</code> is <code>TRUE</code>, otherwise they will be deleted.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>ignored.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Multivariate data are frequently decomposed by methods like principal
+component analysis, partial least squares, linear discriminant analysis, and
+the like.  These methods yield latent spectra (or latent variables,
+loadings, components, ...) that are linear combination coefficients
+along the wavelength axis and scores for each spectrum and loading.
+</p>
+<p>The loadings matrix gives a coordinate transformation, and the scores are
+values in that new coordinate system.
+</p>
+<p>The obtained latent variables are spectra-like objects: a latent variable
+has a coefficient for each wavelength. If such a matrix (with the same
+number of columns as <code>object</code> has wavelengths) is given to
+<code>decomposition</code> (also setting <code>scores = FALSE</code>), the spectra
+matrix is replaced by <code>x</code>. Moreover, all columns of <code>object@data</code>
+that did not contain the same value for all spectra are set to <code>NA</code>.
+Thus, for the resulting <code>hyperSpec</code> object, <code>plotspc</code> and
+related functions are meaningful. <code>plotmap</code> cannot be
+applied as the loadings are not laterally resolved.
+</p>
+<p>The scores matrix needs to have the same number of rows as <code>object</code> has
+spectra. If such a matrix is given, <code>decomposition</code> will replace the
+spectra matrix is replaced by <code>x</code> and <code>object@wavelength</code> by
+<code>wavelength</code>. The information related to each of the spectra is
+retained. For such a <code>hyperSpec</code> object, <code>plotmap</code> and
+<code>plotc</code> and the like can be applied. It is also possible to use
+the spectra plotting, but the interpretation is not that of the spectrum any
+longer.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A <code>hyperSpec</code> object, updated according to <code>x</code>
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>C. Beleites
+</p>
+
+
+<h3>See Also</h3>
+
+<p>See <code>%*%</code> for matrix multiplication of
+<code>hyperSpec</code> objects.
+</p>
+<p>See e.g. <code>prcomp</code> and <code>princomp</code> for
+principal component analysis, and package <code>pls</code> for Partial Least
+Squares Regression.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">pca &lt;- prcomp (flu)
+
+pca.loadings &lt;- decomposition (flu, t (pca$rotation), scores = FALSE)
+pca.center &lt;- decomposition (flu, pca$center, scores = FALSE)
+pca.scores &lt;- decomposition (flu, pca$x)
+
+plot (pca.center)
+plot (pca.loadings, col = c ("red", "gray50"))
+plotc (pca.scores, groups = .wavelength)
+</code></pre>
+
+
+</div>

@@ -1,0 +1,85 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>getCluster</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Get the cluster structure of the HGMND estimate</h2>
+
+<h3>Description</h3>
+
+<p>After estimating the conditional dependence matrices of the multiple datasets using the HGMND method, the cluster structure can be revealed by comparison of these matrices.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">  getCluster(est.HGMND, method = "F", tol = 1e-5)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>est.HGMND</code></td>
+<td>
+<p>a list, the result of the function <code>HGMND</code> with class "est.HGMND".</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+<p>the method of evaluating the difference of two conditional dependence matrices. The function <code>norm</code> from the <code>base</code> package is used to calculate the matrix norm of the element-wise difference of two matrices. It must be chosen from <code>"O"</code>, <code>"I"</code>, <code>"F"</code>, <code>"M"</code>, <code>"2"</code>, corresponding to the same settings in the function <code>norm</code>. Default to <code>"F"</code>, the Frobenius norm.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tol</code></td>
+<td>
+<p>tolerance in evaluating the difference of two conditional dependence matrices. If the calculated difference is no larger than <code>tol</code>, they are regarded as in one cluster. Default to <code>1e-5</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>the function <code>getCluster</code> returns the clustering structure of the multiple conditional dependence matrices.
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>mat.comapre</code></td>
+<td>
+<p>a matrix of 0 or 1. If the element on the <code class="reqn">i</code>th row and <code class="reqn">j</code>th column of the matrix is 1, the <code class="reqn">i</code>th and the <code class="reqn">j</code>th conditional dependence matrices are in the same cluster, 0 otherwise.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>est.cluster</code></td>
+<td>
+<p>a vector with length same as the number of conditional dependence matrices indicating the cluster label of each matrix.</p>
+</td>
+</tr>
+</table>
+<h3>Examples</h3>
+
+<pre><code class="language-R"># This is an example of HGMND with simulated data
+data(HGMND_SimuData)
+h              &lt;- genscore::get_h_hp("mcp", 1, 5)
+HGMND_SimuData &lt;- lapply(HGMND_SimuData, function(x) scale(x, center = FALSE))
+mat.chain      &lt;- diag(length(HGMND_SimuData))
+diag(mat.chain[-nrow(mat.chain), -1]) &lt;- 1
+
+result &lt;- HGMND(x        = HGMND_SimuData,
+                setting  = "gaussian",
+                h        = h,
+                centered = FALSE,
+                mat.adj  = mat.chain,
+                lambda1  = 0.086,
+                lambda2  = 3.6,
+                gamma    = 1,
+                tol      = 1e-3,
+                silent  = TRUE)
+Theta       &lt;- result[["Theta"]]
+res.cluster &lt;- getCluster(result)
+</code></pre>
+
+
+</div>

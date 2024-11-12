@@ -1,0 +1,95 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>build_mock_url</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Convert a request to a mock file path</h2>
+
+<h3>Description</h3>
+
+<p>Requests are translated to mock file paths according to several rules that
+incorporate the request method, URL, query parameters, and body.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">build_mock_url(req, method = "GET")
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>req</code></td>
+<td>
+<p>A <code>request</code> object, or a character "URL" to convert</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+<p>character HTTP method. If <code>req</code> is a 'request' object,
+its request method will override this argument</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>First, the request protocol, such as "https://", is removed from the URL.
+Second, if the request URL contains a query string, it will be popped off,
+hashed by <code>digest::digest()</code>, and the first six characters appended to the
+file being read. Third, request bodies are similarly hashed and
+appended. Finally, if a request method other than GET is used it will be
+appended to the end of the end of the file name.
+</p>
+<p>Mock file paths also have a file extension appended, based on the
+<code>Content-Type</code> of the response, though this function, which is only concerned
+with the request, does not add the extension. In an
+HTTP API, a "directory" itself is a resource,
+so the extension allows distinguishing directories and files in the file
+system. That is, a mocked <code>GET("http://example.com/api/")</code> may read a
+"example.com/api.json" file, while
+<code>GET("http://example.com/api/object1/")</code> reads "example.com/api/object1.json".
+</p>
+<p>Other examples:
+</p>
+
+<ul>
+<li> <p><code>GET("http://example.com/api/object1/?a=1")</code> may read
+"example.com/api/object1-b64371.xml".
+</p>
+</li>
+<li> <p><code>POST("http://example.com/api/object1/?a=1")</code> may read
+"example.com/api/object1-b64371-POST.json".
+</p>
+</li>
+</ul>
+<p>This function is exported so that other packages can construct similar mock
+behaviors or override specific requests at a higher level than
+<code>with_mock_api</code> mocks.
+</p>
+<p>Note that if you are trying to guess the mock file paths corresponding to a
+test for which you intend to create a mock file manually,
+instead of trying to build the URL, you should run the test
+with <code>with_mock_api</code> as the error message will contain the mock file path.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A file path and name, without an extension. The file, or a file with
+some extension appended, may or may not
+exist: existence is not a concern of this function.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>with_mock_api()</code> <code>capture_requests()</code>
+</p>
+
+
+</div>

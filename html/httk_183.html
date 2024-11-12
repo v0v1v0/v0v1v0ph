@@ -1,0 +1,389 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>solve_pbtk</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Solve_PBTK</h2>
+
+<h3>Description</h3>
+
+<p>This function solves for the amounts or concentrations in uM of a chemical
+in different tissues as functions of time based on the dose and dosing
+frequency. 
+In this PBTK formulation. <code class="reqn">C_{tissue}</code> is the concentration in tissue at 
+time t. Since the perfusion limited partition coefficients describe 
+instantaneous equilibrium between the tissue and the free fraction in 
+plasma, the whole plasma concentration is 
+<code class="reqn">C_{tissue,plasma} = \frac{1}{f_{up}*K_{tissue2fup}}*C_{tissue}</code>. 
+Note that we use a single, 
+constant value of <code class="reqn">f_{up}</code> across all tissues. Corespondingly the free 
+plasma 
+concentration is modeled as 
+<code class="reqn">C_{tissue,free plasma} = \frac{1}{K_{tissue2fup}}*C_tissue</code>. 
+The amount of blood flowing from tissue x is <code class="reqn">Q_{tissue}</code> (L/h) at a 
+concentration 
+<code class="reqn">C_{x,blood} = \frac{R_{b2p}}{f_{up}*K_{tissue2fup}}*C_{tissue}</code>, where 
+we use a 
+single <code class="reqn">R_{b2p}</code> value throughout the body.
+Metabolic clearance is modelled as being from the total plasma 
+concentration here, though it is restricted to the free fraction in 
+<code>calc_hep_clearance</code> by default. Renal clearance via 
+glomerulsr filtration is from the free plasma concentration.
+The compartments used in this model are the gutlumen, gut, liver, kidneys,
+veins, arteries, lungs, and the rest of the body.
+The extra compartments include the amounts or concentrations metabolized by
+the liver and excreted by the kidneys through the tubules.
+AUC is the area under the curve of the plasma concentration.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">solve_pbtk(
+  chem.name = NULL,
+  chem.cas = NULL,
+  dtxsid = NULL,
+  times = NULL,
+  parameters = NULL,
+  days = 10,
+  tsteps = 4,
+  daily.dose = NULL,
+  dose = NULL,
+  doses.per.day = NULL,
+  initial.values = NULL,
+  plots = FALSE,
+  suppress.messages = FALSE,
+  species = "Human",
+  iv.dose = FALSE,
+  input.units = "mg/kg",
+  output.units = NULL,
+  default.to.human = FALSE,
+  class.exclude = TRUE,
+  recalc.blood2plasma = FALSE,
+  recalc.clearance = FALSE,
+  dosing.matrix = NULL,
+  adjusted.Funbound.plasma = TRUE,
+  regression = TRUE,
+  restrictive.clearance = TRUE,
+  minimum.Funbound.plasma = 1e-04,
+  Caco2.options = list(),
+  monitor.vars = NULL,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>chem.name</code></td>
+<td>
+<p>Either the chemical name, CAS number, or the parameters
+must be specified.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>chem.cas</code></td>
+<td>
+<p>Either the chemical name, CAS number, or the parameters must
+be specified.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dtxsid</code></td>
+<td>
+<p>EPA's DSSTox Structure ID (<a href="https://comptox.epa.gov/dashboard">https://comptox.epa.gov/dashboard</a>)
+the chemical must be identified by either CAS, name, or DTXSIDs</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>times</code></td>
+<td>
+<p>Optional time sequence for specified number of days.  Dosing
+sequence begins at the beginning of times.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>parameters</code></td>
+<td>
+<p>Chemical parameters from parameterize_pbtk function,
+overrides chem.name and chem.cas.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>days</code></td>
+<td>
+<p>Length of the simulation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tsteps</code></td>
+<td>
+<p>The number of time steps per hour.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>daily.dose</code></td>
+<td>
+<p>Total daily dose, defaults to mg/kg BW.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dose</code></td>
+<td>
+<p>Amount of a single, initial oral dose in mg/kg BW.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>doses.per.day</code></td>
+<td>
+<p>Number of doses per day.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>initial.values</code></td>
+<td>
+<p>Vector containing the initial concentrations or
+amounts of the chemical in specified tissues with units corresponding to
+output.units.  Defaults are zero.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>plots</code></td>
+<td>
+<p>Plots all outputs if true.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>suppress.messages</code></td>
+<td>
+<p>Whether or not the output message is suppressed.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>species</code></td>
+<td>
+<p>Species desired (either "Rat", "Rabbit", "Dog", "Mouse", or
+default "Human").</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>iv.dose</code></td>
+<td>
+<p>Simulates a single i.v. dose if true.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>input.units</code></td>
+<td>
+<p>Input units of interest assigned to dosing, defaults to
+mg/kg BW</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>output.units</code></td>
+<td>
+<p>A named vector of output units expected for the model
+results. Default, NULL, returns model results in units specified in the
+'modelinfo' file. See table below for details.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>default.to.human</code></td>
+<td>
+<p>Substitutes missing animal values with human values
+if true (hepatic intrinsic clearance or fraction of unbound plasma).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>class.exclude</code></td>
+<td>
+<p>Exclude chemical classes identified as outside of 
+domain of applicability by relevant modelinfo_[MODEL] file (default TRUE).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>recalc.blood2plasma</code></td>
+<td>
+<p>Recalculates the ratio of the amount of chemical
+in the blood to plasma using the input parameters, calculated with
+hematocrit, Funbound.plasma, and Krbc2pu.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>recalc.clearance</code></td>
+<td>
+<p>Recalculates the the hepatic clearance
+(Clmetabolism) with new million.cells.per.gliver parameter.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dosing.matrix</code></td>
+<td>
+<p>Vector of dosing times or a matrix consisting of two
+columns or rows named "dose" and "time" containing the time and amount, in
+mg/kg BW, of each dose.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>adjusted.Funbound.plasma</code></td>
+<td>
+<p>Uses adjusted Funbound.plasma when set to
+TRUE along with partition coefficients calculated with this value.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>regression</code></td>
+<td>
+<p>Whether or not to use the regressions in calculating
+partition coefficients.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>restrictive.clearance</code></td>
+<td>
+<p>Protein binding not taken into account (set to
+1) in liver clearance if FALSE.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>minimum.Funbound.plasma</code></td>
+<td>
+<p>Monte Carlo draws less than this value are set 
+equal to this value (default is 0.0001 – half the lowest measured Fup in our
+dataset).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Caco2.options</code></td>
+<td>
+<p>A list of options to use when working with Caco2 apical to
+basolateral data <code>Caco2.Pab</code>, default is Caco2.options = list(Caco2.Pab.default = 1.6,
+Caco2.Fabs = TRUE, Caco2.Fgut = TRUE, overwrite.invivo = FALSE, keepit100 = FALSE). Caco2.Pab.default sets the default value for 
+Caco2.Pab if Caco2.Pab is unavailable. Caco2.Fabs = TRUE uses Caco2.Pab to calculate
+fabs.oral, otherwise fabs.oral = <code>Fabs</code>. Caco2.Fgut = TRUE uses Caco2.Pab to calculate 
+fgut.oral, otherwise fgut.oral = <code>Fgut</code>. overwrite.invivo = TRUE overwrites Fabs and Fgut in vivo values from literature with 
+Caco2 derived values if available. keepit100 = TRUE overwrites Fabs and Fgut with 1 (i.e. 100 percent) regardless of other settings.
+See <code>get_fbio</code> for further details.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>monitor.vars</code></td>
+<td>
+<p>Which variables are returned as a function of time. 
+The default value of NULL provides "Cgut", "Cliver", "Cven", "Clung", "Cart", 
+"Crest", "Ckidney", "Cplasma", "Atubules", "Ametabolized", and "AUC"</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Additional arguments passed to the integrator (deSolve).</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Note that the model parameters have units of hours while the model output is
+in days.
+</p>
+<p>Default NULL value for doses.per.day solves for a single dose.
+</p>
+<p>Model Figure 
+<img src="../help/figures/pbtk.jpg" width="60%" alt="Figure: PBTK Model Schematic"></p>
+<p>When species is specified as rabbit, dog, or mouse, the function uses the
+appropriate physiological data(volumes and flows) but substitutes human
+fraction unbound, partition coefficients, and intrinsic hepatic clearance.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A matrix of class deSolve with a column for time(in days), each
+compartment, the area under the curve, and plasma concentration and a row
+for each time point.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>John Wambaugh and Robert Pearce
+</p>
+
+
+<h3>References</h3>
+
+<p>Pearce RG, Setzer RW, Strope CL, Wambaugh JF, Sipes NS (2017).
+“Httk: R package for high-throughput toxicokinetics.”
+<em>Journal of Statistical Software</em>, <b>79</b>(4), 1.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>solve_model</code>
+</p>
+<p><code>parameterize_gas_pbtk</code>
+</p>
+<p><code>calc_analytic_css_pbtk</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+
+# Multiple doses per day:
+head(solve_pbtk(
+  chem.name='Bisphenol-A',
+  daily.dose=.5,
+  days=2.5,
+  doses.per.day=2,
+  tsteps=2))
+
+# Starting with an initial concentration:
+out &lt;- solve_pbtk(
+  chem.name='bisphenola',
+  dose=0,
+  days=2.5,
+  output.units="mg/L", 
+  initial.values=c(Agut=200))
+
+# Working with parameters (rather than having solve_pbtk retrieve them):
+params &lt;- parameterize_pbtk(chem.cas="80-05-7")
+head(solve_pbtk(parameters=params, days=2.5))
+                  
+# We can change the parameters given to us by parameterize_pbtk:
+params &lt;- parameterize_pbtk(dtxsid="DTXSID4020406", species = "rat")
+params["Funbound.plasma"] &lt;- 0.1
+out &lt;- solve_pbtk(parameters=params, days=2.5)
+
+# A fifty day simulation:
+out &lt;- solve_pbtk(
+  chem.name = "Bisphenol A", 
+  days = 50, 
+  daily.dose=1,
+  doses.per.day = 3)
+plot.data &lt;- as.data.frame(out)
+css &lt;- calc_analytic_css(chem.name = "Bisphenol A")
+
+library("ggplot2")
+c.vs.t &lt;- ggplot(plot.data, aes(time, Cplasma)) + 
+  geom_line() +
+  geom_hline(yintercept = css) + 
+  ylab("Plasma Concentration (uM)") +
+  xlab("Day") + 
+  theme(
+    axis.text = element_text(size = 16), 
+    axis.title = element_text(size = 16), 
+    plot.title = element_text(size = 17)) +
+  ggtitle("Bisphenol A")
+print(c.vs.t)
+
+
+</code></pre>
+
+
+</div>

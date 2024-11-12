@@ -1,0 +1,193 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>panel.cartesian</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>trellis panel function, with labeled rows and columns and without
+strip labels.</h2>
+
+<h3>Description</h3>
+
+<p>trellis panel function, with labeled rows and columns and without
+strip labels.  Designed for use with the ladder of powers plot.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">panel.cartesian(x, y,
+                x.label=unique(panel.labels[,"x"]),
+                y.label=unique(panel.labels[,"y"]),
+                group.label.side="",
+                axis3.line=1,
+                xg.label, yg.label, g.cex=.7,
+                rescale=list(x=TRUE,y=TRUE), ...,
+                browser.on=FALSE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x, y</code></td>
+<td>
+<p>x and y as for any other panel function</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x.label</code></td>
+<td>
+<p>labels for the columns of the scatterplot matrix</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>y.label</code></td>
+<td>
+<p>labels for the rows of the scatterplot matrix</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>axis3.line</code></td>
+<td>
+<p>The <code>x.label</code> doesn't always show up in the
+right place.  This allows the user to adjust it's position. </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>group.label.side</code></td>
+<td>
+<p><code>c("","left","top")</code>, when the plotting
+formula is conditioned on a group factor, the levels of the group are
+displayed in the margins of the plot.  The appearance depends on the
+setting of the trellis <code>between</code> argument.  Getting it to look good
+for any given plot requires experimentation.  Since it is redundant with
+the information in the strip labels, leaving it at the default <code>""</code>
+is often the best thing to do.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>xg.label</code></td>
+<td>
+<p>group labels for rows of the scatterplot matrix</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>yg.label</code></td>
+<td>
+<p>group labels for rows of the scatterplot matrix</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>g.cex</code></td>
+<td>
+<p><code>cex</code> for the group labels</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rescale</code></td>
+<td>
+<p>alternate way to get something similar to <code>relation="free"</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>other arguments</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>browser.on</code></td>
+<td>
+<p>logical, normally <code>FALSE</code>.  This is a debugging
+tool.  When <code>TRUE</code>, the <code>browser()</code> is turned on at various
+critical points.</p>
+</td>
+</tr>
+</table>
+<h3>References</h3>
+
+<p>Heiberger, Richard M. and Holland, Burt (2015).
+<em>Statistical Analysis and Data Display: An Intermediate Course with Examples in R</em>.
+Second Edition.
+Springer-Verlag, New York.
+<a href="https://link.springer.com/book/10.1007/978-1-4939-2122-5">https://link.springer.com/book/10.1007/978-1-4939-2122-5</a>
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>ladder</code>, <code>xysplom</code></p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(rent)  ## Weisberg's file alr162
+
+rent.lm &lt;- lm(rnt.alf ~ rnt.till + cow.dens + lime, data=rent)
+rent$resid.rent &lt;- resid(rent.lm)
+
+xysplom(resid.rent ~ rnt.till + cow.dens | lime, data=rent,
+        layout=c(2,2))
+
+xysplom(resid.rent ~ rnt.till + cow.dens | lime, data=rent,
+        layout=c(2,2),
+        xlab="", ylab="",
+        x.label="", y.label="",
+        group.label.side="",
+        par.strip.text=list(cex=1.2),
+        panel=panel.cartesian,
+        axis3.line=2.4,
+        scales=list(
+          relation="same",
+          alternating=FALSE, labels=FALSE, ticks=FALSE),
+        between=list(x=1, y=3))
+
+xysplom(resid.rent ~ rnt.till + cow.dens | lime, data=rent,
+        layout=c(2,2),
+        xlab="", ylab="",
+        x.label="", y.label="",
+        group.label.side="",
+        par.strip.text=list(cex=1.2),
+        panel=panel.cartesian,
+        axis3.line=3.6,
+        scales=list(
+          relation="same",
+          alternating=FALSE, labels=FALSE, ticks=FALSE),
+        rescale=list(x=FALSE, y=FALSE),
+        between=list(x=1, y=3))
+
+xysplom(resid.rent ~ rnt.till + cow.dens | lime, data=rent,
+        layout=c(2,2),
+        xlab="", ylab="",
+        x.label="", y.label="",
+        group.label.side="",
+        par.strip.text=list(cex=1.2),
+        panel=panel.cartesian,
+        axis3.line=3.6,
+        scales=list(
+          relation="free",
+          alternating=FALSE, labels=FALSE, ticks=FALSE),
+        between=list(x=1, y=3))
+
+tmp &lt;-
+xysplom(resid.rent ~ rnt.till + cow.dens | lime, data=rent,
+        layout=c(2,2),
+        xlab="", ylab="",
+        y.label="resid",
+        group.label.side="top",
+        par.strip.text=list(cex=1.2),
+        panel=panel.cartesian,
+        axis3.line=3.6,
+        scales=list(alternating=FALSE, labels=FALSE, ticks=FALSE),
+        rescale=list(x=FALSE, y=FALSE),
+        between=list(x=4, y=5))
+if.R(r=tmp$par.settings &lt;- list(layout.widths=list(right.padding=4)),
+     s={})
+tmp
+
+</code></pre>
+
+
+</div>

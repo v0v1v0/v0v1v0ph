@@ -1,0 +1,132 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>readFormat</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2> Read a Binary File </h2>
+
+<h3>Description</h3>
+
+<p>Read the raw binary content of a file using a description
+of the binary format.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">readFormat(file, format, width = NULL, offset = 0, machine = "hex",
+           flatten = TRUE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>file</code></td>
+<td>
+<p>The name of a file or a connection.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>format</code></td>
+<td>
+<p> A <code>"memFormat"</code> object. </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>width</code></td>
+<td>
+<p>The number of bytes to print per row when displaying the
+file. </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>offset</code></td>
+<td>
+<p>An offset within the file to start reading.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>machine</code></td>
+<td>
+<p>How to print each byte when displaying the file; either
+<code>"hex"</code> or <code>"binary"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>flatten</code></td>
+<td>
+<p>If <code>TRUE</code> the list of blocks created from the
+<code>"memFormat"</code> description are flattened to a list of depth 1.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>This function uses a <code>"memFormat"</code> description to
+read the raw binary content of a file and interpret
+sub-blocks of the file as distinct (blocks of) values.
+</p>
+<p>The <code>"memFormat"</code> can described a nested structure of
+blocks.  The <code>flatten</code> argument is used to convert
+nested format structures to a flat (depth of one) structure.
+</p>
+<p>The format is always flattened for display, but extracting
+</p>
+
+
+<h3>Value</h3>
+
+<p>A <code>"rawFormat"</code> object, which is a list:
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>blocks</code></td>
+<td>
+<p>A list (of lists) of <code>"rawBlock"</code> objects. </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>offset</code></td>
+<td>
+<p>The offset in the file where reading began.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nbytes</code></td>
+<td>
+<p>The number of bytes read from the file.</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p> Paul Murrell </p>
+
+
+<h3>See Also</h3>
+
+<p><code>viewFormat</code>
+<code>memFormat</code>
+<code>as.character.rawFormat</code>
+<code>print.rawFormat</code>
+<code>readRaw</code>
+<code>readBin</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">fileFormat &lt;- readFormat(hexViewFile("rawTest.int"),
+                         memFormat(int1=integer4, int2=integer4))
+blockValue(fileFormat$blocks$int2)
+
+fileFormat &lt;- readFormat(hexViewFile("rawTest.int"),
+                         memFormat(integers=vectorBlock(integer4, 20)))
+blockValue(fileFormat$blocks$integers)
+</code></pre>
+
+
+</div>

@@ -1,0 +1,56 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>as_integer_if_safe</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Coerce from double to integer if safe</h2>
+
+<h3>Description</h3>
+
+<p>The same as <code>as.integer(x)</code> but only if <code>x</code> consists only of
+whole numbers and is within the range of integers.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">as_integer_if_safe(x)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table><tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>A double vector. If not a double vector, it is simply returned without any coercion.</p>
+</td>
+</tr></table>
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+N &lt;- 1e6  # run with 1e9
+x &lt;- rep_len(as.double(sample.int(100)), N)
+alt_as_integer &lt;- function(x) {
+  xi &lt;- as.integer(x)
+  if (isTRUE(all.equal(x, xi))) {
+    xi
+  } else {
+    x
+  }
+}
+bench_system_time(as_integer_if_safe(x))
+#&gt; process    real
+#&gt;  6.453s  6.452s
+bench_system_time(alt_as_integer(x))
+#&gt; process    real
+#&gt; 15.516s 15.545s
+bench_system_time(as.integer(x))
+#&gt; process    real
+#&gt;  2.469s  2.455s
+
+</code></pre>
+
+
+</div>

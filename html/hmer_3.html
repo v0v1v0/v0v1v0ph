@@ -1,0 +1,121 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>bimodal_emulator_from_data</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Bimodal Emulation</h2>
+
+<h3>Description</h3>
+
+<p>Performs emulation of bimodal outputs and/or systems.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">bimodal_emulator_from_data(
+  data,
+  output_names,
+  ranges,
+  input_names = names(ranges),
+  verbose = interactive(),
+  na.rm = FALSE,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>The data to train emulators on (as in variance_emulator_from_data)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>output_names</code></td>
+<td>
+<p>The names of the outputs to emulate</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ranges</code></td>
+<td>
+<p>The parameter ranges</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>input_names</code></td>
+<td>
+<p>The names of the parameters (by default inferred from <code>ranges</code>)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p>Should status updates be provided?</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>na.rm</code></td>
+<td>
+<p>Should NA values be removed before training?</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Any other parameters to pass to emulator training</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>This function is deprecated in favour of using <code>emulator_from_data</code>
+with argument <code>emulator_type = "multistate"</code>. See the associated help file.
+</p>
+<p>In many stochastic systems, particularly disease models, the outputs exhibit bimodality - a
+familiar example is where a disease either takes off or dies out. In these cases, it is not
+sensible to emulate the outputs based on all realisations, and instead we should emulate each
+mode separately.
+</p>
+<p>This function first tries to identify bimodality. If detected, it determines which of the
+outputs in the data exhibits the bimodality: to these two separate emulators are trained, one
+to each mode. The emulators are provided with any data that is relevant to their training; for
+example, bimodality can exist in some regions of parameter space but not others. Points where
+bimodality is present have their realisations allocated between the two modes while points
+where no bimodality exists have their realisations provided to both modes. Targets that do not
+exhibit bimodality are trained as a normal stochastic output: that is, using the default of
+<code>variance_emulator_from_data</code>.
+</p>
+<p>The function also estimates the proportion of realisations in each mode for the set of outputs.
+This value is also emulated as a deterministic emulator and included in the output.
+</p>
+<p>The output of the function is a list, containing three objects: <code>mode1</code>, <code>mode2</code>, and
+<code>prop</code>. The first two objects have the form produced by <code>variance_emulator_from_data</code>
+while <code>prop</code> has the form of an <code>emulator_from_data</code> output.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A list <code>(mode1, mode2, prop)</code> of emulator lists and objects.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">  # Excessive runtime
+  # Use the stochastic SIR dataset
+  SIR_ranges &lt;- list(aSI = c(0.1, 0.8), aIR = c(0, 0.5), aSR = c(0, 0.05))
+  SIR_names &lt;- c("I10", "I25", "I50", "R10", "R25", "R50")
+  b_ems &lt;- bimodal_emulator_from_data(SIR_stochastic$training, SIR_names, SIR_ranges)
+ 
+
+</code></pre>
+
+
+</div>

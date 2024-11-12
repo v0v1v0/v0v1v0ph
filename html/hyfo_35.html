@@ -1,0 +1,198 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>getPreciBar</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>get mean rainfall bar plot of the input dataset or time series.</h2>
+
+<h3>Description</h3>
+
+<p>get mean rainfall bar plot of the input dataset or time series.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">getPreciBar(
+  data,
+  method,
+  cell = "mean",
+  output = "data",
+  name = NULL,
+  plotRange = TRUE,
+  member = NULL,
+  omitNA = TRUE,
+  info = FALSE,
+  ...
+)
+
+## S4 method for signature 'list'
+getPreciBar(
+  data,
+  method,
+  cell = "mean",
+  output = "data",
+  name = NULL,
+  plotRange = TRUE,
+  member = NULL,
+  omitNA = TRUE,
+  info = FALSE,
+  ...
+)
+
+## S4 method for signature 'data.frame'
+getPreciBar(
+  data,
+  method,
+  cell = "mean",
+  output = "data",
+  name = NULL,
+  plotRange = TRUE,
+  member = NULL,
+  omitNA = TRUE,
+  info = FALSE,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>A list containing different information, should be the result of reading netcdf file using
+<code>loadNcdf</code>, or a time series, with first column the Date, second the value.
+Time series can be an ENSEMBLE containning different members. Than the mean value will be given and the range will be given.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+<p>A string showing the calculating method of the input time series. More information
+please refer to the details.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cell</code></td>
+<td>
+<p>A vector containing the locaton of the cell, e.g. c(2, 3), default is "mean", representing
+the spatially averaged value. Check details for more information.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>output</code></td>
+<td>
+<p>A string showing the type of the output, if <code>output = 'ggplot'</code>, the returned 
+data can be used in ggplot and <code>getPreciBar_comb()</code>; if <code>output = 'plot'</code>, the returned data is the plot containing all 
+layers' information, and can be plot directly or used in grid.arrange; if not set, the data
+will be returned.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>name</code></td>
+<td>
+<p>If <code>output = 'ggplot'</code>, name has to be assigned to your output, in order to differentiate
+different outputs in the later multiplot using <code>getSpatialMap_comb</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>plotRange</code></td>
+<td>
+<p>A boolean showing whether the range will be plotted.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>member</code></td>
+<td>
+<p>A number showing which member is selected to get, if the dataset has a "member" dimension. Default
+is NULL, if no member assigned, and there is a "member" in dimensions, the mean value of the members will be
+taken.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>omitNA</code></td>
+<td>
+<p>A boolean showing whether the missing value is omitted.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>info</code></td>
+<td>
+<p>A boolean showing whether the information of the map, e.g., max, mean ..., default is FALSE.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p><code>title, x, y</code> showing the title and x and y axis of the plot. e.g. <code>title = 'aaa'</code></p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>There are following methods to be selected, 
+"annual": annual rainfall of each year is plotted.  
+"winter", "spring", "autumn", "summer": seasonal rainfall of each year is plotted.
+Month(number 1 to 12): month rainfall of each year is plotted, e.g. march rainfall of each year.
+"meanMonthly": the mean monthly rainfall of each month over the whole period.
+</p>
+<p>#Since "winter" is a crossing year, 12, 1, 2, 12 is in former year, and 1, 2 are in latter year.
+#so winter belongs to the latter year.
+</p>
+<p><code>cell</code> representing the location of the cell, NOTE: this location means the index of the cell,
+IT IS NOT THE LONGITUDE AND LATITUDE. e.g., <code>cell = c(2, 3)</code>, the program will take the 2nd longitude
+and 3rd latitude, by the increasing order. Longitude comes first.
+</p>
+<p>It is a generic function, if in your case you need to debug, please see <code>?debug()</code> 
+for how to debug S4 method.
+</p>
+
+
+<h3>Value</h3>
+
+<p>The calculated mean value of the input time series and the plot of the result.
+</p>
+
+
+<h3>References</h3>
+
+
+<ul>
+<li>
+<p> Hadley Wickham (2007). Reshaping Data with the reshape Package. Journal of Statistical Software,
+21(12), 1-20. URL http://www.jstatsoft.org/v21/i12/.
+</p>
+</li>
+<li>
+<p> H. Wickham. ggplot2: elegant graphics for data analysis. Springer New York, 2009.
+</p>
+</li>
+<li>
+<p> R Core Team (2015). R: A language and environment for statistical computing. R Foundation for
+Statistical Computing, Vienna, Austria. URL https://www.R-project.org/.
+</p>
+</li>
+</ul>
+<h3>Examples</h3>
+
+<pre><code class="language-R">#gridData provided by package is the result of \code{loadNcdf()}
+data(tgridData)
+b1 &lt;- getPreciBar(tgridData, method = 'annual')
+b2 &lt;- getPreciBar(tgridData, method = 'meanMonthly')
+
+data(testdl)
+TS  &lt;- testdl[[1]]
+a &lt;- getPreciBar(TS, method = 'spring')
+# if info = T, the information will be given at the bottom.
+a &lt;- getPreciBar(TS, method = 'spring', info = TRUE)
+
+
+# More examples can be found in the user manual on https://yuanchao-xu.github.io/hyfo/
+
+</code></pre>
+
+
+</div>

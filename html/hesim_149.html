@@ -1,0 +1,499 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>PsmCurves</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Partitioned survival curves</h2>
+
+<h3>Description</h3>
+
+<p>Summarize N-1 survival curves for an N-state partitioned survival model.
+</p>
+
+
+<h3>Format</h3>
+
+<p>An R6::R6Class object.
+</p>
+
+
+<h3>Public fields</h3>
+
+<div class="r6-fields">
+
+<dl>
+<dt><code>params</code></dt>
+<dd>
+<p>An object of class <code>params_surv_list</code>.</p>
+</dd>
+<dt><code>input_data</code></dt>
+<dd>
+<p>An object of class <code>input_mats</code>. Each row in <code>X</code> must
+be a unique treatment strategy and patient.</p>
+</dd>
+</dl>
+</div>
+
+
+<h3>Methods</h3>
+
+
+
+<h4>Public methods</h4>
+
+
+<ul>
+<li> <p><a href="#method-PsmCurves-new"><code>PsmCurves$new()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-PsmCurves-hazard"><code>PsmCurves$hazard()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-PsmCurves-cumhazard"><code>PsmCurves$cumhazard()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-PsmCurves-survival"><code>PsmCurves$survival()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-PsmCurves-rmst"><code>PsmCurves$rmst()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-PsmCurves-quantile"><code>PsmCurves$quantile()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-PsmCurves-check"><code>PsmCurves$check()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-PsmCurves-clone"><code>PsmCurves$clone()</code></a>
+</p>
+</li>
+</ul>
+<hr>
+<a id="method-PsmCurves-new"></a>
+
+
+
+<h4>Method <code>new()</code>
+</h4>
+
+<p>Create a new <code>PsmCurves</code> object.
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>PsmCurves$new(params, input_data)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>params</code></dt>
+<dd>
+<p>The <code>params</code> field.</p>
+</dd>
+<dt><code>input_data</code></dt>
+<dd>
+<p>The <code>input_data</code> field.</p>
+</dd>
+</dl>
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>A new <code>PsmCurves</code> object.
+</p>
+
+
+<hr>
+<a id="method-PsmCurves-hazard"></a>
+
+
+
+<h4>Method <code>hazard()</code>
+</h4>
+
+<p>Predict the hazard function for each survival curve as a function of time.
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>PsmCurves$hazard(t)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>t</code></dt>
+<dd>
+<p>A numeric vector of times.</p>
+</dd>
+</dl>
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>A <code>data.table</code> with columns <code>sample</code>, <code>strategy_id</code>,
+<code>patient_id</code>, <code>grp_id</code>, <code>curve</code> (the curve number), <code>t</code>, and <code>hazard</code>.
+</p>
+
+
+<hr>
+<a id="method-PsmCurves-cumhazard"></a>
+
+
+
+<h4>Method <code>cumhazard()</code>
+</h4>
+
+<p>Predict the cumulative hazard function for each survival curve as a function of time.
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>PsmCurves$cumhazard(t)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>t</code></dt>
+<dd>
+<p>A numeric vector of times.</p>
+</dd>
+</dl>
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>A <code>data.table</code> with columns <code>sample</code>, <code>strategy_id</code>,
+<code>patient_id</code>, <code>grp_id</code>, <code>curve</code>, <code>t</code>, and <code>cumhazard</code>.
+</p>
+
+
+<hr>
+<a id="method-PsmCurves-survival"></a>
+
+
+
+<h4>Method <code>survival()</code>
+</h4>
+
+<p>Predict survival probabilities for each survival curve as a function of time.
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>PsmCurves$survival(t)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>t</code></dt>
+<dd>
+<p>A numeric vector of times.</p>
+</dd>
+</dl>
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>An object of class <code>survival</code>.
+</p>
+
+
+<hr>
+<a id="method-PsmCurves-rmst"></a>
+
+
+
+<h4>Method <code>rmst()</code>
+</h4>
+
+<p>Predict the restricted mean survival time up until time points <code>t</code>
+for each survival curve.
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>PsmCurves$rmst(t, dr = 0)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>t</code></dt>
+<dd>
+<p>A numeric vector of times.</p>
+</dd>
+<dt><code>dr</code></dt>
+<dd>
+<p>Discount rate.</p>
+</dd>
+</dl>
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>A <code>data.table</code> with columns <code>sample</code>, <code>strategy_id</code>,
+<code>patient_id</code>, <code>grp_id</code>, <code>curve</code>, <code>t</code>, and <code>rmst</code>.
+</p>
+
+
+<hr>
+<a id="method-PsmCurves-quantile"></a>
+
+
+
+<h4>Method <code>quantile()</code>
+</h4>
+
+<p>Predict quantiles of the survival distribution for each survival curve.
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>PsmCurves$quantile(p)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>p</code></dt>
+<dd>
+<p>A numeric vector of probabilities for computing quantiles.</p>
+</dd>
+</dl>
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>A <code>data.table</code> with columns <code>sample</code>, <code>strategy_id</code>,
+<code>patient_id</code>, <code>grp_id</code>, <code>curve</code>, <code>p</code> and <code>quantile</code>.
+</p>
+
+
+<hr>
+<a id="method-PsmCurves-check"></a>
+
+
+
+<h4>Method <code>check()</code>
+</h4>
+
+<p>Input validation for class. Checks that fields are the correct type.
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>PsmCurves$check()</pre></div>
+
+
+<hr>
+<a id="method-PsmCurves-clone"></a>
+
+
+
+<h4>Method <code>clone()</code>
+</h4>
+
+<p>The objects of this class are cloneable with this method.
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>PsmCurves$clone(deep = FALSE)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>deep</code></dt>
+<dd>
+<p>Whether to make a deep clone.</p>
+</dd>
+</dl>
+</div>
+
+
+
+
+<h3>See Also</h3>
+
+<p><code>PsmCurves</code> are conveniently created from either fitted models or
+parameter objects with <code>create_PsmCurves()</code>. A complete economic model can be
+implemented with the <code>Psm</code> class. A longer example is provided in
+<code>vignette("psm")</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">library("flexsurv")
+N_SAMPLES &lt;- 5 # Number of parameter samples for PSA
+
+# Consider a 3-state model where there is a 
+# progression-free survival (PFS) and an
+# overall survival (OS) endpoint
+
+# (0) Model setup
+hesim_dat &lt;- hesim_data(
+  strategies = data.frame(
+    strategy_id = c(1, 2),
+    strategy_name = c("SOC", "New 1")
+  ),
+  patients = data.frame(
+    patient_id = 1
+  )
+)
+
+# (1) Parameterize survival models
+## (1.1) If patient-level data is available, 
+## we can fit survival models
+
+### (1.1.1) Data for estimation (for simplicity, only use 2 strategies)
+surv_est_data &lt;- as_pfs_os(
+  onc3[strategy_name != "New 2"], 
+  patient_vars = c("patient_id", "strategy_name")
+)
+surv_est_data$strategy_name &lt;- droplevels(surv_est_data$strategy_name)
+
+### (1.1.2) Fit models
+fit_pfs &lt;- flexsurvreg(Surv(pfs_time, pfs_status) ~ strategy_name,
+                       data = surv_est_data, dist = "exp")
+fit_os &lt;- flexsurvreg(Surv(os_time, os_status) ~ strategy_name,
+                      data = surv_est_data, dist = "exp")
+fits &lt;- flexsurvreg_list(pfs = fit_pfs, os = fit_os)
+
+## (1.2) If patient-level data is NOT available, 
+## we can construct the parameter objects "manually"
+
+### (1.2.1) Baseline hazard:
+### Assume that we know the (log) rate parameters for both PFS and OS 
+### for SOC (i.e., the intercept) and their standard error
+logint_pfs_est &lt;- -1.7470900
+logint_pfs_se &lt;-  0.03866223
+logint_os_est &lt;- -2.7487675
+logint_os_se &lt;- 0.04845015
+
+### (1.2.2) Relative treatment effect:
+### Assume we know the log hazard ratios (and their standard errors) 
+### for comparing the new interventions to the SOC
+loghr_pfs_est_new1 &lt;- -0.1772028 
+loghr_pfs_se_new1 &lt;- 0.05420119
+loghr_os_est_new1 &lt;- -0.1603632
+loghr_os_se_new1 &lt;- 0.06948962
+
+### (1.2.3) Create "params_surv_list" object by combining the baseline hazard 
+### and relative treatment effects
+params &lt;- params_surv_list(
+  #### Model for PFS
+  pfs = params_surv(
+    coefs = list( 
+      rate = data.frame( # coefficients predict log rate
+        intercept = rnorm(N_SAMPLES, logint_pfs_est, logint_pfs_se),
+        new1 = rnorm(N_SAMPLES, loghr_pfs_est_new1, loghr_pfs_se_new1)
+      )
+    ),
+    dist = "exp"
+  ),
+  
+  #### Model for OS
+  os = params_surv(
+    coefs = list(
+      rate = data.frame(
+        intercept = rnorm(N_SAMPLES, logint_os_est, logint_os_se),
+        new1 = rnorm(N_SAMPLES, loghr_os_est_new1, loghr_os_se_new1)
+      )
+    ),
+    dist = "exp"
+  )
+)
+
+#### The print (and summary) methods for the "params_surv_list" object will 
+#### summarize each of the model terms, which is a good way to check
+#### if it's been setup correctly
+params 
+
+# (2) Simulation
+## (2.1) Construct the model
+### (2.1.1) Case where patient-level data was available
+### Use create_PsmCurves.params_flexsurvreg_list() method
+surv_input_data &lt;- expand(hesim_dat, by = c("strategies", "patients"))
+psm_curves1 &lt;- create_PsmCurves(fits, input_data = surv_input_data, 
+                                n = N_SAMPLES,
+                                uncertainty = "normal",
+                                est_data = surv_est_data)
+
+### (2.1.2) Case where patient-level data was NOT available
+### Use create_PsmCurves.params_surv_list() method
+surv_input_data$intercept &lt;- 1
+surv_input_data$new1 &lt;- ifelse(surv_input_data$strategy_name == "New 1", 
+                               1, 0)
+psm_curves2 &lt;- create_PsmCurves(params, input_data = surv_input_data)
+
+## (2.2) Summarize survival models
+## There are minor discrepancies between the case where models were fit
+## with flexsurvreg() and the case where the "params_surv_list" object
+## was constructed manually due to differences in the random draws
+## of the parameter samples. These differences are decreasing in the size 
+## of N_SAMPLES
+times &lt;- seq(0, 10, 1/12) # Monthly times
+
+### Quantiles
+head(psm_curves1$quantile(p = c(.25, .5, .75)))
+head(psm_curves2$quantile(p = c(.25, .5, .75)))
+
+### Survival curves
+head(psm_curves1$survival(t = times))
+head(psm_curves2$survival(t = times))
+
+### Restricted mean survival
+head(psm_curves1$rmst(t = c(2, 5)))
+head(psm_curves2$rmst(t = c(2, 5)))
+</code></pre>
+
+
+</div>

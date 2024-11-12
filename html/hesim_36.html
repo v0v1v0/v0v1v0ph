@@ -1,0 +1,340 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>CohortDtstmTrans</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Transitions for a cohort discrete time state transition model</h2>
+
+<h3>Description</h3>
+
+<p>Simulate health state transitions in a cohort discrete time state transition model.
+</p>
+
+
+<h3>Format</h3>
+
+<p>An R6::R6Class object.
+</p>
+
+
+<h3>Public fields</h3>
+
+<div class="r6-fields">
+
+<dl>
+<dt><code>params</code></dt>
+<dd>
+<p>Parameters for simulating health state transitions.
+Supports objects of class <code>tparams_transprobs</code> or <code>params_mlogit_list</code>.</p>
+</dd>
+<dt><code>input_data</code></dt>
+<dd>
+<p>An object of class <code>input_mats</code>.</p>
+</dd>
+<dt><code>cycle_length</code></dt>
+<dd>
+<p>The length of a model cycle in terms of years.
+The default is <code>1</code> meaning that model cycles are 1 year long.</p>
+</dd>
+<dt><code>absorbing</code></dt>
+<dd>
+<p>A numeric vector denoting the states that are
+absorbing states; i.e., states that cannot be transitioned from.
+Each element should correspond to a <code>state_id</code>,
+which should, in turn, be the index of the health state.</p>
+</dd>
+</dl>
+</div>
+
+
+<h3>Active bindings</h3>
+
+<div class="r6-active-bindings">
+
+<dl>
+<dt><code>start_stateprobs</code></dt>
+<dd>
+<p>A non-negative vector with length equal to the number of
+health states containing the probability that the cohort is in each health
+state at the start of the simulation. For example,
+if there were three states and the cohort began the simulation in state 1,
+then <code>start_stateprobs = c(1, 0, 0)</code>. Automatically normalized to sum to 1.
+If <code>NULL</code>, then a vector with the first element equal to 1 and
+all remaining elements equal to 0.</p>
+</dd>
+<dt><code>trans_mat</code></dt>
+<dd>
+<p>A transition matrix describing the states and transitions
+in a discrete-time multi-state model. Only required if the model is
+parameterized using multinomial logistic regression. The <code style="white-space: pre;">⁠(i,j)⁠</code> element
+represents a transition from state <code>i</code> to state <code>j</code>. Each possible transition
+from row <code>i</code> should be based on a separate multinomial logistic regression
+and ordered from <code>0</code> to <code>K - 1</code> where <code>K</code> is the number of
+possible transitions. Transitions that are not possible should be <code>NA</code>.
+and the reference category for each row should be <code>0</code>.</p>
+</dd>
+</dl>
+</div>
+
+
+<h3>Methods</h3>
+
+
+
+<h4>Public methods</h4>
+
+
+<ul>
+<li> <p><a href="#method-CohortDtstmTrans-new"><code>CohortDtstmTrans$new()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-CohortDtstmTrans-sim_stateprobs"><code>CohortDtstmTrans$sim_stateprobs()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-CohortDtstmTrans-clone"><code>CohortDtstmTrans$clone()</code></a>
+</p>
+</li>
+</ul>
+<hr>
+<a id="method-CohortDtstmTrans-new"></a>
+
+
+
+<h4>Method <code>new()</code>
+</h4>
+
+<p>Create a new <code>CohortDtstmTrans</code> object.
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>CohortDtstmTrans$new(
+  params,
+  input_data = NULL,
+  trans_mat = NULL,
+  start_stateprobs = NULL,
+  cycle_length = 1,
+  absorbing = NULL
+)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>params</code></dt>
+<dd>
+<p>The <code>params</code> field.</p>
+</dd>
+<dt><code>input_data</code></dt>
+<dd>
+<p>The <code>input_data</code> field.</p>
+</dd>
+<dt><code>trans_mat</code></dt>
+<dd>
+<p>The <code>trans_mat</code> field.</p>
+</dd>
+<dt><code>start_stateprobs</code></dt>
+<dd>
+<p>The <code>start_stateprobs</code> field.</p>
+</dd>
+<dt><code>cycle_length</code></dt>
+<dd>
+<p>The <code>cycle_length</code> field.</p>
+</dd>
+<dt><code>absorbing</code></dt>
+<dd>
+<p>The <code>absorbing</code> field. If <code>NULL</code>, then the constructor
+will determine which states are absorbing automatically; non <code>NULL</code> values
+will override this behavior.</p>
+</dd>
+</dl>
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>A new <code>CohortDtstmTrans</code> object.
+</p>
+
+
+<hr>
+<a id="method-CohortDtstmTrans-sim_stateprobs"></a>
+
+
+
+<h4>Method <code>sim_stateprobs()</code>
+</h4>
+
+<p>Simulate probability of being in each health state during each model cycle.
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>CohortDtstmTrans$sim_stateprobs(n_cycles)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>n_cycles</code></dt>
+<dd>
+<p>The number of model cycles to simulate the model for.</p>
+</dd>
+</dl>
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>An object of class <code>stateprobs</code>.
+</p>
+
+
+<hr>
+<a id="method-CohortDtstmTrans-clone"></a>
+
+
+
+<h4>Method <code>clone()</code>
+</h4>
+
+<p>The objects of this class are cloneable with this method.
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>CohortDtstmTrans$clone(deep = FALSE)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>deep</code></dt>
+<dd>
+<p>Whether to make a deep clone.</p>
+</dd>
+</dl>
+</div>
+
+
+
+
+<h3>See Also</h3>
+
+<p><code>create_CohortDtstmTrans()</code> creates a <code>CohortDtstmTrans</code> object from either
+a fitted statistical model or a parameter object. A complete economic model can be implemented
+with the <code>CohortDtstm</code> class.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">library("msm")
+library("data.table")
+set.seed(101)
+
+# We consider two examples that have the same treatment strategies and patients.
+# One model is parameterized by fitting a multi-state model with the "msm"
+# package; in the second model, the parameters are entered "manually" with
+# a "params_mlogit_list" object.
+
+# MODEL SETUP
+strategies &lt;- data.table(
+  strategy_id = c(1, 2, 3),
+  strategy_name = c("SOC", "New 1", "New 2")
+)
+patients &lt;- data.table(patient_id = 1:2)
+hesim_dat &lt;- hesim_data(
+  strategies = strategies,
+  patients = patients
+)
+
+# EXAMPLE #1: msm
+## Fit multi-state model with panel data via msm
+qinit &lt;- rbind(
+  c(0, 0.28163, 0.01239),
+  c(0, 0, 0.10204),
+  c(0, 0, 0)
+)
+fit &lt;- msm(state_id ~ time, subject = patient_id,
+           data = onc3p[patient_id %in% sample(patient_id, 100)],
+           covariates = list("1-2" =~ strategy_name),
+           qmatrix = qinit)
+
+## Simulation model
+transmod_data &lt;- expand(hesim_dat)
+transmod &lt;- create_CohortDtstmTrans(fit,
+                                    input_data = transmod_data,
+                                    cycle_length = 1/2,
+                                    fixedpars = 2,
+                                    n = 2)
+transmod$sim_stateprobs(n_cycles = 2)
+
+# EXAMPLE #2: params_mlogit_list
+## Input data
+transmod_data[, intercept := 1]
+transmod_data[, new1 := ifelse(strategy_name == "New 1", 1, 0)]
+transmod_data[, new2 := ifelse(strategy_name == "New 2", 1, 0)]
+
+## Parameters
+n &lt;- 10
+transmod_params &lt;- params_mlogit_list(
+  
+  ## Transitions from stable state (stable -&gt; progression, stable -&gt; death)
+  stable = params_mlogit(
+    coefs = list(
+      progression = data.frame(
+        intercept = rnorm(n, -0.65, .1),
+        new1 = rnorm(n, log(.8), .02),
+        new2 = rnorm(n, log(.7, .02))
+      ),
+      death = data.frame(
+        intercept = rnorm(n, -3.75, .1),
+        new1 = rep(0, n),
+        new2 = rep(0, n)
+      )
+    )
+  ),
+  
+  ## Transition from progression state (progression -&gt; death)
+  progression = params_mlogit(
+    coefs = list(
+      death = data.frame(
+        intercept = rnorm(n, 2.45, .1),
+        new1 = rep(0, n),
+        new2 = rep(0, n)
+      )
+    )
+  )
+)
+transmod_params
+
+## Simulation model
+tmat &lt;- rbind(c(0, 1, 2),
+              c(NA, 0, 1),
+              c(NA, NA, NA))
+transmod &lt;- create_CohortDtstmTrans(transmod_params, 
+                                    input_data = transmod_data,
+                                    trans_mat = tmat, cycle_length = 1)
+transmod$sim_stateprobs(n_cycles = 2)
+
+
+</code></pre>
+
+
+</div>

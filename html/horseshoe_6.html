@@ -1,0 +1,231 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>HS.normal.means</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>The horseshoe prior for the sparse normal means problem</h2>
+
+<h3>Description</h3>
+
+<p>Apply the horseshoe prior to the normal means problem
+(i.e. linear regression with the design matrix equal to the identity matrix).
+Computes the posterior mean, median and credible intervals. There are options for
+empirical Bayes (estimate of tau and or Sigma2 plugged in) and full Bayes (truncated
+or non-truncated half-Cauchy on tau, Jeffrey's prior on Sigma2). For the full Bayes
+version, the truncated half-Cauchy prior is recommended by Van der Pas et al. (2016).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">HS.normal.means(y, method.tau = c("fixed", "truncatedCauchy",
+  "halfCauchy"), tau = 1, method.sigma = c("fixed", "Jeffreys"),
+  Sigma2 = 1, burn = 1000, nmc = 5000, alpha = 0.05)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+<p>The data. A <code class="reqn">n*1</code> vector.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method.tau</code></td>
+<td>
+<p>Method for handling <code class="reqn">\tau</code>. Select "fixed" to plug in an
+estimate of tau (empirical Bayes), "truncatedCauchy" for the half-
+Cauchy prior truncated to [1/n, 1], or "halfCauchy" for a
+non-truncated half-Cauchy prior. The truncated Cauchy prior is recommended over
+the non-truncated version.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tau</code></td>
+<td>
+<p>Use this argument to pass the (estimated) value of <code class="reqn">\tau</code> in case "fixed"
+is selected for method.tau. Not necessary when method.tau is equal to"halfCauchy" or
+"truncatedCauchy". The function <code>HS.MMLE</code> can be used to compute an
+estimate of tau. The default (tau = 1) is not suitable for most purposes and should
+be replaced.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method.sigma</code></td>
+<td>
+<p>Select "fixed" for a fixed error variance, or "Jeffreys"
+to use Jeffrey's prior.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Sigma2</code></td>
+<td>
+<p>The variance of the data - only necessary when "fixed" is
+selected for method.sigma. The default (Sigma2 = 1) is not suitable for
+most purposes and should be replaced.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>burn</code></td>
+<td>
+<p>Number of samples used for burn-in. Default is 1000.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nmc</code></td>
+<td>
+<p>Number of MCMC samples taken after burn-in. Default is 5000.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alpha</code></td>
+<td>
+<p>The level for the credible intervals. E.g. alpha = 0.05 yields
+95% credible intervals</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The normal means model is:
+</p>
+<p style="text-align: center;"><code class="reqn">y_i=\beta_i+\epsilon_i, \epsilon_i \sim N(0,\sigma^2)</code>
+</p>
+
+<p>And the horseshoe prior:
+</p>
+<p style="text-align: center;"><code class="reqn">\beta_j \sim N(0,\sigma^2 \lambda_j^2 \tau^2)</code>
+</p>
+
+<p style="text-align: center;"><code class="reqn">\lambda_j \sim Half-Cauchy(0,1).</code>
+</p>
+
+<p>Estimates of <code class="reqn">\tau</code> and <code class="reqn">\sigma^2</code> may be plugged in (empirical Bayes), or those
+parameters are equipped with hyperpriors (full Bayes).
+</p>
+
+
+<h3>Value</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>BetaHat</code></td>
+<td>
+<p>The posterior mean (horseshoe estimator) for each of the datapoints.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>LeftCI</code></td>
+<td>
+<p>The left bounds of the credible intervals.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>RightCI</code></td>
+<td>
+<p>The right bounds of the credible intervals.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>BetaMedian</code></td>
+<td>
+<p>Posterior median of Beta, a <code class="reqn">n</code> by 1 vector.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Sigma2Hat</code></td>
+<td>
+<p>Posterior mean of error variance <code class="reqn">\sigma^2</code>. If method.sigma =
+"fixed" is used, this value will be equal to the user-selected value of Sigma2
+passed to the function.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>TauHat</code></td>
+<td>
+<p>Posterior mean of global scale parameter tau, a positive scalar.
+If method.tau = "fixed" is used, this value will be equal to the user-selected value
+of tau passed to the function.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>BetaSamples</code></td>
+<td>
+<p>Posterior samples of Beta.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>TauSamples</code></td>
+<td>
+<p>Posterior samples of tau.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Sigma2Samples</code></td>
+<td>
+<p>Posterior samples of Sigma2.</p>
+</td>
+</tr>
+</table>
+<h3>References</h3>
+
+<p>van der Pas, S.L., Szabo, B., and van der Vaart, A. (2017), Uncertainty
+quantification for the horseshoe (with discussion). Bayesian Analysis
+12(4), 1221-1274.
+</p>
+<p>van der Pas, S.L., Szabo, B., and van der Vaart A. (2017), Adaptive
+posterior contraction rates for the horseshoe. Electronic Journal of
+Statistics 10(1), 3196-3225.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>HS.post.mean</code> for a fast way to compute the posterior mean
+if an estimate of tau is available. <code>horseshoe</code> for linear regression.
+<code>HS.var.select</code> to perform variable selection.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">#Empirical Bayes example with 20 signals, rest is noise
+#Posterior mean for the signals is plotted
+#And variable selection is performed using the credible intervals
+#And the credible intervals are plotted
+truth &lt;- c(rep(0, 80), rep(8, 20))
+data &lt;-  truth + rnorm(100, 1)
+tau.hat &lt;- HS.MMLE(data, Sigma2 = 1)
+res.HS1 &lt;- HS.normal.means(data, method.tau = "fixed", tau = tau.hat,
+method.sigma = "fixed", Sigma2 = 1)
+#Plot the posterior mean against the data (signals in blue)
+plot(data, res.HS1$BetaHat, col = c(rep("black", 80), rep("blue", 20)))
+#Find the selected betas (ideally, the last 20 are equal to 1)
+HS.var.select(res.HS1, data, method = "intervals")
+#Plot the credible intervals
+library(Hmisc)
+xYplot(Cbind(res.HS1$BetaHat, res.HS1$LeftCI, res.HS1$RightCI) ~ 1:100)
+
+
+#Full Bayes example with 20 signals, rest is noise
+#Posterior mean for the signals is plotted
+#And variable selection is performed using the credible intervals
+#And the credible intervals are plotted
+truth &lt;- c(rep(0, 80), rep(8, 20))
+data &lt;-  truth + rnorm(100, 3)
+res.HS2 &lt;- HS.normal.means(data, method.tau = "truncatedCauchy", method.sigma = "Jeffreys")
+#Plot the posterior mean against the data (signals in blue)
+plot(data, res.HS2$BetaHat, col = c(rep("black", 80), rep("blue", 20)))
+#Find the selected betas (ideally, the last 20 are equal to 1)
+HS.var.select(res.HS2, data, method = "intervals")
+#Plot the credible intervals
+library(Hmisc)
+xYplot(Cbind(res.HS2$BetaHat, res.HS2$LeftCI, res.HS2$RightCI) ~ 1:100)
+</code></pre>
+
+
+</div>

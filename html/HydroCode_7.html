@@ -1,0 +1,82 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>rhineCCM2</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>CCM2 River and Catchment of the Rhine Catchment, Rivers only</h2>
+
+<h3>Description</h3>
+
+<p>This spatial dataset is a subset of the data layer <code>RIVERSEGMENTS</code>
+of the tile <code>WGS84_W2003</code> from the CCM River and
+Catchment Database v2.1 (Vogt et al. 2007). The original data format was
+PGeo (ESRI Personal GeoDatabase).
+The subset consists of rivers within the Rhine basin, i.e.
+<code>WSO_ID = 291110</code>. In order to save disk space,
+the fields of the attribute table were shortened.
+</p>
+
+
+<h3>Format</h3>
+
+<p>An Object of class SpatialLinesDataFrame with 30343 features.
+The attribute table comprises 2 fields:
+</p>
+
+<dl>
+<dt>WSO1_ID</dt>
+<dd>
+<p>int, unique river segment identifier</p>
+</dd>
+<dt>PFAFSTETTER</dt>
+<dd>
+<p>num, Pfafstetter code according to CCM2</p>
+</dd>
+</dl>
+<p>The PROJ.4 string
+is <code>+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0</code>.
+</p>
+
+
+<h3>Source</h3>
+
+<p>CCM River and Catchment Database
+(C) European Commission - JRC, 2007.
+</p>
+
+
+<h3>References</h3>
+
+<p>J. Vogt, P. Soille, A. de Jager, E. Rimavičiūtė,
+W. Mehl, S. Foisneau, K. Bódis, et al., 2007,
+<em>A Pan-European River and Catchment Database</em>,
+Publications Office: Luxembourg, <a href="https://doi.org/10.2788/35907">doi:10.2788/35907</a>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+## get the flowpath from a head catchment to
+## the sea
+## Be patient, this might take a while.
+system.time(fps &lt;- 973842223 %up% rhineCCM2$PFAFSTETTER)
+flowpath &lt;- subset(rhineCCM2, subset = fps)
+sp::plot(flowpath)
+
+## does parallel threats increase the speed
+## and provide the same results?
+op.old &lt;- options()
+options("hydrocode.parallel" = TRUE)
+system.time(fpp &lt;- 973842223 %up% rhineCCM2$PFAFSTETTER)
+all.equal(fps, fpp)
+
+## reset previous settings
+options(op.old)
+
+## End(Not run)
+</code></pre>
+
+
+</div>

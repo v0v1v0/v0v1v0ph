@@ -1,0 +1,262 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>cv.higlasso</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Cross Validated Hierarchical Integrative Group LASSO</h2>
+
+<h3>Description</h3>
+
+<p>Does k-fold cross-validation for <code>higlasso</code>, and returns optimal values
+for <code>lambda1</code> and <code>lambda2</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">cv.higlasso(
+  Y,
+  X,
+  Z,
+  method = c("aenet", "gglasso"),
+  lambda1 = NULL,
+  lambda2 = NULL,
+  nlambda1 = 10,
+  nlambda2 = 10,
+  lambda.min.ratio = 0.05,
+  nfolds = 5,
+  foldid = NULL,
+  sigma = 1,
+  degree = 2,
+  maxit = 5000,
+  tol = 1e-05
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>Y</code></td>
+<td>
+<p>A length n numeric response vector</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>X</code></td>
+<td>
+<p>A n x p numeric matrix</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Z</code></td>
+<td>
+<p>A n x m numeric matrix</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+<p>Type of initialization to use. Possible choices are
+<code>gglasso</code> for group LASSO and <code>aenet</code> for adaptive elastic net.
+Default is <code>aenet</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lambda1</code></td>
+<td>
+<p>A numeric vector of main effect penalties on which to tune
+By default, <code>lambda1 = NULL</code> and higlasso generates a length
+<code>nlambda1</code> sequence of lambda1s based off of the data and
+<code>min.lambda.ratio</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lambda2</code></td>
+<td>
+<p>A numeric vector of interaction effects penalties on which to
+tune. By default, <code>lambda2 = NULL</code> and generates a sequence (length
+<code>nlambda2</code>) of lambda2s based off of the data and
+<code>min.lambda.ratio</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nlambda1</code></td>
+<td>
+<p>The number of lambda1 values to generate. Default is 10,
+minimum is 2. If <code>lambda1 != NULL</code>, this parameter is ignored</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nlambda2</code></td>
+<td>
+<p>The number of lambda2 values to generate. Default is 10,
+minimum is 2. If <code>lambda2 != NULL</code>, this parameter is ignored</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lambda.min.ratio</code></td>
+<td>
+<p>Ratio that calculates min lambda from max lambda.
+Ignored if 'lambda1' or 'lambda2' is non NULL. Default is 0.05</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nfolds</code></td>
+<td>
+<p>Number of folds for cross validation. Default is 10. The
+minimum is 3, and while the maximum is the number of observations
+(ie leave one out cross validation)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>foldid</code></td>
+<td>
+<p>An optional vector of values between 1 and
+<code>max(foldid)</code> identifying what fold each observation is in. Default
+is NULL and <code>cv.higlasso</code> will automatically generate <code>foldid</code>
+based off of <code>nfolds</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sigma</code></td>
+<td>
+<p>Scale parameter for integrative weights. Technically a third
+tuning parameter but defaults to 1 for computational tractability</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>degree</code></td>
+<td>
+<p>Degree of <code>bs</code> basis expansion. Default is 2</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>maxit</code></td>
+<td>
+<p>Maximum number of iterations. Default is 5000</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tol</code></td>
+<td>
+<p>Tolerance for convergence. Defaults to 1e-5</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>There are a few things to keep in mind when using <code>cv.higlasso</code>
+</p>
+
+<ul>
+<li>
+<p><code>higlasso</code> uses the strong heredity principle. That is,
+<code>X_1</code> and <code>X_2</code> must included as main effects before the
+interaction <code>X_1 X_2</code> can be included.
+
+</p>
+</li>
+<li>
+<p>While <code>higlasso</code> uses integrative weights to help with
+estimation, <code>higlasso</code> is more of a selection method.
+As a result, <code>cv.higlasso</code> does not output coefficient
+estimates, only which variables are selected.
+
+</p>
+</li>
+<li>
+<p>Simulation studies suggest that <code>higlasso</code> is a very
+conservative method when it comes to selecting interactions.
+That is, <code>higlasso</code> has a low false positive rate and the
+identification of a nonlinear interaction is a good indicator that
+further investigation is worthwhile.
+
+</p>
+</li>
+<li>
+<p><code>cv.higlasso</code> can be slow, so it may may be beneficial to
+tweak some of its settings (for example, <code>nlambda1</code>,
+<code>nlambda2</code>, and <code>nfolds</code>) to get a handle on how long the
+method will take before running the full model.
+</p>
+</li>
+</ul>
+<p>As a side effect of the conservativeness of the method, we have found that
+using the 1 standard error rule results in overly sparse models, and that
+<code>lambda.min</code> generally performs better.
+</p>
+
+
+<h3>Value</h3>
+
+<p>An object of type <code>cv.higlasso</code> with 7 elements
+</p>
+
+<dl>
+<dt>lambda</dt>
+<dd>
+<p>An <code>nlambda1 x nlambda2 x 2</code> array containing each
+pair <code>(lambda1, lambda2)</code> pair.</p>
+</dd>
+<dt>lambda.min</dt>
+<dd>
+<p>lambda pair with the lowest cross validation error</p>
+</dd>
+<dt>lambda.1se</dt>
+<dd></dd>
+<dt>cvm</dt>
+<dd>
+<p>cross validation error at each lambda pair. The error is
+calculated from the mean square error.</p>
+</dd>
+<dt>cvse</dt>
+<dd>
+<p>standard error of <code>cvm</code> at each lambda pair.</p>
+</dd>
+<dt>higlasso.fit</dt>
+<dd>
+<p>higlasso output from fitting the whole data.</p>
+</dd>
+<dt>call</dt>
+<dd>
+<p>The call that generated the output.</p>
+</dd>
+</dl>
+<h3>Author(s)</h3>
+
+<p>Alexander Rix
+</p>
+
+
+<h3>References</h3>
+
+<p>A Hierarchical Integrative Group LASSO (HiGLASSO) Framework for Analyzing
+Environmental Mixtures. Jonathan Boss, Alexander Rix, Yin-Hsiu Chen, Naveen N.
+Narisetty, Zhenke Wu, Kelly K. Ferguson, Thomas F. McElrath, John D. Meeker,
+Bhramar Mukherjee. 2020.
+arXiv:2003.12844
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">library(higlasso)
+
+X &lt;- as.matrix(higlasso.df[, paste0("V", 1:7)])
+Y &lt;- higlasso.df$Y
+Z &lt;- matrix(1, nrow(X))
+
+
+# This can take a bit of time
+
+fit &lt;- cv.higlasso(Y, X, Z)
+
+print(fit)
+
+</code></pre>
+
+
+</div>

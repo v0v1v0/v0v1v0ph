@@ -1,0 +1,75 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>with_mock_api</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Serve a mock API from files</h2>
+
+<h3>Description</h3>
+
+<p>In this context, HTTP requests attempt to load API response fixtures from
+files. This allows test code to proceed evaluating code that expects
+HTTP requests to return meaningful responses. Requests that do not have a
+corresponding fixture file raise errors, like how <code>without_internet()</code>
+does.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">with_mock_api(expr)
+
+use_mock_api()
+
+stop_mocking()
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table><tr style="vertical-align: top;">
+<td><code>expr</code></td>
+<td>
+<p>Code to run inside the mock context</p>
+</td>
+</tr></table>
+<h3>Details</h3>
+
+<p><code>use_mock_api()</code> and <code>stop_mocking()</code> allow you to turn on/off request
+mocking for more convenient use in an interactive session.
+</p>
+<p>Requests are translated to mock file paths according to several rules that
+incorporate the request method, URL, query parameters, and body. See
+<code>build_mock_url()</code> for details.
+</p>
+<p>File paths for API fixture files may be relative to the 'tests/testthat'
+directory, i.e. relative to the .R test files themselves. This is the default
+location for storing and retrieving mocks, but you can put them anywhere you
+want as long as you set the appropriate location with <code>.mockPaths()</code>.
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>with_mock_api()</code> returns the result of <code>expr</code>. <code>use_mock_api()</code> and
+<code>stop_mocking()</code> return nothing.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">library(httr2)
+with_mock_api({
+  # There are no mocks recorded in this example, so catch this request with
+  # expect_GET()
+  expect_GET(
+    request("https://cran.r-project.org") %&gt;% req_perform(),
+    "https://cran.r-project.org"
+  )
+  # For examples with mocks, see the tests and vignettes
+})
+</code></pre>
+
+
+</div>

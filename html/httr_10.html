@@ -1,0 +1,98 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>config</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Set curl options.</h2>
+
+<h3>Description</h3>
+
+<p>Generally you should only need to use this function to set CURL options
+directly if there isn't already a helpful wrapper function, like
+<code>set_cookies()</code>, <code>add_headers()</code> or
+<code>authenticate()</code>. To use this function effectively requires
+some knowledge of CURL, and CURL options. Use <code>httr_options()</code> to
+see a complete list of available options. To see the libcurl documentation
+for a given option, use <code>curl_docs()</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">config(..., token = NULL)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>named Curl options.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>token</code></td>
+<td>
+<p>An OAuth token (1.0 or 2.0)</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Unlike Curl (and RCurl), all configuration options are per request, not
+per handle.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>set_config()</code> to set global config defaults, and
+<code>with_config()</code> to temporarily run code with set options.
+</p>
+<p>All known available options are listed in <code>httr_options()</code>
+</p>
+<p>Other config: 
+<code>add_headers()</code>,
+<code>authenticate()</code>,
+<code>set_cookies()</code>,
+<code>timeout()</code>,
+<code>use_proxy()</code>,
+<code>user_agent()</code>,
+<code>verbose()</code>
+</p>
+<p>Other ways to set configuration: 
+<code>set_config()</code>,
+<code>with_config()</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># There are a number of ways to modify the configuration of a request
+# * you can add directly to a request
+HEAD("https://www.google.com", verbose())
+
+# * you can wrap with with_config()
+with_config(verbose(), HEAD("https://www.google.com"))
+
+# * you can set global with set_config()
+old &lt;- set_config(verbose())
+HEAD("https://www.google.com")
+# and re-establish the previous settings with
+set_config(old, override = TRUE)
+HEAD("https://www.google.com")
+# or
+reset_config()
+HEAD("https://www.google.com")
+
+# If available, you should use a friendly httr wrapper over RCurl
+# options. But you can pass Curl options (as listed in httr_options())
+# in config
+HEAD("https://www.google.com/", config(verbose = TRUE))
+</code></pre>
+
+
+</div>

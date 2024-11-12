@@ -1,0 +1,119 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hapPower</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Power simulation for association analyses with Haplin</h2>
+
+<h3>Description</h3>
+
+<p>Simulates the statistical power of genetic analyses assessing fetal effects, maternal effects and/or parent-of-origin effects. Effects of X-chromosome genes and gene-environment interaction effects are also allowed. 
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hapPower(hapRun.result, alpha = 0.05)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>hapRun.result</code></td>
+<td>
+<p>The result of running <code>hapRun</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alpha</code></td>
+<td>
+<p><code>alpha</code> is the Type I Error probablity. Equals 0.05 by default.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The Haplin framework includes different modules for assessing genetic effects: <code>haplin</code>, 
+<code>haplinStrat</code> and <code>haplinSlide</code>. <code>hapPower</code> simulates the power of these analyses, which enables power calculations of fetal effects, maternal effects and/or parent-of-origin effects. Various family designs, i.e., triads, case-control, the hybrid design, and all intermediate designs, are possible.
+It also allows power calculation of gene-environment interaction effects and effects on X-chromosome markers.
+</p>
+<p><code>hapPower</code> calculates statistical power using the result of <code>hapRun</code>, and the target effects must be specified in this function, see Examples below, and details in <a href="https://haplin.bitbucket.io/docu/Haplin_power.pdf">https://haplin.bitbucket.io/docu/Haplin_power.pdf</a>.
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>hapPower</code> returns the simulated power.</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Miriam Gjerdevik,<br>
+with Hakon K. Gjessing<br>
+Professor of Biostatistics<br>
+Division of Epidemiology<br>
+Norwegian Institute of Public Health<br></p>
+<p><a href="mailto:hakon.gjessing@uib.no">hakon.gjessing@uib.no</a></p>
+
+
+<h3>References</h3>
+
+<p>Web Site: <a href="https://haplin.bitbucket.io">https://haplin.bitbucket.io</a>
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>haplin</code>, <code>haplinSlide</code>, <code>hapSim</code>, <code>hapRun</code>, <code>snpPower</code>, <code>snpSampleSize</code> , <code>hapPowerAsymp</code></p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+## Simulate power from 100 files using haplin. 
+## The files consist of fetal effects at two diallelic markers,
+## corresponding to haplo.freq = rep(0.25, 4), RR = c(2,1,1,1) and RRstar = c(1,1,1,1).
+## The power is simulated for the combination of 100 case triads 
+## and 100 control triads with no missing data at a 0.05 significance level,
+## applying a multiplicative model.
+hapRun.res &lt;- hapRun(nall = c(2,2), n.strata = 1, cases = c(mfc=100), controls = c(mfc=100),
+haplo.freq = rep(0.25,4), RR = c(2,1,1,1), RRstar = c(1,1,1,1), 
+hapfunc = "haplin", response = "mult", n.sim = 100, dire = "simfiles", ask = FALSE)
+hapPower(hapRun.res)
+
+## Simulate power from 100 files applying haplinStrat. 
+## The files consist of fetal and maternal effects at two diallelic markers.
+## The data is simulated for 500 case triads and 200 control families in the first stratum,
+## and 500 case triads and 500 control trids in the second.
+## The fetal effects vary across strata,
+## whereas the maternal effects are the same.
+## One percent of the case triads are missing at random in the second stratum.
+hapRun.res &lt;- hapRun(nall = c(2,2), n.strata = 2, cases = c(mfc=500),
+controls = list(c(mfc=200),c(mfc=500)), haplo.freq = rep(0.25,4), maternal = TRUE, 
+RR = list(c(1.5,1,1,1),c(1,1,1,1)), RRstar = c(1,1,1,1),
+RR.mat = c(1.5,1,1,1), RRstar.mat = c(1,1,1,1), gen.missing.cases = list(NULL,0.01), 
+use.missing = TRUE, hapfunc = "haplinStrat", n.sim = 100, ask = FALSE)
+hapPower(hapRun.res)
+
+## Simulate power at the 0.1 significance level from 1000 files using haplin.
+## The files consist of fetal effects at one diallelic locus,
+## corresponding to haplo.freq = c(0.1,0.9), RR = c(2,1) and RRstar = c(1,1).
+## The data consists of a combination of 100 case triads and 100 control triads.
+hapRun.res &lt;- hapRun(nall = c(2), cases = c(mfc=100), controls = c(mfc=100),
+haplo.freq = c(0.1,0.9), RR = c(2,1), RRstar = c(1,1),
+hapfunc = "haplin", response = "mult", n.sim = 1000, ask = FALSE)
+hapPower(hapRun.res, alpha= 0.10)
+
+## The latter example, applying response = "mult", should be comparable to 
+## the theoretic calculations of snpPower.
+snpPower(cases = list(mfc=100), controls = list(mfc=100),
+RR = 2, MAF = 0.1, alpha = 0.10)
+
+## End(Not run)
+</code></pre>
+
+
+</div>

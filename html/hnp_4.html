@@ -1,0 +1,134 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>chryso</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+<em>Chrysoperla externa</em> mortality data</h2>
+
+<h3>Description</h3>
+
+<p>Mortality of the predator <em>Chrysoperla externa</em> on different doses of lime sulphur, a substance used to control pests on trees.</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">data(chryso)</code></pre>
+
+
+<h3>Format</h3>
+
+<p>A data frame with 24 observations on the following 4 variables.
+</p>
+
+<table>
+<tr>
+<td style="text-align: left;">
+<code>dead</code>
+</td>
+<td style="text-align: left;"> numeric </td>
+<td style="text-align: left;"> count of dead C. externa specimens</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+<code>alive</code>
+</td>
+<td style="text-align: left;"> numeric</td>
+<td style="text-align: left;"> count of alive C. externa specimens</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+<code>conc</code>
+</td>
+<td style="text-align: left;"> numeric</td>
+<td style="text-align: left;"> lime sulphur concentration</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+<code>log.conc</code>
+</td>
+<td style="text-align: left;"> numeric </td>
+<td style="text-align: left;"> natural logarithm of lime sulphur concentration
+  </td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The neuropteran <em>Chrysoperla externa</em> is a predator that acts
+as a natural enemy of the brown citrus aphid, <em>Toxoptera
+citricida</em>, which is among the most important citrus pests
+worldwide. A possible strategy to control <em>T. citricida</em>
+populations would be to use a substance called lime sulphur and the <em>C. externa</em> predator
+in combination, which may be beneficial as long as the lime sulphur has less
+effect on the predator than the prey. To explore this, Battel (2012) conducted an
+experiment with first-instar larvae of <em>Chrysoperla
+externa</em> exposed to different levels of lime sulphur.
+Specifically, twenty-four Orange Jessamine (<em>Murraya
+paniculata</em>) plants were sprayed with different concentrations (<code>conc</code>) of
+lime sulphur and up to seven first-instar larvae were placed on each
+plant. The experiment was set up in a completely randomized design with four treatments:
+lime sulphur concentrations at 0ppm (water control), 60ppm,  600ppm,
+and 6000ppm. The plants were observed until the predators reached the second instar and
+the number of larvae that died on each plant was recorded.
+</p>
+
+
+<h3>Source</h3>
+
+<p>Demétrio, C. G. B., Hinde, J. and Moral, R. A. (2014) Models for overdispersed data in entomology. In Godoy, W. A. C. and Ferreira, C. P. (Eds.) Ecological modelling applied to entomology. Springer.
+</p>
+
+
+<h3>References</h3>
+
+<p>Battel, A. P. M. B. (2012) Dinamica de predacao e resposta funcional em <em>Chrysoperla externa</em> (<em>Neuroptera: Chrysopidae</em>) sobre <em>Toxoptera citricida</em> (<em>Hemiptera: Aphididae</em>) aplicada a citricultura organica. Master's dissertation, ESALQ-USP
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(chryso)
+
+# fit model using conc levels both on log-scale and
+# as a factor to produce simple analysis of deviance
+model &lt;- glm(cbind(dead, alive) ~  log.conc + factor(conc),
+             family=binomial, data=chryso)
+anova(model, test="Chisq")
+# test adequacy of factor model using deviance and X2
+1-pchisq(deviance(model), df.residual(model))
+(X2 &lt;- sum(residuals(model, type="pearson")^2))
+1-pchisq(X2, df.residual(model))
+
+model1 &lt;- glm(cbind(dead, alive) ~ log.conc,
+              family=binomial, data=chryso)
+par(mfrow=c(1,2), cex=1.4)
+with(chryso, plot(jitter(log.conc), dead/(dead+alive),
+                  ylab="Proportion dead", xlab="log(conc+1)"))
+x &lt;- seq(0, 8.7, .1)
+pr &lt;- predict(model1, data.frame(log.conc=x), ty="response")
+lines(x, pr)
+# half-normal plot
+hnp(model1, xlab="Half-normal scores",
+    ylab="Deviance residuals", pch=4)
+
+require(MASS)
+dose.p(model1, p=.10)
+
+logLC10 &lt;- dose.p(model1, p=.10)
+LC10 &lt;- exp(logLC10[[1]]) - 1
+
+#95% CI on log-dose scale using transformation
+c(logLC10[1]-2*attr(logLC10,'SE'),
+  logLC10[1]+2*attr(logLC10,'SE'))
+
+#95% CI on dose scale using transformation
+c(exp(logLC10[1]-2*attr(logLC10,'SE'))-1,
+  exp(logLC10[1]+2*attr(logLC10,'SE'))-1)
+
+## for discussion on the analysis of this data set,
+## see Demetrio et al. (2014)
+</code></pre>
+
+
+</div>

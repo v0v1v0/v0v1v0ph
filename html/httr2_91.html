@@ -1,0 +1,82 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>resps_successes</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Tools for working with lists of responses</h2>
+
+<h3>Description</h3>
+
+<p>These function provide a basic toolkit for operating with lists of
+responses and possibly errors, as returned by <code>req_perform_parallel()</code>,
+<code>req_perform_sequential()</code> and <code>req_perform_iterative()</code>.
+</p>
+
+<ul>
+<li> <p><code>resps_successes()</code> returns a list successful responses.
+</p>
+</li>
+<li> <p><code>resps_failures()</code> returns a list failed responses (i.e. errors).
+</p>
+</li>
+<li> <p><code>resps_requests()</code> returns the list of requests that corresponds to
+each request.
+</p>
+</li>
+<li> <p><code>resps_data()</code> returns all the data in a single vector or data frame.
+It requires the vctrs package to be installed.
+</p>
+</li>
+</ul>
+<h3>Usage</h3>
+
+<pre><code class="language-R">resps_successes(resps)
+
+resps_failures(resps)
+
+resps_requests(resps)
+
+resps_data(resps, resp_data)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>resps</code></td>
+<td>
+<p>A list of responses (possibly including errors).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>resp_data</code></td>
+<td>
+<p>A function that takes a response (<code>resp</code>) and
+returns the data found inside that response as a vector or data frame.</p>
+</td>
+</tr>
+</table>
+<h3>Examples</h3>
+
+<pre><code class="language-R">reqs &lt;- list(
+  request(example_url()) |&gt; req_url_path("/ip"),
+  request(example_url()) |&gt; req_url_path("/user-agent"),
+  request(example_url()) |&gt; req_template("/status/:status", status = 404),
+  request("INVALID")
+)
+resps &lt;- req_perform_parallel(reqs, on_error = "continue")
+
+# find successful responses
+resps |&gt; resps_successes()
+
+# collect all their data
+resps |&gt; resps_successes() |&gt; resps_data(\(resp) resp_body_json(resp))
+
+# find requests corresponding to failure responses
+resps |&gt; resps_failures() |&gt; resps_requests()
+</code></pre>
+
+
+</div>

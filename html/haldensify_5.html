@@ -1,0 +1,105 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>format_long_hazards</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Generate Augmented (Long Format) Data for Pooled Hazards Regression</h2>
+
+<h3>Description</h3>
+
+<p>Generate Augmented (Long Format) Data for Pooled Hazards Regression
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">format_long_hazards(
+  A,
+  W,
+  wts = rep(1, length(A)),
+  grid_type = c("equal_range", "equal_mass"),
+  n_bins = NULL,
+  breaks = NULL
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>A</code></td>
+<td>
+<p>The <code>numeric</code> vector or similar of the observed values of an
+intervention for a group of observational units of interest.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>W</code></td>
+<td>
+<p>A <code>data.frame</code>, <code>matrix</code>, or similar giving the values of
+baseline covariates (potential confounders) for the observed units whose
+observed intervention values are provided in the previous argument.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>wts</code></td>
+<td>
+<p>A <code>numeric</code> vector of observation-level weights. The default
+is to weight all observations equally.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>grid_type</code></td>
+<td>
+<p>A <code>character</code> indicating the strategy (or strategies)
+to be used in creating bins along the observed support of the intervention
+<code>A</code>. For bins of equal range, use "equal_range"; consult documentation
+of <code>cut_interval</code> for more information. To ensure each
+bin has the same number of points, use "equal_mass"; consult documentation
+of <code>cut_number</code> for details.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n_bins</code></td>
+<td>
+<p>Only used if <code>grid_type</code> is set to <code>"equal_range"</code>
+or <code>"equal_mass"</code>. This <code>numeric</code> value indicates the number(s)
+of bins into which the support of <code>A</code> is to be divided.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>breaks</code></td>
+<td>
+<p>A <code>numeric</code> vector of break points to be used in dividing
+up the support of <code>A</code>. This is passed through the <code>...</code> argument
+to <code>cut.default</code> by <code>cut_interval</code>
+or <code>cut_number</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Generates an augmented (long format, or repeated measures) dataset
+that includes multiple records for each observation, a single record for
+each discretized bin up to and including the bin in which a given observed
+value of A falls. Such bins are derived from selecting break points over
+the support of A. This repeated measures dataset is suitable for estimating
+the hazard of failing in a particular bin over A using a highly adaptive
+lasso (or other) classification model.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A <code>list</code> containing the break points used in dividing the
+support of <code>A</code> into discrete bins, the length of each bin, and the
+reformatted data. The reformatted data is a <code>data.table</code> of
+repeated measures data, with an indicator for which bin an observation
+fails in, the bin ID, observation ID, values of <code>W</code> for each given
+observation, and observation-level weights.
+</p>
+
+
+</div>

@@ -1,0 +1,75 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>mchain</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Markov Chain Object</h2>
+
+<h3>Description</h3>
+
+<p>Creates a Markov chain object with class <code>"mchain"</code>. It does not simulate data.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">mchain(x, Pi, delta, nonstat = TRUE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>is a vector of length <code class="reqn">n</code> containing the observed process, else it is specified as <code>NULL</code>. This is used when there are no data and a process is to be simulated.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Pi</code></td>
+<td>
+<p>is the <code class="reqn">m \times m</code> transition probability matrix of the Markov chain.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>delta</code></td>
+<td>
+<p>is the marginal probability distribution of the <code class="reqn">m</code> state Markov chain at the first time point.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nonstat</code></td>
+<td>
+<p>is logical, <code>TRUE</code> if the homogeneous Markov chain is assumed to be non-stationary, default. See “Details” below.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A <code>list</code> object with class <code>"mchain"</code>, containing the above arguments as named components.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">Pi &lt;- matrix(c(0.8, 0.2,
+               0.3, 0.7),
+             byrow=TRUE, nrow=2)
+
+#    Create a Markov chain object with no data (NULL)
+x &lt;- mchain(NULL, Pi, c(0,1))
+
+#    Simulate some data
+x &lt;- simulate(x, nsim=2000)
+
+#   estimate transition probabilities
+estPi &lt;- table(x$mc[-length(x$mc)], x$mc[-1])
+rowtotal &lt;- estPi %*% matrix(1, nrow=nrow(Pi), ncol=1)
+estPi &lt;- diag(as.vector(1/rowtotal)) %*% estPi
+print(estPi)
+</code></pre>
+
+
+</div>

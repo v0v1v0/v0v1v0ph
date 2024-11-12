@@ -1,0 +1,76 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>Dirichlet.multinomial</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Generation of Dirichlet-Multinomial Random Samples</h2>
+
+<h3>Description</h3>
+
+<p>Random generation of Dirichlet-Multinomial samples.</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">Dirichlet.multinomial(Nrs, shape)</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>Nrs</code></td>
+<td>
+<p>A vector specifying the number of reads or sequence depth for each sample.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>shape</code></td>
+<td>
+<p>A vector of Dirichlet parameters for each taxa.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The Dirichlet-Multinomial distribution is given by (Mosimann, J. E. (1962); Tvedebrink, T. (2010)),
+</p>
+<p style="text-align: center;"><code class="reqn">\textbf{P}\left ({\textbf{X}_i}=x_{i};\left \{ \pi_j \right \},\theta\right )=\frac{N_{i}!}{x_{i1} !,\ldots,x_{iK} !}\frac{\prod_{j=1}^K \prod_{r=1}^{x_{ij}} \left \{ \pi_j \left ( 1-\theta \right )+\left ( r-1 \right )\theta\right \}}{\prod_{r=1}^{N_i}\left ( 1-\theta\right )+\left ( r-1 \right) \theta}</code>
+</p>
+
+<p>where <code class="reqn">\textbf{x}_{i}= \left [ x_{i1}, \ldots, x_{iK} \right ]</code> is the random vector formed by K taxa (features) counts (RAD vector), <code class="reqn">N_{i}= \sum_{j=1}^K x_{ij}</code> is the total number of reads (sequence depth), <code class="reqn"> \left\{ \pi_j \right\}</code> are the mean of taxa-proportions (RAD-probability mean), and <code class="reqn">\theta</code> is the overdispersion parameter.
+</p>
+<p>Note: Though the test statistic supports an unequal number of reads across samples, the performance has not yet been fully tested.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A data matrix of taxa counts where the rows are samples and columns are the taxa.</p>
+
+
+<h3>References</h3>
+
+<p>Mosimann, J. E. (1962). On the compound multinomial distribution, the multivariate <code class="reqn">\beta</code>-distribution, and correlations among proportions. Biometrika 49, 65-82.<br> 
+Tvedebrink, T. (2010). Overdispersion in allelic counts and theta-correction in forensic genetics. Theor Popul Biol 78, 200-210.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">	data(saliva)
+	
+	### Generate a the number of reads per sample
+	### The first number is the number of reads and the second is the number of subjects
+	nrs &lt;- rep(15000, 20) 
+	
+	### Get gamma from the dirichlet-multinomial parameters
+	shape &lt;- dirmult(saliva)$gamma
+	
+	dmData &lt;- Dirichlet.multinomial(nrs, shape)
+	dmData[1:5, 1:5]
+</code></pre>
+
+
+</div>

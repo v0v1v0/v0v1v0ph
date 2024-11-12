@@ -1,0 +1,146 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>ws_subset</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Subset ORNL DAAC HWSD data</h2>
+
+<h3>Description</h3>
+
+<p>Subset function to query pixel or spatial data from the
+ORNL DAAC HWSD THREDDS server. Returns a tidy data frame
+for point locations or raster data to the workspace or
+disk.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">ws_subset(
+  location = c(32, -81, 34, -80),
+  site = "HWSD",
+  param = "ALL",
+  layer = "D1",
+  path = tempdir(),
+  ws_path = file.path(tempdir(), "ws_db"),
+  internal = TRUE,
+  rate = 0.1,
+  version = 1.2,
+  verbose = FALSE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>location</code></td>
+<td>
+<p>location of a bounding box c(lon, lat, lon, lat) defined
+by a bottom-left and top-right coordinates, a single location (lon, lat)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>site</code></td>
+<td>
+<p>sitename for the extracted location</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>param</code></td>
+<td>
+<p>soil parameters to provide, the default setting is ALL, this 
+will download all available soil parameters.Check
+https://daac.ornl.gov/SOILS/guides/HWSD.html for parameter descriptions.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>layer</code></td>
+<td>
+<p>which soil depth layer of HWSD v2.0 to consider, layers are
+named D1 to D7 from top to bottom</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>path</code></td>
+<td>
+<p>path where to download the data to (only applicable to
+spatial data)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ws_path</code></td>
+<td>
+<p>path to the gridded HWSD v2.0 data, only required/used if
+querying v2.0 data</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>internal</code></td>
+<td>
+<p>do not store the data on disk</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rate</code></td>
+<td>
+<p>request rate in seconds, determines how long to wait between 
+queries to avoid bouncing because of rate limitations</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>version</code></td>
+<td>
+<p>version of HWSD to query (numeric value). By default the
+package will query the ORNL DAAC v1.2 via their API. If specifying the
+later version (2.0) it will download or require the gridded spatial data
+in addition to the included HWSD v2.0 database with soil parameters.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p>verbose output during processing, only covers the internal
+use of the ws_download() function for HWSD v2.0 data</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>Local geotiff data, or a data frame with HWSD soil information
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+## Not run: 
+ # extract sand fraction values
+ # for a point location
+ values &lt;- ws_subset(
+    site = "HWSD",
+    location = c(34, -81),
+    param = "T_SAND"
+   )
+   
+ print(values)
+ 
+ # Download a soil fraction map
+ # of sand for a given bounding box
+ t_sand &lt;- ws_subset(
+    site = "HWSD",
+    location = c(32, -81, 34, -80),
+    param = "T_SAND",
+    path = tempdir(),
+    internal = TRUE
+   )
+   
+ terra::plot(t_sand)
+
+## End(Not run)
+</code></pre>
+
+
+</div>

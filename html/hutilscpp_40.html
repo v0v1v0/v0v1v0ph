@@ -1,0 +1,238 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>pmaxC</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Parallel maximum/minimum</h2>
+
+<h3>Description</h3>
+
+<p>Faster <code>pmax()</code> and <code>pmin()</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">pmaxC(
+  x,
+  a,
+  in_place = FALSE,
+  keep_nas = FALSE,
+  dbl_ok = NA,
+  nThread = getOption("hutilscpp.nThread", 1L)
+)
+
+pminC(
+  x,
+  a,
+  in_place = FALSE,
+  keep_nas = FALSE,
+  dbl_ok = NA,
+  nThread = getOption("hutilscpp.nThread", 1L)
+)
+
+pmax0(
+  x,
+  in_place = FALSE,
+  sorted = FALSE,
+  keep_nas = FALSE,
+  nThread = getOption("hutilscpp.nThread", 1L)
+)
+
+pmin0(
+  x,
+  in_place = FALSE,
+  sorted = FALSE,
+  keep_nas = FALSE,
+  nThread = getOption("hutilscpp.nThread", 1L)
+)
+
+pmaxV(
+  x,
+  y,
+  in_place = FALSE,
+  dbl_ok = TRUE,
+  nThread = getOption("hutilscpp.nThread", 1L)
+)
+
+pminV(
+  x,
+  y,
+  in_place = FALSE,
+  dbl_ok = TRUE,
+  nThread = getOption("hutilscpp.nThread", 1L)
+)
+
+pmax3(x, y, z, in_place = FALSE)
+
+pmin3(x, y, z, in_place = FALSE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+
+<dl>
+<dt><code>numeric(n)</code></dt>
+<dd>
+<p>A numeric vector.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>a</code></td>
+<td>
+<dl>
+<dt><code>numeric(1)</code></dt>
+<dd>
+<p>A single numeric value.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>in_place</code></td>
+<td>
+
+<dl>
+<dt>
+<code>TRUE | FALSE</code>, default: <code>FALSE</code>
+</dt>
+<dd>
+<p>Should <code>x</code> be modified in-place? For advanced use only.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>keep_nas</code></td>
+<td>
+
+<dl>
+<dt>
+<code>TRUE | FALSE</code>, default: <code>FALSE</code>
+</dt>
+<dd>
+<p>Should <code>NA</code>s values be
+preserved? By default, <code>FALSE</code>, so the behaviour of the function is
+dependent on the representation of <code>NA</code>s at the C++ level.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dbl_ok</code></td>
+<td>
+
+<dl>
+<dt>
+<code>logical(1)</code>, default: <code>NA</code>
+</dt>
+<dd>
+<p>Is it acceptable to return
+a non-integer vector if <code>x</code> is integer?
+</p>
+<p>This argument will have effect <code>a</code> is both double and cannot be coerced to
+<code>integer</code>:
+</p>
+<p>If <code>NA</code>, the default, a message is emitted whenever a double vector
+needs to be returned.
+If <code>FALSE</code>, an error is returned.
+If <code>TRUE</code>, neither an error nor a message is returned.
+</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nThread</code></td>
+<td>
+
+<dl>
+<dt><code>integer(1)</code></dt>
+<dd>
+<p>The number of threads to use. Combining <code>nThread &gt; 1</code>
+and <code>in_place = TRUE</code> is not supported.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sorted</code></td>
+<td>
+
+<dl>
+<dt>
+<code>TRUE | FALSE</code>, default: <code>FALSE</code>
+</dt>
+<dd>
+<p>Is <code>x</code> known to be sorted?
+If <code>TRUE</code>, <code>x</code> is assumed to be sorted. Thus the
+first zero determines whether the position at which zeroes start or end.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>y, z</code></td>
+<td>
+<dl>
+<dt><code>numeric(n)</code></dt>
+<dd>
+<p>Other numeric vectors the same length as <code>x</code></p>
+</dd>
+</dl>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>Versions of <code>pmax</code> and <code>pmin</code>, designed for performance.
+</p>
+<p>When <code>in_place = TRUE</code>, the values of <code>x</code> are modified in-place.
+For advanced users only.
+</p>
+<p>The differences are:
+</p>
+
+<dl>
+<dt>
+<code>pmaxC(x, a)</code> and <code>pminC(x, a)</code>
+</dt>
+<dd>
+<p>Both <code>x</code> and <code>a</code> must be numeric and
+<code>a</code> must be length-one.</p>
+</dd>
+</dl>
+<h3>Note</h3>
+
+<p>This function will always be faster than <code>pmax(x, a)</code> when <code>a</code> is
+a single value, but can be slower than <code>pmax.int(x, a)</code> when <code>x</code> is short.
+Use this function when comparing a numeric vector with a single value.
+</p>
+<p>Use <code>in_place = TRUE</code> only within functions when you are sure it is safe, i.e. not a
+reference to something outside the environment.
+</p>
+<p>By design, the functions first check whether <code>x</code> will be modified before
+allocating memory to a new vector. For example, if all values in <code>x</code> are
+nonnegative, the vector is returned.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">pmaxC(-5:5, 2)
+pmaxC(1:4, 5.5)
+pmaxC(1:4, 5.5, dbl_ok = TRUE)
+# pmaxC(1:4, 5.5, dbl_ok = FALSE)  # error
+
+</code></pre>
+
+
+</div>

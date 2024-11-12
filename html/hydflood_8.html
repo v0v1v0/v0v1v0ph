@@ -1,0 +1,117 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>flood3Points</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Function to compute flood duration for point coordinates along the
+German federal waterways Elbe and Rhine using the 1d water level algorithms
+<code>hyd1d::waterLevel()</code> and <code>hyd1d::waterLevelPegelonline()</code>
+</h2>
+
+<h3>Description</h3>
+
+<p>Computes flood duration for points located in the active
+floodplains along the German federal waterways Elbe and Rhine based on 1d
+water levels computed by <code>waterLevel</code> or
+<code>waterLevelPegelonline</code> provided by package <span class="pkg">hyd1d</span>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">flood3Points(x, seq)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>has to by type <code>sf</code> possibly including columns <code>csa</code>
+(cross section areas) and <code>dem</code> (digital elevation model). To compute
+water levels along the River Elbe, <code>x</code> has to be in the coordinate
+reference system
+<a href="https://spatialreference.org/ref/epsg/25833/">ETRS 1989 UTM 33N</a>,
+for the River Rhine in
+<a href="https://spatialreference.org/ref/epsg/25832/">ETRS 1989 UTM 32N</a>.
+Other coordinate reference systems are not permitted.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>seq</code></td>
+<td>
+<p>has to be type <code>c("POSIXct", "POSIXt")</code> or <code>Date</code> and
+have a length larger than 0. If <code>seq</code> is type <code>c("POSIXct", "POSIXt")</code>,
+values must be in the temporal range between 31 days ago (<code>Sys.time()
+  - 2678400</code>) and now (<code>Sys.time()</code>). Then
+<code>waterLevelPegelonline</code> is used internally for the water
+level computations. If <code>seq</code> is type <code>Date</code>, values must be in the
+temporal range between 1960-01-01 and yesterday (<code>Sys.Date() - 1</code>)</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>For every time step provided in <code>seq</code>, <code>flood3Points()</code>
+computes a 1d water level along the requested river section. This 1d water
+level is transfered to a temporary <code>wl</code> (water level) column and then
+compared to the <code>dem</code> (digital elevation model) column. Where the
+<code>wl</code> is higher than the <code>dem</code> flood duration <code>flood3</code> is
+increased by 1.
+</p>
+<p>Since the underlying tiled digital elevation models (dem) are rather
+large datasets hydflood provides options to permanentely cache these
+datasets. <code>options("hydflood.datadir" = tempdir())</code> is the default. To
+modify the location of your raster cache to your needs set the respective
+<code>options()</code> prior to loading the package, e.g.
+<code>options("hydflood.datadir" = "~/.hydflood");library(hydflood)</code>. The
+location can also be determined through the environmental variable
+<span class="env">hydflood_datadir</span>.
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>sf</code> object with flood duration stored in column
+<code>flood3</code> in the range of <code>[0, length(seq)]</code>, elevation stored in
+column <code>dem</code> and cross section areas stored in column <code>csa</code>.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>waterLevel</code>,
+<code>waterLevelPegelonline</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+  options("hydflood.datadir" = tempdir())
+  library(hydflood)
+  
+  # create a random points object
+  c &lt;- st_crs(25833)
+  e &lt;- st_as_sfc(st_bbox(c(xmin = 309000, xmax = 310000,
+                           ymin = 5749000, ymax = 5750000)))
+  st_crs(e) &lt;- c
+  set.seed(123)
+  points &lt;- st_sample(e, size = 10, "random")
+  p &lt;- data.frame(id = 1:10)
+  st_geometry(p) &lt;- points
+  
+  # create a temporal sequence
+  seq &lt;- seq(as.Date("2016-12-01"), as.Date("2016-12-31"), by = "day")
+  
+  # compute a flood duration
+  p &lt;- flood3Points(x = p, seq = seq)
+
+
+</code></pre>
+
+
+</div>

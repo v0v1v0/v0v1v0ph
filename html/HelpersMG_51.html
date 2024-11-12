@@ -1,0 +1,162 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>minmax.periodic</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Search for minimum and maximum indices in periodic timeseries</h2>
+
+<h3>Description</h3>
+
+<p>Search for minimum and maximum for periodic timeseries when only intermediate values are known.<br>
+For each couple of value with an increasing or decreasing segment of
+the sinusoid function, it is possible to estimate a minimum and maximum
+values using analytical algebra.<br>
+Then the average and standard deviations of all minima and maxima are evaluated.<br>
+It should be noted that any extremum can be estimated at least twice, one by
+increasing segment and one by decreasing segment. Both are used here to produce SD.<br><code>time.minmax.daily</code> should be used when the time at which maximum and minimum indices are regular and
+<code>time.minmax</code> permits to define this time day by day.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">minmax.periodic(
+  time.minmax.daily = NULL,
+  time.minmax = NULL,
+  progressbar = FALSE,
+  observed = stop("data.frame with observed indices"),
+  period = 24,
+  colname.time = "time",
+  colname.index = "index",
+  colname.SD = "SD",
+  plot = FALSE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>time.minmax.daily</code></td>
+<td>
+<p>A named vector with Min and Max being the time in the day with minimum and maximum indices (temperature or level)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>time.minmax</code></td>
+<td>
+<p>A named vector daily with time in the day at which minimum and maximum indices are observed</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>progressbar</code></td>
+<td>
+<p>Tell if a progression bar must be shown</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>observed</code></td>
+<td>
+<p>A dataframe with at least two columns: time and temperatures. A third column SD can indicate the know error in index</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>period</code></td>
+<td>
+<p>The unit of day period (24 for hours, 24*60 for minutes)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>colname.time</code></td>
+<td>
+<p>The name of the column for time in observed</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>colname.index</code></td>
+<td>
+<p>The name of the column for indices in observed</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>colname.SD</code></td>
+<td>
+<p>The name of the column for SD in observed</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>plot</code></td>
+<td>
+<p>If TRUE, show a plot with the different estimates</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>minmax.periodic search for minimum and maximum indices (temperatures or levels) in periodic timeseries
+</p>
+
+
+<h3>Value</h3>
+
+<p>A data.frame with a column time, a column index and a column SD
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Marc Girondot <a href="mailto:marc.girondot@gmail.com">marc.girondot@gmail.com</a>
+</p>
+
+
+<h3>See Also</h3>
+
+<p>Other Periodic patterns of indices: 
+<code>index.periodic()</code>,
+<code>moon.info()</code>,
+<code>sun.info()</code>,
+<code>tide.info()</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+library("HelpersMG")
+# Generate a timeserie of time
+time.obs &lt;- NULL
+for (i in 0:9) time.obs &lt;- c(time.obs, c(0, 6, 12, 18)+i*24)
+# For these time, generate a timeseries of temperatures
+temp.obs &lt;- rep(NA, length(time.obs))
+temp.obs[3+(0:9)*4] &lt;- rnorm(10, 25, 3)
+temp.obs[1+(0:9)*4] &lt;- rnorm(10, 10, 3)
+for (i in 1:(length(time.obs)-1)) 
+  if (is.na(temp.obs[i])) 
+  temp.obs[i] &lt;- mean(c(temp.obs[i-1], temp.obs[i+1]))
+  if (is.na(temp.obs[length(time.obs)])) 
+  temp.obs[length(time.obs)] &lt;- temp.obs[length(time.obs)-1]/2
+observed &lt;- data.frame(time=time.obs, temperature=temp.obs)
+# Search for the minimum and maximum values
+r &lt;- minmax.periodic(time.minmax.daily=c(Min=2, Max=15), 
+observed=observed, period=24, colname.index="temperature")
+
+# Estimate all the temperatures for these values
+t &lt;- index.periodic(minmax=r)
+
+plot_errbar(x=t[,"time"], y=t[,"index"],
+errbar.y=ifelse(is.na(t[,"sd"]), 0, 2*t[,"sd"]),
+type="l", las=1, bty="n", errbar.y.polygon = TRUE, 
+xlab="hours", ylab="Temperatures", ylim=c(0, 35), 
+errbar.y.polygon.list = list(col="grey"))
+
+plot_add(x=t[,"time"], y=t[,"index"], type="l")
+
+plot_add(observed$time, observed$temperature, pch=19, cex=0.5)
+
+## End(Not run)
+</code></pre>
+
+
+</div>

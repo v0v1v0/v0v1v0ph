@@ -1,0 +1,118 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>ReadMapOutput</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Read a Map Output File</h2>
+
+<h3>Description</h3>
+
+<p>This is a convenience wrapper function to import a
+<a href="http://hype.smhi.net//wiki/doku.php?id=start:hype_file_reference:mapxxxx.txt">map output file</a>
+('map&lt;<em>HYPE_output_variable</em>&gt;.txt') into R.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">ReadMapOutput(
+  filename,
+  dt.format = NULL,
+  hype.var = NULL,
+  type = c("df", "dt", "hsv"),
+  warn.nan = FALSE,
+  col.prefix = "X"
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>filename</code></td>
+<td>
+<p>Path to and file name of the map output file to import. Windows users: Note that
+Paths are separated by '/', not '\'.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dt.format</code></td>
+<td>
+<p>Date-time <code>format</code> string as in <code>strptime</code>, for conversion of date-time information in column
+headers to POSIX dates, which are returned as attribute. Incomplete format strings for monthly and annual values allowed, e.g.
+<code>"\%Y"</code>. <em>Defaults to <code>NULL</code>, which prevents date-time conversion</em>, applicable e.g. for files containing just one column of
+summary values over the model period.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>hype.var</code></td>
+<td>
+<p>Character string, a four-letter keyword to specify HYPE variable ID of file contents. See
+<a href="http://hype.smhi.net//wiki/doku.php?id=start:hype_file_reference:info.txt:variables">list of HYPE variables</a>.
+If <code>NULL</code> (default), the variable ID is extracted from the provided file name, which only works for standard HYPE
+map output file names.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>type</code></td>
+<td>
+<p>Character, keyword for data type to return. <code>"df"</code> to return a standard data frame, <code>"dt"</code> to
+return a <code>data.table</code> object, or <code>"hsv"</code> to return a <code>HypeSingleVar</code> array.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>warn.nan</code></td>
+<td>
+<p>Logical, check if imported results contain any <code>NaN</code> values. If <code>TRUE</code> and <code>NaN</code>s are found,
+a warning is thrown and affected SUBIDs saved in an attribute <code>subid.nan</code>. Adds noticeable overhead to import time for large files.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>col.prefix</code></td>
+<td>
+<p>String, prefix added to mapoutput column names. Default is <code>X</code>. Set to <code>NULL</code> to ignore.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p><code>ReadMapOutput</code> is a convenience wrapper function of <code>fread</code> from package
+data.table::data.table,
+with conversion of date-time strings to POSIX time representations. Monthly and annual time steps are returned as first day
+of the time step period.
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>ReadMapOutput</code> returns a <code>data.frame</code>, data.table::data.table, or a <code>HypeSingleVar</code> array.
+Data frames and data tables contain additional <code>attributes</code>: <code>variable</code>, giving the HYPE variable ID,
+<code>date</code>, a vector of date-times (corresponding to columns from column 2), <code>timestep</code> with a time step attribute,
+and <code>comment</code> with the first line of the imported file as text string. An additional attribute <code>subid.nan</code> might be
+returned, see argument <code>warn.nan</code>.
+</p>
+
+
+<h3>Note</h3>
+
+<p>HYPE results are printed to files using a user-specified accuracy. This accuracy is specified in 'info.txt' as a number of
+decimals to print. If large numbers are printed, this can result in a total number of digits which is too large to print.
+Results will then contain values of '****************'. <code>ReadMapOutput</code> will convert those cases to 'NA' entries.
+</p>
+<p>Current versions of HYPE allow for defining significant instead of fixed number of digits, which should prevent this
+issue from arising.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">te &lt;- ReadMapOutput(filename = system.file("demo_model",
+"results", "mapEVAP.txt", package = "HYPEtools"), dt.format = NULL)
+te
+
+</code></pre>
+
+
+</div>

@@ -1,0 +1,129 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>expectation_convex</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Convex expectation
+</h2>
+
+<h3>Description</h3>
+
+<p>Generates expectation hypervolume corresponding to a convex hull (polytope) that minimally encloses the data.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">expectation_convex(input, point.density = NULL, num.samples = NULL,
+                 num.points.on.hull = NULL, check.memory = TRUE,
+                 verbose = TRUE, use.random = FALSE, method =
+                 "hitandrun", chunksize = 1000)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>input</code></td>
+<td>
+
+<p>A m x n matrix or data frame, where m is the number of observations and n is the dimensionality.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>point.density</code></td>
+<td>
+
+<p>The point density of the output expectation. If <code>NULL</code>, defaults to <code>v / num.points</code> where <code>d</code> is the dimensionality of the input and v is the volume of the hypersphere.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>num.samples</code></td>
+<td>
+
+<p>The number of points in the output expectation. If <code>NULL</code>, defaults to <code>10^(3+sqrt(ncol(d)))</code> where <code>d</code> is the dimensionality of the input. <code>num.points</code> has priority over <code>point.density</code>; both cannot be specified.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>num.points.on.hull</code></td>
+<td>
+
+<p>Number of points of the input used to calculate the convex hull. Larger values are more accurate but may lead to slower runtimes. If <code>NULL</code>, defaults to using all of the data (most accurate).
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>check.memory</code></td>
+<td>
+
+<p>If <code>TRUE</code>, reports expected number of convex hull simplices required for calculation and stops further memory allocation. Also warns if dimensionality is high.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+
+<p>If <code>TRUE</code>, prints diagnostic progress messages.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>use.random</code></td>
+<td>
+
+<p>If <code>TRUE</code> and the <code>input</code> is of class <code>Hypervolume</code>, sets boundaries based on the <code>@RandomPoints</code> slot; otherwise uses <code>@Data</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+
+<p>One of <code>"rejection"</code> (rejection sampling) or <code>"hitandrun"</code> (adaptive hit and run Monte Carlo sampling)
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>chunksize</code></td>
+<td>
+
+<p>Number of random points to process per internal step. Larger values may have better performance on machines with large amounts of free memory. Changing this parameter does not change the output of the function; only how this output is internally assembled.
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The rejection sampling algorithm generates random points within a hyperbox enclosing the points, then sequentially tests whether each is in or out of the convex polytope based on a dot product test. It becomes exponentially inefficient in high dimensionalities. The hit-and-run sampling algorithm generates a Markov chain of samples that eventually converges to the true distribution of points within the convex polytope. It performs better in high dimensionalities but may not converge quickly. It will also be slow if the number of simplices on the convex polytope is large.
+</p>
+<p>Both algorithms may become impracticably slow in &gt;= 6 or 7 dimensions.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A <code>Hypervolume-class</code> object corresponding to the expectation hypervolume.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+data(penguins,package='palmerpenguins')
+penguins_no_na = as.data.frame(na.omit(penguins))
+penguins_adelie = penguins_no_na[penguins_no_na$species=="Adelie",
+                    c("bill_length_mm","bill_depth_mm","flipper_length_mm")]
+e_convex &lt;- expectation_convex(penguins_adelie, check.memory=FALSE)
+
+## End(Not run)
+</code></pre>
+
+
+</div>

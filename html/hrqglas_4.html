@@ -1,0 +1,206 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hrq_glasso</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Robust group variable selection for quantile and mean regression</h2>
+
+<h3>Description</h3>
+
+<p>This function conducts group-wise (with known groups) variable selection for quantile and robust mean regression with the group lasso penalty. 
+The Huber loss is used for both types of regression model, where the quantile check function is approximated by Huber loss. A full solution path
+is generated unless a single value of the shrinkage parameter is specified.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hrq_glasso(
+  x,
+  y,
+  group.index,
+  tau = 0.5,
+  lambda = NULL,
+  weights = NULL,
+  w.lambda = NULL,
+  gamma = 0.2,
+  max_iter = 200,
+  apprx = "huber",
+  lambda.discard = TRUE,
+  method = "quantile",
+  scalex = TRUE,
+  epsilon = 1e-04,
+  beta0 = NULL
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>Design matrix (in matrix format)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+<p>Response variable</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>group.index</code></td>
+<td>
+<p>A vector of group index, e.g., (1,1,1,2,2,2,3,3)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tau</code></td>
+<td>
+<p>Percentile</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lambda</code></td>
+<td>
+<p>Shrinkage parameter, default is NULL so that the algorithm chooses a sequence.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>weights</code></td>
+<td>
+<p>Observation weights, default is NULL</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>w.lambda</code></td>
+<td>
+<p>Weights for Shrinkage parameter of each group, default is NULL</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>gamma</code></td>
+<td>
+<p>Huber parameter. An initial value is 0.2, while the algorithm adaptively tunes the value in each iteration.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>max_iter</code></td>
+<td>
+<p>Maximum number of iteration</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>apprx</code></td>
+<td>
+<p>Approximation method. Default is <code>huber</code>. The other option is <code>tanh</code> which uses the hypertangent function to approximate the first order derivative of absolute loss.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lambda.discard</code></td>
+<td>
+<p>Default is TRUE, meaning that the solution path stops if the relative deviance changes sufficiently small. It usually happens near the end of solution path. However, the program returns at least 70 models along the solution path.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+<p>Choice for mean or quantile regression. Default is <code>quantile</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>scalex</code></td>
+<td>
+<p>Standardize design matrix. Default is TRUE.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>epsilon</code></td>
+<td>
+<p>The epsilon level convergence. Default is 1e-4.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>beta0</code></td>
+<td>
+<p>Initial estimates. Default is NULL.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>It returns a sequence of estimated coefficients for quantile regression with group feature selection corresponding to a sequence of lambda. 
+The estimated coefficients are in the sparse matrix format. Returned values also include the sequence of lambda, the null deviance, 
+values of penalized loss, and unpenalized loss across the sequence of lambda. 
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>beta</code></td>
+<td>
+<p>The estimated coefficients for all lambdas, stored in sparse matrix format, where each column corresponds to a lambda.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lambda</code></td>
+<td>
+<p>The sequence of lambdas.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>null.dev</code></td>
+<td>
+<p>The null deviance.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pen.loss</code></td>
+<td>
+<p>The value of penalized loss for each lambda.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>loss</code></td>
+<td>
+<p>The value of unpenalized loss for each lambda.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>index.grp</code></td>
+<td>
+<p>Group indices that correspond to the estimated coefficient matrix <code>beta</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n.grp</code></td>
+<td>
+<p>The number of selected groups for each lambda.</p>
+</td>
+</tr>
+</table>
+<h3>References</h3>
+
+<p>Sherwood, B., and Li, S. (2021) An Efficient Approach to Feature Selection and Estimation for Quantile Regression with Grouped Variables. <em>Working paper</em>.
+</p>
+<p>Yang, Y., and Zou, H., (2015) A Fast Unified Algorithm for Solving Group-lasso Penalize Learning Problems, <em>Statistics and Computing</em>, 25 1129-1141.
+doi: <a href="https://doi.org/10.1007/s11222-014-9498-5">10.1007/s11222-014-9498-5</a>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">n&lt;- 100
+p&lt;- 10
+x0&lt;- matrix(rnorm(n*p),n,p)
+X&lt;- cbind(x0, x0^2, x0^3)[,order(rep(1:p,3))]
+y&lt;- -2+X[,1]+0.5*X[,2]-X[,3]-0.5*X[,7]+X[,8]-0.2*X[,9]+rt(n,2)
+group&lt;- rep(1:p, each=3)
+fit&lt;- hrq_glasso(X, y, group)
+fit$beta[,8]
+
+</code></pre>
+
+
+</div>

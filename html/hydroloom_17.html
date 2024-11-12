@@ -1,0 +1,90 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>add_return_divergence</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Add Return Divergence</h2>
+
+<h3>Description</h3>
+
+<p>Adds a return divergence attribute to the provided network.
+The method implemented matches that of the NHDPlus except
+in the rare case that a diversion includes more than one secondary path.
+</p>
+<p>Requires and <code>id</code>, <code>fromnode</code>, <code>tonode</code> and <code>divergence</code> attribute.
+See add_divergence and make_node_topology.
+</p>
+<p>Algorithm:
+</p>
+<p>All network connections with more than one downstream feature
+are considered.
+</p>
+<p>navigate_network_dfs is used to find all downstream
+features emanating from the primary (<code>divergence == 1</code>) outlet of the
+diversion in question and secondary (<code>divergence == 2</code>) outlet(s) starting
+with the primary outlet.
+</p>
+<p>navigate_network_dfs is called with <code>reset = FALSE</code> such that the
+secondary diversion paths terminate where they combine with a previously
+visited feature.
+</p>
+<p>If the diverted paths result in only one outlet, the feature it flows to
+is marked as a return divergence.
+</p>
+<p>If the diverted paths result in more than one outlet, the one that flows to
+the most upstream feature in the set of features downstream of the primary
+outlet of the diversion is marked as the return divergence.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">add_return_divergence(x, status = TRUE)
+
+## S3 method for class 'data.frame'
+add_return_divergence(x, status = TRUE)
+
+## S3 method for class 'hy'
+add_return_divergence(x, status = TRUE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>data.frame network compatible with hydroloom_names.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>status</code></td>
+<td>
+<p>boolean if status updates should be printed.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>data.frame containing <code>return_divergence</code> attribute
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">x &lt;- sf::read_sf(system.file("extdata/new_hope.gpkg", package = "hydroloom"))
+
+x &lt;- hy(x)
+
+x &lt;- add_return_divergence(x)
+
+sum(x$return_divergence == x$RtnDiv)
+
+# see description for documentation of one that does not match
+
+</code></pre>
+
+
+</div>

@@ -1,0 +1,104 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hm_get</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Extract the slot</h2>
+
+<h3>Description</h3>
+
+<p>Get the table (or metadata) that you want from an <code>hydromet</code> or <code>hydromet_XXX</code> class.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hm_get(obj, slot_name = NA_character_)
+
+## S4 method for signature 'hydromet'
+hm_get(obj, slot_name = NA_character_)
+
+## S4 method for signature 'hydromet_station'
+hm_get(obj, slot_name = NA_character_)
+
+## S4 method for signature 'hydromet_compact'
+hm_get(obj, slot_name = NA_character_)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>obj</code></td>
+<td>
+<p>an <code>hydromet</code> or <code>hydromet_XXX</code> class object.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>slot_name</code></td>
+<td>
+<p>string with slot to extract.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>The required data frame or metadata.
+</p>
+
+
+<h3>Functions</h3>
+
+
+<ul>
+<li> <p><code>hm_get(hydromet)</code>: get method for generic hydromet object
+</p>
+</li>
+<li> <p><code>hm_get(hydromet_station)</code>: get method for station class
+</p>
+</li>
+<li> <p><code>hm_get(hydromet_compact)</code>: get method for compact class
+</p>
+</li>
+</ul>
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+# set path to file
+path_file &lt;- system.file('extdata', 'ianigla_cuevas.csv',
+             package = 'hydrotoolbox')
+
+# read file
+cuevas &lt;-
+     read_ianigla(path = path_file,
+                  out_name = c('tair(°C)', 'rh(%)', 'patm(mbar)',
+                             'p(mm)', 'wspd(km/hr)', 'wdir(°)',
+                              'kin(kW/m2)', 'hsnow(cm)', 'tsoil(°C)' ) )
+
+# create and set one the variables
+hm_cuevas &lt;-
+ hm_create() %&gt;%
+ hm_set(tair = cuevas[ , c('date', 'tair(°C)')],
+        rh = cuevas[ , c("date", 'rh(%)')])
+
+
+# now extract the slot of air temperature
+head( hm_get(obj = hm_cuevas, slot_name = 'tair') )
+
+# extract multiple data
+out_list &lt;- list()
+for(i in c("tair", "rh")){
+ out_list[[ i ]] &lt;-
+   hm_cuevas %&gt;%
+   hm_get(slot_name = i)
+ }
+
+
+## End(Not run)
+
+</code></pre>
+
+
+</div>

@@ -1,0 +1,111 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>plot_kinetics</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Plot kinetics data</h2>
+
+<h3>Description</h3>
+
+<p>Plots kinetics of the hydrogen-deuterium exchange for specific peptides.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">plot_kinetics(kin_dat, theoretical = FALSE, relative = TRUE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>kin_dat</code></td>
+<td>
+<p>calculated kinetic data by <code>calculate_kinetics</code> 
+function</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>theoretical</code></td>
+<td>
+<p><code>logical</code>, determines if plot shows theoretical values</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>relative</code></td>
+<td>
+<p><code>logical</code>, determines if values are relative or absolute</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>This function visualises the output of the  
+<code>calculate_kinetics</code> function. 
+Based on supplied parameters appropriate columns are chosen for the plot. 
+The uncertainty associated with each peptide is shown as a ribbon. 
+Axis are labeled according to the supplied parameters but no title is provided.
+</p>
+<p>If you want to plot data for more then one peptide in one state, join 
+calculated data by using <code>bind_rows</code> from dplyr package and 
+pass the result as kin_dat.
+</p>
+
+
+<h3>Value</h3>
+
+<p>a <code>ggplot</code> object.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>calculate_kinetics</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># load example data
+dat &lt;- read_hdx(system.file(package = "HaDeX", "HaDeX/data/KD_180110_CD160_HVEM.csv"))
+
+# calculate data for the sequence INITSSASQEGTRLN in the CD160 state 
+(kin1 &lt;- calculate_kinetics(dat, 
+                           protein = "db_CD160",
+                           sequence = "INITSSASQEGTRLN", 
+                           state = "CD160",
+                           start = 1, 
+                           end = 15,
+                           time_in = 0.001, 
+                           time_out = 1440))
+
+# calculate data for the sequence INITSSASQEGTRLN in the CD160_HVEM state 
+(kin2 &lt;- calculate_kinetics(dat, 
+                           protein = "db_CD160",
+                           sequence = "INITSSASQEGTRLN", 
+                           state = "CD160_HVEM",
+                           start = 1, 
+                           end = 15,
+                           time_in = 0.001, 
+                           time_out = 1440)) 
+                         
+# load extra packages 
+library(dplyr)
+  
+# plot a single peptide - theoretical and relative
+plot_kinetics(kin_dat = kin1, 
+              theoretical = TRUE, 
+              relative = TRUE)
+                
+# plot joined data - experimental and absolute
+bind_rows(kin1, kin2) %&gt;%
+  plot_kinetics(theoretical = FALSE, 
+                relative = FALSE)
+                
+</code></pre>
+
+
+</div>

@@ -1,0 +1,123 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>pedToHaplin</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Convert from ped format data to Haplin format</h2>
+
+<h3>Description</h3>
+
+<p>Converts an ASCII file from a standard ped format to the Haplin format
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">pedToHaplin(indata, outdata, merge = F, na.strings = "0", sep, 
+colnames.out = F)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>indata</code></td>
+<td>
+<p>A character string giving the name and path of the ASCII data file to be converted. </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>outdata</code></td>
+<td>
+<p>A character string giving the name and path for saving the converted file. </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>merge</code></td>
+<td>
+<p>If the alleles of each genotype are in two separate columns in the <code>indata</code> file, they must be merged (with the ";" separator) in the <code>outdata</code> file. This is done by setting <code>merge = TRUE</code>. Otherwise, it must be set to <code>FALSE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>na.strings</code></td>
+<td>
+<p>The symbol used to denote missing data in <code>indata</code>. It is passed directly to R's <code>read.table</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sep</code></td>
+<td>
+<p>Column separator in <code>indata</code>. If unspecified, any white space will be used, as in <code>read.table</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>colnames.out</code></td>
+<td>
+<p>Provided just for the purpose of checking data. If TRUE, adds colnames to the <code>outdata</code> file to make it more readable. NOTE: Haplin does currently not use colnames, so this should be set to FALSE when producing the file to run on.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Important: The first 6 columns should always be family id, individual id, father's id, mother's id, sex and casetype, in that order, then followed by the genetic data columns. If the genetic data columns are separated into two individual alleles, one should use the option <code>merge = TRUE</code> to merge them in the output file. If they are already joined in single columns, for instance as CT or C;T, <code>merge</code> should be set to <code>FALSE</code> (default).
+</p>
+<p>Additional covariates can be included in the input file. If so, they should be placed after the 6 leading columns but before the genetic data. In this case, one should make sure the genetic data columns are already merged, and that <code>merge = FALSE</code>. (The <code>merge = TRUE</code> option when covariates are present will hopefully be implemented at some point...)
+</p>
+<p>Note that the output file usually has three columns before (to the left of) the columns containing genetic data. These columns are family id, sex, and casetype. When running haplin on the output file one should specify the argument 'n.vars = 3' in haplin. If the data are from the x chromosome the haplin arguments should also include 'sex = 2' and 'xchrom = T'. Similarly, if the casetype variable is a case-control indicator one should use the argument 'ccvar = 3'. If the intention is to only run haplin on the cases the case triads should be saved separately in a new file prior to running haplin on it.
+</p>
+
+
+<h3>Value</h3>
+
+<p>The <code>outdata</code> file is written to disk. <code>pedToHaplin</code> returns (invisibly) the converted data file.
+</p>
+
+
+<h3>Warning</h3>
+
+<p>Data files come in many shapes and formats, so you should always check the output from <code>pedToHaplin</code> before using it.</p>
+
+
+<h3>Note</h3>
+
+<p>Further information is found on the web page.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Hakon K. Gjessing<br>
+Professor of Biostatistics<br>
+Division of Epidemiology<br>
+Norwegian Institute of Public Health<br><a href="mailto:hakon.gjessing@uib.no">hakon.gjessing@uib.no</a></p>
+
+
+<h3>References</h3>
+
+<p> Gjessing HK and Lie RT. Case-parent triads: Estimating single- and double-dose effects of fetal and maternal disease gene haplotypes. Annals of Human Genetics (2006) 70, pp. 382-396.<br><br>
+Web Site: <a href="https://haplin.bitbucket.io">https://haplin.bitbucket.io</a></p>
+
+
+<h3>See Also</h3>
+
+<p><code>haplin</code></p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+## Not run: 
+
+# Standard run on supplied test file:
+pedToHaplin("test_pedToHaplin.ped", outdata = "test_pedToHaplin_result.txt", 
+colnames.out = F, merge = T)
+
+
+## End(Not run)
+
+</code></pre>
+
+
+</div>

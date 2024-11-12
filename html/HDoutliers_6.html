@@ -1,0 +1,145 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>HDoutliers</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Leland Wilkinson's <em>hdoutliers</em> Algorithm for Outlier Detection
+</h2>
+
+<h3>Description</h3>
+
+<p>Detects outliers based on a probability model.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">HDoutliers(data, maxrows=10000, radius=NULL, alpha=0.05, transform=TRUE) 
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+
+<p>A vector, matrix, or data frame consisting of numeric and/or categorical
+variables.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>maxrows</code></td>
+<td>
+
+<p>If the number of observations is greater than <code>maxrows</code>,
+<code>HDoutliers</code> reduces the number used in nearest-neighbor 
+computations to a set of <em>exemplars</em>. The default value is 10000.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>radius</code></td>
+<td>
+
+<p>Threshold for determining membership in the <em>exemplars</em>'s lists
+(used only when the number of observations is greater than <code class="reqn">maxrows</code>).
+An observation is added to an <em>exemplars</em>' lists if its distance
+to that <em>exemplar</em> is less than <code>radius</code>.
+The default value is <code class="reqn">.1/(log n)^(1/p)</code>, where <code class="reqn">n</code> is the 
+number of observations and <code class="reqn">p</code> is the dimension of the data.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alpha</code></td>
+<td>
+
+<p>Threshold for determining the cutoff for outliers.
+Observations are considered outliers
+outliers if they fall in the <code class="reqn">(1- alpha)</code> tail of the distribution
+of the nearest-neighbor distances between <em>exemplars</em>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>transform</code></td>
+<td>
+
+<p>A logical variable indicating whether or not the data needs to be
+transformed to conform to Wilkinson's specifications before outlier
+detection. The default is to transform the data using function
+<code>dataTrans</code>.
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Wilkinson replaces categorical variables with the leading component from
+correspondence analysis, and maps the data to the unit square. This is
+done as a preprocessing step if <code>transform = TRUE</code> (the default). <br>
+If the number of observations exceeds <code>maxrows</code>, 
+the data is first partitioned into lists associated with <em>exemplars</em> 
+and their <em>members</em> within <code>radius</code> of each <em>exemplar</em>,
+to reduce the number of nearest-neighbor computations required for
+outlier detection.<br>
+An exponential distribution is then fitted to the upper tail of the 
+nearest-neighbor distances between <em>exemplars</em>. 
+Observations are considered
+outliers if they fall in the <code class="reqn">(1- alpha)</code> tail of the fitted CDF.
+</p>
+
+
+<h3>Value</h3>
+
+<p>The indexes of the observations determined to be outliers.
+</p>
+
+
+<h3>References</h3>
+
+<p>Wilkinson, L. (2016). Visualizing Outliers.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>getHDmembers</code>,
+<code>getHDoutliers</code>,
+<code>dataTrans</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+data(dots)
+out.W &lt;- HDoutliers(dots$W)
+## Not run: 
+plotHDoutliers(dots$W,out.W)
+## End(Not run)
+
+data(ex2D)
+out.ex2D &lt;- HDoutliers(ex2D)
+## Not run: 
+plotHDoutliers(ex2D,out.ex2D)
+## End(Not run)
+
+## Not run: 
+n &lt;- 100000 # number of observations
+set.seed(3)
+x &lt;- matrix(rnorm(2*n),n,2)
+nout &lt;- 10 # number of outliers
+x[sample(1:n,size=nout),] &lt;- 10*runif(2*nout,min=-1,max=1)
+
+out.x &lt;- HDoutliers(x)
+## End(Not run)
+</code></pre>
+
+
+</div>

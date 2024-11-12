@@ -1,0 +1,106 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>to.logLik</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>log-likelihood
+</h2>
+
+<h3>Description</h3>
+
+<p><code>to.logLik</code> returns either the log-likehood function depending on a vector <code>theta</code> for a given sample <code>X</code> or the value of the log-likelihood, if <code>eval = TRUE</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">to.logLik(X, hac, eval = FALSE, margins = NULL, sum.log = TRUE, 
+na.rm = FALSE, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>X</code></td>
+<td>
+
+<p>a data matrix. The number of columns and the corresponding names have to coincide with the specifications of the copula model <code>hac</code>. The sample <code>X</code> has to contain at least <code class="reqn">2</code> rows (observations), as the values of the underlying density cannot be computed otherwise.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>hac</code></td>
+<td>
+
+<p>an object of the class <code>hac</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>eval</code></td>
+<td>
+
+<p>boolean. If <code>eval = FALSE</code>, the non-evaluated log-likelihood function depending on a parameter vector <code>theta</code> is returned and one default argument, the <code>density</code>, is returned. The values of <code>theta</code> are increasingly ordered.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>margins</code></td>
+<td>
+
+<p>specifies the margins. The data matrix <code>X</code> is assumed to contain the values of the marginal distributions by default, i.e. <code>margins = NULL</code>. If raw data are used, the margins can be determined nonparametrically, <code>"edf"</code>, or in parametric way, e.g. <code>"norm"</code>. See <code>estimate.copula</code> for a detailed explanation.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sum.log</code></td>
+<td>
+
+<p>boolean. If <code>sum.log = FALSE</code>, the values of the individual log-likelihood contributions are returned.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>na.rm</code></td>
+<td>
+
+<p>boolean. If <code>na.rm = TRUE</code>, missing values, <code>NA</code>, contained in <code>X</code> are removed.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+
+<p>arguments to be passed to <code>na.omit</code>.
+</p>
+</td>
+</tr>
+</table>
+<h3>See Also</h3>
+
+<p><code>dHAC</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># construct a hac-model
+tree = list(list("X1", "X5", 3), list("X2", "X3", "X4", 4), 2)
+model = hac(type = 1, tree = tree)
+
+# sample from copula model
+sample = rHAC(1000, model)
+
+# check the accurancy of the estimation procedure
+ll = to.logLik(sample, model)
+ll.value = to.logLik(sample, model, eval = TRUE)
+
+ll(c(2, 3, 4)) == ll.value # [1] TRUE
+</code></pre>
+
+
+</div>

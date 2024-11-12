@@ -1,0 +1,264 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>calibrate</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Calibrate high-dimensional Cox models</h2>
+
+<h3>Description</h3>
+
+<p>Calibrate high-dimensional Cox models
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">calibrate(
+  x,
+  time,
+  event,
+  model.type = c("lasso", "alasso", "flasso", "enet", "aenet", "mcp", "mnet", "scad",
+    "snet"),
+  alpha,
+  lambda,
+  pen.factor = NULL,
+  gamma,
+  lambda1,
+  lambda2,
+  method = c("fitting", "bootstrap", "cv", "repeated.cv"),
+  boot.times = NULL,
+  nfolds = NULL,
+  rep.times = NULL,
+  pred.at,
+  ngroup = 5,
+  seed = 1001,
+  trace = TRUE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>Matrix of training data used for fitting the model;
+on which to run the calibration.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>time</code></td>
+<td>
+<p>Survival time.
+Must be of the same length with the number of rows as <code>x</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>event</code></td>
+<td>
+<p>Status indicator, normally 0 = alive, 1 = dead.
+Must be of the same length with the number of rows as <code>x</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>model.type</code></td>
+<td>
+<p>Model type to calibrate. Could be one of <code>"lasso"</code>,
+<code>"alasso"</code>, <code>"flasso"</code>, <code>"enet"</code>, <code>"aenet"</code>,
+<code>"mcp"</code>, <code>"mnet"</code>, <code>"scad"</code>, or <code>"snet"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alpha</code></td>
+<td>
+<p>Value of the elastic-net mixing parameter alpha for
+<code>enet</code>, <code>aenet</code>, <code>mnet</code>, and <code>snet</code> models.
+For <code>lasso</code>, <code>alasso</code>, <code>mcp</code>, and <code>scad</code> models,
+please set <code>alpha = 1</code>.
+<code>alpha=1</code>: lasso (l1) penalty; <code>alpha=0</code>: ridge (l2) penalty.
+Note that for <code>mnet</code> and <code>snet</code> models,
+<code>alpha</code> can be set to very close to 0 but not 0 exactly.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lambda</code></td>
+<td>
+<p>Value of the penalty parameter lambda to use in the
+model fits on the resampled data. From the Cox model you have built.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pen.factor</code></td>
+<td>
+<p>Penalty factors to apply to each coefficient.
+From the built <em>adaptive lasso</em> or <em>adaptive elastic-net</em> model.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>gamma</code></td>
+<td>
+<p>Value of the model parameter gamma for
+MCP/SCAD/Mnet/Snet models.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lambda1</code></td>
+<td>
+<p>Value of the penalty parameter lambda1 for fused lasso model.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lambda2</code></td>
+<td>
+<p>Value of the penalty parameter lambda2 for fused lasso model.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+<p>Calibration method.
+Options including <code>"fitting"</code>, <code>"bootstrap"</code>, <code>"cv"</code>,
+and <code>"repeated.cv"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>boot.times</code></td>
+<td>
+<p>Number of repetitions for bootstrap.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nfolds</code></td>
+<td>
+<p>Number of folds for cross-validation and
+repeated cross-validation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rep.times</code></td>
+<td>
+<p>Number of repeated times for repeated cross-validation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pred.at</code></td>
+<td>
+<p>Time point at which calibration should take place.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ngroup</code></td>
+<td>
+<p>Number of groups to be formed for calibration.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>seed</code></td>
+<td>
+<p>A random seed for resampling.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>trace</code></td>
+<td>
+<p>Logical. Output the calibration progress or not.
+Default is <code>TRUE</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Examples</h3>
+
+<pre><code class="language-R">data("smart")
+x &lt;- as.matrix(smart[, -c(1, 2)])
+time &lt;- smart$TEVENT
+event &lt;- smart$EVENT
+y &lt;- survival::Surv(time, event)
+
+# Fit Cox model with lasso penalty
+fit &lt;- fit_lasso(x, y, nfolds = 5, rule = "lambda.1se", seed = 11)
+
+# Model calibration by fitting the original data directly
+cal.fitting &lt;- calibrate(
+  x, time, event,
+  model.type = "lasso",
+  alpha = 1, lambda = fit$lambda,
+  method = "fitting",
+  pred.at = 365 * 9, ngroup = 5,
+  seed = 1010
+)
+
+# Model calibration by 5-fold cross-validation
+cal.cv &lt;- calibrate(
+  x, time, event,
+  model.type = "lasso",
+  alpha = 1, lambda = fit$lambda,
+  method = "cv", nfolds = 5,
+  pred.at = 365 * 9, ngroup = 5,
+  seed = 1010
+)
+
+print(cal.fitting)
+summary(cal.fitting)
+plot(cal.fitting)
+
+print(cal.cv)
+summary(cal.cv)
+plot(cal.cv)
+
+# # Test fused lasso, SCAD, and Mnet models
+# data(smart)
+# x = as.matrix(smart[, -c(1, 2)])[1:500, ]
+# time = smart$TEVENT[1:500]
+# event = smart$EVENT[1:500]
+# y = survival::Surv(time, event)
+#
+# set.seed(1010)
+# cal.fitting = calibrate(
+#   x, time, event, model.type = "flasso",
+#   lambda1 = 5, lambda2 = 2,
+#   method = "fitting",
+#   pred.at = 365 * 9, ngroup = 5,
+#   seed = 1010)
+#
+# cal.boot = calibrate(
+#   x, time, event, model.type = "scad",
+#   gamma = 3.7, alpha = 1, lambda = 0.03,
+#   method = "bootstrap", boot.times = 10,
+#   pred.at = 365 * 9, ngroup = 5,
+#   seed = 1010)
+#
+# cal.cv = calibrate(
+#   x, time, event, model.type = "mnet",
+#   gamma = 3, alpha = 0.3, lambda = 0.03,
+#   method = "cv", nfolds = 5,
+#   pred.at = 365 * 9, ngroup = 5,
+#   seed = 1010)
+#
+# cal.repcv = calibrate(
+#   x, time, event, model.type = "flasso",
+#   lambda1 = 5, lambda2 = 2,
+#   method = "repeated.cv", nfolds = 5, rep.times = 3,
+#   pred.at = 365 * 9, ngroup = 5,
+#   seed = 1010)
+#
+# print(cal.fitting)
+# summary(cal.fitting)
+# plot(cal.fitting)
+#
+# print(cal.boot)
+# summary(cal.boot)
+# plot(cal.boot)
+#
+# print(cal.cv)
+# summary(cal.cv)
+# plot(cal.cv)
+#
+# print(cal.repcv)
+# summary(cal.repcv)
+# plot(cal.repcv)
+</code></pre>
+
+
+</div>

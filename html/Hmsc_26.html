@@ -1,0 +1,118 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>predictLatentFactor</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>predictLatentFactor</h2>
+
+<h3>Description</h3>
+
+<p>Draws samples from the conditional predictive
+distribution of latent factors
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">predictLatentFactor(
+  unitsPred,
+  units,
+  postEta,
+  postAlpha,
+  rL,
+  predictMean = FALSE,
+  predictMeanField = FALSE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>unitsPred</code></td>
+<td>
+<p>a factor vector with random level units for which
+predictions are to be made</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>units</code></td>
+<td>
+<p>a factor vector with random level units that are
+conditioned on</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>postEta</code></td>
+<td>
+<p>a list containing samples of random factors at
+conditioned units</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>postAlpha</code></td>
+<td>
+<p>a list containing samples of range (lengthscale)
+parameters for latent factors</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rL</code></td>
+<td>
+<p>a <code>HmscRandomLevel</code>-class object that describes the
+random level structure</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>predictMean</code></td>
+<td>
+<p>a boolean flag indicating whether to return the
+mean of the predictive Gaussian process distribution</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>predictMeanField</code></td>
+<td>
+<p>a boolean flag indicating whether to return
+the samples from the mean-field distribution of the predictive
+Gaussian process distribution</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Length of <code>units</code> vector and number of rows in
+<code>postEta</code> matrix shall be equal. The method assumes that
+the i-th row of <code>postEta</code> correspond to i-th element of
+<code>units</code>.
+</p>
+<p>This method uses only the coordinates <code>rL$s</code> field of the
+<code>rL$s</code> argument. This field shall be a matrix with rownames
+covering the union of <code>unitsPred</code> and <code>units</code>
+factors. Alternatively, it can use distance matrix
+<code>rL$distMat</code> which is a symmetric square matrix with similar
+row names as the coordinate data (except for the GPP models that
+only can use coordinates).
+</p>
+<p>In case of spatial random level, the computational complexity of
+the generic method scales cubically as the number of unobserved
+units to be predicted. Both <code>predictMean=TRUE</code> and
+<code>predictMeanField=TRUE</code> options decrease the asymptotic
+complexity to linear. The <code>predictMeanField=TRUE</code> option
+also preserves the uncertainty in marginal distribution of
+predicted latent factors, but neglects the inter-dependece
+between them.
+</p>
+
+
+<h3>Value</h3>
+
+<p>a list of length <code>length(postEta)</code> containing samples
+of random factors at <code>unitsPred</code> from their predictive
+distribution conditional on the values at <code>units</code>
+</p>
+
+
+</div>

@@ -1,0 +1,163 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hierNet.cv</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Cross-validation function for hierNet</h2>
+
+<h3>Description</h3>
+
+<p>Uses cross-validation to estimate the regularization parameter for hierNet
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hierNet.cv(fit, x, y, nfolds=10,folds=NULL,trace=0)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>fit</code></td>
+<td>
+<p>Object returned from call to hierNet.path or hierNet.logistic.path.  All parameter settings
+will be taken from this object.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>A matrix of predictors, where the rows are the samples and
+the columns are the predictors</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+<p>A vector of observations, where length(y)  equals
+nrow(x)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nfolds</code></td>
+<td>
+<p>Number of cross-validation folds</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>folds</code></td>
+<td>
+<p>(Optional) user-supplied cross-validation folds.  If provided, nfolds is ignored.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>trace</code></td>
+<td>
+<p>Verbose output? 0=no, 1=yes</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>lamlist</code></td>
+<td>
+<p>Vector of lambda values tried</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cv.err</code></td>
+<td>
+<p>Estimate of cross-validation error</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cv.se</code></td>
+<td>
+<p>Estimated  standard error of cross-validation estimate </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lamhat</code></td>
+<td>
+<p>lambda value minimizing cv.err</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lamhat.1se</code></td>
+<td>
+<p>largest lambda value with cv.err less than  or equal to min(cv.err)+ SE </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>folds</code></td>
+<td>
+<p>Indices of folds used in cross-validation</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>yhat</code></td>
+<td>
+<p>n by nlam matrix of predicted values.  Here, ith prediction
+is based on training on all folds that do not include the ith data
+point.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nonzero</code></td>
+<td>
+<p>Vector giving number of non-zero coefficients for each
+lambda value</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>call</code></td>
+<td>
+<p>The call to hierNet.cv</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>Jacob Bien and Robert Tibshirani</p>
+
+
+<h3>References</h3>
+
+<p>Bien, J., Taylor, J., Tibshirani, R., (2013) "A Lasso for Hierarchical Interactions." Annals of Statistics. 41(3). 1111-1141.</p>
+
+
+<h3>See Also</h3>
+
+<p>hierNet,hierNet.path, hierNet.logistic,hierNet.logistic.path</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">set.seed(12)
+x=matrix(rnorm(100*10),ncol=10)
+x=scale(x,TRUE,TRUE)
+y=x[,1]+2*x[,2]+ x[,1]*x[,2]+3*rnorm(100)
+fit=hierNet.path(x,y)
+fitcv=hierNet.cv(fit,x,y)
+print(fitcv)
+plot(fitcv)
+
+
+x=matrix(rnorm(100*10),ncol=10)
+x=scale(x,TRUE,TRUE)
+y=x[,1]+2*x[,2]+ x[,1]*x[,2]+3*rnorm(100)
+y=1*(y&gt;0)
+fit=hierNet.logistic.path(x,y)
+fitcv=hierNet.cv(fit,x,y)
+print(fitcv)
+plot(fitcv)
+</code></pre>
+
+
+</div>

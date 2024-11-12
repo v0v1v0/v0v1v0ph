@@ -1,0 +1,181 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>los_ra_index_summary_tbl</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Make LOS and Readmit Index Summary Tibble</h2>
+
+<h3>Description</h3>
+
+<p>Create the length of stay and readmit index summary tibble
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">los_ra_index_summary_tbl(
+  .data,
+  .max_los = 15,
+  .alos_col,
+  .elos_col,
+  .readmit_rate,
+  .readmit_bench
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>.data</code></td>
+<td>
+<p>The data you are going to analyze.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.max_los</code></td>
+<td>
+<p>You can give a maximum LOS value. Lets say you typically do
+not see los over 15 days, you would then set .max_los to 15 and all values greater
+than .max_los will be grouped to .max_los</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.alos_col</code></td>
+<td>
+<p>The Average Length of Stay column</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.elos_col</code></td>
+<td>
+<p>The Expected Length of Stay column</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.readmit_rate</code></td>
+<td>
+<p>The Actual Readmit Rate column</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.readmit_bench</code></td>
+<td>
+<p>The Expected Readmit Rate column</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+
+<ul>
+<li>
+<p> Expects a tibble
+</p>
+</li>
+<li>
+<p> Expects the following columns and there should only be these 4
+</p>
+
+<ul>
+<li>
+<p> Length Of Stay Actual - Should be an integer
+</p>
+</li>
+<li>
+<p> Length Of Stacy Benchmark - Should be an integer
+</p>
+</li>
+<li>
+<p> Readmit Rate Actual - Should be 0/1 for each record, 1 = readmitted, 0 did not.
+</p>
+</li>
+<li>
+<p> Readmit Rate Benchmark - Should be a percentage from the benchmark file.
+</p>
+</li>
+</ul>
+</li>
+<li>
+<p> This will add a column called visits that will be the count of records per
+length of stay from 1 to .max_los
+</p>
+</li>
+<li>
+<p> The .max_los param can be left blank and the function will default to 15. If
+this is not a good default and you don't know what it should be then set it to
+75 percentile from the <code>stats::quantile()</code> function using the defaults, like so
+.max_los = <code>stats::quantile(data_tbl$alos)[[4]]</code>
+</p>
+</li>
+<li>
+<p> Uses all data to compute variance, if you want it for a particular time frame
+you will have to filter the data that goes into the .data argument. It is
+suggested to use <code>timetk::filter_by_time()</code>
+</p>
+</li>
+<li>
+<p> The index is computed as the excess of the length of stay or readmit rates
+over their respective expectations.
+</p>
+</li>
+</ul>
+<h3>Value</h3>
+
+<p>A tibble
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Steven P. Sanderson II, MPH
+</p>
+
+
+<h3>See Also</h3>
+
+<p>Other Data Table Functions: 
+<code>category_counts_tbl()</code>,
+<code>named_item_list()</code>,
+<code>top_n_tbl()</code>,
+<code>ts_census_los_daily_tbl()</code>,
+<code>ts_signature_tbl()</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+suppressPackageStartupMessages(library(dplyr))
+
+data_tbl &lt;- tibble(
+  "alos"            = runif(186, 1, 20)
+  , "elos"          = runif(186, 1, 17)
+  , "readmit_rate"  = runif(186, 0, .25)
+  , "readmit_bench" = runif(186, 0, .2)
+)
+
+los_ra_index_summary_tbl(
+  .data = data_tbl
+  , .max_los       = 15
+  , .alos_col      = alos
+  , .elos_col      = elos
+  , .readmit_rate  = readmit_rate
+  , .readmit_bench = readmit_bench
+)
+
+los_ra_index_summary_tbl(
+  .data = data_tbl
+  , .max_los       = 10
+  , .alos_col      = alos
+  , .elos_col      = elos
+  , .readmit_rate  = readmit_rate
+  , .readmit_bench = readmit_bench
+)
+
+</code></pre>
+
+
+</div>

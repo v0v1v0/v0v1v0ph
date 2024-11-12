@@ -1,0 +1,84 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>baseflowA</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Baseflow removal (after Fuka et al. 2018)</h2>
+
+<h3>Description</h3>
+
+<p>This function calculates baseflow using a recursive digital filter and is based on
+the implementation in the EcoHydRology package.
+</p>
+<p>The formulation is originally after Lyne and Hollick (1979) and described in Furey and Gupta (2001).
+Recommended parameters are after Nathan and McMahon (1990).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">baseflowA(q, alpha = 0.925, passes = 3)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>q</code></td>
+<td>
+<p>The vector series of streamflow</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alpha</code></td>
+<td>
+<p>Filter parameter</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>passes</code></td>
+<td>
+<p>Number of passes</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A list of the baseflow and baseflow index at each timestep.
+</p>
+
+
+<h3>References</h3>
+
+<p>Fuka D. R., Walter, M.T., Archiblad, J.A., Steenhuis, T.S., &amp; Easton, Z. M. (2018).
+A Community Modeling Foundation for Eco-Hydrology, R package version 0.4.12.1
+Flow from Streamflow Time Series. Water Resources Research, 37(11), 2709–2722.
+</p>
+<p>Furey, P., &amp; Gupta, V. (2001). A Physically Based Filter for Spearating Base
+Flow from Streamflow Time Series. Water Resources Research, 37(11), 2709–2722.
+</p>
+<p>Lyne, V., &amp; Hollick, M. (1979). Stochastic time-variable rainfall-runoff modelling.
+Institute of Engineers Australia National Conference, 89-92.
+</p>
+<p>Nathan, R. J., &amp; McMahon, T. A. (1990). Evaluation of automated techniques for base flow and recession analyses.
+Water Resources Research, 26(7), 1465–1473.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">library(hydroEvents)
+data(dataBassRiver)
+alpha.list = c(0, 0.9, 0.925, 0.95, 0.98, 0.987)
+BFI.1 = numeric(length(alpha.list))
+for (i in 1:length(alpha.list)) {
+  bf.1 = baseflowA(dataBassRiver, alpha = alpha.list[i])
+  BFI.1[i] = sum(bf.1$bf)/sum(dataBassRiver)
+}
+print(cbind(alpha.list, BFI.1))
+</code></pre>
+
+
+</div>

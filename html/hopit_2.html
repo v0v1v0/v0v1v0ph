@@ -1,0 +1,154 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>anova.hopit</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Likelihood Ratio Test Tables</h2>
+
+<h3>Description</h3>
+
+<p>Perform the likelihood ratio test(s) for two or more <code>hopit</code> objects.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">## S3 method for class 'hopit'
+anova(object, ..., method = c("sequential",
+"with.most.complex", 'with.least.complex'),
+direction = c("decreasing", "increasing"))
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>object</code></td>
+<td>
+<p>an object containing the results returned by a <code>hopit</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>an additional object(s) of the same type.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+<p>the method of ordered model comparisons. Choose <code>"sequential"</code>
+for 1-2, 2-3, 3-4, ... comparisons or
+<code>"with.most.complex"</code> for 1-2, 1-3, 1-4, ... comparisons,
+where 1 is the most complex model (the least complex for <code>"with.least.complex"</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>direction</code></td>
+<td>
+<p>determine if the complexity of listed models is
+<code>"increasing"</code> or <code>"decreasing"</code> (default).</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>a vector or a matrix with the results of the test(s).
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Maciej J. Danko
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>print.lrt.hopit</code>,
+<code>lrt.hopit</code>, <code>hopit</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># DATA
+data(healthsurvey)
+
+# the order of response levels decreases from the best health to
+# the worst health; hence the hopit() parameter decreasing.levels
+# is set to TRUE
+levels(healthsurvey$health)
+
+# Example 1 ---------------------
+
+# fitting two nested models
+model1 &lt;- hopit(latent.formula = health ~ hypertension + high_cholesterol +
+                heart_attack_or_stroke + poor_mobility + very_poor_grip +
+                depression + respiratory_problems +
+                IADL_problems + obese + diabetes + other_diseases,
+              thresh.formula = ~ sex + ageclass + country,
+              decreasing.levels = TRUE,
+              control = list(trace = FALSE),
+              data = healthsurvey)
+
+# a model with an interaction between hypertension and high_cholesterol
+model2 &lt;- hopit(latent.formula = health ~ hypertension * high_cholesterol +
+                heart_attack_or_stroke + poor_mobility + very_poor_grip +
+                depression + respiratory_problems +
+                IADL_problems + obese + diabetes + other_diseases,
+              thresh.formula = ~ sex + ageclass + country,
+              decreasing.levels = TRUE,
+              control = list(trace = FALSE),
+              data = healthsurvey)
+
+# a likelihood ratio test
+lrt1 &lt;- anova(model1, model2)
+lrt1
+
+# print results in a shorter form
+print(lrt1, short = TRUE)
+
+# or equivalently
+lrt.hopit(model2, model1)
+
+# Example 2 ---------------------
+
+# fitting additional nested models
+model3 &lt;- hopit(latent.formula = health ~ hypertension * high_cholesterol +
+                heart_attack_or_stroke + poor_mobility + very_poor_grip +
+                depression + respiratory_problems +
+                IADL_problems + obese * diabetes + other_diseases,
+              thresh.formula = ~ sex + ageclass + country,
+              decreasing.levels = TRUE,
+              control = list(trace = FALSE),
+              data = healthsurvey)
+
+model4 &lt;- hopit(latent.formula = health ~ hypertension * high_cholesterol +
+                heart_attack_or_stroke + poor_mobility + very_poor_grip +
+                depression + respiratory_problems +
+                IADL_problems + obese * diabetes + other_diseases,
+              thresh.formula = ~ sex * ageclass + country,
+              decreasing.levels = TRUE,
+              control = list(trace = FALSE),
+              data = healthsurvey)
+
+# sequential likelihood ratio tests
+# model complexity increases so direction = "increasing"
+anova(model1, model2, model3, model4,
+      direction = "increasing", method = "sequential")
+
+# likelihood ratio tests of the most complex model with the rest of the models
+anova(model1, model2, model3, model4,
+      direction = "increasing", method = "with.most.complex")
+
+# likelihood ratio tests of the least complex model with the rest of the models
+anova(model1, model2, model3, model4,
+      direction = "increasing", method = "with.least.complex")
+
+</code></pre>
+
+
+</div>

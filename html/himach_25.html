@@ -1,0 +1,79 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>st_window</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Version of <code>st_transform</code> with view window to avoid dateline</h2>
+
+<h3>Description</h3>
+
+<p><code>st_window</code> does a <code>st_transform</code> but first cuts the data to an
+appropriate view window and so avoids problems with objects wrapping around
+the back of the globe
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">st_window(m, crs = himach::crs_Atlantic, longit_margin = 0.1)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>m</code></td>
+<td>
+<p>A map dataframe, ie of class <code>sf</code> and <code>data.frame</code>, or an
+<code>sfc_MULTIPOLYGON</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>crs</code></td>
+<td>
+<p>Destination coordinate reference system, as in <code>st_tranform</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>longit_margin</code></td>
+<td>
+<p>Amount trimmed off the 'far side' of the projection in
+degrees.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p><code>st_wrap_dateline</code> _should_ handle the break in
+a map projections but uses 'GDAL' for this. Given persistent issues in
+installing GDAL, <code>st_window</code> achieves the same using <code>s2</code> instead.
+</p>
+<p>It works for any 'simple' projection, in the sense of one that has a dateline
+that is a single line of longitude: ie the proj4string contains either
+"longitude_of_center", so the dateline is that +180; or not, in which case it
+assumes the "longitude_of_center" is 0.
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>sf</code> dataframe, same as the parameter <code>m</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">world &lt;- sf::st_as_sf(rnaturalearthdata::coastline110)
+w_pacific &lt;- st_window(world, crs_Pacific)
+ggplot2::ggplot(w_pacific) + ggplot2::geom_sf()
+
+# bad - not run - dateline problem example
+# ggplot2::ggplot(st_transform(world, crs_Pacific)) +
+#   ggplot2::geom_sf()
+
+</code></pre>
+
+
+</div>

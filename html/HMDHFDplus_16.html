@@ -1,0 +1,63 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>readHMD</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+<code>readHMD()</code> reads a standard HMD .txt table as a <code>data.frame</code>
+</h2>
+
+<h3>Description</h3>
+
+<p>This calls <code>read.table()</code> with all the necessary defaults to avoid annoying surprises. The Age column is also stripped of <code>"+"</code> and converted to integer, and a logical indicator column called <code>OpenInterval</code> is added to show where these were located. If the file contains population counts, values are split into two columns for Jan 1 and Dec 31 of the year. Output is invisibly returned, so you must assign it to take a look. This is to avoid lengthy console printouts.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">readHMD(filepath, fixup = TRUE, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>filepath</code></td>
+<td>
+<p>path or connection to the HMD text file, including .txt suffix.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fixup</code></td>
+<td>
+<p>logical. Should columns be made more user-friendly, e.g., forcing Age to be integer?</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>other arguments passed to <code>read.table</code>, not likely needed.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Population counts in the HMD typically refer to Jan 1st. One exception are years in which a territorial adjustment has been accounted for in estimates. For such years, 'YYYY-' refers to Dec 31 of the year before the adjustment, and 'YYYY+' refers to Jan 1 directly after the adjustment (adjustments are always made Jan 1st). In the data, it will just look like two different estimates for the same year, but in fact it is a definition change or similar. In order to remove headaches from potential territorial adjustments in the data, we simply create two columns, one for January 1st (e.g.,<code>"Female1"</code>) and another for Dec 31st (e.g.,<code>"Female2"</code>) . One can recover the adjustment coefficient for each year by taking the ratio $$Vx = P1(t+1) / P2(t)$$. In most years this will be 1, but in adjustment years there is a difference. This must always be accounted for when calculating rates and exposures. Argument <code>fixup</code> is outsourced to <code>HMDparse()</code>.
+</p>
+
+
+<h3>Value</h3>
+
+<p>data.frame of standard HMD output, except the Age column has been cleaned, and a new open age indicator column has been added. If the file is Population.txt or Population5.txt, there will be two columns each for males and females.
+</p>
+
+
+<h3>Note</h3>
+
+<p>function written by Tim Riffe.
+</p>
+
+
+</div>

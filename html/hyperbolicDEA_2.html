@@ -1,0 +1,185 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hyperbolicDEA</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Hyperbolic estimation of DEA efficiency scores</h2>
+
+<h3>Description</h3>
+
+<p>Hyperbolic DEA implementation including weight restrictions,
+non-discretionary variables, gerenralized distance function, external referencing, estimation of slacks and
+super-efficiency scores. The mathematical and theoretical foundations of the code are presented in the paper
+"Data Envelopment Analysis and Hyperbolic Efficiency Measures: Extending Applications and Possiblities
+for Between-Group Comparisons" (2023) by Alexander Öttl, Mette Asmild, and Daniel Gulde.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hyperbolicDEA(
+  X,
+  Y,
+  RTS = "vrs",
+  WR = NULL,
+  SLACK = FALSE,
+  ACCURACY = 1e-10,
+  XREF = NULL,
+  YREF = NULL,
+  SUPEREFF = FALSE,
+  NONDISC_IN = NULL,
+  NONDISC_OUT = NULL,
+  PARALLEL = 1,
+  ALPHA = 0.5
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>X</code></td>
+<td>
+<p>Vector, matrix or dataframe with DMUs as rows and inputs as columns</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Y</code></td>
+<td>
+<p>Vecotr, matrix or dataframe with DMUs as rows and outputs as columns</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>RTS</code></td>
+<td>
+<p>Character string indicating the returns-to-scale, e.g. "crs", "vrs", "ndrs", "nirs", "fdh"</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>WR</code></td>
+<td>
+<p>Matrix with one row per homogeneous linear weight restriction in standard form. The columns are 
+ncol(WR) = ncol(Y) + ncol(X). Hence the first ncol(Y) columns are the restrictions on outputs and the last ncol(X) columns are the 
+restrictions on inputs.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>SLACK</code></td>
+<td>
+<p>Boolean variable indicating whether an additional estimation of slacks shall be performed when set to 'TRUE'.
+Be aware that SLACK estimation can change the lambda values.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ACCURACY</code></td>
+<td>
+<p>Accuracy value for non-linear programm solver.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>XREF</code></td>
+<td>
+<p>Vector, matrix or dataframe with firms defining the technology as rows and inputs as columns</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>YREF</code></td>
+<td>
+<p>Vector, matrix or dataframe with firms defining the technology as rows and outputs as columns</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>SUPEREFF</code></td>
+<td>
+<p>Boolean variable indicating whether super-efficiencies shall be estimated</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>NONDISC_IN</code></td>
+<td>
+<p>Vector containing column indices of the input matrix that are non-discretionary variables e.g. c(1,3) so the first and the third input are non-discretionary</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>NONDISC_OUT</code></td>
+<td>
+<p>Vector containing column indices of the output matrix that are non-discretionary variables e.g. c(1,3) so the first and the third output are non-discretionary</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>PARALLEL</code></td>
+<td>
+<p>Integer of amount of cores that should be used for parallel computing (Check availability of computer)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ALPHA</code></td>
+<td>
+<p>ALPHA can be chosen between [0,1]. It indicates the relative weights given to the distance function to
+both outputs and inputs when approaching the frontier. More weight on the input orientation is set by alpha &lt; 0.5. Here,
+the input efficiency score is estimated in the package. To receive the corresponding output efficiency score, estimate: e^((1-alpha)/alpha).
+Vice versa for an output weighted model alpha &gt; 0.5. The output efficiency is given and the input efficiency can
+be recovered with: e^(alpha/(1-alpha))</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A list object containing the following information:
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>eff</code></td>
+<td>
+<p>Are the estimated efficiency scores for the DMUs under observation stored 
+in a vector with the length nrow(X).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lambdas</code></td>
+<td>
+<p>Estimated values for the composition of the respective Benchmarks.
+The lambdas are stored in a matrix with the dimensions nrow(X) x nrow(X), where
+the row is the DMU under observation and the columns the peers used for the Benchmark.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mus</code></td>
+<td>
+<p>If WR != NULL, the estimated decision variables for the imposed weight restrictions
+are stored in a matrix with the dimensions nrow(X) x nrow(WR), where the rows are the DMUs and 
+columns the weight restrictions. If the values are positive, the WR is binding for the respective DMU.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>slack</code></td>
+<td>
+<p>If SLACK = TRUE, the slacks are estimated and stored in a matrix with the dimensions
+nrow(X) x (ncol(X) + ncol(Y)). Showing the Slack of each DMU (row) for each input and output
+(column).</p>
+</td>
+</tr>
+</table>
+<h3>Examples</h3>
+
+<pre><code class="language-R">X &lt;- c(1,1,2,4,1.5,2,4,3)
+Y &lt;- c(1,2,4,4,0.5,2.5,3.5,4)
+# we now impose linked weght restrictions. We assume outputs decrease by 
+# four units when inputs are reduced by one. And we assume that outputs can
+# can be increased by one when inputs are increased by four 
+
+WR &lt;- matrix(c(-4,-1,1,4), nrow = 2, byrow = TRUE)
+hyperbolicDEA(X,Y,RTS="vrs", WR = WR)
+
+# Another example having the same data but just estimate the results for DMU 1
+# using XREF YREF and and a higher focus on inputs adjusting the ALPHA towards 0.
+# Additionally, slacks are estimated.
+
+hyperbolicDEA(X[1],Y[1],RTS="vrs", XREF = X, YREF = Y, WR = WR, ALPHA = 0.1, SLACK = TRUE)
+
+</code></pre>
+
+
+</div>

@@ -1,0 +1,104 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>service_line_augment</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Service Line Grouper Augment Function</h2>
+
+<h3>Description</h3>
+
+<p>Takes a few arguments from a data.frame/tibble and returns a service line
+augmented to a data.frame/tibble for a set of patients.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">service_line_augment(.data, .dx_col, .px_col, .drg_col)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>.data</code></td>
+<td>
+<p>The data being passed that will be augmented by the function.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.dx_col</code></td>
+<td>
+<p>The column containing the Principal Diagnosis for the discharge.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.px_col</code></td>
+<td>
+<p>The column containing the Principal Coded Procedure for the discharge.
+It is possible that this could be blank.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.drg_col</code></td>
+<td>
+<p>The DRG Number coded to the inpatient discharge.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>This is an augment function in that appends a vector to an data.frame/tibble
+that is passed to the <code>.data</code> parameter. A data.frame/tibble
+is required, along with a principal diagnosis column, a principal procedure column,
+and a column for the DRG number. These are needed so that the function can
+join the dx_cc_mapping and px_cc_mapping columns to provide the service line.
+This function only works on visits that are coded using ICD Version 10 only.
+</p>
+<p>Lets take an example discharge, the DRG is 896 and the Principal Diagnosis code
+maps to DX_660, then this visit would get grouped to <code>alcohol_abuse</code>
+</p>
+<p>DRG 896: ALCOHOL, DRUG ABUSE OR DEPENDENCE WITHOUT REHABILITATION THERAPY WITH
+MAJOR COMPLICATION OR COMORBIDITY (MCC)
+</p>
+<p>DX_660 Maps to the following ICD-10 Codes ie F1010 Alcohol abuse, uncomplicated:
+</p>
+<div class="sourceCode"><pre>library(healthyR)
+dx_cc_mapping %&gt;%
+  filter(CC_Code == "DX_660", ICD_Ver_Flag == "10")
+</pre></div>
+
+
+<h3>Value</h3>
+
+<p>An augmented data.frame/tibble with the service line appended as a new column.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Steven P. Sanderson II, MPH
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">df &lt;- data.frame(
+  dx_col = "F10.10",
+  px_col = NA,
+  drg_col = "896"
+)
+
+service_line_augment(
+  .data = df,
+  .dx_col = dx_col,
+  .px_col = px_col,
+  .drg_col = drg_col
+)
+
+</code></pre>
+
+
+</div>

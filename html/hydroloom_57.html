@@ -1,0 +1,85 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>make_node_topology</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Make Node Topology from Edge Topology</h2>
+
+<h3>Description</h3>
+
+<p>creates a node topology table from an edge topology
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">make_node_topology(x, add_div = NULL, add = TRUE)
+
+## S3 method for class 'data.frame'
+make_node_topology(x, add_div = NULL, add = TRUE)
+
+## S3 method for class 'hy'
+make_node_topology(x, add_div = NULL, add = TRUE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>data.frame network compatible with hydroloom_names.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>add_div</code></td>
+<td>
+<p>data.frame of logical containing id and toid diverted paths to add.
+Should have id and toid fields. If TRUE, the network will be interpreted as
+a directed acyclic graph with downstream divergences included in the edge
+topology.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>add</code></td>
+<td>
+<p>logical if TRUE, node topology will be added to x in return.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>data.frame containing id, fromnode, and tonode attributes or all
+attributes provided with id, fromnode and tonode in the first three columns.
+</p>
+<p>If <code>add_div</code> is TRUE, will also add a <code>divergence</code> attribute where the
+provided diverted paths are assigned value 2, existing main paths that
+emanate from a divergence are assigned value 1, and all other paths
+are assigned value 0.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">x &lt;- sf::read_sf(system.file("extdata/new_hope.gpkg", package = "hydroloom"))
+
+y &lt;- dplyr::select(add_toids(x), -ToNode, -FromNode)
+
+y &lt;- make_node_topology(y)
+
+# just the divergences which have unique fromids in x but don't in new hope.
+div &lt;- add_toids(dplyr::select(x, COMID, FromNode, ToNode),
+                 return_dendritic = FALSE)
+div &lt;- div[div$toid %in%
+           x$COMID[x$Divergence == 2],]
+
+y &lt;- dplyr::select(add_toids(x), -ToNode, -FromNode)
+
+y &lt;- make_node_topology(y, add_div = div)
+
+</code></pre>
+
+
+</div>

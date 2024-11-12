@@ -1,0 +1,95 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hglm_fit</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Fitting Holistic Generalized Linear Models</h2>
+
+<h3>Description</h3>
+
+<p>Fit a generalized linear model under constraints.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hglm_fit(
+  model,
+  constraints = NULL,
+  big_m,
+  solver = "auto",
+  control = list(),
+  dry_run = FALSE,
+  object_size = c("normal", "big")
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>model</code></td>
+<td>
+<p>a 'HGLM' model (object of class <code>"hglm_model"</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>constraints</code></td>
+<td>
+<p>a list of 'HGLM' constraints stored in a list of class <code>"lohglmc"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>big_m</code></td>
+<td>
+<p>an upper bound for the coefficients, needed for the big-M constraint.
+Required to inherit from <code>"hglmc"</code>. Currently constraints created by
+<code>group_sparsity()</code>, <code>group_inout()</code>,
+<code>include()</code> and <code>group_equal()</code> use the big-M set here.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>solver</code></td>
+<td>
+<p>a character string giving the name of the solver to be used for the estimation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>control</code></td>
+<td>
+<p>a list of control parameters passed to <code>ROI_solve</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dry_run</code></td>
+<td>
+<p>a logical if <code>TRUE</code> the model is not fit but only constructed.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>object_size</code></td>
+<td>
+<p>a character string giving the object size, allowed values
+are <code>"normal"</code> and <code>"big"</code>. If <code>"big"</code> is choosen, also
+the <span class="pkg">ROI</span> solution and the <code>"hglm_model"</code> object are returned.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>an object of class <code>"hglm.fit"</code> inheriting from <code>"glm"</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">dat &lt;- rhglm(100, c(1, 2, -3, 4, 5, -6))
+x &lt;- model.matrix(y ~ ., data = dat)
+model &lt;- hglm_model(x, y = dat[["y"]])
+fit &lt;- hglm_fit(model, constraints = k_max(3))
+</code></pre>
+
+
+</div>

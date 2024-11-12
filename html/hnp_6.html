@@ -1,0 +1,133 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>fungi</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+<em>Diaphorina citri</em> mortality data
+</h2>
+
+<h3>Description</h3>
+
+<p>Mortality of the Citrus psyllid, <em>Diaphorina citri</em>, a major pest of Citrus worldwide, when exposed to different concentrations of two fungi species, <em>Beauveria bassiana</em> and <em>Isaria fumosorosea</em>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">data(fungi)</code></pre>
+
+
+<h3>Format</h3>
+
+<p>A data frame with 30 observations on the following 5 variables.
+</p>
+
+<table>
+<tr>
+<td style="text-align: left;">
+<code>y</code>
+</td>
+<td style="text-align: left;"> numeric</td>
+<td style="text-align: left;"> number of dead insects</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+<code>m</code>
+</td>
+<td style="text-align: left;"> numeric</td>
+<td style="text-align: left;"> total number of insects</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+<code>conc</code>
+</td>
+<td style="text-align: left;"> numeric</td>
+<td style="text-align: left;"> fungi concentration (in conidia/ml)</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+<code>lconc</code>
+</td>
+<td style="text-align: left;"> numeric</td>
+<td style="text-align: left;"> natural logarithm of fungi concentration</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+<code>species</code>
+</td>
+<td style="text-align: left;">  factor</td>
+<td style="text-align: left;">  levels <code>isaria</code> and <code>beauveria</code>, fungi species
+  </td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The Citrus psyllid <em>Diaphorina citri</em> is a vector of Huanglongbing, known as greening disease. An
+alternative to chemical control is to use solutions of fungi
+conidia as a biological control strategy. D'Alessandro (2014)
+conducted a completely randomized experiment to assess how
+different conidia concentrations ($10^4$, $10^5$, $10^6$, $10^7$
+and $10^8$ conidia/ml) of two fungi species, <em>Beauveria
+bassiana</em> and <em>Isaria fumosorosea</em>, infected <em>D. citri</em>
+adults. Each experimental unit consisted of around 20 <em>D.
+citri</em> adults, which were placed on <em>Citrus limonia</em> plants.
+The insects were pulverized with the solutions and after 10 days
+the number of dead insects and dead insects due to fungus
+infection were observed. Note that in this case the conidia
+concentrations are obtained in successive dilutions and therefore
+small variations in the number of conidia per ml may contribute
+additional variability to the data. Such additional variability
+may be accounted for in the model by including an additive random
+effect in the linear predictor.
+</p>
+
+
+<h3>Source</h3>
+
+<p>Demétrio, C. G. B., Hinde, J. and Moral, R. A. (2014) Models for overdispersed data in entomology. In Godoy, W. A. C. and Ferreira, C. P. (Eds.) Ecological modelling applied to entomology. Springer.
+</p>
+
+
+<h3>References</h3>
+
+<p>D'Alessandro (2014) Unpublished data, private communication.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(fungi)
+
+# Binomial fit
+model1 &lt;- glm(cbind(y, m-y) ~ lconc*species,
+              family=binomial, data=fungi)
+anova(model1, test="Chisq")
+sum(resid(model1, ty="pearson")^2)
+1 - pchisq(sum(resid(model1, ty="pearson")^2), 20)
+hnp(model1)
+
+# Quasi-binomial fit
+model2 &lt;- glm(cbind(y, m-y) ~ lconc*species,
+              family=quasibinomial, data=fungi)
+anova(model2, test="F")
+hnp(model2)
+
+## Not run: 
+# Logistic-normal fit
+require(lme4)
+fungi$ind &lt;- factor(1:nrow(fungi))
+model3 &lt;- glmer(cbind(y, m-y) ~ lconc*species + (1|ind),
+                family=binomial, data=fungi)
+summary(model3)
+hnp(model3)
+
+## End(Not run)
+
+## for discussion on the analysis of this data set,
+## see Demetrio et al. (2014)
+</code></pre>
+
+
+</div>

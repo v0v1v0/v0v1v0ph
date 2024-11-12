@@ -1,0 +1,102 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>horizon</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Adapt horizon</h2>
+
+<h3>Description</h3>
+
+<p>Adapt the look-ahead horizon depending on the replicate allocation or a target ratio
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">horizon(
+  model,
+  current_horizon = NULL,
+  previous_ratio = NULL,
+  target = NULL,
+  Wijs = NULL
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>model</code></td>
+<td>
+<p><code>hetGP</code> or <code>homGP</code> model</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>current_horizon</code></td>
+<td>
+<p>horizon used for the previous iteration, see details</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>previous_ratio</code></td>
+<td>
+<p>ratio before adding the previous new design</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>target</code></td>
+<td>
+<p>scalar in ]0,1] for desired n/N</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Wijs</code></td>
+<td>
+<p>optional previously computed matrix of Wijs, see <code>Wij</code></p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>If <code>target</code> is provided, along with <code>previous_ratio</code> and <code>current_horizon</code>:
+</p>
+
+<ul>
+<li>
+<p> the horizon is increased by one if more replicates are needed but a new ppint has been added at the previous iteration,
+</p>
+</li>
+<li>
+<p> the horizon is decreased by one if new points are needed but a replicate has been added at the previous iteration,
+</p>
+</li>
+<li>
+<p> otherwise it is unchanged.
+</p>
+</li>
+</ul>
+<p>If no <code>target</code> is provided, <code>allocate_mult</code> is used to obtain the best allocation of the existing replicates,
+then the new horizon is sampled from the difference between the actual allocation and the best one, bounded below by 0.
+See (Binois et al. 2017).
+</p>
+
+
+<h3>Value</h3>
+
+<p>randomly selected horizon for next iteration (adpative) if no <code>target</code> is provided, 
+otherwise returns the update horizon value.
+</p>
+
+
+<h3>References</h3>
+
+<p>M. Binois, J. Huang, R. B. Gramacy, M. Ludkovski (2019), 
+Replication or exploration? Sequential design for stochastic simulation experiments,
+Technometrics, 61(1), 7-23.<br> 
+Preprint available on arXiv:1710.03206.
+</p>
+
+
+</div>

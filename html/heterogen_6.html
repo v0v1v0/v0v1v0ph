@@ -1,0 +1,114 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>gwpca_df_mc</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Perform GWPCA from data.frame with spatial structure.</h2>
+
+<h3>Description</h3>
+
+<p>gwpca_df is an R function that performs Generalized Weighted Principal Component Analysis (GWPCA) on a given dataset.
+This function allow to calculate the environmental heterogeneity from data.frame with spatial structure.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">gwpca_df_mc(
+  datadf,
+  bandwidth = 0.2,
+  tolerance = 5,
+  nprocess = 10000,
+  parallel = FALSE,
+  ncores = 2,
+  normalized = FALSE,
+  method = "iter",
+  dirds = "rds"
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>datadf</code></td>
+<td>
+<p>The input data matrix for which GWPCA needs to be performed. It should contain numerical values only. Rows represent cells, and columns represent bioclimatic variables.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>bandwidth</code></td>
+<td>
+<p>The bandwidth for the spatial weighting function.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tolerance</code></td>
+<td>
+<p>The tolerance for spatial weight computation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nprocess</code></td>
+<td>
+<p>(Optional) The number of iterations for calculating the principal components. Default is set to 1000.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>parallel</code></td>
+<td>
+<p>(Optional) A logical value indicating whether to run the computation in parallel. If <code>TRUE</code>, multiple cores will be used for processing. Default is <code>FALSE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ncores</code></td>
+<td>
+<p>(Optional) The number of cores to be used for parallel computation. Only applicable if <code>parallel</code> is set to <code>TRUE</code>. Default is 4.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>normalized</code></td>
+<td>
+<p>(Optional) A logical value indicating whether the input data should be normalized before performing GWPCA. Default is <code>FALSE</code>, meaning the data will not be normalized.
+Take in account that core function performs correlation analysis in order to normalize the input variables.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+<p>The method used for GWPCA computation. It can take one of the following values. <code>local</code> Performs GWPCA locally and will save each iteration on .rds files. Recommended for large-scale data sets.
+<code>inter</code> Uses RAM memory to . Default is <code>inter</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dirds</code></td>
+<td>
+<p>(Optional) The directory where the results will be saved in RDS format. Default is <code>rds</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A matrix of eigenvalues
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+path_csv &lt;- system.file("extdata","south.csv", package="heterogen")
+south_csv &lt;- rio::import(path_csv)
+
+# notice: south_csv object contains x,y (lot/lat coordinates)
+# and environmental variables
+north_het &lt;- gwpca_df_mc(as.matrix(south_csv), parallel = TRUE, 
+ncores = 2, bandwidth = 0.1, tolerance = 10)
+
+
+
+</code></pre>
+
+
+</div>

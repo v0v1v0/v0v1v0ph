@@ -1,0 +1,148 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>rCholCov</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>CholCov estimator</h2>
+
+<h3>Description</h3>
+
+<p>Positive semi-definite covariance estimation using the CholCov algorithm.
+The algorithm estimates the integrated covariance matrix by sequentially adding series and using 'refreshTime' to synchronize the observations.
+This is done in order of liquidity, which means that the algorithm uses more data points than most other estimation techniques.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">rCholCov(
+  pData,
+  IVest = "rMRCov",
+  COVest = "rMRCov",
+  criterion = "squared duration",
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>pData</code></td>
+<td>
+<p>a list. Each list-item i contains an <code>xts</code> object with the intraday price data (in levels)
+of stock <code class="reqn">i</code> for day <code class="reqn">t</code>. The order of the data does not matter as it will be sorted according to the criterion specified in the <code>criterion</code> argument</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>IVest</code></td>
+<td>
+<p>integrated variance estimator, default is <code>"rMRCov"</code>. For a list of implemented estimators, use <code>listCholCovEstimators()</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>COVest</code></td>
+<td>
+<p>covariance estimator, default is <code>"rMRCov"</code>. For a list of implemented estimators, use <code>listCholCovEstimators()</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>criterion</code></td>
+<td>
+<p>criterion to use for sorting the data according to liquidity. 
+Possible values are <code>"squared duration"</code>, <code>"duration"</code>, <code>"count"</code>, defaults to <code>"squared duration"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>additional arguments to pass to <code>IVest</code> and <code>COVest</code>. See details.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Additional arguments for <code>IVest</code> and <code>COVest</code> should be passed in the ... argument.
+For the <code>rMRCov</code> estimator, which is the default, the <code>theta</code> and <code>delta</code> parameters can be set. These default to 1 and 0.1 respectively.
+</p>
+<p>The CholCov estimation algorithm is useful for estimating covariances of <code class="reqn">d</code> series that are sampled asynchronously and with different liquidities.
+The CholCov estimation algorithm is as follows:
+</p>
+
+<ul>
+<li>
+<p> First sort the series in terms of decreasing liquidity according to a liquidity criterion, such that series <code class="reqn">1</code> is the most liquid, and series <code class="reqn">d</code> the least.
+</p>
+</li>
+<li>
+<p> Step 1:
+</p>
+<p>Apply refresh-time on <code class="reqn">{a} = \{1\}</code> to obtain the grid <code class="reqn">\tau^{a}</code>. 
+</p>
+<p>Estimate <code class="reqn">\hat{g}_{11}</code> using an IV estimator on  <code class="reqn">f_{\tau^{a}_j}^{(1)}= \hat{u}_{\tau^{a}_j}^{(1)}</code>.
+</p>
+</li>
+<li>
+<p> Step 2:
+</p>
+<p>Apply refresh-time on <code class="reqn">{b} = \{1,2\}</code> to obtain the grid <code class="reqn">\tau^{b}</code>. 
+</p>
+<p>Estimate <code class="reqn">\hat{h}^{b}_{21}</code> as the realized beta between <code class="reqn">f_{\tau^{b}_j}^{(1)}</code> and <code class="reqn">\hat{u}_{\tau^{b}_j}^{(2)}</code>. Set <code class="reqn">\hat{h}_{21}=\hat{h}^{b}_{21}</code>.
+</p>
+<p>Estimate <code class="reqn">\hat{g}_{22}</code> using an IV estimator on  <code class="reqn">f_{\tau^{b}_j}^{(2)}= \hat{u}_{\tau^{b}_j}^{(2)}-\hat{h}_{21}f_{\tau^{b}_j}^{(1)}</code>. 
+</p>
+</li>
+<li>
+<p>  Step 3:
+</p>
+<p>Apply refresh-time on <code class="reqn">{c} = \{1,3\}</code> to obtain the grid <code class="reqn">\tau^{c}</code>. 
+</p>
+<p>Estimate <code class="reqn">\hat{h}^{c}_{31}</code> as the realized beta between <code class="reqn">f_{\tau^{c}_j}^{(1)}</code> and <code class="reqn">\hat{u}_{\tau^{c}_j}^{(3)}</code>. Set <code class="reqn">\hat{h}_{31}= \hat{h}^{c}_{31}</code>.
+</p>
+<p>Apply refresh-time on <code class="reqn">{d} = \{1,2,3\}</code> to obtain the grid <code class="reqn">\tau^{d}</code>.
+</p>
+<p>Re-estimate <code class="reqn">\hat{h}_{21}^{d}</code> at the new grid, such that the projections <code class="reqn">f_{\tau^{d}_j}^{(1)}</code> and <code class="reqn">f_{\tau^{d}_j}^{(2)}</code> are orthogonal.
+</p>
+<p>Estimate <code class="reqn">\hat{h}^{d}_{32}</code> as the realized beta between <code class="reqn">f_{\tau^{d}_j}^{(2)}</code> and <code class="reqn">\hat{u}_{\tau^{d}_j}^{(3)}</code>. Set <code class="reqn">\hat{h}_{32} = \hat{h}^{d}_{32}</code>. 
+</p>
+<p>Estimate <code class="reqn">\hat{g}_{33}</code> using an IV estimator on <code class="reqn">f_{\tau^{d}_j}^{(3)}= \hat{u}_{\tau^{d}_j}^{(3)}-\hat{h}_{32}f_{\tau^{d}_j}^{(2)} -\hat{h}_{31}f_{\tau^{d}_j}^{(1)}</code>. 
+</p>
+</li>
+<li>
+<p> Step 4 to d:
+</p>
+<p>Continue in the same fashion by sampling over <code class="reqn">{1,...,k,l}</code> to estimate <code class="reqn">h_{lk}</code> using the smallest possible set. 
+</p>
+<p>Re-estimate the <code class="reqn">h_{nm}</code> with <code class="reqn">m&lt;n\leq k</code> at every new grid to obtain orthogonal projections. 
+</p>
+<p>Estimate the <code class="reqn">g_{kk}</code> as the IV of projections based on the final estimates, <code class="reqn">\hat{h}</code>.
+</p>
+</li>
+</ul>
+<h3>Value</h3>
+
+<p>a list containing the covariance matrix <code>"CholCov"</code>, and the Cholesky decomposition <code>"L"</code> and <code>"G"</code> such that <code class="reqn">\code{L} \times \code{G} \times \code{L}' = \code{CholCov}</code>.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Emil Sjoerup
+</p>
+
+
+<h3>References</h3>
+
+<p>Boudt, K., Laurent, S., Lunde, A., Quaedvlieg, R., and Sauri, O. (2017). Positive semidefinite integrated covariance estimation, factorizations and asynchronicity. <em>Journal of Econometrics</em>, 196, 347-367.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>ICov</code> for a list of implemented estimators of the integrated covariance.
+</p>
+
+
+</div>

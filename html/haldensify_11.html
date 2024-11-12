@@ -1,0 +1,154 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>plateau_selector</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>IPW Estimator Selector Using Lepski's Plateau Method for the MSE</h2>
+
+<h3>Description</h3>
+
+<p>IPW Estimator Selector Using Lepski's Plateau Method for the MSE
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">plateau_selector(
+  W,
+  A,
+  Y,
+  delta = 0,
+  gn_pred_natural,
+  gn_pred_shifted,
+  gn_fit_haldensify,
+  Qn_pred_natural,
+  Qn_pred_shifted,
+  cv_folds = 10L,
+  gcv_mult = 50L,
+  bootstrap = FALSE,
+  n_boot = 1000L,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>W</code></td>
+<td>
+<p>A <code>matrix</code>, <code>data.frame</code>, or similar containing a set of
+baseline covariates.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>A</code></td>
+<td>
+<p>A <code>numeric</code> vector corresponding to a exposure variable. The
+parameter of interest is defined as a location shift of this quantity.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Y</code></td>
+<td>
+<p>A <code>numeric</code> vector of the observed outcomes.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>delta</code></td>
+<td>
+<p>A <code>numeric</code> value indicating the shift in the exposure to
+be used in defining the target parameter. This is defined with respect to
+the scale of the exposure (A).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>gn_pred_natural</code></td>
+<td>
+<p>A <code>matrix</code> of conditional density estimates of
+the exposure mechanism g(A|W) along a grid of the regularization parameter,
+at the natural (observed, actual) values of the exposure.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>gn_pred_shifted</code></td>
+<td>
+<p>A <code>matrix</code> of conditional density estimates of
+the exposure mechanism g(A+delta|W) along a grid of the regularization
+parameter, at the shifted (counterfactual) values of the exposure.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>gn_fit_haldensify</code></td>
+<td>
+<p>An object of class <code>haldensify</code> of the fitted
+conditional density model for the natural exposure mechanism. This should
+be the fit object returned by <code>haldensify[haldensify]</code> as part
+of a call to <code>ipw_shift</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Qn_pred_natural</code></td>
+<td>
+<p>A <code>numeric</code> of the outcome mechanism estimate at
+the natural (i.e., observed) values of the exposure. HAL regression is used
+for the estimate, with the regularization term chosen by cross-validation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Qn_pred_shifted</code></td>
+<td>
+<p>A <code>numeric</code> of the outcome mechanism estimate at
+the shifted (i.e., counterfactual) values of the exposure. HAL regression
+is used for the estimate, with the regularization term chosen by
+cross-validation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cv_folds</code></td>
+<td>
+<p>A <code>numeric</code> giving the number of folds to be used for
+cross-validation. Note that this form of sample splitting is used for the
+selection of tuning parameters by empirical risk minimization, not for the
+estimation of nuisance parameters (i.e., to relax regularity conditions).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>gcv_mult</code></td>
+<td>
+<p>TODO</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>bootstrap</code></td>
+<td>
+<p>A <code>logical</code> indicating whether the estimator variance
+should be approximated using the nonparametric bootstrap. The default is
+<code>FALSE</code>, in which case the empirical variances of the IPW estimating
+function and the EIF are used for for estimator selection and for variance
+estimation, respectively. When set to <code>TRUE</code>, the bootstrap variance
+is used for both of these purposes instead. Note that the bootstrap is very
+computationally intensive and scales relatively poorly.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n_boot</code></td>
+<td>
+<p>A <code>numeric</code> giving the number of bootstrap re-samples to
+be used in computing the plateau estimator selection criterion. The default
+uses 1000 bootstrap samples, though it may be appropriate to use fewer such
+samples for experimentation purposes. This is ignored when <code>bootstrap</code>
+is set to <code>FALSE</code> (its default).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Additional arguments for model fitting to be passed directly to
+<code>haldensify</code>.</p>
+</td>
+</tr>
+</table>
+</div>

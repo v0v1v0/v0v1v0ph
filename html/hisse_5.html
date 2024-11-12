@@ -1,0 +1,419 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>GeoHiSSE.old</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Original Hidden Geographic State Speciation and Extinction</h2>
+
+<h3>Description</h3>
+
+<p>Sets up and executes the original GeoHiSSE model
+(Hidden Geographic State Speciation and Extinction) on a phylogeny and 
+character distribution.</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">GeoHiSSE.old(phy, data, f=c(1,1,1), speciation=c(1,2,3), extirpation=c(1,2), 
+hidden.areas=FALSE, trans.rate=NULL, assume.cladogenetic=TRUE, 
+condition.on.survival=TRUE, root.type="madfitz", root.p=NULL, sann=TRUE,
+sann.its=1000, bounded.search=TRUE,  max.tol=.Machine$double.eps^.50,
+mag.san.start=0.5, starting.vals=NULL, speciation.upper=1000, extirpation.upper=1000, 
+trans.upper=100, ode.eps=0)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>phy</code></td>
+<td>
+<p>a phylogenetic tree, in <code>ape</code> “phylo” format and
+with internal nodes labeled denoting the ancestral selective regimes.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>a matrix (or dataframe) with two columns containing species
+information. First column has the species names and second column has
+area codes. Values for the areas need to be 0, 1, or 2, where 0 is the 
+widespread area '01', 1 is endemic area '0' and 2 is endemic area '1'. See 'Details'.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>f</code></td>
+<td>
+<p>vector of length 3 with the estimated proportion of extant
+species in state 1 (area '0'), state 2 (area '1'), and state 0 (widespread area '01') 
+that are included in the phylogeny. A value of c(0.25, 0.25, 0.5) means that 25 percent
+of species in areas '0' and '1' and 50 percent of species in area '01' are
+included in the phylogeny. By default all species are assumed to be
+sampled.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>speciation</code></td>
+<td>
+<p>a numeric vector of length equal to 3+(number of
+<code>hidden.areas</code> * 3). A GeoSSE model has 3 speciation parameters:
+s0, s1 and s01. A GeoHiSSE model with one hidden area has 6 speciation
+parameters: s0A, s1A, s01A, s0B, s1B, s01B. And so on. The length of the numeric
+vector needs to match the number of speciation parameters in the
+model. See 'Details'.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>extirpation</code></td>
+<td>
+<p>a numeric vector of length equal to 2+(number of
+<code>hidden.areas</code> * 2). A GeoSSE model has 2 extirpation parameters:
+x0 and x1. A GeoHiSSE model with one hidden area has 4 extirpation
+parameters: x0A, x1A, x0B, and x1B. And so on. The length of the numeric
+vector needs to match the number of extirpation parameters in the
+model. See 'Details'.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>hidden.areas</code></td>
+<td>
+<p>a logical indicating whether the model includes a
+hidden area. The default is <code>FALSE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>trans.rate</code></td>
+<td>
+<p>provides the transition rate model. See function
+<code>TransMatMakerGeoHiSSE.old</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>assume.cladogenetic</code></td>
+<td>
+<p>assumes that cladogenetic events occur at nodes. The 
+default is <code>TRUE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>condition.on.survival</code></td>
+<td>
+<p>a logical indicating whether the likelihood
+should be conditioned on the survival of two lineages and the
+speciation event subtending them (Nee et al. 1994). The default is <code>TRUE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>root.type</code></td>
+<td>
+<p>indicates whether root summarization follow the procedure described by FitzJohn et al. 2009, “madfitz” or Herrera-Alsina et al. 2018, “herr_als”.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>root.p</code></td>
+<td>
+<p>a vector indicating fixed root state probabilities. The
+default is <code>NULL</code>. Order of the areas in the vector need to follow:
+root.p[1] = 1 (endemic area '0'); root.p[2] = 2 (endemic
+area '1'); root.p[3] = 0 (widespread area '01').</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sann</code></td>
+<td>
+<p>a logical indicating whether a two-step optimization
+procedure is to be used. The first includes a simulate annealing
+approach, with the second involving a refinement using
+<code>subplex</code>. The default is <code>TRUE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sann.its</code></td>
+<td>
+<p>a numeric indicating the number of times the simulated
+annealing algorithm should call the objective function.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>bounded.search</code></td>
+<td>
+<p>a logical indicating whether or not bounds should
+be enforced during optimization. The default is is <code>TRUE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>max.tol</code></td>
+<td>
+<p>supplies the relative optimization tolerance to
+<code>subplex</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mag.san.start</code></td>
+<td>
+<p>Sets the extinction fraction to estimate the starting values 
+for the diversification parameters. The equation used is based on Magallon and 
+Sanderson (2001), and follows the procedure used in the original GeoSSE 
+implementation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>starting.vals</code></td>
+<td>
+<p>a numeric vector of length 3 with starting values for the
+model for all areas and hidden states. Position [1] sets turnover, [2]
+sets extinction fraction, and [3] dispersal rates.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>speciation.upper</code></td>
+<td>
+<p>sets the upper bound for the speciation parameters.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>extirpation.upper</code></td>
+<td>
+<p>sets the upper bound for the extirpation parameters.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>trans.upper</code></td>
+<td>
+<p>sets the upper bound for the transition rate parameters.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ode.eps</code></td>
+<td>
+<p>sets the tolerance for the integration at the end of a
+branch. Essentially if the sum of compD is less than this tolerance,
+then it assumes the results are unstable and discards them. The
+default is set to zero, but in testing a value of 1e-8 can sometimes
+produce stable solutions for both easy and very difficult optimization problems.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>This function sets up and executes the original GeoHiSSE model. The model closely
+follows <code>diversitree</code>, although here we employ modified
+optimization procedures. As for data file format, <code>GeoHiSSE</code>
+expects a two column matrix or data frame, with the first column
+containing the species names and the second containing the are
+information. The area information need to be in the format of three
+numbers: 0 for area '01', 1 for area '0', and 2 for '1'. Please note that 
+the code for the areas here differ from the
+<code>make.geosse</code> function of package <code>diversitree</code>.
+The order of the data file and the names in the
+“phylo” object need not be in the same order; <code>hisse</code> deals
+with this internally. Also, the character information MUST be 0,
+1, or 2, otherwise, the function will return an error message.
+</p>
+<p>To setup a model, users input vectors containing values to indicate how
+many free parameters are to be estimated for each of the variables in
+the model. This is done using the <code>speciation</code> and
+<code>extirpation</code> parameters. One needs to specify a value for each of
+the parameters of the model, when two parameters show the same value,
+then the parameters are set to be linked during the estimation of the
+model. For example, a GeoHiSSE model with 1 hidden area and all free
+parameters has <code>speciation = 1:6</code>. The same model with
+speciation rates constrained to be the same for all hidden areas has
+<code>speciation = c(1,2,3,1,2,3)</code>. This same format applies to
+<code>extirpation</code>. Please note that GeoHiSSE currently works with up to
+4 hidden areas. The most complex model would be <code>speciation = 1:15</code>
+and <code>extirpation = 1:10</code>.
+</p>
+<p>Once the model is specified, the parameters can be estimated using the
+subplex routine (default), or use a two-step process (i.e., sann=TRUE)
+that first employs a stochastic simulated annealing procedure, which is
+later refined using the subplex routine.
+</p>
+<p>The “trans.rate” input is the transition model and has an
+entirely different setup than speciation and extirpation rates.
+See <code>TransMatMakerGeoHiSSE.old</code> function for more details. 
+</p>
+<p>For user-specified “root.p”, you should specify the probability
+for each area. If you are doing a hidden model, there will be six areas:
+0A, 1A, 01A, 0B, 1B, 01B. So if you wanted to say the root had to be in
+area 0 (widespread distribution), you would specify “root.p =
+c(0.5, 0, 0, 0.5, 0, 0)”. In other words, the root has a 50% chance
+to be in one of the areas 0A or 0B.
+</p>
+<p>For the “root.type” option, we are currently maintaining the previous default of 
+“madfitz”. However, it was recently pointed out by Herrera-Alsina et al. (2018)
+that at the root, the individual likelihoods for each possible state should be conditioned
+prior to averaging the individual likelihoods across states. This can be set doing 
+“herr_als”. It is unclear to us which is exactly correct, but it does seem that 
+both “madfitz” and “herr_als” behave exactly as they should in the case of 
+character-independent diversification (i.e., reduces to likelihood of tree + likelihood of
+trait model). We've also tested the behavior and the likelihood differences are very 
+subtle and the parameter estimates in simulation are nearly indistinguishable from the
+“madfitz” conditioning scheme. We provide both options and encourage users to try 
+both and let us know conditions in which the result vary dramatically under the two root
+implementations. We suspect they do not. 
+</p>
+<p>Also, note, that in the case of “root.type=user” and “root.type=equal” are
+no longer explicit “root.type” options. Instead, either “madfitz” or 
+“herr_als” are specified and the “root.p” can be set to allow for custom
+root options.  
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>GeoHiSSE</code> returns an object of class <code>geohisse.fit</code>. This is a list with 
+elements:
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>$loglik</code></td>
+<td>
+<p>the maximum negative log-likelihood.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>$AIC</code></td>
+<td>
+<p>Akaike information criterion.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>$AICc</code></td>
+<td>
+<p>Akaike information criterion corrected for sample-size.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>$solution</code></td>
+<td>
+<p>a matrix containing the maximum likelihood estimates of the model 
+parameters.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>$index.par</code></td>
+<td>
+<p>an index matrix of the parameters being estimated.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>$f</code></td>
+<td>
+<p>user-supplied sampling frequencies.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>$hidden.areas</code></td>
+<td>
+<p>a logical indicating whether hidden areas were included in the 
+model.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>$assume.cladogenetic</code></td>
+<td>
+<p>a logical indicating whether cladogenetic events were allowed
+at nodes.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>$condition.on.surivival</code></td>
+<td>
+<p>a logical indicating whether the
+likelihood was conditioned on the survival of two lineages and the speciation event 
+subtending them.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>$root.type</code></td>
+<td>
+<p>indicates the user-specified root prior assumption.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>$root.p</code></td>
+<td>
+<p>indicates whether the user-specified fixed root probabilities.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>$timeslice</code></td>
+<td>
+<p>indicates whether the user-specified timeslice that split the tree.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>$phy</code></td>
+<td>
+<p>user-supplied tree</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>$data</code></td>
+<td>
+<p>user-supplied dataset</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>$trans.matrix</code></td>
+<td>
+<p>the user-supplied transition matrix</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>$max.tol</code></td>
+<td>
+<p>relative optimization tolerance.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>$starting.vals</code></td>
+<td>
+<p>The starting values for the optimization.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>$upper.bounds</code></td>
+<td>
+<p>the vector of upper limits to the optimization search.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>$lower.bounds</code></td>
+<td>
+<p>the vector of lower limits to the optimization
+search.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>$ode.eps</code></td>
+<td>
+<p>The ode.eps value used for the estimation.</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>Jeremy M. Beaulieu</p>
+
+
+<h3>References</h3>
+
+<p>Caetano, D.S., B.C. O'Meara, and J.M. Beaulieu. 2018. Hidden state models improve state-dependent diversification approaches, including biogeographic models. Evolution, 72:2308-2324.
+</p>
+<p>Beaulieu, J.M, and B.C. O'Meara. 2016. Detecting hidden diversification shifts in models of trait-dependent speciation and extinction. Syst. Biol. 65:583-601. 
+</p>
+<p>FitzJohn R.G., W.P. Maddison, and S.P. Otto. 2009. Estimating trait-dependent speciation and extinction rates from incompletely resolved phylogenies. Syst. Biol. 58:595-611.
+</p>
+<p>Goldberg, E. E., L. T. Lancaster, and R. H. Ree. 2011. Phylogenetic Inference of Reciprocal Effects between Geographic Range Evolution and Diversification. Syst. Biol. 60:451-465.
+</p>
+<p>Maddison W.P., P.E. Midford, and S.P. Otto. 2007. Estimating a binary characters effect on speciation and extinction. Syst. Biol. 56:701-710.
+</p>
+<p>Nee S., R.M. May, and P.H. Harvey. 1994. The reconstructed evolutionary process. Philos. Trans. R. Soc. Lond. B Biol. Sci. 344:305-311.
+</p>
+
+
+</div>

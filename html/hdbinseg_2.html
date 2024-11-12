@@ -1,0 +1,165 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>dcbs.alg</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Double CUSUM Binary Segmentation</h2>
+
+<h3>Description</h3>
+
+<p>Perform the Double CUSUM Binary Segmentation algorithm detecting change points in the mean or second-order structure of the data.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">dcbs.alg(
+  x,
+  cp.type = c(1, 2)[1],
+  phi = 0.5,
+  thr = NULL,
+  trim = NULL,
+  height = NULL,
+  tau = NULL,
+  temporal = TRUE,
+  scales = NULL,
+  diag = FALSE,
+  B = 1000,
+  q = 0.01,
+  do.parallel = 4
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>input data matrix, with each row representing the component time series</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cp.type</code></td>
+<td>
+<p><code>cp.type = 1</code> specifies change points in the mean, <code>cp.type = 2</code> specifies change points in the second-order structure</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>phi</code></td>
+<td>
+<p>choice of parameter for weights in Double CUSUM statistic; 0 &lt;= phi &lt;= 1 or phi = -1 allowed with the latter leading to the DC statistic combining phi = 0 and phi = 1/2, see Section 4.1 of Cho (2016) for further details</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>thr</code></td>
+<td>
+<p>pre-defined threshold values; when <code>thr = NULL</code>, bootstrap procedure is employed for the threshold selection; when <code>thr != NULL</code> and <code>cp.type = 1</code>, <code>length(thr)</code> should be one, if <code>cp.type = 2</code>, <code>length(thr)</code> should match <code>length(scales)</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>trim</code></td>
+<td>
+<p>length of the intervals trimmed off around the change point candidates; <code>trim = NULL</code> activates the default choice (<code>trim = round(log(dim(x)[2]))</code>)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>height</code></td>
+<td>
+<p>maximum height of the binary tree; <code>height = NULL</code> activates the default choice (<code>height = floor(log(dim(x)[2], 2)/2)</code>)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tau</code></td>
+<td>
+<p>a vector containing the scaling constant for each row of <code>x</code>; if <code>tau = NULL</code>, a data-driven choice is made which takes into account the presence of possibly multiple mean shifts and temporal dependence when <code>temporal = TRUE</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>temporal</code></td>
+<td>
+<p>used when <code>cp.type = 1</code>; if <code>temporal = FALSE</code>, rows of <code>x</code> are scaled by mad estimates, if <code>temporal = TRUE</code>, their long-run variance estimates are used</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>scales</code></td>
+<td>
+<p>used when <code>cp.type = 2</code>; negative integers representing Haar wavelet scales to be used for computing <code>nrow(x)*(nrow(x) + 1)/2</code> dimensional wavelet transformation of <code>x</code>; a small negative integer represents a fine scale</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>diag</code></td>
+<td>
+<p>used when <code>cp.type = 2</code>; if <code>diag = TRUE</code>, only changes in the diagonal elements of the autocovariance matrices are searched for</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>B</code></td>
+<td>
+<p>used when <code>is.null(thr)</code>; number of bootstrap samples for threshold selection</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>q</code></td>
+<td>
+<p>used when <code>is.null(thr)</code>; indicates the quantile of bootstrap test statistics to be used for threshold selection</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>do.parallel</code></td>
+<td>
+<p>used when <code>is.null(thr)</code>; number of copies of R running in parallel, if <code>do.parallel = 0</code>, %do% operator is used, see also foreach</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>S3 <code>bin.tree</code> object, which contains the following fields:
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>tree</code></td>
+<td>
+<p>a list object containing information about the nodes at which change points are detected</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mat</code></td>
+<td>
+<p>matrix concatenation of the nodes of <code>tree</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ecp</code></td>
+<td>
+<p>estimated change points</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>thr</code></td>
+<td>
+<p>threshold used to construct the tree</p>
+</td>
+</tr>
+</table>
+<h3>References</h3>
+
+<p>H. Cho (2016) change point detection in panel data via double CUSUM statistic. <em>Electronic Journal of Statistics</em>, vol. 10, pp. 2000–2038.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">x &lt;- matrix(rnorm(10*100), nrow = 10)
+dcbs.alg(x, cp.type = 1, phi=.5, temporal = FALSE, do.parallel = 0)$ecp
+
+x &lt;- matrix(rnorm(100*300), nrow = 100)
+x[1:10, 151:300] &lt;- x[1:10, 151:300] + 1
+dcbs.alg(x, cp.type = 1, phi=-1, temporal = FALSE, do.parallel = 0)$ecp
+
+</code></pre>
+
+
+</div>

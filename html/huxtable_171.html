@@ -1,0 +1,76 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>mutate.huxtable</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Use dplyr verbs with huxtable objects</h2>
+
+<h3>Description</h3>
+
+<p>Huxtable can be used with dplyr verbs <code>dplyr::select()</code>, <code>dplyr::rename()</code>,
+<code>dplyr::relocate()</code>, <code>dplyr::slice()</code>, <code>dplyr::arrange()</code>, <code>dplyr::mutate()</code>
+and <code>dplyr::transmute()</code>. These will return huxtables. Other verbs like
+<code>dplyr::summarise()</code> will simply return data frames as normal;
+<code>dplyr::pull()</code> will return a vector. <code>mutate</code> has an extra option, detailed
+below.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">mutate.huxtable(.data, ..., copy_cell_props = TRUE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>.data</code></td>
+<td>
+<p>A huxtable.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Arguments passed to <code>dplyr::mutate()</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>copy_cell_props</code></td>
+<td>
+<p>Logical: copy cell and column properties from existing
+columns.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>If <code>mutate</code> creates new columns, and the argument <code>copy_cell_props</code>
+is missing or <code>TRUE</code>, then cell and column properties will be copied from
+existing columns to their left, if there are any. Otherwise, they will be the
+standard defaults. Row and table properties, and properties of cells in
+existing columns, remain unchanged.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">ht &lt;- hux(a = 1:5, b = 1:5, c = 1:5, d = 1:5, add_colnames = FALSE)
+bold(ht)[c(1, 3), ] &lt;- TRUE
+bold(ht)[, 1] &lt;- TRUE
+ht2 &lt;- dplyr::select(ht, b:c)
+ht2
+bold(ht2)
+ht3 &lt;- dplyr::mutate(ht, x = a + b)
+ht3
+bold(ht3)
+ht4 &lt;- dplyr::mutate(ht, x = a + b,
+      copy_cell_props = FALSE)
+bold(ht4)
+</code></pre>
+
+
+</div>

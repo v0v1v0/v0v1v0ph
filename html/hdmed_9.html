@@ -1,0 +1,188 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>mediate_plasso</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Pathway LASSO for Mediation Analysis with High-Dimensional Mediators</h2>
+
+<h3>Description</h3>
+
+<p><code>mediate_plasso</code> fits a high-dimensional mediation model
+with the penalized likelihood described by Zhao and Luo (2022), estimating the
+mediation contributions of each site.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">mediate_plasso(
+  A,
+  M,
+  Y,
+  lambdas = NULL,
+  select_lambda = FALSE,
+  vss_rep = 5,
+  vss_cutoff = 0.1,
+  omega_ratio = 1,
+  phi = 2,
+  maxit = 5000,
+  tol = 1e-06
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>A</code></td>
+<td>
+<p>numeric vector containing exposure variable.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>M</code></td>
+<td>
+<p>numeric matrix of high-dimensional mediators.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Y</code></td>
+<td>
+<p>numeric vector containing continuous outcome variable.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lambdas</code></td>
+<td>
+<p>numeric vector of tuning parameters <code>lambda</code> for
+which model is fitted. Default is a vector of length 50 ranging from 10^-5
+to 10^4, with more density in the lower range.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>select_lambda</code></td>
+<td>
+<p>logical flag indicating whether to conduct a tuning
+parameter selection using the Variable Selection Stability Criterion
+described by Sun et al. (2013). Default is <code>FALSE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>vss_rep</code></td>
+<td>
+<p>if <code>select_lambda</code> is <code>TRUE</code>, number of VSSC
+replications.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>vss_cutoff</code></td>
+<td>
+<p>if <code>select_lambda</code> is <code>TRUE</code>, cutoff used for
+VSSC. Default is 0.1.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>omega_ratio</code></td>
+<td>
+<p>ratio of the <code>omega</code> parameter to <code>lambda</code>
+parameter in the likelihood penalty. Default is 1.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>phi</code></td>
+<td>
+<p>value of the <code>phi</code> parameter in the likelihood penalty.
+Default is 2. Cannot be less than 1/2.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>maxit</code></td>
+<td>
+<p>the maximum number of iterations. Default is 5000.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tol</code></td>
+<td>
+<p>convergence tolerance. Default is 10^-6.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Pathway LASSO fits a high-dimensional mediation model with a likelihood
+that directly penalizes the mediator-outcome effects, exposure-mediator
+effects, and mediation contributions (i.e., the mediation "pathways").
+The shrinkage of the model is determined by three parameters–<code>phi</code>,
+<code>omega</code>, and <code>lambda</code>–with higher values tending to result in more
+sparsity. Mediation results are returned for every unique value in the
+inputted <code>lambdas</code> argument, in increasing order, excluding potentially
+any for which the estimation was unsuccessful. For details on the exact
+likelihood, see the first reference.
+</p>
+<p>When implementing multiple lambdas (i.e., using either the default argument
+to <code>lambdas</code> or specifying one's own vector), there is an option to
+perform a tuning parameter selection using the Variable Selection Stability
+Criterion proposed by Sun et al. (2013), which chooses the parameter for
+which the variable selection is most stable in repeated data-splitting.
+However, implementing this can be computationally costly, especially with a
+long list of tuning parameters, since it involves re-fitting pathway LASSO
+many times.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A list containing:
+</p>
+
+<ul>
+<li> <p><code>lambdas</code>: the <code>lambda</code>s attempted in the same order as the objects in <code>all_fits</code>.
+</p>
+</li>
+<li> <p><code>all_fits</code>: a list containing, for each <code>lambda</code>, a <code>data.frame</code> of the estimated mediation effects.
+</p>
+</li>
+<li> <p><code>chosen_lambda</code>: if <code>select_lambda</code> is <code>TRUE</code>, the <code>lambda</code> chosen by VSSC.
+</p>
+</li>
+<li> <p><code>chosen_fit</code>: if <code>select_lambda</code> is <code>TRUE</code>, the fit corresponding to the chosen <code>lambda</code>.
+</p>
+</li>
+<li> <p><code>vss</code>: if <code>select_lambda</code> is<code>TRUE</code>, a <code>data.frame</code> containing the variable selection stabilities.
+</p>
+</li>
+</ul>
+<h3>Source</h3>
+
+<p><a href="https://github.com/zhaoyi1026/PathwayLasso">https://github.com/zhaoyi1026/PathwayLasso</a>
+</p>
+
+
+<h3>References</h3>
+
+<p>Zhao, Y. &amp; Luo, X. Pathway LASSO: pathway estimation and
+selection with high-dimensional mediators. Stat. Interface 15, 39-50 (2022).
+</p>
+<p>Sun, W., Wang, J. &amp; Fang, Y. Consistent selection of tuning parameters via
+variable selection stability. J. Mach. Learn. Res. 14, 3419-3440 (2013).
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">A &lt;- med_dat$A
+M &lt;- med_dat$M[,1:8]
+Y &lt;- med_dat$Y
+# fit pathway LASSO for two tuning parameters and retrieve their fits
+out &lt;- mediate_plasso(A, M, Y, lambdas = c(10^-3, 10^-2), tol = 1e-4)
+head(out$all_fits$lambda1)
+head(out$all_fits$lambda2)
+
+
+</code></pre>
+
+
+</div>

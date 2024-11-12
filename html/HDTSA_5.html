@@ -1,0 +1,178 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>HDSReg</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>High dimensional stochastic regression with latent factors</h2>
+
+<h3>Description</h3>
+
+<p><code>HDSReg()</code> considers a multivariate time series model which
+represents a high dimensional vector process as a sum of three terms: a
+linear regression of some observed regressors, a linear combination of some
+latent and serially correlated factors, and a vector white noise:</p>
+<p style="text-align: center;"><code class="reqn">{\bf
+y}_t = {\bf Dz}_t + {\bf Ax}_t + {\boldsymbol {\epsilon}}_t,</code>
+</p>
+<p> where <code class="reqn">{\bf
+y}_t</code> and <code class="reqn">{\bf z}_t</code> are, respectively, observable <code class="reqn">p\times 1</code> and
+<code class="reqn">m \times 1</code> time series, <code class="reqn">{\bf x}_t</code> is an <code class="reqn">r \times 1</code> latent
+factor process, <code class="reqn">{\boldsymbol{\epsilon}}_t \sim
+\mathrm{WN}({\boldsymbol{0}},{\bf \Sigma}_{\epsilon}) </code> is a white noise with
+zero mean and covariance matrix <code class="reqn">{\bf \Sigma}_{\epsilon}</code> and
+<code class="reqn">{\boldsymbol{\epsilon}}_t</code> is uncorrelated with <code class="reqn">({\bf z}_t, {\bf
+x}_t)</code>, <code class="reqn">{\bf D}</code> is an unknown regression coefficient matrix, and
+<code class="reqn">{\bf A}</code> is an unknown factor loading matrix. This procedure proposed in
+Chang, Guo and Yao (2015) aims to estimate the unknown regression coefficient
+matrix <code class="reqn">{\bf D}</code>, the number of factors <code class="reqn">r</code> and the factor loading
+matrix <code class="reqn">{\bf A}</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">HDSReg(Y, Z, D = NULL, lag.k = 1, twostep = FALSE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>Y</code></td>
+<td>
+<p><code class="reqn">{\bf Y} = \{{\bf y}_1, \dots , {\bf y}_n \}'</code>, a data matrix
+with <code class="reqn">n</code> rows and <code class="reqn">p</code> columns, where <code class="reqn">n</code> is the sample size and
+<code class="reqn">p</code> is the dimension of <code class="reqn">{\bf y}_t</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Z</code></td>
+<td>
+<p><code class="reqn">{\bf Z} = \{{\bf z}_1, \dots , {\bf z}_n \}'</code>, a data matrix
+representing some observed regressors with <code class="reqn">n</code> rows and <code class="reqn">m</code>
+columns, where <code class="reqn">n</code> is the sample size and <code class="reqn">m</code> is the dimension of
+<code class="reqn">{\bf z}_t</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>D</code></td>
+<td>
+<p>A <code class="reqn">p\times m</code> regression coefficient matrix <code class="reqn">\widetilde{\bf
+D}</code>. If <code>D = NULL</code> (the default), our procedure will estimate
+<code class="reqn">{\bf D}</code> first and let <code class="reqn">\widetilde{\bf D}</code> be the estimate of
+<code class="reqn">{\bf D}</code>. If <code>D</code> is given by R users, then
+<code class="reqn">\widetilde{\bf D}={\bf D}</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lag.k</code></td>
+<td>
+<p>Time lag <code class="reqn">k_0</code> used to calculate the nonnegative definte
+matrix <code class="reqn"> \widehat{\mathbf{M}}</code>: </p>
+<p style="text-align: center;"><code class="reqn">\widehat{\mathbf{M}}\ =\
+\sum_{k=1}^{k_0}\widehat{\mathbf{\Sigma}}_{\eta}(k)\widehat{\mathbf{\Sigma}}_{\eta}(k)',
+</code>
+</p>
+<p> where <code class="reqn">\widehat{\bf \Sigma}_{\eta}(k)</code> is the sample autocovariance
+of <code class="reqn"> {\boldsymbol {\eta}}_t = {\bf y}_t - \widetilde{\bf D}{\bf z}_t</code>
+at lag <code class="reqn">k</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>twostep</code></td>
+<td>
+<p>Logical. If <code>FALSE</code> (the default), then standard
+procedures (see <code>Factors</code>) will be implemented to estimate
+<code class="reqn">r</code> and <code class="reqn">{\bf A}</code>. If <code>TRUE</code>, then a two step estimation
+procedure (see <code>Factors</code>) will be implemented to estimate
+<code class="reqn">r</code> and <code class="reqn">{\bf A}</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>An object of class "factors" is a list containing the following
+components:
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>factor_num</code></td>
+<td>
+<p>The estimated number of factors <code class="reqn">\hat{r}</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>reg.coff.mat</code></td>
+<td>
+<p>The estimated <code class="reqn">p \times m</code> regression coefficient
+matrix <code class="reqn">\widetilde{\bf D}</code> if <code>D</code> is not given.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>loading.mat</code></td>
+<td>
+<p>The estimated <code class="reqn">p \times m</code> factor loading matrix
+<code class="reqn">{\bf \widehat{A}}</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lag.k</code></td>
+<td>
+<p>the time lag used in function.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+<p>a character string indicating what method was performed.</p>
+</td>
+</tr>
+</table>
+<h3>References</h3>
+
+<p>Chang, J., Guo, B. &amp; Yao, Q. (2015).  <em>High dimensional
+stochastic regression with latent factors, endogeneity and nonlinearity</em>,
+Journal of Econometrics, Vol. 189, pp. 297–312.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>Factors</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">n &lt;- 400
+p &lt;- 200
+m &lt;- 2
+r &lt;- 3
+X &lt;- mat.or.vec(n,r)
+x1 &lt;- arima.sim(model=list(ar=c(0.6)),n=n)
+x2 &lt;- arima.sim(model=list(ar=c(-0.5)),n=n)
+x3 &lt;- arima.sim(model=list(ar=c(0.3)),n=n)
+X &lt;- cbind(x1,x2,x3)
+X &lt;- t(X)
+
+Z &lt;- mat.or.vec(m,n)
+S1 &lt;- matrix(c(5/8,1/8,1/8,5/8),2,2)
+Z[,1] &lt;- c(rnorm(m))
+for(i in c(2:n)){
+  Z[,i] &lt;- S1%*%Z[, i-1] + c(rnorm(m))
+}
+D &lt;- matrix(runif(p*m, -2, 2), ncol=m)
+A &lt;- matrix(runif(p*r, -2, 2), ncol=r)
+eps &lt;- mat.or.vec(n, p)
+eps &lt;- matrix(rnorm(n*p), p, n)
+Y &lt;- D %*% Z + A %*% X + eps
+Y &lt;- t(Y)
+Z &lt;- t(Z)
+res1 &lt;- HDSReg(Y,Z,D,lag.k=2)
+res2 &lt;- HDSReg(Y,Z,lag.k=2)
+</code></pre>
+
+
+</div>

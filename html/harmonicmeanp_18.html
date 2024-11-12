@@ -1,0 +1,171 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>Model-Averaged Mean Maximized Likelihood Ratio Asymptotic Distribution</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Model-Averaged Mean Maximized Likelihood Ratio Asymptotic Distribution
+</h2>
+
+<h3>Description</h3>
+
+<p>Density, distribution function, quantile function and random number generation for the mean of <em>L</em> maximized likelihood ratios under their null hypotheses, i.e. the mean of <em>L</em> Pareto(1,1) variables, assuming <em>L</em> is large.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">dmamml(x, L, df, log=FALSE)
+pmamml(x, L, df, log=FALSE, lower.tail=TRUE)
+qmamml(p, L, df, log=FALSE, lower.tail=TRUE, xmin=1+1e-12, xmax=1e12)
+rmamml(n, L, df)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+
+<p>The value or vector of values of the mean maximized likelihood ratios, for example calculated from data using function <code>mamml.stat</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>L</code></td>
+<td>
+
+<p>The number of constituent likelihood ratios used in calculating each value of x.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>df</code></td>
+<td>
+
+<p>Degrees of freedom of the constituent likelihood ratios, assumed all equal for each value of x.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>log</code></td>
+<td>
+
+<p>If true the log probability is output.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lower.tail</code></td>
+<td>
+
+<p>If true (the default) the lower tail probability is returned. Otherwise the upper tail probability.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>p</code></td>
+<td>
+
+<p>The value or vector of values, between 0 and 1, of the probability specifying the quantile for which to return the mean maximized likelihood ratio.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>xmin, xmax</code></td>
+<td>
+
+<p>The range of values of the mean maximized likelihood ratio over which to search for the quantile specified by <code>p</code>, used by the numerical root finding algorithm. Must bracket the solution.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n</code></td>
+<td>
+
+<p>The number of values to simulate.
+</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p><code>dmamml</code> produces the density, <code>pmamml</code> the tail probability, <code>qmamml</code> the quantile and <code>rmamml</code> random variates for the model-averaged mean maximized likelihood ratios when their null hypotheses are true.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Daniel J. Wilson
+</p>
+
+
+<h3>References</h3>
+
+<p>Daniel J. Wilson (2019) The harmonic mean <em>p</em>-value for combining dependent tests. <em>Proceedings of the National Academy of Sciences USA</em> 116: 1195-1200.
+</p>
+
+
+<h3>See Also</h3>
+
+<p>p.hmp
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># For a detailed tutorial type vignette("harmonicmeanp")
+# Example: simulate from a gamma distribution mildly enriched for large likelihood ratios.
+# Compare the significance of the combined p-value for Bonferroni, Benjamini-Hochberg (i.e. Simes), 
+# MAMML with 4 degrees of freedom.
+L = 100
+df = 4
+enrich = 1.5
+y = exp(0.5*rgamma(L,shape=df/2,rate=1/2/enrich))
+p = pchisq(2*log(y),df,lower.tail=FALSE)
+min(p.adjust(p,"bonferroni"))
+min(p.adjust(p,"BH"))
+(x = mamml.stat(y))
+pmamml(x,L,df,lower.tail=FALSE)
+p.mamml(y,df,L=L)
+# Compare to the HMP - MAMML may act more conservatively because of adjustments for its
+# poorer asymptotic approximation
+x = hmp.stat(p)
+p.hmp(p,L=L)
+
+# Compute critical values for MAMML from asymptotic theory and compare to direct simulations
+L = 100
+df = 1
+alpha = 0.05
+(mamml.crit = qmamml(1-alpha,L,df))
+nsim = 10000
+y.direct = matrix(exp(0.5*rchisq(L*nsim,df)),nsim,L)
+mamml.direct = apply(y.direct,1,mamml.stat)
+# mamml.crit may be more conservative than mamml.crit.sim because of adjustments for its
+# poorer asymptotic approximation
+(mamml.crit.sim = quantile(mamml.direct,1-alpha))
+
+# Compare MAMML simulated directly, and via the asymptotic distribution, to the asymptotic density
+# Works best for df = 2
+L = 30
+df = 3
+nsim = 1000
+y.direct = matrix(exp(0.5*rchisq(L*nsim,df)),nsim,L)
+mamml.direct = apply(y.direct,1,mamml.stat)
+xmax = quantile(mamml.direct,.95)
+h = hist(mamml.direct,c(-Inf,seq(0,xmax,len=60),Inf),col="green3",prob=TRUE,
+  main="Distributions of MAMML",xlim=c(1,xmax))
+# Slow because rmamml calls qmamml which uses numerical root finding
+# mamml.asympt = rmamml(nsim,L,df)
+# hist(mamml.asympt,c(-Inf,seq(0,xmax,len=60),Inf),col="yellow2",prob=TRUE,add=TRUE)
+hist(mamml.direct,c(-Inf,seq(0,xmax,len=60),Inf),col=NULL,prob=TRUE,add=TRUE)
+curve(dmamml(x,L,df),lwd=2,col="red3",add=TRUE)
+legend("topright",c("Direct simulation","Asymptotic density"),
+  fill=c("green3",NA),col=c(NA,"red3"),lwd=c(NA,2),bty="n",border=c(1,NA))
+</code></pre>
+
+
+</div>

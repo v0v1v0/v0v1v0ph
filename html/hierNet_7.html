@@ -1,0 +1,264 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hierNet.path</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Fit a path of hierNet models- lasso models with interactions</h2>
+
+<h3>Description</h3>
+
+<p>One of the main functions in the hierNet package.
+Fits a path of hierNet models over different values of the regularization parameter.
+Calls hierNet, which builds a regression model with hierarchically constrained pairwise interactions.
+Required inputs are an x matrix of
+features (the columns are the features) and a y vector of
+values.
+Reasonably fast for moderate sized problems (100-200 variables). We are currently working
+on an alternate algorithm for large scale problems.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hierNet.path(x, y,
+             lamlist = NULL, delta=1e-8, minlam = NULL, maxlam = NULL, nlam=20, flmin=.01,
+             diagonal = TRUE, strong = FALSE, aa = NULL, zz = NULL,
+             stand.main = TRUE, stand.int = FALSE,
+             rho = nrow(x), niter = 100, sym.eps = 0.001, 
+             step = 1, maxiter = 2000, backtrack = 0.2, tol = 1e-05, trace = 0)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>A matrix of predictors, where the rows are the samples and
+the columns are the predictors</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+<p>A vector  of observations, where length(y) equals
+nrow(x)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lamlist</code></td>
+<td>
+<p>Optional vector of values of lambda (the regularization parameter). L1 penalty param is <code>lamdbda * (1-delta)</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>delta</code></td>
+<td>
+<p>Elastic Net parameter. Squared L2 penalty param is <code>lambda * delta</code>. Not a tuning parameter: Think of as fixed and small. Default 1e-8.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>minlam</code></td>
+<td>
+<p>Optional minimum value for lambda</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>maxlam</code></td>
+<td>
+<p>Optional maximum value for lambda</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nlam</code></td>
+<td>
+<p>Number of values of lambda to be tried</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>flmin</code></td>
+<td>
+<p>Fraction of maxlam; minlam= flmin*maxlam. If computation is slow, try increasing
+flmin to focus on the sparser part of the path</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>diagonal</code></td>
+<td>
+<p>Flag specifying whether to include "pure" quadratic
+terms, th_jjX_j^2, in the model.  Default TRUE.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>strong</code></td>
+<td>
+<p>Flag specifying strong hierarchy (true) or weak hierarchy (false). Default false</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>aa</code></td>
+<td>
+<p>An *optional* argument, a list with results from a previous call</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>zz</code></td>
+<td>
+<p>An  *optional* argument, a matrix whose columns are products of features, computed by the function compute.interactions.c</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>stand.main</code></td>
+<td>
+<p>Should main effects be standardized? Default TRUE</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>stand.int</code></td>
+<td>
+<p>Should interactions be standardized? Default FALSE</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rho</code></td>
+<td>
+<p>ADMM parameter: tuning parameter (&gt;0) for ADMM. If there are convergence
+problems, try decreasing rho. Default n.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>niter</code></td>
+<td>
+<p>ADMM parameter: number of iterations</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sym.eps</code></td>
+<td>
+<p>ADMM parameter Thresholding for symmetrizing with strong=TRUE</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>step</code></td>
+<td>
+<p>Stepsize for generalized gradient descent</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>maxiter</code></td>
+<td>
+<p>Maximum number of iterations for generalized gradient descent</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>backtrack</code></td>
+<td>
+<p>Backtrack parameter for generalized gradient descent</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tol</code></td>
+<td>
+<p>Error tolerance parameter for generalized gradient descent</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>trace</code></td>
+<td>
+<p>Output option; trace=1 gives verbose output</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>bp</code></td>
+<td>
+<p>p by nlam  matrix of estimated  "positive part"  main effects (p=#variables)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>bn</code></td>
+<td>
+<p>p by nlam  matrix of estimated  "negative part"  main effects</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>th</code></td>
+<td>
+<p>p by p by nlam array of estimated interaction coefficients</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>obj</code></td>
+<td>
+<p>nlam values of objective function, one per lambda value</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lamlist</code></td>
+<td>
+<p>Vector of values of lambda used</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mx</code></td>
+<td>
+<p> p-vector of  column means of x</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sx</code></td>
+<td>
+<p> p-vector of  column standard deviations of x</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>my</code></td>
+<td>
+<p> mean of y</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mzz</code></td>
+<td>
+<p> column means of feature product matrix</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>szz</code></td>
+<td>
+<p> column standard deviations of feature product matrix</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>Jacob Bien and Robert Tibshirani</p>
+
+
+<h3>References</h3>
+
+<p>Bien, J., Taylor, J., Tibshirani, R., (2013) "A Lasso for Hierarchical Interactions." Annals of Statistics. 41(3). 1111-1141.</p>
+
+
+<h3>See Also</h3>
+
+<p>hierNet,predict.hierNet, hierNet.cv</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">set.seed(12)
+x=matrix(rnorm(100*10),ncol=10)
+x=scale(x,TRUE,TRUE)
+y=x[,1]+2*x[,2]+ x[,1]*x[,2]+3*rnorm(100)
+fit=hierNet.path(x,y)
+print(fit)
+</code></pre>
+
+
+</div>

@@ -1,0 +1,83 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>concordance_mcm</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>C-statistic for mixture cure models</h2>
+
+<h3>Description</h3>
+
+<p>This function calculates the C-statistic using the cure status weighting (CSW) method proposed by Asano and Hirakawa.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">concordance_mcm(object, newdata, cure_cutoff = 5, model.select = "AIC")
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>object</code></td>
+<td>
+<p>a <code>mixturecure</code> object resulting from <code>curegmifs</code>, <code>cureem</code>, <code>cv_curegmifs</code>, <code>cv_cureem</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>newdata</code></td>
+<td>
+<p>an optional data.frame that minimally includes the incidence and/or latency variables to use for predicting the response. If omitted, the training data are used.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cure_cutoff</code></td>
+<td>
+<p>cutoff value for cure, used to produce a proxy for the unobserved cure status; default is 5.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>model.select</code></td>
+<td>
+<p>for models fit using <code>curegmifs</code> or <code>cureem</code> any step along the solution path can be selected. The default is <code>model.select = "AIC"</code> which calculates the predicted values using the coefficients from the model having the lowest AIC. Other options are <code>model.select = "mAIC"</code> for the modified AIC,  <code>model.select = "cAIC"</code> for the corrected AIC, <code>model.select = "BIC"</code>, <code>model.select = "mBIC"</code> for the modified BIC, <code>model.select = "EBIC"</code> for the extended BIC, <code>model.select = "logLik"</code> for the step that maximizes the log-likelihood, or any numeric value from the solution path. This option has no effect for objects fit using <code>cv_curegmifs</code> or <code>cv_cureem</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>value of C-statistic for the cure models.
+</p>
+
+
+<h3>References</h3>
+
+<p>Asano, J. and Hirakawa, H. (2017) Assessing the prediction accuracy of a cure model for censored survival data with long-term survivors: Application to breast cancer data. <em>Journal of Biopharmaceutical Statistics</em>, <b>27</b>:6, 918–932.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>AUC</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">library(survival)
+set.seed(1234)
+temp &lt;- generate_cure_data(N = 100, J = 10, nTrue = 10, A = 1.8)
+training &lt;- temp$Training
+testing &lt;- temp$Testing
+fit &lt;- curegmifs(Surv(Time, Censor) ~ .,
+                  data = training, x.latency = training,
+                  model = "weibull", thresh = 1e-4, maxit = 2000,
+                  epsilon = 0.01, verbose = FALSE)
+concordance_mcm(fit)
+concordance_mcm(fit, newdata = testing)
+</code></pre>
+
+
+</div>

@@ -1,0 +1,156 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>mediate_hdma</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>High-Dimensional Mediation Analysis</h2>
+
+<h3>Description</h3>
+
+<p><code>mediate_hdma</code> fits a high-dimensional mediation model with
+the de-biased LASSO approach as proposed by Gao et al. (2022),
+estimating the mediation contributions of potential mediators.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">mediate_hdma(
+  A,
+  M,
+  Y,
+  C1 = NULL,
+  C2 = NULL,
+  binary_y = FALSE,
+  n_include = NULL,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>A</code></td>
+<td>
+<p>length <code>n</code> numeric vector containing exposure variable</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>M</code></td>
+<td>
+<p><code>n x p</code> numeric matrix of high-dimensional mediators.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Y</code></td>
+<td>
+<p>length <code>n</code> numeric vector containing continuous or binary outcome variable.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>C1</code></td>
+<td>
+<p>optional numeric matrix of covariates to include in the outcome model.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>C2</code></td>
+<td>
+<p>optional numeric matrix of covariates to include in the mediator model.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>binary_y</code></td>
+<td>
+<p>logical flag for whether <code>Y</code> should be interpreted as a
+binary variable with 1/0 coding rather than as continuous. Default is <code>FALSE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n_include</code></td>
+<td>
+<p>integer specifying the number of top markers from sure
+independent screening to be included. Default is <code>NULL</code>, in which case
+<code>n_include</code> will be either <code>ceiling(n/log(n))</code> if
+<code>binary_Y = F</code>, or <code>ceiling(n/(2*log(n)))</code> if <code>binary_Y = T</code>.
+If <code>n_include &gt;= p</code>, all mediators are included with no screening. Note
+that if <code>binary_y = F</code>, screening is performed based on the single-mediator
+outcome model p-values, and if <code>binary_y = F</code>, screening is based on the
+the mediator model p-values.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>other arguments passed to <code>hdi::hdi()</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The first step in HDMA is to perform sure independence
+screening (SIS) to choose the <code>n_include</code> mediators that are most
+associated with the outcome (when Y is continuous) or the exposure
+(when Y is binary), based on p-values from linear regression. The second step
+is to fit the outcome model for the remaining mediators using de-sparsified
+(A.K.A de-biased) LASSO, which as asymptotic properties allowing for
+computation of p-values by the <code>hdi</code> package. HDMA then fits the
+mediator models using linear regression among those mediators that have both
+survived SIS (in step 1) and been identified by the LASSO (in step 2), obtaining
+p-values for the mediation contributions by taking the maximum of the <code class="reqn">\alpha_a</code>
+and <code class="reqn">\beta_m</code> p-values. The global indirect effect is estimated by summing the
+mediation contributions, and the direct effect is estimated by subtracting
+the global indirect effect from an estimate of the total effect. See References for
+more detail.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A list containing:
+</p>
+
+<ul>
+<li> <p><code>contributions</code>: a data frame containing the estimates and p-values
+of the mediation contributions.
+</p>
+</li>
+<li> <p><code>effects</code>: a data frame containing the estimated direct, global mediation,
+and total effects.
+</p>
+</li>
+</ul>
+<h3>Source</h3>
+
+<p><a href="https://github.com/YuzhaoGao/High-dimensional-mediation-analysis-R">https://github.com/YuzhaoGao/High-dimensional-mediation-analysis-R</a>
+</p>
+
+
+<h3>References</h3>
+
+<p>Gao, Y. et al. Testing Mediation Effects in High-Dimensional
+Epigenetic Studies. Front. Genet. 10, 1195 (2019).
+</p>
+<p>Fan, J. &amp; Lv, J. Sure independence screening for ultrahigh dimensional
+feature space. J. R. Stat. Soc. 70, 849-911 (2008)
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">A &lt;- med_dat$A
+M &lt;- med_dat$M
+Y &lt;- med_dat$Y
+
+# Fit hdma with continuous outcomes
+out &lt;- mediate_hdma(A, M, Y)
+head(out$contributions)
+out$effects
+
+</code></pre>
+
+
+</div>

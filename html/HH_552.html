@@ -1,0 +1,248 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>position</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Find or assign the implied position for graphing the levels of a
+factor.
+A new class "positioned", which inherits from "ordered" and "factor",
+is defined.</h2>
+
+<h3>Description</h3>
+
+<p>The default values for plotting a factor <code>x</code> are the integers
+<code>1:length(levels(x))</code>.  These functions provide a way of
+specifying alternate plotting locations for the levels.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">position(x)
+
+position(x) &lt;- value
+
+## S3 method for class 'positioned'
+is.numeric(x, ...)
+## S3 method for class 'positioned'
+as.numeric(x, ...)
+## S3 method for class 'positioned'
+x[..., drop=FALSE]
+## S3 method for class 'positioned'
+is.na(x)
+as.positioned(x)
+as.position(x)
+is.positioned(x)
+positioned(x, ..., value)
+## S3 method for class 'positioned'
+print(x, ...)
+## S3 method for class 'positioned'
+unique(x, incomparables = FALSE, ...)
+unpositioned(x, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>numeric vector or factor</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>value</code></td>
+<td>
+<p>numerical values to be
+associated with <code>levels(x)</code>.
+The <code>length(value)</code> must equal <code>length(levels(as.factor(x)))</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>other arguments.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>drop</code></td>
+<td>
+<p>See
+<code>Extract</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>incomparables</code></td>
+<td>
+<p>See
+<code>unique</code>.
+</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p><code>position(x) &lt;- value</code> first forces its argument to be an ordered
+factor and then assigns the <code>value</code> to the <code>"position"</code>
+attribute of the ordered factor.
+The result is assigned class <code>"positioned"</code> and returned.
+</p>
+<p><code>position(x)</code> returns the position values associated with
+<code>levels(x)</code>.  If <code>x</code> is a positioned factor, then
+the <code>"position"</code> attribute is returned.
+If <code>x</code> is a factor, then the integers
+<code>1:length(levels(x))</code> are returned.  For anything else,
+<code>as.numeric(x)</code> is returned.
+</p>
+<p><code>as.position(x)</code> returns a numeric vector the length of the
+original vector.  If <code>x</code> inherits from <code>"factor"</code>,
+then the values in the vector are the values in
+<code>position(x)</code> subscripted by the levels of the factor.
+If <code>x</code> is numeric, then <code>x</code> itself is returned.
+</p>
+<p><code>unpositioned(x)</code> removes the <code>"position"</code> attribute and
+removes the <code>"positioned"</code> value from the the <code>class</code> of
+the object.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p> Richard M. Heiberger &lt;rmh@temple.edu&gt; </p>
+
+
+<h3>See Also</h3>
+
+<p><code>panel.interaction2wt</code>,
+<code>factor</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## ordered with character levels defaults to
+## integer position of specified levels
+tmp &lt;- ordered(c("mm","cm","m","m","mm","cm"),
+               levels=c("mm","cm","m")) ## size order
+tmp
+as.numeric(tmp)
+levels(tmp)
+position(tmp)
+as.position(tmp)
+as.positioned(tmp)
+positioned(tmp)
+unpositioned(tmp)
+unique(tmp)
+
+## position is assigned to ordered in specified order
+tmp &lt;- ordered(c("cm","mm","m","m","mm","cm"),
+               levels=c("mm","cm","m")) ## size order
+levels(tmp)
+position(tmp) &lt;- c(-3, -2, 0) ## log10 assigned in size order
+tmp
+as.numeric(tmp)
+levels(tmp)
+position(tmp)
+as.position(tmp)
+as.positioned(tmp)
+positioned(tmp)
+unpositioned(tmp)
+unique(tmp)
+
+## numeric stays numeric
+tmp &lt;- c(0.010, 0.001, 1.000, 1.000, 0.001, 0.010)
+tmp
+as.numeric(tmp)
+levels(tmp)
+position(tmp)
+as.position(tmp)
+as.positioned(tmp)
+positioned(tmp)
+unpositioned(tmp)
+unique(tmp)
+
+## factor with numeric levels, position is integer position in size order
+tmp &lt;- factor(c(0.010, 0.001, 1.000, 1.000, 0.001, 0.010))
+tmp
+as.numeric(tmp)
+levels(tmp)
+position(tmp)
+as.position(tmp)
+as.positioned(tmp)
+positioned(tmp)
+unpositioned(tmp)
+unique(tmp)
+
+## ordered with numeric levels, position is numeric value in size order
+tmp &lt;- ordered(c(0.010, 0.001, 1.000, 1.000, 0.001, 0.010))
+tmp
+as.numeric(tmp)
+levels(tmp)
+position(tmp)
+as.position(tmp)
+as.positioned(tmp)
+positioned(tmp)
+unpositioned(tmp)
+unique(tmp)
+
+
+## factor with numeric levels
+## position is assigned in size order
+tmp &lt;- factor(c(0.010, 0.001, 1.000, 1.000, 0.001, 0.010))
+levels(tmp)
+position(tmp) &lt;- c(-3, -2, 0) ## log10 assigned in size order
+tmp
+as.numeric(tmp)
+levels(tmp)
+position(tmp)
+as.position(tmp)
+as.positioned(tmp)
+positioned(tmp)
+unpositioned(tmp)
+unique(tmp)
+
+
+
+## boxplots coded by week
+tmp &lt;- data.frame(Y=rnorm(40, rep(c(20,25,15,22), 10), 5),
+                  week=ordered(rep(1:4, 10)))
+position(tmp$week) &lt;- c(1, 2, 4, 8)
+
+bwplot(Y ~ week, horizontal=FALSE,
+       scales=list(x=list(limits=c(0,9),
+                          at=position(tmp$week),
+                          labels=position(tmp$week))),
+       data=tmp, panel=panel.bwplot.intermediate.hh)
+
+
+#### You probably don't want to use the next two examples.
+#### You need to be aware of their behavior.
+##
+## factor with character levels defaults to
+## integer position of sorted levels.
+## you probably DON'T want to do this!
+tmp &lt;- factor(c("cm","mm","m","m","mm","cm")) ## default alphabetic order
+tmp
+as.numeric(tmp)
+levels(tmp)   ## you probably DON'T want to do this!
+position(tmp) ## you probably DON'T want to do this!
+as.numeric(tmp)
+##
+## position is assigned to factor in default alphabetic order.
+## you probably DON'T want to do this!
+tmp &lt;- factor(c("cm","mm","m","m","mm","cm"))
+levels(tmp)
+position(tmp) &lt;- c(-3, -2, 0) ## assigned in default alphabetic order
+tmp
+as.numeric(tmp)
+levels(tmp)   ## you probably DON'T want to do this!
+position(tmp) ## you probably DON'T want to do this!
+as.numeric(tmp)
+
+</code></pre>
+
+
+</div>

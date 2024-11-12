@@ -1,0 +1,206 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hmc.fit</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Fitter function for Hamiltonian Monte Carlo (HMC)</h2>
+
+<h3>Description</h3>
+
+<p>This is the basic computing function for HMC and should not be called directly except by experienced users.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hmc.fit(
+  N,
+  theta.init,
+  epsilon,
+  L,
+  logPOSTERIOR,
+  glogPOSTERIOR,
+  varnames = NULL,
+  randlength = FALSE,
+  Mdiag = NULL,
+  constrain = NULL,
+  verbose = FALSE,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>N</code></td>
+<td>
+<p>Number of MCMC samples</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>theta.init</code></td>
+<td>
+<p>Vector of initial values for the parameters</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>epsilon</code></td>
+<td>
+<p>Step-size parameter for <code>leapfrog</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>L</code></td>
+<td>
+<p>Number of <code>leapfrog</code> steps parameter</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>logPOSTERIOR</code></td>
+<td>
+<p>Function to calculate and return the log posterior given a vector of values of <code>theta</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>glogPOSTERIOR</code></td>
+<td>
+<p>Function to calculate and return the gradient of the log posterior given a vector of values of  <code>theta</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>varnames</code></td>
+<td>
+<p>Optional vector of theta parameter names</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>randlength</code></td>
+<td>
+<p>Logical to determine whether to apply some randomness to the number of leapfrog steps tuning parameter <code>L</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Mdiag</code></td>
+<td>
+<p>Optional vector of the diagonal of the mass matrix <code>M</code>.  Defaults to unit diagonal.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>constrain</code></td>
+<td>
+<p>Optional vector of which parameters in <code>theta</code> accept positive values only.  Default is that all parameters accept all real numbers</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p>Logical to determine whether to display the progress of the HMC algorithm</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Additional parameters for <code>logPOSTERIOR</code> and <code>glogPOSTERIOR</code></p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>List for <code>hmc</code>
+</p>
+
+
+<h3>Elements for <code>hmclearn</code> objects</h3>
+
+
+<dl>
+<dt><code>N</code></dt>
+<dd>
+<p>Number of MCMC samples
+</p>
+</dd>
+<dt><code>theta</code></dt>
+<dd>
+<p>Nested list of length <code>N</code> of the sampled values of <code>theta</code> for each chain
+</p>
+</dd>
+<dt><code>thetaCombined</code></dt>
+<dd>
+<p>List of dataframes containing sampled values, one for each chain
+</p>
+</dd>
+<dt><code>r</code></dt>
+<dd>
+<p>List of length <code>N</code> of the sampled momenta
+</p>
+</dd>
+<dt><code>theta.all</code></dt>
+<dd>
+<p>Nested list of all parameter values of <code>theta</code> sampled prior to accept/reject step for each
+</p>
+</dd>
+<dt><code>r.all</code></dt>
+<dd>
+<p>List of all values of the momenta <code>r</code> sampled prior to accept/reject
+</p>
+</dd>
+<dt><code>accept</code></dt>
+<dd>
+<p>Number of accepted proposals.  The ratio <code>accept</code> / <code>N</code> is the acceptance rate
+</p>
+</dd>
+<dt><code>accept_v</code></dt>
+<dd>
+<p>Vector of length <code>N</code> indicating which samples were accepted
+</p>
+</dd>
+<dt><code>M</code></dt>
+<dd>
+<p>Mass matrix used in the HMC algorithm
+</p>
+</dd>
+<dt><code>algorithm</code></dt>
+<dd>
+<p><code>HMC</code> for Hamiltonian Monte Carlo
+</p>
+</dd>
+</dl>
+<h3>References</h3>
+
+<p>Neal, Radford. 2011. <em>MCMC Using Hamiltonian Dynamics.</em> In Handbook of Markov Chain Monte Carlo, edited by Steve Brooks, Andrew Gelman, Galin L. Jones, and Xiao-Li Meng, 116–62. Chapman; Hall/CRC.
+</p>
+<p>Betancourt, Michael. 2017.  <em>A Conceptual Introduction to Hamiltonian Monte Carlo</em>.
+</p>
+<p>Thomas, S., Tu, W. 2020. <em>Learning Hamiltonian Monte Carlo in R</em>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Logistic regression example
+X &lt;- cbind(1, seq(-100, 100, by=0.25))
+betavals &lt;- c(-0.9, 0.2)
+lodds &lt;- X %*% betavals
+prob1 &lt;- as.numeric(1 / (1 + exp(-lodds)))
+
+set.seed(9874)
+y &lt;- sapply(prob1, function(xx) {
+  sample(c(0, 1), 1, prob=c(1-xx, xx))
+})
+
+f1 &lt;- hmc.fit(N = 500,
+          theta.init = rep(0, 2),
+          epsilon = c(0.1, 0.002),
+          L = 10,
+          logPOSTERIOR = logistic_posterior,
+          glogPOSTERIOR = g_logistic_posterior,
+          y=y, X=X)
+
+f1$accept / f1$N
+</code></pre>
+
+
+</div>

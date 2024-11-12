@@ -1,0 +1,120 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>beta.dosage</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Estimates pairwise kinships and individual inbreeding coefficients from dosage data</h2>
+
+<h3>Description</h3>
+
+<p>Estimates pairwise kinships (coancestries) and individual inbreeding coefficient 
+using Weir and Goudet (2017) beta estimator.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">beta.dosage(dos,inb=TRUE,Mb=FALSE,MATCHING=FALSE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>dos</code></td>
+<td>
+<p>A matrix of 0, 1 and 2s with loci (SNPs) in columns and individuals in rows. 
+Missing values are allowed</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>inb</code></td>
+<td>
+<p>whether individual inbreeding coefficient should be estimated (rather than self-coancestries)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Mb</code></td>
+<td>
+<p>whether to output the mean matching</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>MATCHING</code></td>
+<td>
+<p>if <code>MATCHING=FALSE</code>, <code>dos</code> is a (ni x nl) dosage matrix; 
+if <code>MATCHING=TRUE</code>, dos is a (ni x ni) matrix 
+of matching proportions, as obtained from a call to the <code>matching</code> function</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>This function is written for dosage data, i.e., how many doses of an allele (0, 1 or 2) an individual carries.
+It should be use for bi-allelic markers only (e.g. SNPs), although you might "force" a k multiallelic locus to k biallelic
+loci (see <code>fstat2dos</code>). 
+</p>
+<p>Matching proportions can be obtained by the following equation: <code class="reqn">M=\beta*(1-Mb)+Mb</code> 
+</p>
+<p>By default (<code>inb=TRUE</code>) the inbreeding coefficient is returned on the main diagonal.  
+With <code>inb=FALSE</code>, self coancestries are reported.
+</p>
+<p>Twice the betas with self-coancestries on the diagonal gives the Genomic Relationship Matrix (GRM)     
+</p>
+<p>Following a suggestion from Olivier Hardy, missing data are removed from the estimation procedure, 
+rather than imputed (this is taken care off automatically)
+</p>
+
+
+<h3>Value</h3>
+
+<p>if <code>Mb</code>=FALSE, a matrix of pairwise kinships and inbreeding coefficients (if <code>inb</code>=TRUE) or self-coancestries 
+(<code>inb</code>=FALSE);  
+if <code>Mb</code>=TRUE, a list with elements <code>inb</code> (whether inbreeding coefficients rather than kinships should 
+be returned on the main diagonal),
+<code>MB</code> (the average off-diagonal matching) and <code>betas</code> the kinships or inbreeding coefficients.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Jerome Goudet <a href="mailto:jerome.goudet@unil.ch">jerome.goudet@unil.ch</a>
+</p>
+
+
+<h3>References</h3>
+
+<p><a href="https://academic.oup.com/genetics/article/206/4/2085/6072590">Weir, BS and Goudet J. 2017</a> A Unified Characterization 
+of Population Structure and Relatedness. Genetics (2017) 206:2085 
+</p>
+<p><a href="https://onlinelibrary.wiley.com/doi/full/10.1111/mec.14833">Goudet, J., Kay, T. and Weir BS. 2018</a> How to estimate kinship. 
+Molecular Ecology 27:4121.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+ dos&lt;-matrix(sample(0:2,size=10000,replace=TRUE),ncol=100)
+ beta.dosage(dos,inb=TRUE)
+ 
+ #matrix of kinship/inbreeding coeff
+ data(gtrunchier)
+ beta.dosage(fstat2dos(gtrunchier[,-c(1:2)]))
+ 
+ #individual inbreeding coefficients
+ dat&lt;-sim.genot(size=100,nbloc=100,nbal=20,mig=0.01,f=c(0,0.3,0.7))
+ hist(diag(beta.dosage(fstat2dos(dat[,-1]))),breaks=-10:100/100,main="",xlab="",ylab="")
+ abline(v=c(0.0,0.3,0.7),col="red")
+ #only 20 loci
+ hist(diag(beta.dosage(fstat2dos(dat[,2:21]))),breaks=-5:20/20,main="",xlab="",ylab="")
+ abline(v=c(0.0,0.3,0.7),col="red")
+ 
+
+## End(Not run)
+</code></pre>
+
+
+</div>

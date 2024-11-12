@@ -1,0 +1,84 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>predict.hdnom.model</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Make predictions from high-dimensional Cox models</h2>
+
+<h3>Description</h3>
+
+<p>Predict overall survival probability at certain time points
+from fitted Cox models.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">## S3 method for class 'hdnom.model'
+predict(object, x, y, newx, pred.at, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>object</code></td>
+<td>
+<p>Model object.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>Data matrix used to fit the model.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+<p>Response matrix made with <code>Surv</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>newx</code></td>
+<td>
+<p>Matrix (with named columns) of new values for <code>x</code>
+at which predictions are to be made.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pred.at</code></td>
+<td>
+<p>Time point at which prediction should take place.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Other parameters (not used).</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A <code>nrow(newx) x length(pred.at)</code> matrix containing
+overall survival probablity.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data("smart")
+x &lt;- as.matrix(smart[, -c(1, 2)])
+time &lt;- smart$TEVENT
+event &lt;- smart$EVENT
+y &lt;- survival::Surv(time, event)
+
+fit &lt;- fit_lasso(x, y, nfolds = 5, rule = "lambda.1se", seed = 11)
+predict(fit, x, y, newx = x[101:105, ], pred.at = 1:10 * 365)
+</code></pre>
+
+
+</div>

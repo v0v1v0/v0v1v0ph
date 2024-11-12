@@ -1,0 +1,93 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hack_estimate</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Hack the ESTIMATE scores</h2>
+
+<h3>Description</h3>
+
+<p>Obtain <em>Immune</em>, <em>Stroma</em>, <em>ESTIMATE</em> and <em>Tumor Purity</em> scores from a cohort
+of samples, using the method implemented in <em>Yoshihara et al., 2013</em>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hack_estimate(expr_data)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table><tr style="vertical-align: top;">
+<td><code>expr_data</code></td>
+<td>
+<p>A normalized gene expression matrix (or data frame) with
+gene symbols as row names and samples as columns.</p>
+</td>
+</tr></table>
+<h3>Details</h3>
+
+<p>The ESTIMATE (<em>Estimation of STromal and Immune cells in MAlignant Tumors
+using Expression data</em>) method was developed with the aim to estimate the
+fraction of tumor cells in a sample by using gene expression instead of copy
+number data. The fundamental assumption of this method is that the tumor
+microenvironment is a very rich and dynamic ecosystem, in which immune
+infiltrating cells and stroma play a major role. The ESTIMATE score is
+defined as the combination (i.e. sum) of immune and stroma scores and can be
+thought of as a <em>"non-tumor score"</em>. Consequently, a high ESTIMATE enrichment
+gives a low tumor purity score and viceversa.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A tibble with one row for each sample in <code>expr_data</code> and five columns:
+<code>sample_id</code>, <code>immune_score</code>, <code>stroma_score</code>, <code>estimate_score</code> and <code>purity_score</code>.
+</p>
+
+
+<h3>Algorithm</h3>
+
+<p>Raw immune and stromal signatures scores are computed using single sample GSEA
+with rank normalization (<em>Barbie et al., 2009</em>).
+Then, the ESTIMATE score is computed by summing the immune and stroma scores.
+Finally, the tumor purity score is obtained with the following formula:
+</p>
+<p style="text-align: center;"><code class="reqn">Purity = cos(0.6049872018 + 0.0001467884 * ESTIMATE)</code>
+</p>
+
+
+
+<h3>Source</h3>
+
+<p><a href="https://bioinformatics.mdanderson.org/public-software/estimate/">bioinformatics.mdanderson.org/public-software/estimate/</a>
+</p>
+
+
+<h3>References</h3>
+
+<p>Barbie, D. A., Tamayo, P., Boehm, J. S., Kim, S. Y., Moody, S. E., Dunn, I. F.,
+Schinzel, A. C., Sandy, P., Meylan, E., Scholl, C., Fröhling, S., Chan, E. M.,
+Sos, M. L., Michel, K., Mermel, C., Silver, S. J., Weir, B. A., Reiling, J. H.,
+Sheng, Q., Gupta, P. B., … Hahn, W. C. (2009). Systematic RNA interference
+reveals that oncogenic KRAS-driven cancers require TBK1. <em>Nature</em>, 462(7269),
+108–112. doi: <a href="https://doi.org/10.1038/nature08460">10.1038/nature08460</a>.
+</p>
+<p>Yoshihara, K., Shahmoradgoli, M., Martínez, E., Vegesna, R.,
+Kim, H., Torres-Garcia, W., Treviño, V., Shen, H., Laird, P. W., Levine, D. A.,
+Carter, S. L., Getz, G., Stemke-Hale, K., Mills, G. B., &amp; Verhaak, R. G. (2013).
+Inferring tumour purity and stromal and immune cell admixture from
+expression data. <em>Nature communications</em>, 4, 2612. doi: <a href="https://doi.org/10.1038/ncomms3612">10.1038/ncomms3612</a>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">hack_estimate(test_expr)
+</code></pre>
+
+
+</div>

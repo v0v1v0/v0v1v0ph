@@ -1,0 +1,185 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>BNSjumpTest</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Barndorff-Nielsen and Shephard (2006) tests for the presence of jumps in the price series.</h2>
+
+<h3>Description</h3>
+
+<p>This test examines the presence of jumps in highfrequency price series. It is based on theory of Barndorff-Nielsen and Shephard (2006). 
+The null hypothesis is that there are no jumps.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">BNSjumpTest(
+  rData,
+  IVestimator = "BV",
+  IQestimator = "TP",
+  type = "linear",
+  logTransform = FALSE,
+  max = FALSE,
+  alignBy = NULL,
+  alignPeriod = NULL,
+  makeReturns = FALSE,
+  alpha = 0.975
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>rData</code></td>
+<td>
+<p>either an <code>xts</code> or a <code>data.table</code> containing the log-returns or prices of a single asset, possibly over multiple days-</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>IVestimator</code></td>
+<td>
+<p>can be chosen among jump robust integrated variance estimators: 
+<code>rBPCov</code>, <code>rMinRVar</code>, <code>rMedRVar</code>, <code>rOWCov</code> and corrected threshold bipower variation (<code>rThresholdCov</code>). 
+If <code>rThresholdCov</code> is chosen, an argument of <code>startV</code>, start point of auxiliary estimators in threshold estimation can be included. <code>rBPCov</code> by default.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>IQestimator</code></td>
+<td>
+<p>can be chosen among jump robust integrated quarticity estimators: <code>rTPQuar</code>, <code>rQPVar</code>, <code>rMinRQuar</code> and <code>rMedRQuar</code>. 
+<code>rTPQuar</code> by default.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>type</code></td>
+<td>
+<p>a method of BNS testing: can be linear or ratio. Linear by default.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>logTransform</code></td>
+<td>
+<p>boolean, should be <code>TRUE</code> when <code>QVestimator</code> and <code>IVestimator</code> are in logarithm form. <code>FALSE</code> by default.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>max</code></td>
+<td>
+<p>boolean, should be <code>TRUE</code> when max adjustment in SE. <code>FALSE</code> by default.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alignBy</code></td>
+<td>
+<p>character, indicating the time scale in which <code>alignPeriod</code> is expressed. 
+Possible values are: <code>"ticks"</code>, <code>"secs"</code>, <code>"seconds"</code>, <code>"mins"</code>, <code>"minutes"</code>, <code>"hours"</code>
+To aggregate based on a 5 minute frequency, set <code>alignPeriod = 5</code> and <code>alignBy = "minutes"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alignPeriod</code></td>
+<td>
+<p>positive numeric, indicating the number of periods to aggregate over. For example, to aggregate
+based on a 5 minute frequency, set <code>alignPeriod = 5</code> and <code>alignBy = "minutes"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>makeReturns</code></td>
+<td>
+<p>boolean, should be <code>TRUE</code> when <code>pData</code> contains prices. <code>FALSE</code> by default.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alpha</code></td>
+<td>
+<p>numeric of length one with the significance level to use for the jump test(s). Defaults to 0.975.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Assume there is <code class="reqn">N</code> equispaced returns in period <code class="reqn">t</code>. 
+Assume the Realized variance (RV), IVestimator and IQestimator are based on <code class="reqn">N</code> equi-spaced returns. 
+</p>
+<p>Let <code class="reqn">r_{t,i}</code> be a return (with <code class="reqn">i = 1, \ldots, N</code>) in period <code class="reqn">t</code>. 
+</p>
+<p>Then the BNSjumpTest is given by
+</p>
+<p style="text-align: center;"><code class="reqn">
+\mbox{BNSjumpTest}= \frac{\code{RV} - \code{IVestimator}}{\sqrt{(\theta-2)\frac{1}{N} {\code{IQestimator}}}}.
+</code>
+</p>
+
+<p>The options for <code>IVestimator</code> and <code>IQestimator</code> are listed above. <code class="reqn">\theta</code> depends on the chosen <code>IVestimator</code> (Huang and Tauchen, 2005).
+</p>
+<p>The theoretical framework underlying the jump test is that the logarithmic price process <code class="reqn">X_t</code> belongs to the class of Brownian semimartingales, which can be written as:
+</p>
+<p style="text-align: center;"><code class="reqn">
+\mbox{X}_{t}=  \int_{0}^{t} a_u \ du + \int_{0}^{t}\sigma_{u} \ dW_{u} + Z_t
+</code>
+</p>
+
+<p>where <code class="reqn">a</code> is the drift term, <code class="reqn">\sigma</code> denotes the spot volatility process, <code class="reqn">W</code> is a standard Brownian motion and <code class="reqn">Z</code> is a jump process defined by:
+</p>
+<p style="text-align: center;"><code class="reqn">
+\mbox{Z}_{t}=  \sum_{j=1}^{N_t}k_j
+</code>
+</p>
+
+<p>where <code class="reqn">k_j</code> are nonzero random variables. The counting process can be either finite or infinite for finite or infinite activity jumps.
+</p>
+<p>Since the realized volatility converges to the sum of integrated variance and jump variation, while the robust <code>IVestimator</code> converges to the integrated variance, 
+it follows that the difference between <code>RV</code> and the <code>IVestimator</code> captures the jump part only, and this observation underlines the BNS test for jumps (Theodosiou and Zikes, 2009).
+</p>
+
+
+<h3>Value</h3>
+
+<p>a list or <code>xts</code> (depending on whether input prices span more than one day)
+with the following values:
+</p>
+
+<ul>
+<li> <p><code class="reqn">z</code>-test value.
+</p>
+</li>
+<li>
+<p> critical value (with confidence level of 95%).
+</p>
+</li>
+<li> <p><code class="reqn">p</code>-value of the test. 
+</p>
+</li>
+</ul>
+<h3>Author(s)</h3>
+
+<p>Giang Nguyen, Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup.
+</p>
+
+
+<h3>References</h3>
+
+<p>Barndorff-Nielsen, O. E., and Shephard, N. (2006). Econometrics of testing for jumps in financial economics using bipower variation. <em>Journal of Financial Econometrics</em>, 4, 1-30. 
+</p>
+<p>Corsi, F., Pirino, D., and Reno, R. (2010). Threshold bipower variation and the impact of jumps on volatility forecasting. <em>Journal of Econometrics</em>, 159, 276-288.
+</p>
+<p>Huang, X., and Tauchen, G. (2005). The relative contribution of jumps to total price variance. <em>Journal of Financial Econometrics</em>, 3, 456-499.
+</p>
+<p>Theodosiou, M., and Zikes, F. (2009). A comprehensive comparison of alternative tests for jumps in asset prices. Unpublished manuscript, Graduate School of Business, Imperial College London.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">bns &lt;- BNSjumpTest(sampleTData[, list(DT, PRICE)], IVestimator= "rMinRVar",
+                   IQestimator = "rMedRQuar", type= "linear", makeReturns = TRUE)
+bns
+
+</code></pre>
+
+
+</div>

@@ -1,0 +1,175 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>flexit</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Return the flexit</h2>
+
+<h3>Description</h3>
+
+<p>Return a vector with the probabilities.
+The flexit equation is published in:<br>
+Abreu-Grobois, F.A., Morales-Mérida, B.A., Hart, C.E., Guillon, J.-M., Godfrey, M.H.,
+Navarro, E. &amp; Girondot, M. (2020) Recent advances on the estimation of the thermal
+reaction norm for sex ratios. PeerJ, 8, e8451.<br>
+If dose &lt; P then <code class="reqn">(1 + (2^K1 - 1) *  exp(4 * S1 * (P - x)))^(-1/K1)</code><br>
+If dose &gt; P then <code class="reqn">1-((1 + (2^K2 - 1) * exp(4 * S2 * (x - P)))^(-1/K2)</code><br>
+with:<br></p>
+<p style="text-align: center;"><code class="reqn">S1 = (2^(K1 - 1) * S * K1)/(2^K1 - 1)</code>
+</p>
+
+<p style="text-align: center;"><code class="reqn">S2 = (2^(K2 - 1) * S * K2)/(2^K2 - 1)</code>
+</p>
+
+<p><br>
+New in version 4.7-3 and larger:<br><br>
+If <code class="reqn">2^K1</code> is too large to be estimated, the approximation <code class="reqn">S1 = S*K1/2</code> is used.<br>
+Demonstration:<br></p>
+<p style="text-align: center;"><code class="reqn">S1 = (2^(K1 - 1) * S * K1)/(2^K1 - 1)</code>
+</p>
+
+<p style="text-align: center;"><code class="reqn">S1 = exp(log((2^(K1 - 1) * S * K1)/(2^K1 - 1)))</code>
+</p>
+
+<p style="text-align: center;"><code class="reqn">S1 = exp(log(2^(K1 - 1)) + log(S * K1) - log(2^K1 - 1))</code>
+</p>
+
+<p>When <code class="reqn">K1</code> is very large, <code class="reqn">2^K1 - 1 = 2^K1</code> then
+</p>
+<p style="text-align: center;"><code class="reqn">S1 = exp((K1 - 1) * log(2) + log(S * K1) - K1 * log(2))</code>
+</p>
+
+<p style="text-align: center;"><code class="reqn">S1 = exp((K1 * log(2) - log(2) + log(S * K1) - K1 * log(2))</code>
+</p>
+
+<p style="text-align: center;"><code class="reqn">S1 = exp(log(S * K1)- log(2))</code>
+</p>
+
+<p style="text-align: center;"><code class="reqn">S1 = S * K1 / 2</code>
+</p>
+
+<p>If <code class="reqn">2^K2</code> is too large to be estimated, the approximation <code class="reqn">S2 = S*K2/2</code> is used.<br></p>
+<p>If <code class="reqn">(1 + (2^K1 - 1) *  exp(4 * S1 * (P - x)))^(-1/K1)</code> is not finite,
+the following approximation is used:<br></p>
+<p style="text-align: center;"><code class="reqn">exp((-1/K1)*(K1*log(2)+(4*S1*(P-x))))</code>
+</p>
+
+<p>If <code class="reqn">1-((1 + (2^K2 - 1) * exp(4 * S2 * (x - P)))^(-1/K2)</code> is not finite,
+the following approximation is used:<br></p>
+<p style="text-align: center;"><code class="reqn">1 - exp((-1/K2)*(K2*log(2)+(4*S2*(x - P))))</code>
+</p>
+
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">flexit(
+  x,
+  par = NULL,
+  P = NULL,
+  S = NULL,
+  K1 = NULL,
+  K2 = NULL,
+  zero = 1e-09,
+  error0 = 0,
+  error1 = 1
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>The values at which the flexit model must be calculated</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>par</code></td>
+<td>
+<p>The vector with P, S, K1, and K2 values</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>P</code></td>
+<td>
+<p>P value</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>S</code></td>
+<td>
+<p>S value</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>K1</code></td>
+<td>
+<p>K1 value</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>K2</code></td>
+<td>
+<p>K2 value</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>zero</code></td>
+<td>
+<p>Value to replace zero</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>error0</code></td>
+<td>
+<p>Value to return if an error is observed toward 0</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>error1</code></td>
+<td>
+<p>Value to return if an error is observed toward 1</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Return the flexit value
+</p>
+
+
+<h3>Value</h3>
+
+<p>A vector with the probabilities
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Marc Girondot <a href="mailto:marc.girondot@gmail.com">marc.girondot@gmail.com</a>
+</p>
+
+
+<h3>See Also</h3>
+
+<p>Other logit: 
+<code>invlogit()</code>,
+<code>logit()</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">n &lt;- flexit(x=1:100, par=c(P=50, S=0.001, K1=0.01, K2=0.02))
+n &lt;- flexit(x=1:100, P=50, S=0.001, K1=0.01, K2=0.02)
+
+1/(1+exp(0.01*4*(50-1:100)))
+flexit(1:100, P=50, S=0.01, K1=1, K2=1)
+</code></pre>
+
+
+</div>

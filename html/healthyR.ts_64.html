@@ -1,0 +1,126 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>ts_growth_rate_vec</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Vector Function Time Series Growth Rate</h2>
+
+<h3>Description</h3>
+
+<p>This function computes the growth rate of a numeric vector,
+typically representing a time series, with optional transformations like
+scaling, power, and lag differences.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">ts_growth_rate_vec(.x, .scale = 100, .power = 1, .log_diff = FALSE, .lags = 1)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>.x</code></td>
+<td>
+<p>A numeric vector</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.scale</code></td>
+<td>
+<p>A numeric value that is used to scale the output</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.power</code></td>
+<td>
+<p>A numeric value that is used to raise the output to a power</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.log_diff</code></td>
+<td>
+<p>A logical value that determines whether the output is a log difference</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.lags</code></td>
+<td>
+<p>An integer that determines the number of lags to use</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The function calculates growth rates for a time series, allowing for scaling,
+exponentiation, and lag differences. It can be useful for financial data analysis,
+among other applications.
+</p>
+<p>The growth rate is computed as follows:
+</p>
+
+<ul>
+<li>
+<p> If lags is positive and log_diff is FALSE:
+growth_rate = (((x / lag(x, lags))^power) - 1) * scale
+</p>
+</li>
+<li>
+<p> If lags is positive and log_diff is TRUE:
+growth_rate = log(x / lag(x, lags)) * scale
+</p>
+</li>
+<li>
+<p> If lags is negative and log_diff is FALSE:
+growth_rate = (((x / lead(x, -lags))^power) - 1) * scale
+</p>
+</li>
+<li>
+<p> If lags is negative and log_diff is TRUE:
+growth_rate = log(x / lead(x, -lags)) * scale
+</p>
+</li>
+</ul>
+<h3>Value</h3>
+
+<p>A list object of workflows.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Steven P. Sanderson II, MPH
+</p>
+
+
+<h3>See Also</h3>
+
+<p>Other Vector Function: 
+<code>ts_acceleration_vec()</code>,
+<code>ts_velocity_vec()</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Calculate the growth rate of a time series without any transformations.
+ts_growth_rate_vec(c(100, 110, 120, 130))
+
+# Calculate the growth rate with scaling and a power transformation.
+ts_growth_rate_vec(c(100, 110, 120, 130), .scale = 10, .power = 2)
+
+# Calculate the log differences of a time series with lags.
+ts_growth_rate_vec(c(100, 110, 120, 130), .log_diff = TRUE, .lags = -1)
+
+# Plot
+plot.ts(AirPassengers)
+plot.ts(ts_growth_rate_vec(AirPassengers))
+
+</code></pre>
+
+
+</div>

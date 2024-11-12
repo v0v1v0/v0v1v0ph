@@ -1,0 +1,141 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>ts_alos_plt</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Plot ALOS - Average Length of Stay</h2>
+
+<h3>Description</h3>
+
+<p>Plot ALOS - Average Length of Stay
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">ts_alos_plt(.data, .date_col, .value_col, .by_grouping, .interactive)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>.data</code></td>
+<td>
+<p>The time series data you need to pass</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.date_col</code></td>
+<td>
+<p>The date column</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.value_col</code></td>
+<td>
+<p>The value column</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.by_grouping</code></td>
+<td>
+<p>How you want the data summarized - "sec", "min", "hour",
+"day", "week", "month", "quarter" or "year"</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.interactive</code></td>
+<td>
+<p>TRUE or FALSE. TRUE returns a <code>plotly</code> plot and FALSE
+returns a static <code>ggplot2</code> plot</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+
+<ul>
+<li>
+<p> Expects a tibble with a date time column and a value column
+</p>
+</li>
+<li>
+<p> Uses <code>timetk</code> for underlying sumarization and plot
+</p>
+</li>
+<li>
+<p> If .by_grouping is missing it will default to "day"
+</p>
+</li>
+<li>
+<p> A static ggplot2 object is return if the .interactive function is FALSE
+otherwise a <code>plotly</code> plot is returned.
+</p>
+</li>
+</ul>
+<h3>Value</h3>
+
+<p>A timetk time series plot
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Steven P. Sanderson II, MPH
+</p>
+
+
+<h3>See Also</h3>
+
+<p>Other Plotting Functions: 
+<code>diverging_bar_plt()</code>,
+<code>diverging_lollipop_plt()</code>,
+<code>gartner_magic_chart_plt()</code>,
+<code>los_ra_index_plt()</code>,
+<code>ts_median_excess_plt()</code>,
+<code>ts_plt()</code>,
+<code>ts_readmit_rate_plt()</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">library(healthyR)
+library(healthyR.data)
+library(timetk)
+library(dplyr)
+library(purrr)
+
+# Make A Series of Dates ----
+data_tbl &lt;- healthyR_data
+
+df_tbl &lt;- data_tbl %&gt;%
+    filter(ip_op_flag == "I") %&gt;%
+    select(visit_end_date_time, length_of_stay) %&gt;%
+    summarise_by_time(
+        .date_var = visit_end_date_time
+        , .by     = "day"
+        , visits  = mean(length_of_stay, na.rm = TRUE)
+    ) %&gt;%
+    filter_by_time(
+        .date_var     = visit_end_date_time
+        , .start_date = "2012"
+        , .end_date   = "2019"
+    ) %&gt;%
+    set_names("Date","Values")
+
+ts_alos_plt(
+  .data = df_tbl
+  , .date_col = Date
+  , .value_col = Values
+  , .by = "month"
+  , .interactive = FALSE
+)
+
+</code></pre>
+
+
+</div>

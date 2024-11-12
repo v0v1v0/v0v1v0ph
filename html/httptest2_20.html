@@ -1,0 +1,102 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>httptest2</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+<code>httptest2</code>: A Test Environment for HTTP Requests</h2>
+
+<h3>Description</h3>
+
+<p>The <code>httptest2</code> package lets you test R code that wraps an API without
+requiring access to the remote service. It provides multiple test contexts
+that mock the network connection in different ways. <code>with_mock_api()</code> lets
+you provide custom fixtures as responses to requests, stored as plain-text
+files in your test directory. <code>without_internet()</code> converts HTTP requests
+into errors that print the request method, URL, and body payload, if
+provided, allowing you to assert that a function call would make a
+correctly-formed HTTP request or assert that a function does not make a
+request (because if it did, it would raise an error in this context).
+</p>
+
+
+<h3>Details</h3>
+
+<p>The package also includes <code>capture_requests()</code>, a context that collects the
+responses from requests you make and stores them as mock files. This enables
+you to perform a series of requests against a live server once and then build
+your test suite using those mocks, running your tests in <code>with_mock_api()</code>.
+For a context that combines both recording and mocking, use
+<code>with_mock_dir()</code>: it records the first time it is run, and subsequent
+runs use the mocks for offline testing.
+</p>
+<p><code>httptest2</code> also includes expectations to assert that HTTP requests
+were—or were not—made. <code>expect_GET()</code>, <code>expect_PUT()</code>, <code>expect_PATCH()</code>,
+<code>expect_POST()</code>, and <code>expect_DELETE()</code> assert that the specified HTTP request
+is made within one of the test contexts. They catch the error or message
+raised by the mocked HTTP service and check that the request URL and optional
+body match the expectation. <code>expect_no_request()</code> is the inverse of those: it
+asserts that no error or message from a mocked HTTP service is raised.
+<code>expect_request_header()</code> asserts that an HTTP request, mocked or not,
+contains a request header.
+</p>
+<p>For an overview of testing with <code>httptest2</code>, see <code>vignette("httptest2")</code>.
+</p>
+<p>When recording requests, by default <code>httptest2</code> looks for and redacts the
+standard ways that auth credentials are passed in requests. This prevents you
+from accidentally publishing your personal tokens. The redacting behavior is
+fully customizable, either by providing a <code>function (response) {...}</code> to
+<code>set_redactor()</code>, or by placing a function in your package's
+<code>inst/httptest2/redact.R</code> that will be used automatically any time you record
+requests with your package loaded. See <code>vignette("redacting")</code> for details.
+</p>
+<p><code>httptest2</code> also enables you to write package vignettes and other R Markdown
+documents that communicate with a remote API. By adding as little as
+<code>start_vignette()</code> to the beginning of your vignette, you can safely record
+API responses from a live session, using your secret credentials. These API
+responses are scrubbed of sensitive personal information and stored in a
+subfolder in your <code>vignettes</code> directory. Subsequent vignette builds,
+including on continuous-integration services, CRAN, and your package users'
+computers, use these recorded responses, allowing the document to regenerate
+without a network connection or API credentials. To record fresh API
+responses, delete the subfolder of cached responses and re-run. See
+<code>vignette("vignettes")</code> for more discussion and links to examples.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p><strong>Maintainer</strong>: Neal Richardson <a href="mailto:neal.p.richardson@gmail.com">neal.p.richardson@gmail.com</a> (<a href="https://orcid.org/0009-0002-7992-3520">ORCID</a>)
+</p>
+<p>Other contributors:
+</p>
+
+<ul>
+<li>
+<p> Jonathan Keane <a href="mailto:jkeane@gmail.com">jkeane@gmail.com</a> [contributor]
+</p>
+</li>
+<li>
+<p> Maëlle Salmon <a href="mailto:maelle.salmon@yahoo.se">maelle.salmon@yahoo.se</a> (<a href="https://orcid.org/0000-0002-2815-0399">ORCID</a>) [contributor]
+</p>
+</li>
+</ul>
+<h3>See Also</h3>
+
+<p>Useful links:
+</p>
+
+<ul>
+<li> <p><a href="https://enpiar.com/httptest2/">https://enpiar.com/httptest2/</a>
+</p>
+</li>
+<li> <p><a href="https://github.com/nealrichardson/httptest2">https://github.com/nealrichardson/httptest2</a>
+</p>
+</li>
+<li>
+<p> Report bugs at <a href="https://github.com/nealrichardson/httptest2/issues">https://github.com/nealrichardson/httptest2/issues</a>
+</p>
+</li>
+</ul>
+</div>

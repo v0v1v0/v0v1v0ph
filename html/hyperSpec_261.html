@@ -1,0 +1,303 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>read.txt.wide</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Import/export of hyperSpec objects to/from ASCII files
+A detailed discussion of hyperSpec's file import and export capabilities is given in vignette “fileio”.</h2>
+
+<h3>Description</h3>
+
+<p>Besides <code>save</code> and <code>load</code>, two general ways to import and
+export data into <code>hyperSpec</code> objects exist.
+</p>
+<p>Firstly, hyperSpec objects can be imported and exported as ASCII files.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">read.txt.wide(
+  file = stop("file is required"),
+  cols = list(spc = "I / a.u.", .wavelength = expression(lambda/nm)),
+  sep = "\t",
+  row.names = NULL,
+  check.names = FALSE,
+  ...
+)
+
+read.txt.long(
+  file = stop("file is required"),
+  cols = list(.wavelength = expression(lambda/nm), spc = "I / a.u."),
+  header = TRUE,
+  ...
+)
+
+write.txt.long(
+  object,
+  file = "",
+  order = c(".rownames", ".wavelength"),
+  na.last = TRUE,
+  decreasing = FALSE,
+  quote = FALSE,
+  sep = "\t",
+  row.names = FALSE,
+  cols = NULL,
+  col.names = TRUE,
+  col.labels = FALSE,
+  append = FALSE,
+  ...
+)
+
+write.txt.wide(
+  object,
+  file = "",
+  cols = NULL,
+  quote = FALSE,
+  sep = "\t",
+  row.names = FALSE,
+  col.names = TRUE,
+  header.lines = 1,
+  col.labels = if (header.lines == 1) FALSE else TRUE,
+  append = FALSE,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>file</code></td>
+<td>
+<p>filename or connection</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cols</code></td>
+<td>
+<p>the column names specifying the column order.
+</p>
+<p>For data import, a list with elements <code>colname = label</code>; for export a
+character vector with the colnames.  Use <code>wavelength</code> to specify the
+wavelengths.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>check.names</code></td>
+<td>
+<p>handed to <code>read.table</code>. Make sure this is <code>FALSE</code>, if
+the column names of the spectra are the wavelength values.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>arguments handed to <code>read.table</code> and
+<code>write.table</code>, respectively.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>header</code></td>
+<td>
+<p>the file has (shall have) a header line</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>object</code></td>
+<td>
+<p>the <code>hyperSpec</code> object</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>order</code></td>
+<td>
+<p>which columns should be <code>order</code>ed?
+<code>order</code> is used as index vector into a <code>data.frame</code> with
+columns given by <code>cols</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>na.last</code></td>
+<td>
+<p>handed to <code>order</code> by
+<code>write.txt.long</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>decreasing</code></td>
+<td>
+<p>logical vector giving the sort order</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>quote, sep, col.names, row.names</code></td>
+<td>
+<p>have their usual meaning (see
+<code>read.table</code> and <code>write.table</code>),
+but different default values.
+</p>
+<p>For file import, <code>row.names</code> should usually be <code>NULL</code> so that the
+first column becomes a extra data column (as opposed to row names of the extra data).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>col.labels</code></td>
+<td>
+<p>Should the column labels be used rather than the
+colnames?</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>append</code></td>
+<td>
+<p>Should the output be appended to an existing file?</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>header.lines</code></td>
+<td>
+<p>Toggle one or two line header (wavelengths in the
+second header line) for <code>write.txt.wide</code></p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Firstly, hyperSpec objects can be imported  and exported as ASCII files.
+</p>
+<p>A second option is using the package <code>R.matlab</code>
+which provides the functions <code>readMat</code> and
+<code>writeMat</code>.
+</p>
+<p>hyperSpec comes with a number of pre-defined functions to import
+manufacturer specific file formats. For details, see <code>vignette
+  ("fileio")</code>.
+</p>
+<p><code>read.spc</code> imports Thermo Galactic's .spc file
+format, and ENVI files may be read using
+<code>read.ENVI</code>.
+</p>
+<p>These functions are very flexible and provide lots of arguments.
+</p>
+<p>If you use them to read or write manufacturer specific ASCII formats,
+please consider writing a wrapper function and contributing this
+function to <span class="pkg">hyperSpec</span>.  An example is in the “flu” vignette
+(see <code>vignette ("flu", package = "hyperSpec"</code>).
+</p>
+<p>Note that R accepts many packed formats for ASCII files, see
+<code>connections</code>. For .zip files, see <code>unzip</code>.
+</p>
+<p>For further information, see the examples below, <code>vignette ("fileio")</code> and the documentation
+of <code>R.matlab</code>.
+</p>
+<p>A second option is using the package <code>R.matlab</code> which
+provides the functions <code>readMat</code> and
+<code>writeMat</code>.
+</p>
+<p>hyperSpec comes with a number of pre-defined functions to import
+manufacturer specific file formats. For details, see <code>vignette
+("file-io")</code>.
+</p>
+<p><code>read.spc</code> imports Thermo Galactic's .spc file
+format, and ENVI files may be read using
+<code>read.ENVI</code>.
+</p>
+<p>These functions are very flexible and provide lots of arguments.
+</p>
+<p>If you use them to read or write manufacturer specific ASCII formats,
+please consider writing a wrapper function and contributing this function
+to <span class="pkg">hyperSpec</span>.  An example is in the “flu” vignette (see
+<code>vignette ("flu", package = "hyperSpec"</code>).
+</p>
+<p>Note that R accepts many packed formats for ASCII files, see
+<code>connections</code>. For .zip files, see
+<code>unzip</code>.
+</p>
+<p>For further information, see the examples below and the documentation of
+<code>R.matlab</code>.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>C. Beleites
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>vignette ("fileio")</code> and <a href="http://hyperspec.r-forge.r-project.org/blob/fileio.pdf">http://hyperspec.r-forge.r-project.org/blob/fileio.pdf</a>,
+respectively
+</p>
+<p><code>read.table</code> and
+<code>write.table</code>
+</p>
+<p><code>R.matlab</code> for .mat files
+</p>
+<p><code>read.ENVI</code> for ENVI data
+</p>
+<p><code>read.spc</code> for .spc files
+</p>
+<p>Manufacturer specific file formats: <code>read.txt.Renishaw</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+
+## Not run: vignette  ("file-io")
+
+## export &amp; import matlab files
+if (require (R.matlab)) {
+   # export to matlab file
+   writeMat (paste0 (tempdir(), "/test.mat"),
+             x = flu[[]], wavelength = flu@wavelength,
+             label = lapply (flu@label, as.character))
+
+   # reading a matlab file
+   data &lt;- readMat (paste0 (tempdir(), "/test.mat"))
+   print (data)
+   mat &lt;- new ("hyperSpec", spc = data$x,
+               wavelength = as.numeric(data$wavelength),
+               label = data$label[,,1])
+}
+
+## ascii export &amp; import
+
+
+write.txt.long (flu,
+    file = paste0 (tempdir(), "/flu.txt"),
+    cols = c(".wavelength", "spc", "c"),
+		order = c("c", ".wavelength"),
+		decreasing = c(FALSE, TRUE))
+
+read.txt.long (file = paste0 (tempdir(), "/flu.txt"),
+      cols = list (.wavelength = expression (lambda / nm),
+      spc = "I / a.u", c = expression ("/" (c, (mg/l)))))
+
+write.txt.wide (flu,  file = paste0 (tempdir(), "/flu.txt"),
+    cols = c("c", "spc"),
+		col.labels = TRUE, header.lines = 2, row.names = TRUE)
+
+write.txt.wide (flu,  file = paste0 (tempdir(), "/flu.txt"),
+                col.labels = FALSE, row.names = FALSE)
+
+read.txt.wide (file = paste0 (tempdir(), "/flu.txt"),
+    # give columns in same order as they are in the file
+    cols = list (spc = "I / a.u",
+                 c = expression ("/"("c", "mg/l")),
+                 filename = "filename",
+                 # plus wavelength label last
+                 .wavelength = "lambda / nm"),
+		header = TRUE)
+
+## End(Not run)
+
+</code></pre>
+
+
+</div>

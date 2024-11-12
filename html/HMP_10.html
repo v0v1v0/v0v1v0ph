@@ -1,0 +1,176 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>DM.Rpart</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Dirichlet-Multinomial RPart</h2>
+
+<h3>Description</h3>
+
+<p>This function combines recursive partitioning and the Dirichlet-Multinomial distribution to identify homogeneous 
+subgroups of microbiome taxa count data.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">DM.Rpart(data, covars, plot = TRUE, minsplit = 1, minbucket = 1, cp = 0, numCV = 10, 
+	numCon = 100, parallel = FALSE, cores = 3, use1SE = FALSE, lowerSE = TRUE)</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>A matrix of taxonomic counts(columns) for each sample(rows).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>covars</code></td>
+<td>
+<p>A matrix of covariates(columns) for each sample(rows).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>plot</code></td>
+<td>
+<p>When 'TRUE' a tree plot of the results will be generated.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>minsplit</code></td>
+<td>
+<p>The minimum number of observations to split on, see rpart.control.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>minbucket</code></td>
+<td>
+<p>The minimum number of observations in any terminal node, see rpart.control.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cp</code></td>
+<td>
+<p>The complexity parameter, see rpart.control.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>numCV</code></td>
+<td>
+<p>The number folds for a k-fold cross validation. A value less than 2 will return the rpart result without any cross validation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>numCon</code></td>
+<td>
+<p>The number of cross validations to repeat to achieve a consensus solution.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>parallel</code></td>
+<td>
+<p>When this is 'TRUE' it allows for parallel calculation of consensus. Requires the package <code>doParallel</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cores</code></td>
+<td>
+<p>The number of parallel processes to run if parallel is 'TRUE'.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>use1SE</code></td>
+<td>
+<p>See details.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lowerSE</code></td>
+<td>
+<p>See details.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>There are 3 ways to run this function.  The first is setting numCV to less than 2, which will run rpart once
+using the DM distribution and the specified minsplit, minbucket and cp.  This result will not have any kind 
+of branch pruning and the objects returned 'fullTree' and 'bestTree' will be the same.
+</p>
+<p>The second way is setting numCV to 2 or greater (we recommend 10) and setting numCon to less than 2.  This will 
+run rpart several times using a k-fold cross validation to prune the tree to its optimal size.  This is the best method to use.
+</p>
+<p>The third way is setting both numCV and numCon to 2 or greater (We recommend at least 100 for numCon).  This will
+repeat the second way numCon times and build a consensus solution.  This method is ONLY needed for low sample sizes.
+</p>
+<p>When the argument 'use1SE' is 'FALSE', the returned object 'bestTree' is the pruned tree with the lowest MSE. 
+When it is 'TRUE', 'bestTree' is either the biggest pruned tree (lowerSE = FALSE) or the smallest pruned tree (lowerSE = TRUE),
+that is within 1 standard error of the lowest MSE.
+</p>
+
+
+<h3>Value</h3>
+
+<p>The 3 main things returned are:
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>fullTree</code></td>
+<td>
+<p>An rpart object without any pruning.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>bestTree</code></td>
+<td>
+<p>A pruned rpart object based on use1SE and lowerSE's settings.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cpTable</code></td>
+<td>
+<p>Information about the fullTree rpart object and how it splits.</p>
+</td>
+</tr>
+</table>
+<p>The other variables returned include surrogate/competing splits, error rates and a plot of the bestTree if plot is TRUE.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">	data(saliva)
+	data(throat)
+	data(tonsils)
+	
+	### Create some covariates for our data set
+	site &lt;- c(rep("Saliva", nrow(saliva)), rep("Throat", nrow(throat)), 
+			rep("Tonsils", nrow(tonsils)))
+	covars &lt;- data.frame(Group=site)
+	
+	### Combine our data into a single object
+	data &lt;- rbind(saliva, throat, tonsils)
+	
+	### For a single rpart tree
+	numCV &lt;- 0
+	numCon &lt;- 0
+	rpartRes &lt;- DM.Rpart(data, covars, numCV=numCV, numCon=numCon)
+	
+	## Not run: 
+		### For a cross validated rpart tree
+		numCon &lt;- 0
+		rpartRes &lt;- DM.Rpart(data, covars, numCon=numCon)
+		
+		### For a cross validated rpart tree with consensus
+		numCon &lt;- 2 # Note this is set to 2 for speed and should be at least 100
+		rpartRes &lt;- DM.Rpart(data, covars, numCon=numCon)
+	
+## End(Not run)
+</code></pre>
+
+
+</div>

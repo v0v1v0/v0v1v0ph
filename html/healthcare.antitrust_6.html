@@ -1,0 +1,123 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>wtp_calc</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Willingness-to-Pay Calculator</h2>
+
+<h3>Description</h3>
+
+<p>This function calculates the system-level Willingness-To-Pay.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">wtp_calc(
+  data,
+  cell = "cell",
+  sys_id = "sys_id",
+  count = "count",
+  weight = "weight",
+  dropDegenerateCell = TRUE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>Dataset of hospital discharges. Required variables:
+<code>cell</code> and <code>sys_id</code>. Use other function arguments to
+indicate alternative variable names to the default names.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cell</code></td>
+<td>
+<p>Name of variable specifying cell to which each observation
+has been allocated. Default variable name is <code>cell</code>. Can be
+created by <code>cell_defn</code> function.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sys_id</code></td>
+<td>
+<p>Name of variable specifying (numeric) system identifier.
+Default variable name is <code>sys_id</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>count</code></td>
+<td>
+<p>Name of variable indicating the number of admissions
+represented by the observation. Set = 1 for every row if each
+observation represents one admission.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>weight</code></td>
+<td>
+<p>Name of variable indicating designated weight of admission; =1 if
+observations should be equally weighted.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dropDegenerateCell</code></td>
+<td>
+<p>logical; specifies how to treat cells with a
+100 percent within-system share. If TRUE, observations in degenerate,
+100 percent share cells will be ignored in the WTP calculation. If FALSE,
+an adjustment is made where any cells with &gt; 99 percent share at a single
+hospital have the share set to 99.0 percent.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>This function calculates the system-level WTP. For use in a WTP
+simulation exercise of the "WTP/Q Method" described in Brand and Balan
+(2018) <a href="https://doi.org/10.2139/SSRN.3153109">doi:10.2139/SSRN.3153109</a>.
+Hospital systems need to be numbered by <code>sys_id</code>, with a distinct
+<code>sys_id</code> for each independent hospital.
+</p>
+<p>The <code>weight</code> input might for example be a DRG weight for each inpatient
+hospital admission.
+</p>
+<p>For more details see the example vignette by typing:
+<code>vignette("semipar_example", package = "healthcare.antitrust")</code>
+</p>
+
+
+<h3>Value</h3>
+
+<p>A data frame with the number of rows equal to the number of systems
+in the input data frame, and the following variables: <code>sys_id</code> is the system
+identifier, <code>WTP_s</code> is the system's WTP, <code>N_s</code> is the number of admission
+for the system, and <code>WTP_s_wt</code> is the weighted WTP for the system
+if the weight input is provided.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(discharge_data, package = "healthcare.antitrust")
+
+list1 &lt;- c("drg","age","zip5")
+layers &lt;- list(list1)
+th &lt;- 15
+discharge_data$count &lt;- 1
+
+outList &lt;- cell_defn(discharge_data,th,layers)
+D0 &lt;- outList$assigned
+
+out &lt;- wtp_calc(D0)
+
+</code></pre>
+
+
+</div>

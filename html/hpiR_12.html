@@ -1,0 +1,132 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>calcSeriesAccuracy</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Calculate the accuracy of a series of indexes</h2>
+
+<h3>Description</h3>
+
+<p>Estimate the index accuracy for a (progressive) series of indexes
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">calcSeriesAccuracy(series_obj, test_method = "insample",
+  test_type = "rt", pred_df = NULL, smooth = FALSE,
+  summarize = FALSE, in_place = FALSE, in_place_name = "accuracy",
+  ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>series_obj</code></td>
+<td>
+<p>Serieshpi object to be analyzed</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>test_method</code></td>
+<td>
+<p>default = 'insample'; Also 'kfold' or 'forecast'</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>test_type</code></td>
+<td>
+<p>default = 'rt'; Type of data to use for test.  See details.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pred_df</code></td>
+<td>
+<p>default = NULL; Extra data if the test_type doesn't match data in hpi_obj</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>smooth</code></td>
+<td>
+<p>default = FALSE; Analyze the smoothed indexes</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>summarize</code></td>
+<td>
+<p>default = FALSE; When multiple accuracy measurements for single observation
+take the mean of them all.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>in_place</code></td>
+<td>
+<p>default = FALSE; Should the result be returned into an existing 'hpi' object</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>in_place_name</code></td>
+<td>
+<p>default = 'accuracy'; Name for returning in place</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Additional Arguments</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>‘seriesaccuracy' object (unless calculated ’in_place')
+</p>
+
+
+<h3>Further Details</h3>
+
+<p>Unless using 'test_method = "forecast"“ with a "forecast_length" of 1, the results
+will have more than one accuracy estimate per observations.  Setting 'summarize = TRUE'
+will take the mean accuracy for each observation across all indexes.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+ # Load data
+ data(ex_sales)
+
+ # Create index
+ rt_index &lt;- rtIndex(trans_df = ex_sales,
+                     periodicity = 'monthly',
+                     min_date = '2010-06-01',
+                     max_date = '2015-11-30',
+                     adj_type = 'clip',
+                     date = 'sale_date',
+                     price = 'sale_price',
+                     trans_id = 'sale_id',
+                     prop_id = 'pinx',
+                     estimator = 'robust',
+                     log_dep = TRUE,
+                     trim_model = TRUE,
+                     max_period = 48,
+                     smooth = FALSE)
+
+  #  Create Series (Suppressing messages do to small sample size of this example)
+  suppressMessages(
+    hpi_series &lt;- createSeries(hpi_obj = rt_index,
+                               train_period = 12))
+
+  # Calculate insample accuracy
+  hpi_series_accr &lt;- calcSeriesAccuracy(series_obj = hpi_series,
+                                        test_type = 'rt',
+                                        test_method = 'insample')
+
+</code></pre>
+
+
+</div>

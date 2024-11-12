@@ -1,0 +1,120 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>pxr</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Precision-Recall curves</h2>
+
+<h3>Description</h3>
+
+<p>Compute the Precision-Recall (PxR) values through <span class="pkg">precrec</span> package.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">precision.at.all.recall.levels.single.class(labels, scores)
+
+precision.at.given.recall.levels.over.classes(
+  target,
+  predicted,
+  folds = NULL,
+  seed = NULL,
+  recall.levels = seq(from = 0.1, to = 1, by = 0.1)
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>labels</code></td>
+<td>
+<p>vector of the true labels (0 negative, 1 positive examples).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>scores</code></td>
+<td>
+<p>a numeric vector of the values of the predicted labels (scores).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>target</code></td>
+<td>
+<p>matrix with the target multilabel: rows correspond to examples and columns to classes.
+<code class="reqn">target[i,j]=1</code> if example <code class="reqn">i</code> belongs to class <code class="reqn">j</code>, <code class="reqn">target[i,j]=0</code> otherwise.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>predicted</code></td>
+<td>
+<p>a numeric matrix with predicted values (scores): rows correspond to examples and columns to classes.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>folds</code></td>
+<td>
+<p>number of folds on which computing the PXR. If <code>folds=NULL</code> (<code>def.</code>), the PXR is computed one-shot,
+otherwise the PXR is computed averaged across folds.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>seed</code></td>
+<td>
+<p>initialization seed for the random generator to create folds. Set <code>seed</code> only if <code>folds</code><code class="reqn">\neq</code><code>NULL</code>.
+If <code>seed=NULL</code> and <code>folds</code><code class="reqn">\neq</code><code>NULL</code>, the PXR averaged across folds is computed without seed initialization.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>recall.levels</code></td>
+<td>
+<p>a vector with the desired recall levels (<code>def:</code> <code>from:0.1</code>, <code>to:0.9</code>, <code>by:0.1</code>).</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p><code>precision.at.all.recall.levels.single.class</code> computes the precision at all recall levels just for a single class.
+</p>
+<p><code>precision.at.given.recall.levels.over.classes</code> computes the precision at fixed recall levels over classes.
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>precision.at.all.recall.levels.single.class</code> returns a two-columns matrix, representing a pair of precision and recall values.
+The first column is the precision, the second the recall;
+<code>precision.at.given.recall.levels.over.classes</code> returns a list with two elements:
+</p>
+
+<ol>
+<li>
+<p> average: a vector with the average precision at different recall levels across classes;
+</p>
+</li>
+<li>
+<p> fixed.recall: a matrix with the precision at different recall levels: rows are classes, columns precision at different recall levels;
+</p>
+</li>
+</ol>
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(labels);
+data(scores);
+data(graph);
+root &lt;- root.node(g);
+L &lt;- L[,-which(colnames(L)==root)];
+S &lt;- S[,-which(colnames(S)==root)];
+labels &lt;- L[,1];
+scores &lt;- S[,1];
+rec.levels &lt;- seq(from=0.25, to=1, by=0.25);
+pxr.single &lt;- precision.at.all.recall.levels.single.class(labels, scores);
+pxr &lt;- precision.at.given.recall.levels.over.classes(L, S, folds=5, seed=23,
+         recall.levels=rec.levels);
+</code></pre>
+
+
+</div>

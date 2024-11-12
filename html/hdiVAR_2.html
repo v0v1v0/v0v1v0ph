@@ -1,0 +1,123 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>Estep</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>expectation step in sparse expectation-maximization algorithm</h2>
+
+<h3>Description</h3>
+
+<p>Compute conditional expectation and covariance of <code class="reqn">x_t</code> given <code class="reqn">y_1,\ldots,y_T</code>
+and current parameter estimates of <code class="reqn">A, \sigma_\eta,\sigma_\epsilon</code>
+via kalman filter and smoothing.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">Estep(Y,A_init,sig_eta_init,sig_epsilon_init,X_init,P_init)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>Y</code></td>
+<td>
+<p>observations of time series, a p by T matrix.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>A_init</code></td>
+<td>
+<p>current estimate of transition matrix <code class="reqn">A</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sig_eta_init</code></td>
+<td>
+<p>current estiamte of <code class="reqn">\sigma_\eta</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sig_epsilon_init</code></td>
+<td>
+<p>current estiamte <code class="reqn">\sigma_\epsilon</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>X_init</code></td>
+<td>
+<p>current estimate of latent <code class="reqn">x_1</code> at the first iteration, a p-dimensional vector.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>P_init</code></td>
+<td>
+<p>current covariance estimate of latent <code class="reqn">x_1</code> at the first iteration, a p by p matrix.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>a list of conditional expectations and covariances for the sequential Maximization step.
+</p>
+
+<table>
+<tr>
+<td style="text-align: left;">
+<code>EXtT</code>  </td>
+<td style="text-align: left;">  a p by T matrix of column <code class="reqn">E[x_t | y_1,\ldots,y_T, \hat{A},\hat{\sigma}_\eta,\hat{\sigma}_\epsilon]</code>. </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+<code>EXtt</code>  </td>
+<td style="text-align: left;">  a p by p by T tensor of first-two-mode slice <code class="reqn">E[x_t x_t^\top | y_1,\ldots,y_T, \hat{A},\hat{\sigma}_\eta,\hat{\sigma}_\epsilon]</code>. </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+<code>EXtt1</code>  </td>
+<td style="text-align: left;">  a p by p by T-1 matrix of first-two-mode slice <code class="reqn">E[x_t x_{t+1}^\top | y_1,\ldots,y_T, \hat{A},\hat{\sigma}_\eta,\hat{\sigma}_\epsilon]</code>. </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>Xiang Lyu, Jian Kang, Lexin Li
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">p= 2; Ti=10  # dimension and time
+A=diag(1,p) # transition matrix
+sig_eta=sig_epsilon=0.2 # error std
+Y=array(0,dim=c(p,Ti)) #observation t=1, ...., Ti
+X=array(0,dim=c(p,Ti)) #latent t=1, ...., T
+Ti_burnin=100 # time for burn-in to stationarity
+for (t in 1:(Ti+Ti_burnin)) {
+  if (t==1){
+    x1=rnorm(p)
+  } else if (t&lt;=Ti_burnin) { # burn in
+    x1=A%*%x1+rnorm(p,mean=0,sd=sig_eta)
+  } else if (t==(Ti_burnin+1)){ # time series used for learning
+    X[,t-Ti_burnin]=x1
+    Y[,t-Ti_burnin]=X[,t-Ti_burnin]+rnorm(p,mean=0,sd=sig_epsilon)
+  } else {
+    X[,t- Ti_burnin]=A%*%X[,t-1- Ti_burnin]+rnorm(p,mean=0,sd=sig_eta)
+    Y[,t- Ti_burnin]=X[,t- Ti_burnin]+rnorm(p,mean=0,sd=sig_epsilon)
+  }
+}
+
+Efit=Estep(Y,A,sig_eta,sig_epsilon,x1,diag(1,p))
+
+
+</code></pre>
+
+
+</div>

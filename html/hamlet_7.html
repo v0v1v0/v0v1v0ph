@@ -1,0 +1,81 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>match.allocate</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Allocation of matched units to intervention arms
+</h2>
+
+<h3>Description</h3>
+
+<p>This function allocates units belonging to a single submatch to separate intervention arms. This ensures that the resulting intervention groups are homogeneous in respect to the variables that were used to construct the distance/dissimilarity matrix for the non-bipartite matching. The number of resulting intervention groups is equal to the 'g' (i.e. submatch size) used in the multigroup non-bipartite matching.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">match.allocate(xmat)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table><tr style="vertical-align: top;">
+<td><code>xmat</code></td>
+<td>
+
+<p>A binary matching matrix or a matching vector given by match.bb-function.
+</p>
+</td>
+</tr></table>
+<h3>Value</h3>
+
+<p>A vector where each element indicates to which group the observation was randomized to. The group names are "Group_A", "Group_B", "Group_C", ... until 'g' letters, where 'g' was the size of submatches.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Teemu Daniel Laajala &lt;teelaa@utu.fi&gt;
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>match.bb</code>
+<code>match.mat2vec</code>
+<code>match.vec2mat</code>
+<code>match.dummy</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(vcapwide)
+
+# Construct an Euclidean distance example distance matrix using 15 observations from the VCaP study
+d &lt;- as.matrix(dist(vcapwide[1:15,c("PSAWeek10", "BWWeek10")]))
+# Matching using the b&amp;b algorithm to submatches of size 3 
+# (which will result in 3 intervention groups)
+bb3 &lt;- match.bb(d, g=3)
+str(bb3)
+
+solvec &lt;- bb3$solution 
+# matching vector, where each element indicates to which submatch each observation belongs to
+
+# Perform an example random allocation of the above submatches, 
+# these will be randomly allocated to 3 arms based on the submatches
+set.seed(1)
+groups &lt;- match.allocate(solvec)
+
+# Illustrate randomization, no baseline differences in these three artificial groups
+by(vcapwide[1:15,c("PSAWeek10", "BWWeek10")], INDICES=groups, FUN=function(x) x)
+
+summary(aov(PSAWeek10 ~ groups, data = data.frame(PSAWeek10 = vcapwide[1:15,"PSAWeek10"], groups)))
+summary(aov(BWWeek10 ~ groups, data = data.frame(BWWeek10 = vcapwide[1:15,"BWWeek10"], groups)))
+</code></pre>
+
+
+</div>

@@ -1,0 +1,299 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>ancova</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Compute and plot oneway analysis of covariance</h2>
+
+<h3>Description</h3>
+
+<p>Compute and plot oneway analysis of covariance.
+The result object is an <code>ancova</code> object which consists of
+an ordinary <code>aov</code> object with an additional <code>trellis</code>
+attribute.  The
+<code>trellis</code> attribute is a <code>trellis</code> object consisting of
+a series of plots of <code>y ~ x</code>.  The left set of panels is
+conditioned on the levels of the factor <code>groups</code>.  The right
+panel is a superpose of all the groups.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">ancova(formula, data.in = NULL, ...,
+       x, groups, transpose = FALSE,
+       display.plot.command = FALSE,
+       superpose.level.name = "superpose",
+       ignore.groups = FALSE, ignore.groups.name = "ignore.groups",
+       blocks, blocks.pch = letters[seq(levels(blocks))],
+       layout, between, main,
+       pch=trellis.par.get()$superpose.symbol$pch)
+
+panel.ancova(x, y, subscripts, groups,
+ transpose = FALSE, ...,
+ coef, contrasts, classes,
+ ignore.groups, blocks, blocks.pch, blocks.cex, pch)
+
+## The following are ancova methods for generic functions.
+## S3 method for class 'ancova'
+anova(object, ...)
+
+## S3 method for class 'ancova'
+predict(object, ...)
+
+## S3 method for class 'ancova'
+print(x, ...) ## prints the anova(x) and the trellis attribute
+
+## S3 method for class 'ancova'
+model.frame(formula, ...)
+
+## S3 method for class 'ancova'
+summary(object, ...)
+
+## S3 method for class 'ancova'
+plot(x, y, ...) ## standard lm plot.  y is always ignored.
+
+## S3 method for class 'ancova'
+coef(object, ...)
+
+
+
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>formula</code></td>
+<td>
+<p>A formula specifying the model.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>data.in</code></td>
+<td>
+<p>A data frame in which the variables specified in the
+formula will be found. If missing, the variables are searched for in
+the standard way.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Arguments to be passed to <code>aov</code>, such as <code>subset</code>
+or <code>na.action</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>Covariate in <code>ancova</code>, needed for plotting when the
+formula does not include <code>x</code>.
+<code>"aov"</code> object in <code>print.ancova</code>, to match the argument of
+the <code>print</code> generic function.
+Variable to plotted in <code>"panel.ancova"</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>groups</code></td>
+<td>
+<p>Factor.  Needed for plotting when the formula does not
+include <code>groups</code> after the conditioning bar <code>"|"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>transpose</code></td>
+<td>
+<p>S-Plus: The axes in each panel of the plot are
+transposed.  The analysis
+is identical, just the axes displaying it have been interchanged.
+R: no effect.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>display.plot.command</code></td>
+<td>
+<p>The default setting is usually what the user
+wants.  The alternate value <code>TRUE</code> prints on the console the
+command that draws the graph.  This is strictly for debugging the
+<code>ancova</code> command.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>superpose.level.name</code></td>
+<td>
+<p>Name used in strip label for superposed panel.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ignore.groups</code></td>
+<td>
+<p>When <code>TRUE</code>, an additional panel showing all
+groups together with a common regression line is displayed.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ignore.groups.name</code></td>
+<td>
+<p>Name used in strip label for
+<code>ignore.groups</code> panel.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pch</code></td>
+<td>
+<p>Plotting character for groups.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>blocks</code></td>
+<td>
+<p>Additional factor used to label points in the panels.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>blocks.pch</code></td>
+<td>
+<p>Alternate set of labels used when a <code>blocks</code>
+factor is specified.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>blocks.cex</code></td>
+<td>
+<p>Alternate set of <code>cex</code> used when a <code>blocks</code>
+factor is specified.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>layout</code></td>
+<td>
+<p>The layout of multiple panels.  The default is a single
+row.  See details.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>between</code></td>
+<td>
+<p>Space between the panels for the individual group
+levels and the superpose panel including all groups.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>main</code></td>
+<td>
+<p>Character with a main header title to be done on the top
+of each page.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>y,subscripts</code></td>
+<td>
+<p>In <code>"panel.ancova"</code>,
+
+see <code>panel.xyplot</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>object</code></td>
+<td>
+<p>An <code>"aov"</code></p>
+</td>
+</tr>
+</table>
+<p> object.  The functions using this
+argument are methods for the similarly named generic functions.
+</p>
+<table><tr style="vertical-align: top;">
+<td><code>coef, contrasts, classes</code></td>
+<td>
+<p>Internal variables used to communicate between
+<code>ancova</code> and <code>panel.ancova</code>.  They keep track
+of the constant or different slopes and intercepts in each
+panel of the plot.</p>
+</td>
+</tr></table>
+<h3>Details</h3>
+
+<p> The <code>ancova</code> function does two things.  It passes its
+arguments directly to the <code>aov</code> function and returns the entire
+<code>aov</code> object.  It also rearranges the data and formula in its
+argument and passes that to the <code>xyplot</code> function.  The
+<code>trellis</code> attribute is a <code>trellis</code> object consisting of
+a series of plots of <code>y ~ x</code>.  The left set of panels is
+conditioned on the levels of the factor <code>groups</code>.  The right
+panel is a superpose of all the groups. </p>
+
+
+<h3>Value</h3>
+
+<p> The result object is an <code>ancova</code> object which consists of
+an ordinary <code>aov</code> object with an additional <code>trellis</code>
+attribute.  The default print method is to print both the <code>anova</code>
+of the object and the <code>trellis</code> attribute.  </p>
+
+
+<h3>Author(s)</h3>
+
+<p> Richard M. Heiberger &lt;rmh@temple.edu&gt; </p>
+
+
+<h3>References</h3>
+
+<p>Heiberger, Richard M. and Holland, Burt (2015).
+<em>Statistical Analysis and Data Display: An Intermediate Course with Examples in R</em>.
+Second Edition.
+Springer-Verlag, New York.
+<a href="https://link.springer.com/book/10.1007/978-1-4939-2122-5">https://link.springer.com/book/10.1007/978-1-4939-2122-5</a>
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>ancova-class</code>
+<code>aov</code>
+<code>xyplot</code>.
+See <code>ancovaplot</code> for a newer set of functions that keep the
+graph and the <code>aov</code> object separate.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(hotdog)
+
+## y ~ x                     ## constant line across all groups
+ancova(Sodium ~ Calories,     data=hotdog, groups=Type)
+
+## y ~ a                     ## different horizontal line in each group
+ancova(Sodium ~            Type, data=hotdog, x=Calories)
+
+## This is the usual usage
+## y ~ x + a  or  y ~ a + x  ## constant slope, different intercepts
+ancova(Sodium ~ Calories + Type, data=hotdog)
+ancova(Sodium ~ Type + Calories, data=hotdog)
+
+## y ~ x * a  or  y ~ a * x  ## different slopes, and different intercepts
+ancova(Sodium ~ Calories * Type, data=hotdog)
+ancova(Sodium ~ Type * Calories, data=hotdog)
+
+## y ~ a * x ## save the object and print the trellis graph
+hotdog.ancova &lt;- ancova(Sodium ~ Type * Calories, data=hotdog)
+attr(hotdog.ancova, "trellis")
+
+
+## label points in the panels by the value of the block factor
+data(apple)
+ancova(yield ~ treat + pre, data=apple, blocks=block)
+
+## Please see
+##      demo("ancova")
+## for a composite graph illustrating the four models listed above.
+</code></pre>
+
+
+</div>

@@ -1,0 +1,190 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hvq</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>hvq</h2>
+
+<h3>Description</h3>
+
+<p>Hierarchical Vector Quantization
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hvq(
+  x,
+  min_compression_perc = NA,
+  n_cells = NA,
+  depth = 3,
+  quant.err = 10,
+  seed = 300,
+  algorithm = "Hartigan-Wong",
+  distance_metric = c("L1_Norm", "L2_Norm"),
+  error_metric = c("mean", "max"),
+  quant_method = c("kmeans", "kmedoids")
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>Data Frame. A dataframe of multivariate data. Each row corresponds to an
+observation, and each column corresponds to a variable. Missing values are
+not accepted.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>min_compression_perc</code></td>
+<td>
+<p>Numeric. An integer indicating the minimum percent compression rate to
+be achieved for the dataset</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n_cells</code></td>
+<td>
+<p>Numeric. Indicating the number of nodes per hierarchy.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>depth</code></td>
+<td>
+<p>Numeric. Indicating the hierarchy depth (or) the depth of the
+tree (1 = no hierarchy, 2 = 2 levels, etc..)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>quant.err</code></td>
+<td>
+<p>Numeric. The quantization error for the algorithm.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>seed</code></td>
+<td>
+<p>Numeric. Random Seed.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>algorithm</code></td>
+<td>
+<p>String. The type of algorithm used for quantization.
+Available algorithms are Hartigan and Wong, "Lloyd", "Forgy", "MacQueen".
+(default is "Hartigan-Wong")</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>distance_metric</code></td>
+<td>
+<p>character. The distance metric can be 'L1_Norm" or "L2_Norm". L1_Norm is selected by default.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>error_metric</code></td>
+<td>
+<p>character. The error metric can be "mean" or "max". mean is selected by default</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>quant_method</code></td>
+<td>
+<p>character. The quant_method can be "kmeans" or "kmedoids". kmeans is selected by default</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The raw data is first scaled and this scaled data is supplied as input to
+the vector quantization algorithm. Vector quantization technique uses a
+parameter called quantization error. This parameter acts as a threshold and
+determines the number of levels in the hierarchy. It means that, if there
+are 'n' number of levels in the hierarchy, then all the clusters formed till
+this level will have quantization error equal or greater than the threshold
+quantization error. The user can define the number of clusters in the first
+level of hierarchy and then each cluster in first level is sub-divided into
+the same number of clusters as there are in the first level. This process
+continues and each group is divided into smaller clusters as long as the
+threshold quantization error is met. The output of this technique will be
+hierarchically arranged vector quantized data.
+</p>
+
+
+<h3>Value</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>clusters</code></td>
+<td>
+<p> List. A list showing each ID assigned to a cluster.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nodes.clust</code></td>
+<td>
+<p> List. A list corresponding to nodes' details. </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>idnodes</code></td>
+<td>
+<p> List. A list of ID and segments similar to 
+<code>nodes.clust</code> with additional columns for nodes ID. </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>error.quant</code></td>
+<td>
+<p> List. A list of quantization error for all levels and
+nodes. </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>plt.clust</code></td>
+<td>
+<p> List. A list of logical values indicating if the
+quantization error was met. </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>summary</code></td>
+<td>
+<p> Summary. Output table with
+summary. </p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>Shubhra Prakash &lt;shubhra.prakash@mu-sigma.com&gt;, Sangeet Moy Das &lt;sangeet.das@mu-sigma.com&gt;
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>plotHVT</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data("EuStockMarkets")
+dataset &lt;- data.frame(date = as.numeric(time(EuStockMarkets)),
+DAX = EuStockMarkets[, "DAX"],
+SMI = EuStockMarkets[, "SMI"],
+CAC = EuStockMarkets[, "CAC"],
+FTSE = EuStockMarkets[, "FTSE"])
+dataset_hvt &lt;- dataset[,-c(1)]
+hvqOutput = hvq(dataset_hvt, n_cells = 5, depth = 2, quant.err = 0.2,
+distance_metric='L1_Norm',error_metric='mean',quant_method="kmeans")
+</code></pre>
+
+
+</div>

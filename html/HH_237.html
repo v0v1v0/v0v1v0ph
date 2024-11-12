@@ -1,0 +1,370 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>ladder</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Draw a "ladder of powers" plot, plotting each of several powers
+of y against the same powers of x.</h2>
+
+<h3>Description</h3>
+
+<p>Draw a "ladder of powers" plot, plotting each of several powers
+of y against the same powers of x.  The powers are
+</p>
+<p><code>result &lt;- data.frame(-1/x, -1/sqrt(x), log(x), sqrt(x), x, x^2)</code>
+</p>
+<p><code>names(result) &lt;- c(-1, -.5, 0, .5, 1, 2)</code>
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">ladder(formula.in, data=NULL,
+       main.in="Ladders of Powers",
+       panel.in=panel.cartesian,
+       xlab=deparse(formula.in[[3]]),
+       ylab=deparse(formula.in[[2]]),
+       scales=list(alternating=FALSE,
+         labels=FALSE, ticks=FALSE, cex=.6),
+       par.strip.text=list(cex=.6),
+       cex=.5, pch=16, between=list(x=.3, y=.3),
+       dsx=xlab,
+       dsy=ylab,
+       ladder.function=ladder.f,
+       strip.number=2,
+       strip.names,
+       strip.style=1,
+       strip,
+       oma=c(0,0,0,0),  ## S-Plus
+       axis3.line=.61,
+       layout=c(length(tmp$x.power), length(tmp$y.power)),
+       axis.key.padding = 10, ## R right axis
+       key.axis.padding = 10, ## R top axis
+       useOuter=TRUE, ## R useOuterStrips(combineLimits(result))
+       ...)
+
+ladder3(x, y,
+        dsx=deparse(substitute(x)),
+        dsy=deparse(substitute(y)),
+        ladder.function=ladder.f)
+
+ladder.f(x, name.prefix="")
+
+ladder.fstar(x, name.prefix="")
+
+strip.ladder(which.given,
+             which.panel,
+             var.name,
+             factor.levels,
+             shingle.intervals,
+             par.strip.text=trellis.par.get("add.text"),
+             strip.names=c(TRUE,TRUE),
+             style=1,
+             ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>formula.in</code></td>
+<td>
+<p>A formula with exactly one variable on each side.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>data.frame</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>main.in</code></td>
+<td>
+<p><code>main</code> title for <code>xyplot</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>panel.in</code></td>
+<td>
+<p><code>panel.cartesian</code> has many arguments in addition
+to the arguments in <code>panel.xyplot</code>.  Any replacement
+panel function must have those argument names, even if it
+doesn't do anything with them.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>xlab, ylab</code></td>
+<td>
+<p>Trellis arguments,  default to right- and left-sides
+of the <code>formula.in</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>strip</code></td>
+<td>
+<p>Strip function. Our default is <code>strip.ladder</code>
+(see below).  The other viable argument value is <code>FALSE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cex, pch, between, scales, layout</code></td>
+<td>
+<p>arguments for <code>xyplot</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dsx, dsy</code></td>
+<td>
+<p>Names to be used as level names in
+<code>ladder.function</code> for the generated factor distinguishing the
+powers.  They default to <code>xlab, ylab</code>.  For long variable names,
+an abbreviated name here will decrease clutter in the ladder of powers
+plot.  These names are not visible in the plot when
+<code>strip=FALSE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ladder.function</code></td>
+<td>
+<p>function to use to create data.frame of powers
+of input variable.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>name.prefix</code></td>
+<td>
+<p>Base name used for column names of powers.  The
+default is empty (<code>""</code>).  An alternative must include
+the power symbol <code>"^"</code>, for example, <code>"abc^"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>strip.number</code></td>
+<td>
+<p>Number of strip labels in each panel of the display.
+0: no strip labels; 1: one strip label of the form <code>y^p ~ x^q</code>;
+2: two strip labels of the form <code>ylab: y^p</code> and <code>xlab: x^q</code>,
+where <code>p</code> and <code>q</code> are the powers returned by <code>ladders</code>;
+<code>y</code> and <code>x</code> are the arguments <code>dsy</code> and <code>dsx</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>useOuter</code></td>
+<td>
+<p>logical, defaults to <code>TRUE</code>. In R, this implies
+that <code>strip.number</code> is forced to <code>2</code> and that the
+resulting <code>"trellis"</code> object will be sent through<br><code>useOuterStrips(combineLimits(result))</code>.<br>
+This argument is ignored by S-Plus.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>strip.style</code></td>
+<td>
+<p><code>style</code> argument to <code>strip</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>oma</code></td>
+<td>
+<p>argument to <code>par</code> in S-Plus.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>other arguments to <code>xyplot</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>axis3.line</code></td>
+<td>
+<p>extra space to make the top axis align with the top
+of the top row of panels.  Trial and error to choose a good value.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>axis.key.padding</code></td>
+<td>
+<p>Extra space on right of set of panels in R.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>key.axis.padding</code></td>
+<td>
+<p>Extra space on top of set of panels in R.</p>
+</td>
+</tr>
+</table>
+<table><tr style="vertical-align: top;">
+<td><code>x, y</code></td>
+<td>
+<p>variables.</p>
+</td>
+</tr></table>
+<table>
+<tr style="vertical-align: top;">
+<td><code>which.given, which.panel, var.name, factor.levels,
+shingle.intervals, par.strip.text</code></td>
+<td>
+<p>See
+
+<code>strip.default</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>strip.names, style</code></td>
+<td>
+<p>We always print the <code>strip.names</code>
+in <code>style=1</code>.  Multicolored styles are too busy.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The <code>ladder</code> function uses <code>panel.cartesian</code> which is
+defined differently in R (using grid graphics) and S-Plus (using
+traditional graphics).  Therefore the fine control over appearance
+uses different arguments or different values for the same arguments.
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>ladder</code> returns a <code>"trellis"</code> object.
+</p>
+<p>The functions <code>ladder.fstar</code> and <code>ladder.f</code> take an input
+vector <code>x</code> of non-negative values and construct a data.frame by
+taking the input to the powers <code>c(-1, -.5, 0, .5, 1, 2)</code>, one
+column per power.  <code>ladder.f</code> uses the simple powers and
+<code>ladder.fstar</code> uses the scaled Box–Cox transformation.
+</p>
+
+<table>
+<tr>
+<td style="text-align: left;">
+<code>ladder.fstar</code>        </td>
+<td style="text-align: left;"> <code>ladder.fstar</code>         </td>
+<td style="text-align: right;"> notation </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+<code>(x^p - 1)/p</code>         </td>
+<td style="text-align: left;"> <code>(x^p - 1)/p</code>          </td>
+<td style="text-align: right;">    p     </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+<code>(1/x - 1)/(-1)</code>      </td>
+<td style="text-align: left;"> <code>(1/x - 1)/(-1)</code>       </td>
+<td style="text-align: right;">   -1.0   </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+<code>(1/sqrt(x)-1)/(-.5)</code> </td>
+<td style="text-align: left;"> <code>(1/sqrt(x)-1)/(-.5)</code>  </td>
+<td style="text-align: right;">   -0.5   </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+<code>log(x)</code>              </td>
+<td style="text-align: left;"> <code>log(x)</code>               </td>
+<td style="text-align: right;">    0.0   </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+<code>((sqrt(x)-1)/.5)</code>    </td>
+<td style="text-align: left;"> <code>((sqrt(x)-1)/.5)</code>     </td>
+<td style="text-align: right;">    0.5   </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+<code>x-1</code>                 </td>
+<td style="text-align: left;"> <code>x-1</code>                  </td>
+<td style="text-align: right;">    1.0   </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+<code>(x^2 - 1)/2</code>         </td>
+<td style="text-align: left;"> <code>(x^2 - 1)/2</code>          </td>
+<td style="text-align: right;">    2.0   </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+       </td>
+</tr>
+</table>
+<p><code>ladder3</code> takes two vectors as arguments.  It returns a
+<code>data.frame</code> with five columns:
+</p>
+<p><code>X, Y</code>: data to be plotted.  The column <code>X</code> contains the data
+from the input <code>x</code> taken to all the powers and aligned with the
+similarly expanded column <code>Y</code>.
+</p>
+<p><code>x, y</code>: symbolic labeling of the power corresponding to <code>X,Y</code>.
+</p>
+<p><code>group</code>: result from pasting the labels in <code>x, y</code> with <code>*</code>
+between them.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p> Richard M. Heiberger &lt;rmh@temple.edu&gt; </p>
+
+
+<h3>References</h3>
+
+<p>Heiberger, Richard M. and Holland, Burt (2015).
+<em>Statistical Analysis and Data Display: An Intermediate Course with Examples in R</em>.
+Second Edition.
+Springer-Verlag, New York.
+<a href="https://link.springer.com/book/10.1007/978-1-4939-2122-5">https://link.springer.com/book/10.1007/978-1-4939-2122-5</a>
+</p>
+<p>Hoaglin, D.~C., Mosteller, F., and Tukey, J.~W., editors (1983).
+<em>Understanding Robust and Exploratory Data Analysis</em>.
+Wiley.
+</p>
+<p>Box, G. E.~P. and Cox, D.~R. (1964).
+An analysis of transformations.
+<em>J. Royal Statist Soc B</em>, 26:211–252.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>panel.cartesian</code></p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(tv)
+
+## default
+## R: outer strip labels
+ladder(life.exp ~ ppl.per.phys, data=tv,
+       main="Ladder of Powers for Life Expectancy and People per Physician")
+
+## Not run: 
+## one strip label
+  ladder(life.exp ~ ppl.per.phys, data=tv, strip.number=1, useOuter=FALSE,
+         dsx="ppp", dsy="le")
+
+## two strip labels
+  ladder(life.exp ~ ppl.per.phys, data=tv, strip.number=2, useOuter=FALSE)
+
+## outer strip labels
+ladder(life.exp ~ ppl.per.phys, data=tv, useOuter=TRUE)
+
+## no strip labels (probably silly, but possible)
+ladder(life.exp ~ ppl.per.phys, data=tv, strip.number=0, useOuter=FALSE)
+
+## End(Not run)
+</code></pre>
+
+
+</div>

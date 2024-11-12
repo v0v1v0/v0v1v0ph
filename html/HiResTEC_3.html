@@ -1,0 +1,132 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>EvaluatePairsFromXCMSSet</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>EvaluatePairsFromXCMSSet.</h2>
+
+<h3>Description</h3>
+
+<p><code>EvaluatePairsFromXCMSSet</code> will analyze an xcmsSet result for mass pairs (mz1, mz2) with changes due to any 13C incorporation.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">EvaluatePairsFromXCMSSet(
+  xg = NULL,
+  tp = NULL,
+  gr = NULL,
+  drt = 1,
+  dmz = 0.025,
+  mz_iso = 1.00335,
+  n = 6,
+  method = c("APCI", "ESI")[1],
+  specific_row = NULL,
+  testing = FALSE,
+  silent = FALSE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>xg</code></td>
+<td>
+<p>xcmsSet object with group information.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tp</code></td>
+<td>
+<p>Timepoint information for all samples (obviously required, internally converted to factor).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>gr</code></td>
+<td>
+<p>Group information for all samples, e.g. different genotypes or concentrations (optional, factor).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>drt</code></td>
+<td>
+<p>Allowed rt deviation in time units of xcmsSet (usually seconds) to test for candidates.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dmz</code></td>
+<td>
+<p>Allowed mass deviation in Da.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mz_iso</code></td>
+<td>
+<p>Mass defect of the isotope under investigation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n</code></td>
+<td>
+<p>Number of maximal incorporated carbons to test.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+<p>Currently APCI or ESI. If APCI, dmz will be modified depending on n (see details).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>specific_row</code></td>
+<td>
+<p>A single row from groupval(xg) to process.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>testing</code></td>
+<td>
+<p>Stop in function using browser() if specific_row is specified; can be a isotope number, i.e. 3 will stop at third isotope.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>silent</code></td>
+<td>
+<p>Suppress warnings and console output if TRUE.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Using 'APCI' as method assumes that (i) you analyze TMS-derivatized compounds and (ii) your MS resolution does not allow to seperate Si and C isotopes
+but reportes an intermediate mass as m/z. In this case you will find carbon isotopes below there expected masses, i.e. M+1 would be 1.001mDa apart from M+0 instead of 1.003.
+The effect is increased with isotope number, i.e. M+6 will be ~20mDa below the expected value. Hence, selecting method 'APCI' will combine your selected dmz
+with a allowed deviation due to Si-isotope caused mass shifts. Use 'ESI' if you are not sure if this effect takes place in your settings.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A dataframe with all observable pairs within the provided xcmsSet peak list including mean group intensities and P values.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Please use examples from previous versions as xcms (and xcms objects) are
+# no longer supported during CRAN checks leading to package rejection
+# if included (and I do not know a work around).
+## Not run: 
+load(xcms_cand)
+head(xcms_cand[order(xcms_cand$P), ])
+
+## End(Not run)
+
+</code></pre>
+
+
+</div>

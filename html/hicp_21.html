@@ -1,0 +1,103 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>linking</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Linking-in new index series</h2>
+
+<h3>Description</h3>
+
+<p>Function <code>link()</code> links a new index series to an existing one by an overlap period supplied. In the resulting linked index series, the new index series starts after the existing one. Function <code>lsf()</code> computes the level-shift factors for linking via the overlap periods in <code>t.overlap</code>. The level-shift factors can be applied to an index series that has already been linked by the standard HICP one-month overlap method using December of year <code>t-1</code>.</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">link(x, x.new, t, t.overlap=NULL)
+
+lsf(x, x.new, t, t.overlap=NULL)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x, x.new</code></td>
+<td>
+<p>numeric vector of index values. <code>NA</code>-values in the vectors indicate when the index series discontinues (for <code>x</code>) or starts (for <code>x.new</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>t</code></td>
+<td>
+<p>date vector</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>t.overlap</code></td>
+<td>
+<p>character specifying the overlap period to be used. Could be a whole year (<code>YYYY</code>) or a single year-month (<code>YYYY-MM</code>). Multiple periods can be provided. If <code>NULL</code>, all available overlap periods are considered.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>Function <code>link()</code> returns a numeric vector or a matrix of the same length as <code>t</code>, while <code>lsf()</code> provides a named numeric vector of the same length as <code>t.overlap</code>.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Sebastian Weinand</p>
+
+
+<h3>See Also</h3>
+
+<p><code>chain</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># input data:
+set.seed(1)
+t &lt;- seq.Date(from=as.Date("2015-01-01"), to=as.Date("2024-05-01"), by="1 month")
+x.new &lt;- rnorm(n=length(t), mean=100, sd=5)
+x.new &lt;- rebase(x=x.new, t=t, t.ref="2019-12")
+x.old &lt;- x.new + rnorm(n=length(x.new), sd=5)
+x.old &lt;- rebase(x=x.old, t=t, t.ref="2015")
+x.old[t&gt;as.Date("2021-12-01")] &lt;- NA # current index discontinues in 2021
+x.new[t&lt;as.Date("2020-01-01")] &lt;- NA # new index starts in 2019-12
+
+# linking in new index in different periods:
+plot(x=t, y=link(x=x.old, x.new=x.new, t=t, t.overlap="2021-12"),
+     col="red", type="l", xlab=NA, ylab="Index", ylim=c(80,120))
+lines(x=t, y=link(x=x.old, x.new=x.new, t=t, t.overlap="2020"), col="blue")
+lines(x=t, y=link(x=x.old, x.new=x.new, t=t, t.overlap="2021"), col="green")
+lines(x=t, y=x.old, col="black")
+abline(v=as.Date("2021-12-01"), lty="dashed")
+legend(x="topleft",
+       legend=c("One-month overlap using December 2021",
+                "Annual overlap using 2021",
+                "Annual overlap using 2020"),
+       fill=c("red","green","blue"), bty = "n")
+
+# compute level-shift factors:
+lsf(x=x.old, x.new=x.new, t=t, t.overlap=c("2020","2021"))
+
+# level-shift factors can be applied to already chain-linked index series
+# to obtain linked series using another overlap period:
+x.new.chained &lt;- link(x=x.old, x.new=x.new, t=t, t.overlap="2021-12")
+
+# level-shift adjustment:
+x.new.adj &lt;- ifelse(test=t&gt;as.Date("2021-12-01"),
+                yes=x.new.chained*lsf(x=x.old, x.new=x.new, t=t, t.overlap="2020"),
+                no=x.new.chained)
+
+# compare:
+all.equal(x.new.adj, link(x=x.old, x.new=x.new, t=t, t.overlap="2020"))
+</code></pre>
+
+
+</div>

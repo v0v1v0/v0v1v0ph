@@ -1,0 +1,194 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>plotGradient</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>plotGradient</h2>
+
+<h3>Description</h3>
+
+<p>Plots an environmental gradient over one of the variables included in <code>XData</code>
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">plotGradient(
+  hM,
+  Gradient,
+  predY,
+  measure,
+  xlabel = NULL,
+  ylabel = NULL,
+  index = 1,
+  q = c(0.025, 0.5, 0.975),
+  cicol = rgb(0, 0, 1, alpha = 0.5),
+  pointcol = "lightgrey",
+  pointsize = 1,
+  showData = FALSE,
+  jigger = 0,
+  yshow = NA,
+  showPosteriorSupport = TRUE,
+  main,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>hM</code></td>
+<td>
+<p>a fitted <code>Hmsc</code> model object</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Gradient</code></td>
+<td>
+<p>an object returned by <code>constructGradient</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>predY</code></td>
+<td>
+<p>an object returned by applying the function <code>predict</code> to <code>Gradient</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>measure</code></td>
+<td>
+<p>whether to plot species richness ("S"), an individual species ("Y") or community-weighted
+mean trait values ("T")</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>xlabel</code></td>
+<td>
+<p>label for x-axis</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ylabel</code></td>
+<td>
+<p>label for y-axis</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>index</code></td>
+<td>
+<p>which species or trait to plot</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>q</code></td>
+<td>
+<p>quantiles of the credibility interval plotted</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cicol</code></td>
+<td>
+<p>colour with which the credibility interval is plotted</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pointcol</code></td>
+<td>
+<p>colour with which the data points are plotted</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pointsize</code></td>
+<td>
+<p>size in which the data points are plotted</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>showData</code></td>
+<td>
+<p>whether raw data are plotted as well</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>jigger</code></td>
+<td>
+<p>the amount by which the raw data are to be jiggered in x-direction (for factors) or
+y-direction (for continuous covariates)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>yshow</code></td>
+<td>
+<p>scale y-axis so that these values are also
+visible. This can used to scale y-axis so that it includes 0
+and the expected maximum values.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>showPosteriorSupport</code></td>
+<td>
+<p>add margin text on the posterior
+support of predicted change from gradient minimum to maximum
+for continuous gradients.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>main</code></td>
+<td>
+<p>main title for the plot.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>additional arguments for plot</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>For <code>measure</code>="Y", <code>index</code> selects which species to plot from <code>hM$spNames</code>.
+For <code>measure</code>="T", <code>index</code> selects which trait to plot from <code>hM$trNames</code>.
+With <code>measure</code>="S" the row sum of <code>pred</code> is plotted,
+and thus the interpretation of "species richness" holds only for probit models.
+For Poisson models "S" shows the total count,
+whereas for normal models it shows the summed response.
+For <code>measure</code>="T",
+in probit model the weighting is over species occurrences,
+whereas in count models it is over individuals.
+In normal models, the weights are exp-transformed predictions to avoid negative weights
+</p>
+
+
+<h3>Value</h3>
+
+<p>For the case of a continuous covariate, returns the posterior probability that the plotted
+variable is greater for the last sampling unit of the gradient than for the first sampling unit of
+the gradient. For the case of a factor, returns the plot object.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>constructGradient</code>, <code>predict</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Plot response of species 2 over the gradient of environmental variable x1
+Gradient = constructGradient(TD$m, focalVariable="x1")
+predY = predict(TD$m, Gradient=Gradient)
+plotGradient(TD$m, Gradient, pred=predY, measure="Y", index = 2, showData = TRUE, jigger = 0.05)
+# Plot modelled species richness over the gradient of environmental variable x1
+Gradient = constructGradient(TD$m, focalVariable="x1")
+predY = predict(TD$m, Gradient=Gradient)
+plotGradient(TD$m, Gradient, pred=predY, measure="S")
+
+</code></pre>
+
+
+</div>

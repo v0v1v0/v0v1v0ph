@@ -1,0 +1,124 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>HWExactStats</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Computation of Exact p-values for Hardy-Weinberg equilibrium for sets of SNPs
+</h2>
+
+<h3>Description</h3>
+
+<p><code>HWExactStats</code> is a function for the computation of Exact p-values
+for a large set of bi-allelic markers (typically SNPs). 
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">HWExactStats(X, x.linked = FALSE, plinkcode = TRUE, midp = FALSE,...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>X</code></td>
+<td>
+<p>A matrix with genotype counts, one row per marker. <code>X</code>
+should have 5 columns for an X-chromosomal data set and 3 columns
+for an autosomal data set.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x.linked</code></td>
+<td>
+<p>Logical indicating whether the markers are autosomal (<code>x.linked=FALSE</code>)
+or X-chromosomal (<code>x.linked=TRUE</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>plinkcode</code></td>
+<td>
+<p>Logical indicating whether to use faster C++ code
+from the PLINK software.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>midp</code></td>
+<td>
+<p>Logical indicating whether to use the mid p-value for the
+C++ code or not</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>extra arguments that are passed on to <code>HWExact</code></p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Matrix <code>X</code> should strictly comply with the following format. For
+an autosomal dataset is should contain the 3 genotype counts in order
+(AA,AB,BB). For an X-chromosomal dataset it should contain the 5
+genotype counts in order (A,B,AA,AB,BB) where A and B are the male
+counts and AA, AB and BB the female counts.
+</p>
+<p>Argument <code>plinkcode=TRUE</code> (the default) will use C++ code for faster calculation (functions <code>SNPHWE2</code> and
+<code>SNPHWEX</code>) with larger datasets. The C++ code  was generously shared by Christopher
+Chang, and the same code is used in the program
+<a href="http://www.cog-genomics.org/plink/2.0">PLINK (2.0)</a>.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A vector of p-values</p>
+
+
+<h3>Author(s)</h3>
+
+<p> Jan Graffelman <a href="mailto:jan.graffelman@upc.edu">jan.graffelman@upc.edu</a> (R code) and
+Christopher Chang <a href="mailto:chrchang523@gmail.com">chrchang523@gmail.com</a> (C++ code)</p>
+
+
+<h3>References</h3>
+
+<p>Graffelman, J. and Weir, B.S. (2016) Testing for Hardy-Weinberg
+equilibrium at bi-allelic genetic markers on the X chromosome.
+Heredity 116(6) pp. 558–568. <a href="https://doi.org/10.1038/hdy.2016.20">doi:10.1038/hdy.2016.20</a>
+</p>
+<p>Purcell et al. (2007) PLINK: A Toolset for Whole-Genome Association and
+Population-Based Linkage Analysis. American Journal of Human Genetics
+81(3) pp. 559–575.
+</p>
+
+
+<h3>See Also</h3>
+
+ <p><code>HWExact</code>  </p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">#
+# Autosomal example
+#
+set.seed(123)
+X &lt;- HWData(1000,100)
+monom &lt;- (X[,2]==0 &amp; X[,1]==0) | (X[,2]==0 &amp; X[,3]==0)
+X &lt;- X[!monom,] # exclude monomorphics
+Exact.pvalues &lt;- HWExactStats(X,x.linked=FALSE)
+#
+# X-chromosomal example
+#
+X &lt;- HWData(1000,100,n.males=50,nA=75,x.linked=TRUE)
+Exact.pvalues &lt;- HWExactStats(X,x.linked=TRUE)
+</code></pre>
+
+
+</div>

@@ -1,0 +1,87 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>with_mocked_responses</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Temporarily mock requests</h2>
+
+<h3>Description</h3>
+
+<p>Mocking allows you to selectively and temporarily replace the response
+you would typically receive from a request with your own code. It's
+primarily used for testing.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">with_mocked_responses(mock, code)
+
+local_mocked_responses(mock, env = caller_env())
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>mock</code></td>
+<td>
+<p>A function, a list, or <code>NULL</code>.
+</p>
+
+<ul>
+<li> <p><code>NULL</code> disables mocking and returns httr2 to regular operation.
+</p>
+</li>
+<li>
+<p> A list of responses will be returned in sequence. After all responses
+have been used up, will return 503 server errors.
+</p>
+</li>
+<li>
+<p> For maximum flexibility, you can supply a function that that takes a
+single argument, <code>req</code>, and returns either <code>NULL</code> (if it doesn't want to
+handle the request) or a response (if it does).
+</p>
+</li>
+</ul>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>code</code></td>
+<td>
+<p>Code to execute in the temporary environment.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>env</code></td>
+<td>
+<p>Environment to use for scoping changes.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p><code>with_mock()</code> returns the result of evaluating <code>code</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># This function should perform a response against google.com:
+google &lt;- function() {
+  request("http://google.com") |&gt;
+    req_perform()
+}
+
+# But I can use a mock to instead return my own made up response:
+my_mock &lt;- function(req) {
+  response(status_code = 403)
+}
+try(with_mock(my_mock, google()))
+</code></pre>
+
+
+</div>

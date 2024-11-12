@@ -1,0 +1,66 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>performance</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>provides performance measures using objects from h2o</h2>
+
+<h3>Description</h3>
+
+<p>takes h2o performance object of class "H2OBinomialMetrics"
+alongside caret confusion matrix and provides different
+model performance measures supported by h2o and caret
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">performance(perf)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table><tr style="vertical-align: top;">
+<td><code>perf</code></td>
+<td>
+<p>h2o performance object of class "H2OBinomialMetrics"</p>
+</td>
+</tr></table>
+<h3>Value</h3>
+
+<p>numeric vector
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>E. F. Haghish
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+## Not run: 
+library(h2o)
+h2o.init(ignore_config = TRUE, nthreads = 2, bind_to_localhost = FALSE, insecure = TRUE)
+prostate_path &lt;- system.file("extdata", "prostate.csv", package = "h2o")
+prostate &lt;- h2o.importFile(path = prostate_path, header = TRUE)
+y &lt;- "CAPSULE"
+prostate[,y] &lt;- as.factor(prostate[,y])  #convert to factor for classification
+aml &lt;- h2o.automl(y = y, training_frame = prostate, max_runtime_secs = 30)
+
+# evaluate the model performance
+perf &lt;- h2o.performance(aml@leader, xval = TRUE)
+
+# compute more performance measures
+performance(perf)
+
+
+## End(Not run)
+</code></pre>
+
+
+</div>

@@ -1,0 +1,113 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>prep_cv</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Prepare for Cross validation bandwidth selection</h2>
+
+<h3>Description</h3>
+
+<p>Implements the calculation of the hqm estimator on cross validation data sets. This is a preparation for the cross validation bandwidth selection technique for future conditional hazard rate estimation based on marker information data.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">prep_cv(data, data.id, marker_name, event_time_name = 'years',
+        time_name = 'year',event_name = 'status2', n, I, b)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>A data frame of time dependent data points.  Missing values are allowed.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>data.id</code></td>
+<td>
+<p>An id data frame obtained from <code>to_id</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>marker_name</code></td>
+<td>
+<p>The column name of the marker values in the data frame <code>data</code>. </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>event_time_name</code></td>
+<td>
+<p>The column name of the event times in the data frame <code>data</code>. </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>time_name</code></td>
+<td>
+<p>The column name of the times the marker values were observed in the data frame <code>data</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>event_name</code></td>
+<td>
+<p>The column name of the events in the data frame <code>data</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n</code></td>
+<td>
+<p>Number of individuals.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>I</code></td>
+<td>
+<p>Number of observations leave out for a K cross validation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>b</code></td>
+<td>
+<p>Bandwidth.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The function splits the data set via <code>dataset_split</code> and calculates for every splitted data set the hqm estimator
+</p>
+<p style="text-align: center;"><code class="reqn">\hat{h}_x(t) = \frac{\sum_{i=1}^n \int_0^T\hat{\alpha}_i(X_i(t+s))Z_i(t+s)Z_i(s)K_{b}(x-X_i(s))\mathrm {d}s}{\sum_{i=1}^n\int_0^TZ_i(t+s)Z_i(s)K_{b}(x-X_i(s))\mathrm {d}s},</code>
+</p>
+
+<p>for all <code class="reqn">x</code> on the marker grid and <code class="reqn">t</code> on the time grid, where <code class="reqn">X</code> is the marker, <code class="reqn">Z</code> is the exposure and <code class="reqn">\alpha(z)</code> is the marker-only hazard, see <code>get_alpha</code> for more details.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A list of matrices for every cross validation data set with <code class="reqn">\hat{h}_x(t)</code> for all <code class="reqn">x</code> on the marker grid and <code class="reqn">t</code> on the time grid.
+</p>
+
+
+<h3>See Also</h3>
+
+ <p><code>b_selection</code> </p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+pbc2_id = to_id(pbc2)
+n = max(as.numeric(pbc2$id))
+b = 1.5
+I = 26
+h_xt_mat_list = prep_cv(pbc2, pbc2_id, 'serBilir', 'years', 'year', 'status2', n, I, b)
+</code></pre>
+
+
+</div>

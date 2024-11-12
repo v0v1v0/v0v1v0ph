@@ -1,0 +1,126 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hypervolume_permute</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Hypervolumes through permuting data of two hypervolumes
+</h2>
+
+<h3>Description</h3>
+
+<p>Takes two data of two hypervolume objects (with the same column labels) and generates pairs of hypervolumes with the original sizes of the input hypervolumes but with permuted data (the rows of the original hypervolumes' data are combined and redistributed to the two new hypervolumes). This function is meant for taking a sample of all permutations and does not guarantee that permutations are not repeated. Newly generated hypervolume objects are written to file.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hypervolume_permute(name, 
+                    hv1, 
+                    hv2, 
+                    n = 50, 
+                    cores = 1, 
+                    verbose = TRUE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>name</code></td>
+<td>
+
+<p>File name; The function writes hypervolumes to file in ./Objects/&lt;name&gt;
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>hv1</code></td>
+<td>
+
+<p>A hypervolume object
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>hv2</code></td>
+<td>
+
+<p>A hypervolume object
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n</code></td>
+<td>
+
+<p>number of permutations to take
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cores</code></td>
+<td>
+
+<p>Number of logical cores to use while generating permuted hypervolumes. If parallel backend already registered to <code>doParallel</code>, function will use that backend and ignore the argument in cores.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+
+<p>Logical value; If function is being run sequentially, outputs progress bar in console.
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p><code>hypervolume_permute</code> creates a directory called Objects in the current working directory if a directory of that name doesn't already exist. Returns an absolute path to directory with permuted hypervolumes. rds files are stored in separate subdirectories for each permutation. Use <code>hypervolume_permute</code> when generating null distribution of overlap statistics. <code>hypervolume_overlap_test</code> takes in a <code>hypervolume_permute</code> filepath output.
+</p>
+<p>It is also possible to access the hypervolumes by using readRDS to read the hypervolume objects in one by one.
+</p>
+
+
+<h3>Value</h3>
+
+<p>returns a string containing an absolute path equivalent to ./Objects/&lt;name&gt;
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>hypervolume_overlap_test</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+data("quercus")
+# For this example consider taking two samples of size 150 from the data.
+qsample1 = quercus[sample(1:nrow(quercus), 150),]
+qsample2 = quercus[sample(1:nrow(quercus), 150),]
+
+# Construct two hypervolumes from the samples
+hv1 = hypervolume(qsample1[,2:3])
+hv2 = hypervolume(qsample2[,2:3])
+
+# Take 200 permutations of the 300 data points. Using more cores is faster.
+perm_path = hypervolume_permute("Quercus_perm_150", hv1, hv2, n = 200, cores = 20)
+
+# hypervolume_overlap_test takes perm_path as an input.
+# Results include p value for the overlap statistics of hv1 and hv2 as well as
+# null distribution generated from perm_path. The null distribution assumes data
+# for hv1 and hv2 are drawn from the same distribution and permuting data will 
+# not change the overlap statitsics.
+results = hypervolume_overlap_test(hv1, hv2, perm_path)
+
+## End(Not run)
+</code></pre>
+
+
+</div>

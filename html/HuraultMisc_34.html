@@ -1,0 +1,147 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>prior_posterior</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Compare prior to posterior</h2>
+
+<h3>Description</h3>
+
+
+<ul>
+<li> <p><code>combine_prior_posterior</code> subsets and binds the prior and posterior dataframes.
+</p>
+</li>
+<li> <p><code>plot_prior_posterior</code> plots posterior CI alongside prior CI.
+</p>
+</li>
+<li> <p><code>compute_prior_influence</code> computes diagnostics of how the posterior is influenced by the prior.
+</p>
+</li>
+<li> <p><code>plot_prior_influence</code> plots diagnostics from <code>compute_prior_influence</code>.
+</p>
+</li>
+</ul>
+<h3>Usage</h3>
+
+<pre><code class="language-R">combine_prior_posterior(prior, post, pars = NULL, match_exact = TRUE)
+
+plot_prior_posterior(
+  prior,
+  post,
+  pars = NULL,
+  match_exact = TRUE,
+  lb = "5%",
+  ub = "95%"
+)
+
+compute_prior_influence(
+  prior,
+  post,
+  pars = NULL,
+  match_exact = TRUE,
+  remove_index_prior = TRUE
+)
+
+plot_prior_influence(prior, post, pars = NULL, match_exact = TRUE)
+
+check_model_sensitivity(prior, post, pars = NULL)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>prior</code></td>
+<td>
+<p>Dataframe of prior parameter estimates.
+The dataframe is expected to have columns <code>Variable</code>, <code>Mean.</code>
+For <code>plot_prior_posterior()</code>, the columns <code style="white-space: pre;">⁠5%⁠</code> and <code style="white-space: pre;">⁠95%⁠</code> should also be present.
+For <code>compute_prior_influence()</code> and <code>plot_prior_influence()</code>, the columns <code>Index</code> and <code>sd</code> should also be present.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>post</code></td>
+<td>
+<p>Dataframe of posterior parameter estimates, with same columns as <code>prior</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pars</code></td>
+<td>
+<p>Vector of parameter names to plot. Defaults to all parameters presents in <code>post</code> and <code>prior.</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>match_exact</code></td>
+<td>
+<p>Logical indicating whether parameters should be matched exactly (e.g. <code>p</code> does not match <code style="white-space: pre;">⁠p\[1\]⁠</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lb</code></td>
+<td>
+<p>Name of the column in <code>prior</code> and <code>post</code> corresponding to lower bound of error bar</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ub</code></td>
+<td>
+<p>Name of the column in <code>prior</code> and <code>post</code> corresponding to upper bound of error bar</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>remove_index_prior</code></td>
+<td>
+<p>Whether to remove the index variable for <code>prior</code> except the first one.
+This is useful if a parameter with multiple index have the same prior distribution
+(e.g. with subject parameters, when <code>prior</code> does not contain as many subjects as post for computational reasons).</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+
+<ul>
+<li>
+<p> Posterior shrinkage (<code>PostShrinkage = 1 - Var(Post) / Var(Prior)</code>), capturing how much the model is learning.
+Shrinkage near 0 indicates that the data provides little information beyond the prior.
+Shrinkage near 1 indicates that the data is much more informative than the prior.
+</p>
+</li>
+<li>
+<p> 'Mahalanobis' distance between the mean posterior and the prior (<code>DistPrior</code>), capturing whether the prior "includes" the posterior.
+</p>
+</li>
+</ul>
+<h3>Value</h3>
+
+
+<ul>
+<li> <p><code>combine_prior_posterior</code> returns a dataframe with the same columns as in prior and post and a column <code>Distribution</code>.
+</p>
+</li>
+<li> <p><code>compute_prior_influence</code> returns a dataframe with columns: <code>Variable</code>, <code>Index</code>, <code>PostShrinkage</code>, <code>DistPrior.</code>
+</p>
+</li>
+<li> <p><code>plot_prior_posterior</code> and <code>plot_prior_influence</code> returns a ggplot object
+</p>
+</li>
+</ul>
+<h3>Note</h3>
+
+<p>For <code>plot_prior_posterior</code>, parameters with the same name but different indices are plotted together.
+If their prior distribution is the same, it can be useful to only keep one index in <code>prior</code>.
+If not, we can use <code>match_exact = FALSE</code> to plot <code>parameter[1]</code> and <code>parameter[2]</code> separately.
+</p>
+
+
+<h3>References</h3>
+
+<p><a href="https://betanalpha.github.io/assets/case_studies/principled_bayesian_workflow.html">M. Betancourt, “Towards a Principled Bayesian Workflow”</a>, 2018.
+</p>
+
+
+</div>

@@ -1,0 +1,141 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>getHDoutliers</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Outlier Detection Stage of Wilkinson's <em>hdoutliers</em> Algorithm
+</h2>
+
+<h3>Description</h3>
+
+<p>Detects outliers based on a probability model.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">getHDoutliers(data, memberLists, alpha = 0.05, transform = TRUE) 
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+
+<p>A vector, matrix, or data frame consisting of numeric and/or categorical
+variables.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>memberLists</code></td>
+<td>
+
+<p>A list following the structure of the output to <code>getHDmembers</code>,
+in which each component is a vector of observation indexes.
+The first index in each list is the index of the <em>exemplar</em>
+representing that list, and any remaining indexes are the
+associated <em>members</em>, considered ‘close to’ the <em>exemplar</em>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alpha</code></td>
+<td>
+
+<p>Threshold for determining the cutoff for outliers.
+Observations are considered outliers
+outliers if they fall in the <code class="reqn">(1- alpha)</code> tail of the distribution
+of the nearest-neighbor distances between <em>exemplars</em>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>transform</code></td>
+<td>
+
+<p>A logical variable indicating whether or not the data needs to be
+transformed to conform to Wilkinson's specifications before outlier
+detection. The default is to transform the data using function
+<code>dataTrans</code>.
+In Wilksinson's algorithm, <code>memberLists</code> would have been created 
+with transformed data.
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>An exponential distribution is fitted to the upper tail of the 
+nearest-neighbor distances between <em>exemplars</em> (the observations
+considered representatives of each component of <code>memberLists</code>). 
+Observations are considered
+outliers if they fall in the <code class="reqn">(1- alpha)</code> tail of the fitted CDF.
+</p>
+
+
+<h3>Value</h3>
+
+<p>The indexes of the observations determined to be outliers.
+</p>
+
+
+<h3>References</h3>
+
+<p>Wilkinson, L. (2016). Visualizing Outliers.
+&lt;https://www.cs.uic.edu/~wilkinson/Publications/outliers.pdf&gt;.
+</p>
+
+
+<h3>Note</h3>
+
+<p>A call to <code>getHDoutliers</code> in which <code>membersLists</code> result from
+a call to <code>getHDmembers</code> is equivalent to calling <code>HDoutliers</code>.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>HDoutliers</code>,
+<code>getHDmembers</code>,
+<code>dataTrans</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+data(dots)
+mem.W &lt;- getHDmembers(dots$W)
+out.W &lt;- getHDoutliers(dots$W,mem.W)
+## Not run: 
+plotHDoutliers( dots.W, out.W)
+## End(Not run)
+
+data(ex2D)
+mem.ex2D &lt;- getHDmembers(ex2D)
+out.ex2D &lt;- getHDoutliers( ex2D, mem.ex2D)
+## Not run: 
+plotHDoutliers( ex2D, out.ex2D)
+## End(Not run)
+
+## Not run: 
+n &lt;- 100000 # number of observations
+set.seed(3)
+x &lt;- matrix(rnorm(2*n),n,2)
+nout &lt;- 10 # number of outliers
+x[sample(1:n,size=nout),] &lt;- 10*runif(2*nout,min=-1,max=1)
+
+mem.x &lt;- getHDmembers(x)
+out.x &lt;- getHDoutliers(x)
+## End(Not run)
+
+</code></pre>
+
+
+</div>

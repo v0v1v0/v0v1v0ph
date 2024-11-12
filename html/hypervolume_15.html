@@ -1,0 +1,172 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>get_occupancy_stats</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Stats from occupancy objects
+</h2>
+
+<h3>Description</h3>
+
+<p>Functions <code>get_occupancy_stats()</code> and <code>get_occupancy_stats_bootstrap()</code> return the results of a function applied to hypervolumes generated with <code>hypervolume_n_occupancy()</code>,
+<code>hypervolume_n_occupancy_bootstrap()</code>, <code>hypervolume_n_occupancy_permute()</code> or <code>hypervolume_n_occupancy_test()</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">get_occupancy_stats(hv, FUN, remove_zeroes = TRUE)
+
+get_occupancy_stats_bootstrap(path,
+                              FUN,
+                              remove_zeroes = TRUE,
+                              method = "pairwise",
+                              res_type = "summary",
+                              verbose = TRUE,
+                              cores = 1)
+
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>hv</code></td>
+<td>
+
+<p>A <code>Hypervolume</code> or <code>HypervolumeList</code> object generated with <code>hypervolume_n_occupancy()</code>, <code>hypervolume_n_occupancy_bootstrap()</code>, <code>hypervolume_n_occupancy_permute()</code> or <code>hypervolume_n_occupancy_test()</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>FUN</code></td>
+<td>
+
+<p>The function to be applied.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>remove_zeroes</code></td>
+<td>
+
+<p>Remove zeroes before the calculation. See Details.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>path</code></td>
+<td>
+
+<p>A path to a directory of bootstrapped hypervolumes obtained with
+<code>hypervolume_n_occupancy_bootstrap()</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+
+<p>If <code>all</code> returns the results for each hypervolume. If <code>pairwise</code> returns the results for all the pairwise comparisons of individual hypervolumes.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>res_type</code></td>
+<td>
+
+<p>It can be <code>raw</code> or <code>pairwise</code>. See details.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+
+<p>Logical value; print diagnostic output if <code>TRUE</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cores</code></td>
+<td>
+
+<p>Number of logical cores to use while generating permuted hypervolumes. If parallel backend already registered to <code>doParallel</code>, function will use that backend and ignore the argument in <code>cores</code>.
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The <code>get_occupancy_stats()</code> and <code>get_occupancy_stats_bootstrap()</code> functions take <code>ValueAtRandomPoints</code> of each hypervolume as input to <code>FUN</code> (e.g. mean, median). <br>
+The <code>get_occupancy_stats_bootstrap()</code> function applies the function to bootstrapped occupancy objects generated with <code>hypervolume_n_occupancy_bootstrap()</code>. If <code>res_type = "raw"</code> raw values of the applied functions are returned for each occupancy object in <code>path</code>, only when <code>method = "all"</code>. If <code>res_type = "summary"</code> the mean value as well as the standard deviation, median, minimum, maximum, 2.5% and 97.5% quantiles, skewness and kurtosis are returned either for individual hypervolumes (<code>method = "all"</code>) or pairwise comparisons (<code>method = "pairwise"</code>). <br>
+The <code>get_occupancy_stats()</code> and <code>get_occupancy_stats_bootstrap()</code> functions remove occupancy values equal to 0 by default. These values are generated during the occupancy routine when a random point is included in some groups of hypervolumes but not in others. A tipical usage of
+<code>get_occupancy_stats()</code> or <code>get_occupancy_stats_bootstrap()</code> should remove zeroes before applying a function (the default).
+</p>
+
+
+<h3>Value</h3>
+
+<p>Either a <code>vector</code>, a <code>matrix</code> or a <code>data.frame</code> with the results of the applied function. 
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>hypervolume_n_occupancy</code>, <code>hypervolume_n_occupancy_bootstrap</code>,
+<code>hypervolume_n_occupancy_permute</code>, <code>hypervolume_n_occupancy_test</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+
+##### single occupancy object #####
+data(penguins,package='palmerpenguins')
+penguins_no_na = as.data.frame(na.omit(penguins))
+
+# split the dataset on species and sex
+penguins_no_na_split = split(penguins_no_na, 
+paste(penguins_no_na$species, penguins_no_na$sex, sep = "_"))
+
+# calculate the hypervolume for each element of the splitted dataset
+hv_list = mapply(function(x, y) 
+  hypervolume_gaussian(x[, c("bill_length_mm","bill_depth_mm","flipper_length_mm")],
+                       samples.per.point=100, name = y), 
+                       x = penguins_no_na_split, 
+                       y = names(penguins_no_na_split))
+
+
+# transform the list into an HypervolumeList
+hv_list = hypervolume_join(hv_list)
+
+# calculate occupancy based on sex
+hv_occupancy_list_sex = hypervolume_n_occupancy(hv_list, 
+                          classification = rep(c("female", "male"), 3))
+
+
+# calculate the mean occupancy value
+get_occupancy_stats(hv_occupancy_list_sex, mean)
+
+##### bootstrapped occupancy objects #####
+
+# bootstrap input hypervolumes
+hv_boot = hypervolume_n_resample(name = "example", hv_list = hv_list,  n = 9)
+
+# calculate occupancy on bootstrapped hypervolumes
+hv_boot_occ = hypervolume_n_occupancy_bootstrap(hv_boot, name = "example_occ",
+                                  classification = rep(c("female", "male"), 3))
+
+# calculate summary statistics for pairwise comparisons
+get_occupancy_stats_bootstrap(hv_boot_occ, FUN = mean)
+
+
+## End(Not run)
+</code></pre>
+
+
+</div>

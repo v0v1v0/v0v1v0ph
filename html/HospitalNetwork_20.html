@@ -1,0 +1,107 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>matrix_from_edgelist</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Compute the adjacency matrix of a network from its edgelist</h2>
+
+<h3>Description</h3>
+
+<p>Compute the adjacency matrix of a network from its edgelist
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">matrix_from_edgelist(
+  edgelist,
+  origin_name = "origin",
+  target_name = "target",
+  count,
+  format_long = FALSE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>edgelist</code></td>
+<td>
+<p>(data.table) A table containing the edges (or links) of the
+network, i.e. representing the movements of subjects between
+facilities. Either in long format with at least two columns (origin and
+target facilities of a link), each row corresponding to a single
+movement, or aggregated by unique pairs of origin/target, therefore with
+an additional variable for movements count (default). See details.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>origin_name</code></td>
+<td>
+<p>(character) Column of the origin facilities of the links.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>target_name</code></td>
+<td>
+<p>(character) Column of the target facilities of the links.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>count</code></td>
+<td>
+<p>(character) Column of the counts of movements by unique pair of
+facilities.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>format_long</code></td>
+<td>
+<p>(logical) Whether the edgelist is in long format, with
+each row corresponding to a single movement. If TRUE, the edgelist will
+be aggregated by unique pairs of facilities to compute the matrix.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The edgelist contains the information on the connections between
+nodes of the network, that is the movements of subjects between
+facilities. The edgelist can be in two different formats: long or
+aggregated. In long format, each row corresponds to a single movement
+between two facilities, therefore only two columns are needed, one
+containing the origin facilities of a movement, the other containing the
+target facilities. In aggregated format, the edgelist is aggregated by
+unique pairs of origin-target facilities. Thus, each row corresponds to a
+unique connection between two facilities, and the table contains an
+additional variable which is the count of the number of movements
+recorded for the pair. If the edgelist is provided in long format, it
+will be aggregated to compute the matrix.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A square numeric matrix, the adjacency matrix of the network.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>edgelist_from_base</code>, <code>matrix_from_base</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">mydb &lt;- create_fake_subjectDB(n_subjects = 100, n_facilities = 10)
+myBase &lt;- checkBase(mydb)
+hospinet &lt;- hospinet_from_subject_database(myBase)
+matrix_from_edgelist(hospinet$edgelist, count = "N")
+</code></pre>
+
+
+</div>

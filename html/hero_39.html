@@ -1,0 +1,180 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hero</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Construct a hero sandwich smoother</h2>
+
+<h3>Description</h3>
+
+<p><code>hero</code> constructs a hero sandwich smoother based off
+off a prepared data object coming from the
+<code>prepare</code> function.  <br>
+Subclasses are added (e.g., <code>hero_numeric</code>,
+<code>hero_matrix</code>, <code>hero_array</code>, etc.) are added to
+the returned object for plotting purposes.
+<br>
+A list is returned (and the data locations are not) for
+<code>hero.prepared_list</code>.  Each element of the list
+contains the coefficients and fitted values (if <code>fitted</code> is
+TRUE) for the respective data observation.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hero(x, ...)
+
+## S3 method for class 'prepared_array'
+hero(x, ...)
+
+## S3 method for class 'prepared_list'
+hero(x, ..., fitted = FALSE)
+
+## S3 method for class 'prepared_matrix'
+hero(x, ...)
+
+## S3 method for class 'prepared_numeric'
+hero(x, ...)
+
+## S3 method for class 'prepared_sequential'
+hero(
+  x,
+  ...,
+  export_list,
+  export_fun = base::saveRDS,
+  package = "base",
+  call_args = list()
+)
+
+## S3 method for class 'prepared_starray'
+hero(x, ...)
+
+## S3 method for class 'prepared_sts'
+hero(x, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>Data prepared via the <code>prepare</code>
+function.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Mostly not implemented.  <code>hero.prepared_list</code> takes
+the <code>fitted</code> argument, specifying whether the <code>fitted</code>
+values should be returned.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fitted</code></td>
+<td>
+<p>A logical value indicating whether the fitted values should be
+computed. The default is <code>FALSE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>export_list</code></td>
+<td>
+<p>A vector or list whose elements tell <code>export_fun</code>
+what files to export. The length must match the number of observations,
+i.e., the number of elements in <code>x$Ytilde</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>export_fun</code></td>
+<td>
+<p>A function that will write the results for each observation
+to file using the names in <code>export_list</code>. Must only have the arguments
+<code>object</code>, which is what will be saved and computed internally, and
+<code>file</code>, which is the name of the file that will be saved. <code>file</code>
+will be one of the elements of <code>export_list</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>package</code></td>
+<td>
+<p>A character string indicating the approach to use for the
+computations. The choices are <code>"base"</code>, <code>"parallel"</code>,
+<code>"pbapply"</code>, <code>"future.apply"</code>, or <code>"Rmpi"</code>. The default is
+<code>"base"</code>. If <code>package == "base"</code>, then <code>mapply</code>
+is used. If <code>package == "parallel"</code>, then
+<code>mcmapply</code> is used. If <code>package == "pbapply"</code>,
+then <code>pblapply</code> is used. If codepackage ==
+"future.apply", then <code>future_mapply</code> is used. If
+codepackage == "Rmpi", then <code>mpi.applyLB</code> is used.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>call_args</code></td>
+<td>
+<p>A named list providing relevant arguments to
+<code>mcmapply</code>, <code>pblapply</code>,
+<code>future_mapply</code>, or
+<code>mpi.applyLB</code>, depending on the <code>package</code> choice.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A <code>hero</code> object with the smoothed data
+(<code>fitted</code>), the estimated coefficients for the
+basis functions (<code>coefficients</code>), and the
+locations of the original data (<code>x</code>).
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Joshua French.
+</p>
+
+
+<h3>References</h3>
+
+<p>Xiao, L. , Li, Y. and Ruppert, D. (2013),
+Fast bivariate P-splines: the sandwich smoother. J. R.
+Stat. Soc. B, 75: 577-599. &lt;doi:10.1111/rssb.12007&gt;
+</p>
+<p>French, Joshua P., and Piotr S. Kokoszka. "A sandwich
+smoother for spatio-temporal functional data." Spatial
+Statistics 42 (2021): 100413.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># create b-splines
+x1 = bspline(nbasis = 10)
+x2 = bspline(nbasis = 12)
+
+# observed data locations
+evalarg1 = seq(0, 1, len = 60)
+evalarg2 = seq(0, 1, len = 80)
+
+# construct "true" data
+mu = matrix(0, nrow = 60, ncol = 80)
+for(i in seq_len(60)) {
+   for(j in seq_len(80)) {
+      mu[i, j] =  sin(2*pi*(evalarg1[i]-.5)^3)*cos(4*pi*evalarg2[j])
+   }
+}
+# construct noisy data
+data = mu + rnorm(60 * 80)
+
+obj = prepare(data, list(evalarg1, evalarg2), list(x1, x2))
+obj = enhance(obj)
+sandmod = hero(obj)
+plot(sandmod)
+</code></pre>
+
+
+</div>

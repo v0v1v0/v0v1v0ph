@@ -1,0 +1,226 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>maxp</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Maximum likelihood estimation</h2>
+
+<h3>Description</h3>
+
+<p>Find the maximum likelihood estimate for p, also equal probabilities</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">maxp(H, startp=NULL, give=FALSE, fcm=NULL, fcv=NULL, SMALL=1e-6, n=1,
+   show=FALSE, justlikes=FALSE, ...)
+maxplist(Hlist, startp=NULL, give=FALSE, fcm=NULL, fcv=NULL, SMALL=1e-6, ...)
+maxp_single(H, startp=NULL, give=FALSE, fcm=NULL, fcv=NULL, SMALL=1e-6,
+   maxtry=100, ...)
+maxp_single2(H, startp=NULL, give=FALSE, fcm=NULL, fcv=NULL, SMALL=1e-6,
+   maxtry=100, ...)
+maxp_simplex(H, n=100, show=FALSE, give=FALSE, ...)
+maxp_lsl(HLSL, startp = NULL, give = FALSE, fcm = NULL, fcv = NULL, SMALL=1e-6, ...)
+equalp(H)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>H</code></td>
+<td>
+<p>A <code>hyper2</code> or <code>hyper3</code> object</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Hlist</code></td>
+<td>
+<p>A list with elements all <code>hyper2</code> objects</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>HLSL</code></td>
+<td>
+<p>An <code>lsl</code> object</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>startp</code></td>
+<td>
+<p>A vector of probabilities specifying the start-point for
+optimization; if a full unit-sum vector, then the fill-up value will
+be removed by <code>indep()</code> (except for <code>maxp_lsl()</code>)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>give</code></td>
+<td>
+<p>Boolean, with default <code>FALSE</code> meaning to return just
+the evaluate (including fillup), and <code>TRUE</code> meaning to return
+the entire formal output of the optimization routine</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fcm,fcv</code></td>
+<td>
+<p>Further problem-specific constraints</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n</code></td>
+<td>
+<p>Number of start points to use</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>show</code></td>
+<td>
+<p>Boolean, with <code>TRUE</code> meaning to show successive
+estimates</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>justlikes</code></td>
+<td>
+<p>Boolean, with <code>TRUE</code> meaning to return just a
+vector of estimated likelihoods</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>SMALL</code></td>
+<td>
+<p>Numerical minimum for probabilities</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>maxtry</code></td>
+<td>
+<p>Integer specifying maximum number of times to try
+<code>constrOptim()</code> with slightly differing start points, to avoid
+a known <span style="font-family: Courier New, Courier; color: #666666;"><b>R</b></span> bug which reports <code>wmmin is not finite</code>, bugzilla
+id 17703</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Further arguments which <code>maxp()</code> passes to
+<code>constrOptim()</code></p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Function <code>maxp()</code> returns the maximum likelihood estimate for
+<code>p</code>, which has the unit sum constraint implemented.
+</p>
+<p>Function <code>maxplist()</code> does the same but takes a list of
+<code>hyper2</code> objects (for example, the output of <code>ggrl()</code>).
+Note that <code>maxplist()</code> does not have access to the gradient of
+the objective function, which makes it slow.
+</p>
+<p>If function <code>maxp()</code> is given a <code>suplist</code> object it
+dispatches to <code>maxplist()</code>.
+</p>
+<p>Functions <code>maxp_single()</code> and <code>maxp_single2()</code> are helper
+functions which perform a single constrained optimization using
+<code>base::constrOptim()</code> or <code>alabama::constrOptim.nl()</code>
+respectively.  The functions should produce identical (or at least
+very similar) results.  They are used by <code>maxp()</code> and
+<code>maxp_simplex()</code> which dispatch to either <code>maxp_single()</code> or
+<code>maxp_single2()</code> depending on the value of option
+<code>use_alabama</code>.  If <code>TRUE</code>, they will use (experimental)
+<code>maxp_single2()</code>, otherwise (default) <code>maxp_single()</code>.
+Function <code>maxp_single()</code> is prone to the “wmmin not
+finite” bug [bugzilla id 17703] but on the other hand is a bit
+slower.  I am not sure which one is better at this time.
+</p>
+<p>Function <code>maxp_simplex()</code> is intended for complicated or flat
+likelihood functions where finding local maxima might be a problem.
+It repeatedly calls <code>maxp_single()</code>, starting from a different
+randomly chosen point in the simplex each time.  This function does
+not take <code>fcm</code> or <code>fcv</code> arguments, it operates over the
+whole simplex (hence the name).  Further arguments, <code>...</code>, are
+passed to <code>maxp_single()</code>.
+</p>
+<p>The functions do not work for the <code>masterchef_series6</code> likelihood
+function.  These require a bespoke optimization as shown in the
+vignette.
+</p>
+<p>Function <code>equalp()</code> returns the value of <code class="reqn">p</code> for which all
+elements are the same.
+</p>
+<p>In functions <code>maxp()</code> etc, arguments <code>fcm</code> and <code>fcv</code>
+implement linear constraints to be passed to <code>constrOptim()</code>.
+These constraints are in addition to the usual nonnegativity
+constraints and unit-sum constraint, and are added to the <code>ui</code>
+and <code>ci</code> arguments of <code>constrOptim()</code> with <code>rbind()</code>
+and <code>c()</code> respectively.  The operative lines are in
+<code>maxp_single()</code>:
+</p>
+<pre>
+    UI &lt;- rbind(diag(nrow = n - 1), -1, fcm)
+    CI &lt;- c(rep(SMALL, n - 1), -1 + SMALL, fcv)
+  </pre>
+<p>where in <code>UI</code>, the first <code class="reqn">n-1</code> rows enforce nonnegativity of
+<code class="reqn">p_i</code>, <code class="reqn">1\leq p &lt; n</code>; row <code class="reqn">n</code> enforces
+nonnegativity of the fillup value <code class="reqn">p_n</code>; and the remaining
+(optional) rows enforce additional linear constraints.  Argument
+<code>CI</code> is a vector with corresponding elements.
+</p>
+<p>Examples of their use are given in the “icons” vignette.
+</p>
+
+
+<h3>Note</h3>
+
+<p>In manpages elsewhere, <code>n=2</code> is sometimes used.  Previous
+advice was to use <code>n=10</code> or greater in production work, but I
+now think this is overly cautious and <code>n=1</code> is perfectly
+adequate unless the dimension of the problem is large.
+</p>
+<p>The (bordered) Hessian is given by function <code>hessian()</code>,
+documented at <code>gradient.Rd</code>; use this to assess the
+“sharpness” of the maximum.
+</p>
+<p>Function <code>maxp()</code> takes <code>hyper2</code> or <code>hyper3</code> objects
+but it does not currently work with <code>lsl</code> objects; use
+<code>maxp_lsl()</code>.
+</p>
+<p>The built-in datasets generally include a pre-calculated result of
+running <code>maxp()</code>; thus hyper2 object <code>icons</code> and
+<code>icons_maxp</code> are included in the same <code>.rda</code> file.
+</p>
+<p>Function <code>maxp()</code> can trigger a known <span style="font-family: Courier New, Courier; color: #666666;"><b>R</b></span> bug (bugzilla id 17703)
+which reports “<code>wmmin is not finite</code>”.  Setting option
+<code>use_alabama</code> to <code>TRUE</code> makes the package use a different
+optimization routine.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Robin K. S. Hankin</p>
+
+
+<h3>See Also</h3>
+
+<p><code>gradient</code>,<code>fillup</code></p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+maxp(icons)
+
+W &lt;- hyper2(pnames=letters[1:5])
+W1 &lt;- ggrl(W, 'a', letters[2:3],'d')  # W1 is a suplist object
+## Not run: maxp(W1)  # takes a long time to maximize a suplist
+
+</code></pre>
+
+
+</div>

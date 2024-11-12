@@ -1,0 +1,124 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>WPT</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Weather Prediction Task Data</h2>
+
+<h3>Description</h3>
+
+<p>This data set contains responses of 11 Parkinsons' patients and 13 age-matched
+controls on the Weather Prediction Task. Both groups were tested twice. The PD
+patients were either on or off dopaminergic medication.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">data(WPT)</code></pre>
+
+
+<h3>Format</h3>
+
+<p>A data.frame with 9600 observations on the following variables.
+</p>
+
+<dl>
+<dt><code>id</code></dt>
+<dd>
+<p>a factor with participant IDs</p>
+</dd>
+<dt><code>group</code></dt>
+<dd>
+<p>a factor with group IDs (Parksinson's patient or control)</p>
+</dd>
+<dt><code>med</code></dt>
+<dd>
+<p>a factor indicating, for the PD patients, whether they were on dopaminergic medicine or not</p>
+</dd>
+<dt><code>occ</code></dt>
+<dd>
+<p>a numeric vector with testing occassions</p>
+</dd>
+<dt><code>trial</code></dt>
+<dd>
+<p>a numeric vector with trial numbers</p>
+</dd>
+<dt><code>c1</code></dt>
+<dd>
+<p>a numeric (binary) vector indicating whether the first cue was present (1) or not (0)</p>
+</dd>
+<dt><code>c2</code></dt>
+<dd>
+<p>a numeric (binary) vector indicating whether the second cue was present (1) or not (0)</p>
+</dd>
+<dt><code>c3</code></dt>
+<dd>
+<p>a numeric (binary) vector indicating whether the third cue was present (1) or not (0)</p>
+</dd>
+<dt><code>c4</code></dt>
+<dd>
+<p>a numeric (binary) vector indicating whether the fourth cue was present (1) or not (0)</p>
+</dd>
+<dt><code>y</code></dt>
+<dd>
+<p>a factor with the actual outcome (Rainy or Fine)</p>
+</dd>
+<dt><code>r</code></dt>
+<dd>
+<p>a factor with participants' prediction of the outcome</p>
+</dd>
+</dl>
+<h3>Source</h3>
+
+<p>Speekenbrink, M., Lagnado, D. A., Wilkinson, L., Jahanshahi, M., &amp; Shanks, D. R. (2010). 
+Models of probabilistic category learning in Parkinson's disease: Strategy use and the 
+effects of L-dopa. <em>Journal of Mathematical Psychology</em>, <em>54</em>, 123-136.
+</p>
+<p>Corresponding author: m.speekenbrink@ucl.ac.uk
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(WPT)
+
+# set up predictors for the different strategies
+WPT$sngl &lt;- 0 # singleton strategy
+WPT$sngl[WPT$c1 == 1 &amp; rowSums(WPT[,c("c1","c2","c3","c4")]) == 1] &lt;- -1
+WPT$sngl[WPT$c2 == 1 &amp; rowSums(WPT[,c("c1","c2","c3","c4")]) == 1] &lt;- -1
+WPT$sngl[WPT$c3 == 1 &amp; rowSums(WPT[,c("c1","c2","c3","c4")]) == 1] &lt;- 1
+WPT$sngl[WPT$c4 == 1 &amp; rowSums(WPT[,c("c1","c2","c3","c4")]) == 1] &lt;- 1
+WPT$sc1 &lt;- 1 - 2*WPT$c1
+WPT$sc2 &lt;- 1 - 2*WPT$c2
+WPT$sc3 &lt;- -1 + 2*WPT$c3
+WPT$sc4 &lt;- -1 + 2*WPT$c4
+WPT$mc &lt;- sign(-WPT$c1 - WPT$c2 + WPT$c3 + WPT$c4)
+
+rModels &lt;- list(
+	list(GLMresponse(formula=r~-1,data=WPT,family=binomial())),
+	list(GLMresponse(formula=r~sngl-1,data=WPT,family=binomial())),
+	list(GLMresponse(formula=r~sc1-1,data=WPT,family=binomial())),
+	list(GLMresponse(formula=r~sc2-1,data=WPT,family=binomial())),
+	list(GLMresponse(formula=r~sc3-1,data=WPT,family=binomial())),
+	list(GLMresponse(formula=r~sc4-1,data=WPT,family=binomial())),
+	list(GLMresponse(formula=r~mc-1,data=WPT,family=binomial()))
+)
+
+transition &lt;- list()
+for(i in 1:7) {
+  transition[[i]] &lt;- transInit(~1,nstates=7,family=multinomial(link="identity"))
+}
+
+inMod &lt;- transInit(~1,ns=7,data=data.frame(rep(1,48)),family=multinomial("identity"))
+
+mod &lt;- makeDepmix(response=rModels,transition=transition, 
+	prior=inMod,ntimes=rep(200,48),stationary=TRUE)
+
+fmod &lt;- fit(mod)
+
+</code></pre>
+
+
+</div>

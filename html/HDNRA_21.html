@@ -1,0 +1,107 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>ts_bs1996</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Test proposed by Bai and Saranadasa (1996)</h2>
+
+<h3>Description</h3>
+
+<p>Bai and Saranadasa (1996)'s test for testing equality of two-sample high-dimensional mean vectors with assuming that two covariance matrices are the same.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">ts_bs1996(y1, y2)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>y1</code></td>
+<td>
+<p>The data matrix (p by n1) from the first population. Each column represents a <code class="reqn">p</code>-dimensional observation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>y2</code></td>
+<td>
+<p>The data matrix (p by n2) from the first population. Each column represents a <code class="reqn">p</code>-dimensional observation.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Suppose we have two independent high-dimensional samples:
+</p>
+<p style="text-align: center;"><code class="reqn">
+\boldsymbol{y}_{i1},\ldots,\boldsymbol{y}_{in_i}, \;\operatorname{are \; i.i.d. \; with}\; \operatorname{E}(\boldsymbol{y}_{i1})=\boldsymbol{\mu}_i,\; \operatorname{Cov}(\boldsymbol{y}_{i1})=\boldsymbol{\Sigma},i=1,2.
+</code>
+</p>
+
+<p>The primary object is to test
+</p>
+<p style="text-align: center;"><code class="reqn">H_{0}: \boldsymbol{\mu}_1 = \boldsymbol{\mu}_2\; \operatorname{versus}\; H_{1}: \boldsymbol{\mu}_1 \neq \boldsymbol{\mu}_2.</code>
+</p>
+
+<p>Bai and Saranadasa (1996) proposed the following centralised <code class="reqn">L^2</code>-norm-based test statistic:
+</p>
+<p style="text-align: center;"><code class="reqn">T_{BS} = \frac{n_1n_2}{n} \|\bar{\boldsymbol{y}}_1 - \bar{\boldsymbol{y}}_2\|^2-\operatorname{tr}(\hat{\boldsymbol{\Sigma}}),</code>
+</p>
+
+<p>where  <code class="reqn">\bar{\boldsymbol{y}}_{i},i=1,2</code> are the sample mean vectors and <code class="reqn">\hat{\boldsymbol{\Sigma}}</code> is the pooled sample covariance matrix.
+They showed that under the null hypothesis, <code class="reqn">T_{BS}</code> is asymptotically normally distributed.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A  (list) object of  <code>S3</code> class <code>htest</code>  containing the following elements:
+</p>
+
+<dl>
+<dt>statistic</dt>
+<dd>
+<p>the test statistic proposed by Bai and Saranadasa (1996)</p>
+</dd>
+<dt>p.value</dt>
+<dd>
+<p>the <code class="reqn">p</code>-value of the test proposed by Bai and Saranadasa (1996).</p>
+</dd>
+</dl>
+<h3>References</h3>
+
+<p>Bai Z, Saranadasa H (1996).
+“Effect of high dimension: by an example of a two sample problem.”
+<em>Statistica Sinica</em>, 311–329.
+<a href="https://www.jstor.org/stable/24306018">https://www.jstor.org/stable/24306018</a>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">set.seed(1234)
+n1 &lt;- 20
+n2 &lt;- 30
+p &lt;- 50
+mu1 &lt;- t(t(rep(0, p)))
+mu2 &lt;- mu1
+rho &lt;- 0.1
+y &lt;- (-2 * sqrt(1 - rho) + sqrt(4 * (1 - rho) + 4 * p * rho)) / (2 * p)
+x &lt;- y + sqrt((1 - rho))
+Gamma &lt;- matrix(rep(y, p * p), nrow = p)
+diag(Gamma) &lt;- rep(x, p)
+Z1 &lt;- matrix(rnorm(n1 * p, mean = 0, sd = 1), p, n1)
+Z2 &lt;- matrix(rnorm(n2 * p, mean = 0, sd = 1), p, n2)
+y1 &lt;- Gamma %*% Z1 + mu1 %*% (rep(1, n1))
+y2 &lt;- Gamma %*% Z2 + mu2 %*% (rep(1, n2))
+ts_bs1996(y1, y2)
+
+</code></pre>
+
+
+</div>

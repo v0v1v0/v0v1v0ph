@@ -1,0 +1,173 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>PlotSimObsRegime</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Plot annual regimes of simulated and observed variables</h2>
+
+<h3>Description</h3>
+
+<p>A combined plot for annual regimes with box plot elements for observed variables and ribbon elements
+for simulated variables. Particularly designed for comparisons of sparse observations with
+high-density model results, e.g. for in-stream nutrients.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">PlotSimObsRegime(
+  x,
+  sim,
+  obs,
+  ts.in = NULL,
+  ts.out = "month",
+  start.mon = 1,
+  add.legend = TRUE,
+  pos.legend = "topright",
+  inset = 0,
+  l.legend = NULL,
+  log = FALSE,
+  ylim = NULL,
+  xlab = NULL,
+  ylab = NULL,
+  mar = c(3, 3, 1, 1) + 0.1
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>Data frame, with column-wise equally-spaced time series of HYPE variables. Date-times in
+<code>POSIXct</code> format in first column. Typically an imported basin output file from HYPE using <code>ReadBasinOutput</code>.
+See details for HYPE output variables required for plotting.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sim, obs</code></td>
+<td>
+<p>Character string keywords, observed and simulated HYPE variable IDs to plot. Not case-sensitive, but must exist in <code>x</code>.
+Set to <code>NULL</code> to omit corresponding elements in plot.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ts.in</code></td>
+<td>
+<p>Character string, timestep of <code>x</code>, searches for an attribute <code>timestep</code> in <code>x</code> per default.
+Otherwise one of <code>"month"</code>, <code>"week"</code>, <code>"day"</code>, or <code>"nhour"</code> (n = number of hours).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ts.out</code></td>
+<td>
+<p>Character string, aggregation timestep for simulation results, defaults to <code>ts.in</code>. This timestep must be equal
+to or longer than <code>ts.in</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>start.mon</code></td>
+<td>
+<p>Integer between 1 and 12, starting month of the hydrological year, used to order the output.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>add.legend</code></td>
+<td>
+<p>Logical. If <code>TRUE</code>, a legend will be added to the plot.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pos.legend</code></td>
+<td>
+<p>Character string keyword for legend positioning. See Details in <code>link{legend}</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>inset</code></td>
+<td>
+<p>Integer, legend inset as fraction of plot region, one or two values for x and y. See <code>link{legend}</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>l.legend</code></td>
+<td>
+<p>Character vector of length 2 containing variable labels for legend, first for <code>sim</code>, then for <code>obs</code>.
+If non-NULL, variable labels are read from here instead of <code>sim</code> and <code>obs</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>log</code></td>
+<td>
+<p>Logical, if <code>TRUE</code>, y-axis will be log-scaled.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ylim</code></td>
+<td>
+<p>Numeric vector of length two, giving y-axis limits. Defaults to min-max range of all plotted data.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>xlab</code></td>
+<td>
+<p>Character string or <code>plotmath</code> expression string, x-axis label. Defaults to a string giving the
+time period on which the regime is based.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ylab</code></td>
+<td>
+<p>Character or <code>plotmath</code> expression string. Y-axis label. Defaults to a HYPE variable unit string taken from
+<code>x</code> <code>attributes</code> <code>'hypeunit'</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mar</code></td>
+<td>
+<p>Numeric vector of length 4, margin specification passed to <code>par</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p><code>PlotSimObsRegime</code> combines ribbons and box plot elements. Box plot elements are composed as defaults from <code>boxplot</code>,
+i.e. boxes with 25\
+extreme values as points. Observation counts per month over the observation period are printed above the x-axis.
+</p>
+<p>Aggregation time length of the simulated variable can be chosen in argument <code>ts.out</code>, resulting in more or less smoothed ribbons.
+For the observed variable, the aggregation is fixed to months, in order to aggregate enough values for each box plot element.
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>PlotSimObsRegime</code> returns a plot to the currently active plot device, and invisibly a <code>list</code> object containing three
+elements with the plotted data and variable IDs.
+Element <code>obs</code> contains a list as returned by <code>AnnualRegime</code>. Element <code>obs</code> contains a list with two elements, a
+vector <code>refdate</code> with x positions of box plots elements, and a list <code>reg.obs</code> with observations for the monthly box plot elements.
+Element <code>variable</code> contains a named vector with HYPE variable IDs for observations and simulations. <code>sim</code> and <code>obs</code> returned
+empty if corresponding function argument was <code>NULL</code>.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>PlotAnnualRegime</code> for a more generic annual regime plot, <code>AnnualRegime</code> to compute annual regimes only.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Plot observed and simulated discharge
+te &lt;- ReadBasinOutput(filename = system.file("demo_model",
+"results", "0003587.txt", package = "HYPEtools"))
+PlotSimObsRegime(x = te, sim = "cout", obs = "rout", start.mon = 10)
+
+</code></pre>
+
+
+</div>

@@ -1,0 +1,167 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>h2</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Total Interaction Strength</h2>
+
+<h3>Description</h3>
+
+<p>Proportion of prediction variability unexplained by main effects of <code>v</code>, see Details.
+Use <code>plot()</code> to get a barplot.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">h2(object, ...)
+
+## Default S3 method:
+h2(object, ...)
+
+## S3 method for class 'hstats'
+h2(object, normalize = TRUE, squared = TRUE, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>object</code></td>
+<td>
+<p>Object of class "hstats".</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Currently unused.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>normalize</code></td>
+<td>
+<p>Should statistics be normalized? Default is <code>TRUE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>squared</code></td>
+<td>
+<p>Should <em>squared</em> statistics be returned? Default is <code>TRUE</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>If the model is additive in all features, then the (centered) prediction
+function <code class="reqn">F</code> equals the sum of the (centered) partial dependence
+functions <code class="reqn">F_j(x_j)</code>, i.e.,
+</p>
+<p style="text-align: center;"><code class="reqn">
+  F(\mathbf{x}) = \sum_{j}^{p} F_j(x_j)
+</code>
+</p>
+
+<p>(check <code>partial_dep()</code> for all definitions).
+To measure the relative amount of variability unexplained by all main effects,
+we can therefore study the test statistic of total interaction strength
+</p>
+<p style="text-align: center;"><code class="reqn">
+  H^2 = \frac{\frac{1}{n} \sum_{i = 1}^n \big[F(\mathbf{x}_i) - 
+  \sum_{j = 1}^p\hat F_j(x_{ij})\big]^2}{\frac{1}{n} 
+  \sum_{i = 1}^n\big[F(\mathbf{x}_i)\big]^2}.
+</code>
+</p>
+
+<p>A value of 0 means there are no interaction effects at all.
+Due to (typically undesired) extrapolation effects, depending on the model,
+values above 1 may occur.
+</p>
+<p>In Żółkowski et al. (2023), <code class="reqn">1 - H^2</code> is called <em>additivity index</em>.
+A similar measure using accumulated local effects is discussed in Molnar (2020).
+</p>
+
+
+<h3>Value</h3>
+
+<p>An object of class "hstats_matrix" containing these elements:
+</p>
+
+<ul>
+<li> <p><code>M</code>: Matrix of statistics (one column per prediction dimension), or <code>NULL</code>.
+</p>
+</li>
+<li> <p><code>SE</code>: Matrix with standard errors of <code>M</code>, or <code>NULL</code>.
+Multiply with <code>sqrt(m_rep)</code> to get <em>standard deviations</em> instead.
+Currently, supported only for <code>perm_importance()</code>.
+</p>
+</li>
+<li> <p><code>m_rep</code>: The number of repetitions behind standard errors <code>SE</code>, or <code>NULL</code>.
+Currently, supported only for <code>perm_importance()</code>.
+</p>
+</li>
+<li> <p><code>statistic</code>: Name of the function that generated the statistic.
+</p>
+</li>
+<li> <p><code>description</code>: Description of the statistic.
+</p>
+</li>
+</ul>
+<h3>Methods (by class)</h3>
+
+
+<ul>
+<li> <p><code>h2(default)</code>: Default method of total interaction strength.
+</p>
+</li>
+<li> <p><code>h2(hstats)</code>: Total interaction strength from "interact" object.
+</p>
+</li>
+</ul>
+<h3>References</h3>
+
+
+<ol>
+<li>
+<p> Żółkowski, Artur, Mateusz Krzyziński, and Paweł Fijałkowski.
+<em>Methods for extraction of interactions from predictive models.</em>
+Undergraduate thesis. Faculty of Mathematics and Information Science,
+Warsaw University of Technology (2023).
+</p>
+</li>
+<li>
+<p> Molnar, Christoph, Giuseppe Casalicchio, and Bernd Bischl".
+<em>Quantifying Model Complexity via Functional Decomposition for Better Post-hoc Interpretability</em>,
+in Machine Learning and Knowledge Discovery in Databases,
+Springer International Publishing (2020): 193-204.
+</p>
+</li>
+</ol>
+<h3>See Also</h3>
+
+<p><code>hstats()</code>, <code>h2_overall()</code>, <code>h2_pairwise()</code>, <code>h2_threeway()</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># MODEL 1: Linear regression
+fit &lt;- lm(Sepal.Length ~ . + Petal.Width:Species, data = iris)
+s &lt;- hstats(fit, X = iris[, -1])
+h2(s)
+
+# MODEL 2: Multi-response linear regression
+fit &lt;- lm(as.matrix(iris[, 1:2]) ~ Petal.Length + Petal.Width * Species, data = iris)
+s &lt;- hstats(fit, X = iris[, 3:5])
+h2(s)
+
+# MODEL 3: No interactions
+fit &lt;- lm(Sepal.Length ~ ., data = iris)
+s &lt;- hstats(fit, X = iris[, -1], verbose = FALSE)
+h2(s)
+</code></pre>
+
+
+</div>

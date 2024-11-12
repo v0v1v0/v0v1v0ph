@@ -1,0 +1,247 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>PrecisionTester</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Test numerically determined instantaneous frequency against exact instantaneous frequency
+</h2>
+
+<h3>Description</h3>
+
+<p>This function compares the performance of <code>InstantaneousFrequency</code> against signals of known instantaneous frequency.
+The known signal is of the form
+</p>
+<p style="text-align: center;"><code class="reqn"> x(t) = a\sin(\omega_{1} + \varphi_{1}) + b\sin(\omega_{2} + \varphi_{2}) + c</code>
+</p>
+
+<p>One can create quite complicated signals by choosing the various amplitude, frequency, and phase constants.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">PrecisionTester(tt = seq(0, 10, by = 0.01), method = "arctan", lag = 1, 
+    a = 1, b = 1, c = 1, omega.1 = 2 * pi, omega.2 = 4 * pi, 
+    phi.1 = 0, phi.2 = pi/6, plot.signal = TRUE, 
+    plot.instfreq = TRUE, plot.error = TRUE, new.device = TRUE, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>tt</code></td>
+<td>
+
+<p>Sample times.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+
+<p>How the numeric instantaneous frequency is calculated, see <code>InstantaneousFrequency</code>
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lag</code></td>
+<td>
+
+<p>Differentiation lag, see the <code>diff</code> function in the <code>base</code> package.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>a</code></td>
+<td>
+
+<p>Amplitude coefficient for the first sinusoid.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>b</code></td>
+<td>
+
+<p>Amplitude coefficient for the second sinusoid.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>c</code></td>
+<td>
+
+<p>DC shift
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>omega.1</code></td>
+<td>
+
+<p>Frequency of the first sinusoid.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>omega.2</code></td>
+<td>
+
+<p>Frequency of the second sinusoid.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>phi.1</code></td>
+<td>
+
+<p>Phase shift of the first sinusoid.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>phi.2</code></td>
+<td>
+
+<p>Phase shift of the second sinusoid.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>plot.signal</code></td>
+<td>
+
+<p>Whether to show the time series.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>plot.instfreq</code></td>
+<td>
+
+<p>Whether to show the instantaneous frequencies, comparing the numerical and analytical result.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>plot.error</code></td>
+<td>
+
+<p>Whether to show the difference between the numerical and analytical result.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>new.device</code></td>
+<td>
+
+<p>Whether to open each plot as a new plot window (defaults to <code>TRUE</code>).  However, Sweave doesn't like <code>dev.new()</code>.
+If you want to use <code>PrecisionTester</code> in Sweave, be sure that <code>new.device = FALSE</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+
+<p>Plotting parameters.
+</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>instfreq$sig</code></td>
+<td>
+<p>The time series</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>instfreq$analytic</code></td>
+<td>
+<p>The exact instantaneous frequency</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>instfreq$numeric</code></td>
+<td>
+<p>The numerically-derived instantaneous frequency from <code>InstantaneousFrequency</code></p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>Daniel C. Bowman <a href="mailto:danny.c.bowman@gmail.com">danny.c.bowman@gmail.com</a>
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>InstantaneousFrequency</code></p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+#Simple signal
+tt &lt;- seq(0, 10, by = 0.01)
+a &lt;- 1
+b &lt;- 0
+c &lt;- 0
+omega.1 &lt;- 30 * pi
+omega.2 &lt;- 0
+phi.1 &lt;- 0
+phi.2 &lt;- 0
+PrecisionTester(tt, method = "arctan", lag = 1, a, b, c, 
+    omega.1, omega.2, phi.1, phi.2)
+
+#That was nice - what happens if we use the "chain" method...?
+
+PrecisionTester(tt, method = "chain", lag = 1, a, b, c, 
+    omega.1, omega.2, phi.1, phi.2)
+
+#Big problems!  Let's increase the sample rate
+
+tt &lt;- seq(0, 10, by = 0.0005)
+PrecisionTester(tt, method = "chain", lag = 1, a, b, c, 
+omega.1, omega.2, phi.1, phi.2)
+
+#That's better
+
+#Frequency modulations caused by signal that is not symmetric about 0
+
+tt &lt;- seq(0, 10, by = 0.01)
+a &lt;- 1
+b &lt;- 0
+c &lt;- 0.25
+omega.1 &lt;- 2 * pi
+omega.2 &lt;- 0
+phi.1 &lt;- 0
+phi.2 &lt;- 0
+
+PrecisionTester(tt, method = "arctan", lag = 1, a, b, c, 
+omega.1, omega.2, phi.1, phi.2)
+
+#Non-uniform sample rate
+set.seed(628)
+tt &lt;- sort(runif(500, 0, 10))
+a &lt;- 1
+b &lt;- 0
+c &lt;- 0
+omega.1 &lt;- 2 * pi
+omega.2 &lt;- 0
+phi.1 &lt;- 0
+phi.2 &lt;- 0
+
+PrecisionTester(tt, method = "arctan", lag = 1, a, b, c, 
+omega.1, omega.2, phi.1, phi.2)
+</code></pre>
+
+
+</div>

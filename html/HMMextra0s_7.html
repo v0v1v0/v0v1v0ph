@@ -1,0 +1,134 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>plotVitloc2d</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Plot the Classified 2-D Data of a Bivariate HMM With Extra Zeros
+</h2>
+
+<h3>Description</h3>
+
+<p>Plot the classified 2-D data with different colours representing different hidden states (or different clusters) obtained from the Viterbi path and confidence contours.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">plotVitloc2d(object, R, Z, HMMest, CI.level=0.95, npoints=100, cols=NA, 
+cex.lab=1.5, cex.axis=1.5, cex=1, cex.text=2)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>object</code></td>
+<td>
+<p>is a list containing <code>y</code> (the estimated Viterbi path) and <code>v</code> (the estimated probability of each time point being in each state). This object is returned from running <code>Viterbi.hmm0norm2d(R, Z, HMMest)</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>R</code></td>
+<td>
+<p>is the observed data. <code>R</code> is a <code class="reqn">T * 2</code> matrix, where <code class="reqn">T</code> is the number of observations.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Z</code></td>
+<td>
+<p>is the binary data with the value 1 indicating that an event was observed and 0 otherwise. <code>Z</code> is a vector of length <code class="reqn">T</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>HMMest</code></td>
+<td>
+<p>is a list which contains pie, gamma, sig, mu, and delta (the bivariate HMM parameter estimates).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>CI.level</code></td>
+<td>
+<p>is a scalar or a vector, the confidence level for the ellipse contour of each state. Default is 0.95.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>npoints</code></td>
+<td>
+<p>is the number of points used in the ellipse. Default is 100.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cols</code></td>
+<td>
+<p>is a vector defines the colors to be used for different states. If col=NA, then the default colors will be used.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cex.lab</code></td>
+<td>
+<p>specifies the size of the axis label text.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cex.axis</code></td>
+<td>
+<p>specifies the size of the tick label numbers/text.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cex</code></td>
+<td>
+<p>specifies the size of the points.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cex.text</code></td>
+<td>
+<p>specifies the size of the text indicting the state number.</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>Ting Wang and Jiancang Zhuang
+</p>
+
+
+<h3>References</h3>
+
+
+<p>Wang, T., Zhuang, J., Buckby, J., Obara, K. and Tsuruoka, H. (2018) Identifying the recurrence patterns of non-volcanic tremors using a 
+2D hidden Markov model with extra zeros. Journal of Geophysical Research, doi: <a href="https://doi.org/10.1029/2017JB015360">10.1029/2017JB015360</a>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">pie &lt;- c(0.008,0.2,0.4)
+gamma &lt;- matrix(c(0.99,0.007,0.003,
+                  0.02,0.97,0.01,
+                  0.04,0.01,0.95),byrow=TRUE, nrow=3)
+mu &lt;- matrix(c(35.03,137.01,
+               35.01,137.29,
+               35.15,137.39),byrow=TRUE,nrow=3)
+sig &lt;- array(NA,dim=c(2,2,3))
+sig[,,1] &lt;- matrix(c(0.005, -0.001,
+                   -0.001,0.01),byrow=TRUE,nrow=2)
+sig[,,2] &lt;- matrix(c(0.0007,-0.0002,
+                    -0.0002,0.0006),byrow=TRUE,nrow=2)
+sig[,,3] &lt;- matrix(c(0.002,0.0018,
+                     0.0018,0.003),byrow=TRUE,nrow=2)
+delta &lt;- c(1,0,0)
+y &lt;- sim.hmm0norm2d(mu,sig,pie,gamma,delta, nsim=5000)
+R &lt;- y$x
+Z &lt;- y$z
+HMMEST &lt;- hmm0norm2d(R, Z, pie, gamma, mu, sig, delta)
+Viterbi3 &lt;- Viterbi.hmm0norm2d(R,Z,HMMEST)
+plotVitloc2d(Viterbi3, R, Z,HMMEST)
+</code></pre>
+
+
+</div>

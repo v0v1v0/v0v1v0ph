@@ -1,0 +1,246 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>summary.fittedloop</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Summarizing and Bootstrapping Fitted Ellipses or Loops
+</h2>
+
+<h3>Description</h3>
+
+<p>summary methods for classes <code>ellipsefit</code> and <code>fittedloop</code> created by the functions <code>fel</code> and <code>floop</code>. Can bootstrap results to produce parameter estimates with reduced bias and standard errors.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">## S3 method for class 'ellipsefit'
+summary(object,boot=TRUE, N = 1000, 
+studentize=TRUE, center=FALSE, cbb=NULL, joint=FALSE,seed=NULL,...)
+## S3 method for class 'fittedloop'
+summary(object,boot=TRUE,N=1000,
+cbb=NULL,joint=FALSE,seed=NULL,...)
+## S3 method for class 'loop2r'
+summary(object,boot=TRUE,N=1000,
+cbb=NULL,joint=FALSE,seed=NULL,...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>object</code></td>
+<td>
+
+<p>an object of class <code>ellipsefit</code> or <code>fittedloop</code>, a result of a call to <code>fel</code> or <code>floop</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>boot</code></td>
+<td>
+
+<p>logical. Whether to perform bootstrapping to get standard errors, which is the default TRUE, or to get standard errors through the delta method if FALSE.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>N</code></td>
+<td>
+
+<p>optional number of bootstrap replicates. Default of 1000.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>studentize</code></td>
+<td>
+
+<p>studentize the residuals to improve performance. Default is true.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>center</code></td>
+<td>
+
+<p>center x and y residuals around zero. Default is false. Irrelevant for "harmonic2" method.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cbb</code></td>
+<td>
+
+<p>allows for circular block bootstrapping. The default is NULL in which case circular block bootstrapping is not performed. If cbb is an integer greater than 1 which is a divisor of either the number of observations for methods "nls", "lm", "geometric" or the number of observations minus 3 for <code>method="harmonic2"</code> then it is used as the block size for circular block bootstrapping.  
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>joint</code></td>
+<td>
+
+<p>logical that defaults to false. Resample input and output residuals paired by observation, instead of separately.  
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>seed</code></td>
+<td>
+
+<p>either NULL or a positive integer. Set the random number seed.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+
+<p>further arguments passed to or from other methods.
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Bootstrap objects created by fitting hysteretic data with one of the functions <code>fel</code> or <code>floop</code> and produce statistical summaries. Bootstrapping reduces the bias on estimates and also gives standard errors. Bootstrap estimates are created by subtracting original estimates from bootstrap means to get a bias estimate, and then subtracting this bias from the original estimate.
+</p>
+<p>Residuals are studentized as if they were produced using the harmonic2 method, regardless of which method was actually used to produce them. However, unpublished simulation studies show that these studentized residuals provide better 95 percent coverages for all methods despite this. This studentization is not true studentization as in <code>rstudent.ellipsefit</code> as it only accounts for the influence matrix and does not divide by the standard deviation.
+</p>
+<p>If residuals are serially correlated than the argument cbb may be used to sample blocks of length cbb instead of individual residuals. Circular block bootstrapping is used, which means that all residuals are equally likely to be included and blocks can be made up of the last points on the ellipse together with the first.
+</p>
+<p>When using the 'nls', 'geometric' or 'lm' methods individual bootstrap replications may occasionally fail to converge, when this occurs an extra replication will take the place of the one that failed to converge and a warning message will be produced.
+</p>
+
+
+<h3>Value</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>call</code></td>
+<td>
+<p>function call for original fit.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+<p>fitting method used. Only for <code>summary.ellipsefit</code>. See <code>fel</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x </code></td>
+<td>
+<p>the input x.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+<p>the output y.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pred.x </code></td>
+<td>
+<p>the bootstrap fitted values for x.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pred.y </code></td>
+<td>
+<p>the bootstrap fitted values for y.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>values </code></td>
+<td>
+<p>matrix containing parameter and standard error estimates, bootstrap quantiles, and bootstrapped parameter estimates for a wide variety of parameters. See <code>loop.parameters</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Delta.Std.Errors</code></td>
+<td>
+<p>the delta method standard errors.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fit.statistics</code></td>
+<td>
+<p>rudimentary measures, based on the "harmonic2" method, include the Multivariate Final Prediction Error (MFPE) and the AIC for both the output alone and the two variables in combination. 
+Although degree of freedom adjustments are made for other methods, measures of fit require further study</p>
+</td>
+</tr>
+</table>
+<p>For bootstrapping
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>summarycall</code></td>
+<td>
+<p>the function call.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>boot.data</code></td>
+<td>
+<p>parameter estimates from individual bootstrap replications.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Boot.Estimates</code></td>
+<td>
+<p>bootstrapped estimates.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Boot.Std.Errors</code></td>
+<td>
+<p>bootstrap standard errors.</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>Spencer Maynes, Fan Yang, and Anne Parkhurst.
+</p>
+
+
+<h3>References</h3>
+
+<p>Yang, F. and A. Parkhurst, Efficient Estimation of Elliptical Hysteresis (submitted)
+</p>
+<p>Correa, Solange, Extended Bootstrap Bias Correction with Application to Multilevel Modelling of Survey Data under Informative Sampling.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>fel</code> for fitting points that form an ellipse and creating an ellipsefit object and <code>plot.ellipsesummary</code> for plotting an ellipsesummary object.  
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">#Loop example with circular block bootstrapping
+loop1 &lt;- mloop(n=1,m=2,sd.x=0.05,sd.y=0.05)
+loop1.fit &lt;- floop(loop1$x,loop1$y,m=2,n=1)
+boot.loop1 &lt;- summary(loop1.fit,cbb=3)
+boot.loop1
+plot(boot.loop1)
+
+#Ellipse example.
+ellipse1 &lt;- mel(sd.x=0.2,sd.y=0.04)
+ellipse1.fit &lt;- fel(ellipse1$x,ellipse1$y)
+boot.ellipse1.fit &lt;- summary(ellipse1.fit)
+boot.ellipse1.fit
+plot(boot.ellipse1.fit,xlab="Input",ylab="Output",
+main="Bootstrapped Ellipse",putNumber=TRUE)
+
+</code></pre>
+
+
+</div>

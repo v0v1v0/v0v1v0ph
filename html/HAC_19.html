@@ -1,0 +1,157 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>dHAC, pHAC, rHAC</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>pdf, cdf and random sampling
+</h2>
+
+<h3>Description</h3>
+
+<p><code>dHAC</code> and <code>pHAC</code> compute the values of the copula's density and cumulative distribution function respectively. <code>rHAC</code> samples from HAC.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">dHAC(X, hac, eval = TRUE, margins = NULL, na.rm = FALSE, ...)
+pHAC(X, hac, margins = NULL, na.rm = FALSE, ...)
+rHAC(n, hac)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>X</code></td>
+<td>
+
+<p>a data matrix. The number of columns and the corresponding names have to coincide with the specifications of the copula model <code>hac</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>hac</code></td>
+<td>
+
+<p>an object of the class <code>hac</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n</code></td>
+<td>
+
+<p>number of observations.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>margins</code></td>
+<td>
+
+<p>specifies the margins. The data matrix <code>X</code> is assumed to contain the values of the marginal distributions by default, i.e. <code>margins = NULL</code>. If raw data are used, the margins can be determined nonparametrically, <code>"edf"</code>, or in parametric way, e.g. <code>"norm"</code>. See <code>estimate.copula</code> for a detailed explanation.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>na.rm</code></td>
+<td>
+
+<p>boolean. If <code>na.rm = TRUE</code>, missing values, <code>NA</code>, contained in <code>X</code> are removed.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>eval</code></td>
+<td>
+
+<p>boolean. If <code>eval = FALSE</code>, a non-evaluated <code>function</code> is returned. Note, that <code>attr</code> <code>"gradient"</code> of the returned function corresponds to the values density.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+
+<p>arguments to be passed to <code>na.omit</code>.
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Sampling schemes of hierarchical and densities of simple Archimedean copula are based on functions of the <span class="env">copula</span> package.
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>rHAC</code> retruns a <code class="reqn">n \times d</code> matrix, where <code class="reqn">d</code> refers to the dimension of the HAC. <code>dHAC</code> and <code>pHAC</code> return vectors. The computation of the density might be time consuming for high-dimensions, since the density is defined as <code class="reqn">d</code>-th derivative of the HAC with respect to its arguments <code class="reqn">u_1, \ldots, u_d</code>. 
+</p>
+
+
+<h3>References</h3>
+
+<p>Hofert, M. 2011, Efficiently Sampling Nested Archimedean Copulas, <em>Computational Statistics &amp; Data Analysis</em> 55, 57-70.
+</p>
+<p>Joe, H. 1997, Multivariate Models and Dependence Concepts, <em>Chapman &amp; Hall</em>.
+</p>
+<p>McNeil, A. J. 2008, Sampling Nested Archimedean Copulas, <em>Journal of Statistical Computation and Simulation</em> 78, 567-581.
+</p>
+<p>Nelsen, R. B. 2006, An Introduction to Copulas, <em>Spinger</em>, 2nd Edition.
+</p>
+<p>Okhrin, O. and Ristig, A. 2014, Hierarchical Archimedean Copulae: The <code style="white-space: pre;">⁠HAC⁠</code> Package", <em>Journal of Statistical Software</em>, 58(4), 1-20, <a href="https://doi.org/10.18637/jss.v058.i04">doi:10.18637/jss.v058.i04</a>.
+</p>
+<p>Savu, C. and Trede, M. 2010, Hierarchies of Archimedean copulas, <em>Quantitative Finance</em> 10, 295-304.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>estimate.copula</code>, <code>to.logLik</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># AC example
+# define the underlying model
+model = hac(type = 4, tree = list("X1", "X2", 2))
+
+# sample from model
+sample = rHAC(100, model)
+
+# returns the pdf/cdf at each vector of the sample
+d.values = dHAC(sample, model)
+p.values = pHAC(sample, model)
+
+# HAC example
+# the underlying model
+y = c("X1", "X2", "X3")
+theta = c(1.5, 3)
+model = hac.full(type = 1, y, theta)
+
+# define sample from copula model
+sample = rHAC(100, model)
+
+# returns the pdf/cdf at each point of the sample
+d.values = dHAC(sample, model)
+p.values = pHAC(sample, model)
+
+# construct a hac-model
+tree = list(list("X1", "X5", 3), list("X2", "X3", "X4", 4), 2)
+model = hac(type = 1, tree = tree)
+
+# sample from copula model
+sample = rHAC(1000, model)
+
+# check the accurancy of the estimation procedure
+result1 = estimate.copula(sample)
+result2 = estimate.copula(sample, epsilon = 0.2)
+</code></pre>
+
+
+</div>

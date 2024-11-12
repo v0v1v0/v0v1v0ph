@@ -1,0 +1,196 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>pairwise</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Pairwise comparisons</h2>
+
+<h3>Description</h3>
+
+<p>Function <code>pairwise()</code> takes a matrix of pairwise comparisons and
+returns a <code>hyper2</code> likelihood function.  Function
+<code>zermelo()</code> gives a standard iterative procedure for likelihood
+maximization of pairwise Bradley-Terry likelihoods (such as those
+produced by function <code>pairwise()</code>).
+</p>
+<p>Function <code>home_away()</code> takes two matrices, one for home wins and
+one for away wins.  It returns a <code>hyper2</code> support function that
+includes a home advantage ghost.  Function <code>home_away3()</code> is the
+same, but returns a <code>hyper3</code> object.  A complex matrix is
+interpreted as real parts being the home wins and imaginary parts away
+wins.
+</p>
+<p>Function <code>white_draw3()</code> returns a <code>hyper3</code> likelihood
+function for pairwise comparisons, one of whom has a home team-type
+advantage (white player in the case of chess).  It is designed to
+work with an array of dimensions <code class="reqn">n\times n\times 3</code>,
+where <code class="reqn">n</code> is the number of players.  It is used in
+<code>inst/kka.Rmd</code> to create <code>chess3</code> likelihood function.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">pairwise(M)
+zermelo(M, maxit = 100, start, tol = 1e-10, give = FALSE)
+home_away(home_games_won, away_games_won)
+home_away3(home_games_won, away_games_won,lambda)
+white_draw3(A,lambda,D)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>M</code></td>
+<td>
+<p>Matrix of pairwise comparison results</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>maxit</code></td>
+<td>
+<p>Maximum number of iterations</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>start</code></td>
+<td>
+<p>Starting value for iteration; if missing, use
+<code>equalp()</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tol</code></td>
+<td>
+<p>Numerical tolerance for stopping criterion</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>give</code></td>
+<td>
+<p>Boolean with default <code>FALSE</code> meaning to return the
+evaluate and <code>TRUE</code> meaning to return all iterations</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>home_games_won, away_games_won</code></td>
+<td>
+<p>Matrices showing home games won
+and away games won</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lambda</code></td>
+<td>
+<p>The home ground advantage
+(or white advantage in chess)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>D</code></td>
+<td>
+<p>Weight of draw</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>A</code></td>
+<td>
+<p>Array of dimension <code>n*n*3</code>, with <code>A[,,i]</code>
+corresponding to white wins, white draws, and white losses for
+<code>i=1,2,3</code>.  The canonical example would be <code>kka_array</code>,
+see <code>inst/kka.Rmd</code> for details</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>In function <code>zermelo()</code>, the diagonal is disregarded.
+</p>
+<p>If <code>home_games_won</code> is complex, then the real parts of the
+entries are interpreted as home games won, and the imaginary parts as
+away games won.
+</p>
+
+
+<h3>Note</h3>
+
+<p>An extended discussion of <code>pairwise()</code> is given in
+<code>inst/zermelo.Rmd</code> and also <code>inst/karate.Rmd</code>.  Functions
+<code>home_away()</code> and <code>home_away3()</code> are described and used in
+<code>inst/home_advantage.Rmd</code>; see Davidson and Beaver 1977.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Robin K. S. Hankin</p>
+
+
+<h3>References</h3>
+
+
+<ul>
+<li>
+<p> D. R. Hunter 2004. “MM algorithms for generalized
+Bradley-Terry models”. <em>The Annals of Statistics</em>, volume 32,
+number 1, pages 384–406
+</p>
+</li>
+<li>
+<p> S. Borozki and others 2016.  “An application of incomplete pairwise
+comparison matrices for ranking top tennis
+players”. <code>arXiv:1611.00538v1</code> <code>10.1016/j.ejor.2015.06.069</code>
+</p>
+</li>
+<li>
+<p> R. R. Davidson and R. J. Beaver 1977. “On extending the
+Bradley-Terry model to incorporate within-pair order effects”.
+<em>Biometrics</em>, 33:693–702
+</p>
+</li>
+</ul>
+<h3>See Also</h3>
+
+<p><code>maxp</code></p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"> #Data is the top 5 players from Borozki's table 1
+
+M &lt;- matrix(c(
+0,10,0, 2,5,
+4, 0,0, 6,6,
+0, 0,0,15,0,
+0, 8,0, 0,7,
+1 ,0,3, 0,0
+),5,5,byrow=TRUE) 
+players &lt;-  c("Agassi","Becker","Borg","Connors","Courier")
+dimnames(M) &lt;- list(winner=players,loser=players)
+M
+# e.g. Agassi beats Becker 10 times and loses 4 times
+pairwise(M)
+zermelo(M)
+# maxp(pairwise(M))  # should be identical (takes ~10s to run)
+
+
+M2 &lt;- matrix(c(NA,19+2i,17,11+2i,16+5i,NA,12+4i,12+6i,12+2i,19+10i,
+NA,12+4i,11+2i,16+2i,11+7i,NA),4,4)
+teams &lt;- LETTERS[1:4]
+dimnames(M2) &lt;- list("@home" = teams,"@away"=teams)
+home_away(M2)
+# home_away3(M2,lambda=1.2)  # works but takes too long (~3s)
+home_away3(M2[1:3,1:3],lambda=1.2) 
+
+M &lt;- kka_array[,,1] + 1i*kka_array[,,3] # ignore draws
+home_away(M)
+# home_away3(M,lambda=1.3)  # works but takes too long (~3s)
+
+white_draw3(kka_array,1.88,1.11)
+</code></pre>
+
+
+</div>

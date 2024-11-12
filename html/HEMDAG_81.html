@@ -1,0 +1,295 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>tpr.dag</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>TPR-DAG ensemble variants</h2>
+
+<h3>Description</h3>
+
+<p>Collection of the true-path-rule-based hierarchical learning ensemble algorithms and its variants.
+</p>
+<p><code>TPR-DAG</code> is a family of algorithms on the basis of the choice of the <strong>bottom-up</strong> step adopted for the selection of
+<em>positive</em> children (or descendants) and of the <strong>top-down</strong> step adopted to assure ontology-based predictions.
+Indeed, in their more general form the <code>TPR-DAG</code> algorithms adopt a two step learning strategy:
+</p>
+
+<ol>
+<li>
+<p> in the first step they compute a <em>per-level bottom-up</em> visit from leaves to root to propagate <em>positive</em> predictions across the hierarchy;
+</p>
+</li>
+<li>
+<p> in the second step they compute a <em>per-level top-down</em> visit from root to leaves in order to assure the consistency of the predictions.
+</p>
+</li>
+</ol>
+<p>It is worth noting that levels (both in the first and second step) are defined in terms of the maximum distance from
+the root node (see <code>graph.levels</code>).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">tpr.dag(
+  S,
+  g,
+  root = "00",
+  positive = "children",
+  bottomup = "threshold.free",
+  topdown = "gpav",
+  t = 0,
+  w = 0,
+  W = NULL,
+  parallel = FALSE,
+  ncores = 1
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>S</code></td>
+<td>
+<p>a named flat scores matrix with examples on rows and classes on columns.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>g</code></td>
+<td>
+<p>a graph of class <code>graphNEL</code>. It represents the hierarchy of the classes.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>root</code></td>
+<td>
+<p>name of the class that it is on the top-level of the hierarchy (<code>def. root="00"</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>positive</code></td>
+<td>
+<p>choice of the <em>positive</em> nodes to be considered in the bottom-up strategy. Can be one of the following values:
+</p>
+
+<ul>
+<li> <p><code>children</code> (<code>def.</code>): positive children are are considered for each node;
+</p>
+</li>
+<li> <p><code>descendants</code>: positive descendants are are considered for each node;
+</p>
+</li>
+</ul>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>bottomup</code></td>
+<td>
+<p>strategy to enhance the flat predictions by propagating the positive predictions from leaves to root. It can be one of the following values:
+</p>
+
+<ul>
+<li> <p><code>threshold.free</code> (<code>def.</code>): positive nodes are selected on the basis of the <code>threshold.free</code> strategy;
+</p>
+</li>
+<li> <p><code>threshold</code>: positive nodes are selected on the basis of the <code>threshold</code> strategy;
+</p>
+</li>
+<li> <p><code>weighted.threshold.free</code>: positive nodes are selected on the basis of the <code>weighted.threshold.free</code> strategy;
+</p>
+</li>
+<li> <p><code>weighted.threshold</code>: positive nodes are selected on the basis of the <code>weighted.threshold</code> strategy;
+</p>
+</li>
+<li> <p><code>tau</code>: positive nodes are selected on the basis of the <code>tau</code> strategy.
+NOTE: <code>tau</code> is only a <code>DESCENS</code> variant. If you select <code>tau</code> strategy you must set <code>positive=descendants</code>;
+</p>
+</li>
+</ul>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>topdown</code></td>
+<td>
+<p>strategy to make scores “hierarchy-aware”. It can be one of the following values:
+</p>
+
+<ul>
+<li> <p><code>htd</code>: <code>HTD-DAG</code> strategy is applied (<code>htd</code>);
+</p>
+</li>
+<li> <p><code>gpav</code> (<code>def.</code>): <code>GPAV</code> strategy is applied (<code>gpav</code>);
+</p>
+</li>
+</ul>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>t</code></td>
+<td>
+<p>threshold for the choice of positive nodes (<code>def. t=0</code>). Set <code>t</code> only for the variants requiring a threshold for the
+selection of the positive nodes, otherwise set <code>t=0</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>w</code></td>
+<td>
+<p>weight to balance between the contribution of the node <code class="reqn">i</code> and that of its positive nodes. Set <code>w</code> only for
+the <em>weighted</em> variants, otherwise set <code>w=0</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>W</code></td>
+<td>
+<p>vector of weight relative to a single example. If <code>W=NULL</code> (def.) it is assumed that <code>W</code> is a unitary vector of the
+same length of the columns' number of the matrix <code>S</code> (root node included). Set <code>W</code> only if <code>topdown=gpav</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>parallel</code></td>
+<td>
+<p>a boolean value:
+</p>
+
+<ul>
+<li> <p><code>TRUE</code>: execute the parallel implementation of GPAV (<code>gpav.parallel</code>);
+</p>
+</li>
+<li> <p><code>FALSE</code> (def.): execute the sequential implementation of GPAV (<code>gpav.over.examples</code>);
+</p>
+</li>
+</ul>
+<p>Use <code>parallel</code> only if <code>topdown=GPAV</code>; otherwise set <code>parallel=FALSE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ncores</code></td>
+<td>
+<p>number of cores to use for parallel execution. Set <code>ncores=1</code> if <code>parallel=FALSE</code>, otherwise set <code>ncores</code> to
+the desired number of cores. Set <code>ncores</code> if and only if <code>topdown=GPAV</code>; otherwise set <code>ncores=1</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The <em>vanilla</em> <code>TPR-DAG</code> adopts a per-level bottom-up traversal of the DAG to correct the flat predictions
+<code class="reqn">\hat{y}_i</code> according to the following formula:
+</p>
+<p style="text-align: center;"><code class="reqn">
+ \bar{y}_i := \frac{1}{1 + |\phi_i|} (\hat{y}_i + \sum_{j \in \phi_i} \bar{y}_j)
+</code>
+</p>
+
+<p>where <code class="reqn">\phi_i</code> are the positive children of <code class="reqn">i</code>.
+Different strategies to select the positive children <code class="reqn">\phi_i</code> can be applied:
+</p>
+
+<ol>
+<li> <p><strong>threshold-free</strong> strategy: the positive nodes are those children that can increment the score of the node <code class="reqn">i</code>, that is those nodes
+that achieve a score higher than that of their parents:
+</p>
+<p style="text-align: center;"><code class="reqn">
+     \phi_i := \{ j \in child(i) | \bar{y}_j &gt; \hat{y}_i \}
+  </code>
+</p>
+
+</li>
+<li> <p><strong>threshold</strong> strategy: the positive children are selected on the basis of a threshold that can be selected in two different ways:
+</p>
+
+<ol>
+<li>
+<p> for each node a constant threshold <code class="reqn">\bar{t}</code> is a priori selected:
+</p>
+<p style="text-align: center;"><code class="reqn">
+     \phi_i := \{ j \in child(i) | \bar{y}_j &gt; \bar{t} \}
+    </code>
+</p>
+
+<p>For instance if the predictions represent probabilities it could be meaningful to a priori select <code class="reqn">\bar{t}=0.5</code>.
+</p>
+</li>
+<li>
+<p> the threshold is selected to maximize some performance metric <code class="reqn">\mathcal{M}</code> estimated on the training data, as for instance
+the Fmax or the AUPRC. In other words the threshold is selected to maximize some measure of accuracy of the predictions
+<code class="reqn">\mathcal{M}(j,t)</code> on the training data for the class <code class="reqn">j</code> with respect to the threshold <code class="reqn">t</code>.
+The corresponding set of positives <code class="reqn">\forall i \in V</code> is:
+</p>
+<p style="text-align: center;"><code class="reqn">
+     \phi_i := \{ j \in child(i) | \bar{y}_j &gt; t_j^*,  t_j^* = \arg \max_{t} \mathcal{M}(j,t) \}
+    </code>
+</p>
+
+<p>For instance <code class="reqn">t_j^*</code> can be selected from a set of <code class="reqn">t \in (0,1)</code> through internal cross-validation techniques.
+</p>
+</li>
+</ol>
+</li>
+</ol>
+<p>The weighted <code>TPR-DAG</code> version can be designed by adding a weight <code class="reqn">w \in [0,1]</code> to balance between the
+contribution of the node <code class="reqn">i</code> and that of its positive children <code class="reqn">\phi</code>, through their convex combination:
+</p>
+<p style="text-align: center;"><code class="reqn">
+ \bar{y}_i := w \hat{y}_i + \frac{(1 - w)}{|\phi_i|} \sum_{j \in \phi_i} \bar{y}_j
+</code>
+</p>
+
+<p>If <code class="reqn">w=1</code> no weight is attributed to the children and the <code>TPR-DAG</code> reduces to the <code>HTD-DAG</code> algorithm, since in this
+way only the prediction for node <code class="reqn">i</code> is used in the bottom-up step of the algorithm. If <code class="reqn">w=0</code> only the predictors
+associated to the children nodes vote to predict node <code class="reqn">i</code>. In the intermediate cases we attribute more importance to the predictor for the
+node <code class="reqn">i</code> or to its children depending on the values of <code class="reqn">w</code>.
+By combining the weighted and the threshold variant, we design the weighted-threshold variant.
+</p>
+<p>Since the contribution of the descendants of a given node decays exponentially with their distance from the node itself, to enhance the
+contribution of the most specific nodes to the overall decision of the ensemble we design the ensemble variant <code>DESCENS</code>.
+The novelty of <code>DESCENS</code> consists in strongly considering the contribution of all the descendants of each node instead of
+only that of its children. Therefore <code>DESCENS</code> predictions are more influenced by the information embedded in the leaves nodes,
+that are the classes containing the most informative and meaningful information from a biological and medical standpoint.
+For the choice of the “positive” descendants we use the same strategies adopted for the selection of the “positive”
+children shown above. Furthermore, we designed a variant specific only for <code>DESCENS</code>, that we named <code>DESCENS</code>-<code class="reqn">\tau</code>.
+The <code>DESCENS</code>-<code class="reqn">\tau</code> variant balances the contribution between the “positives” children of a node <code class="reqn">i</code>
+and that of its “positives” descendants excluding its children by adding a weight <code class="reqn">\tau \in [0,1]</code>:
+</p>
+<p style="text-align: center;"><code class="reqn">
+ \bar{y}_i := \frac{\tau}{1+|\phi_i|}(\hat{y}_i + \sum_{j \in \phi_i} \bar{y}_j) + \frac{1-\tau}{1+|\delta_i|}(\hat{y}_i + \sum_{j\in \delta_i} \bar{y}_j)
+</code>
+</p>
+
+<p>where <code class="reqn">\phi_i</code> are the “positive” children of <code class="reqn">i</code> and <code class="reqn">\delta_i=\Delta_i \setminus \phi_i</code> the descendants of <code class="reqn">i</code> without its children.
+If <code class="reqn">\tau=1</code> we consider only the contribution of the “positive” children of <code class="reqn">i</code>; if <code class="reqn">\tau=0</code> only the descendants that are not
+children contribute to the score, while for intermediate values of <code class="reqn">\tau</code> we can balance the contribution of <code class="reqn">\phi_i</code> and
+<code class="reqn">\delta_i</code> positive nodes.
+</p>
+<p>Simply by replacing the <code>HTD-DAG</code> top-down step (<code>htd</code>) with the <code>GPAV</code> approach (<code>gpav</code>) we design the <code>ISO-TPR</code> variant.
+The most important feature of <code>ISO-TPR</code> is that it maintains the hierarchical constraints by construction and it selects the closest
+solution (in the least square sense) to the bottom-up predictions that obeys the <em>True Path Rule</em>.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A named matrix with the scores of the classes corrected according to the chosen <code>TPR-DAG</code> ensemble algorithm.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>gpav</code>, <code>htd</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(graph);
+data(scores);
+data(labels);
+root &lt;- root.node(g);
+S.tpr &lt;- tpr.dag(S, g, root, positive="children", bottomup="threshold.free",
+topdown="gpav", t=0, w=0, W=NULL, parallel=FALSE, ncores=1);
+</code></pre>
+
+
+</div>

@@ -1,0 +1,148 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>run_psa</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Run Probabilistic Uncertainty Analysis</h2>
+
+<h3>Description</h3>
+
+<p>Run Probabilistic Uncertainty Analysis
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">run_psa(model, psa, N, keep = FALSE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>model</code></td>
+<td>
+<p>The result of <code>run_model()</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>psa</code></td>
+<td>
+<p>Resampling distribution for parameters defined
+by <code>define_psa()</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>N</code></td>
+<td>
+<p>&gt; 0. Number of simulation to run.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>keep</code></td>
+<td>
+<p>logical; if TRUE, all models will be returned</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A list with the following elements
+</p>
+
+<ul>
+<li>
+<p> psa:  a <code>data.frame</code> with one row per model.
+</p>
+</li>
+<li>
+<p> run_model: a <code>data.frame</code> with mean cost and utility for each strategy
+</p>
+</li>
+<li>
+<p> model: the initial model object
+</p>
+</li>
+<li>
+<p> N: the number of simulations ran
+</p>
+</li>
+<li>
+<p> resamp_par: the resampled parameters
+</p>
+</li>
+<li>
+<p> full: if <code>keep</code> is TRUE, a list of each model objects created at each iteration
+</p>
+</li>
+</ul>
+<h3>Examples</h3>
+
+<pre><code class="language-R"># example for run_psa
+
+mod1 &lt;- define_strategy(
+  transition = define_transition(
+    .5, .5,
+    .1, .9
+  ),
+  define_state(
+    cost = cost_init + age * 5,
+    ly = 1
+  ),
+  define_state(
+    cost = cost_init + age,
+    ly = 0
+  )
+)
+
+mod2 &lt;- define_strategy(
+  transition = define_transition(
+    p_trans, C,
+    .1, .9
+  ),
+  define_state(
+    cost = 789 * age / 10,
+    ly = 1
+  ),
+  define_state(
+    cost = 456 * age / 10,
+    ly = 0
+  )
+  
+)
+
+res2 &lt;- run_model(
+  mod1, mod2,
+  parameters = define_parameters(
+    age_init = 60,
+    cost_init = 1000,
+    age = age_init + model_time,
+    p_trans = .7
+  ),
+  init = 1:0,
+  cycles = 10,
+  cost = cost,
+  effect = ly
+)
+
+rsp &lt;- define_psa(
+  age_init ~ normal(60, 10),
+  cost_init ~ normal(1000, 100),
+  p_trans ~ binomial(.7, 100),
+  correlation = matrix(c(
+    1,  .4, 0,
+    .4, 1,  0,
+    0,  0,  1
+  ), byrow = TRUE, ncol = 3)
+)
+
+
+# with run_model result
+# (only 10 resample for speed)
+ndt1 &lt;- run_psa(res2, psa = rsp, N = 10)
+</code></pre>
+
+
+</div>

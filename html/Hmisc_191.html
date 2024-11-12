@@ -1,0 +1,97 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hlab</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>hlab</h2>
+
+<h3>Description</h3>
+
+<p>Easy Extraction of Labels/Units Expressions for Plotting
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hlab(x, name = NULL, html = FALSE, plotmath = TRUE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>a single variable name, unquoted</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>name</code></td>
+<td>
+<p>a single character string providing an alternate way to name <code>x</code> that is useful when <code>hlab</code> is called from another function such as <code>hlabs</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>html</code></td>
+<td>
+<p>set to <code>TRUE</code> to return HTML strings instead of <code>plotmath</code> expressions</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>plotmath</code></td>
+<td>
+<p>set to <code>FALSE</code> to use plain text instead of plotmath</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Given a single unquoted variable, first looks to see if a non-<code>NULL</code> <code>LabelsUnits</code> object exists (produced by <code>extractlabs()</code>).  When <code>LabelsUnits</code> does not exist or is <code>NULL</code>, looks up the attributes in the current dataset, which defaults to <code>d</code> or may be specified by <code>options(current_ds='name of the data frame/table')</code>.  Finally the existence of a variable of the given name in the global environment is checked. When a variable is not found in any of these three sources or has a blank <code>label</code> and <code>units</code>, an <code>expression()</code> with the variable name alone is returned.  If <code>html=TRUE</code>, HTML strings are constructed instead, suitable for <code>plotly</code> graphics.
+</p>
+<p>The result is useful for <code>xlab</code> and <code>ylab</code> in base plotting functions or in <code>ggplot2</code>, along with being useful for <code>labs</code> in <code>ggplot2</code>.  See example.
+</p>
+
+
+<h3>Value</h3>
+
+<p>an expression created by <code>labelPlotmath</code> with <code>plotmath=TRUE</code>
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Frank Harrell
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>label()</code>, <code>units()</code>, <code>contents()</code>, <code>hlabs()</code>, <code>extractlabs()</code>, plotmath
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">d &lt;- data.frame(x=1:10, y=(1:10)/10)
+d &lt;- upData(d, labels=c(x='X', y='Y'), units=c(x='mmHg'), print=FALSE)
+hlab(x)
+hlab(x, html=TRUE)
+hlab(z)
+require(ggplot2)
+ggplot(d, aes(x, y)) + geom_point() + labs(x=hlab(x), y=hlab(y))
+# Can use xlab(hlab(x)) + ylab(hlab(y)) also
+# Store names, labels, units for all variables in d in object
+LabelsUnits &lt;- extractlabs(d)
+# Remove d; labels/units still found
+rm(d)
+hlab(x)
+# Remove LabelsUnits and use a current dataset named
+# d2 instead of the default d
+rm(LabelsUnits)
+options(current_ds='d2')
+</code></pre>
+
+
+</div>

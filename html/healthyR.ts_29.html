@@ -1,0 +1,230 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>tidy_fft</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Tidy Style FFT</h2>
+
+<h3>Description</h3>
+
+<p>Perform an fft using <code>stats::fft()</code> and return a tidier style output list with plots.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">tidy_fft(
+  .data,
+  .date_col,
+  .value_col,
+  .frequency = 12L,
+  .harmonics = 1L,
+  .upsampling = 10L
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>.data</code></td>
+<td>
+<p>The data.frame/tibble you will pass for analysis.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.date_col</code></td>
+<td>
+<p>The column that holds the date.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.value_col</code></td>
+<td>
+<p>The column that holds the data to be analyzed.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.frequency</code></td>
+<td>
+<p>The frequency of the data, 12 = monthly for example.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.harmonics</code></td>
+<td>
+<p>How many harmonic waves do you want to produce.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.upsampling</code></td>
+<td>
+<p>The up sampling of the time series.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>This function will perform a few different things, but primarily it will
+compute the Fast Discrete Fourier Transform (FFT) using <code>stats::fft()</code>. The
+formula is given as:
+</p>
+<p style="text-align: center;"><code class="reqn">y[h] = sum_{k=1}^n z[k]*exp(-2*pi*1i*(k-1)*(h-1)/n)</code>
+</p>
+
+<p>There are many items returned inside of a list invisibly. There are four primary
+categories of data returned in the list. Below are the primary categories and
+the items inside of them.
+</p>
+<p><strong>data:</strong>
+</p>
+
+<ol>
+<li>
+<p> data
+</p>
+</li>
+<li>
+<p> error_data
+</p>
+</li>
+<li>
+<p> input_vector
+</p>
+</li>
+<li>
+<p> maximum_harmonic_tbl
+</p>
+</li>
+<li>
+<p> differenced_value_tbl
+</p>
+</li>
+<li>
+<p> dff_tbl
+</p>
+</li>
+<li>
+<p> ts_obj
+</p>
+</li>
+</ol>
+<p><strong>plots:</strong>
+</p>
+
+<ol>
+<li>
+<p> harmonic_plot
+</p>
+</li>
+<li>
+<p> diff_plot
+</p>
+</li>
+<li>
+<p> max_har_plot
+</p>
+</li>
+<li>
+<p> harmonic_plotly
+</p>
+</li>
+<li>
+<p> max_har_plotly
+</p>
+</li>
+</ol>
+<p><strong>parameters:</strong>
+</p>
+
+<ol>
+<li>
+<p> harmonics
+</p>
+</li>
+<li>
+<p> upsampling
+</p>
+</li>
+<li>
+<p> start_date
+</p>
+</li>
+<li>
+<p> end_date
+</p>
+</li>
+<li>
+<p> freq
+</p>
+</li>
+</ol>
+<p><strong>model:</strong>
+</p>
+
+<ol>
+<li>
+<p> m
+</p>
+</li>
+<li>
+<p> harmonic_obj
+</p>
+</li>
+<li>
+<p> harmonic_model
+</p>
+</li>
+<li>
+<p> model_summary
+</p>
+</li>
+</ol>
+<h3>Value</h3>
+
+<p>A list object returned invisibly.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Steven P. Sanderson II, MPH
+</p>
+
+
+<h3>See Also</h3>
+
+<p>Other Data Generator: 
+<code>ts_brownian_motion()</code>,
+<code>ts_brownian_motion_augment()</code>,
+<code>ts_geometric_brownian_motion()</code>,
+<code>ts_geometric_brownian_motion_augment()</code>,
+<code>ts_random_walk()</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">suppressPackageStartupMessages(library(dplyr))
+
+data_tbl &lt;- AirPassengers %&gt;%
+  ts_to_tbl() %&gt;%
+  select(-index)
+
+a &lt;- tidy_fft(
+  .data = data_tbl,
+  .value_col = value,
+  .date_col = date_col,
+  .harmonics = 3,
+  .frequency = 12
+)
+
+a$plots$max_har_plot
+a$plots$harmonic_plot
+
+</code></pre>
+
+
+</div>

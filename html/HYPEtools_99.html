@@ -1,0 +1,135 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>ReadDescription</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Read a 'description.txt' file</h2>
+
+<h3>Description</h3>
+
+<p>Read a 'description.txt' file as <code>list</code> object into R. A 'description.txt' file contains land use, soil, and crop
+class names of a HYPE set-up, as well as model set-up name and version.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">ReadDescription(
+  filename,
+  gcl = NULL,
+  encoding = c("unknown", "UTF-8", "latin1")
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>filename</code></td>
+<td>
+<p>Path to and file name of the 'description.txt' file to import.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>gcl</code></td>
+<td>
+<p>dataframe, GeoClass.txt file imported with <code>ReadGeoClass</code> to compare class IDs with.
+A warning will be thrown if not all class IDs in <code>gcl</code> exist in the description file.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>encoding</code></td>
+<td>
+<p>Character string, encoding of non-ascii characters in imported text file. Particularly relevant when
+importing files created under Windows (default encoding "Latin-1") in Linux (default encoding "UTF-8") and vice versa. See
+also argument description in <code>scan</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p><code>ReadDescription</code> imports a 'description.txt' into R. This file is not used by HYPE, but is convenient for
+e.g. plotting legend labels or examining imported GeoClass files. E.g., <code>PlotBasinSummary</code> requires a list
+as returned from <code>ReadDescription</code> for labeling.
+</p>
+<p>A 'description.txt' file consists of 22 lines, alternating names and semicolon-separated content. Lines
+with names are not read by the import function, they just make it easier to compose and read the actual text file.
+</p>
+<p>File contents read by <code>ReadDescription</code>:
+</p>
+
+<ul>
+<li>
+<p> HYPE set-up name (line 2)
+</p>
+</li>
+<li>
+<p> HYPE set-up version (line 4)
+</p>
+</li>
+<li>
+<p> Land use class IDs (line 6)
+</p>
+</li>
+<li>
+<p> Land use class names (line 6)
+</p>
+</li>
+<li>
+<p> Land use class short names (line 8)
+</p>
+</li>
+<li>
+<p> Soil class IDs (line 10)
+</p>
+</li>
+<li>
+<p> Soil class names (line 10)
+</p>
+</li>
+<li>
+<p> Soil class short names (line 12)
+</p>
+</li>
+<li>
+<p> Crop class IDs (line 14)
+</p>
+</li>
+<li>
+<p> Crop class names (line 14)
+</p>
+</li>
+<li>
+<p> Crop class short names (line 16)
+</p>
+</li>
+</ul>
+<p>Note that Crop class IDs start from <code>0</code>, which means no crop, whereas land use and soil IDs start from <code>1</code> (or higher).
+</p>
+<p>Formatting example for description.txt files:
+</p>
+<p><code># Name</code> <br><code>MyHYPE</code> <br><code># Version</code> <br><code>0.1</code> <br><code># Land use class IDs</code> <br><code>1;2</code> <br><code># Land use class names</code> <br><code>Agriculture;Coniferous forest</code> <br><code># Short land use class names</code> <br><code>Agric.;Conif. f.</code> <br><code># Soil class IDs</code> <br><code>1;2</code> <br><code># Soil class names</code> <br><code>Coarse soils;Medium to fine soils</code> <br><code># Short soil class names</code> <br><code>Coarse;Medium</code> <br><code># Crop class IDs</code> <br><code>0;1;2</code> <br><code># Crop class names</code> <br><code>None;Row crops;Autumn-sown cereal</code> <br><code># Short crop class names</code> <br><code>None;Row;Aut.-sown</code> <br></p>
+
+
+<h3>Value</h3>
+
+<p><code>ReadDescription</code> returns a named list with 11 named character elements, corresponding to the
+imported lines:
+</p>
+<p><code>Name</code>, <code>Version</code>, <code>lu.id</code>, <code>Landuse</code>, <code>lu</code> (short names), <code>so.id</code>,
+<code>Soil</code>, <code>so</code> (short names), <code>cr.id</code>, <code>Crop</code>, <code>cr</code> (short names)
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">te &lt;- ReadDescription(filename = system.file("demo_model",
+"description.txt", package = "HYPEtools"))
+te
+
+</code></pre>
+
+
+</div>

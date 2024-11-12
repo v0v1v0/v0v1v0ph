@@ -1,0 +1,99 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>h5Backup</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Back up contents from one HDF5 file to another</h2>
+
+<h3>Description</h3>
+
+<p>Function to back up HDF5 file, with optionally excluding specific links.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">h5Backup(
+  from.file,
+  to.file = NULL,
+  exclude = NULL,
+  overwrite = FALSE,
+  verbose = TRUE,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>from.file</code></td>
+<td>
+<p>The source HDF5 file.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>to.file</code></td>
+<td>
+<p>The target HDF5 file. Cannot be the same file as 
+<code>from.file</code>. If <code>NULL</code>, will generate an R temp file.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>exclude</code></td>
+<td>
+<p>Names of HDF5 links not to be backed up.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>overwrite</code></td>
+<td>
+<p>When the <code>to.file</code> already exists, whether or not to 
+overwrite it.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p>Print progress.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Arguments passed to <code>H5File$obj_copy_from()</code></p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>When any HDF5 link is to be excluded, it will copy the rest of links from
+<code>from.file</code> using <code>h5Copy</code>. Otherwise, it will simply copy 
+the <code>from.file</code> to the <code>to.file</code> via <code>file.copy</code>
+</p>
+
+
+<h3>Value</h3>
+
+<p>Path of the <code>to.file</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">file &lt;- system.file("extdata", "pbmc_small.h5ad", package = "hdf5r.Extra")
+to.file &lt;- tempfile(fileext = ".h5")
+
+h5Backup(file, to.file, exclude = "X")
+
+x &lt;- h5Read(file)
+x2 &lt;- h5Read(to.file)
+x$X &lt;- NULL # Remove 'X'
+stopifnot(identical(x, x2)) # Now these two should be identical
+
+</code></pre>
+
+
+</div>

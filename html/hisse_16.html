@@ -1,0 +1,168 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>MarginReconGeoSSE.old</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Original Ancestral State Estimation based on Marginal Reconstruction for
+the GeoSSE and GeoHiSSE models.</h2>
+
+<h3>Description</h3>
+
+<p>Estimates the likeliest states for both internal nodes and tips of a phylogeny using the marginal reconstruction algorithm.</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">MarginReconGeoSSE.old(phy, data, f, pars, hidden.areas=TRUE, 
+assume.cladogenetic=TRUE, condition.on.survival=TRUE, 
+root.type="madfitz", root.p=NULL, AIC=NULL, verbose=TRUE, 
+n.cores=NULL)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>phy</code></td>
+<td>
+<p>a phylogenetic tree, in <code>ape</code> “phylo” format and with internal nodes labeled denoting the ancestral selective regimes.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>a data matrix containing species information (see Details).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>f</code></td>
+<td>
+<p>vector of length 2 with the estimated proportion of extant species in state 0 and 1 that are included in the phylogeny. A value of c(0.25, 0.5) means that 25 percent of species in state 0 and 50 percent of species in state 1 are included in the phylogeny. By default all species are assumed to be known.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pars</code></td>
+<td>
+<p>vector containing the MLE of the parameters.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>hidden.areas</code></td>
+<td>
+<p>a logical indicating whether the model includes hidden areas. The default is <code>FALSE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>assume.cladogenetic</code></td>
+<td>
+<p>a logical indicating whether the model
+assumes that changes occurr at the nodes. The default is
+<code>TRUE</code>. Setting this to <code>FALSE</code> will result in a different
+models from GeoSSE. Please check <code>hisse::GeoHiSSE.old</code> for more details.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>condition.on.survival</code></td>
+<td>
+<p>a logical indicating whether the likelihood should be conditioned on the survival of two lineages and the speciation event subtending them (Nee et al. 1994). The default is <code>TRUE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>root.type</code></td>
+<td>
+<p>indicates whether root prior assumption should based the procedure described by FitzJohn et al. 2009, “madfitz”, assumed equal, “equal”, or set to user, “user”.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>root.p</code></td>
+<td>
+<p>a vector indicating fixed root state probabilities. The default is <code>NULL</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>AIC</code></td>
+<td>
+<p>the AIC for the model being used for the reconstruction. This is used by the plotting function. The default is <code>NULL</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p>a logical indicating whether progress should be printed to screen. The default is <code>TRUE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n.cores</code></td>
+<td>
+<p>specifies the number of independent processors to conduct the analysis.. The default is <code>NULL</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>In this implementation the marginal probability of area i for a focal node is simply the overall likelihood of the tree and data when the area of the focal node is fixed in area i. Note that the likeliest tip areas can also be estimated: we observe area 1, but the underlying area could either be area 1A or 1B. Thus, for any given node or tip we traverse the entire tree as many times as there are areas in the model. As the size of the tree grows, however, these repeated tree traversals can slow the calculation down considerably. For this reason, we allow the marginal calculation to be conducted in parallel across any number of independent computer processors.
+</p>
+<p>For user-specified “root.p”, you should specify the probability
+for each area. If you are doing a hidden model, the number of parameters
+will depend on the number of hidden areas included. For a two classes
+model there are six areas: A0, B0, AB0, A1, B1, AB1. So if you wanted to
+say the root had to be area A, you would specify “root.p = c(0.5,
+0, 0, 0.5, 0, 0)”. There is 'root area is A and there is an equal
+chance for hidden area A0 or A1'.
+</p>
+<p>See help for “GeoHiSSE.old” for more on other parameters for this function.
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>MarginReconGeoSSE.old</code> returns an object of class <code>geohisse.states</code>. This is a list with elements:
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>$node.mat</code></td>
+<td>
+<p>the marginal probabilities calculated for each node. They are ordered based on the elements in the edge matrix in “phylo” format.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>$tip.mat</code></td>
+<td>
+<p>the marginal probabilities calculated for each tip. They are ordered based on the order of tip labels in the tree.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>$rate.mat</code></td>
+<td>
+<p>a matrix that details the rates for each state combination. This is used by the plotting function.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>$phy</code></td>
+<td>
+<p>a phylogenetic tree in the “phylo” format that contains the states with the highest marginal probability at each internal node.</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>Jeremy M. Beaulieu</p>
+
+
+<h3>References</h3>
+
+<p>Beaulieu, J.M, and B.C. O'Meara. 2016. Detecting hidden diversification shifts in models of trait-dependent speciation and extinction. Syst. Biol. 65:583-601. 
+</p>
+<p>FitzJohn R.G., Maddison W.P., and Otto S.P. 2009. Estimating trait-dependent speciation and extinction rates from incompletely resolved phylogenies. Syst. Biol. 58:595-611.
+</p>
+<p>Goldberg, E. E., L. T. Lancaster, and R. H. Ree. 2011. Phylogenetic Inference of Reciprocal Effects between Geographic Range Evolution and Diversification. Syst. Biol. 60:451-465.
+</p>
+<p>Maddison W.P., Midford P.E., and Otto S.P. 2007. Estimating a binary characters' effect on speciation and extinction. Syst. Biol. 56:701-710.
+</p>
+<p>Nee S., May R.M., and Harvey P.H. 1994. The reconstructed evolutionary process. Philos. Trans. R. Soc. Lond. B Biol. Sci. 344:305-311.
+</p>
+
+
+</div>

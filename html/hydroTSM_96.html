@@ -1,0 +1,239 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>izoo2rzoo</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Irregular Zoo -&gt; Regular Zoo
+</h2>
+
+<h3>Description</h3>
+
+<p>It takes an irregular zoo object (with non-existing values for some dates) and converts it into a regularly spaced zoo object within the time period defined by <code>from</code> and <code>to</code>, by filling the missing dates with ‘NA’
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">izoo2rzoo(x, ...)
+
+## Default S3 method:
+izoo2rzoo(x, from= start(x), to= end(x), 
+                   date.fmt, tstep, tz, ...)
+     
+## S3 method for class 'zoo'
+izoo2rzoo(x, from= start(x), to= end(x), 
+                   date.fmt, tstep, tz, ...)
+
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+
+<p>irregular zoo object (vector or matrix) representing a time series (very likely read with some user-defined procedure, and with some missing values for particular days/months/years)
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>from</code></td>
+<td>
+
+<p>Character indicating the starting date for creating the regularly spaced zoo object. The default value corresponds to the date of the first element of <code>x</code> <br>
+It has to be in the format indicated by <code>date.fmt</code>. 
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>to</code></td>
+<td>
+
+<p>Character indicating the ending date for creating the regularly spaced zoo object. The default value corresponds to the date of the last element of <code>x</code> <br>
+It has to be in the format indicated by <code>date.fmt</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>date.fmt</code></td>
+<td>
+
+<p>character indicating the format in which the dates are stored in <code>from</code> and <code>to</code>, e.g. <kbd>%Y-%m-%d</kbd>. See ‘Details’ section in <code>strptime</code>.
+By default, <code>date.fmt</code> is missing, and it is automatically set to <kbd>%Y-%m-%d</kbd> when <code>time(x)</code> is <code>Date</code> object, and set to <kbd>%Y-%m-%d %H:%M:%S</kbd> when <code>x</code> is a sub-daily zoo object.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tstep</code></td>
+<td>
+
+<p>character, indicating the time step used for creating the time sequence going from <code>from</code> to <code>to</code> that will be used as <code>time(x)</code> <br>
+Valid values are (but not limited to) <kbd>hours</kbd>, <kbd>days</kbd>, <kbd>months</kbd>, <kbd>years</kbd>.
+By default, <code>tstep</code> is missing, and it is automatically set to <kbd>"minutes"</kbd> when <code>sfreq(x)</code> is <kbd>min</kbd>, to <kbd>"hours"</kbd> when <code>sfreq(x)</code> is <kbd>hourly</kbd>, to <kbd>"days"</kbd> when <code>sfreq(x)</code> is <kbd>daily</kbd>, to <kbd>"weeks"</kbd> when <code>sfreq(x)</code> is <kbd>weekly</kbd>, to <kbd>"months"</kbd> when <code>sfreq(x)</code> is <kbd>monthly</kbd>, to <kbd>"quarters"</kbd> when <code>sfreq(x)</code> is <kbd>quarterly</kbd>, and to <kbd>"years"</kbd> when <code>sfreq(x)</code> is <kbd>annual</kbd>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tz</code></td>
+<td>
+
+<p>character, with the specification of the time zone used for <code>from</code>, <code>to</code>. System-specific (see time zones), but <code>""</code> is the current time zone, and <code>"GMT"</code> is UTC (Universal Time, Coordinated). See <code>Sys.timezone</code> and <code>as.POSIXct</code>. <br></p>
+<p>If <code>tz</code> is missing (the default), it is automatically set to the time zone used in <code>time(x)</code>. <br></p>
+<p>This argument can be used when working with sub-daily zoo objects to force using  time zones other than the local time zone for <code>from</code> and <code>to</code>. It should be used with caution, being well aware of the time zone of the data. See examples.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+
+<p>further arguments passed to or from other methods
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>If the full time period of <code>x</code> is a subset of the time period defined by <code>from</code> and <code>to</code>, the time period of the resulting zoo is the one defined by <code>from</code> and <code>to</code>, assigning 'NA' to all the dates in which <code>x</code> do not have a value.
+</p>
+
+
+<h3>Value</h3>
+
+<p>a regularly spaced zoo object, with values given by <code>x</code> and time stamps going from <code>from</code> to <code>to</code> at intervals defined by <code>tsteps</code>
+
+
+
+
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Mauricio Zambrano-Bigiarini, <a href="mailto:mzb.devel@gmail">mzb.devel@gmail</a>
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>zoo</code>, <code>vector2zoo</code>, <code>as.POSIXct</code>, <code>Sys.timezone</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">##
+## Example 1: Adding NA for February 29th to an existing zoo object
+
+# dummy values and dates (February 29th is not present !)
+x &lt;- 1:9
+dates &lt;- c("1964-02-25", "1964-02-26", "1964-02-27", "1964-02-28", "1964-03-01", 
+           "1964-03-02", "1964-03-03", "1964-03-04", "1964-03-05")
+
+# From 'character' to 'Date' class
+dates &lt;- as.Date(dates)
+
+## From 'numeric' to 'zoo' class
+( x &lt;- zoo(x, dates) ) # Feb 29th is still not present in 'x'
+## checking the length of 'x'
+length(x) # 9 elements (there is no data for Feb 29th)
+
+## Adding a missing value (NA in this case) for Feb 29th
+( y &lt;- izoo2rzoo(x) )
+
+## checking the new length
+length(y) # 1 element more than the original 'x' (thre is an NA value in Feb 29th)
+
+
+##
+## Example 2: Extending the original 'x' object from February 1st to the end of March, 
+#             assigning 'NA' to the days in which 'x' do not have a value.
+( y &lt;- izoo2rzoo(x, from="1964-02-01", to="1964-03-31") )
+
+
+##
+## Example 3: Working with a zoo matrix with two identical 'x' time series, 
+##            from 1964-02-25 to 1964-03-05
+( Y &lt;- cbind(x,x) )
+
+# Adding a missing value (NA in this case) for Feb 29th in all the columns of Y
+( rY &lt;- izoo2rzoo(Y) )
+
+
+##
+## Example 4: Working with hourly data, from 01:00 to 10:00 UTC on 12th December 2000
+dates  &lt;- ISOdatetime(year=2000, month=12, day=12, hour=1:10, min=0, sec=0, tz="UTC")
+values &lt;- 1:10
+x      &lt;- zoo(values, dates)
+
+# removing four values in 'x', from 02:00 to 05:00, i.e., they will not be present 
+# anymore in 'x' at all, not even NA !)
+x &lt;- x[-c(2:5)]
+time(x)
+length(x)
+
+# Adding missing values (NA in this case) from 02:00 to 05:00
+y &lt;-  izoo2rzoo(x)
+time(y)
+length(y)
+
+
+##
+## Example 5: Extending hourly data to a DateTime before 'start(x)', 
+##            specifying only the date.
+##            Time of 'x' is in local time zone (tz="") instead of UTC
+dt &lt;- hip("2021-01-01 00:00:00", "2021-01-01 20:00:00", tz="")
+x  &lt;- zoo(0:20, dt)
+(y  &lt;- izoo2rzoo(x, from="2020-12-31") )# 00:00:00 is ommited
+
+
+##
+## Example 6: Extending hourly data to a DateTime before 'start(x)', 
+##            specifying date and time.
+##            Time of 'x' is in local time zone (tz="") instead of UTC
+dt &lt;- hip("2021-01-01 00:00:00", "2021-01-01 20:00:00", tz="")
+x  &lt;- zoo(0:20, dt)
+( y  &lt;- izoo2rzoo(x, from="2020-12-31 20:00:00") )
+
+
+##
+## Example 7: Extending hourly data to a DateTime after 'end(x)', 
+##            specifying date and time.
+##            Time of 'x' is in local time zone (tz="") instead of UTC
+dt &lt;- hip("2021-01-01 00:00:00", "2021-01-01 20:00:00", tz="")
+x  &lt;- zoo(0:20, dt)
+( y  &lt;- izoo2rzoo(x, to="2021-01-02 12:00:00") )
+
+
+##
+## Example 8: Extending hourly data to a DateTime before 'start(x)'.
+##            Note that the 'tz' argument can be ommited in the 'hip' function, 
+##            because by default it assumes UTC as time zone
+dt &lt;- hip("2021-01-01 00:00:00", "2021-01-01 20:00:00", tz="UTC")
+x  &lt;- zoo(0:20, dt)
+( y  &lt;- izoo2rzoo(x, from="2020-12-31 20:00:00", tz="UTC") )
+
+
+##
+## Example 9: Extending hourly data to a date before 'start(x)'. However, hourly 'x'
+##            values are given at HH:15:00 hours instead of HH:00:00 hours.
+
+## Loading the time series of hourly streamflows for the station Karamea at Gorge
+## Time Zone for 'KarameaAtGorgeQts' data is GMT+12 (see ?KarameaAtGorgeQts)
+data(KarameaAtGorgeQts)
+x &lt;- KarameaAtGorgeQts
+
+# Subsetting 'x' to its first day only
+# (01/Jan/1980 08:15:00 - 01/Jan/1980 23:15:00)
+x &lt;- window(x, end="1980-01-01 23:59:00")
+
+# Adding NA hourly data since 1979-12-31 21:15:00
+izoo2rzoo(x, from="1979-12-31 21:15:00", tz="GMT+12")
+</code></pre>
+
+
+</div>

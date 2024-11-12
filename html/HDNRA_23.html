@@ -1,0 +1,115 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>ts_zgzc2020</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Test proposed by Zhang et al. (2020)</h2>
+
+<h3>Description</h3>
+
+<p>Zhang et al. (2020)'s test for testing equality of two-sample high-dimensional mean vectors with assuming that two covariance matrices are the same.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">ts_zgzc2020(y1, y2)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>y1</code></td>
+<td>
+<p>The data matrix (<code class="reqn">p</code> by <code class="reqn">n_1</code>) from the first population. Each column represents a <code class="reqn">p</code>-dimensional observation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>y2</code></td>
+<td>
+<p>The data matrix (<code class="reqn">p</code> by <code class="reqn">n_2</code>) from the first population. Each column represents a <code class="reqn">p</code>-dimensional observation.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Suppose we have two independent high-dimensional samples:
+</p>
+<p style="text-align: center;"><code class="reqn">
+\boldsymbol{y}_{i1},\ldots,\boldsymbol{y}_{in_i}, \;\operatorname{are \; i.i.d. \; with}\; \operatorname{E}(\boldsymbol{y}_{i1})=\boldsymbol{\mu}_i,\; \operatorname{Cov}(\boldsymbol{y}_{i1})=\boldsymbol{\Sigma},i=1,2.
+</code>
+</p>
+
+<p>The primary object is to test
+</p>
+<p style="text-align: center;"><code class="reqn">H_{0}: \boldsymbol{\mu}_1 = \boldsymbol{\mu}_2\; \operatorname{versus}\; H_{1}: \boldsymbol{\mu}_1 \neq \boldsymbol{\mu}_2.</code>
+</p>
+
+<p>Zhang et al.(2020) proposed the following test statistic:
+</p>
+<p style="text-align: center;"><code class="reqn">T_{ZGZC} = \frac{n_1n_2}{n} \|\bar{\boldsymbol{y}}_1 - \bar{\boldsymbol{y}}_2\|^2,</code>
+</p>
+
+<p>where  <code class="reqn">\bar{\boldsymbol{y}}_{i},i=1,2</code> are the sample mean vectors.
+They showed that under the null hypothesis, <code class="reqn">T_{ZGZC}</code> and a chi-squared-type mixture have the same normal or non-normal limiting distribution.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A  (list) object of  <code>S3</code> class <code>htest</code>  containing the following elements:
+</p>
+
+<dl>
+<dt>p.value</dt>
+<dd>
+<p>the p-value of the test proposed by  Zhang et al. (2020).</p>
+</dd>
+<dt>statistic</dt>
+<dd>
+<p>the test statistic proposed by  Zhang et al. (2020).</p>
+</dd>
+<dt>beta</dt>
+<dd>
+<p>parameter used in Zhang et al. (2020)'s test.</p>
+</dd>
+<dt>df</dt>
+<dd>
+<p>estimated approximate degrees of freedom of Zhang et al. (2020)'s test.</p>
+</dd>
+</dl>
+<h3>References</h3>
+
+<p>Zhang J, Guo J, Zhou B, Cheng M (2020).
+“A simple two-sample test in high dimensions based on L 2-norm.”
+<em>Journal of the American Statistical Association</em>, <b>115</b>(530), 1011–1027.
+<a href="https://doi.org/10.1080/01621459.2019.1604366">doi:10.1080/01621459.2019.1604366</a>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">set.seed(1234)
+n1 &lt;- 20
+n2 &lt;- 30
+p &lt;- 50
+mu1 &lt;- t(t(rep(0, p)))
+mu2 &lt;- mu1
+rho &lt;- 0.1
+y &lt;- (-2 * sqrt(1 - rho) + sqrt(4 * (1 - rho) + 4 * p * rho)) / (2 * p)
+x &lt;- y + sqrt((1 - rho))
+Gamma &lt;- matrix(rep(y, p * p), nrow = p)
+diag(Gamma) &lt;- rep(x, p)
+Z1 &lt;- matrix(rnorm(n1 * p, mean = 0, sd = 1), p, n1)
+Z2 &lt;- matrix(rnorm(n2 * p, mean = 0, sd = 1), p, n2)
+y1 &lt;- Gamma %*% Z1 + mu1 %*% (rep(1, n1))
+y2 &lt;- Gamma %*% Z2 + mu2 %*% (rep(1, n2))
+ts_zgzc2020(y1, y2)
+
+</code></pre>
+
+
+</div>

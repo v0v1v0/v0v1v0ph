@@ -1,0 +1,128 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>har_plot</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Plot event detection on a time series</h2>
+
+<h3>Description</h3>
+
+<p>It accepts as harbinger, a time series, a data.frame of events, a parameter to mark the detected change points, a threshold for the y-axis and an index for the time series
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">har_plot(
+  obj,
+  serie,
+  detection,
+  event = NULL,
+  mark.cp = TRUE,
+  ylim = NULL,
+  idx = NULL,
+  pointsize = 0.5,
+  colors = c("green", "blue", "red", "purple")
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>obj</code></td>
+<td>
+<p>harbinger detector</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>serie</code></td>
+<td>
+<p>time series</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>detection</code></td>
+<td>
+<p>detection</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>event</code></td>
+<td>
+<p>events</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mark.cp</code></td>
+<td>
+<p>show change points</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ylim</code></td>
+<td>
+<p>limits for y-axis</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>idx</code></td>
+<td>
+<p>labels for x observations</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pointsize</code></td>
+<td>
+<p>default point size</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>colors</code></td>
+<td>
+<p>default colors for event detection: green is TP, blue is FN, red is FP, purple means observations that are part of a sequence.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A time series plot with marked events
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">library(daltoolbox)
+
+#loading the example database
+data(examples_anomalies)
+
+#Using the simple time series
+dataset &lt;- examples_anomalies$simple
+head(dataset)
+
+# setting up time change point using GARCH
+model &lt;- hanr_arima()
+
+# fitting the model
+model &lt;- fit(model, dataset$serie)
+
+# making detections
+detection &lt;- detect(model, dataset$serie)
+
+# filtering detected events
+print(detection[(detection$event),])
+
+# evaluating the detections
+evaluation &lt;- evaluate(har_eval_soft(), detection$event, dataset$event)
+print(evaluation$confMatrix)
+
+# ploting the results
+grf &lt;- har_plot(model, dataset$serie, detection, dataset$event)
+plot(grf)
+</code></pre>
+
+
+</div>

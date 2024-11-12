@@ -1,0 +1,149 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>PlotDurationCurve</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Plot duration curves</h2>
+
+<h3>Description</h3>
+
+<p>Convenience wrapper function for a (multiple) line <code>plot</code>, with pretty defaults for axis annotation and a Gaussian scaling option for the x-axis.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">PlotDurationCurve(
+  freq,
+  xscale = "lin",
+  yscale = "log",
+  add.legend = FALSE,
+  l.legend = NULL,
+  ylim = NULL,
+  xlab = "Flow exceedance percentile",
+  ylab = "m3s",
+  col = "blue",
+  lty = 1,
+  lwd = 1,
+  mar = c(3, 3, 1, 1) + 0.1
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>freq</code></td>
+<td>
+<p>Data frame with at least two columns, containing probabilities in the first and series of data quantiles in the remaining columns. Typically
+an object as returned by <code>ExtractFreq</code> or a subset thereof.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>xscale</code></td>
+<td>
+<p>Character string, keyword for x-axis scaling. Either <code>"lin"</code> for linear scaling or <code>"gauss"</code> for gaussian scaling as in a normal
+probability plot, which allows for for better comparison of low flow and high flow frequencies.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>yscale</code></td>
+<td>
+<p>Character string, keyword for y-axis scaling. Either <code>"lin"</code> for linear scaling or <code>"log"</code> for common logarithm scaling.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>add.legend</code></td>
+<td>
+<p>Logical. If <code>TRUE</code>, a legend will be added to the plot, including the number of observations on which the quantiles are based for
+each curve if <code>freq</code> is a result from <code>ExtractFreq</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>l.legend</code></td>
+<td>
+<p>Character vector. If non-NULL, legend labels are read from here instead of from column names in <code>freq</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ylim</code></td>
+<td>
+<p>Numeric vector of length two, giving y-axis limits. <code>NULL</code> for default values.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>xlab</code></td>
+<td>
+<p>Character string, x-axis label.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ylab</code></td>
+<td>
+<p>Character or <code>plotmath</code> expression string. Y-axis label, either as keyword <code>"m3s"</code> or <code>"mmd"</code> for pre-defined pretty
+discharge labels, or any other string which will be plotted unchanged.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>col</code></td>
+<td>
+<p>Line color specification, see <code>par</code> for details. Defaults to blue. Either a single value or a vector of the same length as quantile
+series in <code>freq</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lty</code></td>
+<td>
+<p>Line type specification, see <code>par</code> for details. Either a single value or a vector of the same length as quantile
+series in <code>freq</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lwd</code></td>
+<td>
+<p>Line width specification, see <code>par</code> for details. Either a single value or a vector of the same length as quantile
+series in <code>freq</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mar</code></td>
+<td>
+<p>Numeric vector of length 4, margin specification as in <code>par</code> with modified default. Details see there.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p><code>PlotDurationCurve</code> plots a duration curve with pretty formatting defaults. The function sets <code>par</code> parameters <code>tcl</code> and <code>mgp</code>
+internally and will override previously set values for the returned plot. It typically uses results from <code>ExtractFreq</code> as input data and via that
+function it can be used to visualize and compare time series properties.
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>PlotDurationCurve</code> returns a plot to the currently active plot device.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>ExtractFreq</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Import source data
+te1 &lt;- ReadBasinOutput(filename = system.file("demo_model", "results", "0003587.txt", 
+                       package = "HYPEtools"))
+te2 &lt;- ExtractFreq(te1[, c("COUT", "ROUT")])
+# Plot flow duration curves for simulated and observed discharge
+PlotDurationCurve(freq = te2, add.legend = TRUE, col = c("red", "blue"))
+
+</code></pre>
+
+
+</div>

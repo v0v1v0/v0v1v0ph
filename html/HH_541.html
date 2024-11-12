@@ -1,0 +1,196 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>rbind.trellis</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Extend matrix reshaping functions to trellis objects.
+</h2>
+
+<h3>Description</h3>
+
+<p>Extend matrix reshaping functions to trellis objects.
+See the details section for comparisons with similar functions in the
+<span class="pkg">lattice</span> package.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">transpose(x)
+## S3 method for class 'trellis'
+transpose(x)
+## Default S3 method:
+transpose(x)
+## S3 method for class 'trellis'
+aperm(a, perm, ...)
+## S3 method for class 'trellis'
+rbind(..., deparse.level=1,
+      combineLimits=TRUE, useOuterStrips=TRUE)
+## S3 method for class 'trellis'
+cbind(..., deparse.level=1,
+      combineLimits=TRUE, useOuterStrips=TRUE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>..., x, a</code></td>
+<td>
+
+<p>A set of <code>trellis</code> objects.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>perm</code></td>
+<td>
+
+<p>Permutation vector, see <code>aperm</code> for details.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>combineLimits, useOuterStrips</code></td>
+<td>
+<p>logical.  If <code>TRUE</code> (the
+default), use the similarly named <span class="pkg">latticeExtra</span> functions before
+returning the result.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>deparse.level</code></td>
+<td>
+
+<p>See <code>cbind</code> for details.  These functions ignore this
+argument and always use the <code>names(list(...))</code>, if non-<code>NULL</code>,
+for the labels.
+If <code>NULL</code>, then the first <code>length(list(...))</code> uppercase
+letters are used.
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p><code>transpose.trellis</code> tries to capture and modify all potentially relevant
+trellis components.  <code>transpose.trellis</code> is more comprehensive
+than the similar
+<code>t.trellis</code> which adjusts only the
+<code>perm.cond</code> component.
+</p>
+<p><code>aperm.trellis</code> does not attempt to check all potentially relevant
+trellis components.
+It does not adjust <code>layout.heights</code>, <code>layout.widths</code>, or
+<code>between</code>
+It may show strange axis
+positions or strip positions for any non-standard arrangement, for example,
+for any trellis object that has already been
+through <code>latticeExtra::combineLimits</code>.
+</p>
+
+
+<h3>Value</h3>
+
+<p>trellis object constructed from arguments with new dim and layout.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p> Richard M. Heiberger &lt;rmh@temple.edu&gt; </p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">F &lt;- xyplot((1:15) ~ (1:15) | rep(factor(letters[3:5]), each=5))
+G &lt;- xyplot((1:18) ~ (1:18) | rep(factor(letters[3:5]), each=6))
+rbind(AAA=F, BBB=G)
+cbind(AAA=F, BBB=G)
+
+tmp &lt;- data.frame(y=1:24,
+                  x=1:24,
+                  a=rep(letters[1:2], each=12),
+                  b=rep(letters[3:5], each=4, times=2),
+                  c=rep(letters[6:9], times=6))
+
+t3 &lt;- xyplot(y ~ x | c*b*a, data=tmp,
+             panel=function(x, y, ...) panel.text(x, y, y),
+             scales=list(alternating=FALSE))
+## t3
+t3u &lt;- update(t3, layout=c(4*3, 2), between=list(x=c(0,0,0,1)), main="t3")
+useOuterStripsT2L1(t3u)
+
+## Not run: 
+## update(t3, layout=c(24, 1))
+
+t3.321 &lt;- aperm(t3, c(3,2,1))
+update(t3.321, main="t3.321", layout=c(6,4), between=list(x=c(0,1))) ## 2*3,4
+
+try(transpose(t3))   ## requires a one- or two-dimensional trellis object.
+
+t3.123 &lt;- aperm(t3, c(1,2,3)) ## identity operation
+t3.132 &lt;- aperm(t3, c(1,3,2))
+t3.213 &lt;- aperm(t3, c(2,1,3))
+t3.231 &lt;- aperm(t3, c(2,3,1))
+t3.312 &lt;- aperm(t3, c(3,1,2))
+t3.321 &lt;- aperm(t3, c(3,2,1))
+
+u3.123 &lt;- update(t3.123, main="t3.123", layout=c(12,2),
+                 between=list(x=c(0,0,0,1))) ## 4*3,2
+u3.132 &lt;- update(t3.132, main="t3.132", layout=c(8,3),
+                 between=list(x=c(0,0,0,1))) ## 4*2,3
+u3.213 &lt;- update(t3.213, main="t3.213", layout=c(3,8),
+                 between=list(y=c(0,0,0,1)), par.strip.text=list(cex=.8)) ## 3,4*2
+u3.231 &lt;- update(t3.231, main="t3.231", layout=c(6,4),
+                 between=list(x=c(0,0,1))) ## 2*3,4
+u3.312 &lt;- update(t3.312, main="t3.312", layout=c(2,12),
+                 between=list(y=c(0,0,0,1)), par.strip.text=list(cex=.6)) ## 2,3*4
+u3.321 &lt;- update(t3.321, main="t3.321", layout=c(6,4),
+                 between=list(x=c(0,1))) ## 2*3,4
+
+u5 &lt;- tempfile("u5", fileext = ".pdf")
+pdf(u5, width=17, height=22)
+print(u3.123, split=c(1,1,2,3), more=TRUE)
+print(u3.132, split=c(2,1,2,3), more=TRUE)
+print(u3.213, split=c(1,2,2,3), more=TRUE)
+print(u3.231, split=c(2,2,2,3), more=TRUE)
+print(u3.312, split=c(1,3,2,3), more=TRUE)
+print(u3.321, split=c(2,3,2,3), more=FALSE)
+dev.off()
+
+try(transpose(t3.123)) ## layout is a matrix, but dim is not.
+
+## End(Not run)
+
+## Not run: 
+t2 &lt;- xyplot(y ~ x | b*c, data=tmp,
+             panel=function(x, y, ...) panel.text(x, y, y),
+             scales=list(alternating=FALSE))
+t2
+
+## aperm(t2, 1:2) ## identity
+
+transpose(t2)
+aperm(t2, 2:1)
+
+t1a &lt;- xyplot(y ~ x | b, data=tmp[tmp$a=="a",])
+t1b &lt;- xyplot(y ~ x | b, data=tmp[tmp$a=="b",])
+t1a
+t1b
+
+rbind(t1a, t1b)
+rbind(AAA=t1a, BBB=t1b)
+
+cbind(t1a, t1b)
+cbind(AAA=t1a, BBB=t1b)
+
+## End(Not run)
+</code></pre>
+
+
+</div>

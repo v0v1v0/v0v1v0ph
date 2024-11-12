@@ -1,0 +1,112 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>waterLevel</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Compute a 1d water level dataset</h2>
+
+<h3>Description</h3>
+
+<p>Functions to compute 1d water level information and store it as
+column <code>w</code> of an S4 object of type WaterLevelDataFrame.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">waterLevel(wldf, shiny = FALSE)
+
+waterLevelPegelonline(wldf, shiny = FALSE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>wldf</code></td>
+<td>
+<p>an object of class WaterLevelDataFrame.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>shiny</code></td>
+<td>
+<p><code>logical</code> determing whether columns (<code>section</code>,
+<code>weight_x</code>, <code>weight_y</code>) relevant for the
+<code>plotShiny()</code>-function are appended to the resulting
+WaterLevelDataFrame.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p><code>waterLevel</code> interpolates 1d water level along the river axis
+of Elbe and Rhine based on daily averaged, mostly validated gauging data
+stored in the internal dataset <code>df.gauging_data</code>. Internally
+stored gauging data are available from 1960-01-01 until yesterday.
+</p>
+<p><code>waterLevelPegelonline</code> carries out the interpolation with gauging
+data obtained through a
+<a href="https://en.wikipedia.org/wiki/Representational_state_transfer">REST</a>
+service from <a href="https://pegelonline.wsv.de/gast/start">https://pegelonline.wsv.de/gast/start</a>. The gauging data
+from <a href="https://pegelonline.wsv.de/gast/start">PEGELONLINE</a> have a high
+temporal resolution of 15 minutes, enabling meaningful linear temporal
+interpolation. Since data from
+<a href="https://pegelonline.wsv.de/gast/start">PEGELONLINE</a>
+expire after 31 days, this function is only applicable for
+WaterLevelDataFrames with a <code>time</code>-slot set to
+appropriate values within the last 31 days before function call.
+</p>
+
+
+<h3>Value</h3>
+
+<p>An object of class WaterLevelDataFrame.
+</p>
+
+
+<h3>References</h3>
+
+<p>Busch N, Hammer M (2009).
+“Einheitliche Grundlage für die Festlegung der Bemessungswasserspiegellagen der Elbe auf der frei fließenden Strecke in Deutschland.”
+<a href="https://doi.org/10.5675/bfg-1650">doi:10.5675/bfg-1650</a>.
+</p>
+<p>HKV Hydrokontor (2014).
+“Erstellung eines SOBEK-River Modells für den Rhein von Iffezheim bis Pannerdense Kop als Weiterentwicklung bestehender SOBEK-RE Modelle.”
+</p>
+<p>Bundesanstalt für Gewässerkunde (2016).
+“FLYS – Flusshydrologischer Webdienst.”
+<a href="https://www.bafg.de/DE/5_Informiert/1_Portale_Dienste/FLYS/flys_node.html">https://www.bafg.de/DE/5_Informiert/1_Portale_Dienste/FLYS/flys_node.html</a>.
+</p>
+<p>Wasserstraßen- und Schifffahrtsverwaltung des Bundes (WSV) (2022).
+“PEGELONLINE.”
+<a href="https://pegelonline.wsv.de/gast/start">https://pegelonline.wsv.de/gast/start</a>.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>plotShiny</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+# waterLevel
+wldf &lt;- WaterLevelDataFrame(river   = "Elbe",
+                            time    = as.POSIXct("2016-12-21"),
+                            station = seq(257, 262, 0.1))
+wldf &lt;- waterLevel(wldf)
+
+# waterLevelPegelonline
+wldf1 &lt;- wldf
+setTime(wldf1) &lt;- Sys.time() - as.difftime(60, units = "mins")
+wldf1 &lt;- waterLevelPegelonline(wldf1)
+
+</code></pre>
+
+
+</div>

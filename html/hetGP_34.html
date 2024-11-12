@@ -1,0 +1,383 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>mleCRNGP</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Gaussian process modeling with correlated noise</h2>
+
+<h3>Description</h3>
+
+<p>Gaussian process regression when seed (or trajectory) information is provided, based on maximum likelihood estimation of the 
+hyperparameters. Trajectory handling involves observing all times for any given seed.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">mleCRNGP(
+  X,
+  Z,
+  T0 = NULL,
+  stype = c("none", "XS"),
+  lower = NULL,
+  upper = NULL,
+  known = NULL,
+  noiseControl = list(g_bounds = c(sqrt(.Machine$double.eps) * 10, 100), rho_bounds =
+    c(0.001, 0.9)),
+  init = NULL,
+  covtype = c("Gaussian", "Matern5_2", "Matern3_2"),
+  maxit = 100,
+  eps = sqrt(.Machine$double.eps),
+  settings = list(return.Ki = TRUE, factr = 1e+07)
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>X</code></td>
+<td>
+<p>matrix of all designs, one per row. The last column is assumed to contain the integer seed value.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Z</code></td>
+<td>
+<p>vector of all observations. If <code>ts</code> is provided, the <code>Z</code> is a matrix of size <code>nrow(X) x length(ts)</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>T0</code></td>
+<td>
+<p>optional vector of times (same for all <code>X</code>s)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>stype</code></td>
+<td>
+<p>structural assumptions, options include:
+</p>
+
+<ul><li> <p><code>none</code>: no structure, regular matrix inversion is used (only when no time is present);
+</p>
+</li></ul>
+<p>When time is present, the Kronecker structure is always used (the alternative is to provide times as an extra variable in <code>X</code>)
+Using the Kronecker structure becomes efficient when the product (nx x ns) x nt becomes large.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lower, upper</code></td>
+<td>
+<p>optional bounds for the <code>theta</code> parameter (see <code>cov_gen</code> for the exact parameterization).
+In the multivariate case, it is possible to give vectors for bounds (resp. scalars) for anisotropy (resp. isotropy)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>known</code></td>
+<td>
+<p>optional list of known parameters, e.g., <code>beta0</code>, <code>theta</code>, <code>g</code> or <code>rho</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>noiseControl</code></td>
+<td>
+<p>list with element, 
+</p>
+
+<ul>
+<li> <p><code>g_bounds</code>, vector providing minimal and maximal noise to signal ratio;
+</p>
+</li>
+<li> <p><code>rho_bounds</code>, vector providing minimal and maximal correlation between seed values, in [0,1];
+</p>
+</li>
+</ul>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>init</code></td>
+<td>
+<p>optional list specifying starting values for MLE optimization, with elements:
+</p>
+
+<ul>
+<li> <p><code>theta_init</code> initial value of the theta parameters to be optimized over (default to 10% of the range determined with <code>lower</code> and <code>upper</code>)
+</p>
+</li>
+<li> <p><code>g_init</code> initial value of the nugget parameter to be optimized over.
+</p>
+</li>
+<li> <p><code>rho_init</code> initial value of the seed correlation parameter.
+</p>
+</li>
+</ul>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>covtype</code></td>
+<td>
+<p>covariance kernel type, either 'Gaussian', 'Matern5_2' or 'Matern3_2', see <code>cov_gen</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>maxit</code></td>
+<td>
+<p>maximum number of iteration for L-BFGS-B of <code>optim</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>eps</code></td>
+<td>
+<p>jitter used in the inversion of the covariance matrix for numerical stability</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>settings</code></td>
+<td>
+<p>list with argument <code>return.Ki</code>, to include the inverse covariance matrix in the object for further use (e.g., prediction).
+Arguments <code>factr</code> (default to 1e9) and <code>pgtol</code> are available to be passed to <code>control</code> for L-BFGS-B in <code>optim</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The global covariance matrix of the model is parameterized as <code>nu_hat * (Cx + g Id) * Cs = nu_hat * K</code>,
+with <code>Cx</code> the spatial correlation matrix between unique designs, depending on the family of kernel used (see <code>cov_gen</code> for available choices) and values of lengthscale parameters.
+<code>Cs</code> is the correlation matrix between seed values, equal to 1 if the seeds are equal, <code>rho</code> otherwise.
+<code>nu_hat</code> is the plugin estimator of the variance of the process.
+</p>
+<p>Compared to <code>mleHomGP</code>, here the replications have a specific identifier, i.e., the seed.
+</p>
+
+
+<h3>Value</h3>
+
+<p>a list which is given the S3 class "<code>CRNGP</code>", with elements:
+</p>
+
+<ul>
+<li> <p><code>theta</code>: maximum likelihood estimate of the lengthscale parameter(s),
+</p>
+</li>
+<li> <p><code>g</code>: maximum likelihood estimate of the nugget variance,
+</p>
+</li>
+<li> <p><code>rho</code>: maximum likelihood estimate of the seed correlation parameter,
+</p>
+</li>
+<li> <p><code>trendtype</code>: either "<code>SK</code>" if <code>beta0</code> is given, else "<code>OK</code>" 
+</p>
+</li>
+<li> <p><code>beta0</code>: estimated trend unless given in input,
+</p>
+</li>
+<li> <p><code>nu_hat</code>: plugin estimator of the variance,
+</p>
+</li>
+<li> <p><code>ll</code>: log-likelihood value,
+</p>
+</li>
+<li> <p><code>X0</code>, <code>S0</code>, <code>T0</code>: values for the spatial, seed and time designs 
+</p>
+</li>
+<li> <p><code>Z</code>, <code>eps</code>, <code>covtype</code>, <code>stype</code>,: values given in input,
+</p>
+</li>
+<li> <p><code>call</code>: user call of the function
+</p>
+</li>
+<li> <p><code>used_args</code>: list with arguments provided in the call
+</p>
+</li>
+<li> <p><code>nit_opt</code>, <code>msg</code>: <code>counts</code> and <code>msg</code> returned by <code>optim</code>
+</p>
+</li>
+<li> <p><code>Ki</code>: inverse covariance matrix (not scaled by <code>nu_hat</code>) (if <code>return.Ki</code> is <code>TRUE</code> in <code>settings</code>)
+</p>
+</li>
+<li> <p><code>Ct</code>: if time is used, corresponding covariance matrix.
+</p>
+</li>
+<li> <p><code>time</code>: time to train the model, in seconds.
+</p>
+</li>
+</ul>
+<h3>Note</h3>
+
+<p>This function is experimental at this time and could evolve in the future.
+</p>
+
+
+<h3>References</h3>
+
+<p>Xi Chen, Bruce E Ankenman, and Barry L Nelson. The effects of common random numbers on stochastic kriging metamodels. ACM Transactions on Modeling and Computer Simulation (TOMACS), 22(2):1-20, 2012.<br><br></p>
+<p>Michael Pearce, Matthias Poloczek, and Juergen Branke. Bayesian simulation optimization with common random numbers. In 2019 Winter Simulation Conference (WSC), pages 3492-3503. IEEE, 2019. <br><br></p>
+<p>A Fadikar, M Binois, N Collier, A Stevens, KB Toh, J Ozik. Trajectory-oriented optimization of stochastic epidemiological models. arXiv preprint arXiv:2305.03926
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>predict.CRNGP</code> for predictions, <code>simul.CRNGP</code> for generating conditional simulation on a Kronecker grid.
+<code>summary</code> and <code>plot</code> functions are available as well.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">##------------------------------------------------------------
+## Example 1: CRN GP modeling on 1d sims
+##------------------------------------------------------------
+#' set.seed(42)
+nx &lt;- 50
+ns &lt;- 5
+x &lt;- matrix(seq(0,1, length.out = nx), nx)
+s &lt;- matrix(seq(1, ns, length.out = ns))
+g &lt;- 1e-3
+theta &lt;- 0.01
+KX &lt;- cov_gen(x, theta = theta)
+rho &lt;- 0.3
+KS &lt;- matrix(rho, ns, ns)
+diag(KS) &lt;- 1
+YY &lt;- MASS::mvrnorm(n = 1, mu = rep(0, nx*ns), Sigma = kronecker(KX, KS) + g * diag(nx*ns))
+YYmat &lt;- matrix(YY, ns, nx)
+matplot(x, t(YYmat), pch = 1, type = "b", lty = 3)
+
+Xgrid &lt;- as.matrix(expand.grid(s, x))
+Xgrid &lt;- cbind(Xgrid[,2], Xgrid[,1])
+ids &lt;- sample(1:nrow(Xgrid), 20)
+X0 &lt;- Xgrid[ids,]
+Y0 &lt;-  YY[ids]
+points(X0[,1], Y0, pch = 20, col = 1 + ((X0[,2] - 1) %% 6))
+
+model &lt;- mleCRNGP(X0, Y0, known = list(theta = 0.01, g = 1e-3, rho = 0.3))
+
+preds &lt;- predict(model, x = Xgrid, xprime = Xgrid)
+matlines(x, t(matrix(preds$mean, ns, nx)), lty = 1)
+# prediction on new seed (i.e., average prediction)
+xs1 &lt;- cbind(x, ns+1)
+predsm &lt;- predict(model, x = xs1)
+lines(x, predsm$mean, col = "orange", lwd = 3)
+lines(x, predsm$mean + 2 * sqrt(predsm$sd2), col = "orange", lwd = 2, lty = 3)
+lines(x, predsm$mean - 2 * sqrt(predsm$sd2), col = "orange", lwd = 2, lty = 3)
+
+# Conditional realizations
+sims &lt;- MASS::mvrnorm(n = 1, mu = preds$mean, Sigma = 1/2 * (preds$cov + t(preds$cov)))
+plot(Xgrid[,1], sims, col = 1 + ((Xgrid[,2] - 1) %% 6))
+points(X0[,1], Y0, pch = 20, col = 1 + ((X0[,2] - 1) %% 6))
+## Not run: 
+##------------------------------------------------------------
+## Example 2: Homoskedastic GP modeling on 2d sims
+##------------------------------------------------------------
+set.seed(2)
+nx &lt;- 31
+ns &lt;- 5
+d &lt;- 2
+x &lt;- as.matrix(expand.grid(seq(0,1, length.out = nx), seq(0,1, length.out = nx)))
+s &lt;- matrix(seq(1, ns, length.out = ns))
+Xgrid &lt;- as.matrix(expand.grid(seq(1, ns, length.out = ns), seq(0,1, length.out = nx), 
+                               seq(0,1, length.out = nx)))
+Xgrid &lt;- Xgrid[,c(2, 3, 1)]
+g &lt;- 1e-3
+theta &lt;- c(0.02, 0.05)
+KX &lt;- cov_gen(x, theta = theta)
+rho &lt;- 0.33
+KS &lt;- matrix(rho, ns, ns)
+diag(KS) &lt;- 1
+YY &lt;- MASS::mvrnorm(n = 1, mu = rep(0, nx*nx*ns), Sigma = kronecker(KX, KS) + g * diag(nx*nx*ns))
+YYmat &lt;- matrix(YY, ns, nx*nx)
+filled.contour(matrix(YYmat[1,], nx))
+filled.contour(matrix(YYmat[2,], nx))
+
+ids &lt;- sample(1:nrow(Xgrid), 80)
+X0 &lt;- Xgrid[ids,]
+Y0 &lt;-  YY[ids]
+
+## Uncomment below for For 3D visualisation
+# library(rgl)
+# plot3d(Xgrid[,1], Xgrid[,2], YY, col = 1 + (Xgrid[,3] - 1) %% 6)
+# points3d(X0[,1], X0[,2], Y0, size = 10, col = 1 + ((X0[,3] - 1) %% 6))
+
+model &lt;- mleCRNGP(X0, Y0, know = list(beta0 = 0))
+
+preds &lt;- predict(model, x = Xgrid, xprime = Xgrid)
+# surface3d(unique(Xgrid[1:nx^2,1]),unique(Xgrid[,2]), matrix(YY[Xgrid[,3]==1], nx), 
+#   front = "lines", back = "lines")
+# aspect3d(1, 1, 1)
+# surface3d(unique(Xgrid[1:nx^2,1]),unique(Xgrid[,2]), matrix(preds$mean[Xgrid[,3]==1], nx), 
+#   front = "lines", back = "lines", col = "red")
+plot(preds$mean, YY)
+
+# prediction on new seed (i.e., average prediction)
+xs1 &lt;- cbind(x, ns+1)
+predsm &lt;- predict(model, x = xs1)
+# surface3d(unique(x[,1]), unique(x[,2]), matrix(predsm$mean, nx), col = "orange", 
+#   front = "lines", back = "lines")
+
+# Conditional realizations
+sims &lt;- MASS::mvrnorm(n = 1, mu = preds$mean, Sigma = 1/2 * (preds$cov + t(preds$cov)))
+# plot3d(X0[,1], X0[,2], Y0, size = 10, col = 1 + ((X0[,3] - 1) %% 6))
+# surface3d(unique(x[,1]), unique(x[,2]), matrix(sims[Xgrid[,3] == 1], nx), col = 1, 
+#   front = "lines", back = "lines")
+# surface3d(unique(x[,1]), unique(x[,2]), matrix(sims[Xgrid[,3] == 2], nx), col = 2, 
+#   front = "lines", back = "lines")
+
+# Faster alternative for conditional realizations 
+# (note: here the design points are part of the simulation points)
+Xgrid0 &lt;- unique(Xgrid[, -(d + 1), drop = FALSE])
+sims2 &lt;- simul(object = model,Xgrid = Xgrid, ids = ids, nsim = 5, check = TRUE) 
+
+##------------------------------------------------------------
+## Example 3: Homoskedastic GP modeling on 1d trajectories (with time)
+##------------------------------------------------------------
+set.seed(42)
+nx &lt;- 11
+nt &lt;- 9
+ns &lt;- 7
+x &lt;- matrix(sort(seq(0,1, length.out = nx)), nx)
+s &lt;- matrix(sort(seq(1, ns, length.out = ns)))
+t &lt;- matrix(sort(seq(0, 1, length.out = nt)), nt)
+covtype &lt;- "Matern5_2"
+g &lt;- 1e-3
+theta &lt;- c(0.3, 0.5)
+KX &lt;- cov_gen(x, theta = theta[1], type = covtype)
+KT &lt;- cov_gen(t, theta = theta[2], type = covtype)
+rho &lt;- 0.3
+KS &lt;- matrix(rho, ns, ns)
+diag(KS) &lt;- 1
+XST &lt;- as.matrix(expand.grid(x, s, t))
+
+Kmc &lt;- kronecker(chol(KT), kronecker(chol(KS), chol(KX)))
+YY &lt;- t(Kmc) %*% rnorm(nrow(Kmc))
+
+ninit &lt;- 50
+XS &lt;- as.matrix(expand.grid(x, s))
+ids &lt;- sort(sample(1:nrow(XS), ninit))
+XST0 &lt;- cbind(XS[ids[rep(1:ninit, each = nt)],], rep(t[,1], times = ninit))
+X0 &lt;- XST[which(duplicated(rbind(XST, XST0), fromLast = TRUE)),]
+Y0 &lt;-  YY[which(duplicated(rbind(XST, XST0), fromLast = TRUE))]
+
+# tmp &lt;- hetGP:::find_reps(X = X0[,-3], Y0)
+model &lt;- mleCRNGP(X = XS[ids,], T0=t, Z = matrix(Y0, ncol = nt), covtype = covtype)
+
+preds &lt;- predict(model, x = XS, xprime = XS)
+
+# compare with regular CRN GP
+mref &lt;- mleCRNGP(X = X0[, c(1, 3, 2)], Z = Y0, covtype = covtype)
+pref &lt;- predict(mref, x = XST[, c(1, 3, 2)], xprime = XST[, c(1, 3, 2)])
+
+print(model$time) # Use Kronecker structure for time
+print(mref$time)
+
+plot(as.vector(preds$mean), YY)
+plot(pref$mean, YY) 
+
+
+## End(Not run)
+</code></pre>
+
+
+</div>

@@ -1,0 +1,119 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hwe.ibf</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Testing Hardy-Weinberg Equilibrium Using an Intrinsic Prior Approach</h2>
+
+<h3>Description</h3>
+
+<p>This function implements the exact calculation of the Bayes factor based on intrinsic priors for the Hardy-Weinberg testing problem as described in Consonni et al. (2011).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hwe.ibf(y, t)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+<p>an object of class "HWEdata".</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>t</code></td>
+<td>
+<p>training sample size.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>This function implements the exact formula for the Bayes factor based on intrinsic priors.
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>hwe.ibf</code> returns the value of the Bayes factor based on intrinsic priors.
+</p>
+
+
+<h3>Note</h3>
+
+<p>The Bayes factor computed here is for the unrestricted model (<code class="reqn">M_1</code>) against the Hardy-Weinberg case (<code class="reqn">M_0</code>). This function provides the output only for the two alleles case.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Sergio Venturini <a href="mailto:sergio.venturini@unicatt.it">sergio.venturini@unicatt.it</a> </p>
+
+
+<h3>References</h3>
+
+<p>Consonni, G., Moreno, E., and Venturini, S. (2011). "Testing Hardy-Weinberg equilibrium: an objective Bayesian analysis". Statistics in Medicine, <b>30</b>, 62–74. <a href="https://onlinelibrary.wiley.com/doi/10.1002/sim.4084/abstract">https://onlinelibrary.wiley.com/doi/10.1002/sim.4084/abstract</a>
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>hwe.ibf.plot</code>,
+<code>hwe.ibf.mc</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+# ATTENTION: the following code may take a long time to run! #
+
+data(Lindley)
+hwe.ibf.exact &lt;- Vectorize(hwe.ibf, "t")
+f &lt;- seq(.05, 1, .05)
+n &lt;- sum(dataL1@data.vec, na.rm = TRUE)
+
+# Dataset 1 #
+plot(dataL1)
+npp.exact &lt;- 1/(1 + hwe.ibf.exact(round(f*n), y = dataL1))
+npp.std &lt;- 1/(1 + hwe.bf(dataL1))
+plot(f, npp.exact, type="l", lwd = 2, xlab = "f = t/n",
+	ylab = "Null posterior probability")
+abline(h = npp.std, col = gray(.5), lty = "longdash")
+
+# Dataset 2 #
+plot(dataL2)
+npp.exact &lt;- 1/(1 + hwe.ibf.exact(round(f*n), y = dataL2))
+npp.std &lt;- 1/(1 + hwe.bf(dataL2))
+plot(f, npp.exact, type="l", lwd = 2, xlab = "f = t/n",
+	ylab = "Null posterior probability")
+abline(h = npp.std, col = gray(.5), lty = "longdash")
+
+# Dataset 3 #
+plot(dataL3)
+npp.exact &lt;- 1/(1 + hwe.ibf.exact(round(f*n), y = dataL3))
+npp.std &lt;- 1/(1 + hwe.bf(dataL3))
+plot(f, npp.exact, type="l", lwd = 2, xlab = "f = t/n",
+	ylab = "Null posterior probability")
+abline(h = npp.std, col = gray(.5), lty = "longdash")
+
+# Dataset 4 #
+plot(dataL4)
+npp.exact &lt;- 1/(1 + hwe.ibf.exact(round(f*n), y = dataL4))
+npp.std &lt;- 1/(1 + hwe.bf(dataL4))
+plot(f, npp.exact, type="l", lwd = 2, xlab = "f = t/n",
+	ylab = "Null posterior probability")
+abline(h = npp.std, col = gray(.5), lty = "longdash")
+
+## End(Not run)
+</code></pre>
+
+
+</div>

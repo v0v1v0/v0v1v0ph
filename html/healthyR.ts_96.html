@@ -1,0 +1,179 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>ts_wfs_xgboost</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Auto XGBoost (XGBoost) Workflowset Function</h2>
+
+<h3>Description</h3>
+
+<p>This function is used to quickly create a workflowsets object.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">ts_wfs_xgboost(
+  .model_type = "xgboost",
+  .recipe_list,
+  .trees = 15L,
+  .min_n = 1L,
+  .tree_depth = 6L,
+  .learn_rate = 0.3,
+  .loss_reduction = 0,
+  .sample_size = 1,
+  .stop_iter = Inf
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>.model_type</code></td>
+<td>
+<p>This is where you will set your engine. It uses
+parsnip::boost_tree under the hood and can take one of the following:
+</p>
+
+<ul><li>
+<p> "xgboost"
+</p>
+</li></ul>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.recipe_list</code></td>
+<td>
+<p>You must supply a list of recipes. list(rec_1, rec_2, ...)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.trees</code></td>
+<td>
+<p>The number of trees (type: integer, default: 15L)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.min_n</code></td>
+<td>
+<p>Minimal Node Size (type: integer, default: 1L)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.tree_depth</code></td>
+<td>
+<p>Tree Depth (type: integer, default: 6L)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.learn_rate</code></td>
+<td>
+<p>Learning Rate (type: double, default: 0.3)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.loss_reduction</code></td>
+<td>
+<p>Minimum Loss Reduction (type: double, default: 0.0)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.sample_size</code></td>
+<td>
+<p>Proportion Observations Sampled (type: double, default: 1.0)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.stop_iter</code></td>
+<td>
+<p>The number of ierations Before Stopping (type: integer, default: Inf)</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>This function expects to take in the recipes that you want to use in
+the modeling process. This is an automated workflow process. There are sensible
+defaults set for the model specification, but if you choose you can set them
+yourself if you have a good understanding of what they should be. The mode is
+set to "regression".
+</p>
+<p>This only uses the option <code>set_engine("xgboost")</code> and therefore the .model_type
+is not needed. The parameter is kept because it is possible in the future that
+this could change, and it keeps with the framework of how other functions
+are written.
+</p>
+<p><code>parsnip::boost_tree()</code> xgboost::xgb.train() creates a series of decision trees
+forming an ensemble. Each tree depends on the results of previous trees.
+All trees in the ensemble are combined to produce a final prediction.
+</p>
+
+
+<h3>Value</h3>
+
+<p>Returns a workflowsets object.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Steven P. Sanderson II, MPH
+</p>
+
+
+<h3>See Also</h3>
+
+<p><a href="https://workflowsets.tidymodels.org/">https://workflowsets.tidymodels.org/</a>
+</p>
+<p><a href="https://parsnip.tidymodels.org/reference/details_boost_tree_xgboost.html">https://parsnip.tidymodels.org/reference/details_boost_tree_xgboost.html</a>
+</p>
+<p><a href="https://arxiv.org/abs/1603.02754">https://arxiv.org/abs/1603.02754</a>
+</p>
+<p>Other Auto Workflowsets: 
+<code>ts_wfs_arima_boost()</code>,
+<code>ts_wfs_auto_arima()</code>,
+<code>ts_wfs_ets_reg()</code>,
+<code>ts_wfs_lin_reg()</code>,
+<code>ts_wfs_mars()</code>,
+<code>ts_wfs_nnetar_reg()</code>,
+<code>ts_wfs_prophet_reg()</code>,
+<code>ts_wfs_svm_poly()</code>,
+<code>ts_wfs_svm_rbf()</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">suppressPackageStartupMessages(library(modeltime))
+suppressPackageStartupMessages(library(timetk))
+suppressPackageStartupMessages(library(dplyr))
+suppressPackageStartupMessages(library(rsample))
+
+data &lt;- AirPassengers %&gt;%
+  ts_to_tbl() %&gt;%
+  select(-index)
+
+splits &lt;- time_series_split(
+   data
+  , date_col
+  , assess = 12
+  , skip = 3
+  , cumulative = TRUE
+)
+
+rec_objs &lt;- ts_auto_recipe(
+ .data = training(splits)
+ , .date_col = date_col
+ , .pred_col = value
+)
+
+wf_sets &lt;- ts_wfs_xgboost("xgboost", rec_objs)
+wf_sets
+
+</code></pre>
+
+
+</div>

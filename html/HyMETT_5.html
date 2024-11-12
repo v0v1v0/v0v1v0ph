@@ -1,0 +1,114 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>calc_logistic_regression</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Calculate logistic regression in annual statistics with zero values</h2>
+
+<h3>Description</h3>
+
+<p>Calculate logistic regression (Everitt and Hothorn, 2009) in annual statistics with
+zero values. A model fit to compute the probability of a zero flow annual statistic.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">calc_logistic_regression(data = NULL, year, value, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>'data.frame'. Optional data.frame input, with columns containing <code>year</code> and <code>value</code>.
+Column names are specified as strings in the corresponding parameter. Default is <code>NULL</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>year</code></td>
+<td>
+<p>'numeric' vector when <code>data = NULL</code>, or 'character' string identifying year column
+name when <code>data</code> is specified. Year of each value in <code>value</code> parameter.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>value</code></td>
+<td>
+<p>'numeric' vector when <code>data = NULL</code>, or 'character' string identifying value column
+name when <code>data</code> is specified. Values to calculate logistic regression on.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>further arguments to be passed to or from <code>stats::glm</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>This function is a wrapper for <code style="white-space: pre;">⁠stats::glm(y ~ year, family = stats::binomial(link="logit")⁠</code>
+with <code>y = 1</code> when <code>value = 0</code> (for example a zero flow annual statistic) and <code>y = 0</code> otherwise.
+The returned values include
+</p>
+
+<dl>
+<dt><code>p_value</code></dt>
+<dd>
+<p>Probability value of the explanatory (<code>year</code>) variable in the logistic model</p>
+</dd>
+<dt><code>stdErr_slope</code></dt>
+<dd>
+<p>Standard error of the regression slope (log odds per year)</p>
+</dd>
+<dt><code>odds_ratio</code></dt>
+<dd>
+<p>Exponential of the explanatory coefficient (year coefficient)</p>
+</dd>
+<dt><code>prob_beg/end</code></dt>
+<dd>
+<p>Logistic regression predicted (fitted) values at the beginning and ending year.</p>
+</dd>
+<dt><code>prob_change</code></dt>
+<dd>
+<p>Change in probability from beginning to end.</p>
+</dd>
+</dl>
+<p>Example, an odds ratio of 1.05 represents the odds of a zero-flow year (versus non-zero)
+increase by a factor of 1.05 (or 5 percent).
+</p>
+
+
+<h3>Value</h3>
+
+<p>A tibble (see <code>tibble::tibble</code>) with logistic regression p-value, standard error of
+slope, odds ratio, beginning and ending probability, and probability change. See <strong>Details</strong>.
+</p>
+
+
+<h3>References</h3>
+
+<p>Everitt, B. S. and Hothorn T., 2009, A Handbook of Statistical Analyses Using R, 2nd Ed.
+Boca Raton, Florida, Chapman and Hall/CRC, 376p.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>glm</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">calc_logistic_regression(data = example_annual, year = "WY", value = "annual_mean")
+
+</code></pre>
+
+
+</div>

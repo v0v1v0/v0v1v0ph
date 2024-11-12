@@ -1,0 +1,187 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>rOWCov</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Realized outlyingness weighted covariance</h2>
+
+<h3>Description</h3>
+
+<p>Calculate the Realized Outlyingness Weighted Covariance (rOWCov), defined in Boudt et al. (2008).
+</p>
+<p>Let <code class="reqn">r_{t,i}</code>, for <code class="reqn">i = 1,..., M</code> be a sample
+of <code class="reqn">M</code> high-frequency <code class="reqn">(N \times 1)</code> return vectors and <code class="reqn">d_{t,i}</code>
+their outlyingness given by the squared Mahalanobis distance between
+the return vector and zero in terms of the reweighted MCD covariance
+estimate based on these returns.
+</p>
+<p>Then, the rOWCov is given by
+</p>
+<p style="text-align: center;"><code class="reqn">
+\mbox{rOWCov}_{t}=c_{w}\frac{\sum_{i=1}^{M}w(d_{t,i})r_{t,i}r'_{t,i}}{\frac{1}{M}\sum_{i=1}^{M}w(d_{t,i})},
+</code>
+</p>
+
+<p>The weight  <code class="reqn">w_{i,\Delta}</code> is one if the multivariate jump test statistic for <code class="reqn">r_{i,\Delta}</code> in Boudt et al. (2008) is less
+than the 99.9% percentile of the chi-square distribution with <code class="reqn">N</code> degrees of freedom and zero otherwise.
+The scalar <code class="reqn">c_{w}</code> is a correction factor ensuring consistency of the rOWCov for the Integrated Covariance,
+under the Brownian Semimartingale with Finite Activity Jumps model.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">rOWCov(
+  rData,
+  cor = FALSE,
+  alignBy = NULL,
+  alignPeriod = NULL,
+  makeReturns = FALSE,
+  seasadjR = NULL,
+  wFunction = "HR",
+  alphaMCD = 0.75,
+  alpha = 0.001,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>rData</code></td>
+<td>
+<p>a <code class="reqn">(M x N)</code> <code>xts</code> object containing the <code class="reqn">N</code>
+return series over period <code class="reqn">t</code>, with <code class="reqn">M</code> observations during <code class="reqn">t</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cor</code></td>
+<td>
+<p>boolean, in case it is <code>TRUE</code>, and the input data is multivariate, the correlation is returned instead of the covariance matrix. 
+<code>FALSE</code> by default.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alignBy</code></td>
+<td>
+<p>character, indicating the time scale in which <code>alignPeriod</code> is expressed. 
+Possible values are: <code>"ticks"</code>, <code>"secs"</code>, <code>"seconds"</code>, <code>"mins"</code>, <code>"minutes"</code>, <code>"hours"</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alignPeriod</code></td>
+<td>
+<p>positive numeric, indicating the number of periods to aggregate over. For example, to aggregate
+based on a 5-minute frequency, set <code>alignPeriod = 5</code> and <code>alignBy = "minutes"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>makeReturns</code></td>
+<td>
+<p>boolean, should be <code>TRUE</code> when <code>rData</code> contains prices instead of returns. <code>FALSE</code> by default.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>seasadjR</code></td>
+<td>
+<p>a <code class="reqn">(M x N)</code> <code>xts</code> object containing
+the seasonally adjusted returns. This is an optional argument.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>wFunction</code></td>
+<td>
+<p>determines whether
+a zero-one weight function (one if no jump is detected based on <code class="reqn">d_{t,i}</code> and 0 otherwise)
+or
+Soft Rejection ("SR") weight function is to be used.
+By default a zero-one weight function (wFunction = "HR") is used.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alphaMCD</code></td>
+<td>
+<p>a numeric parameter, controlling the size of
+the subsets over which the determinant is minimized.
+Allowed values are between 0.5 and 1 and
+the default is 0.75. See Boudt et al. (2008) or the <code>covMcd</code> function in the
+<span class="pkg">robustbase</span> package.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alpha</code></td>
+<td>
+<p>is a parameter between 0 and 0.5,
+that determines the rejection threshold value
+(see Boudt et al. (2008) for details).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>used internally, do not change.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Advantages of the rOWCov compared to the <code>rBPCov</code> include a higher statistical efficiency, positive semi-definiteness and affine equi-variance.
+However, the rOWCov suffers from a curse of dimensionality.
+The rOWCov gives a zero weight to a return vector
+if at least one of the components is affected by a jump.
+In the case of independent jump occurrences, the average proportion of observations
+with at least one component being affected by jumps increases fast with the dimension
+of the series. This means that a potentially large proportion of the returns receives
+a zero weight, due to which the rOWCov can have a low finite sample efficiency in higher dimensions.
+</p>
+
+
+<h3>Value</h3>
+
+<p>an <code class="reqn">N \times N</code> matrix
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup.
+</p>
+
+
+<h3>References</h3>
+
+<p>Boudt, K., Croux, C., and Laurent, S. (2008). Outlyingness weighted covariation. <em>Journal of Financial Econometrics</em>, 9, 657–684.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>ICov</code> for a list of implemented estimators of the integrated covariance.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+library("xts")
+# Realized Outlyingness Weighted Variance/Covariance for prices aligned
+# at 1 minutes.
+
+# Univariate:
+row &lt;- rOWCov(rData = as.xts(sampleOneMinuteData[as.Date(DT) == "2001-08-04",
+                                                 list(DT, MARKET)]), makeReturns = TRUE)
+row
+
+# Multivariate:
+rowc &lt;- rOWCov(rData = as.xts(sampleOneMinuteData[as.Date(DT) == "2001-08-04",]),
+               makeReturns = TRUE)
+rowc
+
+## End(Not run)
+</code></pre>
+
+
+</div>

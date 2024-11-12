@@ -1,0 +1,147 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>HWExactPrevious</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2> Exact test for Hardy-Weinberg equilibrium </h2>
+
+<h3>Description</h3>
+
+<p><code>HWExactPrevious</code> performs an exact test for Hardy-Weinberg equilibrium
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">HWExactPrevious(X, alternative = "two.sided", pvaluetype = "selome",
+x.linked = FALSE, verbose = FALSE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>X</code></td>
+<td>
+<p> vector with the genotype counts AA, AB, BB </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alternative</code></td>
+<td>
+<p><code>two.sided</code> (default) will perform a two-sided
+test where both an excess and a dearth of heterozygotes count as
+evidence against HWE. <code>less</code> is a one-sided test where only
+dearth of heterozygotes counts a evidence against HWE,
+<code>greater</code> is a one-sided test where only excess of
+heterozygotes counts as evidence against HWE.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pvaluetype</code></td>
+<td>
+<p>if <code>pvaluetype</code> is set to <code>dost</code>
+then the p-value of a two-sided test is computed as twice the tail area
+of a one-sided test. When set to <code>selome</code>, the p-value
+is computed as the sum of the probabilities of all samples less or
+equally likely as the current sample. When set to <code>midp</code>, the
+p-value is computed as half the probability of the current sample +
+the probabilities of all samples that are more extreme.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x.linked</code></td>
+<td>
+ <p><code>x.linked=FALSE</code> indicates the marker is
+autosomal (default), and <code>x.linked=TRUE</code> indicates it resides
+on the X-chromosome.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p> print results or not.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p><code>HWExactPrevious</code> uses the recursion equations described by Wigginton
+et. al.
+</p>
+<p>For large samples, <code>HWExactPrevious</code> may give the error message:
+"evaluation nested too deeply: infinite recursion". This can usually
+be resolved by increasing R's limit on nested expressions with
+<code>options(expressions=10000)</code> or a higher limit. With higher
+limits, the error message "protect(): protection stack overflow" can
+occur. This error can usually be resolved by increasing R's
+protection stack with the command line option
+<code>--max-ppsize 100000</code> or higer values. However, with such large
+samples the exact test will give virtually the same result as a
+chi-square test, and it may be easier to use <code>HWChisq</code> in these
+circumstances.
+</p>
+
+
+<h3>Value</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>pval</code></td>
+<td>
+<p> p-value of the exact test </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>prob</code></td>
+<td>
+<p> probabilities of all possible samples with the same
+sample size and minor allele count</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pofthesample</code></td>
+<td>
+<p> probability of the observed sample </p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p> Jan Graffelman (jan.graffelman@upc.edu) </p>
+
+
+<h3>References</h3>
+
+<p>Weir, B.S. (1996) Genetic data analysis II. Sinauer
+Associates, Massachusetts. See Chapter3.
+</p>
+<p>Wigginton, J.E., Cutler, D.J. and Abecasis, G.R. (2005) A note on exact
+tests of Hardy-Weinberg equilibrium, American Journal of Human
+Genetics (76) pp. 887-893.</p>
+
+
+<h3>See Also</h3>
+
+ <p><code>HWLratio</code>, <code>HWChisq</code> </p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">#
+# Example autosomal marker
+#
+x &lt;- c(298,489,213)
+names(x) &lt;- c("MM","MN","NN")
+## Not run: HW.test &lt;- HWExactPrevious(x,verbose=TRUE)
+#
+# Example x-linked marker
+#
+rs5968922  &lt;- c(A=392, B=212, AA=275, AB=296, BB=80 )
+## Not run: HWExactPrevious(rs5968922,x.linked=TRUE,verbose=TRUE) 
+</code></pre>
+
+
+</div>

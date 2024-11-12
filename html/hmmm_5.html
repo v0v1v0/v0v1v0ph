@@ -1,0 +1,127 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>create.XMAT</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>design matrix for a hmm model</h2>
+
+<h3>Description</h3>
+
+<p>Function to specify the matrix X of the linear predictor Cln(Mm)=Xbeta for a hmm model.</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">create.XMAT(model, Formula = NULL, 
+strata = 1, fnames = NULL, cocacontr = NULL, 
+ncocacontr = NULL, replace = TRUE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>model</code></td>
+<td>
+<p>Object created by  ‘hmmm.model’</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Formula</code></td>
+<td>
+<p>List of model-formulas; one formula for every marginal interaction</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>strata</code></td>
+<td>
+<p>Number of categories of the factors that describe the strata</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fnames</code></td>
+<td>
+<p>Names of the factors that describe the strata</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cocacontr</code></td>
+<td>
+<p>A list of zero-one matrices to build "r" logits created by the function ‘recursive’</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ncocacontr</code></td>
+<td>
+<p>Number of contrasts for every factor, if NULL the maximum number is used</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>replace</code></td>
+<td>
+<p>If TRUE a new model object with design matrix X is produced, if FALSE the list of design matrices associated to each element specified in Formula is returned</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>When the marginal interactions of a hmm model are defined in terms of
+a linear predictor of covariates Cln(Mm)=Xbeta, the list of model formulas defines additive effects of covariates on the interactions. 
+In a case with 
+two response variables declared by <code>names&lt;-c("A","B")</code>
+and two covariates, named C and D by <code>fnames=c("C","D")</code>, the additive effect of the covariates 
+on marginal logits of A and B and 
+log odds ratios (A.B) of the two responses is specified by the following <code>Formula</code>:
+<code>Formula&lt;-list(A=~A*(C+D), B=~B*(C+D), A.B=~A.B*(C+D))</code>. Use "zero" to constrain to zero all the interactions of a given type.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A list of matrices or a hmm model with X as design matrix according to the input argument <code>replace</code>. The parameters beta in 
+the predictor Cln(Mm)=Xbeta are the effects specified in <code>Formula</code> and correspond to the columns of X.</p>
+
+
+<h3>References</h3>
+
+<p>Lang  JB (2004) Multinomial Poisson homogeneous models for contingency tables. The Annals of Statistics, 32, 340-383.
+</p>
+<p>Lang JB (2005) Homogeneous linear predictor models for contingency tables. Journal of the American Statistical 
+Association, 100, 121-134.</p>
+
+
+<h3>See Also</h3>
+
+<p><code>hmmm.model</code>, <code>hmmm.mlfit</code>, <code>summary.hmmmfit</code></p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(accident)
+y&lt;-getnames(accident,st=9,sep=";")
+# responses: 1 = Type, 2 = Time; covariates: 3 = Age, 4 = Hour
+
+marglist&lt;-c("l-m","m-g","l-g")
+marginals&lt;-marg.list(marglist,mflag="m")
+names&lt;-c("Type","Time")
+
+modelsat&lt;-hmmm.model(marg=marginals,lev=c(3,4),
+strata=6, names=names) 
+
+# Create X to account for additive effect of Age and Hour on the logits of Type and Time
+# and constant association between Type and Time
+al&lt;-list(Type=~Type*(Age+Hour),
+Time=~Time*(Age+Hour),Type.Time=~Type.Time)
+# list of matrices (replace=FALSE)
+listmat&lt;-create.XMAT(modelsat,Formula=al,strata=c(3,2),fnames=c("Age","Hour"),replace=FALSE)
+
+# the model obtained by the modified X (replace=TRUE)
+model&lt;-create.XMAT(modelsat,Formula=al,strata=c(3,2),fnames=c("Age","Hour")) 
+fitmodel&lt;-hmmm.mlfit(y,model,y.eps=0.00001,maxit=2000)
+print(fitmodel)
+</code></pre>
+
+
+</div>

@@ -1,0 +1,186 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>mps</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2> Most probable states. </h2>
+
+<h3>Description</h3>
+
+<p>Calculates the most probable hidden state underlying each
+observation.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">mps(y, model = NULL, tpm, Rho, ispd=NULL, warn=TRUE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+<p>The observations for which the underlying most
+probable hidden states are required.  May be a sequence
+of observations in the form of a vector or a one or two
+column matrix, or a list each component of which constitutes
+a (replicate) sequence of observations.  It may also be
+an object of class <code>"multipleHmmDataSets"</code> as returned
+by <code>rhmm()</code> with <code>nsim&gt;1</code>.
+</p>
+<p>If <code>y</code> is missing, it is extracted from
+<code>model</code> (whence it will <em>not</em> be of class
+<code>"multipleHmmDataSets"</code>!) provided that <code>model</code> and
+its <code>y</code> component are not <code>NULL</code>.  Otherwise an error
+is given.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>model</code></td>
+<td>
+<p> An object describing a fitted hidden Markov
+model, as returned by <code>hmm()</code>.  In order to
+make any kind of sense, <code>model</code> should bear some
+reasonable relationship to <code>y</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tpm</code></td>
+<td>
+<p> The transition probability matrix for a hidden
+Markov model; ignored if <code>model</code> is non-null. Should
+bear some reasonable relationship to <code>y</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Rho</code></td>
+<td>
+<p>An object specifying the probability distributions of
+the observations (“emission” probabilities) for a hidden
+Markov model.  See <code>hmm()</code>.  Ignored if <code>model</code>
+is non-null. Should bear some reasonable relationship to <code>y</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ispd</code></td>
+<td>
+<p>A vector specifying the initial state probability
+distribution for a hidden Markov model, or a matrix each of whose
+columns are trivial (“delta function”) vectors specifying
+the “most probable” initial state for each observation
+sequence.
+</p>
+<p>This argument is ignored if <code>model</code> is non-null. It should
+bear some reasonable relationship to <code>y</code>.  If both <code>ispd</code>
+and <code>model</code> are <code>NULL</code> then <code>ispd</code> is taken to
+be the stationary distribution of the chain, calculated from
+<code>tpm</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>warn</code></td>
+<td>
+<p>Logical scalar; in the bivariate setting, should a
+warning be issued if the two matrices constituting <code>Rho</code>
+(bivariate independent case) or the array constituting <code>Rho</code>
+(bivariate dependent case) have not got relevant dimension names?
+(Note that if this is so, then the corresponding dimension names
+are formed from the sorted unique values of the appropriate
+columns of <code>y</code>.  And if <em>this</em> is so, then the user
+should be sure that the ordering of the entries of <code>Rho</code>
+corresponds properly to the the sorted unique values of <code>y</code>.)
+This argument is passed to the utility function <code>check.yval()</code>
+which actually issues the warning if <code>warn=TRUE</code>.
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>For each <code class="reqn">t</code> the maximum value of <code class="reqn">\gamma_t(i)</code>,
+i.e. of the (estimated) probability that the state at time <code class="reqn">t</code>
+is equal to <code class="reqn">i</code>, is calculated, and the value of the state
+with the  corresponding index is returned.
+</p>
+
+
+<h3>Value</h3>
+
+<p>If <code>y</code> is a single observation sequence, then the
+value is a vector of corresponding most probable states.
+</p>
+<p>If <code>y</code> is a list of replicate sequences, then the value is
+a list, the <code class="reqn">j</code>-th entry of which constitutes the vector of
+most probable states underlying the <code class="reqn">j</code>-th replicate sequence.
+</p>
+<p>If <code>y</code> is of class <code>"multipleHmmDataSets"</code> then the
+value returned is a list of lists of the sort described above.
+</p>
+
+
+<h3>Warning</h3>
+
+<p>The <em>sequence of most probable states</em> as calculated by this
+function will not in general be the <em>most probable sequence of
+states</em>.  It may not even be a <em>possible</em> sequence of states.
+This function looks at the state probabilities separately for each
+time <code class="reqn">t</code>, and not at the states in their sequential context.
+</p>
+<p>To obtain the most probable sequence of states use
+<code>viterbi()</code>.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Rolf Turner
+<a href="mailto:r.turner@auckland.ac.nz">r.turner@auckland.ac.nz</a><br></p>
+
+
+<h3>References</h3>
+
+<p>Rabiner, L. R., "A tutorial on hidden Markov models and
+selected applications in speech recognition," Proc. IEEE vol. 77,
+pp. 257 – 286, 1989.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>hmm()</code>, <code>rhmm()</code>,
+<code>viterbi()</code></p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+P &lt;- matrix(c(0.7,0.3,0.1,0.9),2,2,byrow=TRUE)
+rownames(P) &lt;- 1:2
+R &lt;- matrix(c(0.5,0,0.1,0.1,0.3,
+              0.1,0.1,0,0.3,0.5),5,2)
+set.seed(42)
+lll   &lt;- sample(250:350,20,TRUE)
+set.seed(909)
+y.num &lt;- rhmm(ylengths=lll,nsim=1,tpm=P,Rho=R,drop=TRUE)
+fit.num &lt;- hmm(y.num,K=2,verb=TRUE)
+s.1 &lt;- mps(y.num,fit.num)
+s.2 &lt;- mps(y.num,tpm=P,ispd=c(0.25,0.75),Rho=R)
+# The order of the states has got swapped; 
+# note that ifelse(s.1[[1]]=="1","2","1") is much
+# more similar to s.2[[1]] than is s.1[[1]].
+
+## End(Not run)
+</code></pre>
+
+
+</div>

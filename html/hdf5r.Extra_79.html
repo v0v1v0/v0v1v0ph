@@ -1,0 +1,224 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>h5Write</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Write an R object to HDF5 file</h2>
+
+<h3>Description</h3>
+
+<p>Methods to write an R object to an HDF5 file.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">h5Write(x, file, name, ...)
+
+## Default S3 method:
+h5Write(x, file, name, overwrite = FALSE, gzip_level = 6, ...)
+
+## S3 method for class 'array'
+h5Write(
+  x,
+  file,
+  name,
+  overwrite = FALSE,
+  transpose = FALSE,
+  block_size = 5000L,
+  gzip_level = 6,
+  ...
+)
+
+## S3 method for class 'factor'
+h5Write(x, file, name, overwrite = FALSE, ordered = TRUE, gzip_level = 6, ...)
+
+## S3 method for class 'data.frame'
+h5Write(x, file, name, overwrite = FALSE, gzip_level = 6, ...)
+
+## S3 method for class 'dgCMatrix'
+h5Write(
+  x,
+  file,
+  name,
+  overwrite = FALSE,
+  transpose = FALSE,
+  add.shape = FALSE,
+  dimnames = list(),
+  gzip_level = 6,
+  ...
+)
+
+## S3 method for class 'dgRMatrix'
+h5Write(
+  x,
+  file,
+  name,
+  overwrite = FALSE,
+  transpose = FALSE,
+  add.shape = FALSE,
+  dimnames = list(),
+  gzip_level = 6,
+  ...
+)
+
+## S3 method for class 'list'
+h5Write(x, file, name, overwrite = FALSE, gzip_level = 6, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>An R object to be written</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>file</code></td>
+<td>
+<p>An existing HDF5 file</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>name</code></td>
+<td>
+<p>Name of the HDF5 link to be written into</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Arguments passed to other methods.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>overwrite</code></td>
+<td>
+<p>Whether or not to overwrite the existing HDF5 link.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>gzip_level</code></td>
+<td>
+<p>Enable zipping at the level given here.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>transpose</code></td>
+<td>
+<p>Whether or not to transpose the input matrix. Only works for 
+a 2-dimension array-like object.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>block_size</code></td>
+<td>
+<p>Default size for number of columns when <code>transpose</code> 
+is <code>TRUE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ordered</code></td>
+<td>
+<p>When writing a factor, whether or not the categories are 
+ordered.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>add.shape</code></td>
+<td>
+<p>When writing a CSC- or CSR-matrix, whether or not to also 
+write the number of dimensions into an HDF5 dataset.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dimnames</code></td>
+<td>
+<p>When writing a CSC- or CSR-matrix, whether or not to also 
+write the dimension names.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>By default, <code>h5Write</code> will try to transform any S4 object <code>x</code> into 
+combination of base R objects using <code>h5Prep</code> before writting it.
+</p>
+
+
+<h3>Value</h3>
+
+<p>This is an operation function and no return. Any failure should raise an 
+error.
+</p>
+
+
+<h3>References</h3>
+
+<p><a href="https://anndata.readthedocs.io/en/latest/fileformat-prose.html">https://anndata.readthedocs.io/en/latest/fileformat-prose.html</a>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+file &lt;- system.file("extdata", "pbmc_small.h5ad", package = "hdf5r.Extra")
+tmp.file &lt;- tempfile(fileext = ".h5")
+h5CreateFile(tmp.file)
+
+# vector -----------------------
+x &lt;- h5Read(file, "/raw/X/data")
+h5Write(x, tmp.file, "raw/X/data")
+x2 &lt;- h5Read(tmp.file, "raw/X/data")
+stopifnot(identical(x, x2))
+
+
+
+# matrix -----------------------
+x &lt;- h5Read(file, "X")
+h5Write(x, tmp.file, "X")
+x2 &lt;- h5Read(tmp.file, "X")
+stopifnot(identical(x, x2))
+
+h5Write(x, tmp.file, "X2", transpose = TRUE)
+x2 &lt;- h5Read(tmp.file, "X2")
+stopifnot(identical(t(x), x2))
+
+
+
+# data.frame -----------------------
+x &lt;- h5Read(file, "obs")
+h5Write(x, tmp.file, "obs")
+x2 &lt;- h5Read(tmp.file, "obs")
+stopifnot(identical(x, x2))
+
+x &lt;- h5Read(file, "raw/var") # data.frame with empty column
+h5Write(x, tmp.file, "raw/var")
+x2 &lt;- h5Read(tmp.file, "raw/var")
+stopifnot(identical(x, x2))
+
+
+
+# dgCMatrix -----------------------
+x &lt;- h5Read(file, "raw/X")
+h5Write(x, tmp.file, "raw/X", overwrite = TRUE)
+x2 &lt;- h5Read(tmp.file, "raw/X")
+stopifnot(identical(x, x2))
+
+
+
+# list -----------------------
+x &lt;- h5Read(file)
+h5Write(x, tmp.file, name = NULL, overwrite = TRUE)
+x2 &lt;- h5Read(tmp.file)
+stopifnot(identical(x, x2))
+
+
+</code></pre>
+
+
+</div>

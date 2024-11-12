@@ -1,0 +1,70 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>coef.mixturecure</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Extract model coefficients from a fitted mixture cure object</h2>
+
+<h3>Description</h3>
+
+<p><code>coef.mixturecure</code> is a generic function which extracts the model coefficients from a fitted mixture cure model object fit using <code>curegmifs</code>, <code>cureem</code>, <code>cv_curegmifs</code>, or <code>cv_cureem</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">## S3 method for class 'mixturecure'
+coef(object, model.select = "AIC", ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>object</code></td>
+<td>
+<p>a <code>mixturecure</code> object resulting from <code>curegmifs</code>, <code>cureem</code>, <code>cv_curegmifs</code>, or <code>cv_cureem</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>model.select</code></td>
+<td>
+<p>for models fit using <code>curegmifs</code> or <code>cureem</code> any step along the solution path can be selected. The default is <code>model.select = "AIC"</code> which calculates the predicted values using the coefficients from the model having the lowest AIC. Other options are <code>model.select = "mAIC"</code> for the modified AIC,  <code>model.select = "cAIC"</code> for the corrected AIC, <code>model.select = "BIC"</code>, <code>model.select = "mBIC"</code> for the modified BIC, <code>model.select = "EBIC"</code> for the extended BIC, <code>model.select = "logLik"</code> for the step that maximizes the log-likelihood, or any numeric value from the solution path. This option has no effect for objects fit using <code>cv_curegmifs</code> or <code>cv_cureem</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>other arguments.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>a list of estimated parameters extracted from the model object using the model selection criterion
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>curegmifs</code>, <code>cureem</code>, <code>summary.mixturecure</code>, <code>plot.mixturecure</code>, <code>predict.mixturecure</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">library(survival)
+set.seed(1234)
+temp &lt;- generate_cure_data(N = 100, J = 10, nTrue = 10, A = 1.8)
+training &lt;- temp$Training
+fit &lt;- curegmifs(Surv(Time, Censor) ~ .,
+                      data = training, x.latency = training,
+                      model = "weibull", thresh = 1e-4, maxit = 2000, epsilon = 0.01,
+                      verbose = FALSE)
+coef(fit)
+</code></pre>
+
+
+</div>

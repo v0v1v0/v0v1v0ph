@@ -1,0 +1,74 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>rescale_variance</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Re-scales each row of matrix by its MAD estimate</h2>
+
+<h3>Description</h3>
+
+<p>R wrapper for C function computing the (rescaled) median absolute difference in differences for each row of the input matrix. The rescaling factor is set to 1.05 (corresponding to the Normal distribution). Each row of the input matrix then re-scaled by the corresponding noise estimate.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">rescale_variance(X, debug = FALSE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>X</code></td>
+<td>
+<p>A <code class="reqn">p \times n</code> matrix</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>debug</code></td>
+<td>
+<p>If <code>TRUE</code>, diagnostic prints are provided during execution</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A list containing 
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>X</code></td>
+<td>
+<p>the input matrix, variance re-scaled and flattened</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>scales</code></td>
+<td>
+<p>vector of MAD estimates of the noise level of each row of the input matrix</p>
+</td>
+</tr>
+</table>
+<h3>Examples</h3>
+
+<pre><code class="language-R">library(HDCD)
+n = 200
+p = 500
+set.seed(101)
+# Generating data
+X = matrix(rnorm(n*p), ncol = n, nrow=p)
+
+ret = rescale_variance(X)
+ret$X #rescaled matrix
+ret$scales #estimated noise level for each time series (each row)
+
+# Note that the rescaled matrix is in (column wise) vector form. To transform it back to a matrix,
+# do the following:
+rescaled_X = matrix(ret$X, nrow = p, ncol=n)
+</code></pre>
+
+
+</div>

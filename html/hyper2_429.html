@@ -1,0 +1,162 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>suplist</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Methods for suplist objects</h2>
+
+<h3>Description</h3>
+
+<p>Basic functionality for lists of <code>hyper2</code> objects, allowing the
+user to concatenate independent observations which are themselves
+composite objects such as returned by <code>ggrl()</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">## S3 method for class 'suplist'
+Ops(e1, e2)
+## S3 method for class 'suplist'
+sum(x,...,na.rm=FALSE)
+suplist_add(e1,e2)
+suplist_times_scalar(e1,e2)
+as.suplist(L)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>e1,e2</code></td>
+<td>
+<p>Objects of class <code>suplist</code>, here interpreted as
+a list of possible likelihood functions (who should be added)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x,...,na.rm</code></td>
+<td>
+<p>In the <code>sum()</code> method, objects to be summed;
+<code>na.rm</code> is currently ignored</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>L</code></td>
+<td>
+<p>A list of <code>hyper2</code> objects</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>A <code>suplist</code> object is a list of <code>hyper2</code> objects.  Each
+element is a <code>hyper2</code> object that is consistent with an
+incomplete rank observation <code class="reqn">R</code>; the list elements are exclusive
+and exhaustive for <code class="reqn">R</code>.  If <code>S</code> is a <code>suplist</code> object,
+and <code>S=list(H1,H2,...,Hn)</code> where the <code>Hi</code> are <code>hyper2</code>
+objects, then
+<code class="reqn">\mbox{Prob}(p|H_1)+\cdots+\mbox{Prob}(p|H_n)</code>.
+This is because the elements of a <code>suplist</code> object are disjoint
+alternatives.
+</p>
+<p>It is <strong>incorrect</strong> to say that a likelihood function
+<code class="reqn">\mathcal{L}_S(p)</code> for <code class="reqn">p</code> is the sum of separate
+likelihood functions.  This is incorrect because the arbitrary
+multiplicative constant messes up the math, for example we might have
+<code class="reqn">\mathcal{L}_{H_1}(p)=C_1\mathrm{Prob}(p|H_1)</code> and
+<code class="reqn">\mathcal{L}_{H_2}(p)=C_2\mathrm{Prob}(p|H_2)</code> and indeed
+<code class="reqn">\mathcal{L}_{{H_1}\cup H_2}(p)=C_{12}\left(\mathrm{Prob}(p|H_1)+\mathrm{Prob}(p|H_2)\right)</code>  but
+</p>
+<p style="text-align: center;"><code class="reqn">\mathcal{L}_{H_1}(p)+\mathcal{L}_{H_2}(p) \neq
+   C_1\mathrm{Prob}(p|H_1)+C_2\mathrm{Prob}(p|H_2)</code>
+</p>
+
+<p>(the right hand side is meaningless).
+</p>
+<p>Functions <code>suplist_add()</code> and <code>sum.suplist()</code> implement
+“<code>S1+S2</code>” as the support function for independent
+observations <code>S1</code> and <code>S2</code>.  The idea is that the support
+functions “add” in the following sense.  If
+<code>S1=list(H1,...,Hr)</code> and <code>S2=list(I1,...,Is)</code> where
+<code>Hx,Ix</code> are <code>hyper2</code> objects, then the likelihood function
+for “<code>S1+S2</code>” is the likelihood function for <code>S1</code>
+followed by (independent) <code>S2</code>.  Formally
+</p>
+<p style="text-align: center;"><code class="reqn">
+    \mbox{Prob}(p|S_1+S_2) =
+    \left(
+    \mbox{Prob}(p|H_1)
+    +\cdots+
+    \mbox{Prob}(p|H_r)
+    \right)\cdot\left(
+    \mbox{Prob}(p|I_1)
+    +\cdots+
+    \mbox{Prob}(p|I_s)
+    \right)</code>
+</p>
+
+<p style="text-align: center;"><code class="reqn">
+    \log\mbox{Prob}(p|S_1+S_2) =
+    \log\left(
+    \mbox{Prob}(p|H_1)
+    +\cdots+
+    \mbox{Prob}(p|H_r)
+    \right)+\log\left(
+    \mbox{Prob}(p|I_1)
+    +\cdots+
+    \mbox{Prob}(p|I_s)
+    \right)</code>
+</p>
+
+<p>However, <code>S1+S2</code> is typically a large and unwieldy object, and
+can be very slow to evaluate.  These functions are here because they
+provide slick package idiom.
+</p>
+<p>The experimental <code>lsl</code> mechanism furnishes an alternative
+methodology which is more computationally efficient at the expense of
+a non-explicit likelihood function.  It is not clear at present (2022)
+which of the two systems is better.
+</p>
+
+
+<h3>Value</h3>
+
+<p>Returns a <code>suplist</code> object.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Robin K. S. Hankin</p>
+
+
+<h3>See Also</h3>
+
+<p><code>Ops.hyper2</code>,<code>Extract</code>,<code>loglik</code></p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+W &lt;- hyper2(pnames=letters[1:5])
+W1 &lt;- ggrl(W, 'a', letters[2:3],'d')  # 2-element list
+W2 &lt;- ggrl(W, 'e', letters[1:3],'d')  # 6-element list
+W3 &lt;- ggrl(W, 'c', letters[4:5],'a')  # 2-element list
+
+# likelihood function for independent observations  W1,W2,W3:
+
+W1+W2+W3 # A 2*6*2=24-element list
+
+like_single_list(equalp(W),W1+W2+W3)
+## Not run: dotchart(maxplist(W1+W1+W3),pch=16) # takes a long time
+
+a &lt;- lsl(list(W1,W2,W3),4:6)  # observe W1 four times, W2 five times and W3 six times
+loglik_lsl(equalp(W),a,log=TRUE)
+
+</code></pre>
+
+
+</div>

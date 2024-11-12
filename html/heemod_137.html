@@ -1,0 +1,113 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>who_mortality</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Use WHO Mortality Rate</h2>
+
+<h3>Description</h3>
+
+<p>Returns age and sex-specific mortality probabilities for
+a given country.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">get_who_mr_memo(
+  age,
+  sex = NULL,
+  region = NULL,
+  country = NULL,
+  year = "latest",
+  local = FALSE
+)
+
+get_who_mr(
+  age,
+  sex = NULL,
+  region = NULL,
+  country = NULL,
+  year = "latest",
+  local = FALSE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>age</code></td>
+<td>
+<p>age as a continuous variable.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sex</code></td>
+<td>
+<p>sex as <code>"FMLE"</code>-<code>"MLE"</code>, <code>0</code>-<code>1</code> (male = 0,
+female = 1) or <code>1</code>-<code>2</code> (male = 1, female = 2).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>region</code></td>
+<td>
+<p>Region code. Assumed <code>NULL</code> if provided along
+with <code>country</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>country</code></td>
+<td>
+<p>Country code (see details).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>year</code></td>
+<td>
+<p>Use data from that year. Defaults to
+<code>"latest"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>local</code></td>
+<td>
+<p>Fetch mortality data from package cached
+data?</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Locally cached data is used in case of connection
+problems, of if <code>local = TRUE</code>. For memory space reasons
+local data is only available for WHO high-income
+countries (pooled), and only for the latest year.
+</p>
+<p>The results of <code>get_who_mr</code> are memoised for
+<code>options("heemod.memotime")</code> (default: 1 hour) to
+increase resampling performance.
+</p>
+
+
+<h3>Value</h3>
+
+<p>This function should be used within
+<code>define_transition()</code> or <code>define_parameters()</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+define_transition(
+  C, get_who_mr(age = 50 + model_time, sex = "FMLE", country = "FRA"),
+  0, 1
+)
+
+</code></pre>
+
+
+</div>

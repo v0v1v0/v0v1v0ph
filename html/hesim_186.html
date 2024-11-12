@@ -1,0 +1,125 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>summary.tpmatrix</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Summarize transition probability matrix</h2>
+
+<h3>Description</h3>
+
+<p>Summarize a <code>tpmatrix</code> object storing transition probability matrices.
+Summary statistics are computed for each possible transition.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">## S3 method for class 'tpmatrix'
+summary(object, id = NULL, probs = NULL, unflatten = FALSE, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>object</code></td>
+<td>
+<p>A <code>tpmatrix</code> object.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>id</code></td>
+<td>
+<p>A <code>tpmatrix_id</code> object for which columns contain the ID variables
+for each row in <code>object</code>. If not <code>NULL</code>, then transition probability matrices
+are summarized by the ID variables in <code>id</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>probs</code></td>
+<td>
+<p>A numeric vector of probabilities with values in <code style="white-space: pre;">⁠[0,1]⁠</code> used
+to compute quantiles. Computing quantiles can be slow when <code>object</code> is large,
+so the default is <code>NULL</code>, meaning that no quantiles are computed.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>unflatten</code></td>
+<td>
+<p>If <code>FALSE</code>, then each column containing a summary statistic
+is a vector and the generated table contains one row
+(for each set of ID variables) for each possible transition; if
+<code>TRUE</code>, then each column stores a list of <code>matrix</code> objects containing
+transition probability matrices formed by "unflattening" the one-dimensional
+vectors. See "Value" below for additional details.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Additional arguments affecting the summary. Currently unused.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>If <code>unflatten = "FALSE"</code> (the default), then a <code>data.table::data.table</code>
+is returned with columns for (i) the health state that is being transitioned
+from (<code>from</code>), (ii) the health state that is being transitioned to (<code>to</code>)
+(iii) the mean of each parameter across parameter samples (<code>mean</code>),
+(iv) the standard deviation of the parameter samples (<code>sd</code>), and
+(v) quantiles of the parameter samples corresponding to the <code>probs</code> argument.
+</p>
+<p>If, on the other hand, <code>unflatten = "TRUE"</code>, then the parameters are unflattened
+to form transition probability matrices; that is, the <code>mean</code>, <code>sd</code>, and
+quantile columns are (lists of) matrices.
+</p>
+<p>In both cases, if <code>id</code> is not <code>NULL</code>, then the ID variables are also
+returned as columns.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">library("data.table")
+hesim_dat &lt;-  hesim_data(strategies = data.table(strategy_id = 1:2),
+                                patients = data.table(patient_id = 1:3))
+input_data &lt;- expand(hesim_dat, by = c("strategies", "patients"))
+
+# Summarize across all rows in "input_data"
+p_12 &lt;- ifelse(input_data$strategy_id == 1, .8, .6)
+p &lt;- tpmatrix(
+  C, p_12,
+  0, 1
+)
+
+## Summary where each column is a vector
+summary(p)
+summary(p, probs = c(.025, .975))
+
+## Summary where each column is a matrix
+ps &lt;- summary(p, probs = .5, unflatten = TRUE)
+ps
+ps$mean
+
+# Summarize by ID variables
+tpmat_id &lt;- tpmatrix_id(input_data, n_samples = 2) 
+p_12 &lt;- ifelse(tpmat_id$strategy_id == 1, .8, .6)
+p &lt;- tpmatrix(
+  C, p_12,
+  0, 1
+)
+
+## Summary where each column is a vector
+summary(p, id = tpmat_id)
+
+## Summary where each column is a matrix
+ps &lt;- summary(p, id = tpmat_id, unflatten = TRUE)
+ps
+ps$mean
+</code></pre>
+
+
+</div>

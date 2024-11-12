@@ -1,0 +1,85 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>predict.hero</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Predict method for <code>hero</code> object</h2>
+
+<h3>Description</h3>
+
+<p>Predict new values based on object produced by the
+<code>hero</code> function.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">## S3 method for class 'hero'
+predict(object, newB, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>object</code></td>
+<td>
+<p>A <code>hero_bspline</code> object created by
+<code>bspline</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>newB</code></td>
+<td>
+<p>A vector or list containing the evaluated
+basis functions for the observations for
+which predictions are desired.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Not currently implemented.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A matrix of the appropriate size
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># create b-splines
+x1 = bspline(nbasis = 10)
+x2 = bspline(nbasis = 12)
+
+# observed data locations
+evalarg1 = seq(0, 1, len = 60)
+evalarg2 = seq(0, 1, len = 80)
+
+# construct "true" data
+mu = matrix(0, nrow = 60, ncol = 80)
+for(i in seq_len(60)) {
+   for(j in seq_len(80)) {
+      mu[i, j] =  sin(2*pi*(evalarg1[i]-.5)^3)*cos(4*pi*evalarg2[j])
+   }
+}
+# construct noisy data
+data = mu + rnorm(60 * 80)
+
+obj = prepare(data, list(evalarg1, evalarg2), list(x1, x2))
+obj = enhance(obj)
+sandmod = hero(obj)
+plot(sandmod)
+newb1 = predict(x1, newx = seq(0, 1, len = 100))
+newb2 = predict(x2, newx = seq(0, 1, len = 100))
+newB = list(newb1, newb2)
+p = predict(sandmod, newB = list(newb1, newb2))
+</code></pre>
+
+
+</div>

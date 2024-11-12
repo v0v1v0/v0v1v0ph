@@ -1,0 +1,150 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>HWPerm</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Permutation test for Hardy-Weinberg equilibrium
+</h2>
+
+<h3>Description</h3>
+
+<p>Function <code>HWPerm</code> does a permutation test for Hardy-Weinberg
+equilibrium using a user-supplied test statistic.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">HWPerm(x, nperm = 17000, verbose = TRUE, x.linked = FALSE,
+FUN = ifelse(x.linked,Chisquare.x,Chisquare), eps=1e-10, ...) 
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>A vector of genotype counts (AA,AB,BB)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nperm</code></td>
+<td>
+<p>The number of permutations</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p><code>verbose</code> = TRUE will print results,
+<code>verbose</code> = FALSE is silent.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x.linked</code></td>
+<td>
+ <p><code>x.linked=FALSE</code> indicates the marker is
+autosomal (default), and <code>x.linked=TRUE</code> indicates it resides
+on the X-chromosome.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>FUN</code></td>
+<td>
+<p>An function call for calculating the test statistic for HWE
+(see examples below)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>eps</code></td>
+<td>
+<p>Tolerance for comparison of floating point numbers (1e-10 by default)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Additional parameters for the function call argument <code>FUN</code></p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The set of alleles for the observed sample is permuted. Consequently, the test is
+conditional on allele frequency.
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>HWPerm</code> returns a list with the components:
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>stat </code></td>
+<td>
+<p>value of the chosen test statistic for the observed sample.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pval </code></td>
+<td>
+<p>p-value of the permutation test.</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p> Jan Graffelman <a href="mailto:jan.graffelman@upc.edu">jan.graffelman@upc.edu</a> </p>
+
+
+<h3>References</h3>
+
+<p>Ziegler, A. &amp; Konig, I.R. (2006) A statistical approach to genetic
+epidemiology. Wiley.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>HWChisq</code>,<code>HWExact</code>,<code>HWLratio</code></p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">x &lt;- c(MM=298,MN=489,NN=213)
+## Not run: 
+#
+# use a default chi-square statistic
+#
+HW.test &lt;- HWPerm(x,nperm=10000,verbose=TRUE)
+#
+# use a chi-square statistic with continuity correction.
+#
+HW.test &lt;- HWPerm(x,nperm=10000,verbose=TRUE,
+FUN=function(z) HWChisq(z,verbose=FALSE)$chisq,cc=0.5) # 
+#
+# use a likelihood ratio statistic.
+#
+HW.test &lt;- HWPerm(x,nperm=10000,verbose=TRUE,
+FUN=function(y) HWLratio(y,verbose=FALSE)$G2)
+# 
+# use an exact test p-value
+#
+HWPerm(x,nperm=10000,verbose=TRUE,FUN=function(y) 1-HWExact(y,verbose=FALSE)$pval)
+# 
+#
+# Permutation test for a marker on the X chromosome
+#
+rs5968922 &lt;-  c(A=392, B=212, AA=275, AB=296, BB=80)
+HW.test &lt;- HWPerm(rs5968922,nperm=10000,x.linked=TRUE,verbose=TRUE)
+
+## End(Not run)
+</code></pre>
+
+
+</div>

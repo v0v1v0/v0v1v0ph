@@ -1,0 +1,107 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>params_mlogit</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Parameters of a multinomial logit model</h2>
+
+<h3>Description</h3>
+
+<p>Store the parameters of a fitted multinomial logistic
+regression model. The model is used to predict probabilities of <code class="reqn">K</code>
+classes, which represent the probability of transitioning to particular health
+state in a discrete time state transition model. Can be used as an element of a
+<code>params_mlogit_list</code> to parameterize a <code>CohortDtstmTrans</code> object.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">params_mlogit(coefs)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table><tr style="vertical-align: top;">
+<td><code>coefs</code></td>
+<td>
+<p>A 3D array of stacked matrices containing samples of the regression
+coefficients under sampling uncertainty. May also be a
+list of objects (e.g., data frames) that can be coerced into matrices with
+<code>as.matrix()</code>. Each matrix must have the same number of columns and the
+number of matrices must be equal to <code class="reqn">K-1</code>.</p>
+</td>
+</tr></table>
+<h3>Details</h3>
+
+<p>Multinomial logit models are used to predict the probability of
+membership for subject <code class="reqn">i</code> in each of <code class="reqn">K</code> classes as a function of covariates:
+</p>
+<p style="text-align: center;"><code class="reqn">Pr(y_i = c) = \frac{e^{\beta_c x_i}}{\sum_{k=1}^K e^{\beta_k x_i}}</code>
+</p>
+
+
+
+<h3>Value</h3>
+
+<p>An object of class <code>params_mlogit</code>, which is a list containing <code>coefs</code>
+and <code>n_samples</code>, where <code>n_samples</code> is equal to the number of rows in each
+element of <code>coefs</code>. The <code>coefs</code> element is always converted into
+a 3D array of stacked matrices.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>summary.params_mlogit()</code>, <code>params_mlogit_list()</code>, <code>CohortDtstmTrans</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Consider a sick-sicker model and model transitions from the sick state
+
+## We can instantiate from a list of data frames
+params &lt;- params_mlogit(
+  coefs = list(
+    ### Transition from sick to sicker
+    sicker = data.frame(
+      intercept = c(-0.33, -.2, -.15),
+      treat = c(log(.75), log(.8), log(.9))
+    ),
+    
+   ### Transition from sick to death
+    death = data.frame(
+      intercept = c(-1, -1.2, -.5),
+      treat = c(log(.6), log(.65), log(.55))
+    )
+  )
+)
+summary(params)
+params
+
+## We can also instantiate from an array
+coefs_sicker &lt;- data.frame(
+  intercept = c(-0.33, -.2, -.15),
+  treat = c(log(.75), log(.8), log(.9))
+)
+coefs_death &lt;- data.frame(
+  intercept = c(-1, -1.2, -.5),
+  treat = c(log(.6), log(.65), log(.55))
+)
+
+params2 &lt;- params_mlogit(
+  coefs &lt;- array(
+    data = c(as.matrix(coefs_sicker),
+             as.matrix(coefs_death)),
+    dim = c(3, 2, 2),
+    dimnames = list(NULL, c("intercept", "treat"), c("sicker", "death"))
+  )
+)
+params2
+</code></pre>
+
+
+</div>

@@ -1,0 +1,124 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hypervolume_general_model</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Generates hypervolume by sampling from arbitrary model object.
+</h2>
+
+<h3>Description</h3>
+
+<p>Uses rejection sampling to obtain predicted values of a model object at uniformly random points within a range box, then converts output to a hypervolume.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hypervolume_general_model(model, name = NULL, verbose = TRUE, 
+  data = NULL, range.box = NULL, num.samples = ceiling(10^(3 + sqrt(ncol(range.box)))), 
+  chunk.size = 10000, min.value = 0, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>model</code></td>
+<td>
+
+<p>Any model object which can be used within a <code>predict(model, newdata, ...) call.</code>
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>name</code></td>
+<td>
+
+<p>Name of the output hypervolume
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+
+<p>If <code>TRUE</code>, prints diagnostic output.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+
+<p>If not <code>NULL</code>, used to specify <code>range.box=padded_range(data)</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>range.box</code></td>
+<td>
+
+<p>A 2 x n matrix, where n is the number of dimensions of the data, and the first row corresponds to a lower limit and the second row to an upper limit. Each column is thus the low and high limits of the range box along each axis. Can be generated via <code>padded_range</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>num.samples</code></td>
+<td>
+
+<p>Number of samples to draw from the range box.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>chunk.size</code></td>
+<td>
+
+<p>Number of samples to process in each <code>predict</code> call. Changing this value may affect the speed of function return but not the returned values.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>min.value</code></td>
+<td>
+
+<p>If <code>TRUE</code>, discards sampled values below this threshold. Effectively used to set hypervolume boundaries.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+
+<p>Other arguments to be passed to <code>predict</code>, e.g. <code>type='response'</code>.
+</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A <code>Hypervolume</code>-class object corresponding to retained values within the hyperbox of interest.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(penguins,package='palmerpenguins')
+penguins_no_na = as.data.frame(na.omit(penguins))
+penguins_no_na$is_adelie = penguins_no_na$species=="Adelie"
+penguins_no_na = penguins_no_na[,c("is_adelie","bill_length_mm","bill_depth_mm")]
+
+
+m_glm = glm(is_adelie~.,data=penguins_no_na)
+
+hv_general_glm = hypervolume_general_model(m_glm, 
+  range.box=padded_range(penguins_no_na[,2:3]),type='response')
+plot(hv_general_glm)	
+	
+</code></pre>
+
+
+</div>

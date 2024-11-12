@@ -1,0 +1,130 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>Correlator</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Correlation Structure</h2>
+
+<h3>Description</h3>
+
+<p>Creates a correlation structure, with the necessary specifications.
+</p>
+<p>The correlator has three main elements: the type of correlator, the associated
+hyperparameters, and the nugget term. The nugget term is broadly separate from
+the other two parameters, being type-independent.
+</p>
+
+
+<h3>Constructor</h3>
+
+<p><code>Correlator$new(corr, hp, nug)</code>
+</p>
+
+
+<h3>Arguments</h3>
+
+<p><code>corr</code> The type of correlation function. This is provided as a string which
+corresponds exactly with a function - the function should take three arguments
+<code>x, xp, hp</code>. This gives a correlation function u(x, xp) defined by
+hyperparameters <code>hp</code>. For a simple example, see <code>exp_sq</code>.
+</p>
+<p><code>hp</code> The associated hyperparameters needed to define the correlation
+structure, as a named list. In the case of <code>exp_sq</code>, this is a list of
+one element, <code>list(theta)</code>.
+</p>
+<p><code>nug</code> The size of the nugget term. In situations where not all variables
+are active, the main part of u(x) operates only on the active parts, xA. The
+presence of the nugget term accounts for the fact that points at the same
+position in the active space need not be at the same position in the full space.
+</p>
+<p>By default, <code>Correlator$new()</code> initialises with <code>corr = exp_sq</code>,
+<code>hp = list(theta = 0.1)</code>, and <code>nug = 0</code>.
+</p>
+
+
+<h3>Accessor Methods</h3>
+
+<p><code>get_corr(x, xp = NULL, actives = TRUE)</code> Returns the correlation
+between two points. If <code>xp</code> is <code>NULL</code>, then this is correlation
+between a set of points and themselves (i.e. 1 on the diagonal). All variables
+are assumed to be active unless otherwise stated in <code>actives</code>.
+</p>
+<p><code>get_hyper_p()</code> Returns the list of hyperparameters.
+</p>
+<p><code>print()</code> Produces a summary of the correlation structure specification.
+</p>
+
+
+<h3>Object Methods</h3>
+
+<p><code>set_hyper_p(hp, nugget)</code> Modifies the hyperparameter and/or nugget
+terms. Returns a new <code>Correlator</code> object.
+</p>
+
+
+<h3>Options for Correlations</h3>
+
+<p>The default choice (and that supported by other functions in this package, particularly
+emulator_from_data) for the correlation structure is exponential-squared, due to the
+useful properties it possesses. However, one can manually instantiate a Correlator with
+a different underlying structure. Built-in alternatives are as follows, as well as whether
+a form exists for its derivative:
+</p>
+
+<dl>
+<dt><code>matern</code></dt>
+<dd>
+<p>the Matérn function (derivative exists)</p>
+</dd>
+<dt><code>orn_uhl</code></dt>
+<dd>
+<p>the Ornstein-Uhlenbeck function (no derivative)</p>
+</dd>
+<dt><code>rat_quad</code></dt>
+<dd>
+<p>the rational quadratic function (derivative exists)</p>
+</dd>
+</dl>
+<p>One more function, <code>gamma_exp</code>, is available but not directly supported
+by <code>emulator_from_data</code>, for example, due to its very limited suitability to
+emulating model outputs. However, this can be used as a test case for writing one's
+own correlation functions and using them with <code>emulator_from_data</code>.
+</p>
+<p>A user-defined correlation function can be provided to the Correlator: the requirements
+are that the function accept data.matrix objects as its first and second arguments,
+and accept a named list of hyperparameters as its third argument, and return a matrix
+of correlations between rows of the data.matrices. If a derivative also
+exists, it should take the same name as the correlation function with "_d" appended to
+it, and the directions to differentiate with respect to should come after the
+hyperparameter argument. For example, the rational quadratic functions have the form
+</p>
+<p><code>rat_quad(x1, x2, hp = list(alpha, theta))</code>
+</p>
+<p><code>rat_quad_d(x1, x2, hp = list(alpha, theta), dx1, dx2)</code>
+</p>
+<p>If defining a custom correlation function, care should be taken with hyperparameter
+estimation - see <code>emulator_from_data</code> examples for details.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">test_corr &lt;- Correlator$new(nug = 0.1)
+test_corr
+point1 &lt;- data.frame(a = 0.1, b = 0.2, c = 0.3)
+point2 &lt;- data.frame(a = 0.15, b = 0.18, c = 0.295)
+test_corr$get_corr(point1) #&gt; 1
+test_corr$get_corr(point1, point2) #&gt; 0.6717557
+test_corr$get_corr(point1, point2, actives = c(TRUE, TRUE, FALSE)) #&gt; 0.6734372
+
+new_corr &lt;- test_corr$set_hyper_p(list(theta = 0.5), nug = 0.01)
+new_corr$get_corr(point1, point2) #&gt; 0.9784845
+new_corr$get_corr(point1, point2, actives = c(TRUE, TRUE, FALSE)) #&gt; 0.9785824
+
+mat_corr &lt;- Correlator$new('matern', list(nu = 1.5, theta = 0.5))
+mat_corr$get_corr(data.frame(a = c(1, 0.9), b = c(4, 4.2)))
+</code></pre>
+
+
+</div>

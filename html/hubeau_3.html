@@ -1,0 +1,99 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>doApiQuery</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Main internal functions for querying the Hub'Eau API endpoints</h2>
+
+<h3>Description</h3>
+
+<p>The function <code>doQueryApi</code> is called by all the function querying the API
+endpoints and return the raw data sent by the endpoint.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">doApiQuery(api, endpoint, ..., params)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>api</code></td>
+<td>
+<p>a character name of the API (e.g.: "indicateurs_services", "prelevements"...), see example for available APIs</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>endpoint</code></td>
+<td>
+<p>a character name of the endpoint, see example for available endpoints in an API</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>parameters of the queries and their values in the format
+<code style="white-space: pre;">⁠Param1_Name = "Param1 value", Param2_Name = "Param2 value"⁠</code>, use the
+function list_params for a list of the available filter parameters
+for a given API endpoint and see the API documentation for their description</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>params</code></td>
+<td>
+<p>(deprecated) a list the list of parameters of the queries and their
+values in the format <code>list(ParamName = "Param value", ...)</code>. This parameter
+is replaced by the parameter <code>...</code></p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Pagination of the queries is handled automatically and the returned list is
+the concatenation of all the results sent by the API.
+</p>
+<p>The functions <code style="white-space: pre;">⁠get_[api]_[endpoint]⁠</code> call the function <code>doQueryApi</code>
+and parse the response in a tibble::tibble format for the user (See convert_list_to_tibble).
+</p>
+<p>By default the user agent used for the query is "https://github.com/inrae/hubeau".
+You can redefined the user agent with the global option
+"hubeau.user_agent": <code>options(hubeau.user_agent = "My user agent")</code>.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A list with the concatenated results returned by the API.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># To get the available APIs in the package
+list_apis()
+
+# To get the available endpoints in an API
+list_endpoints("prelevements")
+
+# To get available parameters in endpoint "chroniques" of the API "prelevements"
+list_params(api = "prelevements", endpoint = "chroniques")
+
+# To query the endpoint "chroniques" of the API "prelevements"
+# on all devices in the commune of Romilly-sur-Seine in 2018
+## Not run: 
+resp &lt;- doApiQuery(api = "prelevements",
+                   endpoint = "chroniques",
+                   code_commune_insee = "10323",
+                   annee = "2018")
+convert_list_to_tibble(resp)
+
+## End(Not run)
+</code></pre>
+
+
+</div>

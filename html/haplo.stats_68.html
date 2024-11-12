@@ -1,0 +1,356 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>seqhap</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Sequential Haplotype Scan Association Analysis for Case-Control Data
+</h2>
+
+<h3>Description</h3>
+
+<p>Seqhap implements sequential haplotype scan methods to perform
+association analyses for case-control data.  When evaluating each
+locus, loci that contribute additional information to haplotype 
+associations with disease status will be added sequentially. 
+This conditional evaluation is based on the 
+Mantel-Haenszel (MH) test.  Two sequential methods are provided, a
+sequential haplotype method and a sequential summary method, as well as
+results based on the traditional single-locus method.  Currently, seqhap
+only works with bialleleic loci (single nucleotide polymorphisms, 
+or SNPs) and binary traits.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">seqhap(y, geno, pos, locus.label=NA, weight=NULL, 
+       mh.threshold=3.84, r2.threshold=0.95, haplo.freq.min=0.005, 
+       miss.val=c(0, NA), sim.control=score.sim.control(),
+       control=haplo.em.control())
+## S3 method for class 'seqhap'
+print(x, digits=max(options()$digits-2, 5), ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+
+<p>vector of binary response (1=case, 0=control). The length is equal 
+to the number of rows in geno. 
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>geno</code></td>
+<td>
+
+<p>matrix of alleles, such that each locus has a pair of adjacent columns
+of alleles, and the order of columns corresponds to the order of loci
+on a chromosome. If there are K loci, then ncol(geno)=2*K. Rows
+represent the alleles for each subject. Currently, only bi-allelic loci
+(SNPs) are allowed. 
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pos</code></td>
+<td>
+
+<p>vector of physical positions (or relative physical positions) for
+loci. If there are K loci, length(pos)=K. The scale (in kb, bp, or
+etc.) doesn't affect the results.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>locus.label </code></td>
+<td>
+
+<p>vector of labels for the set of loci 
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>weight</code></td>
+<td>
+
+<p>weights for observations (rows of geno matrix).
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mh.threshold </code></td>
+<td>
+
+<p>threshold for the Mantel-Haenszel statistic that evaluates whether a
+locus contributes additional information of haplotype association to
+disease, conditional on current haplotypes. The default is 3.84, which
+is the 95th percentile of the chi-square distribution with 1 degree 
+of freedom. 
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>r2.threshold </code></td>
+<td>
+
+<p>threshold for a locus to be skipped. When scanning locus k, loci
+with correlations r-squared (the square of the Pearson's correlation)
+greater than r2.threshold with locus k will be ignored, so that the haplotype
+growing process continues for markers that are further away from locus k.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>haplo.freq.min </code></td>
+<td>
+
+<p>the minimum haplotype frequency for a haplotype to be included in the
+association tests. The haplotype frequency is based on the EM
+algorithm that estimates haplotype frequencies independent of trait. 
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>miss.val </code></td>
+<td>
+
+<p>vector of values that represent missing alleles.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sim.control</code></td>
+<td>
+
+<p>A list of control parameters to determine how simulations are
+performed for permutation p-values, similar to the strategy in
+haplo.score.  The list is created by the function
+score.sim.control and the default values of this function can be 
+changed as desired.  Permutations are performed until a p.threshold
+accuracy rate is met for the three region-based p-values calculated in
+seqhap. See score.sim.control for details.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>control</code></td>
+<td>
+
+<p>A list of parameters that control the EM algorithm for estimating 
+haplotype frequencies when phase is unknown.  The list is created by 
+the function haplo.em.control - see this function for more details.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+
+<p>a seqhap object to print
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>digits</code></td>
+<td>
+
+<p>Number of significant digits to print for numeric values
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>... </code></td>
+<td>
+
+<p>Additional parameters for the print method
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>No further details
+</p>
+
+
+<h3>Value</h3>
+
+<p>list with components:
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>converge</code></td>
+<td>
+
+<p>indicator of convergence of the EM algorithm (see haplo.em); 
+1 = converge, 0=failed
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>locus.label</code></td>
+<td>
+
+<p>vector of labels for loci
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pos</code></td>
+<td>
+
+<p>chromosome positions for loci, same as input.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n.sim</code></td>
+<td>
+
+<p>number of permutations performed for emperical p-values
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>inlist</code></td>
+<td>
+
+<p>matrix that shows which loci are combined for association analysis in
+the sequential scan. The non-zero values of the kth row of inlist are
+the indices of the loci combined when scanning locus k. 
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>chi.stat</code></td>
+<td>
+
+<p>chi-square statistics of single-locus analysis.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>chi.p.point</code></td>
+<td>
+
+<p>permuted pointwise p-values of single-locus analysis.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>chi.p.region</code></td>
+<td>
+
+<p>permuted regional p-value of single-locus analysis.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>hap.stat</code></td>
+<td>
+
+<p>chi-square statistics of sequential haplotype analysis.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>hap.df</code></td>
+<td>
+
+<p>degrees of freedom of sequential haplotype analysis.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>hap.p.point</code></td>
+<td>
+
+<p>permuted pointwise p-values of sequential haplotype analysis.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>hap.p.region</code></td>
+<td>
+
+<p>permuted region p-value of sequential haplotype analysis.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sum.stat</code></td>
+<td>
+
+<p>chi-square statistics of sequential summary analysis.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sum.df</code></td>
+<td>
+
+<p>degrees of freedom of sequential summary analysis.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sum.p.point</code></td>
+<td>
+
+<p>permuted pointwise p-values of sequential summary analysis.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sum.p.region</code></td>
+<td>
+
+<p>permuted regional p-value of sequential summary analysis.
+</p>
+</td>
+</tr>
+</table>
+<h3>References</h3>
+
+<p>Yu Z, Schaid DJ. (2007) Sequential haplotype scan methods for
+association analysis. Genet Epidemiol, in print.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>haplo.em</code>,
+<code>print.seqhap</code>,
+<code>plot.seqhap</code>,
+<code>score.sim.control</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+# load example data with response and genotypes. 
+data(seqhap.dat)
+mydata.y &lt;- seqhap.dat[,1]
+mydata.x &lt;- seqhap.dat[,-1]
+# load positions
+data(seqhap.pos)
+pos &lt;- seqhap.pos$pos
+# run seqhap with default settings
+## Not run: 
+  # this example takes 5-10 seconds to run
+  myobj &lt;- seqhap(y=mydata.y, geno=mydata.x, pos=pos)
+  print.seqhap(myobj)
+
+## End(Not run)
+</code></pre>
+
+
+</div>

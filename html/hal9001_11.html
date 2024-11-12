@@ -1,0 +1,367 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>fit_hal</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>HAL: The Highly Adaptive Lasso</h2>
+
+<h3>Description</h3>
+
+<p>Estimation procedure for HAL, the Highly Adaptive Lasso
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">fit_hal(
+  X,
+  Y,
+  formula = NULL,
+  X_unpenalized = NULL,
+  max_degree = ifelse(ncol(X) &gt;= 20, 2, 3),
+  smoothness_orders = 1,
+  num_knots = num_knots_generator(max_degree = max_degree, smoothness_orders =
+    smoothness_orders, base_num_knots_0 = 200, base_num_knots_1 = 50),
+  reduce_basis = NULL,
+  family = c("gaussian", "binomial", "poisson", "cox", "mgaussian"),
+  lambda = NULL,
+  id = NULL,
+  weights = NULL,
+  offset = NULL,
+  fit_control = list(cv_select = TRUE, use_min = TRUE, lambda.min.ratio = 1e-04,
+    prediction_bounds = "default"),
+  basis_list = NULL,
+  return_lasso = TRUE,
+  return_x_basis = FALSE,
+  yolo = FALSE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>X</code></td>
+<td>
+<p>An input <code>matrix</code> with dimensions number of observations -by-
+number of covariates that will be used to derive the design matrix of basis
+functions.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Y</code></td>
+<td>
+<p>A <code>numeric</code> vector of observations of the outcome variable. For
+<code>family="mgaussian"</code>, <code>Y</code> is a matrix of observations of the
+outcome variables.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>formula</code></td>
+<td>
+<p>A character string formula to be used in
+<code>formula_hal</code>. See its documentation for details.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>X_unpenalized</code></td>
+<td>
+<p>An input <code>matrix</code> with the same number of rows as
+<code>X</code>, for which no L1 penalization will be performed. Note that
+<code>X_unpenalized</code> is directly appended to the design matrix; no basis
+expansion is performed on <code>X_unpenalized</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>max_degree</code></td>
+<td>
+<p>The highest order of interaction terms for which basis
+functions ought to be generated.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>smoothness_orders</code></td>
+<td>
+<p>An <code>integer</code>, specifying the smoothness of the
+basis functions. See details for <code>smoothness_orders</code> for more
+information.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>num_knots</code></td>
+<td>
+<p>An <code>integer</code> vector of length 1 or <code>max_degree</code>,
+specifying the maximum number of knot points (i.e., bins) for any covariate
+for generating basis functions. If <code>num_knots</code> is a unit-length
+vector, then the same <code>num_knots</code> are used for each degree (this is
+not recommended). The default settings for <code>num_knots</code> are
+recommended, and these defaults decrease <code>num_knots</code> with increasing
+<code>max_degree</code> and <code>smoothness_orders</code>, which prevents (expensive)
+combinatorial explosions in the number of higher-degree and higher-order
+basis functions generated. This allows the complexity of the optimization
+problem to grow scalably. See details of <code>num_knots</code> more information.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>reduce_basis</code></td>
+<td>
+<p>Am optional <code>numeric</code> value bounded in the open
+unit interval indicating the minimum proportion of 1's in a basis function
+column needed for the basis function to be included in the procedure to fit
+the lasso. Any basis functions with a lower proportion of 1's than the
+cutoff will be removed. Defaults to 1 over the square root of the number of
+observations. Only applicable for models fit with zero-order splines, i.e.
+<code>smoothness_orders = 0</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>family</code></td>
+<td>
+<p>A <code>character</code> or a <code>family</code> object
+(supported by <code>glmnet</code>) specifying the error/link
+family for a generalized linear model. <code>character</code> options are limited
+to "gaussian" for fitting a standard penalized linear model, "binomial" for
+penalized logistic regression, "poisson" for penalized Poisson regression,
+"cox" for a penalized proportional hazards model, and "mgaussian" for
+multivariate penalized linear model. Note that passing in
+family objects leads to slower performance relative to passing in a
+character family (if supported). For example, one should set
+<code>family = "binomial"</code> instead of <code>family = binomial()</code> when
+calling <code>fit_hal</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lambda</code></td>
+<td>
+<p>User-specified sequence of values of the regularization
+parameter for the lasso L1 regression. If <code>NULL</code>, the default sequence
+in <code>cv.glmnet</code> will be used. The cross-validated
+optimal value of this regularization parameter will be selected with
+<code>cv.glmnet</code>. If <code>fit_control</code>'s <code>cv_select</code>
+argument is set to <code>FALSE</code>, then the lasso model will be fit via
+<code>glmnet</code>, and regularized coefficient values for each
+lambda in the input array will be returned.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>id</code></td>
+<td>
+<p>A vector of ID values that is used to generate cross-validation
+folds for <code>cv.glmnet</code>. This argument is ignored when
+<code>fit_control</code>'s <code>cv_select</code> argument is <code>FALSE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>weights</code></td>
+<td>
+<p>observation weights; defaults to 1 per observation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>offset</code></td>
+<td>
+<p>a vector of offset values, used in fitting.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fit_control</code></td>
+<td>
+<p>List of arguments, including the following, and any
+others to be passed to <code>cv.glmnet</code> or
+<code>glmnet</code>.
+</p>
+
+<ul>
+<li> <p><code>cv_select</code>: A <code>logical</code> specifying if the sequence of
+specified <code>lambda</code> values should be passed to
+<code>cv.glmnet</code> in order for a single, optimal value of
+<code>lambda</code> to be selected according to cross-validation. When
+<code>cv_select = FALSE</code>, a <code>glmnet</code> model will be
+used to fit the sequence of (or single) <code>lambda</code>.
+</p>
+</li>
+<li> <p><code>use_min</code>: Specify the choice of lambda to be selected by
+<code>cv.glmnet</code>. When <code>TRUE</code>, <code>"lambda.min"</code> is
+used; otherwise, <code>"lambda.1se"</code>. Only used when
+<code>cv_select = TRUE</code>.
+</p>
+</li>
+<li> <p><code>lambda.min.ratio</code>: A <code>glmnet</code> argument
+specifying the smallest value for <code>lambda</code>, as a fraction of
+<code>lambda.max</code>, the (data derived) entry value (i.e. the smallest value
+for which all coefficients are zero). We've seen that not setting
+<code>lambda.min.ratio</code> can lead to no <code>lambda</code> values that fit the
+data sufficiently well.
+</p>
+</li>
+<li> <p><code>prediction_bounds</code>: An optional vector of size two that provides
+the lower and upper bounds predictions; not used when
+<code>family = "cox"</code>. When <code>prediction_bounds = "default"</code>, the
+predictions are bounded between <code>min(Y) - sd(Y)</code> and
+<code>max(Y) + sd(Y)</code> for each outcome (when <code>family = "mgaussian"</code>,
+each outcome can have different bounds). Bounding ensures that there is
+no extrapolation.
+</p>
+</li>
+</ul>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>basis_list</code></td>
+<td>
+<p>The full set of basis functions generated from <code>X</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>return_lasso</code></td>
+<td>
+<p>A <code>logical</code> indicating whether or not to return
+the <code>glmnet</code> fit object of the lasso model.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>return_x_basis</code></td>
+<td>
+<p>A <code>logical</code> indicating whether or not to return
+the matrix of (possibly reduced) basis functions used in <code>fit_hal</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>yolo</code></td>
+<td>
+<p>A <code>logical</code> indicating whether to print one of a curated
+selection of quotes from the HAL9000 computer, from the critically
+acclaimed epic science-fiction film "2001: A Space Odyssey" (1968).</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The procedure uses a custom C++ implementation to generate a design
+matrix of spline basis functions of covariates and interactions of
+covariates. The lasso regression is fit to this design matrix via
+<code>cv.glmnet</code> or a custom implementation derived from
+<span class="pkg">origami</span>. The maximum dimension of the design matrix is <code class="reqn">n</code> -by-
+<code class="reqn">(n * 2^(d-1))</code>, where where <code class="reqn">n</code> is the number of observations and
+<code class="reqn">d</code> is the number of covariates.
+</p>
+<p>For <code>smoothness_orders = 0</code>, only zero-order splines (piece-wise
+constant) are generated, which assume the true regression function has no
+smoothness or continuity. When <code>smoothness_orders = 1</code>, first-order
+splines (piece-wise linear) are generated, which assume continuity of the
+true regression function. When <code>smoothness_orders = 2</code>, second-order
+splines (piece-wise quadratic and linear terms) are generated, which assume
+a the true regression function has a single order of differentiability.
+</p>
+<p><code>num_knots</code> argument specifies the number of knot points for each
+covariate and for each <code>max_degree</code>. Fewer knot points can
+significantly decrease runtime, but might be overly simplistic. When
+considering <code>smoothness_orders = 0</code>, too few knot points (e.g., &lt; 50)
+can significantly reduce performance. When <code>smoothness_orders = 1</code> or
+higher, then fewer knot points (e.g., 10-30) is actually better for
+performance. We recommend specifying <code>num_knots</code> with respect to
+<code>smoothness_orders</code>, and as a vector of length <code>max_degree</code> with
+values decreasing exponentially. This prevents combinatorial explosions in
+the number of higher-degree basis functions generated. The default behavior
+of <code>num_knots</code> follows this logic — for <code>smoothness_orders = 0</code>,
+<code>num_knots</code> is set to <code class="reqn">500 / 2^{j-1}</code>, and for
+<code>smoothness_orders = 1</code> or higher, <code>num_knots</code> is set to
+<code class="reqn">200 / 2^{j-1}</code>, where <code class="reqn">j</code> is the interaction degree. We also
+include some other suitable settings for <code>num_knots</code> below, all of
+which are less complex than default <code>num_knots</code> and will thus result
+in a faster runtime:
+</p>
+
+<ul>
+<li>
+<p> Some good settings for little to no cost in performance:
+</p>
+
+<ul>
+<li>
+<p> If <code>smoothness_orders = 0</code> and <code>max_degree = 3</code>,
+<code>num_knots = c(400, 200, 100)</code>.
+</p>
+</li>
+<li>
+<p> If <code>smoothness_orders = 1+</code> and <code>max_degree = 3</code>,
+<code>num_knots = c(100, 75, 50)</code>.
+</p>
+</li>
+</ul>
+</li>
+<li>
+<p> Recommended settings for fairly fast runtime:
+</p>
+
+<ul>
+<li>
+<p> If <code>smoothness_orders = 0</code> and <code>max_degree = 3</code>,
+<code>num_knots = c(200, 100, 50)</code>.
+</p>
+</li>
+<li>
+<p> If <code>smoothness_orders = 1+</code> and <code>max_degree = 3</code>,
+<code>num_knots = c(50, 25, 15)</code>.
+</p>
+</li>
+</ul>
+</li>
+<li>
+<p> Recommended settings for fast runtime:
+</p>
+
+<ul>
+<li>
+<p> If <code>smoothness_orders = 0</code> and <code>max_degree = 3</code>,
+<code>num_knots = c(100, 50, 25)</code>.
+</p>
+</li>
+<li>
+<p> If <code>smoothness_orders = 1+</code> and <code>max_degree = 3</code>,
+<code>num_knots = c(40, 15, 10)</code>.
+</p>
+</li>
+</ul>
+</li>
+<li>
+<p> Recommended settings for very fast runtime:
+</p>
+
+<ul>
+<li>
+<p> If <code>smoothness_orders = 0</code> and <code>max_degree = 3</code>,
+<code>num_knots = c(50, 25, 10)</code>.
+</p>
+</li>
+<li>
+<p> If <code>smoothness_orders = 1+</code> and <code>max_degree = 3</code>,
+<code>num_knots = c(25, 10, 5)</code>.
+</p>
+</li>
+</ul>
+</li>
+</ul>
+<h3>Value</h3>
+
+<p>Object of class <code>hal9001</code>, containing a list of basis
+functions, a copy map, coefficients estimated for basis functions, and
+timing results (for assessing computational efficiency).
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">n &lt;- 100
+p &lt;- 3
+x &lt;- xmat &lt;- matrix(rnorm(n * p), n, p)
+y_prob &lt;- plogis(3 * sin(x[, 1]) + sin(x[, 2]))
+y &lt;- rbinom(n = n, size = 1, prob = y_prob)
+hal_fit &lt;- fit_hal(X = x, Y = y, family = "binomial")
+preds &lt;- predict(hal_fit, new_data = x)
+</code></pre>
+
+
+</div>

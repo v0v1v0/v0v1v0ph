@@ -1,0 +1,171 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>ipw_shift</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>IPW Estimates of the Causal Effects of Stochatic Shift Interventions</h2>
+
+<h3>Description</h3>
+
+<p>IPW Estimates of the Causal Effects of Stochatic Shift Interventions
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">ipw_shift(
+  W,
+  A,
+  Y,
+  delta,
+  n_bins = make_bins(A, "hist"),
+  cv_folds = 10L,
+  lambda_seq,
+  ...,
+  bin_type = c("equal_range", "equal_mass"),
+  trim_density = FALSE,
+  undersmooth_type = c("dcar", "plateau", "gcv", "all"),
+  bootstrap = FALSE,
+  n_boot = 1000L
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>W</code></td>
+<td>
+<p>A <code>matrix</code>, <code>data.frame</code>, or similar containing a set of
+baseline covariates.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>A</code></td>
+<td>
+<p>A <code>numeric</code> vector corresponding to a exposure variable. The
+parameter of interest is defined as a location shift of this quantity.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Y</code></td>
+<td>
+<p>A <code>numeric</code> vector of the observed outcomes.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>delta</code></td>
+<td>
+<p>A <code>numeric</code> value indicating the shift in the exposure to
+be used in defining the target parameter. This is defined with respect to
+the scale of the exposure (A).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n_bins</code></td>
+<td>
+<p>A <code>numeric</code>, scalar or vector, indicating the number of
+bins into which the support of A is to be partitioned for constructing
+conditional density estimates.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cv_folds</code></td>
+<td>
+<p>A <code>numeric</code> giving the number of folds to be used for
+cross-validation. Note that this form of sample splitting is used for the
+selection of tuning parameters by empirical risk minimization, not for the
+estimation of nuisance parameters (i.e., to relax regularity conditions).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lambda_seq</code></td>
+<td>
+<p>A <code>numeric</code> sequence of the regularization parameter
+(L1 norm of HAL coefficients) to be used in fitting HAL models.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Additional arguments for model fitting to be passed directly to
+<code>haldensify</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>bin_type</code></td>
+<td>
+<p>A <code>character</code> indicating the strategy to be used in
+creating bins along the observed support of <code>A</code>. For bins of equal
+range, use <code>"equal_range"</code>; to ensure each bin has the same number of
+observations, use instead <code>"equal_mass"</code>. For more information, see
+documentation of <code>grid_type</code> in <code>haldensify</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>trim_density</code></td>
+<td>
+<p>A <code>logical</code> indicating whether estimates of the
+conditional density should be trimmed. Refer to the <code>trim</code> argument of
+the <code>predict</code> method of <code>haldensify</code> for details. The default is
+<code>FALSE</code> since propensity score truncation can lead to estimation bias.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>undersmooth_type</code></td>
+<td>
+<p>A <code>character</code> indicating the selection strategy
+to be used in identifying an efficent IPW estimator. The choices include
+<code>"gcv"</code> for global cross-validation, <code>"dcar"</code> for solving the
+IPW representation of the EIF through, and <code>"plateau"</code> for an approach
+that balances changes in the parameter estimate and its mean squared error,
+based on Lepski's method. The option <code>"all"</code> produces results based on
+all three selection strategies, sharing redundant computation between each.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>bootstrap</code></td>
+<td>
+<p>A <code>logical</code> indicating whether the estimator variance
+should be approximated using the nonparametric bootstrap. The default is
+<code>FALSE</code>, in which case the empirical variances of the IPW estimating
+function and the EIF are used for for estimator selection and for variance
+estimation, respectively. When set to <code>TRUE</code>, the bootstrap variance
+is used for both of these purposes instead. Note that the bootstrap is very
+computationally intensive and scales relatively poorly.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n_boot</code></td>
+<td>
+<p>A <code>numeric</code> giving the number of bootstrap re-samples to
+be used in computing the mean squared error as part of the plateau selector
+criterion. Ignored when <code>undersmooth_type</code> is not <code>"plateau"</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Examples</h3>
+
+<pre><code class="language-R"># simulate data
+n_obs &lt;- 50
+W1 &lt;- rbinom(n_obs, 1, 0.6)
+W2 &lt;- rbinom(n_obs, 1, 0.2)
+A &lt;- rnorm(n_obs, (2 * W1 - W2 - W1 * W2), 2)
+Y &lt;- rbinom(n_obs, 1, plogis(3 * A + W1 + W2 - W1 * W2))
+
+# fit the IPW estimator
+est_ipw_shift &lt;- ipw_shift(
+  W = cbind(W1, W2), A = A, Y = Y,
+  delta = 0.5, n_bins = 3L, cv_folds = 2L,
+  lambda_seq = exp(seq(-1, -10, length = 100L)),
+  # arguments passed to hal9001::fit_hal()
+  max_degree = 1,
+  # ...continue arguments for IPW
+  undersmooth_type = "gcv"
+)
+</code></pre>
+
+
+</div>

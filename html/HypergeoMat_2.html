@@ -1,0 +1,113 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hypergeomPFQ</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Hypergeometric function of a matrix argument</h2>
+
+<h3>Description</h3>
+
+<p>Evaluates a truncated hypergeometric function of a matrix
+argument.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hypergeomPFQ(m, a, b, x, alpha = 2)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>m</code></td>
+<td>
+<p>truncation weight of the summation, a positive integer</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>a</code></td>
+<td>
+<p>the "upper" parameters, a numeric or complex vector,
+possibly empty (or <code>NULL</code>)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>b</code></td>
+<td>
+<p>the "lower" parameters, a numeric or complex vector,
+possibly empty (or <code>NULL</code>)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>either a real or complex square matrix,
+or a numeric or complex vector, the eigenvalues of the matrix</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alpha</code></td>
+<td>
+<p>the alpha parameter, a positive number</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>This is an implementation of Koev &amp; Edelman's algorithm
+(see the reference). This algorithm is split into two parts: the case of
+a scalar matrix (multiple of an identity matrix) and the general case.
+The case of a scalar matrix is much faster (try e.g. <code>x = c(1,1,1)</code> vs
+<code>x = c(1,1,0.999)</code>).
+</p>
+
+
+<h3>Value</h3>
+
+<p>A real or a complex number.
+</p>
+
+
+<h3>Note</h3>
+
+<p>The hypergeometric function of a matrix argument is usually defined
+for a symmetric real matrix or a Hermitian complex matrix.
+</p>
+
+
+<h3>References</h3>
+
+<p>Plamen Koev and Alan Edelman.
+<em>The Efficient Evaluation of the Hypergeometric Function of a Matrix Argument</em>.
+Mathematics of Computation, 75, 833-846, 2006.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># a scalar x example, the Gauss hypergeometric function
+hypergeomPFQ(m = 10, a = c(1,2), b = c(3), x = 0.2)
+gsl::hyperg_2F1(1, 2, 3, 0.2)
+# 0F0 is the exponential of the trace
+X &lt;- toeplitz(c(3,2,1))/10
+hypergeomPFQ(m = 10, a = NULL, b = NULL, x = X)
+exp(sum(diag(X)))
+# 1F0 is det(I-X)^(-a)
+X &lt;- toeplitz(c(3,2,1))/100
+hypergeomPFQ(m = 10, a = 3, b = NULL, x = X)
+det(diag(3)-X)^(-3)
+# Herz's relation for 1F1
+hypergeomPFQ(m = 10, a = 2, b = 3, x = X)
+exp(sum(diag(X))) * hypergeomPFQ(m = 10, a = 3-2, b = 3, x = -X)
+# Herz's relation for 2F1
+hypergeomPFQ(10, a = c(1,2), b = 3, x = X)
+det(diag(3)-X)^(-2) *
+  hypergeomPFQ(10, a = c(3-1,2), b = 3, -X %*% solve(diag(3)-X))
+</code></pre>
+
+
+</div>

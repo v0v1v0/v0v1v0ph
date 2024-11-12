@@ -1,0 +1,139 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>haplinStrat</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Fit <code>haplin</code> to each subset/stratum of data, determined by the argument <code>strata</code>
+</h2>
+
+<h3>Description</h3>
+
+<p>Produces a list, each element of which is an object of class <code>haplin</code>, which is the result of fitting the log-linear <code>haplin</code> models to each <code>strata</code> stratum independently. 
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">haplinStrat( data, strata = NULL, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>R-object of class "haplin.ready", which is e.g., output from <code>genDataPreprocess</code> or <code>genDataLoad</code>, and contains covariate and genetic data.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>strata</code></td>
+<td>
+<p>A single integer specifying the number of the column in the covariate data that contains the stratification variable</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Remaining arguments to be used by <code>haplin</code> in each run.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p><code>haplinStrat</code> runs <code>haplin</code> first on the entire input data file, then on each stratum separately. Strata are defined by the <code>strata</code> variable, which can be coded as numerical or character. However, one should use only a moderate number of levels/strata, since <code>haplin</code> will be run independetly on each, and some strata may otherwise have an insufficient amount of data. 
+Running <code>haplinStrat</code> is thus just a simplification of manually splitting the file into strata and running <code>haplin</code> on each; the end result would be the same.
+The main reason for running haplinStrat is to test for gene-environment interactions. This is achieved by running <code>postTest</code> on the result from <code>haplinStrat</code>.
+<code>haplinStrat</code> can also be run from within <code>haplinSlide</code> by using the <code>strata</code> argument in <code>haplinSlide</code>.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A list of objects of class haplin is returned. The first element contains the result of running <code>haplin</code> on the entire data file; the remaining elements are the results from each of the strata. The names of the list correspond to the values of the <code>strata</code> variable.
+</p>
+
+
+<h3>Note</h3>
+
+<p>Further information is found on the web page.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Hakon K. Gjessing<br>
+Professor of Biostatistics<br>
+Division of Epidemiology<br>
+Norwegian Institute of Public Health<br><a href="mailto:hakon.gjessing@uib.no">hakon.gjessing@uib.no</a></p>
+
+
+<h3>References</h3>
+
+<p> Gjessing HK and Lie RT. Case-parent triads: Estimating single- and double-dose effects of fetal and maternal disease gene haplotypes. Annals of Human Genetics (2006) 70, pp. 382-396.<br><br>
+Web Site: <a href="https://haplin.bitbucket.io">https://haplin.bitbucket.io</a></p>
+
+
+<h3>See Also</h3>
+
+<p><code>haplin</code>, <code>summary.haplin</code>, <code>plot.haplin</code>, <code>haptable</code>, <code>toDataFrame</code>, <code>haplinSlide</code>, <code>gxe</code></p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+# setting up the directory with exemplary data
+dir.in &lt;- system.file( "extdata", package = "Haplin" )
+file.in &lt;- paste0( dir.in, "/data.dat" )
+
+# reading data in
+data.in &lt;- genDataRead( file.in, file.out = "poo_exmpl_data_read", format = "haplin",
+  dir.out = tempdir( check = TRUE ), n.vars = 1, allele.sep = " ", col.sep = " ",
+  overwrite = TRUE )
+# preprocessing the data
+data.preproc &lt;- genDataPreprocess( data.in, design = "triad",
+  file.out = "poo_exmpl_data_preproc", dir.out = tempdir( check = TRUE ), overwrite = TRUE )
+
+# running haplinStrat, checking for gene-environment interactions
+res.GxE &lt;- haplinStrat( data.preproc, markers = 2, strata = 1, poo = FALSE,
+  response = "mult", reference = 2, use.missing = TRUE )
+res.GxE
+
+# running haplinStrat, checking for POO-environment interactions
+res.POOxE &lt;- haplinStrat( data.preproc, markers = c(1,2,3), strata = 1, poo = TRUE,
+  response = "mult", reference = "ref.cat", use.missing = TRUE )
+res.POOxE
+
+## Not run: 
+# All standard haplin runs can be done with haplinStrat. 
+# Below is an illustration. See the haplin help page for more 
+# examples.
+# 
+# Analyzing the effect of fetal genes, including triads with missing data,
+# using a multiplicative response model. The first column of the data file
+# in this example contains the stratification variable.
+result &lt;- haplinStrat("C:/work/data.dat", strata = 1, use.missing = T, response = "mult",
+reference = "ref.cat", winlength = 1)
+# Provide summary of separate results:
+lapply(result, summary)
+# Plot results separately:
+par(ask = T)
+lapply(result, plot)
+#
+# Convert results to table format and stack them over strata:
+haptable(result)
+# Test for interaction between haplotype risk estimates and the strata variable:
+postTest(result)
+
+
+
+
+
+## End(Not run)
+
+</code></pre>
+
+
+</div>

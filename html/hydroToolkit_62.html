@@ -1,0 +1,66 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>report_miss_data</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Report <code>NA_real_</code> values</h2>
+
+<h3>Description</h3>
+
+<p>Creates a data frame with reported dates and number of times-step of missing or not recorded data.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">report_miss_data(df, Lang = "spanish")
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>df</code></td>
+<td>
+<p>data frame with hydro-meteo data. First column is date and the second the numeric vector to be reported.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Lang</code></td>
+<td>
+<p>string with output column name language: 'spanish' (default) or 'english'.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A data frame with three columns: start-date, end-date and number of missing time steps.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Create BDHI hydro-met station
+guido &lt;- create_hydroMet(class_name = 'BDHI')
+
+# List with meteorological variables (slots in BDHI's object)
+cargar &lt;- list('precip', 'Qmd', 'Qmm')
+
+# Now assign as names the files
+hydro_files   &lt;- list.files( system.file('extdata', package = "hydroToolkit"), pattern = 'Guido' )
+names(cargar) &lt;- hydro_files
+
+# Build the object with the met records
+guido &lt;- build_hydroMet(obj = guido, slot_list = cargar, 
+               path = system.file('extdata', package = "hydroToolkit") )
+               
+# Get mean daily discharge and report miss data
+Qmd  &lt;- get_hydroMet(obj = guido, name = 'Qmd')[[1]]
+miss &lt;- report_miss_data(df = Qmd)
+ 
+</code></pre>
+
+
+</div>

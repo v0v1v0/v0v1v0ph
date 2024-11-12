@@ -1,0 +1,157 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>get_lag</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Get Lag</h2>
+
+<h3>Description</h3>
+
+<p>Given a data frame (time series) of measurements
+and a vector of gauging station ID's in order of their location
+in downstream direction, the lag (the amount of passing time
+between two gauging stations) is estimated based on the
+cross-correlation function (ccf) of the time series of two
+adjacent gauging stations
+(<code>stats::ccf()</code>).  To ensure that the
+same time period is used for every gauging station,
+intersecting time steps are determined. These time steps are
+used to estimate the lags. The result of
+<code>stats::ccf()</code> is rounded to four
+decimals before selecting the optimal time lag so that minimal
+differences are neglected.  If there are multiple time steps
+with the highest correlation, the smallest time step is
+considered. If the highest correlation corresponds to a zero
+lag or positive lag (note that the result should usually be negative as
+measurements at the lower gauge are later recorded as
+measurements at the upper gauge), a time step of length 1 is
+selected and a warning message is generated.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">get_lag(
+  Q,
+  relation,
+  steplength = 15,
+  lag.max = 20,
+  na.action = na.pass,
+  mc.cores = getOption("mc.cores", 2L),
+  tz = "Etc/GMT-1",
+  format = "%Y.%m.%d %H:%M",
+  cols = c(1, 2, 3)
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>Q</code></td>
+<td>
+<p>Data frame (time series) of measurements which
+contains at least a column with the gauging station ID's
+(default: column index 1), a column with date-time values in
+character representation (default: column index 2) and a column
+with flow measurements (default: column index 3).  If the column
+indices differ from <code>c(1, 2, 3)</code>, they have to be
+specified in the <code>cols</code> argument in the format <code>c(i,
+j, k)</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>relation</code></td>
+<td>
+<p>A character vector containing the gauging station
+ID's in order of their location in downstream direction.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>steplength</code></td>
+<td>
+<p>Numeric value that specifies the length between
+time steps in minutes (default: <code>15</code> minutes). As time
+steps have to be equispaced, this is used by
+<code>hydropeak::flow()</code> to get a
+compatible format and fill missing time steps with <code>NA</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lag.max</code></td>
+<td>
+<p>Numeric value that specifies the maximum lag at
+which to calculate the ccf in
+<code>stats::ccf()</code> (default: <code>20</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>na.action</code></td>
+<td>
+<p>Function to be called to handle missing values in
+<code>stats::ccf()</code> (default:
+<code>na.pass</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mc.cores</code></td>
+<td>
+<p>Number of cores to use with
+<code>parallel::mclapply()</code>. On
+Windows, this is set to 1.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tz</code></td>
+<td>
+<p>Character string specifying the time zone to be used for
+internal conversion (default: <code>Etc/GMT-1</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>format</code></td>
+<td>
+<p>Character string giving the date-time format of the
+date-time column in the input data frame <code>Q</code>. This is
+passed to <code>hydropeak::flow()</code>, to
+get a compatible format (default: <code>YYYY.mm.dd HH:MM</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cols</code></td>
+<td>
+<p>Integer vector specifying column indices in <code>Q</code>.
+The default indices are 1 (ID), 2 (date-time) and 3 (flow rate,
+Q).  This is passed to
+<code>hydropeak::flow()</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A character vector which contains the estimated cumulative
+lag between neighboring gauging stations in the format
+<code>HH:MM</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">Q_path &lt;- system.file("testdata", "Q.csv", package = "hydroroute")
+Q &lt;- utils::read.csv(Q_path)
+
+relation_path &lt;- system.file("testdata", "relation.csv",
+                            package = "hydroroute")
+relation &lt;- utils::read.csv(relation_path)
+# from relation data frame
+get_lag(Q, relation$ID, format = "%Y-%m-%d %H:%M", tz = "Etc/GMT-1")
+
+# station ID's in downstream direction as vector
+relation &lt;- c("100000", "200000", "300000", "400000")
+get_lag(Q, relation, format = "%Y-%m-%d %H:%M", tz = "Etc/GMT-1")
+</code></pre>
+
+
+</div>

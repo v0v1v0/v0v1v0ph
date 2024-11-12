@@ -1,0 +1,122 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>rmTradeOutliersUsingQuotes</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Delete transactions with unlikely transaction prices</h2>
+
+<h3>Description</h3>
+
+<p>Function deletes entries with prices that are above the ask plus the bid-ask spread.
+Similar for entries with prices below the bid minus the bid-ask spread.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">rmTradeOutliersUsingQuotes(
+  tData,
+  qData,
+  lagQuotes = 0,
+  nSpreads = 1,
+  BFM = FALSE,
+  backwardsWindow = 3600,
+  forwardsWindow = 0.5,
+  plot = FALSE,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>tData</code></td>
+<td>
+<p>a <code>data.table</code> or <code>xts</code> object containing the time series data, with at least the column <code>"PRICE"</code>, containing the transaction price.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>qData</code></td>
+<td>
+<p>a <code>data.table</code> or <code>xts</code> object containing the time series data with at least the columns <code>"BID"</code> and <code>"OFR"</code>, containing the bid and ask prices.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lagQuotes</code></td>
+<td>
+<p>numeric, number of seconds the quotes are registered faster than
+the trades (should be round and positive). Default is 0. For older datasets, i.e. before 2010, it may be a good idea to set this to e.g. 2. See Vergote (2005)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nSpreads</code></td>
+<td>
+<p>numeric of length 1 denotes how far above the offer and below bid we allow outliers to be. Trades are filtered out if they are MORE THAN nSpread * spread above (below) the offer (bid)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>BFM</code></td>
+<td>
+<p>a logical determining whether to conduct 'Backwards - Forwards matching' of trades and quotes.
+The algorithm tries to match trades that fall outside the bid - ask and first tries to match a small window forwards and if this fails, it tries to match backwards in a bigger window.
+The small window is a tolerance for inaccuracies in the timestamps of bids and asks. The backwards window allow for matching of late reported trades, i.e. block trades.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>backwardsWindow</code></td>
+<td>
+<p>a numeric denoting the length of the backwards window. Default is 3600, corresponding to one hour.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>forwardsWindow</code></td>
+<td>
+<p>a numeric denoting the length of the forwards window. Default is 0.5, corresponding to one half second.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>plot</code></td>
+<td>
+<p>a logical denoting whether to visualize the forwards, backwards, and unmatched trades in a plot.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>used internally</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Note: in order to work correctly, the input data of this function should be
+cleaned trade (tData) and quote (qData) data respectively.
+In older high frequency datasets the trades frequently lag the quotes. In newer datasets this tends to happen 
+only during extreme market activity when exchange networks are at maximum capacity.
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>xts</code> or <code>data.table</code> object depending on input.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup.
+</p>
+
+
+<h3>References</h3>
+
+<p>Vergote, O. (2005). How to match trades and quotes for NYSE stocks? K.U.Leuven working paper.
+</p>
+<p>Christensen, K., Oomen, R. C. A., Podolskij, M. (2014): Fact or Friction: Jumps at ultra high frequency. <em>Journal of Financial Economics</em>, 144, 576-599
+</p>
+
+
+</div>

@@ -1,0 +1,188 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>update_model</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Run Model on New Data</h2>
+
+<h3>Description</h3>
+
+<p>Given a table of new parameter values with a new
+parameter set per line, runs iteratively Markov models
+over these sets.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">## S3 method for class 'run_model'
+update(object, newdata, ...)
+
+## S3 method for class 'updated_model'
+plot(
+  x,
+  type = c("simple", "difference", "counts", "ce", "values"),
+  result = c("cost", "effect", "icer"),
+  strategy = NULL,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>object</code></td>
+<td>
+<p>The result of <code>run_model()</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>newdata</code></td>
+<td>
+<p>A <code>data.frame</code> of new parameter sets,
+one column per parameter and one row per parameter set.
+An optional <code>.weights</code> column can be included for
+a weighted analysis.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Additional arguments passed to
+<code>geom_histogram</code>. Especially useful to specify
+<code>binwidth</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>Updated model to plot.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>type</code></td>
+<td>
+<p>Plot simple values or differences?</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>result</code></td>
+<td>
+<p>The the result to plot (see details).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>strategy</code></td>
+<td>
+<p>A model index, character or numeric.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p><code>newdata</code> must be a <code>data.frame</code> with the
+following properties: the column names must be parameter
+names used in <code>define_parameters()</code>; and an
+optional column <code>.weights</code> can give the respective
+weight of each row in the target population.
+</p>
+<p>Weights are automatically scaled. If no weights are
+provided equal weights are used for each strata.
+</p>
+<p>For the plotting function, the <code>type</code> argument can
+take the following values: <code>"cost"</code>, <code>"effect"</code>
+or <code>"icer"</code> to plot the heterogeneity of the
+respective values. Furthermore <code>"ce"</code> and
+<code>"count"</code> can produce from the combined model plots
+similar to those of <code>run_model()</code>.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A <code>data.frame</code> with one row per model/value.
+</p>
+
+
+<h3>Warning</h3>
+
+<p>Histograms do not account for weights. On the other
+hand summary results do.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">mod1 &lt;-
+  define_strategy(
+    transition = define_transition(
+      .5, .5,
+      .1, .9
+    ),
+    define_state(
+      cost = 543 + age * 5,
+      ly = 1
+    ),
+    define_state(
+      cost = 432 + age,
+      ly = 1 * age / 100
+    )
+  )
+
+mod2 &lt;-
+  define_strategy(
+    transition = define_transition(
+      .5, .5,
+      .1, .9
+    ),
+    define_state(
+      cost = 789 * age / 10,
+      ly = 1
+    ),
+    define_state(
+      cost = 456 * age / 10,
+      ly = 1 * age / 200
+    )
+  )
+
+res &lt;- run_model(
+  mod1, mod2,
+  parameters = define_parameters(
+    age_init = 60,
+    age = age_init + model_time
+  ),
+  init = 1:0,
+  cycles = 10,
+  cost = cost,
+  effect = ly
+)
+
+# generating table with new parameter sets
+new_tab &lt;- data.frame(
+  age_init = 40:45
+)
+
+# with run_model result
+ndt &lt;- update(res, newdata = new_tab)
+
+summary(ndt)
+
+# using weights
+
+new_tab2 &lt;- data.frame(
+  age_init = 40:45,
+  .weights = runif(6)
+)
+
+#'\dontrun{
+#'ndt2 &lt;- update(res, newdata = new_tab2)
+#'
+#'summary(ndt2)
+#'}
+</code></pre>
+
+
+</div>

@@ -1,0 +1,120 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>SSvgm</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+A five-parameter van Genuchten water retention model
+</h2>
+
+<h3>Description</h3>
+
+<p>This is a five- parameter function to determine water retention hydraulic parameters contained in the van Genuchten water retention model
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">SSvgm(input, thr, ths, alp, nscal, mscal)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>input</code></td>
+<td>
+
+<p>Suction potential/head as contained in the x-column of the xy water retention table or data
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>thr</code></td>
+<td>
+
+<p>This is the residual moisture content. It's the moisture content when suction potential is very high (almost at the drying point)
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ths</code></td>
+<td>
+
+<p>This is the saturated moisture content. It's the moisture content when suction potential is very low (almost at the saturation point)
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alp</code></td>
+<td>
+
+<p>It's the inverse of air-entry potential or bubbling pressure
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nscal</code></td>
+<td>
+
+<p>This is a parameter or index for the pore-size distribution
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mscal</code></td>
+<td>
+
+<p>This is a scaling parameter which is also related to index for pore-size distribution
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Van Genuchten model is a type of self-starting nonlinear curve fitting model for fitting water retention characteristics using experimental data. In this model, the restriction of m=1-1/n has been relaxed so that m is estimated as an independent parameter of the water retention characteristics. If warnings are given during the estimation process, try to increase the iteration limit using control function. Sometimes the warnings can be suppressed using (warn=-1)/ignored since they do not terminate the process
+</p>
+
+
+<h3>Value</h3>
+
+<p>A list of objects returned by standard R regression functions such as nls and lm
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Christian Thine Omuto
+</p>
+
+
+<h3>References</h3>
+
+<p>van Genuchten MT. 1980. A closed-form equation for predicting the hydraulic conductivity of unsaturated soils. Soil Science Society of America Journal 44: 892-898
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>SSomuto</code>, <code>Brook</code>, <code>Campbel</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(isric)
+library(minpack.lm)
+pf1=subset(isric,Sample=="Nicaragua21")
+suppressWarnings(
+vn.ns &lt;- nlsLM(y ~ SSvgm(x,thr,ths,alp,nscal,mscal),
+               data = pf1,
+               control = nls.lm.control(maxiter=200)))
+coef(vn.ns)
+plot(fitted(vn.ns)~pf1$y)
+abline(a=0,b=1,lty=20, col="blue")
+</code></pre>
+
+
+</div>

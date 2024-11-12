@@ -1,0 +1,111 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>calcInSampleError</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Calculate index errors in sample</h2>
+
+<h3>Description</h3>
+
+<p>Estimate the predictive error of an index via an in-sample approach.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">calcInSampleError(pred_df, index, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>pred_df</code></td>
+<td>
+<p>Set of sales against which to test predictions</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>index</code></td>
+<td>
+<p>Index (of class 'ts') to be tested for accuracy</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Additional Arguments</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>object of class 'hpiaccuracy' inheriting from class 'data.frame'
+containing the following fields:
+</p>
+
+<dl>
+<dt>pair_id</dt>
+<dd>
+<p>Uniq Pair ID number</p>
+</dd>
+<dt>price</dt>
+<dd>
+<p>Transaction Price</p>
+</dd>
+<dt>pred_price</dt>
+<dd>
+<p>Predicted price</p>
+</dd>
+<dt>error</dt>
+<dd>
+<p>(Prediction - Actual) / Actual</p>
+</dd>
+<dt>log_error</dt>
+<dd>
+<p>log(prediction) - log(actual)</p>
+</dd>
+<dt>pred_period</dt>
+<dd>
+<p>Period of the prediction</p>
+</dd>
+</dl>
+<h3>Further Details</h3>
+
+<p>In addition to being a stand-alone function, it is also used by 'calcForecastError'
+and 'calcKFoldError“
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+ # Load example data
+ data(ex_sales)
+
+ # Create index with raw transaction data
+ rt_index &lt;- rtIndex(trans_df = ex_sales,
+                     periodicity = 'monthly',
+                     min_date = '2010-06-01',
+                     max_date = '2015-11-30',
+                     adj_type = 'clip',
+                     date = 'sale_date',
+                     price = 'sale_price',
+                     trans_id = 'sale_id',
+                     prop_id = 'pinx',
+                     estimator = 'robust',
+                     log_dep = TRUE,
+                     trim_model = TRUE,
+                     max_period = 48,
+                     smooth = FALSE)
+
+ # Calculate accuracy
+ in_accr &lt;- calcInSampleError(pred_df = rt_index$data,
+                              index = rt_index$index$value)
+
+</code></pre>
+
+
+</div>

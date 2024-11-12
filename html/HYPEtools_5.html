@@ -1,0 +1,110 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>AllUpstreamSubids</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Find All Upstream SUBIDs</h2>
+
+<h3>Description</h3>
+
+<p>Function to find all SUBIDs of upstream sub-catchments for a single
+sub-catchment.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">AllUpstreamSubids(
+  subid,
+  gd,
+  bd = NULL,
+  sort = FALSE,
+  get.weights = FALSE,
+  write.arcgis = FALSE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>subid</code></td>
+<td>
+<p>SUBID of a target sub-catchment (must exist in <code>gd</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>gd</code></td>
+<td>
+<p>A data frame, containing 'SUBID' and 'MAINDOWN' columns, e.g. an imported 'GeoData.txt' file. Mandatory argument. See 'Details'.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>bd</code></td>
+<td>
+<p>A data frame, containing 'BRANCHID' and 'SOURCEID' columns, and 'MAINPART' with argument <code>get.weights</code>,
+e.g. an imported 'BranchData.txt' file. Optional argument.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sort</code></td>
+<td>
+<p>Logical. If <code>TRUE</code>, the resulting upstream SUBID vector will be sorted according to order in argument <code>gd</code>, i.e. in
+downstream order for a working GeoData table.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>get.weights</code></td>
+<td>
+<p>Logical. If <code>TRUE</code>, flow weights are computed along the upstream SUBID sequence. See details.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>write.arcgis</code></td>
+<td>
+<p>Logical. If <code>TRUE</code>, a string containing an SQL expression suitable for ArcGIS's
+'Select By Attributes' feature will be written to the clipboard.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p><code>AllUpstreamSubids</code> finds all upstream SUBIDs of a given SUBID (including itself but not
+including potential irrigation links or groundwater flows) using GeoData columns 'SUBID' and 'MAINDOWN', i.e the full upstream catchment.
+If a BranchData file is provided, the function will also include upstream areas which are connected through an upstream bifurcation. The
+results can be directly used as 'partial model setup file' ('pmsf.txt') using the export function <code>WritePmsf</code>.
+</p>
+<p>If argument <code>get.weights</code> is set to <code>TRUE</code>, weighting fractions are returned along with upstream SUBIDs. The fractions are based
+on column 'MAINPART' in argument <code>bd</code>. The function considers fractions from bifurcation branches which flow into the basin, and
+fractions where bifurcation branches remove discharge from the basin. Fractions are incrementally updated, i.e. nested bifurcation fractions
+are multiplied.
+</p>
+<p>For details on bifurcation handling in HYPE, see the
+<a href="http://hype.smhi.net//wiki/doku.php?id=start:hype_file_reference:branchdata.txt">HYPE online documentation for BranchData.txt</a>.
+</p>
+
+
+<h3>Value</h3>
+
+<p>If <code>get.weights</code> is <code>FALSE</code>, <code>AllUpstreamSubids</code> returns a vector of SUBIDs, otherwise a two-column data frame with SUBIDs in
+the first, and flow weight fractions in the second column.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>UpstreamGeoData</code>, <code>AllDownstreamSubids</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">te &lt;- ReadGeoData(filename = system.file("demo_model", "GeoData.txt", package = "HYPEtools"))
+AllUpstreamSubids(subid = 63794, gd = te)
+
+</code></pre>
+
+
+</div>

@@ -1,0 +1,77 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>powerC</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Exponentiate a Matrix via Eigendecomposition</h2>
+
+<h3>Description</h3>
+
+<p>Based on a (contact) matrix <code>C</code>, the function <code>make_powerC</code>
+generates a function with a single argument <code>power</code> that returns
+the input matrix raised to that power. Matrix exponentiation is thereby
+defined via the eigendecomposition of <code>C</code> as
+<code class="reqn">C^{power} := E \Lambda^{power} E^{-1}</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">make_powerC(C, normalize = FALSE, truncate = FALSE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>C</code></td>
+<td>
+<p>a square numeric matrix.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>normalize</code></td>
+<td>
+<p>a logical indicating if <code>C</code> should be normalized
+in advance such that all rows sum to 1 (becomes a transition matrix).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>truncate</code></td>
+<td>
+<p>a logical indicating whether to force entries in the
+resulting matrix to be non-negative (by truncation at 0).</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>a function of the <code>power</code>
+that returns the exponentiated matrix.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">Cnorm &lt;- contactmatrix(normalize = TRUE)
+powerC &lt;- make_powerC(Cnorm)
+powerC(1)
+zapsmall(powerC(0))
+powers &lt;- c(0, 0.5, 1, 2)
+Cp &lt;- lapply(powers, powerC)
+if (require("gridExtra"))
+    grid.arrange(
+        grobs = mapply(plotC, C = Cp, main = paste("power =", powers),
+                       SIMPLIFY = FALSE),
+        nrow = 2, ncol = 2)
+
+## truncation to enforce non-negative entries
+powerC(0.2)  # some entries become negative for small powers
+powerC0 &lt;- make_powerC(Cnorm, truncate = TRUE)
+powerC0(0.2)
+</code></pre>
+
+
+</div>

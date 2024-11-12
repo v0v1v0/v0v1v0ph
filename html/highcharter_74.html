@@ -1,0 +1,118 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hc_colorAxis</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Coloraxis options for highcharter objects</h2>
+
+<h3>Description</h3>
+
+<p>A color axis for series. Visually, the color
+axis will appear as a gradient or as separate items inside the
+legend, depending on whether the axis is scalar or based on data
+classes.
+For supported color formats, see the
+docs article about colors.
+A scalar color axis is represented by a gradient. The colors either
+range between the minColor and the
+maxColor, or for more fine grained control the
+colors can be defined in stops. Often times, the
+color axis needs to be adjusted to get the right color spread for the
+data. In addition to stops, consider using a logarithmic
+axis type, or setting min and
+max to avoid the colors being determined by
+outliers.
+When dataClasses are used, the ranges are
+subdivided into separate classes like categories based on their
+values. This can be used for ranges between two values, but also for
+a true category. However, when your data is categorized, it may be as
+convenient to add each category to a separate series.
+Color axis does not work with: sankey, sunburst, dependencywheel,
+networkgraph, wordcloud, venn, gauge and solidgauge series
+types.
+Since v7.2.0 colorAxis can also be an array of options objects.
+See the Axis object for
+programmatic access to the axis.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hc_colorAxis(hc, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>hc</code></td>
+<td>
+<p>A <code>highchart</code> <code>htmlwidget</code> object.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Arguments defined in <a href="https://api.highcharts.com/highcharts/colorAxis">https://api.highcharts.com/highcharts/colorAxis</a>.</p>
+</td>
+</tr>
+</table>
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+library(dplyr)
+
+data(mpg, package = "ggplot2")
+
+mpgman2 &lt;- mpg %&gt;%
+  group_by(manufacturer, year) %&gt;%
+  dplyr::summarise(
+    n = dplyr::n(),
+    displ = mean(displ)
+  )
+
+mpgman2
+
+hchart(
+  mpgman2, "column", hcaes(x = manufacturer, y = n, group = year),
+  colorKey = "displ",
+  # color = c("#FCA50A", "#FCFFA4"),
+  name = c("Year 1999", "Year 2008")
+) %&gt;%
+  hc_colorAxis(min = 0, max = 5)
+
+
+# defaults to yAxis
+hchart(iris, "point", hcaes(Sepal.Length, Sepal.Width)) %&gt;%
+  hc_colorAxis(
+    minColor = "red",
+    maxColor = "blue"
+  )
+
+
+
+# Ex2
+n &lt;- 5
+
+stops &lt;- data.frame(
+  q = 0:n / n,
+  c = c("#440154", "#414487", "#2A788E", "#22A884", "#7AD151", "#FDE725"),
+  stringsAsFactors = FALSE
+)
+
+stops &lt;- list_parse2(stops)
+
+M &lt;- round(matrix(rnorm(50 * 50), ncol = 50), 2)
+
+hchart(M) %&gt;%
+  hc_colorAxis(stops = stops)
+
+# Ex3
+# hchart(volcano) %&gt;%
+#   hc_colorAxis(stops = stops, max = 200)
+</code></pre>
+
+
+</div>

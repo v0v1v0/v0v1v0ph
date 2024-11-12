@@ -1,0 +1,133 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>glht_zgz2017</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Test proposed by Zhang et al. (2017)</h2>
+
+<h3>Description</h3>
+
+<p>Zhang et al. (2017)'s test for general linear hypothesis testing (GLHT) problem for high-dimensional data with assuming that underlying covariance matrices are the same.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">glht_zgz2017(Y,G,n,p)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>Y</code></td>
+<td>
+<p>A list of <code class="reqn">k</code> data matrices.  The <code class="reqn">i</code>th element represents the data matrix (<code class="reqn">p\times n_i</code>) from the <code class="reqn">i</code>th population with each column representing a <code class="reqn">p</code>-dimensional observation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>G</code></td>
+<td>
+<p>A known full-rank coefficient matrix (<code class="reqn">q\times k</code>) with <code class="reqn">\operatorname{rank}(\boldsymbol{G})&lt;k</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n</code></td>
+<td>
+<p>A vector of <code class="reqn">k</code> sample sizes. The <code class="reqn">i</code>th element represents the sample size of group <code class="reqn">i</code>, <code class="reqn">n_i</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>p</code></td>
+<td>
+<p>The dimension of data.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Suppose we have the following <code class="reqn">k</code> independent high-dimensional samples:
+</p>
+<p style="text-align: center;"><code class="reqn">
+\boldsymbol{y}_{i1},\ldots,\boldsymbol{y}_{in_i}, \;\operatorname{are \; i.i.d. \; with}\; \operatorname{E}(\boldsymbol{y}_{i1})=\boldsymbol{\mu}_i,\; \operatorname{Cov}(\boldsymbol{y}_{i1})=\boldsymbol{\Sigma},\;i=1,\ldots,k.
+</code>
+</p>
+
+<p>It is of interest to test the following GLHT problem:
+</p>
+<p style="text-align: center;"><code class="reqn">H_0: \boldsymbol{G M}=\boldsymbol{0}, \quad \text { vs. } \quad H_1: \boldsymbol{G M} \neq \boldsymbol{0},</code>
+</p>
+
+<p>where
+<code class="reqn">\boldsymbol{M}=(\boldsymbol{\mu}_1,\ldots,\boldsymbol{\mu}_k)^\top</code> is a <code class="reqn">k\times p</code> matrix collecting <code class="reqn">k</code> mean vectors and <code class="reqn">\boldsymbol{G}:q\times k</code> is a known full-rank coefficient matrix with <code class="reqn">\operatorname{rank}(\boldsymbol{G})&lt;k</code>.
+</p>
+<p>Zhang et al. (2017) proposed the following test statistic:
+</p>
+<p style="text-align: center;"><code class="reqn">
+T_{ZGZ}=\|\boldsymbol{C \hat{\mu}}\|^2,
+</code>
+</p>
+
+<p>where <code class="reqn">\boldsymbol{C}=[(\boldsymbol{G D G}^\top)^{-1/2}\boldsymbol{G}]\otimes\boldsymbol{I}_p</code>, and <code class="reqn">\hat{\boldsymbol{\mu}}=(\bar{\boldsymbol{y}}_1^\top,\ldots,\bar{\boldsymbol{y}}_k^\top)^\top</code>, with <code class="reqn">\bar{\boldsymbol{y}}_{i},i=1,\ldots,k</code> being the sample mean vectors and <code class="reqn">\boldsymbol{D}=\operatorname{diag}(1/n_1,\ldots,1/n_k)</code>.
+</p>
+<p>They showed that under the null hypothesis, <code class="reqn">T_{ZGZ}</code> and a chi-squared-type mixture have the same normal or non-normal limiting distribution.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A  (list) object of  <code>S3</code> class <code>htest</code>  containing the following elements:
+</p>
+
+<dl>
+<dt>statistic</dt>
+<dd>
+<p>the test statistic proposed by  Zhang et al. (2017)</p>
+</dd>
+<dt>p.value</dt>
+<dd>
+<p>the <code class="reqn">p</code>-value of the test proposed by Zhang et al. (2017).</p>
+</dd>
+<dt>beta</dt>
+<dd>
+<p>the parameters used in Zhang et al. (2017)'s test.</p>
+</dd>
+<dt>df</dt>
+<dd>
+<p>estimated approximate degrees of freedom of Zhang et al.(2017)'s test.</p>
+</dd>
+</dl>
+<h3>References</h3>
+
+<p>Zhang J, Guo J, Zhou B (2017).
+“Linear hypothesis testing in high-dimensional one-way MANOVA.”
+<em>Journal of Multivariate Analysis</em>, <b>155</b>, 200–216.
+<a href="https://doi.org/10.1016/j.jmva.2017.01.002">doi:10.1016/j.jmva.2017.01.002</a>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">set.seed(1234)
+k &lt;- 3
+p &lt;- 50
+n &lt;- c(25, 30, 40)
+rho &lt;- 0.1
+M &lt;- matrix(rep(0, k * p), nrow = k, ncol = p)
+y &lt;- (-2 * sqrt(1 - rho) + sqrt(4 * (1 - rho) + 4 * p * rho)) / (2 * p)
+x &lt;- y + sqrt((1 - rho))
+Gamma &lt;- matrix(rep(y, p * p), nrow = p)
+diag(Gamma) &lt;- rep(x, p)
+Y &lt;- list()
+for (g in 1:k) {
+  Z &lt;- matrix(rnorm(n[g] * p, mean = 0, sd = 1), p, n[g])
+  Y[[g]] &lt;- Gamma %*% Z + t(t(M[g, ])) %*% (rep(1, n[g]))
+}
+G &lt;- cbind(diag(k - 1), rep(-1, k - 1))
+glht_zgz2017(Y, G, n, p)
+</code></pre>
+
+
+</div>

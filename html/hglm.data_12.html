@@ -1,0 +1,108 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>ohio</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Ohio elementary school dataset</h2>
+
+<h3>Description</h3>
+
+<p>Data set on 1,965 Ohio elementary school buildings for 2001-2002.
+</p>
+
+
+<h3>Format</h3>
+
+<p> The ‘ohio’ dataset contains 6 objects as follows. 
+</p>
+
+<dl>
+<dt>ohioSchools</dt>
+<dd>
+<p>Original data <code>ohioschool.dat</code> from <a href="http://www.spatial-econometrics.com/">http://www.spatial-econometrics.com/</a> (J. LeSage and R. Pace 2009). 
+The data set contains information on, for instance, school building ID, Zip code of 
+the location of the school, proportion of passing on five subjects, number of teacher, 
+number of student, etc. The variables are:<br>
+col 1: zip code<br>
+col 2: lattitude (zip centroid)<br>
+col 3: longitude (zip centroid)<br>
+col 4: buidling irn<br>
+col 5: district irn<br>
+col 6: # of teachers (FTE 2001-02)<br>
+col 7: teacher attendance rate<br>
+col 8: avg years of teaching experience<br>
+col 9: avg teacher salary<br>
+col 10: Per Pupil Spending on Instruction<br>
+col 11: Per Pupil Spending on Building Operations<br>
+col 12: Per Pupil Spending on Administration<br>
+col 13: Per Pupil Spending on Pupil Support<br>
+col 14: Per Pupil Spending on Staff Support<br>
+col 15: Total Expenditures Per Pupil<br>
+col 16: Per Pupil Spending on Instruction % of Total Spending Per Pupil<br>
+col 17: Per Pupil Spending on Building Operations % of Total Spending Per Pupil<br>
+col 18: Per Pupil Spending on Administration % of Total Spending Per Pupil<br>
+col 19: Per Pupil Spending on Pupil Support % of Total Spending Per Pupil<br>
+col 20: Per Pupil Spending on Staff Support % of Total Spending Per Pupil<br>
+col 21: irn number<br>
+col 22: avg of all 4th grade proficiency scores<br>
+col 23: median of 4th grade prof scores<br>
+col 24: building enrollment<br>
+col 25: short-term students &lt; 6 months<br>
+col 26: 4th Grade (or 9th grade) Citizenship % Passed 2001-2002<br>
+col 27: 4th Grade (or 9th grade)  math % Passed 2001-2002<br>
+col 28: 4th Grade (or 9th grade)  reading % Passed 2001-2002<br>
+col 29: 4th Grade (or 9th grade)  writing % Passed 2001-2002<br>
+col 30: 4th Grade (or 9th grade)  science % Passed 2001-2002<br>
+col 31: pincome per capita income in the zip code area<br>
+col 32: nonwhite percent of population that is non-white<br>
+col 33: poverty percent of population in poverty<br>
+col 34: samehouse % percent of population living in same house 5 years ago<br>
+col 35: public % of population attending public schools<br>
+col 36: highschool graduates, educ attainment for 25 years plus<br>
+col 37: associate degrees, educ attainment for 25 years plus<br>
+col 38: college, educ attainment for 25 years plus<br>
+col 39: graduate, educ attainment for 25 years plus<br>
+col 40: professional, educ attainment for 25 years plus</p>
+</dd>
+<dt>ohioGrades</dt>
+<dd>
+<p>The derived dataset for analyzing the percentage passed based on Zip codes. The variables are:<br>
+y: the percentage passed (4th or 9th grade) in each school<br>
+TchExp: average Teacher's experience<br>
+Subjects: for five study subjects of Citizenship, Maths, Reading, Writing and Science<br>
+Stu.Tch: student by teacher ratio<br>
+School: school index<br>
+Zip: Zip code</p>
+</dd>
+<dt>ohioMedian</dt>
+<dd>
+<p>The derived dataset for analyzing the median of 4th grade scores based on school districts. The variables are:<br>
+MedianScore: the median of 4th grade prof scores<br>
+district: school districts</p>
+</dd>
+<dt>ohioShape</dt>
+<dd>
+<p>A <code>SpatialPolygonsDataFrame</code> object (see package <b>sp</b>) containing the map information of ohio school districts.</p>
+</dd>
+<dt>ohioZipDistMat</dt>
+<dd>
+<p>The spatial distance matrix based on Zip codes. The codes generated this matrix are:<br><code>Zsp &lt;- model.matrix(~ factor(Zip) - 1, data = ohioGrades)</code><br><code>uzipC &lt;- matrix(0, nrow = ncol(Zsp), ncol = 2)</code><br><code>Zip &lt;- as.numeric(substr(colnames(Zsp), start = 12, stop = 16))</code><br><code>for (i in 1: ncol(Zsp)) {</code><br><code>    Cord &lt;- as.matrix(ohioSchools[(ohioSchools$V1 == Zip[i]), 2:3])</code><br><code>    uzipC[i,] &lt;- Cord[1,]</code><br><code>}</code><br><code>Dst &lt;- as.matrix(dist(uzipC))</code><br><code>for(i in 1:nrow(Dst)) {</code><br><code>    x &lt;- Dst[i,]</code><br><code>    x &lt;- ifelse(x == 0, 0, 1/x)</code><br><code>    Dst[i,] &lt;- ifelse(x &gt; 4, 4, x)</code><br><code>}</code><br><code>ohioZipDistMat &lt;- Dst/4</code></p>
+</dd>
+<dt>ohioDistrictDistMat</dt>
+<dd>
+<p>The spatial distance matrix based on school districts. The codes generated this matrix are:<br><code>ccNb &lt;- poly2nb(ccShape)</code><br><code>W &lt;- matrix(0, 616, 616)</code><br><code>for (i in 1:nrow(W)) {</code><br><code>    tmp &lt;- as.numeric(ccNb[[i]])</code><br><code>    for (k in tmp) W[i,k] &lt;- 1</code><br><code>}</code><br><code>W[353,] &lt;- W[,353] &lt;- 0</code><br><code>districtShape &lt;- as.numeric(substr(as.character(ohioShape@data$UNSDIDFP), 3, 7))</code><br><code>dimnames(W) &lt;- list(districtShape, districtShape)</code><br><code>districtSchool &lt;- floor(ohioSchools[,5]/10)</code><br><code>districtSchool &lt;- factor(districtSchool[districtSchool %in% districtShape])</code><br><code>levelsShape &lt;- levels(factor(districtShape))</code><br><code>levelsSchool &lt;- levels(districtSchool)</code><br><code>levels(districtSchool) &lt;- c(levelsSchool, levelsShape[!(levelsShape %in% levelsSchool)])</code><br><code>ohioDistrictDistMat &lt;- W[levels(districtSchool),levels(districtSchool)]</code></p>
+</dd>
+</dl>
+<h3>Source</h3>
+
+<p>J. LeSage and R. Pace (2009). <em>Introduction to Spatial Econometrics</em>. Chapman \&amp; Hall/CRC, Boca Raton.</p>
+
+
+<h3>References</h3>
+
+<p>J. LeSage and R. Pace (2009). <em>Introduction to Spatial Econometrics</em>. Chapman \&amp; Hall/CRC, Boca Raton.<br><br>
+M. Alam, L. Ronnegard, X. Shen (2014). <b>Fitting spatial models in hglm</b>. <em>Submitted</em>.</p>
+
+
+</div>

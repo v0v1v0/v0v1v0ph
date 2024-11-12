@@ -1,0 +1,157 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>bench</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Benchmark small area estimates.</h2>
+
+<h3>Description</h3>
+
+<p>Benchmark small area estimates to conform to given totals at aggregate levels.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">bench(x, R, rhs, mseMethod = "no", Omega, Lambda)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>sae object to be benchmarked. As an alternative, a list can be supplied with at least components <code>Narea</code> with
+area population sizes and <code>est</code> with small area estimates. In the latter case argument <code>Omega</code> cannot be left unspecified.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>R</code></td>
+<td>
+<p>restriction matrix, M x r matrix where r is the number of restrictions and M the number of areas; default is a single constraint on the population total.
+Note that <code>R</code> acts on the vector of area totals, not the vector of means.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rhs</code></td>
+<td>
+<p>r-vector of benchmark totals corresponding to the restrictions represented by (the columns of) <code>R</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mseMethod</code></td>
+<td>
+<p>if <code>"no"</code>, MSEs are not updated, if <code>"exact"</code>, constraints are treated as independent information
+(exact identities by default), and if <code>"model"</code>, the squared differences between original and benchmarked estimates are added to the MSEs.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Omega</code></td>
+<td>
+<p>M x M matrix <code class="reqn">\Omega</code> in objective function, see details. By default this is the covariance
+matrix of the small area estimates.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Lambda</code></td>
+<td>
+<p>r x r matrix <code class="reqn">\Lambda</code> in objective function, see details. By specifying <code>Lambda</code>
+it is possible to impose 'soft' constraints, i.e. constraints that need to hold only approximately.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>This function adjusts the small area estimates <code>EST(x)</code>, denoted by <code class="reqn">x_0</code>, to
+</p>
+<p style="text-align: center;"><code class="reqn">x_1 = x_0 + \Omega R_N (R_N' \Omega R_N + \Lambda)^{-1} (t - R_N' x_0)\,,</code>
+</p>
+
+<p>where
+</p>
+
+<ul>
+<li> <p><code class="reqn">\Omega</code>
+is a symmetric M x M matrix. By default, <code class="reqn">\Omega</code> is taken to be the covariance matrix <code class="reqn">V_0</code>
+of the input sae-object <code>x</code>.
+</p>
+</li>
+<li> <p><code class="reqn">R_N = {\rm diag}(N_1,\dots, N_M)\,R</code>
+where <code class="reqn">R</code> is the matrix passed to <code>bench</code> and <code class="reqn">N_i</code> denotes the population size
+of the <code class="reqn">i</code>th area, is a M x r matrix describing the aggregate level relative to the area level.
+Note that the matrix <code class="reqn">R</code> acts on the vector of area totals whereas <code class="reqn">R_N</code> acts on the area means to
+produce the aggregate totals.
+The default for <code class="reqn">R</code> is a column vector of 1s representing an additivity constraint to the overall population total.
+</p>
+</li>
+<li> <p><code class="reqn">t</code> is an r-vector of aggregate-level totals, specified as <code>rhs</code>, that the small area estimates should add up to.
+</p>
+</li>
+<li> <p><code class="reqn">\Lambda</code> is a symmetric r x r matrix controlling the penalty associated with deviations from the constraints
+<code class="reqn">R_N' x_1 = t</code>.
+The default is <code class="reqn">\Lambda=0</code>, implying that the constraints must hold exactly.
+</p>
+</li>
+</ul>
+<p>The adjusted or benchmarked small area estimates minimize the expectation of the loss function
+</p>
+<p style="text-align: center;"><code class="reqn">L(x_1, \theta) = (x_1 - \theta)' \Omega^{-1} (x_1 - \theta) + 
+       (R_N' x_1 - t)' \Lambda^{-1} (R_N' x_1 - t)</code>
+</p>
+
+<p>with respect to the posterior for the unknown small area means <code class="reqn">\theta</code>.
+</p>
+<p>Optionally, <code>MSE(x)</code> is updated as well. If <code>mseMethod="exact"</code> the covariance matrix is adjusted from
+<code class="reqn">V_0</code> to
+</p>
+<p style="text-align: center;"><code class="reqn">V_1 = V_0 - V_0 R_N (R_N' \Omega R_N + \Lambda)^{-1} R_N' V_0\,,</code>
+</p>
+
+<p>and if <code>mseMethod</code> is <code>"model"</code> the adjusted covariance matrix is
+</p>
+<p style="text-align: center;"><code class="reqn">V_1 = V_0 + (x_1 - x_0) (x_1 - x_0)'\,.</code>
+</p>
+
+<p>The latter method treats the benchmark adjustments as incurring a bias
+relative to the best predictor under the model.
+</p>
+
+
+<h3>Value</h3>
+
+<p>An object of class <code>sae</code> with adjusted estimates.
+</p>
+
+
+<h3>References</h3>
+
+<p>G.S. Datta, M. Ghosh, R. Steorts and J. Maples (2011). Bayesian benchmarking with applications to small area estimation. TEST 20(3), 574-588.
+</p>
+<p>Y. You, J.N.K. Rao and P. Dick (2004). Benchmarking Hierarchical Bayes Small Area Estimators
+in the Canadian Census Undercoverage Estimation. Statistics in Transition 6(5), 631-640.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>sae-class</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">d &lt;- generateFakeData()
+
+# compute small area estimates
+sae &lt;- fSAE(y0 ~ x + area2, data=d$sam, area="area", popdata=d$Xpop)
+
+# calibrate to overall population total
+sae.c &lt;- bench(sae, rhs=sum(d$mY0*sae$Narea))
+plot(sae, sae.c)
+</code></pre>
+
+
+</div>

@@ -1,0 +1,150 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>rAVGCov</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Realized covariances via subsample averaging</h2>
+
+<h3>Description</h3>
+
+<p>Calculates realized variances via averaging across partially
+overlapping grids, first introduced by Zhang et al. (2005).
+This estimator is basically an average across different <code>rCov</code> estimates that start at
+different points in time, see details below.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">rAVGCov(
+  rData,
+  cor = FALSE,
+  alignBy = "minutes",
+  alignPeriod = 5,
+  k = 1,
+  makeReturns = FALSE,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>rData</code></td>
+<td>
+<p>an <code>xts</code> or <code>data.table</code> object containing returns or prices, possibly for multiple assets over multiple days.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cor</code></td>
+<td>
+<p>boolean, in case it is <code>TRUE</code>, and the input data is multivariate, the correlation is returned instead of the covariance matrix. <code>FALSE</code> by default.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alignBy</code></td>
+<td>
+<p>character, indicating the time scale in which <code>alignPeriod</code> is expressed. 
+Possible values are: <code>"ticks"</code>, <code>"secs"</code>, <code>"seconds"</code>, <code>"mins"</code>, <code>"minutes"</code>, <code>"hours"</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alignPeriod</code></td>
+<td>
+<p>positive numeric, indicating the number of periods to aggregate over. For example, to aggregate
+based on a 5-minute frequency, set <code>alignPeriod = 5</code> and <code>alignBy = "minutes"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>k</code></td>
+<td>
+<p>numeric denoting which horizon to use for the subsambles. This can be a fraction as long as <code class="reqn">k</code> is a divisor of <code>alignPeriod</code> default is <code>1</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>makeReturns</code></td>
+<td>
+<p>boolean, should be <code>TRUE</code> when <code>rData</code> contains prices instead of returns. <code>FALSE</code> by default.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>used internally, do not change.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Suppose that in period <code class="reqn">t</code>, there are <code class="reqn">N</code> equispaced returns <code class="reqn">r_{i,t}</code> 
+and let <code class="reqn">\Delta</code> be equal to <code>alignPeriod</code>. For <code class="reqn">\ i \geq \Delta</code>, 
+we define the subsampled <code class="reqn">\Delta</code>-period return as
+</p>
+<p style="text-align: center;"><code class="reqn">
+\tilde r_{t,i} = \sum_{k = 0}^{\Delta - 1} r_{t,i-k}, .
+</code>
+</p>
+
+<p>Now define <code class="reqn">N^*(j) = N/\Delta</code> if <code class="reqn">j = 0</code> and  <code class="reqn">N^*(j) = N/\Delta - 1</code> otherwise.
+The <code class="reqn">j</code>-th component of the <code>rAVGCov</code> estimator is given by
+</p>
+<p style="text-align: center;"><code class="reqn">
+RV_t^j = \sum_{i = 1}^{N^*(j)} \tilde r_{t, j + i \cdot \Delta}^2.
+</code>
+</p>
+
+<p>Now taking the average across the different <code class="reqn">RV_t^j, \ j = 0, \dots, \Delta-1,</code> defines the <code>rAVGCov</code> estimator.
+The multivariate version follows analogously.
+</p>
+<p>Note that Liu et al. (2015) show that <code>rAVGCov</code> is not only theoretically but also empirically a more reliable estimator than rCov.
+</p>
+
+
+<h3>Value</h3>
+
+<p>in case the input is and contains data from one day, an <code class="reqn">N</code> by <code class="reqn">N</code> matrix is returned. If the data is a univariate <code>xts</code> object with multiple days, an <code>xts</code> is returned.
+If the data is multivariate and contains multiple days (<code>xts</code> or <code>data.table</code>), the function returns a list containing <code class="reqn">N</code> by <code class="reqn">N</code> matrices. 
+Each item in the list has a name which corresponds to the date for the matrix.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Scott Payseur, Onno Kleen, and Emil Sjoerup.
+</p>
+
+
+<h3>References</h3>
+
+<p>Liu, L. Y., Patton, A. J., Sheppard, K. (2015). Does anything beat 5-minute RV? A comparison of realized measures across multiple asset classes. <em>Journal of Econometrics</em>, 187, 293-311.
+</p>
+<p>Zhang, L., Mykland, P. A. , and Ait-Sahalia, Y. (2005). A tale of two time scales: Determining integrated volatility with noisy high-frequency data. <em>Journal of the American Statistical Association</em>, 100, 1394-1411.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>ICov</code> for a list of implemented estimators of the integrated covariance.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Average subsampled realized variance/covariance aligned at one minute returns at
+# 5 sub-grids (5 minutes).
+
+# Univariate subsampled realized variance
+rvAvgSub &lt;- rAVGCov(rData = sampleTData[, list(DT, PRICE)], alignBy = "minutes",
+                    makeReturns = TRUE)
+rvAvgSub
+
+# Multivariate subsampled realized variance
+rvAvgCovSub &lt;- rAVGCov(rData = sampleOneMinuteData[1:391], makeReturns = TRUE)
+rvAvgCovSub
+</code></pre>
+
+
+</div>

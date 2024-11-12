@@ -1,0 +1,97 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>coef.HDtweedie</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>get coefficients or make coefficient predictions from an "HDtweedie" object.</h2>
+
+<h3>Description</h3>
+
+<p>Computes the coefficients at the requested values for <code>lambda</code> from a fitted <code>HDtweedie</code> object.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">## S3 method for class 'HDtweedie'
+coef(object, s = NULL, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>object</code></td>
+<td>
+<p>fitted <code>HDtweedie</code> model object.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>s</code></td>
+<td>
+<p>value(s) of the penalty parameter <code>lambda</code> at which predictions are required. Default is the entire sequence used to create the model.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>not used. Other arguments to predict. </p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p><code>s</code> is the new vector at which predictions are requested. If <code>s</code> is not in the lambda sequence used for fitting the model, the <code>coef</code> function will use linear interpolation to make predictions. The new values are interpolated using a fraction of coefficients from both left and right <code>lambda</code> indices. 
+</p>
+
+
+<h3>Value</h3>
+
+<p>The coefficients at the requested values for <code>lambda</code>.</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Wei Qian, Yi Yang and Hui Zou<br>
+Maintainer: Wei Qian  &lt;weiqian@stat.umn.edu&gt;</p>
+
+
+<h3>References</h3>
+
+<p>Qian, W., Yang, Y., Yang, Y. and Zou, H. (2016), “Tweedie's Compound
+Poisson Model With Grouped Elastic Net,” <em>Journal of Computational and Graphical Statistics</em>, 25, 606-625.<br></p>
+
+
+<h3>See Also</h3>
+
+<p><code>predict.HDtweedie</code> method</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># load HDtweedie library
+library(HDtweedie)
+
+# load data set
+data(auto)
+
+# fit the lasso
+m0 &lt;- HDtweedie(x=auto$x,y=auto$y,p=1.5)
+
+# the coefficients at lambda = 0.01
+coef(m0,s=0.01)
+
+# define group index
+group1 &lt;- c(rep(1,5),rep(2,7),rep(3,4),rep(4:14,each=3),15:21)
+
+# fit grouped lasso
+m1 &lt;- HDtweedie(x=auto$x,y=auto$y,group=group1,p=1.5)
+
+# the coefficients at lambda = 0.01 and 0.04
+coef(m1,s=c(0.01,0.04))
+</code></pre>
+
+
+</div>

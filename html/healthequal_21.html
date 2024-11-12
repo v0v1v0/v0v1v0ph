@@ -1,0 +1,177 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>parisk</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Population attributable risk (PAR)</h2>
+
+<h3>Description</h3>
+
+<p>Population Attributable Risk (PAR) is an absolute measure of inequality
+that shows the potential improvement in the average of an indicator, in
+absolute terms, that could be achieved if all population subgroups had
+the same level of the indicator as a reference group.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">parisk(
+  pop = NULL,
+  est,
+  ordered_dimension,
+  subgroup_order = NULL,
+  setting_average = NULL,
+  favourable_indicator,
+  scaleval,
+  conf.level = 0.95,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>pop</code></td>
+<td>
+<p>The number of people within each subgroup.
+Population size must be available for all subgroups.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>est</code></td>
+<td>
+<p>The subgroup estimate. Estimates must be
+available for all subgroups.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ordered_dimension</code></td>
+<td>
+<p>Records whether the dimension is ordered (1)
+or not (0).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>subgroup_order</code></td>
+<td>
+<p>The order of subgroups in an increasing sequence,
+if the dimension is ordered.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>setting_average</code></td>
+<td>
+<p>The reported setting average. Setting average must
+be unique for each setting, year, indicator combination.
+If population is not specified for all subgroups, the setting average is
+used.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>favourable_indicator</code></td>
+<td>
+<p>Records whether the indicator is
+favourable (1) or non-favourable (0). Favourable indicators measure
+desirable health events where the ultimate goal is
+to achieve a maximum level (such as skilled birth attendance).
+Non-favourable indicators measure undesirable health events where
+the ultimate goal is to achieve a minimum level (such as under-five
+mortality rate).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>scaleval</code></td>
+<td>
+<p>The scale of the indicator. For example, the
+scale of an indicator measured as a percentage is 100. The
+scale of an indicator measured as a rate per 1000 population is 1000.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>conf.level</code></td>
+<td>
+<p>confidence level of the interval.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Further arguments passed to or from other methods.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>PAR is calculated as the difference between the estimate for the
+reference subgroup and the setting average. For more information
+on this inequality measure see Schlotheuber, A., &amp; Hosseinpoor, A. R.
+(2022) below.
+</p>
+<p>If the indicator is favourable and PAR &lt; 0, then PAR is replaced with 0.
+If the indicator is adverse and PAR &gt; 0, then PAR is replaced with 0.
+The selection of the reference subgroup depends on the characteristics
+of the inequality dimension and the indicator type. It is the
+most-advantaged subgroup for ordered dimensions. For non-ordered
+dimensions, it is the subgroup with the highest estimate for favourable
+indicators and is the subgroup with the lowest estimate for adverse
+indicators.
+</p>
+<p><strong>Interpretation:</strong> PAR assumes positive values for favourable
+indicators and negative values for non-favourable (adverse) indicators.
+The larger the absolute value of PAR, the higher the level of inequality.
+PAR is zero if no further improvement can be achieved (i.e., if all
+subgroups have reached the same level of the indicator as the reference
+subgroup or surpassed that level).
+</p>
+<p><strong>Type of summary measure:</strong> Complex; absolute; weighted
+</p>
+<p><strong>Applicability:</strong> Any
+</p>
+<p><strong>Warning:</strong> The confidence intervals are approximate
+and might be biased. See Walter S.D. (1978) below for
+further information on the standard error formula.
+</p>
+
+
+<h3>Value</h3>
+
+<p>The estimated PAR value, corresponding estimated standard error,
+and confidence interval as a <code>data.frame</code>.
+</p>
+
+
+<h3>References</h3>
+
+<p>Schlotheuber, A., &amp; Hosseinpoor, A. R. (2022).
+Summary measures of health inequality: A review of existing
+measures and their application. International Journal of
+Environmental Research and Public Health, 19 (6), 3697.
+</p>
+<p>Walter, Stephen D. 1978. “Calculation of Attributable
+Risks from Epidemiological Data.” International Journal of Epidemiology
+7 (2): 175–82. https://doi.org/10.1093/IJE/7.2.175.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># example code
+data(OrderedSample)
+head(OrderedSample)
+with(OrderedSample,
+     parisk(pop = population,
+            est = estimate,
+            ordered_dimension = ordered_dimension,
+            subgroup_order = subgroup_order,
+            favourable_indicator = favourable_indicator,
+            scaleval = indicator_scale
+            )
+     )
+</code></pre>
+
+
+</div>

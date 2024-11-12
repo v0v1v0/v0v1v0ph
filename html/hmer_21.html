@@ -1,0 +1,249 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>generate_new_runs</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Generate Proposal Points</h2>
+
+<h3>Description</h3>
+
+<p>This function is deprecated in favour of <code>generate_new_design</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">generate_new_runs(
+  ems,
+  n_points,
+  z,
+  method = "default",
+  cutoff = 3,
+  plausible_set,
+  verbose = interactive(),
+  opts = NULL,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>ems</code></td>
+<td>
+<p>A list of <code>Emulator</code> objects, trained
+on previous design points.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n_points</code></td>
+<td>
+<p>The desired number of points to propose.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>z</code></td>
+<td>
+<p>The targets to match to.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+<p>Which methods to use.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cutoff</code></td>
+<td>
+<p>The value of the cutoff to use to assess suitability.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>plausible_set</code></td>
+<td>
+<p>An optional set of known non-implausible points, to avoid LHD sampling.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p>Should progress statements be printed to the console?</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>opts</code></td>
+<td>
+<p>A named list of opts as described.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Any parameters to pass via chaining to individual sampling functions (eg <code>distro</code>
+for importance sampling or <code>ordering</code> for collecting emulators).</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Given a set of trained emulators, this finds the next set of points that will be
+informative for a subsequent wave of emulation or, in the event that the
+current wave is the last desired, a set of points that optimally span the
+parameter region of interest. There are a number of different methods that can
+be utilised, alone or in combination with one another, to generate the points.
+</p>
+<p>If the <code>method</code> argument contains <code>'lhs'</code>, a Latin hypercube is generated and
+non-implausible points from this design are retained. If more points are accepted
+than the next design requires, then points are subselected using a maximin argument.
+</p>
+<p>If <code>method</code> contains <code>'line'</code>, then line sampling is performed. Given an
+already established collection of non-implausible points, rays are drawn between
+pairs of points (selected so as to maximise the distance between them) and more
+points are sampled along the rays. Points thus sampled are retained if they lie
+near a boundary of the non-implausible space, or on the boundary of the parameter
+region of interest.
+</p>
+<p>If <code>method</code> contains <code>'importance'</code>, importance sampling is performed.
+Given a collection of non-implausible points, a mixture distribution of either
+multivariate normal or uniform ellipsoid proposals around the current non-implausible
+set are constructed. The optimal standard deviation (in the normal case) or radius
+(in the ellipsoid case) is determined using a burn-in phase, and points are
+proposed until the desired number of points have been found.
+</p>
+<p>If <code>method</code> contains <code>'slice'</code>, then slice sampling is performed. Given
+a single known non-implausible point, a minimum enclosing hyperrectangle (perhaps
+after transforming the space) is determined and points are sampled for each dimension
+of the parameter space uniformly, shrinking the minimum enclosing hyperrectangle as
+appropriate. This method is akin to to a Gibbs sampler.
+</p>
+<p>If <code>method</code> contains <code>'optical'</code>, then optical depth sampling is used.
+Given a set of non-implausible points, an approximation of the one-dimensional
+marginal distributions for each parameter can be determined. From these derived
+marginals, points are sampled and subject to rejection as in the LHD sampling.
+</p>
+<p>For any sampling strategy, the parameters <code>ems</code>, <code>n_points</code>, and <code>z</code>
+must be provided. All methods rely on a means of assessing point suitability, which
+we refer to as an implausibility measure. By default, this uses nth-maximum implausibility
+as provided by <code>nth_implausible</code>; a user-defined method can be provided
+instead by supplying the function call to <code>opts[["accept_measure"]]</code>. Any
+such function must take at least five arguments: the emulators, the points, the
+targets, and a cutoff, as well as a <code>...</code> argument to ensure compatibility with
+the default behaviour of the point proposal method.
+</p>
+<p>The option <code>opts[["seek"]]</code> determines how many points should be chosen that
+have a higher probability of matching targets, as opposed to not missing targets. Due
+to the danger of such an approach if a representative space-filling design over the
+space, this value should not be too high and should be used sparingly at early waves;
+even at later waves, it is inadvisable to seek more than 10% of the output points
+using this metric. The default is <code>seek = 0</code>, and can be provided as either
+a percentage of points desired (in the range [0,1]) or the fixed number of points.
+</p>
+<p>The default behaviour is as follows. A set of initial points are generated from a
+large LHD; line sampling is performed to find the boundaries of the space; then importance
+sampling is used to fill out the space. The proposed set of points are thinned and
+both line and importance sampling are applied again; this resampling behaviour is
+controlled by <code>opts[["resample"]]</code>, where <code>resample = n</code> indicates that
+the proposal will be thinned and resampled from <code>n</code> times (resulting in <code>n+1</code>
+proposal stages).
+</p>
+<p>In regions where the non-implausible space at a given cutoff value is very hard to find,
+the point proposal will start at a higher cutoff where it can find a space-filling design.
+Given such a design at a higher cutoff, it can subselect to a lower cutoff by demanding
+some percentage of the proposed points are retained and repeat. This approach terminates
+if the 'ladder' of cutoffs reaches the desired cutoff, or if the process asymptotes at
+a particular higher cutoff. The opts <code>ladder_tolerance</code> and <code>cutoff_tolerance</code>
+determine the minimum improvement required in consecutive cutoffs for the process to not
+be considered to be asymptoting and the level of closeness to the desired cutoff at which
+we are prepared to stop, respectively. For instance, setting <code>ladder_tolerance</code> to
+0.1 and <code>cutoff_tolerance</code> to 0.01, with a cutoff of 3, will terminate the process
+if two consecutive cutoffs proposed are within 0.1 of each other, or when the points proposed
+all have implausibility less than the 3.01.
+</p>
+<p>These methods may work slowly, or not at all, if the target space is extremely small in
+comparison with the initial non-yet-ruled-out (NROY) space; it may also fail to give a
+representative sample if the target space is formed of disconnected regions of different
+volumes.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A data.frame containing the set of new points upon which to run the model.
+</p>
+
+
+<h3>Arguments within <code>opts</code>
+</h3>
+
+
+<dl>
+<dt>accept_measure</dt>
+<dd>
+<p>A custom implausibility measure to be used.</p>
+</dd>
+<dt>cluster</dt>
+<dd>
+<p>Whether to try to apply emulator clustering.</p>
+</dd>
+<dt>cutoff_tolerance</dt>
+<dd>
+<p>Tolerance for an obtained cutoff to be similar enough to that desired.</p>
+</dd>
+<dt>ladder_tolerance</dt>
+<dd>
+<p>Tolerance with which to determine if the process is asymptoting.</p>
+</dd>
+<dt>nth</dt>
+<dd>
+<p>The level of nth implausibility to apply, if using the default implausibility.</p>
+</dd>
+<dt>resample</dt>
+<dd>
+<p>How many times to perform the resampling step once points are found.</p>
+</dd>
+<dt>seek</dt>
+<dd>
+<p>How many 'good' points should be sought: either as an integer or a ratio.</p>
+</dd>
+<dt>to_file</dt>
+<dd>
+<p>If output is to be written to file periodically, the file location.</p>
+</dd>
+<dt>points.factor (LHS, Cluster LHS)</dt>
+<dd>
+<p>How many more points than desired to sample.</p>
+</dd>
+<dt>pca_lhs (LHS)</dt>
+<dd>
+<p>Whether to apply PCA to the space before proposing.</p>
+</dd>
+<dt>n_lines (Line)</dt>
+<dd>
+<p>How many lines to draw.</p>
+</dd>
+<dt>ppl (Line)</dt>
+<dd>
+<p>The number of points to sample per line.</p>
+</dd>
+<dt>imp_distro (Importance)</dt>
+<dd>
+<p>The distribution to propose around points.</p>
+</dd>
+<dt>imp_scale (Importance)</dt>
+<dd>
+<p>The radius, or standard deviation, of proposed distributions.</p>
+</dd>
+<dt>pca_slice (Slice)</dt>
+<dd>
+<p>Whether to apply PCA to the space before slice sampling.</p>
+</dd>
+<dt>seek_distro (Seek)</dt>
+<dd>
+<p>The distribution to apply when looking for 'good' points.</p>
+</dd>
+</dl>
+</div>

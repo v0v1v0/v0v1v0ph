@@ -1,0 +1,71 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>spreadPrices</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Convert to format for realized measures</h2>
+
+<h3>Description</h3>
+
+<p>Convenience function to split data from one <code>xts</code> or <code>data.table</code> 
+with at least <code>"DT"</code>, <code>"SYMBOL"</code>, and <code>"PRICE"</code> columns to a format 
+that can be used in the functions for calculation of realized measures. 
+This is the opposite of <code>gatherPrices</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">spreadPrices(data)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table><tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>An <code>xts</code> or a <code>data.table</code> object with at least <code>"DT"</code>, 
+<code>"SYMBOL"</code>, and <code>"PRICE"</code> columns. This data should already be cleaned.</p>
+</td>
+</tr></table>
+<h3>Value</h3>
+
+<p>An <code>xts</code> or a <code>data.table</code> object with columns <code>"DT"</code> and 
+a column named after each unique entrance in the <code>"SYMBOL"</code> column of the input. 
+These columns contain the price of the associated symbol. We drop all other columns, e.g. <code>SIZE</code>.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Emil Sjoerup.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>gatherPrices</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+library(data.table)
+data1 &lt;- copy(sampleTData)[,  `:=`(PRICE = PRICE * runif(.N, min = 0.99, max = 1.01),
+                                               DT = DT + runif(.N, 0.01, 0.02))]
+data2 &lt;- copy(sampleTData)[, SYMBOL := 'XYZ']
+
+dat &lt;- rbind(data1, data2)
+setkey(dat, "DT")
+dat &lt;- spreadPrices(dat)
+
+rCov(dat, alignBy = 'minutes', alignPeriod = 5, makeReturns = TRUE, cor = TRUE) 
+
+## End(Not run)
+</code></pre>
+
+
+</div>

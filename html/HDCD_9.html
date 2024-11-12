@@ -1,0 +1,141 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>Inspect_calibrate</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Generates empirical detection threshold <code class="reqn">\xi</code> using Monte Carlo simulation</h2>
+
+<h3>Description</h3>
+
+<p>R wrapper for C function choosing empirical detection threshold <code class="reqn">\xi</code> for the Narrowest-Over-Threshold variant of Inspect (as specified in section 4.2 in Moen et al. 2023) using Monte Carlo simulation.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">Inspect_calibrate(
+  n,
+  p,
+  N = 100,
+  tol = 1/100,
+  lambda = NULL,
+  alpha = 1.5,
+  K = 5,
+  eps = 1e-10,
+  maxiter = 10000,
+  rescale_variance = TRUE,
+  debug = FALSE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>n</code></td>
+<td>
+<p>Number of observations</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>p</code></td>
+<td>
+<p>Number time series</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>N</code></td>
+<td>
+<p>Number of Monte Carlo samples used</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tol</code></td>
+<td>
+<p>False positive probability tolerance</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lambda</code></td>
+<td>
+<p>Manually specified value of <code class="reqn">\lambda</code> (can be <code>NULL</code>, in which case <code class="reqn">\lambda \gets \sqrt{\log(p\log n)/2}</code>)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alpha</code></td>
+<td>
+<p>Parameter for generating seeded intervals</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>K</code></td>
+<td>
+<p>Parameter for generating seeded intervals</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>eps</code></td>
+<td>
+<p>Threshold for declaring numerical convergence of the power method</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>maxiter</code></td>
+<td>
+<p>Maximum number of iterations for the power method</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rescale_variance</code></td>
+<td>
+<p>If <code>TRUE</code>, each row of the data is re-scaled by a MAD estimate using <code>rescale_variance</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>debug</code></td>
+<td>
+<p>If <code>TRUE</code>, diagnostic prints are provided during execution</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A list containing 
+</p>
+<table><tr style="vertical-align: top;">
+<td><code>max_value</code></td>
+<td>
+<p>the empirical threshold</p>
+</td>
+</tr></table>
+<h3>References</h3>
+
+<p>Moen PAJ, Glad IK, Tveten M (2023).
+“Efficient sparsity adaptive changepoint estimation.”
+Arxiv preprint, 2306.04702, <a href="https://doi.org/10.48550/arXiv.2306.04702">https://doi.org/10.48550/arXiv.2306.04702</a>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">library(HDCD)
+n = 50
+p = 50
+
+set.seed(100)
+thresholds_emp = Inspect_calibrate(n,p, N=100, tol=1/100)
+thresholds_emp$max_value # xi
+
+# Generating data
+X = matrix(rnorm(n*p), ncol = n, nrow=p)
+# Adding a single sparse change-point:
+X[1:5, 26:n] = X[1:5, 26:n] +2
+
+res = Inspect(X, xi = thresholds_emp$max_value)
+res$changepoints
+</code></pre>
+
+
+</div>

@@ -1,0 +1,154 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>create_params</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Create a parameter object from a fitted model</h2>
+
+<h3>Description</h3>
+
+<p><code>create_params</code> is a generic function for creating an object containing
+parameters from a fitted statistical model. If <code>uncertainty != "none"</code>,
+then random samples from suitable probability distributions are returned.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">create_params(object, ...)
+
+## S3 method for class 'lm'
+create_params(object, n = 1000, uncertainty = c("normal", "none"), ...)
+
+## S3 method for class 'multinom'
+create_params(object, n = 1000, uncertainty = c("normal", "none"), ...)
+
+## S3 method for class 'multinom_list'
+create_params(object, n = 1000, uncertainty = c("normal", "none"), ...)
+
+## S3 method for class 'flexsurvreg'
+create_params(object, n = 1000, uncertainty = c("normal", "none"), ...)
+
+## S3 method for class 'flexsurvreg_list'
+create_params(object, n = 1000, uncertainty = c("normal", "none"), ...)
+
+## S3 method for class 'partsurvfit'
+create_params(
+  object,
+  n = 1000,
+  uncertainty = c("normal", "bootstrap", "none"),
+  max_errors = 0,
+  silent = FALSE,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>object</code></td>
+<td>
+<p>A statistical model to randomly sample parameters from.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Currently unused.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n</code></td>
+<td>
+<p>Number of random observations to draw. Not used if <code>uncertainty = "none"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>uncertainty</code></td>
+<td>
+<p>Method determining how parameter uncertainty should be handled.
+If <code>"normal"</code>, then parameters are randomly drawn from their multivariate normal
+distribution. If <code>"bootstrap"</code>, then parameters are bootstrapped using <code>bootstrap</code>.
+If <code>"none"</code>, then only point estimates are returned.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>max_errors</code></td>
+<td>
+<p>Maximum number of errors that are allowed when fitting statistical models
+during the bootstrap procedure. This argument may be useful if, for instance, the model
+fails to converge during some bootstrap replications. Default is 0.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>silent</code></td>
+<td>
+<p>Logical indicating whether error messages should be suppressed. Passed to
+the <code>silent</code> argument of <code>try()</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>An object prefixed by <code>params_</code>. Mapping between <code>create_params</code>
+and the classes of the returned objects are:
+</p>
+
+<ul>
+<li> <p><code>create_params.lm</code> -&gt; <code>params_lm</code>
+</p>
+</li>
+<li> <p><code>create_params.multinom</code> -&gt; <code>params_mlogit</code>
+</p>
+</li>
+<li> <p><code>create_params.multinom_list</code> -&gt;  <code>params_mlogit_list</code>
+</p>
+</li>
+<li> <p><code>create_params.flexsurvreg</code> -&gt; <code>params_surv</code>
+</p>
+</li>
+<li> <p><code>create_params.flexsurvreg_list</code> -&gt; <code>params_surv_list</code>
+</p>
+</li>
+<li> <p><code>create_params.partsurvfit</code> -&gt;  <code>params_surv_list</code>
+</p>
+</li>
+</ul>
+<h3>See Also</h3>
+
+<p>These methods are typically used alongside <code>create_input_mats()</code>
+to create model objects as a function of input data and a
+fitted statistical model. For instance,
+<code>create_PsmCurves()</code> creates the survival model for a partitioned survival model,
+<code>create_IndivCtstmTrans()</code> creates the transition model for an individual
+continuous time state transition model,
+<code>create_CohortDtstmTrans()</code> creates the transition model for a cohort discrete
+time state transition model, and
+<code>create_StateVals()</code> creates a health state values model.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># create_params.lm
+fit &lt;- lm(costs ~ female, data = psm4_exdata$costs$medical)
+n &lt;- 5
+params_lm &lt;- create_params(fit, n = n)
+head(params_lm$coefs)
+head(params_lm$sigma)
+
+# create_params.flexsurvreg
+library("flexsurv")
+fit &lt;- flexsurvreg(formula = Surv(futime, fustat) ~ 1, 
+                   data = ovarian, dist = "weibull")
+n &lt;- 5
+params_surv_wei &lt;- create_params(fit, n = n)
+print(params_surv_wei$dist)
+head(params_surv_wei$coefs)
+</code></pre>
+
+
+</div>

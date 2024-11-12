@@ -1,0 +1,226 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>cmv</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Counting Missing Values
+</h2>
+
+<h3>Description</h3>
+
+<p>Generic function for counting the percentage/amount of missing values in a zoo object, using a user-defined temporal scale.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">cmv(x, ...)
+
+## Default S3 method:
+cmv(x, tscale=c("hourly", "daily", "weekly", "monthly", 
+            "quarterly", "seasonal", "annual"),
+            out.type=c("percentage", "amount"), dec=3, 
+            start="00:00:00", start.fmt= "%H:%M:%S", tz, ...)
+
+## S3 method for class 'zoo'
+cmv(x, tscale=c("hourly", "daily", "weekly", "monthly", 
+            "quarterly", "seasonal", "annual"),
+            out.type=c("percentage", "amount"), dec=3, 
+            start="00:00:00", start.fmt= "%H:%M:%S", tz, ...)
+
+## S3 method for class 'data.frame'
+cmv(x, tscale=c("hourly", "daily", "weekly", "monthly", 
+            "quarterly", "seasonal", "annual"),
+            out.type=c("percentage", "amount"), dec=3, 
+            start="00:00:00", start.fmt= "%H:%M:%S", tz, 
+            dates=1, date.fmt="%Y-%m-%d", ...)
+
+## S3 method for class 'matrix'
+cmv(x, tscale=c("hourly", "daily", "weekly", "monthly", 
+            "quarterly", "seasonal", "annual"),
+            out.type=c("percentage", "amount"), dec=3, 
+            start="00:00:00", start.fmt= "%H:%M:%S", tz,
+            dates=1, date.fmt="%Y-%m-%d", ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+
+<p>zoo, data.frame or matrix object, with the time series to be analised. <br>
+Measurements at several gauging stations can be stored in a data.frame or matrix object, and in that case, each column of <code>x</code> represents the time series measured in a gauging statio, and the column names of <code>x</code> have to correspond to the ID of each station (starting by a letter).
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tscale</code></td>
+<td>
+
+<p>character with the temporal scale to be used for analysing the mssing data. Valid values are: <br>
+-) <kbd>hourly</kbd>: the percentage/amount of missing values will be given for each hour and ,therefore, the expected time frequency of <code>x</code> must be sub-hourly. <br>
+-) <kbd>daily</kbd>: the percentage/amount of missing values will be given for each day and, therefore, the expected time frequency of <code>x</code>  must be sub-daily (i.e., hourly or sub-hourly). <br>
+-) <kbd>weekly</kbd>: the percentage/amount of missing values will be given for each week (starting on Monday) and, therefore, the expected time frequency of <code>x</code> must be sub-weekly (i.e., daily, (sub)hourly). <br>
+-) <kbd>monthly</kbd>: the percentage/amount of missing values will be given for each month and, therefore, the expected time frequency of <code>x</code> must be sub-monthly (i.e., daily, hourly or sub-hourly). <br>
+-) <kbd>quarterly</kbd>: the percentage/amount of missing values will be given for each quarter and, therefore, the expected time frequency of <code>x</code> must be sub-quarterly (i.e., monthly, daily, hourly or sub-hourly). <br>
+-) <kbd>seasonal</kbd>: the percentage/amount of missing values will be given for each weather season (see ?time2season) and, therefore, the expected time frequency of <code>x</code> must be sub-seasonal (i.e., monthly, daily, hourly or sub-hourly). <br>
+-) <kbd>annual</kbd>: the percentage/amount of missing values will be given for each year and, therefore, the expected time frequency of <code>x</code> must be sub-annual (i.e., seasonal, monthly, daily, hourly or sub-hourly). <br></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dec</code></td>
+<td>
+
+<p>integer indicating the amount of decimal places included in the output. <br>
+It is only used when <code>out.type=='percentage'</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>start</code></td>
+<td>
+
+<p>character, indicating the starting time used for aggregating sub-daily time series into daily ones. It MUST be provided in the format specified by <code>start.fmt</code>. <br>
+This value is used to define the time when a new day begins (e.g., for some rain gauge stations). <br>
+-) All the values of <code>x</code> with a time attribute before <code>start</code> are considered as belonging to the day before the one indicated in the time attribute of those values. <br>
+-) All the values of <code>x</code> with a time attribute equal to <code>start</code> are considered to be equal to <code>"00:00:00"</code> in the output zoo object. <br>
+-) All the values of <code>x</code> with a time attribute after <code>start</code> are considered as belonging to the same day as the one indicated in the time attribute of those values. <br></p>
+<p>It is useful when the daily values start at a time different from <code>"00:00:00"</code>. Use with caution. See examples.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>start.fmt</code></td>
+<td>
+
+<p>character indicating the format in which the time is provided in <code>start</code>, By default <code>date.fmt=%H:%M:%S</code>. See <code>format</code> in <code>as.POSIXct</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tz</code></td>
+<td>
+
+<p>character, with the specification of the time zone used in both <code>x</code> and <code>start</code>. System-specific (see time zones), but <code>""</code> is the current time zone, and <code>"GMT"</code> is UTC (Universal Time, Coordinated). See <code>Sys.timezone</code> and <code>as.POSIXct</code>. <br>
+If <code>tz</code> is missing (the default), it is automatically set to the time zone used in <code>time(x)</code>. <br>
+This argument can be used to force using the local time zone or any other time zone instead of UTC as time zone.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dates</code></td>
+<td>
+
+<p>numeric, factor, POSIXct or POSIXt object indicating how to obtain the dates and times for each column of <code>x</code> (e.g., gauging station). <br>
+If <code>dates</code> is a number, it indicates the index of the column in <code>x</code> that stores the date and times. <br>
+If <code>dates</code> is a factor, it is converted into POSIXct class, using the date format specified by <code>date.fmt</code>  <br>
+If <code>dates</code> is already of POSIXct or POSIXt class, this function verifies that the number of elements on it be equal to the number of elements in <code>x</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>date.fmt</code></td>
+<td>
+
+<p>character indicating the format in which the dates are stored in <code>dates</code>, By default <code>date.fmt=%Y-%m-%d %H:%M:%S</code>. See <code>format</code> in <code>as.Date</code>. <br>
+ONLY required when <code>class(dates)=="factor"</code> or <code>class(dates)=="numeric"</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>out.type</code></td>
+<td>
+
+<p>character indicating how should be returned the missing values for each temporal scale. Valid values are: <br>
+-) <kbd>percentage</kbd>: the missing values are returned as an real value, representing the percentage of missing values in each temporal scale. <br>
+-) <kbd>amount</kbd>: the missing values are returned as an integer value, representing the absolute amount of missing values in each temporal scale.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+
+<p>further arguments passed to or from other methods.
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The amount of missing values in each temporal scale is computed just by counting the amount of NAs in each hour / day / week / month / quarter / season / year, while the percentage of missing values in each temporal scale is computed by dividing the previous number by the total number of data elements in each hour / day / week / month / quarter / season / year. <br></p>
+<p>This function was developed to allow the selective removal of values when agregting from a high temporal resolution into a lower temporal resolution (e.g., from hourly to daily or from daily to monthly), using any of the temporal aggregation functions available int his package (e.g., <code>hourly2daily</code>, <code>daily2monthly</code>)
+</p>
+
+
+<h3>Value</h3>
+
+<p>a zoo object with the percentage/amount of missing values for each temporal scale selected by the user.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Mauricio Zambrano-Bigiarini, <a href="mailto:mzb.devel@gmail">mzb.devel@gmail</a>
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>dwi</code>, <code>subhourly2hourly</code>, <code>subdaily2daily</code>, <code>daily2monthly</code>, <code>daily2annual</code>, <code>monthlyfunction</code>, <code>izoo2rzoo</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">######################
+## Ex1: Loading the DAILY precipitation data at SanMartino (25567 daily values)
+data(SanMartinoPPts)
+x &lt;- SanMartinoPPts
+
+## Transforming into NA the 10% of values in 'x'
+n           &lt;- length(x)
+n.nas       &lt;- round(0.1*n, 0)
+na.index    &lt;- sample(1:n, n.nas)
+x[na.index] &lt;- NA
+
+# Getting the amount of NAs in 'x' for each week (starting on Monday)
+cmv(x, tscale="weekly")
+
+# Getting the amount of NAs in 'x' for each month
+cmv(x, tscale="monthly")
+
+# Getting the amount of NAs in 'x' for each quarter
+cmv(x, tscale="quarterly")
+
+# Getting the amount of NAs in 'x' for each weather season
+cmv(x, tscale="seasonal")
+
+# Getting the amount of NAs in 'x' for each year
+cmv(x, tscale="annual")
+######################
+## Ex2: Loading the time series of HOURLY streamflows for the station 
+## Karamea at Gorge (52579 hourly values)
+data(KarameaAtGorgeQts)
+x &lt;- KarameaAtGorgeQts
+
+## Transforming into NA the 30% of values in 'x'
+n           &lt;- length(x)
+n.nas       &lt;- round(0.1*n, 0)
+na.index    &lt;- sample(1:n, n.nas)
+x[na.index] &lt;- NA
+
+# Getting the amount of NAs in 'x' for each day
+cmv(x, tscale="daily")
+
+# Getting the amount of NAs in 'x' for each weather season
+cmv(x, tscale="seasonal")
+</code></pre>
+
+
+</div>

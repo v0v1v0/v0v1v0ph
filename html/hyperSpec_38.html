@@ -1,0 +1,167 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>aggregate</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>aggregate hyperSpec objects</h2>
+
+<h3>Description</h3>
+
+<p>Compute summary statistics for subsets of a <code>hyperSpec</code> object.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">## S4 method for signature 'hyperSpec'
+aggregate(
+  x,
+  by = stop("by is needed"),
+  FUN = stop("FUN is needed."),
+  ...,
+  out.rows = NULL,
+  append.rows = NULL,
+  by.isindex = FALSE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>a <code>hyperSpec</code> object</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>by</code></td>
+<td>
+<p>grouping for the rows of <code>x@data</code>.
+</p>
+<p>Either a list containing an index vector for each of the subgroups or a
+vector that can be <code>split</code> in such a list.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>FUN</code></td>
+<td>
+<p>function to compute the summary statistics</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>further arguments passed to <code>FUN</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>out.rows</code></td>
+<td>
+<p>number of rows in the resulting <code>hyperSpec</code> object,
+for memory preallocation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>append.rows</code></td>
+<td>
+<p>If more rows are needed, how many should be appended?
+</p>
+<p>Defaults to 100 or an estimate based on the percentage of groups that are
+still to be done, whatever is larger.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>by.isindex</code></td>
+<td>
+<p>If a list is given in <code>by</code>: does the list already
+contain the row indices of the groups? If <code>FALSE</code>, the list in
+<code>by</code> is computed first (as in <code>aggregate</code>).</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p><code>aggregate</code> applies <code>FUN</code> to each of the subgroups given by
+<code>by</code>. It combines the functionality of <code>aggregate</code>,
+<code>tapply</code>, and <code>ave</code> for hyperSpec
+objects.
+</p>
+<p><code>aggregate</code> avoids splitting <code>x@data</code>.
+</p>
+<p><code>FUN</code> does not need to return exactly one value.  The number of
+returned values needs to be the same for all wavelengths (otherwise the
+result could not be a matrix), see the examples.
+</p>
+<p>If the initially preallocated <code>data.frame</code> turns out to be too small,
+more rows are appended and a warning is issued.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A <code>hyperSpec</code> object with an additional column
+<code>@data$.aggregate</code> tracing which group the rows belong to.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>C. Beleites
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>tapply</code>, <code>aggregate</code>,
+<code>ave</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">cluster.means &lt;- aggregate (chondro, chondro$clusters, mean_pm_sd)
+plot(cluster.means, stacked = ".aggregate", fill = ".aggregate",
+     col = matlab.dark.palette (3))
+
+## make some "spectra"
+spc &lt;- new ("hyperSpec", spc = sweep (matrix (rnorm (10*20), ncol = 20), 1, (1:10)*5, "+"))
+
+## 3 groups
+color &lt;- c("red", "blue", "black")
+by &lt;- as.factor (c (1, 1, 1, 1, 1, 1, 5, 1, 2, 2))
+by
+plot (spc, "spc", col = color[by])
+
+## Example 1: plot the mean of the groups
+plot (aggregate (spc, by, mean), "spc", col = color, add = TRUE,
+      lines.args = list(lwd = 3, lty = 2))
+
+## Example 2: FUN may return more than one value (here: 3)
+plot (aggregate (spc, by, mean_pm_sd), "spc",
+      col = rep(color, each = 3), lines.args = list(lwd = 3, lty = 2))
+
+## Example 3: aggregate even takes FUN that return different numbers of
+##            values for different groups
+plot (spc, "spc", col = color[by])
+
+weird.function &lt;- function (x){
+   if (length (x) == 1)
+      x + 1 : 10
+   else if (length (x) == 2)
+      NULL
+   else
+      x [1]
+}
+
+agg &lt;- aggregate (spc, by, weird.function)
+agg$.aggregate
+plot (agg, "spc",  add = TRUE, col = color[agg$.aggregate],
+      lines.args = list (lwd = 3, lty = 2))
+
+</code></pre>
+
+
+</div>

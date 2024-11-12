@@ -1,0 +1,161 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>HMTL-package</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Heterogeneous Multi-task Feature Learning
+</h2>
+
+<h3>Description</h3>
+
+<p><code>HMTL</code> package implements the block-wise sparse estimation by grouping the coefficients of related predictors across multiple tasks. The tasks can be either regression, Huber regression, adaptive Huber regression, and logistic regression, which provide a wide variety of data types for the integration. The robust methods, such as the Huber regression and adaptive Huber regression, can deal with outlier contamination based on Sun, Q., Zhou, W.-X. and Fan, J. (2020), and Wang, L., Zheng, C., Zhou, W. and Zhou, W.-X. (2021). The model selection applies the modified form of Bayesian information criterion to measure the mdoel performance, which has similar formulation as previous work developed by Gao, X.,  and Carroll, R. J., (2017).
+</p>
+
+
+<h3>Details</h3>
+
+<p>In the context of multi-task learning, there are <code class="reqn">K</code> different data sets obtained from <code class="reqn">K</code> related sources. The data sets can be modeled by different types of learning tasks based on the data distributions.  Let the candidate features be denoted as <code class="reqn">\{M_1,M_2,...,M_j,...,M_p \}</code>. When the integrated data sets have different measurements, we assume the predictors to share some similarities. For example, the <code class="reqn">j</code>th predictors collected as <code class="reqn">M_j = (X_{1j}, X_{2j}, \cdots, X_{Kj})</code> in the table below represent the same type of feature in all related studies. In some cases, the tasks can share same set of predictor, then <code class="reqn">X_{1j} = X_{2j} = \cdots = X_{Kj}</code>.
+</p>
+
+<table>
+<tr>
+<td style="text-align: left;">
+Tasks </td>
+<td style="text-align: left;">  Formula </td>
+<td style="text-align: center;"> <code class="reqn">M_1</code> </td>
+<td style="text-align: center;"> <code class="reqn">M_2</code> </td>
+<td style="text-align: center;"> <code class="reqn">\dots</code> </td>
+<td style="text-align: center;"> <code class="reqn">M_j</code> </td>
+<td style="text-align: center;"> <code class="reqn">\dots</code> </td>
+<td style="text-align: center;"> <code class="reqn">M_p</code> </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+1 </td>
+<td style="text-align: left;"> <code class="reqn">y_1: g_1(\mu_1) \sim</code> </td>
+<td style="text-align: center;"> <code class="reqn">x_{11}\theta_{11}+</code> </td>
+<td style="text-align: center;"> <code class="reqn">x_{12}\theta_{12}+</code> </td>
+<td style="text-align: center;"> <code class="reqn">\dots</code>  </td>
+<td style="text-align: center;"> <code class="reqn">x_{1j}\theta_{1j}+</code> </td>
+<td style="text-align: center;"> <code class="reqn">\dots</code> </td>
+<td style="text-align: center;"> <code class="reqn">x_{1p}\theta_{1p}</code> </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+2 </td>
+<td style="text-align: left;"> <code class="reqn">y_2: g_2(\mu_2) \sim</code> </td>
+<td style="text-align: center;"> <code class="reqn">x_{21}\theta_{21}+</code> </td>
+<td style="text-align: center;"> <code class="reqn">x_{22}\theta_{22}+</code> </td>
+<td style="text-align: center;"> <code class="reqn">\dots</code> </td>
+<td style="text-align: center;"> <code class="reqn">x_{2j}\theta_{2j}+</code> </td>
+<td style="text-align: center;"> <code class="reqn">\dots</code>  </td>
+<td style="text-align: center;"> <code class="reqn">x_{2p}\theta_{2p}</code>  </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+</td>
+<td style="text-align: left;">  ... </td>
+<td style="text-align: center;">  </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+K </td>
+<td style="text-align: left;"> <code class="reqn">y_K: g_K(\mu_K) \sim</code> </td>
+<td style="text-align: center;"> <code class="reqn">x_{K1}\theta_{K1}+</code> </td>
+<td style="text-align: center;"> <code class="reqn">x_{K2}\theta_{K2}+</code> </td>
+<td style="text-align: center;"> <code class="reqn">\dots</code> </td>
+<td style="text-align: center;"> <code class="reqn">x_{Kj}\theta_{Kj}+</code> </td>
+<td style="text-align: center;"> <code class="reqn">\dots</code> </td>
+<td style="text-align: center;"> <code class="reqn">x_{Kp}\theta_{Kp}</code>  </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+</td>
+</tr>
+</table>
+<p>The coefficients can be grouped as the vector <code class="reqn">\theta^{(j)}</code> for the feature <code class="reqn">M_j</code>.
+</p>
+
+<table>
+<tr>
+<td style="text-align: left;">
+Platforms </td>
+<td style="text-align: left;"> <code class="reqn">\bold{M_j}</code> </td>
+<td style="text-align: left;"> </td>
+<td style="text-align: left;"> <code class="reqn">\bold{\theta^{(j)}}</code> </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+1 </td>
+<td style="text-align: left;"> <code class="reqn">x_{1j}</code> </td>
+<td style="text-align: left;"> </td>
+<td style="text-align: left;"> <code class="reqn">\theta_{1j}</code> </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+2 </td>
+<td style="text-align: left;"> <code class="reqn">x_{2j}</code> </td>
+<td style="text-align: left;"> </td>
+<td style="text-align: left;"> <code class="reqn">\theta_{2j}</code> </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+ </td>
+<td style="text-align: left;"> ... </td>
+<td style="text-align: left;"> </td>
+<td style="text-align: left;"> ... </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+k </td>
+<td style="text-align: left;"> <code class="reqn">x_{Kj}</code> </td>
+<td style="text-align: left;"> </td>
+<td style="text-align: left;"> <code class="reqn">\theta_{Kj}</code>
+</td>
+</tr>
+</table>
+<p>The heterogeneous multi-task feature learning <code>HMTL</code> can select significant features through the overall objective function:
+</p>
+<p style="text-align: center;"><code class="reqn">Q(\theta)=  \mathcal{L}(\theta) + \mathcal{R}(\theta).</code>
+</p>
+
+<p>The loss function is defined as <code class="reqn">\mathcal{L}(\theta) = \sum_{k=1}^K w_k \ell_k(\theta_k)</code>, which can be the composite quasi-likelihood or the composite form of (adaptive) Huber loss with additional robustification parameter <code class="reqn">\tau_k</code>. The penalty function is the mixed <code class="reqn">\ell_{2,1}</code> regularization, such that <code class="reqn">\mathcal{R}(\theta) =  \lambda \sum_{j=1}^p (\sum_{k=1}^K \theta_{kj}^2)^{1/2}</code>.
+</p>
+<p>This package also contains functions to provide the Bayesian information criterion:
+</p>
+<p style="text-align: center;"><code class="reqn">  BIC(s) = 2\mathcal{L}_s(\hat{\theta}) + d_s^{*} \gamma_n </code>
+</p>
+
+<p>with <code class="reqn">\mathcal{L}_s(\hat{\theta})</code> denoting the composite quasi-likelihood or adaptive Huber loss, <code class="reqn">d_s^{*}</code> measuring the model complexity and <code class="reqn">\gamma_n</code> being the penalty on the model complexity.
+</p>
+<p>In this package, the function <code>MTL_reg</code> deals with regression tasks, which can be outlier contaminated. The function <code>MTL_class</code> is applied to model multiple classification tasks, and the function <code>MTL_hetero</code> can integrate different types of tasks together.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Yuan Zhong, Wei Xu, and Xin Gao
+</p>
+<p>Maintainer: Yuan Zhong &lt;aqua.zhong@gmail.com&gt;
+</p>
+
+
+<h3>References</h3>
+
+<p>Zhong, Y., Xu, W., and Gao X., (2023) Heterogeneous multi-task feature learning with mixed <code class="reqn">\ell_{2,1}</code> regularization. Submitted
+</p>
+<p>Zhong, Y., Xu, W., and Gao X., (2023) Robust Multi-task Feature Learning. Submitted
+</p>
+<p>Gao, X.,  and Carroll, R. J., (2017) Data integration with high dimensionality. Biometrika, 104, 2, pp. 251-272
+</p>
+<p>Huber, P. J. (1964). Robust estimation of a location parameter. Ann. Math. Statist., 35, 73–101.
+</p>
+<p>Sun, Q., Zhou, W.-X. and Fan, J. (2020). Adaptive Huber regression. J. Amer. Statist. Assoc., 115, 254-265.
+</p>
+<p>Wang, L., Zheng, C., Zhou, W. and Zhou, W.-X. (2021). A new principle for tuning-free Huber regression. Stat. Sinica, 31, 2153-2177.
+</p>
+
+
+</div>

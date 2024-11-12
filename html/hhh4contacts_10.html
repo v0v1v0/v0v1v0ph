@@ -1,0 +1,208 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>contactmatrix</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>POLYMOD Contact Matrices for Germany</h2>
+
+<h3>Description</h3>
+
+<p>The function <code>contactmatrix</code> retrieves various social contact matrices
+for Germany from the POLYMOD survey (Mossong et al., 2008). Such a matrix
+contains the average numbers of reported contacts by participant age group.
+The original age groups (5-year intervals) can be joined together by the
+<code>grouping</code> argument, which first sums over contact groups (columns) and
+then averages over the corresponding participant groups (rows) using the
+corresponding age distribution as weights.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">contactmatrix(
+  which = c("corrected", "mossong", "reciprocal"),
+  type = c("all", "physical"),
+  grouping = c(1, 2, 2, 4, 4, 2),
+  normalize = FALSE
+)
+
+contactmatrix_mossong
+
+contactmatrix_mossong_physical
+
+contactmatrix_POLYMOD
+
+contactmatrix_POLYMOD_physical
+
+contactmatrix_wallinga
+
+contactmatrix_wallinga_physical
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>which</code></td>
+<td>
+<p>character string indicating which contact matrix to return.
+<code>"mossong"</code> uses the average numbers of reported contacts as published
+in Table S5 of Mossong et al. (2008), available as
+<code>contactmatrix_mossong</code> or <code>contactmatrix_mossong_physical</code>.
+<code>"corrected"</code> (from <code>contactmatrix_POLYMOD</code> or
+<code>contactmatrix_POLYMOD_physical</code>) fixes an error in these numbers
+related to the age group 70+ (see the Examples) and is the default.
+If <code>which="reciprocal"</code> (corresponding to <code>contactmatrix_wallinga</code>
+or <code>contactmatrix_wallinga_physical</code> as used by Meyer and Held, 2017),
+the returned social contact matrix fulfils reciprocity of contacts with
+respect to the age distribution of Berlin, <code>pop2011</code>,
+via the method of Wallinga et al. (2006).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>type</code></td>
+<td>
+<p>a character string to select the type of contacts to use:
+either <code>"all"</code> contacts, i.e., count both physical and pure
+conversational contacts, or only <code>"physical"</code> contacts.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>grouping</code></td>
+<td>
+<p>specification of how to aggregate groups using
+<code>aggregateC</code>, i.e., a named list of vectors of group labels,
+or an integer vector of sequential group sizes. The <code>"agedistri"</code>
+attribute of the contact matrix is used as <code>weights</code>.
+If <code>grouping=NULL</code>, aggregation is skipped and the original (5-year)
+age groups are returned.
+The default setting produces the six age groups of Meyer and Held (2017).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>normalize</code></td>
+<td>
+<p>a logical indicating whether to normalize the matrix
+such that each row sums to 1.</p>
+</td>
+</tr>
+</table>
+<h3>Format</h3>
+
+<p>The dataset <code>contactmatrix_POLYMOD</code> and its variants are all
+square numeric matrices with 15 rows (participants) and 15 columns
+(contacts), labelled with the corresponding age groups. There is an attribute
+<code>"agedistri"</code>, a named numeric vector of length 15, which for the
+“_mossong_” and “_POLYMOD_” variants gives the
+age distribution of the German POLYMOD sample, and for the <code>_wallinga_</code>
+variants gives the age distribution of Berlin, i.e.,
+<code>prop.table(colSums(pop2011))</code>.
+</p>
+
+
+<h3>Value</h3>
+
+<p>a square numeric matrix containing the average numbers of contact
+persons recorded per day per survey participant in Germany,
+potentially averaged over multiple <em>row</em> (participant) age groups
+and aggregated over the corresponding <em>column</em> (contact) age groups.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Sebastian Meyer
+</p>
+
+
+<h3>Source</h3>
+
+<p><code>contactmatrix_mossong</code> and <code>contactmatrix_mossong_physical</code>
+are taken from the Supporting Information in Mossong et al. (2008):
+the matrices from Table S5 (8.2), and the attached age distribution
+from Table S2 (3.2).
+</p>
+<p>The corrected versions <code>contactmatrix_POLYMOD</code> and
+<code>contactmatrix_POLYMOD_physical</code> were constructed
+from the <em>raw</em> POLYMOD data initially made available at
+<a href="https://www.researchgate.net/publication/232701632_POLYMOD_contact_survey_for_researchers">https://www.researchgate.net/publication/232701632_POLYMOD_contact_survey_for_researchers</a>
+(a reformatted and better documented version is
+nowadays available at <a href="https://doi.org/10.5281/zenodo.1043437">doi:10.5281/zenodo.1043437</a>).
+The reciprocal contact matrices <code>contactmatrix_wallinga</code> and
+<code>contactmatrix_wallinga_physical</code> were estimated from these raw data
+via the method of Wallinga et al. (2006).
+</p>
+
+
+<h3>References</h3>
+
+<p>Meyer S and Held L (2017): Incorporating social contact data in
+spatio-temporal models for infectious disease spread.
+<em>Biostatistics</em>, <b>18</b> (2), 338-351.
+<a href="https://doi.org/10.1093/biostatistics/kxw051">doi:10.1093/biostatistics/kxw051</a>
+</p>
+<p>Mossong et al. (2008):
+Social contacts and mixing patterns relevant to the
+spread of infectious diseases.
+<em>PLoS Medicine</em>, <b>5</b> (3), e74.
+<a href="https://doi.org/10.1371/journal.pmed.0050074">doi:10.1371/journal.pmed.0050074</a>
+</p>
+<p>Wallinga J, Teunis P and Kretzschmar M (2006):
+Using data on social contacts to estimate age-specific transmission
+parameters for respiratory-spread infectious agents.
+<em>American Journal of Epidemiology</em>, <b>164</b> (10), 936-944.
+<a href="https://doi.org/10.1093/aje/kwj317">doi:10.1093/aje/kwj317</a>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## contact matrix reported in Mossong et al (2008, Table S5)
+(C_original &lt;- contactmatrix(which = "mossong", grouping = NULL))
+## this simply returns the dataset 'contactmatrix_mossong'
+stopifnot(identical(C_original, contactmatrix_mossong))
+
+## with corrected numbers for the 70+ age group (the default)
+C_corrected &lt;- contactmatrix(which = "corrected", grouping = NULL)
+## this simply returns the dataset 'contactmatrix_POLYMOD'
+stopifnot(identical(C_corrected, contactmatrix_POLYMOD))
+
+## check for differences
+C_original == round(C_corrected, 2)
+## compare entries of last row and last column
+round(rbind(original = C_original[15,], corrected = C_corrected[15,]), 2)
+round(cbind(original = C_original[,15], corrected = C_corrected[,15]), 2)
+
+## contact matrix estimated to be reciprocal on the population level
+C_reciprocal &lt;- contactmatrix(which = "reciprocal", grouping = NULL)
+## this simply returns the dataset 'contactmatrix_wallinga'
+## (without its "overdisp" attribute)
+stopifnot(all.equal(C_reciprocal, contactmatrix_wallinga, check.attributes=FALSE))
+
+## check reciprocity
+agedistriBE &lt;- attr(C_reciprocal, "agedistri")
+stopifnot(identical(agedistriBE, prop.table(colSums(pop2011))))
+stopifnot(isSymmetric(C_reciprocal * agedistriBE, check.attributes=FALSE))
+
+## visually compare raw to reciprocal contact matrix
+if (require("gridExtra"))
+    grid.arrange(plotC(C_corrected, main = "raw"),
+                 plotC(C_reciprocal, main = "reciprocal"),
+                 nrow = 1)
+
+## select physical contacts and aggregate into 5 age groups
+contactmatrix(type = "physical", grouping = c(1, 2, 7, 3, 2))
+
+## the default 6 age groups, normalized to a transition matrix
+contactmatrix(normalize = TRUE)
+
+## reciprocity also holds for this grouping
+(C6 &lt;- contactmatrix(which = "reciprocal"))
+stopifnot(isSymmetric(C6 * attr(C6, "agedistri"), check.attributes=FALSE))
+
+</code></pre>
+
+
+</div>

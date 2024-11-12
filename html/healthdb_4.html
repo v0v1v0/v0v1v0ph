@@ -1,0 +1,83 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>build_def</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Build case definition function calls</h2>
+
+<h3>Description</h3>
+
+<p>This function assembles function calls from the supplied functions and their required arguments, leaving the data argument empty for easy re-use of the definition calls with different data and batch execution (see <code>execute_def()</code> for detail). It is useful for defining multiple diseases/events across multiple sources.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">build_def(def_lab, src_labs, def_fn = define_case, fn_args)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>def_lab</code></td>
+<td>
+<p>A single character label for the definition, e.g., some disease.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>src_labs</code></td>
+<td>
+<p>A character vector of place-holder names for the data sources that will be used to execute the definition.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>def_fn</code></td>
+<td>
+<p>A list of functions (default: <code>define_case()</code>) that will filter the source data sets and keep clients met the case definition. The length of the list should be either 1 or equal to the length of <code>src_labs</code>. If length = 1, the same function will be applied to all sources; otherwise, <code>def_fn</code> should match <code>src_lab</code> by position. User can supply custom functions but must put input data as the first argument and name it <code>data</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fn_args</code></td>
+<td>
+<p>A named list of arguments passing to the <code>def_fn</code>. Each element in the list should have the same name as an argument in the source-specific <code>def_fn</code>, and the element length should also be either 1 or equal to the number of sources. If you have <code>def_fn</code> functions taking different sets of arguments, include the union in one list.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A tibble with a number of rows equal to the length of <code>src_labs</code>, containing the input arguments and the synthetic function call in the <code>fn_call</code> column.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">sud_def &lt;- build_def("SUD", # usually a disease name
+  src_lab = c("src1", "src2"), # identify from multiple sources, e.g., hospitalization, ED visits.
+  # functions that filter the data with some criteria,
+  # including mean here for src2 as a trivial example
+  # to show only valid arguments will be in the call
+  def_fn = list(define_case, mean),
+  fn_args = list(
+    vars = list(starts_with("diagx"), "diagx_2"),
+    match = "start", # "start" will be applied to all sources as length = 1
+    vals = list(c("304"), c("305")),
+    clnt_id = "clnt_id",
+    # c() can be used in place of list
+    # if this argument only takes one value for each source
+    n_per_clnt = c(2, 3),
+    x = list(1:10) # src2 with mean as def_fn will only accept this argument
+  )
+)
+
+# the result is a tibble
+sud_def
+
+# the fn_call column stores the code that can be ran with execute_def
+sud_def#fn_call
+</code></pre>
+
+
+</div>

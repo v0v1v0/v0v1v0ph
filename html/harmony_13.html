@@ -1,0 +1,168 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>RunHarmony.SingleCellExperiment</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Applies harmony on PCA cell embeddings of a SingleCellExperiment.</h2>
+
+<h3>Description</h3>
+
+<p>Applies harmony on PCA cell embeddings of a SingleCellExperiment.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">## S3 method for class 'SingleCellExperiment'
+RunHarmony(
+  object,
+  group.by.vars,
+  dims.use = NULL,
+  verbose = TRUE,
+  reduction.save = "HARMONY",
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>object</code></td>
+<td>
+<p>SingleCellExperiment with the PCA reducedDim cell embeddings populated</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>group.by.vars</code></td>
+<td>
+<p>the name(s) of covariates that harmony will remove
+its effect on the data.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dims.use</code></td>
+<td>
+<p>a vector of indices that allows only selected cell embeddings
+features to be used.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p>enable verbosity</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>reduction.save</code></td>
+<td>
+<p>the name of the new slot that is going to be created by
+harmony. By default, HARMONY.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+
+<p>Arguments passed on to <code>RunHarmony.default</code>
+</p>
+
+<dl>
+<dt><code>theta</code></dt>
+<dd>
+<p>Diversity clustering penalty parameter. Specify for
+each variable in vars_use Default theta=2. theta=0 does not
+encourage any diversity. Larger values of theta result in more
+diverse clusters.</p>
+</dd>
+<dt><code>sigma</code></dt>
+<dd>
+<p>Width of soft kmeans clusters. Default
+sigma=0.1. Sigma scales the distance from a cell to cluster
+centroids. Larger values of sigma result in cells assigned to
+more clusters. Smaller values of sigma make soft kmeans cluster
+approach hard clustering.</p>
+</dd>
+<dt><code>lambda</code></dt>
+<dd>
+<p>Ridge regression penalty. Default lambda=1. Bigger
+values protect against over correction. If several covariates
+are specified, then lambda can also be a vector which needs to
+be equal length with the number of variables to be
+corrected. In this scenario, each covariate level group will be
+assigned the scalars specified by the user. If set to NULL,
+harmony will start lambda estimation mode to determine lambdas
+automatically and try to minimize overcorrection (Use with caution still
+in beta testing).</p>
+</dd>
+<dt><code>nclust</code></dt>
+<dd>
+<p>Number of clusters in model. nclust=1 equivalent to
+simple linear regression.</p>
+</dd>
+<dt><code>max_iter</code></dt>
+<dd>
+<p>Maximum number of rounds to run Harmony. One round
+of Harmony involves one clustering and one correction step.</p>
+</dd>
+<dt><code>early_stop</code></dt>
+<dd>
+<p>Enable early stopping for harmony. The
+harmonization process will stop when the change of objective
+function between corrections drops below 1e-4</p>
+</dd>
+<dt><code>ncores</code></dt>
+<dd>
+<p>Number of processors to be used for math operations
+when optimized BLAS is available. If BLAS is not supporting
+multithreaded then this option has no effect. By default,
+ncore=1 which runs as a single-threaded process. Although
+Harmony supports multiple cores, it is not optimized for
+multithreading. Increase this number for large datasets iff
+single-core performance is not adequate.</p>
+</dd>
+<dt><code>plot_convergence</code></dt>
+<dd>
+<p>Whether to print the convergence plot of
+the clustering objective function. TRUE to plot, FALSE to
+suppress. This can be useful for debugging.</p>
+</dd>
+<dt><code>.options</code></dt>
+<dd>
+<p>Setting advanced parameters of RunHarmony. This must be the
+result from a call to 'harmony_options'. See ?'harmony_options' for 
+parameters not listed above and more details.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>SingleCellExperiment object. After running RunHarmony, the corrected
+cell embeddings can be accessed with reducedDim(object, "Harmony").
+</p>
+
+
+<h3>See Also</h3>
+
+<p>Other RunHarmony: 
+<code>RunHarmony.Seurat()</code>,
+<code>RunHarmony.default()</code>,
+<code>RunHarmony()</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+## sce is a SingleCellExperiment R object
+sce &lt;- RunHarmony(sce, "donor_id")
+
+## End(Not run)
+</code></pre>
+
+
+</div>

@@ -1,0 +1,308 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>boot.lasso.proj</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>P-values based on the bootstrapped lasso projection method</h2>
+
+<h3>Description</h3>
+
+<p>Compute p-values based on the lasso projection method, also known as
+the de-sparsified Lasso, using the bootstrap to approximate the
+distribution of the estimator.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">boot.lasso.proj(x, y, family = "gaussian", standardize = TRUE,
+                multiplecorr.method = "WY",
+                parallel = FALSE, ncores = getOption("mc.cores", 2L),
+                betainit = "cv lasso", sigma = NULL, Z = NULL, verbose = FALSE,
+                return.Z = FALSE, robust= FALSE,
+                B = 1000, boot.shortcut = FALSE,
+                return.bootdist = FALSE, wild = FALSE,
+                gaussian.stub = FALSE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>Design matrix (without intercept).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+<p>Response vector.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>family</code></td>
+<td>
+<p>family</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>standardize</code></td>
+<td>
+<p>Should design matrix be standardized to unit column
+standard deviation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>multiplecorr.method</code></td>
+<td>
+<p>Either "WY" or any of
+<code>p.adjust.methods</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>parallel</code></td>
+<td>
+<p>Should parallelization be used? (logical)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ncores</code></td>
+<td>
+<p>Number of cores used for parallelization.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>betainit</code></td>
+<td>
+<p>Either a numeric vector, corresponding to a sparse
+estimate of the coefficient vector, or the method to be used for the
+initial estimation, "scaled lasso" or "cv lasso".</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sigma</code></td>
+<td>
+<p>Estimate of the standard deviation of the error term. This
+estimate needs to be compatible with the initial
+estimate (see betainit) provided or calculated. Otherwise, results
+will not be correct.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Z</code></td>
+<td>
+<p>user input, also see <code>return.Z</code> below</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p>A boolean to enable reporting on the progress of the
+computations. (Only prints out information when Z is not provided by
+the user)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>return.Z</code></td>
+<td>
+<p>An option to return the intermediate result which only
+depends on the design matrix x. This intermediate results
+can be used when calling the function again and the design matrix
+is the same as before.</p>
+</td>
+</tr>
+</table>
+<table>
+<tr style="vertical-align: top;">
+<td><code>robust</code></td>
+<td>
+<p>Uses a robust variance estimation procedure to be able
+to deal with model misspecification.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>B</code></td>
+<td>
+<p>The number of bootstrap samples to be used.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>boot.shortcut</code></td>
+<td>
+<p>A boolean to enable the computational shortcut
+for the bootstrap. If set to true, the lasso is not re-tuned for
+each bootstrap iteration, but it uses the tuning parameter computed
+on the original data instead.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>return.bootdist</code></td>
+<td>
+<p>A boolean specifying if one is to return the
+computed bootstrap distributions to the estimator. (Matrix size:
+ncol(x)*B) If the multiple testing method was chosen to be WY, the
+bootstrap distribution computer under the complete null hypothesis
+is returned as well. This option is required if one wants to compute
+confidence intervals afterwards.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>wild</code></td>
+<td>
+<p>Perform the wild bootstrap based on N(0,1) distributed
+random variables</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>gaussian.stub</code></td>
+<td>
+<p>DEVELOPER OPTION. Only enable if you know what
+you are doing.
+A boolean to run stub code instead of actually bootstrapping the
+estimator. It generates a finite sample distribution for each
+estimate by sampling B samples from
+N(0,\hat{s.e.}_j^2). (Note: we do not sample from the multivariate
+gaussian with the covariance matrix. Therefore, no dependencies are 
+modelled at all.) Useful for debugging and for checking if the 
+bootstrap is way off for some reason.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>pval</code></td>
+<td>
+<p>Individual p-values for each parameter.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pval.corr</code></td>
+<td>
+<p>Multiple testing corrected p-values for each
+parameter.</p>
+</td>
+</tr>
+</table>
+<table>
+<tr style="vertical-align: top;">
+<td><code>sigmahat</code></td>
+<td>
+<p><code class="reqn">\widehat{\sigma}</code> coming from the scaled lasso.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Z</code></td>
+<td>
+<p>Only different from NULL if the option return.Z is on. This
+is an intermediate result from the computation which only depends on
+the design matrix x. These are the residuals of the nodewise
+regressions.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>B</code></td>
+<td>
+<p>The number of bootstrap samples used.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>boot.shortcut</code></td>
+<td>
+<p>If the bootstrap shortcut has been used or not.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lambda</code></td>
+<td>
+<p>What tuning parameter was used for the bootstrap
+shortcut. NULL if no shortcut was used or if no valid lambda was
+available to use for the shortcut.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cboot.dist</code></td>
+<td>
+<p>Only different from NULL if the option
+return.bootdist is on. This is a ncol(x)*B matrix where each row
+contains the computed centered bootstrap distribution for that
+estimate.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cboot.dist.underH0</code></td>
+<td>
+<p>Only different from NULL if the option
+return.bootdist is on and if the multiple testing method is WY. This
+is a ncol(x)*B matrix where each row 
+contains the computed centered bootstrap distribution for that
+estimate. These bootstrap distributions were computed under the
+complete null hypothesis (b_1 = ... = b_p = 0).</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>Ruben Dezeure</p>
+
+
+<h3>References</h3>
+
+<p>van de Geer, S., Bühlmann, P., Ritov, Y. and Dezeure, R. (2014)
+On asymptotically optimal confidence regions and tests for
+high-dimensional models. <em>Annals of Statistics</em> <b>42</b>, 1166–1202._
+</p>
+<p>Zhang, C., Zhang, S. (2014)
+Confidence intervals for low dimensional parameters in high
+dimensional linear models. <em>Journal of the Royal Statistical
+Society: Series B</em> <b>76</b>, 217–242.
+</p>
+<p>Bühlmann, P. and van de Geer, S. (2015)
+High-dimensional inference in misspecified linear models.
+<em>Electronic Journal of Statistics</em> <b>9</b>, 1449–1473.
+</p>
+<p>Dezeure, R., Bühlmann, P. and Zhang, C. (2016)
+High-dimensional simultaneous inference with the bootstrap
+<em>http://arxiv.org/abs/1606.03940</em>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">x &lt;- matrix(rnorm(100 * 10), nrow = 100, ncol = 10)
+y &lt;- x[,1] + x[,2] + rnorm(100)
+
+
+fit.lasso &lt;- boot.lasso.proj(x, y)
+which(fit.lasso$pval.corr &lt; 0.05) # typically: '1' and '2' and no other
+
+
+
+## Use the computational shortcut for the bootstrap to speed up
+## computations
+fit.lasso.shortcut &lt;- boot.lasso.proj(x, y, boot.shortcut = TRUE)
+which(fit.lasso.shortcut$pval.corr &lt; 0.05) # typically: '1' and '2' and no other
+
+
+
+## Return the bootstrap distribution as well and compute confidence intervals based on it
+fit.lasso.allinfo &lt;- boot.lasso.proj(x, y, return.bootdist = TRUE)
+confint(fit.lasso.allinfo, level = 0.95)
+confint(fit.lasso.allinfo, parm = 1:3)
+
+## Use the scaled lasso for the initial estimate
+fit.lasso.scaled &lt;- boot.lasso.proj(x, y, betainit = "scaled lasso")
+which(fit.lasso.scaled$pval.corr &lt; 0.05)
+
+## Use a robust estimate for the standard error
+fit.lasso.robust &lt;- boot.lasso.proj(x, y, robust = TRUE)
+which(fit.lasso.robust$pval.corr &lt; 0.05)
+
+</code></pre>
+
+
+</div>

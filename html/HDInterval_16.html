@@ -1,0 +1,96 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>inverseCDF</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Inverse Cumulative Density Function
+</h2>
+
+<h3>Description</h3>
+
+<p>Given a cumulative density function, calculates the quantiles coresponding to given probabilities, ie, "converts" a CDF to an ICDF. The function method for <code>hdi</code> requires an ICDF, which is not always available for custom distributions.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">inverseCDF(p, CDF, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>p</code></td>
+<td>
+
+<p>a vector of probabilities. Values less than 1e6 will be replaced with 1e6 and values greater than (1 - 1e-6) will be replaced with (1 - 1e-6), without a warning.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>CDF</code></td>
+<td>
+
+<p>a cumulative density function; standard CDFs in R begin with <code>p-</code>, eg, <code>pnorm</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+
+<p>named parameters to be passed to the CDF function; see Examples; <code>log.p</code> and <code>lower.tail</code> are not supported and generate an error.
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The function uses a search algorithm to find the value of <code>q</code> which corresponds to <code>p</code>. This suffers from imprecision, especially for sections of the CDF which are relatively flat, as is usually the case close to p = 0 or 1.
+</p>
+
+
+<h3>Value</h3>
+
+<p>a vector of the same length as <code>p</code> with the corresponding quantiles.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Mike Meredith
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Try with pgamma/qgamma
+inverseCDF(c(0.025, 0.975), pgamma, shape=2.5, rate=2) # 95% interval
+qgamma(c(0.025, 0.975), shape=2.5, rate=2) # for comparison
+inverseCDF(c(0, 1), pgamma, shape=2.5, rate=2) # nonsense, fixed internally...
+inverseCDF(c(1e-6, 1 - 1e-6), pgamma, shape=2.5, rate=2) # ...same.
+
+# Plug inverseCDF into hdi, need to specify the CDF
+hdi(inverseCDF, CDF=pgamma, shape=2.5, rate=2)
+hdi(qgamma, shape=2.5, rate=2) # for comparison
+
+# for a custom density, here a mixture of normals
+# the PDF
+dmixg &lt;- function(x)
+  0.6 * dnorm(x, 0, 1) + 0.4 * dnorm(x, 4, 2^0.5)
+curve(dmixg, -5, 10)
+# and the CDF
+pmixg &lt;- function(q)
+  0.6 * pnorm(q, 0, 1) + 0.4 * pnorm(q, 4, 2^0.5)
+curve(pmixg, -5, 10)
+# Now plug into inverseCDF and hdi
+inverseCDF(c(0.025, 0.975), pmixg)
+hdi(inverseCDF, CDF=pmixg)
+</code></pre>
+
+
+</div>

@@ -1,0 +1,108 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>getDEM</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Function to obtain the digital elevation models for the active
+floodplains along the German federal waterways Elbe and Rhine</h2>
+
+<h3>Description</h3>
+
+<p>This function downloads and patches the tiled digital elevation
+models (dem) along the German federal waterways Elbe and Rhine that have
+been published on <a href="https://www.pangaea.de">pangaea.de</a>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">getDEM(filename = "", ext, crs, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>filename</code></td>
+<td>
+<p>supplies an optional in- and output filename and has to be
+type <code>character</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ext</code></td>
+<td>
+<p>argument of type <code>SpatExtent</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>crs</code></td>
+<td>
+<p>argument of type <code>crs</code> or
+<code>crs</code>. It is
+used to select the respective river (Elbe: <a href="https://spatialreference.org/ref/epsg/25833/">'ETRS 1989 UTM 33N'</a>; Rhine:
+<a href="https://spatialreference.org/ref/epsg/25832/">'ETRS 1989 UTM 32N'</a>)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>additional arguments as for <code>writeRaster</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Since the underlying tiled digital elevation models (dem) are rather
+large datasets hydflood provides options to permanentely cache these
+datasets. <code>options("hydflood.datadir" = tempdir())</code> is the default. To
+modify the location of your raster cache to your needs set the respective
+<code>options()</code> prior to loading the package, e.g.
+<code>options("hydflood.datadir" = "~/.hydflood");library(hydflood)</code>. The
+location can also be determined through the environmental variable
+<span class="env">hydflood_datadir</span>.
+</p>
+<p>Since downloads of large individual datasets might cause timeouts, it is
+recommended to increase <code>options("timeout")</code>.
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>SpatRaster</code> object containing elevation data for the selected
+floodplain region.
+</p>
+
+
+<h3>References</h3>
+
+<p>Weber A (2020).
+“Digital elevation models of German waterway and navigation authorities - Version 0.1.0.”
+<a href="https://doi.org/10.5675/BfG-2011">https://doi.org/10.5675/BfG-2011</a>.
+</p>
+<p>Weber A (2020).
+“Digital elevation model (DEM1) of the River Elbe floodplain between Schmilka and Geesthacht, Germany.”
+<a href="https://doi.org/10.1594/PANGAEA.919293">https://doi.org/10.1594/PANGAEA.919293</a>.
+</p>
+<p>Weber A (2020).
+“Digital elevation model (DEM1) of the River Rhine floodplain between Iffezheim and Kleve, Germany.”
+<a href="https://doi.org/10.1594/PANGAEA.919308">https://doi.org/10.1594/PANGAEA.919308</a>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+  options("hydflood.datadir" = tempdir())
+  options("timeout" = 120)
+  library(hydflood)
+  dem &lt;- getDEM(ext = ext(c(309000, 310000, 5749000, 5750000)),
+                crs = st_crs("EPSG:25833"))
+
+
+</code></pre>
+
+
+</div>

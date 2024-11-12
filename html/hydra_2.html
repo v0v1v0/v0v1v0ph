@@ -1,0 +1,188 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hydraPlus</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+<code>hydra</code> with additional stress minimization</h2>
+
+<h3>Description</h3>
+
+<p>Runs the <code>hydra</code> method and then performs a further optimization step by minimizing the stress of the embedding and optimizing hyperbolic curvature
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hydraPlus(D, dim = 2, curvature = 1, alpha = 1.1, equi.adj = 0.5,
+  control = list(), curvature.bias = 1, curvature.freeze = TRUE,
+  curvature.max = NULL, maxit = 1000, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>D</code></td>
+<td>
+<p>a square symmetric matrix of distances (or dissimiliarities) to be embdedded, can also be a <code>dist</code> object</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dim</code></td>
+<td>
+<p>embedding dimension</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>curvature</code></td>
+<td>
+<p>embedding curvature; if this argument is NULL, hydra tries to find the optimal curvature</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alpha</code></td>
+<td>
+<p>real number greater one; adjusts the hyperbolic curvature. Values larger than one yield a more distorted embedding where points are pushed
+to the outer boundary (i.e. the ideal points) of hyperblic space. The interaction between <code>curvature</code> and <code>alpha</code> is non-linear.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>equi.adj</code></td>
+<td>
+<p>equi-angular adjustment; must be a real number between zero and one; only used if <code>dim</code> is 2. Value 0 means no ajustment, 1 adjusts
+embedded data points such that their angular coordinates in the Poincare disc are uniformly distributed. Other values interpolate between the two extremes. Setting the parameter to non-zero values can make the embedding result look more harmoniuous in plots.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>control</code></td>
+<td>
+<p>a list which may contain the following boolean flags:
+</p>
+
+<ul>
+<li>
+<p> polar - return polar coordinates in dimension 2 (default: TRUE if <code>dim</code> is 2. This flag is ignored in higher dimension)
+</p>
+</li>
+<li>
+<p> isotropic.adj - perform isotropic adjustment, ignoring Eigenvalues (default: TRUE if <code>dim</code> is 2, FALSE else)
+</p>
+</li>
+<li>
+<p> return.lorentz - return raw Lorentz coordinates (before projection to hyperbolic space) (default: FALSE)
+</p>
+</li>
+<li>
+<p> return.stress - return embedding stress (default: TRUE)
+</p>
+</li>
+<li>
+<p> return.dist - return hyperbolic distance matrix of embedded points (default: FALSE)
+</p>
+</li>
+<li>
+<p> use.eigs  - use <code>eigs</code> function from <span class="pkg">RSpectra</span> and <code>norm</code> function from <span class="pkg">Matrix</span> to speed up computation (default: FALSE)
+</p>
+</li>
+</ul>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>curvature.bias</code></td>
+<td>
+<p>Modify curvature before stress minimization by multiplying with <code>curvature.bias</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>curvature.freeze</code></td>
+<td>
+<p>Freeze the curvature returned by <code>hydra</code>. If TRUE then no optimization of curvature is attempted in the second stage of the algorithm. If FALSE then curvature is optimized in the second stage</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>curvature.max</code></td>
+<td>
+<p>Upper bound for the curvature. If NULL, a defulat bound is used</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>maxit</code></td>
+<td>
+<p>Maximal number of iterations. This parameter is passed to the optimization routine <code>optim</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Additional parameters are passed to <code>optim</code>, which performs the underlying stress minimization</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>See <a href="https://arxiv.org/abs/1903.08977">https://arxiv.org/abs/1903.08977</a> for more details.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A ‘hydra’ object, which is a list with all or some of the following components:
+</p>
+
+<dl>
+<dt>r</dt>
+<dd>
+<p>a vector containing the radial coordinates of the embedded points</p>
+</dd>
+<dt>directional</dt>
+<dd>
+<p>a matrix with <code>dim</code> columns containing as rows the directional coordinates of the embedded points</p>
+</dd>
+<dt>theta</dt>
+<dd>
+<p>a vector containing the angular coordinates of the embedded points (only returned if <code>dim</code> is 2 and <code>polar</code> flag  is TRUE)</p>
+</dd>
+<dt>curvature</dt>
+<dd>
+<p>the curvature used for the returned embedding</p>
+</dd>
+<dt>dim</dt>
+<dd>
+<p>the dimension used for the returned embedding</p>
+</dd>
+<dt>stress</dt>
+<dd>
+<p>the stress (i.e. the mean-square difference) between distances supplied in <code>D</code> and the hyperbolic distance matrix of the returned embedding</p>
+</dd>
+<dt>dist</dt>
+<dd>
+<p>the hyperbolic distance matrix of the returned embedding (only returned if flag <code>return.dist</code> is true. Computation may be time- and memory-intensive.)</p>
+</dd>
+<dt>x0</dt>
+<dd>
+<p>a vector containing the 'time-like' coordinate of the raw Lorentz embedding (only returned if flag <code>return.lorentz</code> is true)</p>
+</dd>
+<dt>X</dt>
+<dd>
+<p>a matrix with <code>dim</code> columns containing as rows the 'space-like' coordinate of the raw Lorentz embedding (only returned if flag <code>return.lorentz</code> is true)</p>
+</dd>
+</dl>
+<h3>Author(s)</h3>
+
+<p>Martin Keller-Ressel &lt;martin.keller-ressel@tu-dresden.de&gt;
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(karate)
+embedding &lt;- hydraPlus(karate$distance)
+plot(embedding,labels=karate$label,node.col=karate$group,graph.adj=karate$adjacency)
+
+</code></pre>
+
+
+</div>

@@ -1,0 +1,69 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>lookup</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Find value corresponding to the input vector using a look-up table</h2>
+
+<h3>Description</h3>
+
+<p>Find value corresponding to the input vector using a look-up table
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">lookup(x, link, lu, verbose = getOption("healthdb.verbose"))
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>A variable name in a data.frame; this function should be called inside dplyr::mutate().</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>link</code></td>
+<td>
+<p>A formula in the form: name_of_x_in_lu ~ name_of_target_value. The left-hand-side can be omitted if x's name is also x in the look-up.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lu</code></td>
+<td>
+<p>Look-up table in data.frame class.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p>A logical for whether warn for missing values in the output.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A vector of matched values.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+df &lt;- data.frame(drug_code = 1:10)
+lu &lt;- data.frame(drug_id = 1:20, drug_code = as.character(1:10), drug_name = sample(letters, 20))
+
+df %&gt;% dplyr::mutate(
+  drug_nm = lookup(drug_code, drug_id ~ drug_name, lu),
+  # this will work as lu also has drug_code column
+  drug_nm = lookup(drug_code, ~ drug_name, lu)
+)
+</code></pre>
+
+
+</div>

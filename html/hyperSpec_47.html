@@ -1,0 +1,151 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>apply</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>apply
+Computes summary statistics for the spectra of a <code>hyperSpec</code> object.</h2>
+
+<h3>Description</h3>
+
+<p><code>apply</code> gives the functionality of <code>apply</code> for
+<code>hyperSpec</code> objects.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">## S4 method for signature 'hyperSpec'
+apply(
+  X,
+  MARGIN,
+  FUN,
+  ...,
+  label.wl = NULL,
+  label.spc = NULL,
+  new.wavelength = NULL,
+  simplify
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>X, spc</code></td>
+<td>
+<p>a <code>hyperSpec</code> object</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>MARGIN</code></td>
+<td>
+<p>The subscript which the function will be applied over.
+</p>
+<p><code>1</code> indicates rows (<code>FUN</code> is applied to each spectrum),
+</p>
+<p><code>2</code> indicates columns (<code>FUN</code> is applied to each wavelength),
+</p>
+<p><code>1 : 2</code> indicates that <code>FUN</code> should be applied to each single
+element of the spectra matrix. Note that many basic mathematical
+functions are already defined for hyperSpec objects (see
+<code>Math</code>).
+</p>
+<p>If <code>MARGIN</code> is missing, the whole spectra matrix is handed to
+<code>FUN</code>, see also the examples.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>FUN</code></td>
+<td>
+<p>function to compute the summary statistics</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>further arguments passed to <code>FUN</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>label.wl, label.spc</code></td>
+<td>
+<p>new labels for wavelength and spectral intensity
+axes</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>new.wavelength</code></td>
+<td>
+<p>for <code>MARGIN = 2</code>: numeric vector or name of the
+argument in ... that is to be used (character) as wavelength axis of
+the resulting object.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>simplify</code></td>
+<td>
+<p>ignored: apply for hyperSpec results are always simplified</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The generic functions of group <code>Math</code> are not definded
+for <code>hyperSpec</code> objects. Instead, <code>apply</code> can be used. For
+functions like <code>log</code> that work on scalars, <code>MARGIN = 1 : 2</code> gives
+the appropriate behaviour.
+</p>
+<p><code>spcapply</code> does the same as <code>apply</code> with <code>MARGIN = 1</code>, but
+additionally allows to set a new wavelength axis and adjust the labels.
+</p>
+<p><code>wlapply</code> does the same as <code>apply</code> with <code>MARGIN = 2</code>, but
+additionally allows to set a new wavelength axis and adjust the labels.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A <code>hyperSpec</code> object
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>C. Beleites
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>apply</code>, for applying <code>FUN</code> to subgroups of
+the <code>hyperSpec</code> object: <code>aggregate</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+
+plotspc (apply (chondro, 2, range))
+
+avgflu &lt;- apply (flu, 1, mean,
+                 label.spc = expression (bar (I)),
+                 new.wavelength = mean (wl (flu)))
+avgflu
+
+flu[[,,405:407]]
+apply (flu, 1:2, "*", -1)[[,,405:407]]
+
+## without MARGIN the whole matrix is handed to FUN
+apply (flu [,,405:407], , print) [[]]
+
+## whereas MARGIN = 1 : 2 leads to FUN being called for each element separately
+apply (flu [,,405:407], 1 : 2, print) [[]]
+
+</code></pre>
+
+
+</div>

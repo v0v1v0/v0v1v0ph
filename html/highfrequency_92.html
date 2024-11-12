@@ -1,0 +1,118 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>rSVar</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Realized semivariance of highfrequency return series</h2>
+
+<h3>Description</h3>
+
+<p>Calculate the realized semivariances, defined in Barndorff-Nielsen et al. (2008).
+</p>
+<p>Function returns two outcomes: 
+</p>
+
+<ol>
+<li>
+<p> Downside realized semivariance 
+</p>
+</li>
+<li>
+<p> Upside realized semivariance.
+</p>
+</li>
+</ol>
+<p>Assume there are <code class="reqn">N</code> equispaced returns <code class="reqn">r_{t,i}</code> in period <code class="reqn">t</code>, <code class="reqn">i=1, \ldots,N</code>.
+</p>
+<p>Then, the <code>rSVar</code> is given by
+</p>
+<p style="text-align: center;"><code class="reqn">
+  \mbox{rSVardownside}_{t}= \sum_{i=1}^{N} (r_{t,i})^2  \ \times \ I [ r_{t,i} &lt; 0]
+</code>
+</p>
+
+<p style="text-align: center;"><code class="reqn">
+  \mbox{rSVarupside}_{t}= \sum_{i=1}^{N} (r_{t,i})^2 \ \times \ I [ r_{t,i} &gt; 0]
+</code>
+</p>
+
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">rSVar(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>rData</code></td>
+<td>
+<p>an <code>xts</code> or <code>data.table</code> object containing returns or prices, possibly for multiple assets over multiple days.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alignBy</code></td>
+<td>
+<p>character, indicating the time scale in which <code>alignPeriod</code> is expressed. 
+Possible values are: <code>"ticks"</code>, <code>"secs"</code>, <code>"seconds"</code>, <code>"mins"</code>, <code>"minutes"</code>, <code>"hours"</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alignPeriod</code></td>
+<td>
+<p>positive numeric, indicating the number of periods to aggregate over. For example to aggregate.
+based on a 5-minute frequency, set <code>alignPeriod = 5</code> and <code>alignBy = "minutes"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>makeReturns</code></td>
+<td>
+<p>boolean, should be <code>TRUE</code> when <code>rData</code> contains prices instead of returns. 
+<code>FALSE</code> by default.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>used internally</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>list with two entries, the realized positive and negative semivariances
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Giang Nguyen, Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup.
+</p>
+
+
+<h3>References</h3>
+
+<p>Barndorff-Nielsen, O. E., Kinnebrock, S., and Shephard N. (2010). <em>Measuring downside risk: realised semivariance</em>. In: Volatility and Time Series Econometrics: Essays in Honor of Robert F. Engle,
+(Edited by Bollerslev, T., Russell, J., and Watson, M.), 117-136. Oxford University Press.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>IVar</code> for a list of implemented estimators of the integrated variance.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">sv &lt;- rSVar(sampleTData[, list(DT, PRICE)], alignBy = "minutes",
+          alignPeriod = 5, makeReturns = TRUE)
+sv
+</code></pre>
+
+
+</div>

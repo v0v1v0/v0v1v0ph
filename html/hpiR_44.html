@@ -1,0 +1,97 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>rfModel</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Estimate random forest model for index creation</h2>
+
+<h3>Description</h3>
+
+<p>Estimate coefficients for an index via the random forest approach (generic method)
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">rfModel(estimator, rf_df, rf_spec, ntrees = 200, seed = 1, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>estimator</code></td>
+<td>
+<p>Type of model to estimates (pdp)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rf_df</code></td>
+<td>
+<p>Transactions dataset from hedCreateSales()</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rf_spec</code></td>
+<td>
+<p>Model specification ('formula' object)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ntrees</code></td>
+<td>
+<p>[200] Set number of trees to use</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>seed</code></td>
+<td>
+<p>[1] Random seed for reproducibility</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Additional arguments</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>'rfmodel' object: model object of the estimator (ex.: 'lm')
+</p>
+
+
+<h3>Further Details</h3>
+
+<p>‘estimator' argument must be in a class of ’pdp'
+This function is not generally called directly, but rather from 'hpiModel()'
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"> # Load example data
+ data(ex_sales)
+
+ # Create hedonic data
+ hed_data &lt;- hedCreateTrans(trans_df = ex_sales,
+                           prop_id = 'pinx',
+                           trans_id = 'sale_id',
+                           price = 'sale_price',
+                           date = 'sale_date',
+                           periodicity = 'monthly')
+
+ # Estimate Model
+ rf_model &lt;- rfModel(estimator = structure('pdp', class = 'pdp'),
+                     rf_df = hed_data,
+                     rf_spec = as.formula(log(price) ~ baths + tot_sf),
+                     ntrees = 10,
+                     sim_count = 1)
+
+</code></pre>
+
+
+</div>

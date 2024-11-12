@@ -1,0 +1,67 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>expect_header</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Test that an HTTP request is made with a header</h2>
+
+<h3>Description</h3>
+
+<p>This expectation checks that a HTTP header (and potentially header value)
+is present in a request. It works by inspecting the request object and
+raising warnings that are caught by <code>testthat::expect_warning()</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">expect_header(..., ignore.case = TRUE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Arguments passed to <code>expect_warning</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ignore.case</code></td>
+<td>
+<p>logical: if <code>FALSE</code>, the pattern matching is <em>case
+sensitive</em> and if <code>TRUE</code>, case is ignored during matching. Default is <code>TRUE</code>;
+note that this is the opposite of <code>expect_warning</code> but is appropriate here
+because HTTP header names are case insensitive.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p><code>expect_header</code> works both in the mock HTTP contexts and on "live" HTTP
+requests.
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>NULL</code>, according to <code>expect_warning</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">library(httr)
+with_fake_http({
+  expect_header(
+    GET("http://example.com", config = add_headers(Accept = "image/png")),
+    "Accept: image/png"
+  )
+})
+</code></pre>
+
+
+</div>

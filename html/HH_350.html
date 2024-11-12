@@ -1,0 +1,213 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>OddsRatio</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2> Calculate or plot the odds ratio for a 2x2 table of counts.</h2>
+
+<h3>Description</h3>
+
+<p>Calculate or plot the odds ratio for a 2x2 table of counts.
+The plot shows the confidence intervals on the probability of
+row2 for fixed odds ratio
+and specified probability for row1.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">OddsRatio(x, alpha = 0.05)
+
+plotOddsRatio(x,
+              ylab="prob(col1 | row1)",
+              xlab="prob(col1 | row2)",
+              alpha=c(.50, .05),
+              col=trellis.par.get("superpose.line")$col,
+              lwd=trellis.par.get("superpose.line")$lwd,
+              lwd.reference=1,
+              ...)
+
+plotOddsRatio.base(x,
+ ylab = "prob(col1 | row1)", xlab = "prob(col1 | row2)",
+ alpha = c(0.05, 0.5),
+ legend.x=1.05,
+ oma=c(0,0,0,5), ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>2 x 2 table of counts</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alpha</code></td>
+<td>
+<p>Significance levels of test.
+<code>OddsRatio</code> requires a single number in the range [0,1].
+<code>plotOddsRatio</code> accepts more than one number on the range
+[0,1] and draws confidence lines at each value.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>xlab,
+ylab</code></td>
+<td>
+<p>x- and y-labels for the plot  Sensible defaults are
+generated.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>col, lwd</code></td>
+<td>
+<p>Colors and linewidths to be used in the graph.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lwd.reference</code></td>
+<td>
+<p>linewidth for reference line.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>other arguments, currently ignored.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>legend.x</code></td>
+<td>
+<p>x position of left-hand side of legend.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>oma</code></td>
+<td>
+<p>outer margin <code>par()$oma</code>, needed to make room for legend. </p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p><code>plotOddsRatio</code> returns a lattice object.
+</p>
+<p>The older <code>plotOddsRatio.base</code> draws a plot with base graphics and invisibly returns the same
+list as <code>OddsRatio</code> returns for the first value of <code>alpha</code>.
+</p>
+<p><code>OddsRatio</code> returns the list:
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>p1, p2</code></td>
+<td>
+<p>proportion of each row total observed in the first column.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>omega1, omega2</code></td>
+<td>
+<p>odds for each row, p/(1-p)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>psihat</code></td>
+<td>
+<p>odds ratio, omega2/omega1</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>s.ln.psihat</code></td>
+<td>
+<p>standard deviation of <code>ln(psihat)</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ci.ln.psihat</code></td>
+<td>
+<p>confidence interval for <code>ln(psihat)</code>
+using normal approximation</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ci.psihat</code></td>
+<td>
+<p>confidence interval for <code>psihat</code> calculated
+ase <code>p(ci.ln.psihat)</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>prob1</code></td>
+<td>
+<p><code>seq(0,1,.05)</code>, set of p1 values for plotting.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>odds1</code></td>
+<td>
+<p><code>p1/(1-p1)</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>odds2</code></td>
+<td>
+<p>odds for the second row needed to retain <code>psihat</code> with
+the specified <code>odds1</code>, calculated as <code>odds1*psihat</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ci.odds2</code></td>
+<td>
+<p>confidence interval for <code>odds2</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>prob2</code></td>
+<td>
+<p><code>odds2 / (odds2+1)</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ci.prob2</code></td>
+<td>
+<p><code>ci.odds2 / (ci.odds2+1)</code></p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p> Richard M. Heiberger &lt;rmh@temple.edu&gt; </p>
+
+
+<h3>References</h3>
+
+<p>Heiberger, Richard M. and Holland, Burt (2015).
+<em>Statistical Analysis and Data Display: An Intermediate Course with Examples in R</em>.
+Second Edition.
+Springer-Verlag, New York.
+<a href="https://link.springer.com/book/10.1007/978-1-4939-2122-5">https://link.springer.com/book/10.1007/978-1-4939-2122-5</a>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(glasses)
+
+## draw the iso-odds ratio plot with 50% CI and 95% CI,
+plotOddsRatio(glasses)
+
+## return the 95% CI information
+OddsRatio(glasses)
+
+## draw the iso-odds ratio plot with 50% CI and 95% CI,
+## invisibly return the 95% CI information
+plotOddsRatio.base(glasses)
+</code></pre>
+
+
+</div>

@@ -1,0 +1,103 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>SEfromHessian</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Standard error of parameters based on Hessian matrix</h2>
+
+<h3>Description</h3>
+
+<p>Standard error of parameters based on Hessian matrix.<br>
+The strategy is as follow:<br>
+First it tries to inverse the Hessian matrix. If it fails, it uses the near
+positive definite matrix of the Hessian.<br>
+So now the inverse of the Hessian matrix can be computed.<br>
+The diagonal of the inverse of the Hessian matrix is calculated. If all values are positive,
+the SEs are the square root of the inverse of the Hessian.<br>
+If not all values are positive, it will estimate the pseudo-variance
+matrix based on Gill &amp; King (2004). It necessitates a Cholesky matrix.<br>
+If from some reason it fails (for example all SE are 0 in output), then the strategy of
+Rebonato and Jackel (2000) will be used to generate the Cholesky matrix.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">SEfromHessian(a, hessian = FALSE, silent = FALSE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>a</code></td>
+<td>
+<p>An Hessian matrix</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>hessian</code></td>
+<td>
+<p>If TRUE, return a list with the hessian and SE</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>silent</code></td>
+<td>
+<p>If TRUE, report some problems</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>SEfromHessian returns standard error of parameters based on Hessian matrix
+</p>
+
+
+<h3>Value</h3>
+
+<p>SEfromHessian returns a vector with standard errors
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Marc Girondot <a href="mailto:marc.girondot@gmail.com">marc.girondot@gmail.com</a>
+</p>
+
+
+<h3>References</h3>
+
+<p>Gill J. and G. King 2004. What to do when your Hessian is not invertible:
+Alternatives to model respecification in nonlinear estimation. Sociological Methods
+&amp; Research 33: 54-87.
+</p>
+<p>Rebonato and Jackel, “The most general methodology for creating a valid
+correlation matrix for risk management and option pricing purposes”, Journal of Risk,
+Vol 2, No 2, 2000.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+val=rnorm(100, mean=20, sd=5)
+# Return -ln L of values in val in Gaussian distribution with mean and sd in par
+fitnorm&lt;-function(par, val) {
+  -sum(dnorm(val, par["mean"], par["sd"], log = TRUE))
+}
+# Initial values for search
+p&lt;-c(mean=20, sd=5)
+# fit the model
+result &lt;- optim(par=p, fn=fitnorm, val=val, method="BFGS", hessian=TRUE)
+SE &lt;- SEfromHessian(result$hessian)
+library(MASS)
+fitdistr(val, densfun = "normal")
+
+## End(Not run)
+</code></pre>
+
+
+</div>

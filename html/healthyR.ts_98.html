@@ -1,0 +1,121 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>util_doubledifflog_ts</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Double Differencing with Log Transformation to Make Time Series Stationary</h2>
+
+<h3>Description</h3>
+
+<p>This function attempts to make a non-stationary time series stationary by applying
+double differencing with a logarithmic transformation. It iteratively increases the differencing order
+until stationarity is achieved or informs the user if the transformation is not possible.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">util_doubledifflog_ts(.time_series)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table><tr style="vertical-align: top;">
+<td><code>.time_series</code></td>
+<td>
+<p>A time series object to be made stationary.</p>
+</td>
+</tr></table>
+<h3>Details</h3>
+
+<p>The function calculates the frequency of the input time series using the <code>stats::frequency</code> function
+and checks if the minimum value of the time series is greater than 0. It then applies double differencing
+with a logarithmic transformation incrementally until the Augmented Dickey-Fuller test indicates
+stationarity (p-value &lt; 0.05) or until the differencing order reaches the frequency of the data.
+</p>
+<p>If double differencing with a logarithmic transformation successfully makes the time series stationary,
+it returns the stationary time series and related information as a list with the following elements:
+</p>
+
+<ul>
+<li>
+<p> stationary_ts: The stationary time series after the transformation.
+</p>
+</li>
+<li>
+<p> ndiffs: The order of differencing applied to make it stationary.
+</p>
+</li>
+<li>
+<p> adf_stats: Augmented Dickey-Fuller test statistics on the stationary time series.
+</p>
+</li>
+<li>
+<p> trans_type: Transformation type, which is "double_diff_log" in this case.
+</p>
+</li>
+<li>
+<p> ret: TRUE to indicate a successful transformation.
+</p>
+</li>
+</ul>
+<p>If the data either had a minimum value less than or equal to 0 or requires more differencing than
+its frequency allows, it informs the user that the data could not be stationarized.
+</p>
+
+
+<h3>Value</h3>
+
+<p>If the time series is already stationary or the double differencing with a logarithmic transformation is successful,
+it returns a list as described in the details section. If the transformation is not possible, it informs
+the user and returns a list with ret set to FALSE, indicating that the data could not be stationarized.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Steven P. Sanderson II, MPH
+</p>
+
+
+<h3>See Also</h3>
+
+<p>Other Utility: 
+<code>auto_stationarize()</code>,
+<code>calibrate_and_plot()</code>,
+<code>internal_ts_backward_event_tbl()</code>,
+<code>internal_ts_both_event_tbl()</code>,
+<code>internal_ts_forward_event_tbl()</code>,
+<code>model_extraction_helper()</code>,
+<code>ts_get_date_columns()</code>,
+<code>ts_info_tbl()</code>,
+<code>ts_is_date_class()</code>,
+<code>ts_lag_correlation()</code>,
+<code>ts_model_auto_tune()</code>,
+<code>ts_model_compare()</code>,
+<code>ts_model_rank_tbl()</code>,
+<code>ts_model_spec_tune_template()</code>,
+<code>ts_qq_plot()</code>,
+<code>ts_scedacity_scatter_plot()</code>,
+<code>ts_to_tbl()</code>,
+<code>util_difflog_ts()</code>,
+<code>util_doublediff_ts()</code>,
+<code>util_log_ts()</code>,
+<code>util_singlediff_ts()</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Example 1: Using a time series dataset
+util_doubledifflog_ts(AirPassengers)
+
+# Example 2: Using a different time series dataset
+util_doubledifflog_ts(BJsales)$ret
+
+</code></pre>
+
+
+</div>

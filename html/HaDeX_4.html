@@ -1,0 +1,165 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>calculate_kinetics</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Calculate kinetic data</h2>
+
+<h3>Description</h3>
+
+<p>Calculate kinetics of the hydrogen-deuteration exchange 
+for given peptide.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">calculate_kinetics(
+  dat,
+  protein = dat[["Protein"]][1],
+  sequence,
+  state,
+  start,
+  end,
+  time_in,
+  time_out,
+  deut_part = 1
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>dat</code></td>
+<td>
+<p>dat data read by <code>read_hdx</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>protein</code></td>
+<td>
+<p>protein value for chosen peptide</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sequence</code></td>
+<td>
+<p>sequence of the peptide for which the kinetics is calculated</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>state</code></td>
+<td>
+<p>state of given sequence</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>start</code></td>
+<td>
+<p>end of given sequence</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>end</code></td>
+<td>
+<p>end of given sequence</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>time_in</code></td>
+<td>
+<p>time in for experimental calculations</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>time_out</code></td>
+<td>
+<p>time out for experimental calculations</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>deut_part</code></td>
+<td>
+<p>percentage of deuterium the protein was exposed to, value in range [0, 1]</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The function calculates deuteration data for all available data points 
+for given peptide. 
+All four variants (relative &amp; theoretical combinations) of deuteration computations 
+are supported. Manual correction of percentage of deuterium the protein was exposed 
+to during the exchange in theoretical calculations is provided.
+To visualize obtained data we recommend using <code>plot_kinetics</code> function.
+The first version doesn't support filled Modification and Fragment columns.
+</p>
+
+
+<h3>Value</h3>
+
+<p>data frame with deuteration calculated for all the data points 
+between time_in and time_out. 
+The chosen time point for which deuteration in all four variants is calculated 
+is available in column 'time_chosen'. The rest of
+the returned structure is equivalent to structure returned by
+<code>calculate_state_deuteration</code>.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>read_hdx</code> <code>calculate_state_deuteration</code> <code>plot_kinetics</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># load example data
+dat &lt;- read_hdx(system.file(package = "HaDeX", 
+                            "HaDeX/data/KD_180110_CD160_HVEM.csv"))
+
+# calculate data for sequence INITSSASQEGTRLN in state CD160
+(kin1 &lt;- calculate_kinetics(dat, 
+                   protein = "db_CD160",
+                   sequence = "INITSSASQEGTRLN", 
+                   state = "CD160",
+                   start = 1, 
+                   end = 15,
+                   time_in = 0.001, 
+                   time_out = 1440))
+                   
+# calculate data for sequence INITSSASQEGTRLN in state CD160_HVEM
+(kin2 &lt;- calculate_kinetics(dat, 
+                   protein = "db_CD160",
+                   sequence = "INITSSASQEGTRLN", 
+                   state = "CD160_HVEM",
+                   start = 1, 
+                   end = 15,
+                   time_in = 0.001, 
+                   time_out = 1440))
+                   
+# load extra libraries
+library(dplyr)
+library(ggplot2)
+
+# plot example - experimental and relative 
+bind_rows(kin1, kin2) %&gt;% 
+ plot_kinetics(theoretical = FALSE, 
+               relative = TRUE) +
+ labs(title = "Kinetic plot for INITSSASQEGTRLN")
+ 
+# plot example - theoretical and absolute
+bind_rows(kin1, kin2) %&gt;%
+  plot_kinetics(theoretical = TRUE, 
+               relative = FALSE) +
+  labs(title = "Theoretical kinetics plot for INITSSASQEGTRLN")
+       
+
+</code></pre>
+
+
+</div>

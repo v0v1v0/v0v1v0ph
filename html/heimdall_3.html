@@ -1,0 +1,81 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>dfr_ddm</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Adapted Drift Detection Method (DDM) method</h2>
+
+<h3>Description</h3>
+
+<p>DDM is a concept change detection method based on the PAC learning model premise, that the learner’s error rate will decrease as the number of analysed samples increase, as long as the data distribution is stationary. <a href="doi:10.1007/978-3-540-28645-5_29">doi:10.1007/978-3-540-28645-5_29</a>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">dfr_ddm(min_instances = 30, warning_level = 2, out_control_level = 3)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>min_instances</code></td>
+<td>
+<p>The minimum number of instances before detecting change</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>warning_level</code></td>
+<td>
+<p>Necessary level for warning zone (2 standard deviation)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>out_control_level</code></td>
+<td>
+<p>Necessary level for a positive drift detection</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p><code>dfr_ddm</code> object
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">library(daltoolbox)
+library(heimdall)
+
+# This example uses an error-based drift detector with a synthetic a 
+# model residual where 1 is an error and 0 is a correct prediction.
+
+data(st_drift_examples)
+data &lt;- st_drift_examples$univariate
+data$event &lt;- NULL
+data$prediction &lt;- st_drift_examples$univariate$serie &gt; 4
+
+model &lt;- dfr_ddm()
+
+detection &lt;- NULL
+output &lt;- list(obj=model, drift=FALSE)
+for (i in 1:length(data$prediction)){
+ output &lt;- update_state(output$obj, data$prediction[i])
+ if (output$drift){
+   type &lt;- 'drift'
+   output$obj &lt;- reset_state(output$obj)
+ }else{
+   type &lt;- ''
+ }
+ detection &lt;- rbind(detection, data.frame(idx=i, event=output$drift, type=type))
+}
+
+detection[detection$type == 'drift',]
+</code></pre>
+
+
+</div>

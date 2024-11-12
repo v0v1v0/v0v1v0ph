@@ -1,0 +1,198 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>HDJM_fit</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>The function to fit penalized HDJM.</h2>
+
+<h3>Description</h3>
+
+<p>The function is used to fit the penalized HDJM with adpative lasso penalty.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">HDJM_fit(
+  LongData = NULL,
+  SurvData = NULL,
+  marker.name = NULL,
+  control_list = NULL,
+  nlam = 50,
+  ridge = 0,
+  pmax = 10,
+  min_ratio = 0.01,
+  maxiter = 100,
+  eps = 1e-04,
+  UseSurvN = FALSE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>LongData</code></td>
+<td>
+<p>a data frame containing the longitudinal data
+(see <code>LongData</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>SurvData</code></td>
+<td>
+<p>a data frame containing the survival data
+(see <code>SurvData</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>marker.name</code></td>
+<td>
+<p>a vector indicating which set of longitudinal biomarkers
+to be analyzed. If NULL, all biomarkers in LongData will be used.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>control_list</code></td>
+<td>
+<p>a list of parameters specifying the joint model
+(see <code>control_list</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nlam</code></td>
+<td>
+<p>number of tuning parameters.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ridge</code></td>
+<td>
+<p>ridge penalty.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pmax</code></td>
+<td>
+<p>the maximum of biomarkers being selected.
+The algorithm will stop early if the maximum has been reached.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>min_ratio</code></td>
+<td>
+<p>the ratio between the largest possible penalty
+and the smallest penalty to tune.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>maxiter</code></td>
+<td>
+<p>the maximum number of iterations.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>eps</code></td>
+<td>
+<p>threshold for convergence.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>UseSurvN</code></td>
+<td>
+<p>a logical variable indicating whether the
+effective sample size (i.e., the number of events) should be
+used in calculating BIC.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>return a list with the following objects.
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>marker.name</code></td>
+<td>
+<p>the names for biomarkers being analyzed.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alpha</code></td>
+<td>
+<p>the estimates for the effects of biomarkers
+in the survival submodel.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>weib</code></td>
+<td>
+<p>the estimates for the Weibull baseline hazard
+in the survival submodel.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>gamma</code></td>
+<td>
+<p>the estimates for the effects of baseline covariates
+in the survival submodel.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>beta</code></td>
+<td>
+<p>the estimates for the fixed-effects
+in the longitudinal submodel.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sig2</code></td>
+<td>
+<p>the estimates for the noise variances
+in the longitudinal submodel.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Sigma</code></td>
+<td>
+<p>the estimates for the covariance matrices of the
+random effects in the longitudinal submodel.</p>
+</td>
+</tr>
+</table>
+<h3>References</h3>
+
+<p>Jiehuan Sun and Sanjib Basu. "Penalized Joint Models of
+High-Dimensional Longitudinal Biomarkers and A Survival Outcome".
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(HDJMdata)
+flex_time_fun &lt;- function(x=NULL){
+    xx = matrix(x, ncol = 1)
+    colnames(xx) = c("year_l")
+    xx
+}
+ran_time_ind = 1 ## random time-trend effects
+control_list = list(
+  ID_name = "ID", item_name = "item",
+  value_name = "value",  time_name = "years",
+  fix_cov = NULL, random_cov = NULL,
+  FUN = flex_time_fun, ran_time_ind=ran_time_ind,
+  surv_time_name = "ftime",  surv_status_name = "fstat",
+  surv_cov = "x", n_points = 5
+)
+
+## takes about one minute.
+res = HDJM_fit(LongData=LongData, SurvData=SurvData,
+               control_list=control_list)
+
+
+</code></pre>
+
+
+</div>

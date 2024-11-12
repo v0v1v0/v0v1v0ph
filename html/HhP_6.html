@@ -1,0 +1,123 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>HhP.reg</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Hierarchical Heterogeneity Regression Analysis.</h2>
+
+<h3>Description</h3>
+
+<p>The main function for Transfer learning for tensor graphical models.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">HhP.reg(lambda, whole.data, n, q, p, beta.init,
+               merge.all=FALSE, trace=FALSE, selection.sub=FALSE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>lambda</code></td>
+<td>
+<p>The sequences of the tuning parameters (lambda1 and lambda2).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>whole.data</code></td>
+<td>
+<p>The input data analyzed (a list including the response and design matrix).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n</code></td>
+<td>
+<p>The sample size.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>q</code></td>
+<td>
+<p>The dimension of type 1 features.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>p</code></td>
+<td>
+<p>The dimension of type 2 features.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>beta.init</code></td>
+<td>
+<p>The Initial values of regression coefficients.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>merge.all</code></td>
+<td>
+<p>the logical variable, the default is F.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>trace</code></td>
+<td>
+<p>the logical variable, whether or not to output the number of identified subgroups during the search for parameters.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>selection.sub</code></td>
+<td>
+<p>the logical variable, the default is F.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A result list.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Mingyang Ren, Qingzhao Zhang, Sanguo Zhang, Tingyan Zhong, Jian Huang, Shuangge Ma. Maintainer: Mingyang Ren <a href="mailto:renmingyang17@mails.ucas.ac.cn">renmingyang17@mails.ucas.ac.cn</a>.
+</p>
+
+
+<h3>References</h3>
+
+<p>Mingyang Ren, Qingzhao Zhang, Sanguo Zhang, Tingyan Zhong, Jian Huang, Shuangge Ma. 2022. Hierarchical Cancer Heterogeneity Analysis Based On Histopathological Imaging Features. Biometrics, &lt;DOI: 10.1111/biom.13544&gt;.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+library(HhP)
+library(Matrix)
+library(MASS)
+library(fmrs)
+data(example.data.reg)
+n = example.data.reg$n
+q = example.data.reg$q
+p = example.data.reg$p
+
+beta.init.list  =  gen_int_beta(n, p, q, example.data.reg)
+beta.init  =  beta.init.list$beta.init
+lambda  =  genelambda.obo()
+result  =  HhP.reg(lambda, example.data.reg, n, q, p, beta.init)
+index.list  =  evaluation.sum(n,q,p, result$admmres, result$abic.n,
+               result$admmres2, example.data.reg$Beta0, result$bic.var)
+index.list$err.s
+
+
+
+</code></pre>
+
+
+</div>

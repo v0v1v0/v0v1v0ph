@@ -1,0 +1,195 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>tsum</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Summary function for the scale or location component of a
+heteroscedastic t model</h2>
+
+<h3>Description</h3>
+
+<p>Summarizes the location <em>or</em> scale components of a heteroscedastic <em>t</em> model
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">
+tsum(object, dispersion = NULL, correlation = FALSE,
+             symbolic.cor = FALSE, ...)
+
+## S3 method for class 'tsum'
+print(x, digits = max(3, getOption("digits") - 3), symbolic.cor =
+      x$symbolic.cor, signif.stars = getOption("show.signif.stars"),
+      scale = TRUE, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>object</code></td>
+<td>
+<p>either the location <em>or</em> scale object created by fitting
+a heteroscedastic t object with <code>tlm</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>an object of class "<code>tsum</code>"</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dispersion</code></td>
+<td>
+<p>1 if summarizing the location model; 2 if
+summarizing the scale model (see Details)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>correlation</code></td>
+<td>
+<p>logical; if <code>TRUE</code>, the correlation matrix of the
+estimated parameters is returned and printed.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>digits</code></td>
+<td>
+<p> the number of significant digits to be printed.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>symbolic.cor</code></td>
+<td>
+<p>logical. If <code>TRUE</code>, print the correlations in
+a symbolic form (see ‘symnum’) rather than as numbers.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>signif.stars</code></td>
+<td>
+<p>logical. if <code>TRUE</code>, "significance stars" are
+printed for each coefficient.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>scale</code></td>
+<td>
+<p>logical. If <code>TRUE</code> then the dispersion is known in
+advance (2), and is printed accordingly.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>further arguments passed to or from other methods.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The argument supplied to <code>dispersion</code> must be either 1
+(location model) or 2 (scale model). The reason for this is because
+the fitting of the model has already
+scaled the covariance matrix for the location coefficients. Hence the
+scaled and unscaled versions of covariance matrix for the location
+model are identical.     
+</p>
+<p>This function will not be generally called by the user as it
+will only summarize the location or scale model but not both. Instead
+the user should refer to <code>summary.tlm</code> to print a summary of both models.
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>tsum</code> returns an object of class "<code>tsum</code>", a list
+with components
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>call</code></td>
+<td>
+<p>the component from <code>object</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>df.residual</code></td>
+<td>
+<p>the component from <code>object</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>coefficients</code></td>
+<td>
+<p>the matrix of coefficients, standard errors, z-values and
+p-values</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dispersion</code></td>
+<td>
+<p>the supplied dispersion argument</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>df</code></td>
+<td>
+<p>a 2-vector of the rank of the model and the number of
+residual degrees of freedom</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cov.unscaled</code></td>
+<td>
+<p>the unscaled (<code>dispersion = 1</code>) estimated covariance
+matrix of the estimated coefficients</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cov.scaled</code></td>
+<td>
+<p>ditto, scaled by <code>dispersion</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>correlation</code></td>
+<td>
+<p> (only if <code>correlation</code> is true.)  The estimated
+correlations of the estimated coefficients</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>symbolic.cor</code></td>
+<td>
+<p>(only if <code>correlation</code> is true.)  The value of the
+argument <code>symbolic.cor</code></p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>Julian Taylor</p>
+
+
+<h3>See Also</h3>
+
+<p><code>summary.tlm</code>, <code>tlm</code></p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+data(mm, package = "hett")
+attach(mm)
+tfit &lt;- tlm(m.marietta ~ CRSP, ~ CRSP, data = mm, start = list(dof = 3),
+estDof = TRUE) 
+tsum(tfit$loc.fit, dispersion = 1) 
+</code></pre>
+
+
+</div>

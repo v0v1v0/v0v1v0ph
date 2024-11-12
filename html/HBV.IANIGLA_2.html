@@ -1,0 +1,141 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>Glacier_Disch</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Glacier discharge conceptual model</h2>
+
+<h3>Description</h3>
+
+<p>Implement the conceptual water storage and release formulation for
+glacier runoff routing. The current model version follows the approach proposed
+by <cite>Stahl et al. (2008)</cite> (hereafter S08) for the Bridge River basin. Note that
+the bucket storage and release concepts for glacier runoff modeling are also
+described in <cite>Jansson et al. (2002)</cite>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">Glacier_Disch(
+       model,
+       inputData,
+       initCond,
+       param
+       )
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>model</code></td>
+<td>
+<p>numeric integer with the model's choice. The current HBV.IANIGLA version
+only supports the <strong>S08</strong> approach.
+</p>
+
+<ul><li>
+<p> 1:<strong>S08</strong> glacier storage and release model.
+</p>
+</li></ul>
+<p><img src="../help/figures/glacier_discharge_hbv.png" width="200" alt="glacier_discharge_hbv.png"></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>inputData</code></td>
+<td>
+<p>numeric matrix with two columns:
+</p>
+<p><strong>Model 1</strong>
+</p>
+
+<ul>
+<li> <p><code>column_1</code>: snow water equivalent above the glacier <code class="reqn">[mm/\Delta t]</code>.
+The series can be obtained from the SnowGlacier_HBV function output.
+</p>
+</li>
+<li> <p><code>column_2</code>:  melted snow + melted ice + rainfall <code class="reqn">[mm/\Delta t]</code>. This
+series comes from the <strong>TotScal</strong> column in the SnowGlacier_HBV
+function output.
+</p>
+</li>
+</ul>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>initCond</code></td>
+<td>
+<p>numeric value with the initial glacier reservoir
+water content <strong><code>SG</code></strong> <code class="reqn">[mm]</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>param</code></td>
+<td>
+<p>numeric vector with the following values:
+</p>
+<p><strong>Model 1 (S08)</strong>
+</p>
+
+<ul>
+<li> <p><code>KGmin</code>: minimal outflow rate <code class="reqn">[1/\Delta t]</code>.
+</p>
+</li>
+<li> <p><code>dKG</code>:  maximum outflow rate increase <code class="reqn">[1/\Delta t]</code>.
+</p>
+</li>
+<li> <p><code>AG</code>: scale factor <code class="reqn">[mm]</code>.
+</p>
+</li>
+</ul>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>Numeric matrix with the following columns:
+</p>
+<p><strong>Model 1 (S08)</strong>
+</p>
+
+<ul>
+<li> <p><code>Q</code>: glacier discharge <code class="reqn">[mm/\Delta t]</code>.
+</p>
+</li>
+<li> <p><code>SG</code>: glacier's bucket water storage content series <code class="reqn">[1/\Delta t]</code>.
+</p>
+</li>
+</ul>
+<h3>References</h3>
+
+<p>Jansson, P., Hock, R., Schneider, T., 2003. The concept of glacier storage: a review.
+J. Hydrol., Mountain Hydrology and Water Resources 282, 116–129.
+https://doi.org/10.1016/S0022-1694(03)00258-0
+</p>
+<p>Stahl, K., Moore, R.D., Shea, J.M., Hutchinson, D., Cannon, A.J., 2008. Coupled
+modelling of glacier and streamflow response to future climate scenarios.
+Water Resour. Res. 44, W02422. https://doi.org/10.1029/2007WR005956
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># The following is a toy example. I strongly recommend to see
+# the package vignettes in order to improve your skills on HBV.IANIGLA
+
+## Create an input data and run the module
+DataMatrix &lt;- cbind(
+                    runif(n = 100, min = 0, max = 50),
+                    runif(n = 100, min = 0, max = 200)
+                    )
+
+dischGl    &lt;- Glacier_Disch(model = 1, inputData = DataMatrix,
+                           initCond = 100, param = c(0.1, 0.9, 10))
+
+</code></pre>
+
+
+</div>

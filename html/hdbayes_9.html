@@ -1,0 +1,211 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>glm.commensurate</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Posterior of commensurate prior (CP)</h2>
+
+<h3>Description</h3>
+
+<p>Sample from the posterior distribution of a GLM using the commensurate prior (CP) by Hobbs et al. (2011) <a href="doi:10.1111/j.1541-0420.2011.01564.x">doi:10.1111/j.1541-0420.2011.01564.x</a>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">glm.commensurate(
+  formula,
+  family,
+  data.list,
+  offset.list = NULL,
+  beta0.mean = NULL,
+  beta0.sd = NULL,
+  disp.mean = NULL,
+  disp.sd = NULL,
+  p.spike = 0.1,
+  spike.mean = 200,
+  spike.sd = 0.1,
+  slab.mean = 0,
+  slab.sd = 5,
+  iter_warmup = 1000,
+  iter_sampling = 1000,
+  chains = 4,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>formula</code></td>
+<td>
+<p>a two-sided formula giving the relationship between the response variable and covariates</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>family</code></td>
+<td>
+<p>an object of class <code>family</code>. See <code>?stats::family</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>data.list</code></td>
+<td>
+<p>a list of <code>data.frame</code>s. The first element in the list is the current data, and the rest
+are the historical data sets.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>offset.list</code></td>
+<td>
+<p>a list of vectors giving the offsets for each data. The length of <code>offset.list</code> is equal to
+the length of <code>data.list</code>. The length of each element of <code>offset.list</code> is equal to the number
+of rows in the corresponding element of <code>data.list</code>. Defaults to a list of vectors of 0s.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>beta0.mean</code></td>
+<td>
+<p>a scalar or a vector whose dimension is equal to the number of regression coefficients
+giving the mean parameters for the prior on the historical data regression coefficients. If a
+scalar is provided, <code>beta0.mean</code> will be a vector of repeated elements of the given scalar.
+Defaults to a vector of 0s.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>beta0.sd</code></td>
+<td>
+<p>a scalar or a vector whose dimension is equal to the number of regression coefficients giving
+the sd parameters for the prior on the historical data regression coefficients. If a scalar is
+provided, same as for <code>beta0.mean</code>. Defaults to a vector of 10s.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>disp.mean</code></td>
+<td>
+<p>a scalar or a vector whose dimension is equal to the number of data sets (including the current
+data) giving the location parameters for the half-normal priors on the dispersion parameters.
+If a scalar is provided, same as for <code>beta0.mean</code>. Defaults to a vector of 0s.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>disp.sd</code></td>
+<td>
+<p>a scalar or a vector whose dimension is equal to the number of data sets (including the current
+data) giving the scale parameters for the half-normal priors on the dispersion parameters. If a
+scalar is provided, same as for <code>beta0.mean</code>. Defaults to a vector of 10s.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>p.spike</code></td>
+<td>
+<p>a scalar between 0 and 1 giving the probability of the spike component in spike-and-slab prior
+on commensurability parameter <code class="reqn">\tau</code>. Defaults to 0.1.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>spike.mean</code></td>
+<td>
+<p>a scalar giving the location parameter for the half-normal prior (spike component) on <code class="reqn">\tau</code>.
+Defaults to 200.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>spike.sd</code></td>
+<td>
+<p>a scalar giving the scale parameter for the half-normal prior (spike component) on <code class="reqn">\tau</code>.
+Defaults to 0.1.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>slab.mean</code></td>
+<td>
+<p>a scalar giving the location parameter for the half-normal prior (slab component) on <code class="reqn">\tau</code>.
+Defaults to 0.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>slab.sd</code></td>
+<td>
+<p>a scalar giving the scale parameter for the half-normal prior (slab component) on <code class="reqn">\tau</code>.
+Defaults to 5.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>iter_warmup</code></td>
+<td>
+<p>number of warmup iterations to run per chain. Defaults to 1000. See the argument <code>iter_warmup</code> in
+<code>sample()</code> method in cmdstanr package.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>iter_sampling</code></td>
+<td>
+<p>number of post-warmup iterations to run per chain. Defaults to 1000. See the argument <code>iter_sampling</code>
+in <code>sample()</code> method in cmdstanr package.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>chains</code></td>
+<td>
+<p>number of Markov chains to run. Defaults to 4. See the argument <code>chains</code> in <code>sample()</code> method in
+cmdstanr package.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>arguments passed to <code>sample()</code> method in cmdstanr package (e.g., <code>seed</code>, <code>refresh</code>, <code>init</code>).</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The commensurate prior (CP) assumes that the regression coefficients for the current data conditional on those for
+the historical data are independent normal distributions with mean equal to the corresponding regression coefficients
+for the historical data and variance equal to the inverse of the corresponding elements of a vector of precision
+parameters (referred to as the commensurability parameter <code class="reqn">\tau</code>). We regard <code class="reqn">\tau</code> as random and elicit
+a spike-and-slab prior, which is specified as a mixture of two half-normal priors, on <code class="reqn">\tau</code>.
+</p>
+<p>The number of current data regression coefficients is assumed to be the same as that of historical data regression
+coefficients. The priors on the dispersion parameters (if applicable) for the current and historical data sets are
+independent half-normal distributions.
+</p>
+
+
+<h3>Value</h3>
+
+<p>The function returns an object of class <code>draws_df</code> giving posterior samples, with an attribute called 'data' which includes
+the list of variables specified in the data block of the Stan program.
+</p>
+
+
+<h3>References</h3>
+
+<p>Hobbs, B. P., Carlin, B. P., Mandrekar, S. J., and Sargent, D. J. (2011). Hierarchical commensurate and power prior models for adaptive incorporation of historical information in clinical trials. Biometrics, 67(3), 1047–1056.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">if (instantiate::stan_cmdstan_exists()) {
+  data(actg019)
+  data(actg036)
+  ## take subset for speed purposes
+  actg019 = actg019[1:100, ]
+  actg036 = actg036[1:50, ]
+  data_list = list(currdata = actg019, histdata = actg036)
+  glm.commensurate(
+    formula = cd4 ~ treatment + age + race,
+    family = poisson(), data.list = data_list,
+    p.spike = 0.1,
+    chains = 1, iter_warmup = 500, iter_sampling = 1000
+  )
+}
+</code></pre>
+
+
+</div>

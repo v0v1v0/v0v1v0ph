@@ -1,0 +1,238 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>clusterGroupBound</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Hierarchical structure group tests in linear model</h2>
+
+<h3>Description</h3>
+
+<p>Computes confidence intervals for the l1-norm of groups of linear regression
+coefficients in a hierarchical clustering tree.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">clusterGroupBound(x, y, method = "average",
+                  dist = as.dist(1 - abs(cor(x))), alpha = 0.05,
+                  eps = 0.1, hcloutput, nsplit = 11,
+                  s = min(10, ncol(x) - 1),
+                  silent = FALSE, setseed = TRUE, lpSolve = TRUE)</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>numeric design matrix of the regression <code class="reqn">n \times p</code>
+with <code class="reqn">p</code> columns for <code class="reqn">p</code> predictor variables and <code class="reqn">n</code>
+rows corresponding to <code class="reqn">n</code> observations.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+<p>numeric response variable of length <code class="reqn">n</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+<p>a <code>character</code> string; the method used for
+constructing the hierarchical clustering tree (default:
+<code>"average"</code> for “average linkage”) via
+<code>hclust</code>.
+Alternatively, you can provide your own hierarchical clustering
+through the optional argument <code>hcloutput</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dist</code></td>
+<td>
+<p>a distance matrix can be specified on which the
+hierarchical clustering will be based (see <code>dist</code>).  The
+default option is that the distance between variables will be
+calculated as 1 less the absolute correlation matrix.
+Alternatively, you can provide your own hierarchical clustering
+through the optional argument <code>hcloutput</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alpha</code></td>
+<td>
+<p>numeric level in <code class="reqn">(0, 1)</code> at which the test / confidence
+intervals are to be constructed.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>eps</code></td>
+<td>
+<p>a level of eps*alpha is used and the values of different
+splits are aggregated using the (1-eps) quantile. See reference
+below for more details.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>hcloutput</code></td>
+<td>
+<p>optionally, the value of a <code>hclust()</code>
+call. If it is provided, the arguments <code>dist</code> and <code>method</code>
+are ignored.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nsplit</code></td>
+<td>
+<p>the number of data splits used.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>s</code></td>
+<td>
+<p>the dimensionality of the projection that is used. Lower
+values lead to faster computation and if <code class="reqn">n &gt; 50</code>, then <code>s</code>
+is set to 50 if left unspecified, to avoid lengthy computations.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>silent</code></td>
+<td>
+<p>logical enabling progress output.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>setseed</code></td>
+<td>
+<p>a logical; if this is true (recommended), then the same
+random seeds are used for all groups, which makes the confidence
+intervals simultaneously valid over all groups of variables tested.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lpSolve</code></td>
+<td>
+<p>logical; only set it to false if <code>lpSolve()</code> is not
+working on the current machine: setting it to false will result in
+much slower computations; only use on small problems.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>Returns a list with components
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>groupNumber</code></td>
+<td>
+<p>The index of the group tested in the original
+hierarchical clustering tree</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>members</code></td>
+<td>
+<p>A list containing the variables that belong into each
+testes group</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>noMembers</code></td>
+<td>
+<p>A vector containing the number of members in each group</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lowerBound</code></td>
+<td>
+<p>The lower bound on the l1-norm in each group</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>position</code></td>
+<td>
+<p>The position on the x-axis of each group (used for plotting)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>leftChild</code></td>
+<td>
+<p>Gives the index of the group that corresponds to the
+left child node in the tested tree (negative values correspond to leaf
+nodes)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rightChild</code></td>
+<td>
+<p>Same as <code>leftCHild</code> for the right child of each node</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>isLeaf</code></td>
+<td>
+<p>Logical vector. Is <code>TRUE</code> for a group if it is a leaf
+node in the tested tree or if both child nodes have a zero lower bound
+on their group l1-norm</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>Nicolai Meinshausen</p>
+
+
+<h3>References</h3>
+
+<p>Meinshausen, N. (2015); JRSS B, see <code>groupBound</code>.
+</p>
+
+
+<h3>See Also</h3>
+
+<p>Use <code>groupBound</code> to compute the lower bound for selected
+groups of variables whereas you use this <code>clusterGroupBound</code> to
+test all groups in a hierarchical clustering tree.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+
+
+
+## Create a regression problem with correlated design (n = 10, p = 3):
+## a block of size 2 and a block of size 1, within-block correlation is 0.99
+
+set.seed(29)
+p   &lt;- 3
+n   &lt;- 10
+
+Sigma &lt;- diag(p)
+Sigma[1,2] &lt;- Sigma[2,1] &lt;- 0.99
+
+x &lt;- matrix(rnorm(n * p), nrow = n) %*% chol(Sigma)
+
+## Create response with active variable 1
+beta    &lt;- rep(0, p)
+beta[1] &lt;- 5
+
+y  &lt;- as.numeric(x %*% beta + rnorm(n))
+
+out &lt;- clusterGroupBound(x, y, nsplit = 4) ## use larger value for nsplit!
+
+## Plot and print the hierarchical group-test
+plot(out)
+print(out)
+out$members
+out$lowerBound
+
+</code></pre>
+
+
+</div>

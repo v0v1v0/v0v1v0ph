@@ -1,0 +1,91 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>CovShrinkBGP14</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Linear shrinkage estimator of the covariance matrix
+(Bodnar et al. 2014)</h2>
+
+<h3>Description</h3>
+
+<p>The optimal linear shrinkage estimator of the covariance matrix that
+minimizes the Frobenius norm:
+</p>
+<p style="text-align: center;"><code class="reqn">\hat{\Sigma}_{OLSE} = \hat{\alpha} S + \hat{\beta} \Sigma_0,</code>
+</p>
+
+<p>where <code class="reqn">\hat{\alpha}</code> and <code class="reqn">\hat{\beta}</code> are optimal shrinkage
+intensities given in Eq. (4.3) and (4.4) of
+Bodnar et al. (2014). <code class="reqn">S</code> is the sample covariance
+matrix (SCM, see <code>Sigma_sample_estimator</code>) and <code class="reqn">\Sigma_0</code>
+is a positive definite symmetric matrix used as the target matrix (TM),
+for example, <code class="reqn">\frac{1}{p} I</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">CovShrinkBGP14(n, TM, SCM)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>n</code></td>
+<td>
+<p>sample size.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>TM</code></td>
+<td>
+<p>the target matrix for the shrinkage estimator.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>SCM</code></td>
+<td>
+<p>sample covariance matrix.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>a list containing an object of class matrix (S) and the estimated
+shrinkage intensities <code class="reqn">\hat{\alpha}</code> and <code class="reqn">\hat{\beta}</code>.
+</p>
+
+
+<h3>References</h3>
+
+<p>Bodnar T, Gupta AK, Parolya N (2014).
+“On the strong convergence of the optimal linear shrinkage estimator for large dimensional covariance matrix.”
+<em>Journal of Multivariate Analysis</em>, <b>132</b>, 215–228.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Parameter setting
+n&lt;-3e2
+c&lt;-0.7
+p&lt;-c*n
+mu &lt;- rep(0, p)
+Sigma &lt;- RandCovMtrx(p=p)
+
+# Generating observations
+X &lt;- t(MASS::mvrnorm(n=n, mu=mu, Sigma=Sigma))
+
+# Estimation
+TM &lt;- matrix(0, nrow=p, ncol=p)
+diag(TM) &lt;- 1/p
+SCM &lt;- Sigma_sample_estimator(X)
+Sigma_shr &lt;- CovShrinkBGP14(n=n, TM=TM, SCM=SCM)
+Sigma_shr$S[1:6, 1:6]
+</code></pre>
+
+
+</div>

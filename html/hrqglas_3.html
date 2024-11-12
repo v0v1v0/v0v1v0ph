@@ -1,0 +1,177 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>cv.hrq_glasso</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Cross-validation for quantile regression with group lasso</h2>
+
+<h3>Description</h3>
+
+<p>K fold cross-validation is conducted. Four types of loss (squared error (<code>se</code>), absolute error (<code>ae</code>)
+quantile check loss (<code>check</code>) and huber loss (<code>he</code>)) 
+can be specified as the CV criterion.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">cv.hrq_glasso(
+  x,
+  y,
+  group.index,
+  tau = 0.5,
+  k = 5,
+  loss = "check",
+  method = "quantile",
+  folds = NULL,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>Design matrix</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+<p>Response variable</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>group.index</code></td>
+<td>
+<p>A vector of group index, e.g., (1,1,1,2,2,2,3,3)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tau</code></td>
+<td>
+<p>Percentage</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>k</code></td>
+<td>
+<p>Number of folders.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>loss</code></td>
+<td>
+<p>The loss function used for computing the cross-validation error. Supported losses include squared error (<code>se</code>), absolute error (<code>ae</code>), quantile check loss (<code>check</code>) and huber loss (<code>he</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+<p>Choice for mean or quantile regression. Default is <code>quantile</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>folds</code></td>
+<td>
+<p>A vector of folder index for all observations. The procedure random splits if this argument is not specified.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Other inputs of function <code>hrq_glasso()</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>The full solution path is returned. It also returns the vector of CV score 
+as well as the optimal values in terms of min and 1se. Corresponding lambda values are also returned. 
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>beta</code></td>
+<td>
+<p>The estimated coefficients for all lambdas, stored in sparse matrix format, where each column corresponds to a lambda.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lambda</code></td>
+<td>
+<p>The sequence of lambdas.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lambda.min</code></td>
+<td>
+<p>The optimal lambda that minimizes the CV error</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lambda.1se</code></td>
+<td>
+<p>The largest lambda such that CV error is within 1 standard error of the minimum CV error.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cv.all</code></td>
+<td>
+<p>The vector of all values of CV error for all lambdas.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cv.min</code></td>
+<td>
+<p>The value of CV error corresponding to <code>lambda.min</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cv.1se</code></td>
+<td>
+<p>The value of CV error corresponding to <code>lambda.1se</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>folds</code></td>
+<td>
+<p>The vector of indices for k folds split.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cvup</code></td>
+<td>
+<p>CV error + 1 standard error</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cvlo</code></td>
+<td>
+<p>CV error + 1 standard error</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n.grp</code></td>
+<td>
+<p>The number of selected groups for each lambda.</p>
+</td>
+</tr>
+</table>
+<h3>Examples</h3>
+
+<pre><code class="language-R">n&lt;- 100
+p&lt;- 10
+x0&lt;- matrix(rnorm(n*p),n,p)
+X&lt;- cbind(x0, x0^2, x0^3)[,order(rep(1:p,3))]
+y&lt;- -2+X[,1]+0.5*X[,2]-X[,3]-0.5*X[,7]+X[,8]-0.2*X[,9]+rt(n,2)
+group&lt;- rep(1:p, each=3)
+fitcv&lt;- cv.hrq_glasso(x=X, y=y, group.index=group, method="quantile")
+plot(fitcv)
+</code></pre>
+
+
+</div>

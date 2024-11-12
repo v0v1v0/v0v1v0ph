@@ -1,0 +1,128 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>HiClimR2nc</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Export NetCDF-4 file for Hierarchical Climate Regionalization</h2>
+
+<h3>Description</h3>
+
+<p><code>HiClimR2nc</code> is a helper function that exports region map
+and mean timeseries into NetCDF-4 file, using the <code>ncdf4</code> package.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">HiClimR2nc(y = NULL, ncfile = "HiClimR.nc", timeunit = "", dataunit = "")
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+<p>a dendrogram tree produced by <code>HiClimR</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ncfile</code></td>
+<td>
+<p>Path and name of the NetCDF-4 file to be created.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>timeunit</code></td>
+<td>
+<p>an optional character string for the time units,
+A zero-length string (default: <code>timeunit=""</code>) removes units attribute.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dataunit</code></td>
+<td>
+<p>an optional character string for the data units,
+A zero-length string (default: <code>timeunit=""</code>) removes units attribute.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p><code>HiClimR2nc</code> function exports region map and mean timeseries
+from <code>HiClimR</code> tree into NetCDF-4 file, using the <code>ncdf4</code> package.
+The NetCDF-4 file will be open to add other variables, if needed.
+It is important to close the created file using <code>nc_close</code>,
+which flushes any unwritten data to disk.
+</p>
+
+
+<h3>Value</h3>
+
+<p>An object of class <code>ncdf4</code>, which has the fields described in <code>nc_open</code>.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Hamada S. Badr &lt;badr@jhu.edu&gt;, Benjamin F. Zaitchik &lt;zaitchik@jhu.edu&gt;,
+and Amin K. Dezfuli &lt;amin.dezfuli@nasa.gov&gt;.
+</p>
+
+
+<h3>References</h3>
+
+<p>Hamada S. Badr, Zaitchik, B. F. and Dezfuli, A. K. (2015):
+A Tool for Hierarchical Climate Regionalization, <em>Earth Science Informatics</em>,
+<b>8</b>(4), 949-958, doi: <a href="https://doi.org/10.1007/s12145-015-0221-7">10.1007/s12145-015-0221-7</a>.
+</p>
+<p>Hamada S. Badr, Zaitchik, B. F. and Dezfuli, A. K. (2014):
+Hierarchical Climate Regionalization,
+<em>Comprehensive R Archive Network (CRAN)</em>,
+<a href="https://cran.r-project.org/package=HiClimR">https://cran.r-project.org/package=HiClimR</a>.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>HiClimR</code>, <code>HiClimR2nc</code>, <code>validClimR</code>,
+<code>geogMask</code>, <code>coarseR</code>, <code>fastCor</code>,
+<code>grid2D</code> and <code>minSigCor</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">require(HiClimR)
+require(ncdf4)
+
+## Load test case data
+x &lt;- TestCase$x
+
+## Generate longitude and latitude mesh vectors
+xGrid &lt;- grid2D(lon = unique(TestCase$lon), lat = unique(TestCase$lat))
+lon &lt;- c(xGrid$lon)
+lat &lt;- c(xGrid$lat)
+
+## Hierarchical Climate Regionalization
+y &lt;- HiClimR(x, lon = lon, lat = lat, lonStep = 1, latStep = 1, geogMask = FALSE,
+    continent = "Africa", meanThresh = 10, varThresh = 0, detrend = TRUE,
+    standardize = TRUE, nPC = NULL, method = "ward", hybrid = FALSE,
+    kH = NULL, members = NULL, validClimR = TRUE, k = 12, minSize = 1,
+    alpha = 0.01, plot = TRUE, colPalette = NULL, hang = -1, labels = FALSE)
+
+## Not run: 
+
+## Export region map and mean timeseries into NetCDF-4 file
+y.nc &lt;- HiClimR2nc(y=y, ncfile="HiClimR.nc", timeunit="years", dataunit="mm")
+## The NetCDF-4 file is still open to add other variables or close it
+nc_close(y.nc)
+
+
+## End(Not run)
+</code></pre>
+
+
+</div>

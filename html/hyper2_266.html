@@ -1,0 +1,209 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>B</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Normalizing constant for the hyperdirichlet distribution</h2>
+
+<h3>Description</h3>
+
+<p>Numerical techniques for calculating the normalizing constant for the hyperdirichlet distribution
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">B(H, disallowed=NULL, give=FALSE, ...)
+probability(H, disallowed=NULL, ...)
+mgf(H, powers, ...) 
+dhyper2(ip,H,...)
+dhyper2_e(e,H,include.Jacobian=TRUE)
+mean_hyper2(H, normalize=TRUE, ...)
+Jacobian(e)
+e_to_p(e)
+p_to_e(p)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>H</code></td>
+<td>
+<p>Object of class hyper2</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>powers</code></td>
+<td>
+<p>Vector of length <code>dim(x)</code> whose elements are the
+powers of the expectation; see details section</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>disallowed</code></td>
+<td>
+<p>Function specifying a subset of the simplex
+over which to integrate; default <code>NULL</code> means to integrate over
+the whole simplex.  The integration proceeds over <code>p</code> with
+<code>disallowed(p)</code> evaluating to <code>FALSE</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>e,p</code></td>
+<td>
+<p>A vector; see details</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ip</code></td>
+<td>
+<p>A vector of probabilities corresponding to <code>indep(p)</code>
+where <code>p</code> is vector with unit sum</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>include.Jacobian</code></td>
+<td>
+<p>Boolean, with default <code>TRUE</code> meaning to
+include the Jacobian transformation in the evaluation, and
+<code>FALSE</code> meaning to ignore it; use <code>FALSE</code> for likelihood
+work and <code>TRUE</code> for probability densities</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>give</code></td>
+<td>
+<p>Boolean, with default <code>FALSE</code> meaning to return the
+value of the integral and <code>TRUE</code> meaning to return the full
+output of <code>adaptIntegrate()</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>normalize</code></td>
+<td>
+<p>Boolean, indicates whether return value of
+<code>mean_hyper2()</code> is normalized to have unit sum</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Further arguments passed to <code>adaptIntegrate()</code></p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+
+<ul>
+<li>
+<p> Function <code>B()</code> returns the normalizing constant of a
+hyperdirichlet likelihood function.  Internally, <code class="reqn">p</code> is
+converted to <code>e</code> (by <code>e_to_p()</code>) and the integral proceeds
+over a hypercube.  This function can be very slow, especially if
+<code>disallowed</code> is used.
+</p>
+</li>
+<li>
+<p> Function <code>dhyper2(ip,H)</code> is a probability density
+function on the independent components of a unit-sum vector, that
+is, <code>ip=indep(p)</code>.  This function calls <code>B()</code> each time so
+might be a performance bottleneck.
+</p>
+</li>
+<li>
+<p> Function <code>probability()</code> gives the probability of an
+observation from a hyperdirichlet distribution satisfying
+<code>!disallowed(p)</code>.
+</p>
+</li>
+<li>
+<p> Function <code>mgf()</code> is the moment generating function,
+taking an argument that specifies the powers of <code>p</code> needed: the
+expectation of <code class="reqn">\prod_{i=1}^n {p_i}^{{\rm powers}[i]}</code> is returned.
+</p>
+</li>
+<li>
+<p> Function <code>mean_hyper2()</code> returns the mean value of the
+hyperdirichlet distribution.  This is computationally slow (consider
+<code>maxp()</code> for a measure of central tendency).  The function
+takes a <code>normalize</code> argument, not passed to
+<code>adaptIntegrate()</code>: this is Boolean with <code>FALSE</code> meaning
+to return the value found by integration directly, and default
+<code>TRUE</code> meaning to normalize so the sum is exactly 1
+</p>
+</li>
+</ul>
+<h3>Value</h3>
+
+
+<ul>
+<li>
+<p> Function <code>B()</code> returns a scalar: the normalization
+constant
+</p>
+</li>
+<li>
+<p> Function <code>dhyper2()</code> is a probability density function
+over <code>indep(p)</code>
+</p>
+</li>
+<li>
+<p> Function <code>mean()</code> returns a <code class="reqn">k</code>-tuple with unit sum
+</p>
+</li>
+<li>
+<p> Function <code>mgf()</code> returns a scalar equal to the expectation of
+<code>p^power</code>
+</p>
+</li>
+<li>
+<p> Functions <code>is.proper()</code> and <code>validated()</code> return a Boolean
+</p>
+</li>
+<li>
+<p> Function <code>probability()</code> returns a scalar, a (Bayesian)
+probability
+</p>
+</li>
+</ul>
+<h3>Note</h3>
+
+<p>The adapt package is no longer available on CRAN; from 1.4-3, the
+package uses <code>adaptIntegrate</code> of the cubature package.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Robin K. S. Hankin</p>
+
+
+<h3>See Also</h3>
+
+<p><code>loglik</code></p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+# Two different measures of central tendency:
+# mean_hyper2(chess,tol=0.1)   # takes ~10s to run
+maxp(chess)                    # faster
+
+# Using the 'disallowed' argument typically results in slow run times;
+# use high tol for speed:
+
+# probability(chess,disallowed=function(p){p[1]&gt;p[2]},tol=0.5)
+# probability(chess,disallowed=function(p){p[1]&lt;p[2]},tol=0.5)
+
+# Above should sum to 1 [they are exclusive and exhaustive events]
+
+
+</code></pre>
+
+
+</div>

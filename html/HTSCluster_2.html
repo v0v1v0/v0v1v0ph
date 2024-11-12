@@ -1,0 +1,258 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>Init</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Parameter initialization for a Poisson mixture model.
+</h2>
+
+<h3>Description</h3>
+
+<p>These functions implement a variety of initialization methods for the parameters of a Poisson mixture model: the Small EM initialization strategy (<code>emInit</code>) described in Rau et al. (2011), a K-means initialization strategy (<code>kmeanInit</code>) that is itself used to initialize the small EM strategy, the splitting small-EM initialization strategy (<code>splitEMInit</code>) based on that described in Papastamoulis et al. (2014), and a function to initialize a small-EM strategy using the posterior probabilities (<code>probaPostInit</code>) obtained from a previous run with one fewer cluster following the splitting strategy.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">
+emInit(y, g, conds, norm, alg.type = "EM", 
+    init.runs, init.iter, fixed.lambda, equal.proportions, verbose)
+
+kmeanInit(y, g, conds, norm, fixed.lambda,
+    equal.proportions)
+
+splitEMInit(y, g, conds, norm, alg.type, fixed.lambda,
+    equal.proportions, prev.labels, prev.probaPost, init.runs, 
+    init.iter, verbose)
+
+probaPostInit(y, g, conds, norm, alg.type = "EM", 
+    fixed.lambda, equal.proportions, probaPost.init, init.iter,
+    verbose)
+
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+
+<p>(<em>n</em> x <em>q</em>) matrix of observed counts for <em>n</em> observations and <em>q</em> variables
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>g</code></td>
+<td>
+
+<p>Number of clusters. If <code>fixed.lambda</code> contains a list of lambda values to be fixed, <em>g</em> corresponds to the number of clusters in addition to those fixed.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>conds</code></td>
+<td>
+
+<p>Vector of length <em>q</em> defining the condition (treatment group) for each variable (column) in <code>y</code>
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>norm</code></td>
+<td>
+
+<p>The type of estimator to be used to normalize for differences in library size: (“<code>TC</code>” for total count, “<code>UQ</code>” for upper quantile, “<code>Med</code>” for median, 
+“<code>DESeq</code>” for the normalization method in the DESeq package, and “<code>TMM</code>” for the TMM normalization method (Robinson and Oshlack, 2010). Can also
+be a vector (of length <em>q</em>) containing pre-estimated library size estimates for each sample.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alg.type</code></td>
+<td>
+
+<p>Algorithm to be used for parameter estimation (“<code>EM</code>” or “<code>CEM</code>” for the EM or CEM algorithms, respectively)
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>init.runs</code></td>
+<td>
+
+<p>In the case of the Small-EM algorithm, the number of independent runs to be performed.
+In the case of the splitting Small-EM algorithm, the number of cluster splits to be performed in the splitting small-EM initialization. 
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>init.iter</code></td>
+<td>
+
+<p>The number of iterations to run within each Small-EM algorithm
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fixed.lambda</code></td>
+<td>
+
+<p>If one (or more) clusters with fixed values of lambda is desires, a list containing vectors of length <em>d</em> (the number of conditions). Note that the values of lambda chosen must satisfy the constraint noted in the technical report.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>equal.proportions</code></td>
+<td>
+
+<p>If <code>TRUE</code>, the cluster proportions are set to be equal for all clusters. Default is <code>FALSE</code> (unequal cluster proportions)
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>prev.labels</code></td>
+<td>
+
+<p>A vector of length <em>n</em> of cluster labels obtained from the previous run (g-1 clusters)
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>prev.probaPost</code></td>
+<td>
+
+<p>An <em>n</em> x (<em>g</em>-1) matrix of the conditional probabilities of each observation belonging to each of the 
+<em>g</em>-1 clusters from the previous run
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>probaPost.init</code></td>
+<td>
+
+<p>An <em>n</em> x (<em>g</em>) matrix of the conditional probabilities of each observation belonging to each of the 
+<em>g</em> clusters following the splitting strategy in the <code>splitEMInit</code> function
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+
+<p>If <code>TRUE</code>, include verbose output
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>In practice, the user will not directly call the initialization functions described here; they are indirectly called
+for a single number of clusters through the <code>PoisMixClus</code> function (via <code>init.type</code>) or via the 
+<code>PoisMixClusWrapper</code> function for a sequence of cluster numbers (via <code>gmin.init.type</code> and <code>split.init</code>). 
+</p>
+<p>To initialize parameter values for the EM and CEM algorithms, for the Small-EM strategy (Biernacki et al., 2003) we use the <code>emInit</code> function as follows. For a given number of independent runs (given by <code>init.runs</code>), the following procedure is used to obtain parameter values: first, a K-means algorithm (MacQueen, 1967) is run to partition the data into <code>g</code> clusters (<code class="reqn">\hat{\boldsymbol{z}}^{(0)}</code>). Second, initial parameter values <code class="reqn">\boldsymbol{\pi}^{(0)}</code> and <code class="reqn">\boldsymbol{\lambda}^{(0)}</code> are calculated (see Rau et al. (2011) for details). Third, a given number of iterations of an EM algorithm are run (defined by <code>init.iter</code>), using <code class="reqn">\boldsymbol{\pi}^{(0)}</code> and <code class="reqn">\boldsymbol{\lambda}^{(0)}</code> as initial values. Finally, among the <code>init.runs</code> sets of parameter values, we use <code class="reqn">\hat{\boldsymbol{\lambda}}</code> and <code class="reqn">\hat{\boldsymbol{\pi}}</code> corresponding to the highest log likelihood or completed log likelihood to initialize the subsequent full EM or CEM algorithms, respectively.
+</p>
+<p>For the splitting small EM initialization strategy, we implement an approach similar to that described in Papastamoulis et al. (2014),
+where the cluster from the previous run (with <em>g</em>-1 clusters) with the largest entropy is chosen to be split into two new clusters,
+followed by a small EM run as described above.
+</p>
+
+
+<h3>Value</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>pi.init </code></td>
+<td>
+<p>Vector of length <code>g</code> containing the estimate for <code class="reqn">\hat{\boldsymbol{\pi}}</code> corresponding to the highest log likelihood (or completed log likelihood) from the chosen inialization strategy. </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lambda.init </code></td>
+<td>
+<p>(<em>d</em> x <code>g</code>) matrix containing the estimate of <code class="reqn">\hat{\boldsymbol{\lambda}}</code> corresponding to the highest log likelihood (or completed log likelihood) from the chosen initialization strategy, where <em>d</em> is the number of conditions and <code>g</code> is the number of clusters. </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lambda </code></td>
+<td>
+<p>(<em>d</em> x <code>g</code>) matrix containing the estimate of <code class="reqn">\hat{\boldsymbol{\lambda}}</code> arising from the splitting initialization and small EM run for a single split, 
+where <em>d</em> is the number of conditions and <code>g</code> is the number of clusters. </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pi </code></td>
+<td>
+<p>Vector of length <code>g</code> containing the estimate for <code class="reqn">\hat{\boldsymbol{\pi}}</code> arising from the splitting initialization and small EM run for a single split, where <code>g</code> is the 
+number of clusters.  </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>log.like </code></td>
+<td>
+<p>Log likelihood arising from the splitting initialization and small EM run for a single split. </p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>Andrea Rau
+</p>
+
+
+<h3>References</h3>
+
+<p>Anders, S. and Huber, W. (2010) Differential expression analysis for sequence count data. <em>Genome Biology</em>, <b>11</b>(R106), 1-28.
+</p>
+<p>Biernacki, C., Celeux, G., Govaert, G. (2003) Choosing starting values for the EM algorithm for getting the highest likelhiood in multivariate Gaussian mixture models. <em>Computational Statistics and Data Analysis</em>, <b>41</b>(1), 561-575.
+</p>
+<p>MacQueen, J. B. (1967) Some methods for classification and analysis of multivariate observations. In <em>Proceedings of the 5th Berkeley Symposium on Mathematical Statistics and Probability</em>, number 1, pages 281-297. Berkeley, University of California Press.
+</p>
+<p>Papastamoulis, P., Martin-Magniette, M.-L., and Maugis-Rabusseau, C. (2014). On the estimation of mixtures of Poisson regression models with large number of components. <em>Computational Statistics and Data Analysis</em>: 3rd special Issue on Advances in Mixture Models, DOI: 10.1016/j.csda.2014.07.005.
+</p>
+<p>Rau, A., Celeux, G., Martin-Magniette, M.-L., Maugis-Rabusseau, C. (2011). Clustering high-throughput sequencing data with Poisson mixture models. Inria Research Report 7786. Available at <a href="https://inria.hal.science/inria-00638082">https://inria.hal.science/inria-00638082</a>.
+</p>
+<p>Rau, A., Maugis-Rabusseau, C., Martin-Magniette, M.-L., Celeux G. (2015). Co-expression analysis of high-throughput transcriptome sequencing data with Poisson mixture models. Bioinformatics, 31(9):1420-1427.
+</p>
+<p>Robinson, M. D. and Oshlack, A. (2010) A scaling normalization method for differential expression analysis of RNA-seq data. <em>Genome Biology</em>, <b>11</b>(R25).
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>PoisMixClus</code> for Poisson mixture model estimation for a given number of clusters,
+<code>PoisMixClusWrapper</code> for Poisson mixture model estimation and model selection for a sequence of cluster numbers.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+set.seed(12345)
+
+## Simulate data as shown in Rau et al. (2011)
+## Library size setting "A", high cluster separation
+## n = 500 observations
+
+simulate &lt;- PoisMixSim(n = 500, libsize = "A", separation = "high")
+y &lt;- simulate$y
+conds &lt;- simulate$conditions
+
+## Calculate initial values for lambda and pi using the Small-EM
+## initialization (4 classes, PMM-II model with "TC" library size)
+##
+## init.values &lt;- emInit(y, g = 4, conds, 
+##    norm = "TC", alg.type = "EM", 
+##    init.runs = 50, init.iter = 10, fixed.lambda = NA,
+##    equal.proportions = FALSE, verbose = FALSE)
+## pi.init &lt;- init.values$pi.init
+## lambda.init &lt;- init.values$lambda.init
+
+
+</code></pre>
+
+
+</div>

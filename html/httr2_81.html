@@ -1,0 +1,123 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>req_url</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Modify request URL</h2>
+
+<h3>Description</h3>
+
+
+<ul>
+<li> <p><code>req_url()</code> replaces the entire url
+</p>
+</li>
+<li> <p><code>req_url_query()</code> modifies the components of the query
+</p>
+</li>
+<li> <p><code>req_url_path()</code> modifies the path
+</p>
+</li>
+<li> <p><code>req_url_path_append()</code> adds to the path
+</p>
+</li>
+</ul>
+<h3>Usage</h3>
+
+<pre><code class="language-R">req_url(req, url)
+
+req_url_query(.req, ..., .multi = c("error", "comma", "pipe", "explode"))
+
+req_url_path(req, ...)
+
+req_url_path_append(req, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>req, .req</code></td>
+<td>
+<p>A httr2 request object.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>url</code></td>
+<td>
+<p>New URL; completely replaces existing.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>For <code>req_url_query()</code>: &lt;<code>dynamic-dots</code>&gt;
+Name-value pairs that define query parameters. Each value must be either
+an atomic vector or <code>NULL</code> (which removes the corresponding parameters).
+If you want to opt out of escaping, wrap strings in <code>I()</code>.
+</p>
+<p>For <code>req_url_path()</code> and <code>req_url_path_append()</code>: A sequence of path
+components that will be combined with <code>/</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.multi</code></td>
+<td>
+<p>Controls what happens when an element of <code>...</code> is a vector
+containing multiple values:
+</p>
+
+<ul>
+<li> <p><code>"error"</code>, the default, throws an error.
+</p>
+</li>
+<li> <p><code>"comma"</code>, separates values with a <code style="white-space: pre;">⁠,⁠</code>, e.g. <code style="white-space: pre;">⁠?x=1,2⁠</code>.
+</p>
+</li>
+<li> <p><code>"pipe"</code>, separates values with a <code>|</code>, e.g. <code>?x=1|2</code>.
+</p>
+</li>
+<li> <p><code>"explode"</code>, turns each element into its own parameter, e.g. <code>?x=1&amp;x=2</code>.
+</p>
+</li>
+</ul>
+<p>If none of these functions work, you can alternatively supply a function
+that takes a character vector and returns a string.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A modified HTTP request.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">req &lt;- request("http://example.com")
+
+# Change url components
+req |&gt;
+  req_url_path_append("a") |&gt;
+  req_url_path_append("b") |&gt;
+  req_url_path_append("search.html") |&gt;
+  req_url_query(q = "the cool ice")
+
+# Change complete url
+req |&gt;
+  req_url("http://google.com")
+
+# Use .multi to control what happens with vector parameters:
+req |&gt; req_url_query(id = 100:105, .multi = "comma")
+req |&gt; req_url_query(id = 100:105, .multi = "explode")
+
+# If you have query parameters in a list, use !!!
+params &lt;- list(a = "1", b = "2")
+req |&gt;
+  req_url_query(!!!params, c = "3")
+</code></pre>
+
+
+</div>

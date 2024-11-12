@@ -1,0 +1,214 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>genDataRead</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Reading the genetic data from a file</h2>
+
+<h3>Description</h3>
+
+<p>This function will read in data from PED or haplin formatted file.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">genDataRead(
+  file.in = stop("Filename must be given!", call. = FALSE),
+  file.out = NULL,
+  dir.out = ".",
+  format = stop("Format parameter is required!"),
+  header = FALSE,
+  n.vars,
+  cov.file.in,
+  cov.header,
+  map.file,
+  map.header = FALSE,
+  allele.sep = ";",
+  na.strings = "NA",
+  col.sep = "",
+  overwrite = NULL
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>file.in</code></td>
+<td>
+<p>The name of the main input file with genotype information.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>file.out</code></td>
+<td>
+<p>The base for the output filename (by default, constructed from the
+input file name).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dir.out</code></td>
+<td>
+<p>The path to the directory where the output files will be saved.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>format</code></td>
+<td>
+<p>Format of data (will influence how data is processed) - choose from:
+</p>
+
+<ul>
+<li> <p><em>haplin</em> - data already in one row per family,
+</p>
+</li>
+<li> <p><em>ped</em> - data from .ped file, each row represents an individual.
+</p>
+</li>
+</ul>
+<p>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>header</code></td>
+<td>
+<p>Whether the first line of the main input file contains column names;
+default: FALSE; NB: this is useful only for 'haplin'-formatted files!</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n.vars</code></td>
+<td>
+<p>The number of columns with covariate data (if any) in the main file;
+NB: if the main file is in PED format, it is assumed that the first 6 columns contain
+the standard PED-covariates (i.e., family ID, ID of the child, father and mother,
+sex and case-control status), so in this case setting 'n.vars' is useful only
+if the PED file contains more than 6 covariate columns.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cov.file.in</code></td>
+<td>
+<p>Name of the file containing additional covariate data, if any. 
+Caution: unless the 'cov.header' argument is used, it is assumed that the first line 
+of this file contains the header (i.e., the column names of the additional data).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cov.header</code></td>
+<td>
+<p>The character vector containing the names of covariate columns
+(in the file with additional covariate data if given by the 'cov.file.in' argument;
+or in the main file, if it's a "haplin"-formatted file).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>map.file</code></td>
+<td>
+<p>Filename (with path if the file is not in current directory) of the
+.map file holding the SNP names, if available (see Details).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>map.header</code></td>
+<td>
+<p>Logical: does the map.file contain a header in the first row?
+Default: FALSE.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>allele.sep</code></td>
+<td>
+<p>Character: separator between two alleles (default: ";").</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>na.strings</code></td>
+<td>
+<p>Character or NA: how the missing data is coded (default: "NA").</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>col.sep</code></td>
+<td>
+<p>Character: separator between the columns (i.e., markers; default: any
+whitespace character).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>overwrite</code></td>
+<td>
+<p>Whether to overwrite the output files: if NULL (default), will prompt
+the user to give answer; set to TRUE, will automatically overwrite any existing files;
+and set to FALSE, will stop if the output files exist.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The function reads in all the data in the file, creates ff objects to store
+the genetic information and data.frame to store covariate data (if any). These
+objects are saved in <code>.RData</code> and <code>.ffData</code> files, which can be later on
+easily uploaded to R (with genDataLoad) and re-used.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A list object with three elements:
+</p>
+
+<ul>
+<li> <p><em>cov.data</em> - a <code>data.frame</code> with covariate data (if available in
+the input file)
+</p>
+</li>
+<li> <p><em>gen.data</em> - a list with chunks of the genetic data; the data is divided
+column-wise, using 10,000 columns per chunk; each element of this list is a
+ff matrix
+</p>
+</li>
+<li> <p><em>aux</em> - a list with meta-data and important parameters.
+</p>
+</li>
+</ul>
+<h3>Details</h3>
+
+<p>The .map file should contain at least two columns, where the second one contains SNP 
+names. Any additional columns should be separated by a whitespace character, but will 
+be ignored. The file should contain a header.
+</p>
+
+
+<h3>Usage note</h3>
+
+<p>When reading in a covariate file together with the genotype information, it is advised
+to include the header in the file, so that there is no doubt to the naming of
+the data columns.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">  # The argument 'overwrite' is set to TRUE!
+  examples.dir &lt;- system.file( "extdata", package = "Haplin" )
+  # ped format:
+  example.file2 &lt;- file.path( examples.dir, "exmpl_data.ped" )
+  ped.data.read &lt;- genDataRead( example.file2, file.out = "exmpl_ped_data", 
+   dir.out = tempdir( check = TRUE ), format = "ped", overwrite = TRUE )
+  ped.data.read
+  # haplin format:
+  example.file1 &lt;- file.path( examples.dir, "HAPLIN.trialdata2.txt" )
+  haplin.data.read &lt;- genDataRead( file.in = example.file1,
+   file.out = "exmpl_haplin_data", format = "haplin", allele.sep = "", n.vars = 2, 
+   cov.header = c( "smoking", "sex" ), overwrite = TRUE,
+   dir.out = tempdir( check = TRUE ) )
+  haplin.data.read
+
+</code></pre>
+
+
+</div>

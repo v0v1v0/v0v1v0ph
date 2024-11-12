@@ -1,0 +1,116 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>sim_nsppp</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Generation of a realisation of a Neyman-Scott process</h2>
+
+<h3>Description</h3>
+
+<p>This algorithm generates a realisation of a Neyman-Scott process whose
+expected number of points equals the number of observations in a given
+pattern.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">sim_nsppp(ppdata, radius, clustering = 5, thinning = 0)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>ppdata</code></td>
+<td>
+<p>observed point pattern, whose estimated intensity (adjusted for
+thinning and divided by "clustering") is used for simulating the
+parent process</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>radius</code></td>
+<td>
+<p>radius of the circles around the parent points in which the cluster
+points are located (Maximum radius of a random cluster)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>clustering</code></td>
+<td>
+<p>a value larger or equal 1 which describes the amount of clustering; the
+adjusted estimated intensity of the observed pattern is divided by
+this value; it is also the parameter of the Poisson distribution
+for the number of points per cluster</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>thinning</code></td>
+<td>
+<p>constant thinning probability (in case the observed pattern is a
+thinned version of a full pattern); usually equal to the probability of having
+unobserved events</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>First, the algorithm generates a Poisson point process (see <code>rpoispp</code> for
+details) of parent points with intensity kappa, which is a pixel image
+object of class "im" (see <code>im.object</code>).<br>
+This pixel image is derived from the observed pattern using <code>density.ppp</code>.
+The bandwidth is not chosen in advance.<br>
+If only a thinned version of the original pattern has been observed,
+this can be taken into account using the parameter <code>thinning</code>.
+Usually, not the estimated intensity itself is used for simulating the
+parent process, but its values are divided by a constant named "clustering".<br>
+Second, each parent point is replaced by a random cluster of points, created
+by calling the function <code>runifdisc</code>. Each cluster consists of a Poisson
+distributed number of points (with <code>clustering</code> being the expected number of
+points in each cluster) which are located in a disc of a given <code>radius</code>.
+These clusters are combined to yield a single point pattern which is
+then returned as the result.<br>
+The estimation of the intensity (on an adequate window) and the
+simulation of the Neyman-Scott process are performed seperately,
+so the intensity does not need to be reestimated in every iteration.<br>
+The resulting process is a Mat?rn process whose parent process is an
+inhomogeneous Poisson point process.
+</p>
+
+
+<h3>Value</h3>
+
+<p>The simulated point pattern (an object of class "ppp").
+Additionally, some intermediate results of the simulation are returned as 
+attributes of this point pattern: see <code>rNeymanScott</code>.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>rNeymanScott</code>, <code>rThomas</code>, 
+<code>rMatClust</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run:       
+ data(craterA)
+ data(craterB)
+ set.seed(100)
+ sim_pp1 &lt;- sim_nsppp(craterA, radius=300, clustering=15, thinning=0.1)
+ sim_pp2 &lt;- sim_nsppp(craterB, radius=300, clustering=15, thinning=0.1)
+ op &lt;- par(mfrow = c(1, 2))
+ plot(sim_pp1, main = "simulated cluster process 1")
+ plot(sim_pp2, main = "simulated cluster process 2")
+ par(op)
+ 
+## End(Not run)
+</code></pre>
+
+
+</div>

@@ -1,0 +1,141 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>fit_haldensify</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Fit Conditional Density Estimation for a Sequence of HAL Models</h2>
+
+<h3>Description</h3>
+
+<p>Fit Conditional Density Estimation for a Sequence of HAL Models
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">fit_haldensify(
+  A,
+  W,
+  wts = rep(1, length(A)),
+  grid_type = "equal_range",
+  n_bins = round(c(0.5, 1, 1.5, 2) * sqrt(length(A))),
+  cv_folds = 5L,
+  lambda_seq = exp(seq(-1, -13, length = 1000L)),
+  smoothness_orders = 0L,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>A</code></td>
+<td>
+<p>The <code>numeric</code> vector of observed values.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>W</code></td>
+<td>
+<p>A <code>data.frame</code>, <code>matrix</code>, or similar giving the values of
+baseline covariates (potential confounders) for the observed units. These
+make up the conditioning set for the conditional density estimate.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>wts</code></td>
+<td>
+<p>A <code>numeric</code> vector of observation-level weights. The default
+is to weight all observations equally.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>grid_type</code></td>
+<td>
+<p>A <code>character</code> indicating the strategy to be used in
+creating bins along the observed support of <code>A</code>. For bins of equal
+range, use <code>"equal_range"</code>; consult the documentation of
+<code>cut_interval</code> for more information. To ensure each
+bin has the same number of observations, use <code>"equal_mass"</code>; consult
+the documentation of <code>cut_number</code> for details.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n_bins</code></td>
+<td>
+<p>This <code>numeric</code> value indicates the number(s) of bins into
+which the support of <code>A</code> is to be divided. As with <code>grid_type</code>,
+multiple values may be specified, in which case cross-validation will be
+used to choose the optimal number of bins. The default sets the candidate
+choices of the number of bins based on heuristics tested in simulation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cv_folds</code></td>
+<td>
+<p>A <code>numeric</code> indicating the number of cross-validation
+folds to be used in fitting the sequence of HAL conditional density models.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lambda_seq</code></td>
+<td>
+<p>A <code>numeric</code> sequence of values of the regularization
+parameter of Lasso regression; passed to <code>fit_hal</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>smoothness_orders</code></td>
+<td>
+<p>A <code>integer</code> indicating the smoothness of the
+HAL basis functions; passed to <code>fit_hal</code>. The default
+is set to zero, for indicator basis functions.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Additional (optional) arguments of <code>fit_hal</code>
+that may be used to control fitting of the HAL regression model. Possible
+choices include <code>use_min</code>, <code>reduce_basis</code>, <code>return_lasso</code>,
+and <code>return_x_basis</code>, but this list is not exhaustive. Consult the
+documentation of <code>fit_hal</code> for complete details.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Estimation of the conditional density of A|W via a cross-validated
+highly adaptive lasso, used to estimate the conditional hazard of failure
+in a given bin over the support of A.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A <code>list</code>, containing density predictions for the sequence of
+fitted HAL models; the index and value of the L1 regularization parameter
+minimizing the density loss; and the sequence of empirical risks for the
+sequence of fitted HAL models.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># simulate data: W ~ U[-4, 4] and A|W ~ N(mu = W, sd = 0.5)
+n_train &lt;- 50
+w &lt;- runif(n_train, -4, 4)
+a &lt;- rnorm(n_train, w, 0.5)
+# fit cross-validated HAL-based density estimator of A|W
+haldensify_cvfit &lt;- fit_haldensify(
+  A = a, W = w, n_bins = 10L, lambda_seq = exp(seq(-1, -10, length = 100)),
+  # the following arguments are passed to hal9001::fit_hal()
+  max_degree = 3, reduce_basis = 1 / sqrt(length(a))
+)
+</code></pre>
+
+
+</div>

@@ -1,0 +1,144 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>progressbar</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Creates an animated progress bar</h2>
+
+<h3>Description</h3>
+
+<p>Creates an animated progress bar
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">progressbar(
+  format = "[[|][|/-\\][ ]]",
+  width = 20,
+  refresh = 200,
+  n_iterations = NULL
+)
+
+render(object, ...)
+
+## S3 method for class 'fraction_progressbar'
+render(object, progress, show_progress = c("nothing", "percentage"), ...)
+
+## S3 method for class 'iteration_progressbar'
+render(
+  object,
+  progress,
+  show_progress = c("nothing", "percentage", "iteration"),
+  ...
+)
+
+## S3 method for class 'progressbar'
+render(object, show_progress = c("nothing", "percentage", "iteration"), ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>format</code></td>
+<td>
+<p>character vector containing the format of the animation. See 'details' for more information.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>width</code></td>
+<td>
+<p>progress bar width.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>refresh</code></td>
+<td>
+<p>refresh rate in milliseconds of the animation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n_iterations</code></td>
+<td>
+<p>optional parameter, specifies the number of total iterations. When updating the progress bar it
+is then sufficient to specify the current iteration number.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>object</code></td>
+<td>
+<p>animated progress bar.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>further arguments passed to or from other methods.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>progress</code></td>
+<td>
+<p>either the iteration number (if n_iterations is set), or the progress fraction (in [0,1]).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>show_progress</code></td>
+<td>
+<p>how to show the progress. Either not to show it (default),
+show a percentage or if <code>n_iterations</code> is set to show the number of iterations.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The format of the progress bar is given by a character vector. It consists of 5 parts:
+</p>
+
+<ol>
+<li>
+<p> the left border of the progress bar consisting of 0 or more characters.
+</p>
+</li>
+<li>
+<p> a pair of square brackets containing a single character which represents the loaded area.
+</p>
+</li>
+<li>
+<p> a pair of square brackets containing 0 or more characters. These are animated on the border between the loaded and unloaded area.
+</p>
+</li>
+<li>
+<p> a pair of square brackets containing a single character which represents the unloaded area.
+</p>
+</li>
+<li>
+<p> the right border of the progress bar consisting of 0 or more characters.
+</p>
+</li>
+</ol>
+<p>The format follows the following regular expression: <code>^.*?[.?][.*?][.?].*$</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+# simple progressbar
+bar = progressbar(format = "[[|][|/-\\][ ]]")
+# fancy progressbar using UTF-8 codes
+n_operations = 1000
+bar2 = progressbar(format="\u25ba[\u2589][\u2580\u2584][\u3000]\u25c4", n_iterations=n_operations)
+
+for(i in 1:n_operations) {
+  cat("\r", render(bar),sep="")
+  Sys.sleep(0.01)
+}
+## End(Not run)
+</code></pre>
+
+
+</div>

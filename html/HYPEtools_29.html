@@ -1,0 +1,93 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>DirectUpstreamSubids</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Find Direct Upstream SUBIDs, with Flow Fractions</h2>
+
+<h3>Description</h3>
+
+<p>Function to find <b>direct</b> upstream SUBIDs including flow fractions for MAINDOWN/BRANCHDOWN splits for a single
+sub-catchment or all sub-catchments in a GeoData-like data frame.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">DirectUpstreamSubids(subid = NULL, gd, bd = NULL)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>subid</code></td>
+<td>
+<p>Integer, SUBID of a target sub-catchment (must exist in <code>gd</code>), defaults to
+<code>NULL</code>. If non-<code>NULL</code>, <code>DirectUpstreamSubids</code>
+returns the direct upstream SUBIDs for this sub-catchment, otherwise for all sub-catchments in <code>gd</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>gd</code></td>
+<td>
+<p>Data frame, typically an imported 'GeoData.txt' file. Mandatory argument. See 'Details'.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>bd</code></td>
+<td>
+<p>Data frame, typically an imported 'BranchData.txt' file. Optional argument, defaults to
+an empty placeholder. See 'Details'.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p><code>DirectUpstreamSubids</code> identifies <b>direct</b> upstream SUBIDs for a user-provided target SUBID or
+for all SUBIDs given in a data frame <code>gd</code>, typically an imported GeoData file.
+</p>
+<p>A sub-catchment in HYPE can have several upstream sub-catchments. If there are more than one upstream sub-catchments,
+the downstream sub-catchment is a confluence. HYPE stores these connections in the GeoData file, in downstream direction,
+given as downstream SUBID in column 'MAINDOWN'. Bifurcations, i.e. splits in downstream direction, are also possible to model in HYPE.
+These additional downstream connections are provided in the BranchData file, together with flow fractions to each downstream SUBID.
+</p>
+<p>Formally, <code>gd</code> can be any data frame which contains columns 'SUBID' and 'MAINDOWN' (not case-sensitive), and <code>bd</code> any
+data frame which contains three columns: 'BRANCHID', 'SOURCEID', and 'MAINPART', and optionally columns 'MAXQMAIN', 'MINQMAIN', 'MAXQBRANCH'.
+Typically, these are HYPE data files
+imported through <code>ReadGeoData</code> and <code>ReadBranchData</code>. See HYPE documentation for further details on connections
+Between SUBIDs in the model.
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>DirectUpstreamSubids</code> always returns a list. If argument <code>subid</code> is non-<code>NULL</code>, a list with two elements is returned:
+<code>subid</code> contains an integer giving the target SUBID and <code>upstr.df</code> contains a data frame with columns
+<code>upstream</code> (upstream SUBID), <code>is.main</code> (logical, <code>TRUE</code> if it is a MAINDOWN connection),
+<code>fraction</code> (fraction of flow going into the target SUBID), and <code>llim</code> and <code>ulim</code> giving upper and lower flow boundaries which
+optionally limit flow into the target SUBID.
+</p>
+<p>If no specific SUBID was provided, <code>DirectUpstreamSubids</code> returns a list with upstream information for all SUBIDs in argument
+<code>gd</code>, each list element containing the list described above, i.e. with an integer element (SUBID) and a data frame element
+(upstream connections).
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>AllUpstreamSubids</code>, which returns all upstream SUBIDs, i.e. the full upstream network up to the headwaters, for a given SUBID.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">te &lt;- ReadGeoData(filename = system.file("demo_model", "GeoData.txt", package = "HYPEtools"))
+DirectUpstreamSubids(subid = 3594, gd = te)
+
+</code></pre>
+
+
+</div>

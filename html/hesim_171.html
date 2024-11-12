@@ -1,0 +1,154 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>sim_stateprobs.survival</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Simulate state probabilities from survival curves</h2>
+
+<h3>Description</h3>
+
+<p>Simulate health state probabilities from a <code>survival</code> object using partitioned
+survival analysis.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">## S3 method for class 'survival'
+sim_stateprobs(x, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>An object of class <code>survival</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Further arguments passed to or from other methods.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>In an <code class="reqn">N</code>-state partitioned survival model there are <code class="reqn">N-1</code> survival curves
+and <code class="reqn">S_n(t)</code> is the cumulative survival function denoting the probability of
+survival to health state <code class="reqn">n</code> or a lower indexed state beyond time <code class="reqn">t</code>.
+The probability that a patient is in health state 1 at time <code class="reqn">t</code> is simply
+<code class="reqn">S_1(t)</code>. State membership in health states <code class="reqn">2,\ldots, N -1</code> is calculated
+as <code class="reqn">S_n(t) - S_{n-1}(t)</code>. Finally, the probability of being in the final
+health state <code class="reqn">N</code> (i.e., the death state) is <code class="reqn">1-S_{N-1}(t)</code>, or
+one minus the overall survival curve.
+</p>
+<p>In some cases, the survival curves may cross. <code>hesim</code> will issue a warning
+but the function will still run. Probabilities will be set to 0 in a health state
+if the prior survival curve lies above the curve for state <code class="reqn">n</code>;
+that is, if <code class="reqn">S_n(t) &lt; S_{n-1}(t)</code>, then the probability of being in state <code class="reqn">n</code>
+is set to 0 and <code class="reqn">S_n(t)</code> is adjusted to equal <code class="reqn">S_{n-1}(t)</code>. The
+probability of being in the final health state is also adjusted if necessary to
+ensure that probabilities sum to 1.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A <code>stateprobs</code> object.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>survival</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">library("data.table")
+library("survival")
+
+# This example shows how to simulate a partitioned survival model by
+# manually constructing a "survival" object. We will consider a case in which
+# Cox proportional hazards models from the survival package---which are not
+# integrated with hesim---are used for parameter estimation. We will use 
+# point estimates in the example, but bootstrapping, Bayesian modeling,
+# or other techniques could be used to draw samples for a probabilistic 
+# sensitivity analysis. 
+
+# (0) We first setup our model per usual by defining the treatment strategies,
+# target population, and health states
+hesim_dat &lt;- hesim_data(
+  strategies = data.table(strategy_id = 1:3,
+                          strategy_name = c("SOC", "New 1", "New 2")),
+  patients = data.table(patient_id = 1:2,
+                        female = c(0, 1),
+                        grp_id = 1),
+  states = data.table(state_id = 1:2,
+                      state_name = c("Stable", "Progression"))
+)
+
+# (1) Next we will estimate Cox models with survival::coxph(). We illustrate 
+# by predicting progression free survival (PFS) and overall survival (OS)
+## Fit models
+onc3_pfs_os &lt;- as_pfs_os(onc3, patient_vars = c("patient_id", "female",
+                                                "strategy_name"))
+fit_pfs &lt;- coxph(Surv(pfs_time, pfs_status) ~ strategy_name + female,
+                 data = onc3_pfs_os)
+fit_os &lt;- coxph(Surv(os_time, pfs_status) ~ strategy_name + female,
+                data = onc3_pfs_os)
+
+## Predict survival on input data
+surv_input_data &lt;- expand(hesim_dat)
+times &lt;- seq(0, 14, 1/12)
+predict_survival &lt;- function(object, newdata, times) {
+  surv &lt;- summary(survfit(object, newdata = newdata, se.fit = FALSE),
+                  t = times)
+  pred &lt;- newdata[rep(seq_len(nrow(newdata)), each = length(times)), ]
+  pred[, sample := 1] # Point estimates only in this example
+  pred[, time := rep(surv$time, times = nrow(newdata))]
+  pred[, survival := c(surv$surv)]
+  return(pred[, ])
+}
+pfs &lt;- predict_survival(fit_pfs, newdata = surv_input_data, times = times)
+os &lt;- predict_survival(fit_os, newdata = surv_input_data, times = times)
+surv &lt;- rbind(
+  as.data.table(pfs)[, curve := 1L],
+  as.data.table(os)[, curve := 2L]
+)
+
+## Convert predictions to a survival object
+surv &lt;- survival(surv, t = "time")
+## Not run: autoplot(surv)
+
+# (2) We can then compute state probabilities from the survival object
+stprobs &lt;- sim_stateprobs(surv)
+
+# (3) Finally, we can use the state probabilities to compute QALYs and costs
+## A dummy utility model to illustrate
+utility_tbl &lt;- stateval_tbl(
+  data.table(state_id = 1:2,
+             est = c(1, 1)
+  ),
+  dist = "fixed"
+)
+utilitymod &lt;- create_StateVals(utility_tbl, 
+                               hesim_data = hesim_dat,
+                               n = 1)
+
+## Instantiate Psm class and compute QALYs
+psm &lt;- Psm$new(utility_model = utilitymod)
+psm$stateprobs_ &lt;- stprobs
+psm$sim_qalys()
+psm$qalys_
+
+</code></pre>
+
+
+</div>

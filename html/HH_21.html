@@ -1,0 +1,268 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>tsdiagplot</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Times series diagnostic plots for a structured set of
+ARIMA models.</h2>
+
+<h3>Description</h3>
+
+<p>Times series diagnostic plots for a structured set of ARIMA models.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">tsdiagplot(x,
+           p.max=2, q.max=p.max,
+           model=c(p.max, 0, q.max), ## S-Plus
+           order=c(p.max, 0, q.max), ## R
+           lag.max=36, gof.lag=lag.max,
+           armas=arma.loop(x, order=order,
+               series=deparse(substitute(x)), ...),
+           diags=diag.arma.loop(armas, x,
+                                lag.max=lag.max,
+                                gof.lag=gof.lag),
+           ts.diag=rearrange.diag.arma.loop(diags),
+           lag.units=ts.diag$tspar["frequency"],
+           lag.lim=range(pretty(ts.diag$acf$lag))*lag.units,
+           lag.x.at=pretty(ts.diag$acf$lag)*lag.units,
+           lag.x.labels={tmp &lt;- lag.x.at
+                      tmp[as.integer(tmp)!=tmp] &lt;- ""
+                      tmp},
+           lag.0=TRUE,
+           main, lwd=0,
+           ...)
+
+acfplot(rdal, type="acf",
+        main=paste("ACF of std.resid:", rdal$series,
+                   "   model:",         rdal$model),
+        lag.units=rdal$tspar["frequency"],
+        lag.lim=range(pretty(rdal[[type]]$lag)*lag.units),
+        lag.x.at=pretty(rdal[[type]]$lag)*lag.units,
+        lag.x.labels={tmp &lt;- lag.x.at
+                      tmp[as.integer(tmp)!=tmp] &lt;- ""
+                      tmp},
+        lag.0=TRUE,
+        xlim=xlim.function(lag.lim/lag.units),
+        ...)
+
+aicsigplot(z, z.name=deparse(substitute(z)), series.name="ts",
+           model=NULL,
+           xlab="", ylab=z.name,
+           main=paste(z.name,  series.name, model),
+           layout=c(1,2), between=list(x=1,y=1), ...)
+
+residplot(rdal,
+          main=paste("std.resid:", rdal$series,
+                     "   model:",  rdal$model),
+          ...)
+
+gofplot(rdal,
+        main=paste("P-value for gof:", rdal$series,
+                   "   model:",         rdal$model),
+       lag.units=rdal$tspar["frequency"],
+        lag.lim=range(pretty(rdal$gof$lag)*lag.units),
+        lag.x.at=pretty(rdal$gof$lag)*lag.units,
+        lag.x.labels={tmp &lt;- lag.x.at
+                      tmp[as.integer(tmp)!=tmp] &lt;- ""
+                      tmp},
+        xlim=xlim.function(lag.lim/lag.units),
+        pch=16, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>Time series vector.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>p.max, q.max</code></td>
+<td>
+<p>Maximum number of AR and MA arguments to use in
+the series of ARIMA models.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>model</code></td>
+<td>
+<p>A valid S-Plus <code>model</code> for
+
+<code>arima.mle</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>order</code></td>
+<td>
+<p>A valid R <code>order</code> for
+
+<code>arima</code>.
+</p>
+<p>The additional argument <code>seasonal</code> may also be used.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lag.max</code></td>
+<td>
+<p>Maximum lag for the acf and pacf plots.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>gof.lag</code></td>
+<td>
+<p>Maximum lag for the gof plots.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>armas</code></td>
+<td>
+<p>An <code>arma.loop</code> object.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>diags</code></td>
+<td>
+<p>An <code>diag.arma.loop</code> object.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ts.diag, rdal</code></td>
+<td>
+<p>A list constructed as a rearranged <code>diag.arma.loop</code> object.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lag.units</code></td>
+<td>
+<p>Units for time series, defaults to <code>frequency(x)</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lag.lim</code></td>
+<td>
+<p>scaling for <code>xlim</code> in acf and pacf plots.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lag.x.at, lag.x.labels</code></td>
+<td>
+<p>Location of ticks and labels for the acf and pacf plots.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lag.0</code></td>
+<td>
+<p>Logical.  If <code>TRUE</code>, then plot the correlation (identically 1)
+at lag=0.
+If <code>FALSE</code>, do not plot the correlation at lag=0.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>type</code></td>
+<td>
+<p><code>"acf"</code> or <code>"pacf"</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>z</code></td>
+<td>
+<p>A matrix constructed as the <code>aic</code> or <code>sigma2</code> component of the
+sumamry of a  <code>arma.loop</code> object.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>z.name</code></td>
+<td>
+<p><code>"aic"</code> or <code>"sigma2"</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>series.name</code></td>
+<td>
+<p>Character string describing the time series.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>xlab, ylab, layout, between, pch, xlim, main, lwd</code></td>
+<td>
+<p>Standard
+trellis arguments.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Additional arguments.  <code>tsdiagplot</code> sends them to
+<code>arima</code> or <code>arima.mle</code>.  <code>acfplot</code>,
+<code>aicsigplot</code> <code>residplot</code>, and <code>gofplot</code> send them to <code>xyplot</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p><code>tsdiagplot</code> returns a <code>"tsdiagplot"</code> object which is
+a list of <code>"trellis"</code> objects.  It is printed with its own
+print method.
+</p>
+<p>The other functions return <code>"trellis"</code> objects.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Richard M. Heiberger (rmh@temple.edu)</p>
+
+
+<h3>References</h3>
+
+<p>"Displays for Direct Comparison of ARIMA Models"
+The American Statistician, May 2002, Vol. 56, No. 2, pp. 131-138.
+Richard M. Heiberger, Temple University, and
+Paulo Teles, Faculdade de Economia do Porto.
+</p>
+<p>Heiberger, Richard M. and Holland, Burt (2015).
+<em>Statistical Analysis and Data Display: An Intermediate Course with Examples in R</em>.
+Second Edition.
+Springer-Verlag, New York.
+<a href="https://link.springer.com/book/10.1007/978-1-4939-2122-5">https://link.springer.com/book/10.1007/978-1-4939-2122-5</a>
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>tsacfplots</code>, <code>arma.loop</code></p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(tser.mystery.X)
+X &lt;- tser.mystery.X
+
+X.dataplot &lt;- tsacfplots(X, lwd=1, pch.seq=16, cex=.7)
+X.dataplot
+
+X.loop &lt;- if.R(
+               s=
+               arma.loop(X, model=list(order=c(2,0,2)))
+               ,r=
+               arma.loop(X, order=c(2,0,2))
+               )
+X.dal &lt;- diag.arma.loop(X.loop, x=X)
+X.diag &lt;- rearrange.diag.arma.loop(X.dal)
+X.diagplot &lt;- tsdiagplot(armas=X.loop, ts.diag=X.diag, lwd=1)
+X.diagplot
+
+X.loop
+X.loop[["1","1"]]
+</code></pre>
+
+
+</div>

@@ -1,0 +1,255 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>quotesCleanup</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Cleans quote data</h2>
+
+<h3>Description</h3>
+
+<p>This is a wrapper function for cleaning the quote data in the entire folder <code>dataSource</code>. 
+The result is saved in the folder <code>dataDestination</code>. 
+</p>
+<p>In case you supply the argument <code>qDataRaw</code>, the on-disk functionality is ignored
+and the function returns the cleaned quotes as <code>xts</code> or <code>data.table</code> object (see examples).
+</p>
+<p>The following cleaning functions are performed sequentially:
+<code>noZeroQuotes</code>, <code>exchangeHoursOnly</code>, <code>autoSelectExchangeQuotes</code> or <code>selectExchange</code>, <code>rmNegativeSpread</code>, <code>rmLargeSpread</code>
+<code>mergeQuotesSameTimestamp</code>, <code>rmOutliersQuotes</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">quotesCleanup(
+  dataSource = NULL,
+  dataDestination = NULL,
+  exchanges = "auto",
+  qDataRaw = NULL,
+  report = TRUE,
+  selection = "median",
+  maxi = 50,
+  window = 50,
+  type = "standard",
+  marketOpen = "09:30:00",
+  marketClose = "16:00:00",
+  rmoutliersmaxi = 10,
+  printExchange = TRUE,
+  saveAsXTS = FALSE,
+  tz = NULL
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>dataSource</code></td>
+<td>
+<p>character indicating the folder in which the original data is stored.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dataDestination</code></td>
+<td>
+<p>character indicating the folder in which the cleaned data is stored.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>exchanges</code></td>
+<td>
+<p>vector of stock exchange symbols for all data in dataSource, 
+e.g. <code>exchanges = c("T","N")</code> retrieves all stock market data from both NYSE and NASDAQ.
+The possible exchange symbols are:
+</p>
+
+<ul>
+<li>
+<p> A: AMEX
+</p>
+</li>
+<li>
+<p> N: NYSE
+</p>
+</li>
+<li>
+<p> B: Boston
+</p>
+</li>
+<li>
+<p> P: Arca
+</p>
+</li>
+<li>
+<p> C: NSX
+</p>
+</li>
+<li>
+<p> T/Q: NASDAQ
+</p>
+</li>
+<li>
+<p> D: NASD ADF and TRF
+</p>
+</li>
+<li>
+<p> X: Philadelphia
+</p>
+</li>
+<li>
+<p> I: ISE
+</p>
+</li>
+<li>
+<p> M: Chicago
+</p>
+</li>
+<li>
+<p> W: CBOE
+</p>
+</li>
+<li>
+<p> Z: BATS
+</p>
+</li>
+</ul>
+<p>. The default value is <code>"auto"</code> which automatically selects the exchange for the stocks and days independently using the <code>autoSelectExchangeQuotes</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>qDataRaw</code></td>
+<td>
+<p><code>xts</code> or <code>data.table</code> object containing raw quote data, possibly for multiple symbols over multiple days. This argument is <code>NULL</code> by default. 
+Enabling it means the arguments <code>dataSource</code> and <code>dataDestination</code> will be ignored. (only advisable for small chunks of data)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>report</code></td>
+<td>
+<p>boolean and <code>TRUE</code> by default. In case it is true and we don't use the on-disk functionality, the function returns (also) a vector indicating how many quotes were deleted by each cleaning step.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>selection</code></td>
+<td>
+<p>argument to be passed on to the cleaning routine <code>mergeQuotesSameTimestamp</code>. The default is <code>"median"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>maxi</code></td>
+<td>
+<p>spreads which are greater than median spreads of the day times <code>maxi</code> are excluded.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>window</code></td>
+<td>
+<p>argument to be passed on to the cleaning routine <code>rmOutliersQuotes</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>type</code></td>
+<td>
+<p>argument to be passed on to the cleaning routine <code>rmOutliersQuotes</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>marketOpen</code></td>
+<td>
+<p>passed to <code>exchangeHoursOnly</code>. A character in the format of <code>"HH:MM:SS"</code>,
+specifying the starting hour, minute and second of an exchange.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>marketClose</code></td>
+<td>
+<p>passed to <code>exchangeHoursOnly</code>. A character in the format of <code>"HH:MM:SS"</code>,
+specifying the closing hour, minute and second of an exchange.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rmoutliersmaxi</code></td>
+<td>
+<p>argument to be passed on to the cleaning routine <code>rmOutliersQuotes</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>printExchange</code></td>
+<td>
+<p>Argument passed to <code>autoSelectExchangeQuotes</code> indicates whether the chosen exchange is printed on the console, 
+default is <code>TRUE</code>. This is only used when <code>exchanges</code> is <code>"auto"</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>saveAsXTS</code></td>
+<td>
+<p>indicates whether data should be saved in <code>xts</code> format instead of <code>data.table</code> when using on-disk functionality. <code>FALSE</code> by default, which means we save as <code>data.table</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tz</code></td>
+<td>
+<p>fallback time zone used in case we we are unable to identify the timezone of the data, by default: <code>tz = NULL</code>. With the non-disk functionality, we attempt to extract the timezone from the DT column (or index) of the data, which may fail. 
+In case of failure we use <code>tz</code> if specified, and if it is not specified, we use <code>"UTC"</code>. 
+In the on-disk functionality, if <code>tz</code> is not specified, the timezone used will be the system default.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Using the on-disk functionality with .csv.zip files which is the standard from the WRDS database
+will write temporary files on your machine - we try to clean up after it, but cannot guarantee that 
+there won't be files that slip through the crack if the permission settings on your machine does not match 
+ours.
+</p>
+<p>If the input <code>data.table</code> does not contain a <code>DT</code> column but it does contain <code>DATE</code> and <code>TIME_M</code> columns, we create the <code>DT</code> column by REFERENCE, altering the <code>data.table</code> that may be in the user's environment!
+</p>
+
+
+<h3>Value</h3>
+
+<p>The function converts every (compressed) csv (or rds) file in <code>dataSource</code> into multiple <code>xts</code> or <code>data.table</code> files.
+</p>
+<p>In <code>dataDestination</code>, there will be one folder for each symbol containing .rds files with cleaned data stored either in <code>data.table</code> or <code>xts</code> format.
+</p>
+<p>In case you supply the argument <code>qDataRaw</code>, the on-disk functionality is ignored
+and the function returns a list with the cleaned quotes as an <code>xts</code> or <code>data.table</code> object depending on input (see examples).
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup.
+</p>
+
+
+<h3>References</h3>
+
+<p>Barndorff-Nielsen, O. E., Hansen, P. R., Lunde, A., and Shephard, N. (2009). Realized kernels in practice: Trades and quotes. Econometrics Journal 12, C1-C32.
+</p>
+<p>Brownlees, C.T. and Gallo, G.M. (2006). Financial econometric analysis at ultra-high frequency: Data handling concerns. Computational Statistics &amp; Data Analysis, 51, pages 2232-2245.
+</p>
+<p>Falkenberry, T.N. (2002). High frequency data filtering. Unpublished technical report.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+
+# Consider you have raw quote data for 1 stock for 2 days
+head(sampleQDataRaw)
+dim(sampleQDataRaw)
+qDataAfterCleaning &lt;- quotesCleanup(qDataRaw = sampleQDataRaw, exchanges = "N")
+qDataAfterCleaning$report
+dim(qDataAfterCleaning$qData)
+
+# In case you have more data it is advised to use the on-disk functionality
+# via "dataSource" and "dataDestination" arguments
+
+</code></pre>
+
+
+</div>

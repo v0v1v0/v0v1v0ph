@@ -1,0 +1,143 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>conversions</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Shorthand versions for simple hypothesis translation</h2>
+
+<h3>Description</h3>
+
+<p>These functions can be used to translate between null hypothesis equations, hypothesis matrices, and contrast matrices without defining a <code>hypr</code> object. Note that some of these functions do generate a <code>hypr</code> object internally but they never return one.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">eqs2hmat(
+  eqs,
+  levels = NULL,
+  order_levels = missing(levels),
+  as_fractions = TRUE
+)
+
+eqs2cmat(eqs, as_fractions = TRUE)
+
+hmat2cmat(hmat, as_fractions = TRUE)
+
+cmat2hmat(cmat, as_fractions = TRUE)
+
+hmat2eqs(hmat, as_fractions = TRUE)
+
+cmat2eqs(cmat, as_fractions = TRUE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>eqs</code></td>
+<td>
+<p>A <code>list</code> of equations</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>levels</code></td>
+<td>
+<p>(optional) A <code>character</code> vector of variables to be expected (if not provided, automatically generated from all terms occurring in the equations list)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>order_levels</code></td>
+<td>
+<p>(optional) Whether to alphabetically order appearance of levels (rows in transposed hypothesis matrix or contrast matrix). Default is <code>TRUE</code> if <code>levels</code> were not explicitly provided.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>as_fractions</code></td>
+<td>
+<p>(optional) Whether to output matrix using fractions formatting (via <code>MASS::as.fractions</code>). Defaults to <code>TRUE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>hmat</code></td>
+<td>
+<p>Hypothesis matrix</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cmat</code></td>
+<td>
+<p>Contrast matrix</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A <code>list</code> of equations (<code>hmat2eqs</code> and <code>cmat2eqs</code>), a contrast matrix (<code>hmat2cmat</code>, <code>eqs2cmat</code>), or a hypothesis matrix (<code>cmat2hmat</code>, <code>eqs2hmat</code>).
+</p>
+
+
+<h3>Functions</h3>
+
+
+<ul>
+<li> <p><code>eqs2hmat()</code>: Convert null hypothesis equations to hypothesis matrix
+</p>
+</li>
+<li> <p><code>eqs2cmat()</code>: Convert null hypothesis equations to contrast matrix
+</p>
+</li>
+<li> <p><code>hmat2cmat()</code>: Convert hypothesis matrix to contrast matrix
+</p>
+</li>
+<li> <p><code>cmat2hmat()</code>: Convert contrast matrix to hypothesis matrix
+</p>
+</li>
+<li> <p><code>hmat2eqs()</code>: Convert hypothesis matrix to null hypothesis equations
+</p>
+</li>
+<li> <p><code>cmat2eqs()</code>: Convert contrast matrix to null hypothesis equations
+</p>
+</li>
+</ul>
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+# The following examples are based on a 2-level treatment contrast (i.e., baseline and treatment).
+hypotheses &lt;- list(baseline = mu1~0, treatment = mu2~mu1)
+hypothesis_matrix &lt;- matrix(
+    c(c(1, -1), c(0, 1)), ncol = 2, dimnames = list(c("baseline","treatment"), c("mu1", "mu2")))
+contrast_matrix &lt;- matrix(
+    c(c(1, 1), c(0, 1)), ncol = 2, dimnames = list(c("mu1","mu2"), c("baseline", "treatment")))
+
+# Convert a list of null hypothesis equations to ...
+# ... a hypothesis matrix:
+eqs2hmat(hypotheses)
+# ... a contrast matrix:
+eqs2cmat(hypotheses)
+
+# Convert a hypothesis matrix to...
+# ... a list of null hypothesis equations:
+hmat2eqs(hypothesis_matrix)
+# ... a contrast matrix:
+hmat2cmat(hypothesis_matrix)
+
+# Convert a contrast matrix to...
+# ... a list of null hypothesis equations:
+cmat2eqs(contrast_matrix)
+# ... a hypothesis matrix:
+cmat2hmat(contrast_matrix)
+
+
+# Are all functions returning the expected results?
+stopifnot(all.equal(eqs2hmat(hypotheses, as_fractions = FALSE), hypothesis_matrix))
+stopifnot(all.equal(eqs2cmat(hypotheses, as_fractions = FALSE), contrast_matrix))
+stopifnot(all.equal(hmat2cmat(hypothesis_matrix, as_fractions = FALSE), contrast_matrix))
+stopifnot(all.equal(cmat2hmat(contrast_matrix, as_fractions = FALSE), hypothesis_matrix))
+
+</code></pre>
+
+
+</div>

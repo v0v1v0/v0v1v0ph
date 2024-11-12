@@ -1,0 +1,103 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>propWINS</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Proportion of wins/losses/ties given the win odds and the win ratio</h2>
+
+<h3>Description</h3>
+
+<p>Proportion of wins/losses/ties given the win odds and the win ratio
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">propWINS(WO, WR, Overall = 1, alpha = NULL, N = NULL)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>WO</code></td>
+<td>
+<p>win odds.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>WR</code></td>
+<td>
+<p>win ratio.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Overall</code></td>
+<td>
+<p>number of comparisons, the sample size of
+the active treatment multiplied by the sample size of the placebo.
+The default is 1, hence gives the proportion.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alpha</code></td>
+<td>
+<p>significance level for the win ratio confidence interval. The default is <code>NULL</code> hence the confidence interval is not produced.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>N</code></td>
+<td>
+<p>the combined sample size of two treatment groups. The default is <code>NULL</code>. If <code>alpha</code> is specified then either <code>N</code> should be specified or <code>Overall &gt; 1</code>.
+For given <code>Overall</code>, the pooled sample size is calculated as <code>N = 2*sqrt(Overall)</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p><img src="../help/figures/propWINS.png" alt="Calculation formula"></p>
+
+
+<h3>Value</h3>
+
+<p>a data frame with a number (or proportion if <code>Overall = 1</code>) of wins/losses/ties. If <code>alpha</code> is specified returns also <code>WR</code> confidence interval.
+</p>
+
+
+<h3>References</h3>
+
+
+<ul>
+<li>
+<p> For the relationship between win odds and win ratio see
+<br><br> Gasparyan SB et al. "Hierarchical Composite Endpoints in COVID-19: The DARE-19 Trial". Case Studies in Innovative Clinical Trials, Chapter 7 (2023): 95-148. Chapman and Hall/CRC. <a href="doi:10.1201/9781003288640-7">doi:10.1201/9781003288640-7</a>.
+</p>
+</li>
+<li>
+<p> The win ratio CI uses the standard error presented in
+<br><br> Yu RX, Ganju J. (2022) "Sample size formula for a win ratio endpoint." Statistics in Medicine 41.6: 950-63. <a href="doi:10.1002/sim.9297">doi:10.1002/sim.9297</a>.
+</p>
+</li>
+</ul>
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Example 1
+propWINS(WR = 2, WO = 1.5)
+# Example 2 - Back-calculation 
+COVID19HCE &lt;- hce(GROUP = COVID19$GROUP, TRTP = COVID19$TRTP)
+res &lt;- calcWINS(COVID19HCE)
+WR &lt;- res$WR1$WR
+WO &lt;- res$WO$WO
+Overall &lt;- res$summary$TOTAL
+propWINS(WR = WR, WO = WO, Overall = Overall)
+## Verify 
+res$summary
+# Example 3 - Confidence interval
+ propWINS(WR = 1.4, WO = 1.3, alpha = 0.05, Overall = 2500)
+ propWINS(WR = 2, WO = 1.5, alpha = 0.01, N = 500)
+</code></pre>
+
+
+</div>

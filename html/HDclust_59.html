@@ -1,0 +1,140 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hmmvbTrain</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Train HMM-VB</h2>
+
+<h3>Description</h3>
+
+<p>This function estimates parameters for HMM-VB
+using the Baum-Welch algorithm. If the variable block structure
+is not provided, the function will first find the structure by
+a greedy search algorithm that minimizes BIC.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hmmvbTrain(
+  data,
+  VbStructure = NULL,
+  searchControl = vbSearchControl(),
+  trControl = trainControl(),
+  nthread = 1
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>A numeric vector, matrix, or data frame of observations.
+Categorical values are not allowed. If a matrix or data frame, rows 
+correspond to observations and columns correspond to variables.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>VbStructure</code></td>
+<td>
+<p>An object of class 'VB'. If supplied, variable block 
+structure stored in VbStructure is used to train HMM-VB. If not 
+provided, a search algorithm will be perfomed to find a variable block
+structure with minimal BIC.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>searchControl</code></td>
+<td>
+<p>A list of control parameters for variable block structure
+search. This parameter is ignored if variable block structure VbStructure is provided.
+The defaults are set by the call <code>vbSearchControl()</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>trControl</code></td>
+<td>
+<p>A list of control parameters for HMM-VB training algorithm.
+The defaults are set by the call <code>hmmvbTrainControl()</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nthread</code></td>
+<td>
+<p>An integer specifying the number of threads used in searching and 
+training routines.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>An object of class 'HMMVB' providing estimation for HMM-VB.
+The details of output components are as follows:
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>VbStructure</code></td>
+<td>
+<p>An object of class 'VB' with variable block structure for 
+HMM-VB</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>HmmChain</code></td>
+<td>
+<p>A list of objects of class 'HMM' with trained Hidden Markov Models
+for each variable block.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>diagCov</code></td>
+<td>
+<p>A logical value indicating whether or not covariance matrices 
+for mixture models are diagonal.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>BIC</code></td>
+<td>
+<p>BIC value for provided variable block structure or optimal BIC value
+for found variable block structure.</p>
+</td>
+</tr>
+</table>
+<h3>See Also</h3>
+
+<p><code>VB</code>, <code>vb</code>, <code>vbSearchControl</code>, 
+<code>trainControl</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Train HMM-VB with known variable block structure
+data("sim3")
+Vb &lt;- vb(2, dim=40, bdim=c(10,30), numst=c(3,5), varorder=list(c(1:10),c(11:40)))
+set.seed(12345)
+hmmvb &lt;- hmmvbTrain(sim3[,1:40], VbStructure=Vb)
+show(hmmvb)
+
+
+# Train HMM-VB with unknown variable block structure using default parameters
+data("sim2")
+set.seed(12345)
+hmmvb &lt;- hmmvbTrain(sim2[,1:5])
+show(hmmvb)
+
+# Train HMM-VB with unknown variable block structure using with ten permutations
+# and several threads
+data("sim2")
+set.seed(12345)
+hmmvb &lt;- hmmvbTrain(sim2[1:5], searchControl=vbSearchControl(nperm=10), nthread=1)
+show(hmmvb)
+</code></pre>
+
+
+</div>

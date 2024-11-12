@@ -1,0 +1,235 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>tparams_transprobs</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Transition probabilities</h2>
+
+<h3>Description</h3>
+
+<p>Create a list containing predicted transition probabilities at discrete times.
+Since the transition probabilities have presumably already been predicted
+based on covariate values, no input data is required for
+simulation. The class can be instantiated from either an <code>array</code>,
+a <code>data.table</code>, a <code>data.frame</code>, or a <code>tpmatrix</code>. This is the object in
+<code>hesim</code> used to specify the transition probabilities required to simulate
+Markov chains with the <code>CohortDtstmTrans</code> class.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">tparams_transprobs(object, ...)
+
+## S3 method for class 'array'
+tparams_transprobs(
+  object,
+  tpmatrix_id = NULL,
+  times = NULL,
+  grp_id = NULL,
+  patient_wt = NULL,
+  ...
+)
+
+## S3 method for class 'data.table'
+tparams_transprobs(object, ...)
+
+## S3 method for class 'data.frame'
+tparams_transprobs(object, ...)
+
+## S3 method for class 'tpmatrix'
+tparams_transprobs(object, tpmatrix_id, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>object</code></td>
+<td>
+<p>An object of the appropriate class.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Further arguments passed to or from other methods. Currently unused.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tpmatrix_id</code></td>
+<td>
+<p>An object of class <code>tpmatrix_id</code> (or an equivalent
+<code>data.table</code> with the same ID columns as returned by <code>tpmatrix_id()</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>times</code></td>
+<td>
+<p>An optional numeric vector of distinct times to pass to
+time_intervals representing time intervals indexed by the 4th dimension of
+the array. May either be the start or the end of intervals.
+This argument is not required if there is only one time interval.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>grp_id</code></td>
+<td>
+<p>An optional numeric vector of integers denoting the subgroups. Must
+be the same length as the 3rd dimension of the array.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>patient_wt</code></td>
+<td>
+<p>An optional numeric vector denoting the weight to apply to each
+patient within a subgroup. Must be the same length as the 3rd dimension of the array.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The format of <code>object</code> depends on its class:
+</p>
+
+<dl>
+<dt>array</dt>
+<dd>
+<p>Either a 3D or a 6D array is possible.
+</p>
+
+<ul>
+<li>
+<p> If a 3D array, then each slice is a
+square transition probability matrix. In this case
+<code>tpmatrix_id</code> is required and each matrix slice corresponds to the same
+numbered row in <code>tpmatrix_id</code>. The number of matrix slices must equal the number
+of rows in <code>tpmatrix_id</code>.
+</p>
+</li>
+<li>
+<p> If a 6D array, then the dimensions of the array should be indexed as follows:
+1st (<code>sample</code>), 2nd (<code>strategy_id</code>), 3rd (<code>patient_id</code>),
+4th (<code>time_id</code>), 5th (rows of transition matrix), and
+6th (columns of transition matrix). In other words, an index of
+<code style="white-space: pre;">⁠[s, k, i, t]⁠</code> represents the transition matrix for the <code>s</code>th
+sample, <code>k</code>th treatment strategy, <code>i</code>th patient, and <code>t</code>th
+time interval.
+</p>
+</li>
+</ul>
+</dd>
+<dt>data.table</dt>
+<dd>
+<p>Must contain the following:
+</p>
+
+<ul>
+<li>
+<p> ID columns for the parameter sample (<code>sample</code>),
+treatment strategy (<code>strategy_id</code>), and patient (<code>patient_id</code>).
+If the number of time intervals is greater than 1 it must also contain the
+column <code>time_start</code> denoting the starting time of a time interval. A column
+<code>patient_wt</code> may also be used to denote the weight to apply to each
+patient.
+</p>
+</li>
+<li>
+<p> Columns for each element of the transition probability matrix.
+They should be prefixed with "prob_" and ordered rowwise.
+For example, the following columns would be used for a 2x2 transition
+probability matrix:
+<code>prob_1</code> (1st row, 1st column),
+<code>prob_2</code> (1st row, 2nd column),
+<code>prob_3</code> (2nd row, 1st column), and
+<code>prob_4</code> (2nd row, 2nd column).
+</p>
+</li>
+</ul>
+</dd>
+<dt>data.frame</dt>
+<dd>
+<p>Same as <code>data.table</code>.</p>
+</dd>
+<dt>tpmatrix</dt>
+<dd>
+<p>An object of class <code>tpmatrix</code>.</p>
+</dd>
+</dl>
+<p>A <code>tparams_transprobs</code> object is also instantiated when creating a
+cohort discrete time state transition model using <code>define_model()</code>.
+</p>
+
+
+<h3>Value</h3>
+
+<p>An object of class <code>tparams_transprobs</code>,
+which is a list containing <code>value</code> and relevant ID attributes. The element
+<code>value</code> is an array of predicted transition probability matrices from the
+probability distribution of the underlying statistical model. Each matrix in
+<code>value</code> is a prediction for a <code>sample</code>, <code>strategy_id</code>, <code>patient_id</code>, and
+optionally <code>time_id</code> combination.
+</p>
+
+
+<h3>See Also</h3>
+
+<p>A <code>tparams_transprobs</code> object is used to store the "parameters" of
+the transition component of a cohort discrete time state transition
+model (cDTSTM). You can create such an object with <code>CohortDtstmTran$new()</code>.
+</p>
+<p><code>tpmatrix()</code> and <code>tpmatrix_id()</code> provide a convenient way to construct a
+<code>tparams_transprobs</code> object in a flexible way. <code>define_model()</code> is, in turn,
+a convenient way to construct a <code>tpmatrix</code> object using mathematical
+expressions; in this case, an entire cDTSTM can be instantiated from a model
+definition using <code>create_CohortDtstm.model_def()</code>. Detailed examples
+are provided in <code>vignette("markov-cohort")</code> and
+<code>vignette("markov-inhomogeneous-cohort")</code>
+</p>
+<p>The output of a <code>tparams_transprobs</code> object is rather verbose. It can be
+helpful to check the output by converting it to a <code>data.table</code> (containing
+both the ID variables and flattened transition probability matrices)
+with <code>as.data.table.tparams_transprobs()</code>. Transition probabilities can
+also be summarized (across parameter samples) using
+<code>summary.tparams_transprobs()</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">hesim_dat &lt;- hesim_data(strategies = data.frame(strategy_id = 1:2),
+                        patients = data.frame(patient_id = 1:3))
+input_data &lt;- expand(hesim_dat, by = c("strategies", "patients"))    
+
+# tpmatrix objects provide a convenient way to construct
+# tparams_transprobs() objects
+tpmat_id &lt;- tpmatrix_id(input_data, n_samples = 2)      
+p_12 &lt;- runif(nrow(tpmat_id), .6, .7) + 
+  .05 * (tpmat_id$strategy_id == 2)
+tpmat &lt;- tpmatrix(
+  C, p_12,
+  0, 1
+)
+tprobs &lt;- tparams_transprobs(tpmat, tpmat_id)
+names(tprobs) # Names of list elements
+
+# Convert to data.table in wide format
+as.data.table(tprobs)
+
+# Convert to data.table in long format
+as.data.table(tprobs, long = TRUE)
+
+# Summary where each column is a vector
+summary(tprobs)
+summary(tprobs, probs = c(.025, .975))
+
+# Summary where each column is a matrix
+ps &lt;- summary(tprobs, id = tpmat_id, unflatten = TRUE)
+ps
+ps$mean
+</code></pre>
+
+
+</div>

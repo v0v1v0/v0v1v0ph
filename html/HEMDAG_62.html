@@ -1,0 +1,83 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>obozinski.heuristic.methods</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Obozinski heuristic methods</h2>
+
+<h3>Description</h3>
+
+<p>Implementation of the Obozinski's heuristic methods <code>Max</code>, <code>And</code>, <code>Or</code> (<cite>Obozinski et al., Genome Biology, 2008,
+doi: <a href="https://doi.org/10.1186/gb-2008-9-s1-s6">10.1186/gb-2008-9-s1-s6</a></cite>).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">obozinski.max(S, g, root = "00")
+
+obozinski.and(S, g, root = "00")
+
+obozinski.or(S, g, root = "00")
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>S</code></td>
+<td>
+<p>a named flat scores matrix with examples on rows and classes on columns.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>g</code></td>
+<td>
+<p>a graph of class <code>graphNEL</code>. It represents the hierarchy of the classes.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>root</code></td>
+<td>
+<p>name of the class that it is the top-level of the hierarchy (<code>def:00</code>).</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Obozinski's heuristic methods:
+</p>
+
+<ol>
+<li> <p><b>Max</b>: reports the largest logistic regression (LR) value of self and all descendants: <code class="reqn">p_i = max_{j \in descendants(i)} \hat{p_j}</code>;
+</p>
+</li>
+<li> <p><b>And</b>: reports the product of LR values of all ancestors and self. This is equivalent to computing the probability that all
+ancestral terms are "on" assuming that, conditional on the data, all predictions are independent: <code class="reqn">p_i = \prod_{j \in ancestors(i)} \hat{p_j}</code>;
+</p>
+</li>
+<li> <p><b>Or</b>: computes the probability that at least one of the descendant terms is "on" assuming again that, conditional on the data,
+all predictions are independent: <code class="reqn">1 - p_i = \prod_{j \in descendants(i)} (1 - \hat{p_j})</code>;
+</p>
+</li>
+</ol>
+<h3>Value</h3>
+
+<p>A matrix with the scores of the classes corrected according to the chosen Obozinski's heuristic algorithm.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(graph);
+data(scores);
+root  &lt;- root.node(g);
+S.max &lt;- obozinski.max(S,g,root);
+S.and &lt;- obozinski.and(S,g,root);
+S.or  &lt;- obozinski.or(S,g,root);
+</code></pre>
+
+
+</div>

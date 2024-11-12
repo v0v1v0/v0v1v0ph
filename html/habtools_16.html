@@ -1,0 +1,90 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>fd_area</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Calculate fractal dimension using the surface area method</h2>
+
+<h3>Description</h3>
+
+<p>Calculate fractal dimension using the surface area method
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">fd_area(data, lvec = NULL, keep_data = FALSE, plot = FALSE, scale = FALSE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>DEM of class "RasterLayer" or mesh of class "mesh3d".</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lvec</code></td>
+<td>
+<p>Vector of scales to use for calculation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>keep_data</code></td>
+<td>
+<p>Logical. Keep data? Default is FALSE.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>plot</code></td>
+<td>
+<p>Logical. Plot surface with area resolutions superimposed? Defaults to FALSE.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>scale</code></td>
+<td>
+<p>Logical. Rescale height values to fit the extent? Only relevant for DEMs. Defaults to FALSE.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>This function calculates fractal dimension using the area method.
+Based on values in <code>lvec</code>, the DEM or mesh is reprojected to varying scales.
+Fractal dimension is defined as <code>2 - s</code> with s being the slope of the regression between the log-transformed surface areas across scales and the log-transformed scales.
+Considerate bias is introduced if scales approach the extent of the object due to an edge effect.
+Therefore, this approach is only appropriate when the object is large relative to the scales of interest to be used as <code>lvec</code>.
+Diagnostic plots may help visualize whether bias is present for the scales chosen (i.e. points do not fall on a straight line).
+</p>
+
+
+<h3>Value</h3>
+
+<p>A value for fractal dimension, typically between 2 and 3 or a list if keep_data = TRUE.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">fd_area(horseshoe, lvec = c(0.125, 0.25, 0.5))
+
+# Look at diagnostic plot
+fdata &lt;- fd_area(horseshoe, lvec = c(0.05, 0.1, 0.2, 0.4), keep_data = TRUE)
+fd_diagnose(fdata)
+# points fall on straight line
+
+fdata &lt;- fd_area(horseshoe, lvec = c(0.5, 1, 2, 4), keep_data = TRUE)
+fd_diagnose(fdata)
+# points fall on hollow curve, indicating that lvec includes values that
+# are too high.
+
+
+</code></pre>
+
+
+</div>

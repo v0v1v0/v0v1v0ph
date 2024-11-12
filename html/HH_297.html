@@ -1,0 +1,578 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>mmc</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>MMC (Mean–mean Multiple Comparisons) plots.</h2>
+
+<h3>Description</h3>
+
+<p>Constructs a <code>"mmc.multicomp"</code> object from the formula and
+other arguments.  The constructed object must be explicitly plotted
+with the <code>mmcplot</code> function.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">mmc(model, ...)  ## R
+
+## S3 method for class 'glht'
+mmc(model, ...)
+
+
+## Default S3 method:
+mmc(model,       ## lm object
+    linfct=NULL,
+    focus=
+    if (is.null(linfct))
+    {
+      if (length(model$contrasts)==1) names(model$contrasts)
+      else stop("focus or linfct must be specified.")
+    }
+    else
+    {
+      if (is.null(names(linfct)))
+        stop("focus must be specified.")
+      else names(linfct)
+    },
+    focus.lmat,
+    ylabel=deparse(terms(model)[[2]]),
+    lmat=if (missing(focus.lmat)) {
+      t(linfct)
+    } else {
+      lmatContrast(t(none.glht$linfct), focus.lmat)
+      },
+    lmat.rows=lmatRows(model, focus),
+    lmat.scale.abs2=TRUE,
+    estimate.sign=1,
+    order.contrasts=TRUE,
+    level=.95,
+    calpha=NULL,
+    alternative = c("two.sided", "less", "greater"),
+    ...
+    )
+
+multicomp.mmc(x,  ## S-Plus
+              focus=dimnames(attr(x$terms,"factors"))[[2]][1],
+              comparisons="mca",
+              lmat,
+              lmat.rows=lmatRows(x, focus),
+              lmat.scale.abs2=TRUE,
+              ry,
+              plot=TRUE,
+              crit.point,
+              iso.name=TRUE,
+              estimate.sign=1,
+              x.offset=0,
+              order.contrasts=TRUE,
+              main,
+              main2,
+              focus.lmat,
+              ...)
+
+## S3 method for class 'mmc.multicomp'
+x[..., drop = TRUE]
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>model</code></td>
+<td>
+<p><code>"aov"</code> object in <code>"lm"</code> method.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ylabel</code></td>
+<td>
+<p>name of the response variable.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lmat</code></td>
+<td>
+<p>contrast matrix as in the S-Plus <code>multicomp</code>.
+The convention for <code>lmat</code> in R is to use
+the transpose of the <code>linfct</code> component produced by
+<code>glht</code>.   Required for user-specified contrasts.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lmat.rows</code></td>
+<td>
+<p>rows in <code>lmat</code> for the <code>focus</code> factor.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>focus</code></td>
+<td>
+<p>define the factor to compute contrasts of.
+In R this argument often can be used to simplify the call.
+The statement <code>mmc(my.aov, focus="factorA")</code> is interpreted as
+<code>mmc(my.aov, factorA="Tukey", `interaction_average`=TRUE, `covariate_average`=TRUE)</code>
+With <code>TRUE, TRUE</code>, <code>multcomp::glht</code> always gives the same result as the S-Plus
+<code>multcomp</code> function.  Without the <code>TRUE, TRUE</code>,
+<code>multcomp::glht</code> gives a
+different answer when there are interactions or covariates in the model.
+See
+
+<code>glht</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>focus.lmat</code></td>
+<td>
+<p>R only.  Contrast matrix used in the user-specified
+comparisons of the <code>focus</code> factor.  This is the matrix the user
+constructs.
+Row names must include all levels of the factor.
+Column names are the names the user assigns to the contrasts.
+Each column must sum to zero.  See <code>catalystm.lmat</code> in the Examples
+section for an example.
+The <code>focus.lmat</code> matrix is multiplied by the <code>lmat</code> from the <code>none</code>
+component to create the <code>lmat</code> for the user-specified contrasts.
+Display the <code>hibrido.lmat</code> and <code>maiz2.lmat</code> in the maiz
+example below to see what is happening.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>linfct</code></td>
+<td>
+<p>In R, see
+
+<code>glht</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>other arguments.  <code>alternative</code> and
+<code>base</code> are frequently used with <code>glht</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>comparisons</code></td>
+<td>
+<p>argument to <code>multicomp</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lmat.scale.abs2</code></td>
+<td>
+<p>logical, scale the contrasts in the columns of
+<code>lmat</code> to make the sum of the absolute values of each column equal 2.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>estimate.sign</code></td>
+<td>
+<p>numeric.  If <code>0</code>, leave contrasts in the
+default lexicographic direction.  If positive, force all contrasts to positive,
+reversing their names if needed (if contrast A-B is negative, reverse it
+to B-A).  If negative, the force all contrasts to positive.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>order.contrasts</code></td>
+<td>
+<p>sort the contrasts in the (<code>mca</code>, <code>none</code>,
+<code>lmat</code>) components by height on the MMC plot.  This will place the
+contrasts in the multicomp plots in the same order as in the MMC plot.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alternative</code></td>
+<td>
+<p>Direction of alternative hypothesis.
+See
+
+<code>glht</code>
+</p>
+<p>in R.  S-Plus <code>multicomp</code>
+uses the argument <code>bounds</code> for this concept.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>level</code></td>
+<td>
+<p>Confidence level.  Defaults to 0.95.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>crit.point, calpha</code></td>
+<td>
+<p>critical value for the tests.  The value from the
+specified <code>multicomp</code> method is used for the user-specified
+contrasts when <code>lmat</code> is specified.  This argument is called
+<code>crit.point</code> with <code>multicomp</code> in S-Plus and <code>calpha</code>
+when used with <code>glht</code> and <code>confint</code> in R.
+In R, with a large number of levels for the focus factor, <code>calpha</code>
+should
+be specified.  See notes below for discussion of the timing issues
+and the examples for an illustration how to use <code>calpha</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>plot</code></td>
+<td>
+<p>logical, display the plot if <code>TRUE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ry, iso.name, x.offset, main, main2</code></td>
+<td>
+<p>arguments to
+<code>plot.mmc.multicomp</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x, drop</code></td>
+<td>
+<p>See <code>"["</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>By default, if <code>lmat</code> is not specified, we plot the isomeans grid
+and the pairwise comparisons for the <code>focus</code> factor.  By default,
+we plot the specified contrasts if the <code>lmat</code> is specified.
+Each contrast is plotted at a height which is the weighted average of
+the means being compared.  The weights are scaled to the sum of their
+absolute values equals 2.
+</p>
+<p>We get the right contrasts automatically if the aov is oneway.  If we
+specify an lmat for oneway it must have a leading row of 0.
+</p>
+<p>For any more complex design, we must study the <code>lmat</code> from the <code>mca</code>
+component of the result to see how to construct the <code>lmat</code> (with the
+extra rows as needed) and how to specify the <code>lmat.rows</code>
+corresponding to the rows for the focus factor.
+</p>
+<p><code>mmc</code> in R works from either an <code>"glht"</code> object or an
+<code>"aov"</code> object.  <code>multicomp.mmc</code> in S-Plus works from an
+<code>"aov"</code> object.
+</p>
+
+
+<h3>Value</h3>
+
+<p>An <code>"mmc.multicomp"</code> object contains either the first two or all
+three of the <code>"multicomp"</code> components <code>mca</code>, <code>none</code>,
+<code>lmat</code> described here.  Each <code>"multicomp"</code> component in
+R also contains a <code>"glht"</code> object.
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>mca</code></td>
+<td>
+<p>Object containing the pairwise comparisons.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>none</code></td>
+<td>
+<p>Object comparing each mean to 0.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lmat</code></td>
+<td>
+<p>Object for the contrasts specified in
+the <code>lmat</code> argument.</p>
+</td>
+</tr>
+</table>
+<p><code>"[.mmc.multicomp"</code> is a subscript method.
+</p>
+
+
+<h3>Note</h3>
+
+<p>The multiple comparisons calculations in R and S-Plus use
+completely different functions.
+MMC plots in R are constructed by <code>mmc</code>
+based on
+
+<code>glht</code>.
+</p>
+<p>MMC plots in S-Plus are constructed by
+<code>multicomp.mmc</code> based on the S-Plus
+
+<code>multicomp</code>.
+</p>
+<p>The MMC plot is the same in both systems.  The details of getting the
+plot differ.
+</p>
+<p>Function <code>mmc</code> calls
+
+<code>glht</code> and <code>confint.glht</code>.
+</p>
+<p>With a large number of levels
+for the focus factor, the <code>confint</code> function is exceedingly slow
+(80 minutes for 30 levels on 1.5GHz Windows XP). Therefore,
+always specify <code>calpha</code> to reduce the time to under a second for
+the same example.
+</p>
+<p>There are two plotting functions for MMC plots.  <code>mmcplot</code>, the
+newer <span class="pkg">lattice</span>-based function, is recommended.   <code>mmcplot</code>,
+chooses better default values for it arguments and is better coordinated
+with the tiebreaker plot.
+</p>
+<p>The older
+<code>plot.mmc.multicomp</code>, built on <span class="pkg">base</span> graphics, chooses sensible defaults for its many
+arguments, but they still often need manual adjustment.  The examples show
+several types of adjustments.  We have changed the centering and scaling
+to avoid overprinting of label information.  By default the significant
+contrasts are shown in a more intense color than the nonsignificant
+contrasts.
+We have an option to reduce the color intensity of the isomeans grid.
+</p>
+
+
+
+
+
+
+<h3>Author(s)</h3>
+
+<p> Richard M. Heiberger &lt;rmh@temple.edu&gt; </p>
+
+
+<h3>References</h3>
+
+<p>Heiberger, Richard M. and Holland, Burt (2015).
+<em>Statistical Analysis and Data Display: An Intermediate Course with Examples in R</em>.
+Second Edition.
+Springer-Verlag, New York.
+<a href="https://link.springer.com/book/10.1007/978-1-4939-2122-5">https://link.springer.com/book/10.1007/978-1-4939-2122-5</a>
+</p>
+<p>Heiberger, Richard M. and Holland, Burt (2006).
+"Mean–mean multiple comparison displays for families of linear contrasts."
+<em>Journal of Computational and Graphical Statistics</em>, 15:937–955.
+</p>
+<p>Hsu, J. and Peruggia, M. (1994).
+"Graphical representations of Tukey's multiple comparison method."
+<em>Journal of Computational and Graphical Statistics</em>, 3:143–161.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>mmcplot</code>, <code>plot.mmc.multicomp</code>, <code>as.multicomp</code></p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Use mmc with R.
+## Use multicomp.mmc with S-Plus.
+
+## data and ANOVA
+## catalystm example
+data(catalystm)
+
+bwplot(concent ~ catalyst, data=catalystm,
+       scales=list(cex=1.5),
+       ylab=list("concentration", cex=1.5),
+       xlab=list("catalyst",cex=1.5))
+
+
+catalystm1.aov &lt;- aov(concent ~ catalyst, data=catalystm)
+summary(catalystm1.aov)
+
+catalystm.mca &lt;-
+glht(catalystm1.aov, linfct = mcp(catalyst = "Tukey"))
+confint(catalystm.mca)
+plot(catalystm.mca)                      ## multcomp plot
+mmcplot(catalystm.mca, focus="catalyst") ## HH plot
+
+## pairwise comparisons
+catalystm.mmc &lt;-
+  mmc(catalystm1.aov, focus="catalyst")
+catalystm.mmc
+
+## Not run: 
+## these three statements are identical for a one-way aov
+  mmc(catalystm1.aov)  ## simplest
+  mmc(catalystm1.aov, focus="catalyst") ## generalizes to higher-order designs
+  mmc(catalystm1.aov, linfct = mcp(catalyst = "Tukey")) ## glht arguments
+
+## End(Not run)
+
+mmcplot(catalystm.mmc, style="both")
+
+
+## User-Specified Contrasts
+## Row names must include all levels of the factor.
+## Column names are the names the user assigns to the contrasts.
+## Each column must sum to zero.
+catalystm.lmat &lt;- cbind("AB-D" =c( 1, 1, 0,-2),
+                        "A-B"  =c( 1,-1, 0, 0),
+                        "ABD-C"=c( 1, 1,-3, 1))
+dimnames(catalystm.lmat)[[1]] &lt;- levels(catalystm$catalyst)
+catalystm.lmat
+
+catalystm.mmc &lt;-
+mmc(catalystm1.aov,
+       linfct = mcp(catalyst = "Tukey"),
+       focus.lmat=catalystm.lmat)
+catalystm.mmc
+
+mmcplot(catalystm.mmc, style="both", type="lmat")
+
+
+## Not run: 
+## Dunnett's test
+## weightloss example
+data(weightloss)
+bwplot(loss ~ group, data=weightloss,
+       scales=list(cex=1.5),
+       ylab=list("Weight Loss", cex=1.5),
+       xlab=list("group",cex=1.5))
+
+weightloss.aov &lt;- aov(loss ~ group, data=weightloss)
+summary(weightloss.aov)
+
+group.count &lt;- table(weightloss$group)
+
+tmp.dunnett &lt;-
+  glht(weightloss.aov,
+       linfct=mcp(group=contrMat(group.count, base=4)),
+       alternative="greater")
+mmcplot(tmp.dunnett, main="contrasts in alphabetical order", focus="group")
+
+tmp.dunnett.mmc &lt;-
+  mmc(weightloss.aov,
+      linfct=mcp(group=contrMat(group.count, base=4)),
+      alternative="greater")
+mmcplot(tmp.dunnett.mmc,
+        main="contrasts ordered by average value of the means\nof the two levels in the contrasts")
+
+tmp.dunnett.mmc
+
+## End(Not run)
+
+## Not run: 
+## two-way ANOVA
+## display example
+
+data(display)
+
+interaction2wt(time ~ emergenc * panel.ordered, data=display)
+
+displayf.aov &lt;- aov(time ~ emergenc * panel, data=display)
+anova(displayf.aov)
+
+## multiple comparisons
+## MMC plot
+displayf.mmc &lt;- mmc(displayf.aov, focus="panel")
+displayf.mmc
+
+## same thing using glht argument list
+displayf.mmc &lt;-
+  mmc(displayf.aov,
+      linfct=mcp(panel="Tukey", `interaction_average`=TRUE, `covariate_average`=TRUE))
+
+mmcplot(displayf.mmc)
+
+
+panel.lmat &lt;- cbind("3-12"=c(-1,-1,2),
+                    "1-2"=c( 1,-1,0))
+dimnames(panel.lmat)[[1]] &lt;- levels(display$panel)
+panel.lmat
+
+displayf.mmc &lt;-
+  mmc(displayf.aov, focus="panel", focus.lmat=panel.lmat)
+
+## same thing using glht argument list
+displayf.mmc &lt;-
+  mmc(displayf.aov,
+      linfct=mcp(panel="Tukey", `interaction_average`=TRUE, `covariate_average`=TRUE),
+      focus.lmat=panel.lmat)
+
+mmcplot(displayf.mmc, type="lmat")
+
+## End(Not run)
+
+## Not run: 
+## split plot design with tiebreaker plot
+##
+## This example is based on the query by Tomas Goicoa to R-news
+## http://article.gmane.org/gmane.comp.lang.r.general/76275/match=goicoa
+## It is a split plot similar to the one in HH Section 14.2 based on
+## Yates 1937 example.  I am using the Goicoa example here because its
+## MMC plot requires a tiebreaker plot.
+
+
+data(maiz)
+
+interaction2wt(yield ~ hibrido+nitrogeno+bloque, data=maiz,
+               par.strip.text=list(cex=.7))
+interaction2wt(yield ~ hibrido+nitrogeno, data=maiz)
+
+maiz.aov &lt;- aov(yield ~ nitrogeno*hibrido + Error(bloque/nitrogeno), data=maiz)
+
+summary(maiz.aov)
+summary(maiz.aov,
+        split=list(hibrido=list(P3732=1, Mol17=2, A632=3, LH74=4)))
+
+try(glht(maiz.aov, linfct=mcp(hibrido="Tukey")))  ## can't use 'aovlist' objects in glht
+
+## R glht() requires aov, not aovlist
+maiz2.aov &lt;- aov(terms(yield ~ bloque*nitrogeno + hibrido/nitrogeno,
+                       keep.order=TRUE),
+                 data=maiz)
+summary(maiz2.aov)
+
+## There are many ties in the group means.
+## These are easily seen in the MMC plot, where the two clusters
+## c("P3747", "P3732", "LH74") and c("Mol17", "A632")
+## are evident from the top three contrasts including zero and the
+## bottom contrast including zero.  The significant contrasts are the
+## ones comparing hybrids in the top group of three to ones in the
+## bottom group of two.
+
+## We have two graphical responses to the ties.
+## 1. We constructed the tiebreaker plot.
+## 2. We construct a set of orthogonal contrasts to illustrate
+##    the clusters.
+
+## pairwise contrasts with tiebreakers.
+maiz2.mmc &lt;- mmc(maiz2.aov,
+                 linfct=mcp(hibrido="Tukey", interaction_average=TRUE))
+mmcplot(maiz2.mmc, style="both")  ## MMC and Tiebreaker
+
+
+## orthogonal contrasts
+## user-specified contrasts
+hibrido.lmat &lt;- cbind("PPL-MA" =c(2, 2,-3,-3, 2),
+                      "PP-L"   =c(1, 1, 0, 0,-2),
+                      "P47-P32"=c(1,-1, 0, 0, 0),
+                      "M-A"    =c(0, 0, 1,-1, 0))
+dimnames(hibrido.lmat)[[1]] &lt;- levels(maiz$hibrido)
+hibrido.lmat
+
+maiz2.mmc &lt;-
+  mmc(maiz2.aov, focus="hibrido", focus.lmat=hibrido.lmat)
+maiz2.mmc
+
+## same thing using glht argument list
+maiz2.mmc &lt;-
+  mmc(maiz2.aov, linfct=mcp(hibrido="Tukey",
+      `interaction_average`=TRUE), focus.lmat=hibrido.lmat)
+
+  mmcplot(maiz2.mmc, style="both", type="lmat")
+
+## End(Not run)
+</code></pre>
+
+
+</div>

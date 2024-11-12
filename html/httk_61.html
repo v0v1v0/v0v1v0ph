@@ -1,0 +1,183 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>convert_solve_x</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>convert_solve_x</h2>
+
+<h3>Description</h3>
+
+<p>This function is designed to convert compartment values estimated from one
+of the HTTK models (e.g. "1compartment) using the solve_model function.
+It takes the HTTK model output matrix, model name, desired output units,
+and compound information to perform the conversion default model units to
+user specified units.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">convert_solve_x(
+  model.output.mat,
+  model = NULL,
+  output.units = NULL,
+  MW = NULL,
+  vol = NULL,
+  chem.cas = NULL,
+  chem.name = NULL,
+  dtxsid = NULL,
+  parameters = NULL,
+  monitor.vars = NULL,
+  suppress.messages = FALSE,
+  verbose = FALSE,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>model.output.mat</code></td>
+<td>
+<p>Matrix of results from HTTK solve_model function.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>model</code></td>
+<td>
+<p>Specified model to use in simulation: "pbtk", "3compartment",
+"3compartmentss", "1compartment", "schmitt", ...</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>output.units</code></td>
+<td>
+<p>Output units of interest for the compiled components.
+Defaults to NULL, and will provide values in model units if unspecified.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>MW</code></td>
+<td>
+<p>Molecular weight of substance of interest in g/mole</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>vol</code></td>
+<td>
+<p>Volume for the target tissue of interest in liters (L).
+NOTE: Volume should not be in units of per BW, i.e. "kg".</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>chem.cas</code></td>
+<td>
+<p>Either the chemical name, CAS number, or the parameters must
+be specified.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>chem.name</code></td>
+<td>
+<p>Either the chemical name, CAS number, or the parameters
+must be specified.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dtxsid</code></td>
+<td>
+<p>EPA's DSSTox Structure ID .
+(<a href="https://comptox.epa.gov/dashboard">https://comptox.epa.gov/dashboard</a>) the chemical must be identified by
+either CAS, name, or DTXSIDs.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>parameters</code></td>
+<td>
+<p>A set of model parameters, especially a set that
+includes MW (molecular weight) for our conversions.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>monitor.vars</code></td>
+<td>
+<p>A vector of character strings indicating the model
+component variables to retain in the conversion factor table
+(assuming suppress.messages == FALSE).  It should also be noted this option
+does NOT exclude columns from the input matrix provided in the
+'model.output.mat' parameter. (Default is NULL, i.e. conversion factors for
+all model components are included in the reporting matrix.)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>suppress.messages</code></td>
+<td>
+<p>Whether or not the output messages are suppressed.
+(Default is FALSE, i.e. show messages.)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p>Whether or not to display the full conversion factor table.
+(Default is FALSE, i.e. only include rows where the conversion factor is 1.)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Other parameters that can be passed to <code>convert_units</code>, e.g.
+temperature and compound state.  See details in <code>convert_units</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The function can be used to convert all compartments to a single unit,
+only units for a single model compartment, or units for a set of model
+compartments.
+</p>
+<p>More details on the unit conversion can be found in the documentation for
+<code>convert_units</code>.
+</p>
+
+
+<h3>Value</h3>
+
+<p>'new.ouput.matrix' A matrix with a column for time (in days), each
+compartment, and the area under the curve (AUC) and a row
+for each time point. The compartment and AUC columns are
+converted from model specified units to user specified units.
+</p>
+<p>'output.units.vector' A vector of character strings providing the
+model compartments and their corresponding units after <code>convert_solve_x</code>.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Sarah E. Davidson
+</p>
+
+
+<h3>See Also</h3>
+
+<p>convert_units
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">output.mat &lt;- solve_1comp(dtxsid = "DTXSID0020573",days=1)
+new.output.mat &lt;- convert_solve_x(output.units = "mg",
+                                  model.output.mat = output.mat,
+                                  model = "1compartment",
+                                  dtxsid = "DTXSID0020573")
+
+</code></pre>
+
+
+</div>

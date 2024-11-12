@@ -1,0 +1,209 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>MTL_hetero</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Heterogeneous Multi-task Feature Learning</h2>
+
+<h3>Description</h3>
+
+<p><code>MTL_hetero</code> conducts multi-tasks feature learning to different types of learning tasks, including linear regression, Huber regression, adaptive Huber, and logistic regression. The penalty function applies a mixed <code class="reqn">\ell_{2,1}</code> norm to combine regression coefficients of predictor shared across all tasks.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">MTL_hetero(
+  y,
+  x,
+  lambda,
+  Kn,
+  p,
+  n,
+  beta = 0.1,
+  tau = 1.45,
+  Cont_Model = "adaptive Huber",
+  import_w = 1,
+  tol = 0.05,
+  max_iter = 100,
+  Complete = "True",
+  diagnostics = FALSE,
+  gamma = 1,
+  alpha = 1
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+<p>List. A list of responses vectors for all tasks. The order of the list put the continuous responses before the binary responses.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>List. Listing matrices of the predictors for all tasks align with the same order as in y.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lambda</code></td>
+<td>
+<p>Numeric. The penalty parameter used for block-wise regularization (<code class="reqn">\ell_{2,1}</code> norm).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Kn</code></td>
+<td>
+<p>Vector of two elements. First element is the number of tasks with continuous responses, and the second element is the number of tasks with binary responses.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>p</code></td>
+<td>
+<p>Numeric. The number of features.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n</code></td>
+<td>
+<p>Numeric or vector. If only one numeric value is provided, equal sample size will be assumed for each task. If a vector is provided, then the elements are the sample sizes for all tasks.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>beta</code></td>
+<td>
+<p>(<strong>optional</strong>). Numeric or matrix. An initial value or matrix of values <code class="reqn">p</code> by <code class="reqn">K</code> for the estimation. The default value is 0.1.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tau</code></td>
+<td>
+<p>Numeric or vector. The robustification parameter used for methods "Huber regression" or "Adaptive Huber". The default value is 1.45.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Cont_Model</code></td>
+<td>
+<p>Character("regression", "Huber regression", or "adaptive Huber"). The models used for tasks with continuous responses.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>import_w</code></td>
+<td>
+<p>Numeric or vector. The weights assigned to different tasks. An equal weight is set as the default.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tol</code></td>
+<td>
+<p>(<strong>optional</strong>). Numeric. The tolerance level of optimation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>max_iter</code></td>
+<td>
+<p>(<strong>optional</strong>). Numeric. The maximum number of iteration steps.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Complete</code></td>
+<td>
+<p>Logic input. If the predictors in each task are all measured, set 'Complete == TRUE'; If some predictors in some but not all task are all measured, set'Complete == FALSE', and the missing values are imputed by column mean. The adjustment weights will be assigned based on the completeness of the predictors.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>diagnostics</code></td>
+<td>
+<p>Logic input. If 'diagnostics == TRUE', the function provides Bayesian information criterion, and the selected model performance is evalued by the MSE and MAE for tasks with continuous response and the AUC and deviance for tasks with binary responses.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>gamma</code></td>
+<td>
+<p>(<strong>optional</strong>). Numeric. Step size for each inner iteration. The default is equal to 1.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alpha</code></td>
+<td>
+<p>(<strong>optional</strong>). Numeric. A tuning parameter for BIC penalty. The default is equal to 1.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A list including the following terms will be returned:
+</p>
+
+<dl>
+<dt><code>beta</code></dt>
+<dd>
+<p>A <code class="reqn">p</code> by <code class="reqn">K</code> matrix of estimated sparse parameters.</p>
+</dd>
+<dt><code>Task type</code></dt>
+<dd>
+<p>The models used in each task.</p>
+</dd>
+<dt><code>Task weights</code></dt>
+<dd>
+<p>The weights assigned to each task.</p>
+</dd>
+<dt><code>Selected_List</code></dt>
+<dd>
+<p>The index of non-zero parameters.</p>
+</dd>
+</dl>
+<p>If 'diagnostics = TRUE', the following terms will be returned:
+</p>
+
+<dl>
+<dt><code>Bayesian_Information</code></dt>
+<dd>
+<p>Table of the information criterion: Composite likelihood, Degree of freedom, and (peudo or robust) Bayesian informtion criterion.</p>
+</dd>
+<dt><code>Reg_Error</code></dt>
+<dd>
+<p>Table of the model performance for (Huber) regressions: the mean square error (MSE), and the mean absolute error (MAE).</p>
+</dd>
+<dt><code>Class_Perform</code></dt>
+<dd>
+<p>Table of the model performance for classification tasks: the area under ROC curve (AUC), and the deviance (DEV) estimated by 'glm'.</p>
+</dd>
+<dt><code>Residuals</code></dt>
+<dd>
+<p>The residuals for all tasks.</p>
+</dd>
+</dl>
+<h3>Note</h3>
+
+<p>When penalty parameter is too small, the estimated coefficients may have <code class="reqn">p \ge n</code>. The algorithm can provide the estimated values, but the <code>diagnostics</code>'s results will not be given.
+</p>
+
+
+<h3>References</h3>
+
+<p>Zhong, Y., Xu, W., and Gao X., (2023) Heterogeneous multi-task feature learning with mixed <code class="reqn">\ell_{2,1}</code> regularization. Submitted
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">model &lt;- MTL_hetero(mockdata2,mockdata1, lambda =2.5, Kn = c(2,2), p=500,n = c(500,250,250,250),
+                    gamma = 2, Complete = FALSE, diagnostics = TRUE, alpha = 2)
+# Selected non-zero coefficients
+model$beta[model$Selected_List,]
+# Estimated Pseudo-BIC
+model$Bayesian_Information
+# Regression error
+model$Reg_Error
+# Classification accuracy
+model$Class_Perform
+</code></pre>
+
+
+</div>

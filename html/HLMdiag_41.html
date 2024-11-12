@@ -1,0 +1,125 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hlm_influence.default</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Calculating influence diagnostics for HLMs</h2>
+
+<h3>Description</h3>
+
+<p>This function is used to compute influence diagnostics for a hierarchical linear model.
+It takes a model fit as a <code>lmerMod</code> object or as a <code>lme</code> object and returns a tibble with Cook's
+distance, MDFFITS, covtrace, covratio, and leverage.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">## Default S3 method:
+hlm_influence(model, ...)
+
+## S3 method for class 'lmerMod'
+hlm_influence(
+  model,
+  level = 1,
+  delete = NULL,
+  approx = TRUE,
+  leverage = "overall",
+  data = NULL,
+  ...
+)
+
+## S3 method for class 'lme'
+hlm_influence(
+  model,
+  level = 1,
+  delete = NULL,
+  approx = TRUE,
+  leverage = "overall",
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>model</code></td>
+<td>
+<p>an object of class <code>lmerMod</code> or <code>lme</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>not in use</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>level</code></td>
+<td>
+<p>used to define the group for which cases are deleted and influence
+diagnostics are calculated. If <code>level = 1</code> (default), then influence diagnostics are
+calculated for individual observations. Otherwise, <code>level</code> should be the name of a grouping
+factor as defined in <code>flist</code> for a <code>lmerMod</code> object or as in <code>groups</code> for a <code>lme</code> object.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>delete</code></td>
+<td>
+<p>numeric index of individual cases to be deleted. If the <code>level</code> parameter 
+is specified, <code>delete</code> may also take the form of a character vector consisting of group 
+names as they appear in <code>flist</code> for <code>lme4</code> models or as in <code>groups</code> for <code>nlme</code> models. 
+If <code>delete = NULL</code> then all cases are iteratively deleted.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>approx</code></td>
+<td>
+<p>logical parameter used to determine how the influence diagnostics are calculated.
+If <code>FALSE</code> (default), influence diagnostics are calculated using a one step approximation.
+If <code>TRUE</code>, influence diagnostics are calculated by iteratively deleting groups and refitting
+the model using <code>lmer</code>. This method is more accurate, but slower than the one step approximation.
+If <code>approx = FALSE</code>, the returned tibble also contains columns for relative variance change (RVC).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>leverage</code></td>
+<td>
+<p>a character vector to determine which types of leverage should be included in the
+returned tibble. There are four options: 'overall' (default), 'fixef', 'ranef', or 'ranef.uc'.
+One or more types may be specified. For additional information about the types of leverage, see
+<code>?leverage</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>(optional) the data frame used to fit the model. This is only necessary for <code>lmerMod</code> models if
+<code>na.action = "na.exclude"</code> was set.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The <code>hlm_influence</code> function provides a wrapper that appends influence diagnostics
+to the original data. The approximated influence diagnostics returned by this
+function are equivalent to those returned by <code>cooks.distance</code>, <code>mdffits</code>, <code>covtrace</code>,
+<code>covratio</code>, and <code>leverage</code>. The exact influence diagnostics obtained through a full
+refit of the data are also available through <code>case_delete</code> and the accompanying functions
+<code>cooks.distance</code>, <code>mdffits</code>, <code>covtrace</code>, and <code>covratio</code> that can be called
+directly on the <code>case_delete</code> object.
+</p>
+
+
+<h3>Note</h3>
+
+<p>It is possible to set <code>level</code> and delete individual cases from different groups using 
+<code>delete</code>, so numeric indices should be double checked to confirm that they encompass entire groups.
+Additionally, if <code>delete</code> is specified, leverage values are not returned in the resulting tibble.
+</p>
+
+
+</div>

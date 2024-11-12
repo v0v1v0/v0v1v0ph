@@ -1,0 +1,147 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>chaining</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Chain-linking, rebasing and frequency conversion</h2>
+
+<h3>Description</h3>
+
+<p>Function <code>unchain()</code> decouples a chained index series with monthly frequency. These unchained index series can be aggregated into higher-level indices using <code>aggregate()</code>. To obtain a longterm index series, the higher-level indices must be chained using function <code>chain()</code>. Finally, <code>rebase()</code> sets the index reference period. Monthly indices can be converted into annual or quarterly indices using function <code>convert()</code>.</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">unchain(x, t, by=12)
+
+chain(x, t, by=12)
+
+rebase(x, t, t.ref, verbose=FALSE)
+
+convert(x, t, freq="annual")
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>numeric vector of index values</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>t</code></td>
+<td>
+<p>date vector</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>by</code></td>
+<td>
+<p>for annual overlap <code>NULL</code>; for one-month overlap a single integer between 1 and 12 specifying the price reference month</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>t.ref</code></td>
+<td>
+<p>character specifying the index reference period. Could be a whole year (<code>YYYY</code>) or a single year-month (<code>YYYY-MM</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p>logical indicating if messages regarding the index reference period should be printed to the console or not.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>freq</code></td>
+<td>
+<p>frequency of converted index. Either <code>annual</code> or <code>quarterly</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Function <code>unchain()</code> sets the value of the first price reference period to <code>NA</code> although the value could be set to 100 (if <code>by</code> is not <code>NULL</code>) or 100 divided by the average of the year (if <code>by=NULL</code>). This is wanted to avoid aggregation of these values. Function <code>chain()</code> finally sets the values back to 100.
+</p>
+
+
+<h3>Value</h3>
+
+<p>Functions <code>unchain()</code>, <code>chain()</code> and <code>rebase()</code> return numeric values of the same length as <code>x</code>.
+</p>
+<p>Function <code>convert()</code> returns a named vector of the length of quarter or years available in <code>t</code>, where the names correspond to the years or quarters.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Sebastian Weinand</p>
+
+
+<h3>References</h3>
+
+<p>European Commission, Eurostat, <em>Harmonised Index of Consumer Prices (HICP) - Methodological Manual - 2024 edition</em>, Publications Office of the European Union, 2024, <a href="https://data.europa.eu/doi/10.2785/055028">https://data.europa.eu/doi/10.2785/055028</a>.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>aggregate</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">### EXAMPLE 1
+
+t &lt;- seq.Date(from=as.Date("2021-12-01"), to=as.Date("2024-12-01"), by="1 month")
+p &lt;- rnorm(n=length(t), mean=100, sd=5)
+
+100*p/p[1]
+chain(unchain(p, t, by=12), t, by=12)
+
+convert(x=p, t=t, freq="q") # quarterly index
+
+t &lt;- seq.Date(from=as.Date("2021-01-01"), to=as.Date("2024-12-01"), by="1 month")
+p &lt;- rnorm(n=length(t), mean=100, sd=5)
+
+100*p/mean(p[1:12])
+(res &lt;- chain(unchain(p, t, by=NULL), t, by=NULL))
+# note that for backwards compability, each month in the first
+# year receives an index value of 100. this allows the same
+# computation again:
+chain(unchain(res, t, by=NULL), t, by=NULL)
+
+### EXAMPLE 2
+
+# set cores for testing on CRAN:
+library(restatapi)
+options(restatapi_cores=1)
+library(data.table)
+
+# get hicp index values for euro area with base 2015:
+dt &lt;- hicp.dataimport(id="prc_hicp_midx", filter=list(unit="I15", geo="EA"))
+dt[, "time":=as.Date(paste0(time, "-01"))]
+setkeyv(x=dt, cols=c("unit","coicop","time"))
+
+# check chain-linked indices against published data:
+dt[, "dec_ratio" := unchain(x=values, t=time), by="coicop"]
+dt[, "chained_index" := chain(x=dec_ratio, t=time), by="coicop"]
+dt[, "index_own" := rebase(x=chained_index, t=time, t.ref="2015"), by="coicop"]
+dt[abs(values-index_own)&gt;0.01,] # should be empty
+
+# check converted indices against published data:
+dta &lt;- dt[, as.data.table(convert(x=values, t=time), keep.rownames=TRUE), by="coicop"]
+setnames(x=dta, c("coicop","time","index"))
+aind &lt;- hicp.dataimport(id="prc_hicp_aind", filter=list(unit="INX_A_AVG", geo="EA"))
+aind[, c("geo","unit") := NULL]
+dtcomp &lt;- merge(x=aind, y=dta, by=c("coicop","time"), all=TRUE)
+dtcomp[abs(values-index)&gt;0.01,] # should be empty
+</code></pre>
+
+
+</div>

@@ -1,0 +1,130 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>lmatRows</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Find the row numbers in the lmat 
+corresponding to the focus factor.</h2>
+
+<h3>Description</h3>
+
+<p><code>lmatRows</code> finds the row numbers in the lmat (column numbers in the linfct in R)
+corresponding to the focus factor.  See <code>mmc</code> for more information.
+These are internal functions that the user doesn't see.
+They are necessary when the design has more than one factor.
+<code>lmatContrast</code> converts user-specified contrasts of levels of a
+factor to the full <code>lmat</code> or <code>linfct</code> matrix that carries the
+information about other factors and their interactions and covariates.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">lmatRows(x, focus)
+## S3 method for class 'mmc.multicomp'
+lmatRows(x, focus)
+## S3 method for class 'multicomp'
+lmatRows(x, focus)
+## S3 method for class 'glht'
+lmatRows(x, focus) ## R only
+## S3 method for class 'lm'
+lmatRows(x, focus)
+lmatContrast(lmat.none, contrast.matrix)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p><code>"lm"</code> or <code>"mmc.multicomp"</code> or <code>"multicomp"</code>
+or <code>"glht"</code> object.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>focus</code></td>
+<td>
+<p>The name of the term in the ANOVA table for which
+multiple comparisons are to be constructed.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lmat.none</code></td>
+<td>
+<p><code>lmat</code> matrix with the S-Plus <code>multicomp</code>
+package or <code>t(linfct)</code> matrix with the R <code>multcomp</code> package.
+In both packages the matrix is the one used for estimating the group
+means.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>contrast.matrix</code></td>
+<td>
+<p>Matrix of column contrasts for a factor.
+The columns are the contrasts, the rows are the levels of the factor.
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The <code>MMC</code> function are based on <code>glht</code> in R and on
+<code>multicomp</code>
+in S-Plus.  The two packages have different conventions for specifying
+the linear contrasts.  The <code>lmatRows</code> function gives appropriate
+values in each system.
+</p>
+
+
+<h3>Value</h3>
+
+<p>For <code>lmatRows</code>, vector of row numbers of the <code>lmat</code>,
+the matrix of linear contrasts defining the comparisons of interest.
+For <code>lmatContrast</code>, a linear contrast matrix that follows the
+conventions of the multiple comparisons package.  It has columns for each contrast
+specified by the input <code>contrast.matrix</code> and rows as needed for
+the other terms in the model.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p> Richard M. Heiberger &lt;rmh@temple.edu&gt; </p>
+
+
+<h3>See Also</h3>
+
+<p><code>mmc</code>,
+
+<code>glht</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## catalystm example
+## See ?MMC for more on this example
+data(catalystm)
+catalystm1.aov &lt;- aov(concent ~ catalyst, data=catalystm)
+
+catalystm.mmc &lt;-
+  if.R(r=mmc(catalystm1.aov, linfct = mcp(catalyst = "Tukey")),
+       s=multicomp.mmc(catalystm1.aov, plot=FALSE))
+dimnames(catalystm.mmc$mca$lmat)[[1]]
+lmatRows(catalystm1.aov, focus="catalyst")
+
+## user-specified contrasts
+catalystm.lmat &lt;- cbind("AB-D" =c( 1, 1, 0,-2),
+                        "A-B"  =c( 1,-1, 0, 0),
+                        "ABD-C"=c( 1, 1,-3, 1))
+dimnames(catalystm.lmat)[[1]] &lt;- levels(catalystm$catalyst)
+zapsmall(lmatContrast(catalystm.mmc$none$lmat, catalystm.lmat))
+</code></pre>
+
+
+</div>

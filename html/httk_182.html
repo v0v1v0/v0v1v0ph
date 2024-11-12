@@ -1,0 +1,427 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>solve_model</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Solve_model</h2>
+
+<h3>Description</h3>
+
+<p>solve_model is designed to accept systematized metadata (provided by the
+model.list defined in the modelinfo files) for a given 
+toxicokinetic model, including names of variables, parameterization
+functions, and key units, and use it along with chemical information
+to prepare an ode system for numerical solution over time of the amounts
+or concentrations of chemical in different bodily compartments of a given
+species (either "Rat", "Rabbit", "Dog", "Mouse", or default "Human").
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">solve_model(
+  chem.name = NULL,
+  chem.cas = NULL,
+  dtxsid = NULL,
+  times = NULL,
+  parameters = NULL,
+  model = NULL,
+  route = "oral",
+  dosing = NULL,
+  days = 10,
+  tsteps = 4,
+  initial.values = NULL,
+  initial.value.units = NULL,
+  plots = FALSE,
+  monitor.vars = NULL,
+  suppress.messages = FALSE,
+  species = "Human",
+  input.units = "mg/kg",
+  output.units = NULL,
+  method = NULL,
+  rtol = 1e-06,
+  atol = 1e-06,
+  recalc.blood2plasma = FALSE,
+  recalc.clearance = FALSE,
+  restrictive.clearance = TRUE,
+  adjusted.Funbound.plasma = TRUE,
+  minimum.Funbound.plasma = 1e-04,
+  parameterize.arg.list = list(),
+  small.time = 1e-04,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>chem.name</code></td>
+<td>
+<p>Either the chemical name, CAS number, or the parameters
+must be specified.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>chem.cas</code></td>
+<td>
+<p>Either the chemical name, CAS number, or the parameters must
+be specified.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dtxsid</code></td>
+<td>
+<p>EPA's DSSTox Structure ID (<a href="https://comptox.epa.gov/dashboard">https://comptox.epa.gov/dashboard</a>)
+the chemical must be identified by either CAS, name, or DTXSIDs</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>times</code></td>
+<td>
+<p>Optional time sequence for specified number of output times (in days) to be returned by the function.
+The model is solved explicitly at the time sequence specified. Dosing sequence begins at the first time provided.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>parameters</code></td>
+<td>
+<p>List of chemical parameters, as output by 
+parameterize_pbtk function. Overrides chem.name and chem.cas.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>model</code></td>
+<td>
+<p>Specified model to use in simulation: "pbtk", "3compartment",
+"3compartmentss", "1compartment", "schmitt", ...</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>route</code></td>
+<td>
+<p>String specification of route of exposure for simulation:
+"oral", "iv", "inhalation", ...</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dosing</code></td>
+<td>
+<p>List of dosing metrics used in simulation, which includes
+the namesake entries of a model's associated dosing.params. In the case
+of most httk models, these should include "initial.dose", "doses.per.day", 
+"daily.dose", and "dosing.matrix". The "dosing.matrix" is used for more
+precise dose regimen specification, and is a matrix consisting of two
+columns or rows named "time" and "dose" containing the time and amount of 
+each dose. If none of the namesake entries of the dosing list is set to a
+non-NULL value, solve_model uses a default initial dose of 1 mg/kg BW along with the 
+dose type (add/multiply) specified for a given route (for example, add the dose to gut
+lumen for oral route)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>days</code></td>
+<td>
+<p>Simulated period. Default 10 days.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tsteps</code></td>
+<td>
+<p>The number of time steps per hour. Default of 4.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>initial.values</code></td>
+<td>
+<p>Vector of numeric values containing the initial
+concentrations or amounts of the chemical in specified tissues with units
+corresponding to those specified for the model outputs. Default values are zero.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>initial.value.units</code></td>
+<td>
+<p>Vector of character strings containing the units
+corresponding to 'initial.values' specified for the model outputs.
+Default is assuming the units match expected compartment units for the model.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>plots</code></td>
+<td>
+<p>Plots all outputs if true.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>monitor.vars</code></td>
+<td>
+<p>Which variables are returned as a function of time. 
+Default values of NULL looks up variables specified in modelinfo_MODEL.R</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>suppress.messages</code></td>
+<td>
+<p>Whether or not the output messages are suppressed.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>species</code></td>
+<td>
+<p>Species desired (models have been designed to be
+parameterized for some subset of the following species: "Rat", "Rabbit", 
+"Dog", "Mouse", or default "Human").</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>input.units</code></td>
+<td>
+<p>Input units of interest assigned to dosing. Defaults
+to mg/kg BW, in line with the default dosing scheme of a one-time dose of
+1 mg/kg in which no other dosing parameters are specified.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>output.units</code></td>
+<td>
+<p>Output units of interest for the compiled components.
+Defaults to NULL, and will provide values in model units if unspecified.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+<p>Method used by integrator (deSolve).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rtol</code></td>
+<td>
+<p>Relative tolerance used by integrator (deSolve) to determine 
+numerical precision – defaults to 1e-6.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>atol</code></td>
+<td>
+<p>Absolute tolerance used by integrator (deSolve) to determine</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>recalc.blood2plasma</code></td>
+<td>
+<p>Recalculates the ratio of the amount of chemical
+in the blood to plasma using the input parameters, calculated with
+hematocrit, Funbound.plasma, and Krbc2pu.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>recalc.clearance</code></td>
+<td>
+<p>Recalculates the the hepatic clearance
+(Clmetabolism) with new million.cells.per.gliver parameter.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>restrictive.clearance</code></td>
+<td>
+<p>Protein binding not taken into account (set to
+1) in liver clearance if FALSE.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>adjusted.Funbound.plasma</code></td>
+<td>
+<p>Uses adjusted Funbound.plasma when set to
+TRUE along with partition coefficients calculated with this value.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>minimum.Funbound.plasma</code></td>
+<td>
+<p>Monte Carlo draws less than this value are set 
+equal to this value (default is 0.0001 – half the lowest measured Fup in our
+dataset)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>parameterize.arg.list</code></td>
+<td>
+<p>Additional parameterized passed to the model
+parameterization function.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>small.time</code></td>
+<td>
+<p>A tiny amount of time used to provide predictions on either
+side of an instaneous event (like an iv injection). This helps ensure that
+abrupt changes plot well. Defaults to 1e-4.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Additional arguments passed to the integrator.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Dosing values with certain acceptable associated input.units (like mg/kg BW)
+are configured to undergo a unit conversion. All model simulations are 
+intended to run with units as specifed by "compartment.units" in the 
+model.list (as defined by the modelinfo files).
+</p>
+<p>The 'dosing' argument includes all parameters needed to describe exposure
+in terms of route of administration, frequency, and quantity short of 
+scenarios that require use of a more precise forcing function. If the dosing
+argument's namesake entries are left NULL, solve_model defaults to a
+single-time dose of 1 mg/kg BW according to the given dosing route and 
+associated type (either add/multiply, for example we typically add a dose to 
+gut lumen 
+when oral route is specified).
+</p>
+<p>AUC is the area under the curve of the plasma concentration.
+</p>
+<p>Model parameters are named according to the following convention:
+</p>
+
+<table>
+<tr>
+<td style="text-align: left;">
+prefix </td>
+<td style="text-align: right;"> suffix </td>
+<td style="text-align: right;"> Meaning </td>
+<td style="text-align: right;"> units </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+K </td>
+<td style="text-align: right;"> </td>
+<td style="text-align: right;"> Partition coefficient for tissue to free plasma \ tab unitless </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+V </td>
+<td style="text-align: right;"> </td>
+<td style="text-align: right;"> Volume </td>
+<td style="text-align: right;"> L </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+Q </td>
+<td style="text-align: right;"> </td>
+<td style="text-align: right;"> Flow </td>
+<td style="text-align: right;"> L/h </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+k </td>
+<td style="text-align: right;"> </td>
+<td style="text-align: right;"> Rate </td>
+<td style="text-align: right;"> 1/h </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+</td>
+<td style="text-align: right;"> c </td>
+<td style="text-align: right;"> Parameter is proportional to body weight </td>
+<td style="text-align: right;"> 1 / kg for volumes
+and 1/kg^(3/4) for flows </td>
+</tr>
+</table>
+<p>When species is specified but chemical-specific in vitro data are not
+available, the function uses the appropriate physiological data (volumes and
+flows) but default.to.human = TRUE must be used to substitute human
+fraction unbound, partition coefficients, and intrinsic hepatic clearance.
+(NOTE: The 'default.to.human' specification should be included as part of the
+arguments listed in 'parameterize.arg.list'.)
+</p>
+<p>For both plotting purposes and helping the numerical equation solver, it is
+helpful to specify that time points shortly before and after dosing are 
+included. This function automatically add these points, and they are returned
+to the user unless the times argument is used, in which case only the time
+points specified by that argument are provided.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A matrix of class deSolve with a column for time(in days), each
+compartment, the area under the curve, and plasma concentration and a row
+for each time point.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>John Wambaugh, Robert Pearce, Miyuki Breen, Mark Sfeir, and
+Sarah E. Davidson
+</p>
+
+
+<h3>References</h3>
+
+<p>Pearce RG, Setzer RW, Strope CL, Wambaugh JF, Sipes NS (2017).
+“Httk: R package for high-throughput toxicokinetics.”
+<em>Journal of Statistical Software</em>, <b>79</b>(4), 1.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># The various "solve_x" functions are wrappers for solve_model:
+head(solve_pbtk(chem.name="Terbufos", days=1))
+
+head(solve_model(chem.name="Terbufos",model="pbtk",
+                 days=1,
+                 dosing=list(
+                   initial.dose = 1, # Assume dose is in mg/kg BW/day  
+                   doses.per.day=NULL,
+                   dosing.matrix = NULL,
+                   daily.dose = NULL)))
+
+
+# A dose matrix specifies times and magnitudes of doses:
+dm &lt;- matrix(c(0,1,2,5,5,5),nrow=3)
+colnames(dm) &lt;- c("time","dose")
+
+solve_pbtk(chem.name="Methenamine",
+           dosing.matrix=dm,
+           dose=NULL,
+           days=2.5,
+           daily.dose=NULL)
+
+solve_model(chem.name="Methenamine",
+            model="pbtk",
+            days=2.5,
+            dosing=list(
+              initial.dose =NULL,
+              doses.per.day=NULL,
+              daily.dose=NULL,
+              dosing.matrix=dm))
+
+solve_model(chem.name="Besonprodil",
+            model="pbtk",
+            days=2.5,
+            dosing=list(
+              initial.dose=NULL,
+              doses.per.day=4,
+              daily.dose=1,
+              dosing.matrix=NULL))
+  
+solve_pbtk(chem.name="Besonprodil",
+           daily.dose=1,
+           dose=NULL,
+           doses.per.day=4,
+           days=2.5)
+ 
+
+</code></pre>
+
+
+</div>

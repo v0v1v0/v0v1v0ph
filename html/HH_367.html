@@ -1,0 +1,205 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>panel.bwplot.superpose</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Panel function for bwplot that displays an entire box in the colors coded
+by groups.
+</h2>
+
+<h3>Description</h3>
+
+<p>Panel function for bwplot that displays an entire box (central dot, box,
+umbrella, outliers) in the same color, coded by the groups argument.
+The function is based on <code>panel.superpose</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">panel.bwplot.superpose(x, y, ...,
+                       groups=groups,
+                       col=rep(trellis.par.get("superpose.symbol")$col,
+                               length=length(groups)),
+                       pch=trellis.par.get("box.dot")$pch,
+                       panel.groups=panel.bwplot.groups)
+
+panel.bwplot.groups(..., col, pch, fill, fill.alpha=NULL, group.number)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x, y</code></td>
+<td>
+
+<p>Standard arguments to a <span class="pkg">lattice</span> panel function.
+When <code>x</code> has class <code>positioned</code> (see <code>position</code>), the
+position  will be forwarded by <code>panel.bwplot.superpose</code> to <code>panel.bwplot.groups</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+
+<p>Additional <span class="pkg">lattice</span> arguments.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>groups</code></td>
+<td>
+
+<p>Factor to be used for color coding entire boxes: central dot,
+rectangle, umbrella, and outlier symbol.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>col</code></td>
+<td>
+
+<p>Colors to be assigned to the levels of the group.  The default colors
+are taken from <code>trellis.par.get("superpose.symbol")$col</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pch</code></td>
+<td>
+
+<p>Standard <span class="pkg">lattice</span> arguments.
+The <code>pch</code> describes the central dot.  The outlier dots are
+specified in the <code>plot.symbol</code> component of <code>trellis.par.get</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fill, fill.alpha</code></td>
+<td>
+
+<p>These are related to the similarly named arguments in <code>panel.bwplot</code>.
+The <code>fill</code> argument is ignored.  It is there to capture the
+automatically
+generated <code>fill</code> argument.  The default<code>NULL</code> value of <code>fill.alpha</code>
+implies that there is no background color for the boxes.  The user can set
+<code>fill.alpha</code>
+to a number between 0 and 1.  The boxes will be shaded in a lighter
+version of their color as implied by the <code>groups</code> argument.  The
+value 0 gives a transparent fill, and the value one makes the box the
+full opaque color.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>panel.groups, group.number</code></td>
+<td>
+
+<p>See <code>panel.superpose</code> for details.
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p><code>panel.bwplot.superpose</code> is the user-level function.
+<code>panel.bwplot.groups</code> is the <code>panel.groups</code> function called by <code>panel.superpose</code>.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p> Richard M. Heiberger &lt;rmh@temple.edu&gt; </p>
+
+
+<h3>See Also</h3>
+
+<p><code>position</code>, <code>panel.bwplot.intermediate.hh</code>,
+<code>panel.superpose</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">tmp &lt;- data.frame(Response=rnorm(20), Group=factor(rep(LETTERS[1:3], c(5,7,8))))
+
+bwplot(Group ~ Response, data=tmp,
+       main="Default panel.bwplot, groups ignored", groups=Group)
+
+bwplot(Group ~ Response, data=tmp,
+       main="panel.bwplot.superpose",
+       groups=Group, panel=panel.bwplot.superpose)
+
+bwplot(Group ~ Response, data=tmp,
+       main="panel.bwplot.superpose with fill specified",
+       groups=Group, panel=panel.bwplot.superpose,
+       fill.alpha=.33)
+
+
+bwplot(Group ~ Response, data=tmp,
+       main="panel.bwplot.superpose, with color specified",
+       groups=Group, panel=panel.bwplot.superpose,
+       col=c("forestgreen","blue", "brown"))
+
+
+Test &lt;- data.frame(id=rep(letters, each=4),
+                   Week=rep(c(0,1,3,6), 26),
+                   Treatment=rep(factor(c("A","B"), levels=c("A","B")), each=52),
+                   y=rep(1:4, 52) + rep(4:5, each=52) + rnorm(104),
+                   stringsAsFactors=FALSE)
+Test$WeekTrt &lt;- with(Test, interaction(Week, Treatment))
+position(Test$Week) &lt;- unique(Test$Week)
+position(Test$WeekTrt) &lt;- as.vector(outer(position(Test$Week), c(-.2, .2), `+`))
+
+tapply(Test$y, Test[c("Week", "Treatment")], median)
+
+bwplot( y ~ WeekTrt, groups = Treatment, data = Test,
+      main="default panel.bwplot, groups ignored")
+
+bwplot( y ~ WeekTrt, groups = Treatment, data = Test,
+      panel=panel.bwplot.superpose,
+      scales=list(x=list(limits=c(-1, 7))),
+      main="Minimal use of panel.bwplot.superpose")
+
+bwplot( y ~ WeekTrt, groups = Treatment, data = Test,
+       panel=panel.bwplot.superpose,
+       scales=list(x=list(limits=c(-1, 7), at=position(Test$Week))),
+       box.width=.3,
+       xlab="Week",
+       pch=c(17, 16),
+       key=list(col=trellis.par.get()$superpose.symbol$col[1:2],
+           border=TRUE, title="Treatment", cex.title=1, columns=2,
+           text=list(levels(Test$Treatment)),
+           points=list(pch=c(17, 16))),
+       par.settings=list(plot.symbol=list(pch=c(17, 16), cex=.5)),
+       main="panel.bwplot.superpose with additional annotations")
+
+
+bwplot( y ~ WeekTrt, groups = Treatment, data = Test,
+       panel=panel.bwplot.superpose,
+       scales=list(x=list(limits=c(-1, 7), at=position(Test$Week))),
+       box.width=.3,
+       xlab="Week",
+       pch=c(17, 16),
+       key=list(col=trellis.par.get()$superpose.symbol$col[1:2],
+           border=TRUE, title="Treatment", cex.title=1, columns=2,
+           text=list(levels(Test$Treatment)),
+           points=list(pch=c(17, 16))),
+       par.settings=list(plot.symbol=list(pch=c(17, 16), cex=.5)),
+       main="panel.bwplot.superpose with fill and more complex panel.groups",
+       panel.groups = function(...) {
+           panel.stripplot(...)
+           panel.bwplot.groups(...)
+       },
+       fill.alpha=.33,
+       jitter.data = TRUE)
+
+</code></pre>
+
+
+</div>

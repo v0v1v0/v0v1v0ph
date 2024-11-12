@@ -1,0 +1,89 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>filter_by_keyword</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Filter genes by keyword</h2>
+
+<h3>Description</h3>
+
+<p>Filter the HGNC data set by a keyword to be looked up in the columns
+containing gene names or symbols. By default, it will look up in <code>symbol</code>,
+<code>name</code>, <code>alias_symbol</code>, <code>alias_name</code>, <code>prev_symbol</code> and <code>prev_name</code>. Note
+that this function in dive into list-columns and match return a hit result if
+at least one of the strings matches the <code>keyword</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">filter_by_keyword(
+  tbl,
+  keyword,
+  cols = c("symbol", "name", "alias_symbol", "alias_name", "prev_symbol", "prev_name")
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>tbl</code></td>
+<td>
+<p>A tibble containing the HGNC data set, typically obtained with <code>import_hgnc_dataset()</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>keyword</code></td>
+<td>
+<p>A keyword or a regular expression to be used as search criterion.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cols</code></td>
+<td>
+<p>Columns to be looked up.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A tibble of the HGNC data set filtered by
+observations matching the <code>keyword</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+# Start by retrieving the HGNC data set
+hgnc_tbl &lt;- import_hgnc_dataset()
+
+# Search for entries containing "TP53" in the HGNC data set
+hgnc_tbl %&gt;%
+  filter_by_keyword('TP53') %&gt;%
+  dplyr::select(1:4)
+
+# The same as above but restrict the search to the `symbol` column
+hgnc_tbl %&gt;%
+  filter_by_keyword('TP53', cols = 'symbol') %&gt;%
+  dplyr::select(1:4)
+
+# Match "TP53" exactly in the `symbol` column
+hgnc_tbl %&gt;%
+  filter_by_keyword('^TP53$', cols = 'symbol') %&gt;%
+  dplyr::select(1:4)
+
+# `filter_by_keyword()` is vectorised over `keyword`
+hgnc_tbl %&gt;%
+  filter_by_keyword(c('^TP53$', '^PIK3CA$'), cols = 'symbol') %&gt;%
+  dplyr::select(1:4)
+
+## End(Not run)
+
+</code></pre>
+
+
+</div>

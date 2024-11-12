@@ -1,0 +1,97 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>logical3s</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Complex logical expressions</h2>
+
+<h3>Description</h3>
+
+<p>Performant implementations of <code>&amp;</code> et <code>or</code>.
+Performance is high when the expressions are long (i.e. over 10M elements)
+and in particular when they are of the form <code>lhs &lt;op&gt; rhs</code> for binary
+<code>&lt;op&gt;</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">and3s(
+  exprA,
+  exprB = NULL,
+  exprC = NULL,
+  ...,
+  nThread = getOption("hutilscpp.nThread", 1L),
+  .parent_nframes = 1L,
+  type = c("logical", "raw", "which")
+)
+
+or3s(
+  exprA,
+  exprB = NULL,
+  exprC = NULL,
+  ...,
+  nThread = getOption("hutilscpp.nThread", 1L),
+  .parent_nframes = 1L,
+  type = c("logical", "raw", "which")
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>exprA, exprB, exprC, ...</code></td>
+<td>
+<p>Expressions of the form <code>x &lt;op&gt; y</code>.
+with <code>&lt;op&gt;</code> one of the standard binary operators.
+</p>
+<p>Only <code>exprA</code> is required, all following expressions are optional.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nThread</code></td>
+<td>
+
+<dl>
+<dt><code>integer(1)</code></dt>
+<dd>
+<p>Number of threads to use.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.parent_nframes</code></td>
+<td>
+
+<dl>
+<dt><code>integer(1)</code></dt>
+<dd>
+<p>For internal use. Passed to <code>eval.parent</code>.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>type</code></td>
+<td>
+<p>The type of the result. <code>which</code> corresponds to the
+indices of <code>TRUE</code> in the result. Type <code>raw</code> is available
+for a memory-constrained result, though the result will not be
+interpreted as logical.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p><code>and3s</code> and <code>or3s</code> return <code>exprA &amp; exprB &amp; exprC</code> and
+<code>exprA | exprB | exprC</code> respectively. If any expression is missing
+it is considered <code>TRUE</code> for <code>and3s</code> and <code>FALSE</code> for <code>or3s</code>;
+in other words only the results of the other expressions count towards the result.
+</p>
+
+
+</div>

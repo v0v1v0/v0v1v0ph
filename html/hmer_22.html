@@ -1,0 +1,155 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>get_diagnostic</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Diagnostic Tests for Emulators</h2>
+
+<h3>Description</h3>
+
+<p>Given an emulator, return a diagnostic measure.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">get_diagnostic(
+  emulator,
+  targets = NULL,
+  validation = NULL,
+  which_diag = "cd",
+  stdev = 3,
+  cleaned = NULL,
+  warn = TRUE,
+  kfold = NULL,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>emulator</code></td>
+<td>
+<p>An object of class Emulator</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>targets</code></td>
+<td>
+<p>If desired, the target values for the output(s) of the system</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>validation</code></td>
+<td>
+<p>If provided, the emulator is tested against the outputs of these points</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>which_diag</code></td>
+<td>
+<p>Which diagnostic measure to use (choosing from cd, ce, se above)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>stdev</code></td>
+<td>
+<p>For ‘cd’, a measure of the allowed distance from prediction and reality</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cleaned</code></td>
+<td>
+<p>Internal for stochastic emulators</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>warn</code></td>
+<td>
+<p>Should a warning be shown if ce is chosen and no targets provided?</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>kfold</code></td>
+<td>
+<p>Mainly internal: pre-computed k-fold diagnostic results for output</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Any other parameters to be passed through to subfunctions.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>An emulator's suitability can be checked in a number of ways. This function combines all
+current diagnostics available in the package, returning a context-dependent data.frame
+containing the results.
+</p>
+<p>Comparison Diagnostics (cd): Given a set of points, the emulator expectation and variance
+are calculated. This gives a predictive range for the input point, according to the
+emulator. We compare this against the actual value given by the simulator: points whose
+emulator prediction is further away from the simulator prediction are to be investigated.
+This 'distance' is given by <code>stdev</code>, and an emulator prediction correspondingly
+should not be further away from the simulator value than stdev*uncertainty.
+</p>
+<p>Classification Error (ce): Given a set of targets, the emulator can determine implausibility
+of a point with respect to the relevant target, accepting or rejecting it as appropriate.
+We can define a similar ‘implausibility’ function for the simulator: the combination of
+the two rejection schemes gives four classifications of points. Any point where the
+emulator would reject the point but the simulator would not should be investigated.
+</p>
+<p>Standardized Error (se): The known value at a point, combined with the emulator expectation
+and uncertainty, can be combined to provide a standardized error for a point. This error
+should not be too large, in general. but the diagnostic is more useful when looking at
+a collection of such measures, where systematic bias or over/underconfidence can be seen.
+</p>
+<p>Which of the diagnostics is performed can be controlled by the <code>which_diag</code> argument.
+If performing classification error diagnostics, a set of targets must be provided; for all
+diagnostics, a validation (or holdout) set can be provided. If no such set is given, then
+the emulator diagnostics are performed with respect to its training points, using k-fold
+cross-validation.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A data.frame consisting of the input points, output values, and diagnostic measures.
+</p>
+
+
+<h3>See Also</h3>
+
+<p>validation_diagnostics
+</p>
+<p>Other diagnostic functions: 
+<code>analyze_diagnostic()</code>,
+<code>classification_diag()</code>,
+<code>comparison_diag()</code>,
+<code>individual_errors()</code>,
+<code>residual_diag()</code>,
+<code>standard_errors()</code>,
+<code>summary_diag()</code>,
+<code>validation_diagnostics()</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"> # Use the simple SIR model via SIREmulators
+ get_diagnostic(SIREmulators$ems$nS, validation = SIRSample$validation)
+ # Classification error fails without the set of targets
+ get_diagnostic(SIREmulators$ems$nI, SIREmulators$targets, SIRSample$validation, 'ce')
+ # No validation set: k-fold cross-validation will be used.
+ get_diagnostic(SIREmulators$ems$nR, which_diag = 'se')
+
+</code></pre>
+
+
+</div>

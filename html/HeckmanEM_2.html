@@ -1,0 +1,139 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>HeckmanEM</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Fit the Normal, Student-t or Contaminated normal Heckman Selection model</h2>
+
+<h3>Description</h3>
+
+<p>'HeckmanEM()' fits the Heckman selection model.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">HeckmanEM(
+  y,
+  x,
+  w,
+  cc,
+  nu = 4,
+  family = "T",
+  error = 1e-05,
+  iter.max = 500,
+  im = TRUE,
+  criteria = TRUE,
+  verbose = TRUE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+<p>A response vector.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>A covariate matrix for the response y.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>w</code></td>
+<td>
+<p>A covariate matrix for the missing indicator cc.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cc</code></td>
+<td>
+<p>A missing indicator vector (1=observed, 0=missing) .</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nu</code></td>
+<td>
+<p>When using the t- distribution, the initial value for the degrees of freedom.
+When using the CN distribution, the initial values for the proportion of bad observations and the degree of contamination.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>family</code></td>
+<td>
+<p>The family to be used (Normal, T or CN).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>error</code></td>
+<td>
+<p>The absolute convergence error for the EM stopping rule.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>iter.max</code></td>
+<td>
+<p>The maximum number of iterations for the EM algorithm.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>im</code></td>
+<td>
+<p>TRUE/FALSE, boolean to decide if the standard errors of the parameters should be computed.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>criteria</code></td>
+<td>
+<p>TRUE/FALSE, boolean to decide if the model selection criteria should be computed.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p>TRUE/FALSE, boolean to decide if the progress should be printed in the screen.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>An object of the class HeckmanEM with all the outputs provided from the function.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">n    &lt;- 100
+nu   &lt;- 3
+cens &lt;- 0.25
+
+set.seed(13)
+w &lt;- cbind(1,runif(n,-1,1),rnorm(n))
+x &lt;- cbind(w[,1:2])
+c &lt;- qt(cens, df=nu)
+
+sigma2   &lt;- 1
+beta     &lt;- c(1,0.5)
+gamma    &lt;- c(1,0.3,-.5)
+gamma[1] &lt;- -c*sqrt(sigma2)
+
+set.seed(1)
+datas &lt;- rHeckman(x,w,beta,gamma,sigma2,rho = 0.6,nu,family="T")
+y &lt;- datas$y
+cc &lt;- datas$cc
+
+# Normal EM
+res.N &lt;- HeckmanEM(y, x, w, cc, family="Normal",iter.max = 50)
+# Student-t EM
+res.T &lt;- HeckmanEM(y, x, w, cc, nu = 4, family="T", iter.max = 50)
+
+</code></pre>
+
+
+</div>

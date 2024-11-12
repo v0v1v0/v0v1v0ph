@@ -1,0 +1,169 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>direct_step</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Uses the direct step method to find the distance between two known depths
+in a trapezoidal channel</h2>
+
+<h3>Description</h3>
+
+<p>This function applies the direct step method for a gradually-varying water 
+surface profile for flow in an open channel with a trapezoidal shape.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">direct_step(
+  So = NULL,
+  n = NULL,
+  Q = NULL,
+  y1 = NULL,
+  y2 = NULL,
+  b = NULL,
+  m = NULL,
+  nsteps = 1,
+  units = c("SI", "Eng"),
+  ret_units = FALSE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>So</code></td>
+<td>
+<p>numeric channel bed slope [unitless]</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n</code></td>
+<td>
+<p>numeric vector that contains the Manning roughness coefficient</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Q</code></td>
+<td>
+<p>numeric vector that contains the flow rate [<code class="reqn">m^3 s^{-1}</code> or <code class="reqn">ft^3 s^{-1}</code>]</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>y1</code></td>
+<td>
+<p>numeric vector that contains the initial water depth [<code class="reqn">m</code> or <code class="reqn">ft</code>]</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>y2</code></td>
+<td>
+<p>numeric vector that contains the final water depth [<code class="reqn">m</code> or <code class="reqn">ft</code>]</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>b</code></td>
+<td>
+<p>numeric vector that contains the channel bottom width [<code class="reqn">m</code> or <code class="reqn">ft</code>]</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>m</code></td>
+<td>
+<p>numeric vector that contains the side slope of the channel (m:1 H:V) [unitless]</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nsteps</code></td>
+<td>
+<p>integer of the number of calculation steps between y1 and y2 [unitless]</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>units</code></td>
+<td>
+<p>character vector that contains the system of units [options are
+<code>SI</code> for International System of Units and <code>Eng</code> for English (US customary)
+units. This is used for compatibility with iemisc package.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ret_units</code></td>
+<td>
+<p>If set to TRUE the value(s) returned are of class <code>units</code> with
+units attached to the value. [Default is FALSE]</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The direct step method applies the energy equation to gradually-varied 
+open channel flow conditions, assuming each increment is approximately uniform.
+This function works with a trapezoidal channel shape. The water depths at two 
+locations are input with channel geometry and flow rate, and the distance between
+the two locations, <code class="reqn">{\Delta}X</code>, is calculated: 
+</p>
+<p style="text-align: center;"><code class="reqn">{\Delta}X = \frac{E_1 - E_2}{S_f-S_o}</code>
+</p>
+
+<p>where <code class="reqn">E_1</code> and  <code class="reqn">E_2</code> are the specific energy values at the locations 
+of <code class="reqn">y_1</code> and  <code class="reqn">y_2</code>,  <code class="reqn">S_f</code> is the slope of the energy grade line, 
+and <code class="reqn">S_o</code> is the slope of the channel bed.
+</p>
+
+
+<h3>Value</h3>
+
+<p>Returns a data frame (tibble) with the columns:
+</p>
+
+<ul>
+<li>
+<p> x - cumulative distance from position of y1
+</p>
+</li>
+<li>
+<p> z - elevation of the channel bed at location x
+</p>
+</li>
+<li>
+<p> y - depth of the water at location x
+</p>
+</li>
+<li>
+<p> A - cross-sectional area at location x
+</p>
+</li>
+<li>
+<p> Sf - slope of the energy grade line at location x
+</p>
+</li>
+<li>
+<p> E - specific energy at location x
+</p>
+</li>
+<li>
+<p> Fr - Froude number at location x
+</p>
+</li>
+</ul>
+<h3>Author(s)</h3>
+
+<p>Ed Maurer
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+#Solving for profile between depths 3.1 ft and 3.4 ft in a rectangular channel
+#Flow of 140 ft^3/s, bottom width = 6 ft:
+direct_step(So=0.0015, n=0.013, Q=140, y1=3.1, y2=3.4, b=6, m=0, nsteps=2, units="Eng")
+
+</code></pre>
+
+
+</div>

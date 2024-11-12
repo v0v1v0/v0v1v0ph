@@ -1,0 +1,114 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>plot</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Summary plots for hybrid Models</h2>
+
+<h3>Description</h3>
+
+<p><code>plot.HM</code> is a method to plot hybrid models from this
+package
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">## S3 method for class 'HM'
+plot(x, sim = 1, plot.type = "subpop", facet.scales = "free_y", ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p><code>HM</code> object</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sim</code></td>
+<td>
+<p>indicates which simulation to plot.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>plot.type</code></td>
+<td>
+<p>plots the mean number of each state variable for the whole
+population ('pop.mean'), or the subpopulations of a particular
+simulation ('subpop', default value), or the mean of each subpopulation
+('subpop.mean').</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>facet.scales</code></td>
+<td>
+<p>should scales be fixed ("free_y", the default), free ("free"), or free
+in one dimension ("free_x", "free_y"). See ggplot2 package for more
+details.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>arguments to be passed to methods.</p>
+</td>
+</tr>
+</table>
+<h3>References</h3>
+
+<p>[1] Fernando S. Marques, Jose H. H. Grisi-Filho, Marcos Amaku et al.
+hybridModels: An R Package for the Stochastic Simulation of Disease Spreading
+in Dynamic Network. In: Jounal of Statistical Software Volume 94, Issue 6
+&lt;doi:10.18637/jss.v094.i06&gt;.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Parameters and initial conditions for an SIS model
+# loading the data set 
+data(networkSample) # help("networkSample"), for more info
+networkSample &lt;- networkSample[which(networkSample$Day &lt; "2012-03-20"),]
+
+var.names &lt;- list(from = 'originID', to = 'destinationID', Time = 'Day',
+                  arc = 'num.animals')
+                  
+prop.func &lt;- c('beta * S * I / (S + I)', 'gamma * I')
+state.var &lt;- c('S', 'I')
+state.change.matrix &lt;- matrix(c(-1,  1,  # S
+                                 1, -1), # I
+                              nrow = 2, ncol = 2, byrow = TRUE)
+                              
+model.parms &lt;- c(beta = 0.1, gamma = 0.01)
+
+init.cond &lt;- rep(100, length(unique(c(networkSample$originID,
+                                      networkSample$destinationID))))
+names(init.cond) &lt;- paste('S', unique(c(networkSample$originID,
+                                        networkSample$destinationID)), sep = '')
+init.cond &lt;- c(init.cond, c(I36811 = 10, I36812 = 10)) # adding infection
+                  
+# running simulations, check num of cores available (num.cores)
+sim.results &lt;- hybridModel(network = networkSample, var.names = var.names,
+                           model.parms = model.parms, state.var = state.var,
+                           prop.func = prop.func, init.cond = init.cond,
+                           state.change.matrix = state.change.matrix,
+                           sim.number = 2, num.cores = 2)
+
+# default plot layout (plot.types: 'pop.mean', 'subpop', or 'subpop.mean')
+plot(sim.results, plot.type = 'subpop.mean')
+
+# changing plot layout with ggplot2 (example)
+# uncomment the lines below to test new layout exemple
+#library(ggplot2)
+#plot(sim.results, plot.type = 'subpop') + ggtitle('New Layout') + 
+#  theme_bw() + theme(axis.title = element_text(size = 14, face = "italic"))
+
+</code></pre>
+
+
+</div>

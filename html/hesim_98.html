@@ -1,0 +1,125 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>get_labels</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Get value labels</h2>
+
+<h3>Description</h3>
+
+<p>Get value labels for the ID variables in a <code>hesim_data</code> object and create a list
+of named vectors that can be passed to formatting and plotting functions. This
+lets users create nice labels for treatment strategies, subgroups, health states,
+and/or transitions when presenting results.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">get_labels(
+  object,
+  strategy = "strategy_name",
+  grp = "grp_name",
+  state = "state_name",
+  transition = "transition_name",
+  death_label = "Death"
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>object</code></td>
+<td>
+<p>An object of class <code>hesim_data</code> created with <code>hesim_data()</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>strategy</code></td>
+<td>
+<p>The name of the column in the <code>strategy</code> element of <code>object</code>
+containing labels for <code>strategy_id</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>grp</code></td>
+<td>
+<p>The name of the column in the <code>patient</code> element of <code>object</code>
+containing labels for <code>grp_id</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>state</code></td>
+<td>
+<p>The name of the column in the <code>state</code> element of <code>object</code>
+containing labels for <code>state_id</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>transition</code></td>
+<td>
+<p>The name of the column in the <code>transition</code> element of <code>object</code>
+containing labels for <code>transition_id</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>death_label</code></td>
+<td>
+<p>The label to use for the death health state. By default a
+label named "Death" will be concatenated to the labels for the non-death health
+states. The death state can be omitted from labels for the health states by setting
+<code>death_label = NULL</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A list of named vectors containing the values and labels of
+variables. The elements of each vector are the values of a variable and the names
+are the labels. The names of the list are the names of the ID variables.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>hesim_data()</code>, <code>set_labels()</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">library("data.table")
+strategies &lt;- data.table(
+  strategy_id = c(1, 2),
+  strategy_name = c("Strategy 1", "Strategy 2")
+)
+patients &lt;- data.table(
+  patient_id = seq(1, 4),
+  age = c(50, 55, 60, 65),
+  grp_id = c(1, 1, 2, 2),
+  grp_name = rep(c("Age 50-59", "Age 60-69"), each = 2)
+)
+states &lt;- data.table(
+  state_id =  seq(1, 2),
+  state_name = c("State 1", "State 2")
+)
+hesim_dat &lt;- hesim_data(
+  strategies = strategies,
+  patients = patients,
+  states = states
+)
+labs &lt;- get_labels(hesim_dat)
+labs
+
+# Pass to set_labels()
+d &lt;- data.table(strategy_id = c(1, 1, 2, 2),
+                grp_id = c(1, 2, 1, 2))
+set_labels(d, labs, new_name = c("strategy_name", "grp_name"))
+d
+</code></pre>
+
+
+</div>

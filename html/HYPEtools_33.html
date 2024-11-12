@@ -1,0 +1,119 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>ExtractStats</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Extract statistics from time series</h2>
+
+<h3>Description</h3>
+
+<p>Calculate aggregated statistics from long-term time series, typically imported HYPE time output files.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">ExtractStats(
+  x,
+  start.mon = 1,
+  aggperiod = c("year", "season1", "season2", "month"),
+  timestep = attr(x, "timestep"),
+  subid = attr(x, "subid"),
+  FUN,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>Data frame, with column-wise equally-spaced time series. Date-times in <code>POSIXct</code> format in first column.
+Typically an imported time output file from HYPE.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>start.mon</code></td>
+<td>
+<p>Integer between 1 and 12, starting month of the hydrological year.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>aggperiod</code></td>
+<td>
+<p>Character string, timestep for aggregated results. One of <code>"year"</code> for annual statistics,
+<code>"season1"</code> (winter/summer half-years), <code>"season2"</code> (4 seasons), or <code>"month"</code>. See details.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>timestep</code></td>
+<td>
+<p>Character string, timestep of data in <code>x</code>. Attribute <code>timestep</code> in <code>x</code> per default.
+Otherwise one of <code>"month"</code> (not allowed with <code>aggperiod = "month"</code>), <code>"week"</code>, <code>"day"</code>, or
+<code>"nhour"</code> (n = number of hours).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>subid</code></td>
+<td>
+<p>Integer, a vector of HYPE subbasin IDs for data in <code>x</code>. Attribute <code>subid</code> in <code>x</code> per default.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>FUN</code></td>
+<td>
+<p>A function to compute for each <code>aggperiod</code> in <code>x</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Optional arguments to <code>FUN</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p><code>ExtractStats</code> uses <code>aggregate</code> to calculate statistics for all data columns provided in <code>x</code>. Argument
+<code>start.mon</code> allows to define the start of the hydrological year. Hydrological seasons begin with winter (season1) or
+autumn (season2).
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>ExtractStats</code> returns a dataframe with starting dates for each aggregation period in the first column, and a descriptive
+aggregation period name in the second. Remaining columns contain aggregated results as ordered in <code>x</code>. Additional attributes
+<code>subid</code> with subbasin IDs, <code>timestep</code> with time step of the source data, and <code>period</code> with a two-element POSIXct vector
+containing start and end dates of the source data.
+</p>
+
+
+<h3>Note</h3>
+
+<p>If <code>FUN</code> returns several values per aggregation period, these are returned in nested columns in the resulting dataframe. See
+<code>Value</code> section for <code>aggregate</code> and example code below.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Import example data
+te1 &lt;- ReadTimeOutput(filename = system.file("demo_model", "results",
+"timeCOUT.txt", package = "HYPEtools"), dt.format = "%Y-%m")
+# Extract maxima
+ExtractStats(x = te1, start.mon = 1, FUN = max)
+# Multiple result stats: Extract min, mean, and max in one go:
+te2 &lt;- ExtractStats(x = te1, start.mon = 1,
+FUN = function(x) {c(min(x), mean(x), max(x))})
+# extract mean from resulting nested dataframe:
+data.frame(te2[, 1:2], sapply(te2[, -c(1:2)], function(x){x[, 2]}))
+
+</code></pre>
+
+
+</div>

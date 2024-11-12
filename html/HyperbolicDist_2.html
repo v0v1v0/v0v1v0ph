@@ -1,0 +1,120 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>Bessel K Ratio</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Ratio of Bessel K Functions</h2>
+
+<h3>Description</h3>
+
+<p>Calculates the ratio of Bessel K functions of different orders
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">besselRatio(x, nu, orderDiff, useExpScaled = 700)
+
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>Numeric, <code class="reqn">\geq 0</code>. Value at which the numerator and
+denominator Bessel functions are evaluated.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nu</code></td>
+<td>
+<p>Numeric. The order of the Bessel function in the
+denominator.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>orderDiff</code></td>
+<td>
+<p>Numeric. The order of the numerator Bessel function
+minus the order of the denominator Bessel function.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>useExpScaled</code></td>
+<td>
+<p>Numeric, <code class="reqn">\geq 0</code>. The smallest value of
+<code class="reqn">x</code> for which the ratio is calculated using the
+exponentially-scaled Bessel function values.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Uses the function <code>besselK</code> to calculate the ratio of two
+modified Bessel function of the third kind whose orders are
+different. The calculation of Bessel functions will underflow if the
+value of <code class="reqn">x</code> is greater than around 740. To avoid underflow the
+exponentially-scaled Bessel functions can be returned by
+<code>besselK</code>. The ratio is actually unaffected by exponential
+scaling since the scaling cancels across numerator and denominator.
+</p>
+<p>The Bessel function ratio is useful in calculating moments of the
+Generalized Inverse Gaussian distribution, and hence also for the
+moments of the hyperbolic and generalized hyperbolic distributions.
+</p>
+
+
+<h3>Value</h3>
+
+<p>The ratio
+</p>
+<p style="text-align: center;"><code class="reqn">\frac{K_{\nu+k}(x)}{K_{\nu}(x)}</code>
+</p>
+
+<p>of two modified Bessel functions of the third kind whose orders differ
+by <code class="reqn">k</code>.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>David Scott <a href="mailto:d.scott@auckland.ac.nz">d.scott@auckland.ac.nz</a></p>
+
+
+<h3>See Also</h3>
+
+<p><code>besselK</code>, <code>gigMom</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">nus &lt;- c(0:5, 10, 20)
+x &lt;- seq(1, 4, length.out = 11)
+k &lt;- 3
+
+raw &lt;- matrix(nrow = length(nus), ncol = length(x))
+scaled &lt;- matrix(nrow = length(nus), ncol = length(x))
+compare &lt;- matrix(nrow = length(nus), ncol = length(x))
+
+for (i in 1:length(nus)){
+    for (j in 1:length(x)) {
+        raw[i,j] &lt;- besselRatio(x[j], nus[i],
+                                orderDiff = k)
+        scaled[i,j] &lt;- besselRatio(x[j], nus[i],
+                                orderDiff = k, useExpScaled = 1)
+        compare[i,j] &lt;- raw[i,j]/scaled[i,j]
+    }
+}
+raw
+scaled
+compare
+
+</code></pre>
+
+
+</div>

@@ -1,0 +1,176 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>genDataPreprocess</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Pre-processing of the genetic data</h2>
+
+<h3>Description</h3>
+
+<p>This function prepares the data to be used in Haplin analysis
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">genDataPreprocess(
+  data.in = stop("You have to give the object to preprocess!"),
+  map.file,
+  map.header = FALSE,
+  design = "triad",
+  file.out = "data_preprocessed",
+  dir.out = ".",
+  ncpu = 1,
+  overwrite = NULL
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>data.in</code></td>
+<td>
+<p>Input data, as loaded by genDataRead or genDataLoad.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>map.file</code></td>
+<td>
+<p>Filename (with path if the file is not in current directory) of the
+.map file holding the SNP names, if available.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>map.header</code></td>
+<td>
+<p>Logical: does the map.file contain a header in the first row?
+Default: FALSE.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>design</code></td>
+<td>
+<p>The design used in the study - choose from:
+</p>
+
+<ul>
+<li> <p><em>triad</em> - (default), data includes genotypes of mother, father and child;
+</p>
+</li>
+<li> <p><em>cc</em> - classical case-control;
+</p>
+</li>
+<li> <p><em>cc.triad</em> - hybrid design: triads with cases and controls
+</p>
+</li>
+</ul>
+<p>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>file.out</code></td>
+<td>
+<p>The core name of the files that will contain the preprocessed data
+(character string); ready to load next time with genDataLoad function;
+default: "data_preprocessed".</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dir.out</code></td>
+<td>
+<p>The directory that will contain the saved data; defaults to current 
+working directory.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ncpu</code></td>
+<td>
+<p>The number of CPU cores to use - this speeds up the process for large 
+datasets significantly. Default is 1 core, maximum is 1 less than the total number
+of cores available on a current machine (even if the number given by the user is
+more than that).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>overwrite</code></td>
+<td>
+<p>Whether to overwrite the output files: if NULL (default), will prompt
+the user to give answer; set to TRUE, will automatically overwrite any existing files;
+and set to FALSE, will stop if the output files exist.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A list object with three elements:
+</p>
+
+<ul>
+<li> <p><em>cov.data</em> - a <code>data.frame</code> with covariate data (if available in
+the input file)
+</p>
+</li>
+<li> <p><em>gen.data</em> - a list with chunks of the genetic data; the data is divided
+column-wise, using 10,000 columns per chunk; each element of this list is a
+ff matrix
+</p>
+</li>
+<li> <p><em>aux</em> - a list with meta-data and important parameters:
+</p>
+
+<ul>
+<li> <p><em>variables</em> - tabulated information of the covariate data;
+</p>
+</li>
+<li> <p><em>variables.nas</em> - how many NA values per each column of covariate data;
+</p>
+</li>
+<li> <p><em>alleles</em> - all the possible alleles in each marker;
+</p>
+</li>
+<li> <p><em>alleles.nas</em> - how many NA values in each marker;
+</p>
+</li>
+<li> <p><em>nrows.with.missing</em> - how many rows contain any missing allele information;
+</p>
+</li>
+<li> <p><em>which.rows.with.missing</em> - vector of indices of rows with missing data (if any)
+</p>
+</li>
+</ul>
+<p>.
+</p>
+</li>
+</ul>
+<h3>Details</h3>
+
+<p>The .map file should contain at least two columns, where the second one contains SNP 
+names. Any additional columns should be separated by a whitespace character, but will 
+be ignored. The file should contain a header.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">  # The argument 'overwrite' is set to TRUE!
+  # First, read the data:
+  examples.dir &lt;- system.file( "extdata", package = "Haplin" )
+  example.file &lt;- file.path( examples.dir, "exmpl_data.ped" )
+  ped.data.read &lt;- genDataRead( example.file, file.out = "exmpl_ped_data", 
+   dir.out = tempdir( check = TRUE ), format = "ped", overwrite = TRUE )
+  ped.data.read
+  # Take only part of the data (if needed)
+  ped.data.part &lt;- genDataGetPart( ped.data.read, design = "triad", markers = 10:12,
+   dir.out = tempdir( check = TRUE ), file.out = "exmpl_ped_data_part", overwrite = TRUE )
+  # Preprocess as "triad" data:
+  ped.data.preproc &lt;- genDataPreprocess( ped.data.part, design = "triad",
+   dir.out = tempdir( check = TRUE ), file.out = "exmpl_data_preproc", overwrite = TRUE )
+  ped.data.preproc
+
+</code></pre>
+
+
+</div>

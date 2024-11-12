@@ -1,0 +1,102 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>eventMaxima</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Event identification (using local maxima as a basis)</h2>
+
+<h3>Description</h3>
+
+<p>Events are identified on the basis of local maxima with an "event" considered to have
+occurred if the maxima is above a tolerable threshold of the neighbouring troughs/valleys.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">eventMaxima(
+  data,
+  delta.y = 200,
+  delta.x = 1,
+  threshold = -1,
+  out.style = "summary"
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>The data vector</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>delta.y</code></td>
+<td>
+<p>Minimum allowable difference from a peak to a trough</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>delta.x</code></td>
+<td>
+<p>Minimum spacing between peaks</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>threshold</code></td>
+<td>
+<p>Value above which an event is considered to have occurred</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>out.style</code></td>
+<td>
+<p>The type of output (currently either "summary" or "none")</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>If <code>delta.y</code> is negative it is applied a fractional decrease from the peak, otherwise it is
+treated as an absolute value. The <code>threshold</code> is applied after the event separation meaning that if a trough
+goes below the threshold but was originally considered one event it will continue to be considered one event.
+This makes this method distinct from the peaks over threshold algorithm in <code>eventPOT</code>. The <code>threshold</code>
+here should be thought of as a filter to remove trace amounts that are not part of an event rather than event separation
+metric.
+</p>
+
+
+<h3>Value</h3>
+
+<p>By default, the <code>out.style</code> returns the indices of the maximum in each event, as well as the value of
+the maximum and the sum of the <code>data</code> in each event, alongside the start and end of the events. Otherwise just
+the indices of start and end of events as a two column dataframe are returned.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>calcStats</code> <code>eventBaseflow</code> <code>eventMaxima</code> <code>eventPOT</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Example extracting events from quickflow
+bf = baseflowB(dataBassRiver, alpha = 0.925)
+qf = dataBassRiver - bf$bf
+events = eventMaxima(qf, delta.y = 200, delta.x = 1, threshold = 0)
+print(events)
+plotEvents(qf, dates = NULL, events = events, type = "lineover", main = "")
+# Other examples to try
+# delta.y = 200; delta.x = 1 # 5 events identified
+# delta.y = 500; delta.x = 1 # 3 events identified
+# delta.y = 10;  delta.x = 7 # 2 events identified
+</code></pre>
+
+
+</div>

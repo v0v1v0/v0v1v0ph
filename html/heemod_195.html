@@ -1,0 +1,119 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>run_dsa</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Run Sensitivity Analysis</h2>
+
+<h3>Description</h3>
+
+<p>Run Sensitivity Analysis
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">run_dsa(model, dsa)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>model</code></td>
+<td>
+<p>An evaluated Markov model.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dsa</code></td>
+<td>
+<p>An object returned by
+<code>define_dsa()</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A <code>data.frame</code> with one row per model and
+parameter value.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">param &lt;- define_parameters(
+  p1 = .5,
+  p2 = .2,
+  r = .05
+)
+mod1 &lt;- define_strategy(
+  transition = define_transition(
+    C, p1,
+    p2, C
+  ),
+  define_state(
+    cost = discount(543, r),
+    ly = 1
+  ),
+  define_state(
+    cost = discount(432, r),
+    ly = .5
+  )
+)
+
+mod2 &lt;- define_strategy(
+  transition = define_transition(
+    C, p1,
+    p2, C
+  ),
+  define_state(
+    cost = 789,
+    ly = 1
+  ),
+  define_state(
+    cost = 456,
+    ly = .8
+  )
+)
+
+res2 &lt;- run_model(
+  mod1, mod2,
+  parameters = param,
+  init = c(100, 0),
+  cycles = 10,
+  cost = cost,
+  effect = ly
+)
+
+ds &lt;- define_dsa(
+  p1, .1, .9,
+  p2, .1, .3,
+  r, .05, .1
+)
+print(ds)
+
+
+
+#'\dontrun{
+#'x &lt;- run_dsa(res2, ds)
+#'plot(x, value = "cost")
+#'}
+#'
+#'
+# can be specified as a function of other parameters
+
+
+ds2 &lt;- define_dsa(
+  p2, p1 - .1, p1 + .1
+)
+
+#'\dontrun{
+#'run_dsa(res2, ds2)
+#'}
+</code></pre>
+
+
+</div>

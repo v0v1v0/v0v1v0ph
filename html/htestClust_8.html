@@ -1,0 +1,170 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>levenetestClust</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Reweighted Levene's Test for Homogeneity of Variance in Clustered Data</h2>
+
+<h3>Description</h3>
+
+<p>Performs a reweighted test for homogeneity of marginal variances across intra-cluster groups in clustered data.
+Appropriate for clustered data with cluster- or group size informativeness.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">levenetestClust(y, ...)
+
+## Default S3 method:
+levenetestClust(y, group, id, center = c("median", "mean"), trim = NA, ...)
+
+## S3 method for class 'formula'
+levenetestClust(formula, id, data, subset, na.action, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+<p>vector of numeric responses.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>further arguments to be passed to or from methods.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>group</code></td>
+<td>
+<p>vector or factor object defining groups.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>id</code></td>
+<td>
+<p>vector or factor object denoting cluster membership for <code>y</code> responses.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>center</code></td>
+<td>
+<p>The name of a function to compute the center of each group. If <code>mean</code>, the reweighted
+group means will be used. The default <code>median</code> is the suggested measure of center, as it provides a more
+robust test.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>trim</code></td>
+<td>
+<p>optional numeric argument taking values [0, 0.5] to specify the percentage trimmed mean.
+Ignored if <code>center = median</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>formula</code></td>
+<td>
+<p>a formula of the form <code>lhs ~ rhs</code> where <code>lhs</code> is a numeric variable giving the data values and
+<code>rhs</code> a factor with two or more levels giving the corresponding groups.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>an optional matrix or data frame containing variables in the formula <code>formula</code> and <code>id</code>.
+By default the variables are taken from <code>environment(formula)</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>subset</code></td>
+<td>
+<p>an optional vector specifying a subset of observations to be used.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>na.action</code></td>
+<td>
+<p>a function which indicates what should happen when data contain <code>NA</code>s. Defaults to
+<code>getOption("na.action")</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The null hypothesis is that all levels of <code>group</code> have equal marginal variances.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A list with class "<code>htest</code>" containing the following components:
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>statistic</code></td>
+<td>
+<p>the value of the test statistic.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>p.value</code></td>
+<td>
+<p>the p-value of the test.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>parameter</code></td>
+<td>
+<p>the degrees of freedom of the chi square distribution.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+<p>a character string indicating the test performed.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>data.name</code></td>
+<td>
+<p>a character string giving the name of the data and the total number of clusters.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>M</code></td>
+<td>
+<p>the number of clusters.</p>
+</td>
+</tr>
+</table>
+<h3>References</h3>
+
+<p>Gregg, M., Marginal methods and software for clustered data with cluster- and group-size informativeness.
+PhD dissertation, University of Louisville, 2020.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(screen8)
+
+## Do boys and girls have the same variability in math scores?
+## Test using vectors
+levenetestClust(y=screen8$math, group=screen8$gender, id=screen8$sch.id)
+
+## Test using formula method
+levenetestClust(math~gender, id=sch.id, data=screen8)
+
+## Using 10% trimmed mean
+levenetestClust(math~gender, id=sch.id, data=screen8, center="mean", trim=.1)
+
+</code></pre>
+
+
+</div>

@@ -1,0 +1,123 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>req_perform_promise</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Perform request asynchronously using the promises package</h2>
+
+<h3>Description</h3>
+
+<p><a href="https://lifecycle.r-lib.org/articles/stages.html#experimental"><img src="../help/figures/lifecycle-experimental.svg" alt="[Experimental]"></a>
+</p>
+<p>This variation on <code>req_perform()</code> returns a <code>promises::promise()</code> object immediately
+and then performs the request in the background, returning program control before the request
+is finished. See the
+<a href="https://rstudio.github.io/promises/articles/promises_01_motivation.html">promises package documentation</a>
+for more details on how to work with the resulting promise object.
+</p>
+<p>Like with <code>req_perform_parallel()</code>, exercise caution when using this function;
+it's easy to pummel a server with many simultaneous requests. Also, not all servers
+can handle more than 1 request at a time, so the responses may still return
+sequentially.
+</p>
+<p><code>req_perform_promise()</code> also has similar limitations to the
+<code>req_perform_parallel()</code> function, it:
+</p>
+
+<ul>
+<li>
+<p> Will not retrieve a new OAuth token if it expires after the promised request
+is created but before it is actually requested.
+</p>
+</li>
+<li>
+<p> Does not perform throttling with <code>req_throttle()</code>.
+</p>
+</li>
+<li>
+<p> Does not attempt retries as described by <code>req_retry()</code>.
+</p>
+</li>
+<li>
+<p> Only consults the cache set by <code>req_cache()</code> when the request is promised.
+</p>
+</li>
+</ul>
+<h3>Usage</h3>
+
+<pre><code class="language-R">req_perform_promise(req, path = NULL, pool = NULL)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>req</code></td>
+<td>
+<p>A httr2 request object.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>path</code></td>
+<td>
+<p>Optionally, path to save body of the response. This is useful
+for large responses since it avoids storing the response in memory.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pool</code></td>
+<td>
+<p>Optionally, a curl pool made by <code>curl::new_pool()</code>. Supply
+this if you want to override the defaults for total concurrent connections
+(100) or concurrent connections per host (6).</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>a <code>promises::promise()</code> object which resolves to a response if
+successful or rejects on the same errors thrown by <code>req_perform()</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+library(promises)
+request_base &lt;- request(example_url()) |&gt; req_url_path_append("delay")
+
+p &lt;- request_base |&gt; req_url_path_append(2) |&gt; req_perform_promise()
+
+# A promise object, not particularly useful on its own
+p
+
+# Use promise chaining functions to access results
+p %...&gt;%
+  resp_body_json() %...&gt;%
+  print()
+
+
+# Can run two requests at the same time
+p1 &lt;- request_base |&gt; req_url_path_append(2) |&gt; req_perform_promise()
+p2 &lt;- request_base |&gt; req_url_path_append(1) |&gt; req_perform_promise()
+
+p1 %...&gt;%
+  resp_url_path %...&gt;%
+  paste0(., " finished") %...&gt;%
+  print()
+
+p2 %...&gt;%
+  resp_url_path %...&gt;%
+  paste0(., " finished") %...&gt;%
+  print()
+
+# See the [promises package documentation](https://rstudio.github.io/promises/)
+# for more information on working with promises
+
+## End(Not run)
+</code></pre>
+
+
+</div>

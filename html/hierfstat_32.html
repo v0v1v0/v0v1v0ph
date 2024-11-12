@@ -1,0 +1,199 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>basic.stats</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Basic diversity and differentiation statistics</h2>
+
+<h3>Description</h3>
+
+<p>Estimates individual counts, allelic frequencies, observed heterozygosities and genetic diversities per locus and population.
+Also Estimates mean observed heterozygosities, mean gene diversities within population Hs, Gene diversities overall Ht and corrected Htp, and Dst, Dstp.
+Finally, estimates Fst and Fstp as well as Fis following Nei (1987) per locus and overall loci</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">basic.stats(data,diploid=TRUE,digits=4)
+
+## S3 method for class 'basic.stats'
+print(x,...)
+
+Hs(data,...)
+
+Ho(data,...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>a data frame where the first column contains the population to which the different individuals belong, and the following columns contain the genotype of the individuals -one locus per column- </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>diploid</code></td>
+<td>
+<p>Whether individuals are diploids (default) or haploids</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>digits</code></td>
+<td>
+<p>how many digits to print out in the output (default is 4)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>an object of class basic.stats</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>further arguments to pass to print.bas.stats</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>n.ind.samp</code></td>
+<td>
+<p>A table –with np (number of populations) columns and nl (number of loci) rows– of genotype counts</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pop.freq</code></td>
+<td>
+<p>A list containing allele frequencies. Each element of the list is one locus.
+For each locus, Populations are in columns and alleles in rows</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Ho</code></td>
+<td>
+<p>A table –with np (number of populations) columns and nl (number of loci) rows– of observed heterozygosities</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Hs</code></td>
+<td>
+<p>A table –with np (number of populations) columns and nl (number of loci) rows– of observed gene diversities</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Fis</code></td>
+<td>
+<p>A table –with np (number of populations) columns and nl (number of loci) rows–of observed Fis</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>perloc</code></td>
+<td>
+<p>A table –with as many rows as loci– containing basic statistics Ho, Hs, Ht, Dst, Ht', Dst', Fst, Fst' ,Fis, Dest</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>overall</code></td>
+<td>
+<p>Basic statistics averaged over loci</p>
+</td>
+</tr>
+</table>
+<h3>Note</h3>
+
+<p>For the perloc and overall tables (see value section), the following statistics, defined in eq.7.38– 7.43 pp.164–5 of Nei (1987)
+are estimated:
+</p>
+<p>The observed heterozygosity
+</p>
+<p style="text-align: center;"><code class="reqn">Ho= 1-\sum_k \sum_i  Pkii/np,</code>
+</p>
+
+<p>where <code class="reqn">Pkii</code> represents the proportion of homozygote <code class="reqn">i</code> in sample <code class="reqn">k</code> and
+<code class="reqn">np</code> the number of samples.
+</p>
+<p>The within population gene diversity (sometimes misleadingly called expected
+heterozygosity):
+</p>
+<p style="text-align: center;"><code class="reqn">Hs=\tilde{n}/(\tilde{n}-1)[1-\sum_i\bar{p_i^2}-Ho/2\tilde{n}],
+</code>
+</p>
+
+<p>where <code class="reqn">\tilde{n}=np/\sum_k 1/n_k</code> and
+<code class="reqn">\bar{p_i^2}=\sum_k p_{ki}^2/np</code>
+</p>
+<p>The overall gene diversity
+</p>
+<p style="text-align: center;"><code class="reqn">
+Ht= 1-\sum_i\bar{p_i}^2+Hs/(\tilde{n} np)-Ho/(2\tilde{n}
+np),</code>
+</p>
+
+<p>where <code class="reqn">\bar{p_i}=\sum_kp_{ki}/np</code>.
+</p>
+<p>The amount of gene diversity among samples <code class="reqn">Dst=Ht-Hs</code>
+</p>
+<p><code class="reqn">Dst'=np/(np-1)Dst</code>
+</p>
+<p><code class="reqn">Ht'=Hs+Dst'</code>
+</p>
+<p><code class="reqn">Fst=Dst/Ht</code>.(This is not the same as Nei's <code class="reqn">Gst</code>,
+Nei's <code class="reqn">Gst</code> is an estimator of <code class="reqn">Fst</code> based on allele frequencies only)
+</p>
+<p><code class="reqn">Fst'=Dst'/Ht'</code>
+</p>
+<p><code class="reqn">Fis=1-Ho/Hs</code>
+</p>
+<p>Last, <code class="reqn">Dest=np/(np-1) (Ht'-Hs)/(1-Hs)</code> a measure of population
+differentiation as defined by Jost (2008) is also given
+</p>
+<p>Here, the <code class="reqn">p_{ki}</code> are unweighted by sample size. These statistics are
+estimated for each locus and an overall loci estimates is also given, as the
+unweighted average of the per locus estimates. In this way, monomorphic loci
+are accounted for (with estimated value of 0) in the overall estimates.
+</p>
+<p>Note that the equations used here all rely on genotypic rather than allelic
+number and are corrected for heterozygosity.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Jerome Goudet <a href="mailto:jerome.goudet@unil.ch">jerome.goudet@unil.ch</a></p>
+
+
+<h3>References</h3>
+
+<p>Nei M. (1987) Molecular Evolutionary Genetics. Columbia University Press
+</p>
+<p>Jost L (2008) GST and its relatives do not measure differentiation.
+Molecular Ecology, 17, 4015-4026.
+</p>
+<p>Nei M, Chesser R (1983) Estimation of fixation indexes and gene diversities.
+Annals of Human Genetics, 47, 253-259.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>ind.count</code>,<code>pop.freq</code>.</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(gtrunchier)
+basic.stats(gtrunchier[,-1])
+Hs(gtrunchier[,-2])
+Ho(gtrunchier[,-2])
+</code></pre>
+
+
+</div>

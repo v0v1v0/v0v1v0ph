@@ -1,0 +1,296 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>SpatialScan</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Spatial scan procedure</h2>
+
+<h3>Description</h3>
+
+<p>This function computes the different scan procedures available in the package.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">SpatialScan(
+  method,
+  data,
+  sites_coord = NULL,
+  system = NULL,
+  mini = 1,
+  maxi = nrow(sites_coord)/2,
+  type_minimaxi = "sites/indiv",
+  mini_post = NULL,
+  maxi_post = NULL,
+  type_minimaxi_post = "sites/indiv",
+  sites_areas = NULL,
+  MC = 999,
+  typeI = 0.05,
+  nbCPU = 1,
+  variable_names = NULL,
+  times = NULL
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+<p>character vector. The scan procedures to apply on the data. Possible values are:
+</p>
+
+<ul>
+<li>
+<p> Univariate scan procedures: "UG" (univariate gaussian, see <code>UG</code>), "UNP" (univariate nonparametric, see <code>UNP</code>)
+</p>
+</li>
+<li>
+<p> Multivariate scan procedures: "MG" (multivariate gaussian, see <code>MG</code>), "MNP" (multivariate nonparametric, see <code>MNP</code>)
+</p>
+</li>
+<li>
+<p> Univariate functional scan procedures: "NPFSS" (nonparametric functional scan statistic, see <code>NPFSS</code>), "PFSS" (parametric functional scan statistic, see <code>PFSS</code>), "DFFSS" (distribution-free functional scan statistic, see <code>DFFSS</code>), "URBFSS" (univariate rank-based functional scan statistic, see <code>URBFSS</code>)
+</p>
+</li>
+<li>
+<p> Multivariate functional scan procedures: "NPFSS" (nonparametric functional scan statistic, see <code>NPFSS</code>), "MDFFSS" (multivariate distribution-free functional scan statistic, see <code>MDFFSS</code>), "MRBFSS" (multivariate rank-based functional scan statistic, see <code>MRBFSS</code>), "MPFSS", "MPFSS-LH", "MPFSS-W", "MPFSS-P" and "MPFSS-R" (parametric multivariate functional scan statistic ; "LH", "W", "P", "R" correspond respectively to the Lawley-Hotelling trace test statistic, The Wilks lambda test statistic, the Pillai trace test statistic and the Roy's maximum root test statistic, see <code>MPFSS</code>). Note that "MPFSS" computes "MPFSS-LH", "MPFSS-W", "MPFSS-P" and "MPFSS-R".
+</p>
+</li>
+</ul>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>list of numeric matrices or a matrix or a vector:
+</p>
+
+<ul>
+<li>
+<p> Univariate case: Vector of the data, each element corresponds to a site (or an individual if the observations are by individuals and not by sites).
+</p>
+</li>
+<li>
+<p> Multivariate case: Matrix of the data, the rows correspond to the sites (or the individuals if the observations are by individuals and not by sites) and each column represents a variable.
+</p>
+</li>
+<li>
+<p> Univariate functional case: Matrix of the data, the rows correspond to the sites (or to the individuals if the observations are by individuals and not by sites) and each column represents an observation time. The times must be the same for each site/individual. Depending on the scan procedure they also need to be equally-spaced.
+</p>
+</li>
+<li>
+<p> Multivariate functional case: List of nb_sites (or nb_individuals if the observations are by individuals and not by sites) matrices of the data, the rows correspond to the variables and each column represents an observation time. The times must be the same for each site/individual. Depending on the scan procedure they also need to be equally-spaced.
+</p>
+</li>
+</ul>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sites_coord</code></td>
+<td>
+<p>numeric matrix. Coordinates of the sites (or the individuals, in that case there can be many individuals with the same coordinates).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>system</code></td>
+<td>
+<p>character. System in which the coordinates are expressed: "Euclidean" or "WGS84".</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mini</code></td>
+<td>
+<p>numeric. A minimum for the clusters (see type_minimaxi). Changing the default value may bias the inference.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>maxi</code></td>
+<td>
+<p>numeric. A Maximum for the clusters (see type_minimaxi). Changing the default value may bias the inference.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>type_minimaxi</code></td>
+<td>
+<p>character. Type of minimum and maximum: by default "sites/indiv": the mini and maxi are on the number of sites or individuals in the potential clusters. Other possible values are "area": the minimum and maximum area of the clusters, or "radius": the minimum and maximum radius.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mini_post</code></td>
+<td>
+<p>numeric. A minimum to filter the significant clusters a posteriori (see type_minimaxi_post). The default NULL is for no filtering with a a posteriori minimum.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>maxi_post</code></td>
+<td>
+<p>numeric. A maximum to filter the significant clusters a posteriori (see type_minimaxi_post). The default NULL is for no filtering with a a posteriori maximum.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>type_minimaxi_post</code></td>
+<td>
+<p>character. Type of minimum and maximum a posteriori: by default "sites/indiv": the mini_post and maxi_post are on the number of sites or individuals in the significant clusters. Other possible values are "area": the minimum and maximum area of the clusters, or "radius": the minimum and maximum radius.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sites_areas</code></td>
+<td>
+<p>numeric vector. Areas of the sites. It must contain the same number of elements than the rows of sites_coord. If the data is on individuals and not on sites, there can be duplicated values. By default: NULL</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>MC</code></td>
+<td>
+<p>numeric. Number of Monte-Carlo permutations to evaluate the statistical significance of the clusters. By default: 999.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>typeI</code></td>
+<td>
+<p>numeric. The desired type I error. A cluster will be evaluated as significant if its associated p-value is less than typeI. By default 0.05.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nbCPU</code></td>
+<td>
+<p>numeric. Number of CPU. If nbCPU &gt; 1 parallelization is done. By default: 1. Ignored for "UG" and "UNP"</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>variable_names</code></td>
+<td>
+<p>character. Names of the variables. By default NULL. Ignored for the univariate and univariate functional scan procedures.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>times</code></td>
+<td>
+<p>numeric. Times of observation of the data. By default NULL. Ignored for the univariate and multivariate scan procedures.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A list of objects of class ResScanOutput:
+</p>
+
+<ul>
+<li>
+<p> Univariate case (UG, UNP): A list of objects of class ResScanOutputUni
+</p>
+</li>
+<li>
+<p> Multivariate case (MG, MNP): A list of objects of class ResScanOutputMulti
+</p>
+</li>
+<li>
+<p> Univariate functional case (NPFSS, PFSS, DFFSS, URBFSS): A list of objects of class ResScanOutputUniFunct
+</p>
+</li>
+<li>
+<p> Multivariate functional case (NPFSS, MPFSS, MDFFSS, MRBFSS): A list of objects of class ResScanOutputMultiFunct
+</p>
+</li>
+</ul>
+<h3>References</h3>
+
+<p>For univariate scan statistics:
+</p>
+
+<ul>
+<li>
+<p> Inkyung Jung and Ho Jin Cho (2015). A Nonparametric Spatial Scan Statistic for Continuous Data. International Journal of Health Geographics, 14.
+</p>
+</li>
+<li>
+<p> Martin Kulldorff and Lan Huang and Kevin Konty (2009). A Scan Statistic for Continuous Data Based on the Normal Probability Model. International Journal of Health Geographics, 8 (58).
+</p>
+</li>
+</ul>
+<p>For multivariate scan statistics:
+</p>
+
+<ul>
+<li>
+<p> Lionel Cucala and Michaël Genin and Florent Occelli and Julien Soula (2019). A Multivariate Nonparametric Scan Statistic for Spatial Data. Spatial statistics, 29, 1-14.
+</p>
+</li>
+<li>
+<p> Lionel Cucala and Michaël Genin and Caroline Lanier and Florent Occelli (2017). A Multivariate Gaussian Scan Statistic for Spatial Data. Spatial Statistics, 21, 66-74.
+</p>
+</li>
+</ul>
+<p>For functional scan statistics:
+</p>
+
+<ul>
+<li>
+<p> Zaineb Smida and Lionel Cucala and Ali Gannoun. A Nonparametric Spatial Scan Statistic for Functional Data. Pre-print &lt;https://hal.archives-ouvertes.fr/hal-02908496&gt;.
+</p>
+</li>
+<li>
+<p> Camille Frévent and Mohamed-Salem Ahmed and Matthieu Marbac and Michaël Genin. Detecting Spatial Clusters in Functional Data: New Scan Statistic Approaches. Pre-print &lt;arXiv:2011.03482&gt;.
+</p>
+</li>
+<li>
+<p> Camille Frévent and Mohamed-Salem Ahmed and Sophie Dabo-Niang and Michaël Genin. Investigating Spatial Scan Statistics for Multivariate Functional Data. Pre-print &lt;arXiv:2103.14401&gt;.
+</p>
+</li>
+</ul>
+<h3>See Also</h3>
+
+<p><code>ResScanOutput</code>, <code>ResScanOutputUni</code>, <code>ResScanOutputMulti</code>, <code>ResScanOutputUniFunct</code> and <code>ResScanOutputMultiFunct</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Univariate scan statistics
+
+library(sp)
+data("map_sites")
+data("multi_data")
+uni_data &lt;- multi_data[,1]
+coords &lt;- coordinates(map_sites)
+res &lt;- SpatialScan(method = c("UG", "UNP"), data = uni_data, sites_coord = coords,
+system = "WGS84", mini = 1, maxi = nrow(coords)/2)
+
+# Multivariate scan statistics
+
+library(sp)
+data("map_sites")
+data("multi_data")
+coords &lt;- coordinates(map_sites)
+res &lt;- SpatialScan(method = c("MG", "MNP"), data = multi_data, sites_coord = coords,
+system = "WGS84", mini = 1, maxi = nrow(coords)/2)
+
+# Univariate functional scan statistics
+
+library(sp)
+data("map_sites")
+data("funi_data")
+coords &lt;- coordinates(map_sites)
+res &lt;- SpatialScan(method = c("NPFSS", "PFSS", "DFFSS", "URBFSS"), data = funi_data,
+sites_coord = coords, system = "WGS84", mini = 1, maxi = nrow(coords)/2)
+
+# Multivariate functional
+
+library(sp)
+data("map_sites")
+data("fmulti_data")
+coords &lt;- coordinates(map_sites)
+res &lt;- SpatialScan(method = c("NPFSS", "MPFSS", "MDFFSS", "MRBFSS"), data = fmulti_data,
+sites_coord = coords, system = "WGS84", mini = 1, maxi = nrow(coords)/2)
+
+
+
+</code></pre>
+
+
+</div>

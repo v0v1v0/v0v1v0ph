@@ -1,0 +1,104 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>fSAE.Area</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Compute small area estimates based on the basic area-level model.</h2>
+
+<h3>Description</h3>
+
+<p>This function returns small area estimates based on the basic area-level model, also known as the Fay-Herriot model.
+It calls <code>fSAE.Unit</code> to carry out the computations.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">fSAE.Area(est.init, var.init, X, x, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>est.init</code></td>
+<td>
+<p>m-vector of initial estimates, where m is the number of in-sample areas.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>var.init</code></td>
+<td>
+<p>m-vector of corresponding variance estimates.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>X</code></td>
+<td>
+<p>M x p matrix of area-level covariates (typically population means), where M is the number of areas for which estimates are computed.
+If missing, a column vector of ones of the same length as <code>est.init</code> is used, corresponding to a model with an intercept only.
+The M areas may or may not equal the m areas for which initial estimates are provided. For example, estimates
+for out-of-sample areas, for which no initial estimates are available, are computed as long as the corresponding
+rows of auxiliary means are in <code>X</code>. It is also possible to compute estimates only for a subset of sample areas,
+see the help for argument <code>x</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>an optional m x p matrix with auxiliary area-level covariates to be used for fitting the model,
+where the rows correspond to the components of <code>est.init</code>.
+If the M areas corresponding to the rows of <code>X</code> do not contain all m areas corresponding to
+<code>est.init</code>, <code>x</code> must be provided separately in order to be able to fit the model.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>additional arguments passed to <code>fSAE.Unit</code>. For example, passing
+an M-vector <code>Narea</code> with area population sizes (along with the matrix <code>X</code> of
+population means) allows to compute aggregates of the small area estimates. See the
+documentation of function <code>fSAE.Unit</code> for a description of other possible arguments.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>An object of class <code>sae</code> containing the small area estimates and MSEs, the model fit, and model selection measures.
+</p>
+
+
+<h3>References</h3>
+
+<p>R.E. Fay and R.A. Herriot (1979). Estimates of Income for Small Places: An Application of James-Stein Procedures to Census Data.
+Journal of the American Statistical Association 74(366), 269-277.
+</p>
+<p>J.N.K. Rao and I. Molina (2015). Small Area Estimation. Wiley.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>sae-class</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">d &lt;- generateFakeData()
+
+# first compute input estimates without "borrowing strength" over areas
+sae0 &lt;- fSAE(y0 ~ x + area2, data=d$sam, area="area", popdata=d$Xpop,
+             type="direct", keep.data=TRUE)
+
+# compute small area estimates based on the basic area-level model
+#   using the above survey regression estimates as input
+sae &lt;- fSAE.Area(EST(sae0), MSE(sae0), X=sae0$Xp)
+EST(sae)  # estimates
+RMSE(sae)  # standard errors
+</code></pre>
+
+
+</div>

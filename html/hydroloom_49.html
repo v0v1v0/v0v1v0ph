@@ -1,0 +1,78 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>make_attribute_topology</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Make Attribute Topology</h2>
+
+<h3>Description</h3>
+
+<p>given a set of lines with starting and ending nodes that
+form a geometric network, construct an attribute topology.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">make_attribute_topology(x, min_distance)
+
+## S3 method for class 'data.frame'
+make_attribute_topology(x, min_distance)
+
+## S3 method for class 'hy'
+make_attribute_topology(x, min_distance)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>data.frame network compatible with hydroloom_names.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>min_distance</code></td>
+<td>
+<p>numeric distance in units compatible with the units of
+the projection of <code>lines</code>. If no nodes are found within this distance, no
+connection will be returned.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>If a <code>future</code> plan is set up, node distance calculations will be
+applied using future workers.
+</p>
+
+
+<h3>Value</h3>
+
+<p>data.frame with id and toid
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+x &lt;- sf::read_sf(system.file("extdata/new_hope.gpkg", package = "hydroloom"))
+
+y &lt;- dplyr::select(x, COMID)
+
+y &lt;- sf::st_transform(y, 5070)
+
+z &lt;- make_attribute_topology(y, 10)
+
+x &lt;- add_toids(hy(x), return_dendritic = FALSE)
+
+x[x$id == x$id[1],]$toid
+z[z$COMID == x$id[1],]$toid
+
+</code></pre>
+
+
+</div>

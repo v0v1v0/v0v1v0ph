@@ -1,0 +1,92 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>residuals</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Residuals of a Hawkes process</h2>
+
+<h3>Description</h3>
+
+<p>Outputs the residuals (values of the compensator at the times of arrival) of a Hawkes process.
+Useful function for diagnosis through the random time change theorem: the residuals should follow
+a unit rate Poisson process.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">residuals(x, fun = NULL, repr = NULL, family = NULL, M = NULL, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>A non-negative numeric vector, sorted in ascending order; or an object of class "hawkes" output by function <code>hawkes</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fun</code></td>
+<td>
+<p>(default = TRUE) A non-negative numeric function or value - intensity (function) of the immigrant process.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>repr</code></td>
+<td>
+<p>(default = NULL) A non-negative numeric value - mean number of offsprings.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>family</code></td>
+<td>
+<p>(default = NULL) A character string "name" naming a distribution with corresponding distribution function <code>dname</code>, or directly the distribution function.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>M</code></td>
+<td>
+<p>(default = NULL) A non-negative numeric value - upper bound on <code>fun</code>(ignored if <code>fun</code> is a numeric value).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Additional arguments passed on to the random generation function <code>dname</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>The residuals of the process.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Simulate an exponential Hawkes process with baseline intensity 1,
+# reproduction mean 0.5 and exponential fertility distribution with rate 2.
+x &lt;- hawkes(10, fun=1, repr=0.5, family="exp", rate=2)
+resid = residuals(x)
+resid
+plot(resid)
+abline(0, 1, col="red", lty="dashed")
+# Residuals with a different set of parameters
+residuals(x, repr=0.8, rate=3)
+# Residuals with a different distribution function
+residuals(x, family="chisq", df=2)
+# Simulate a Hawkes process with baseline intensity function 1 + sin(x),
+# reproduction mean 0.5 and custom [0,1]-triangular fertility function.
+x &lt;- hawkes(10, fun=function(y) {1+sin(y)}, M=2, repr=0.5,
+            family=function(n) {1 - sqrt(1 - runif(n))})
+resid = residuals(x, family=function(y) ifelse(y&gt;0 &amp; y&lt;1, 2-2*y, 0))
+plot(resid)
+abline(0, 1, col="red", lty="dashed")
+</code></pre>
+
+
+</div>

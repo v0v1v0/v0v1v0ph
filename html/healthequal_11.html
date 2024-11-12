@@ -1,0 +1,149 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>mdmu</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Mean difference from mean (unweighted) (MDMU)</h2>
+
+<h3>Description</h3>
+
+<p>The Mean Difference from Mean (MDM) is an absolute measure of inequality
+that shows the mean difference between each subgroup and the setting
+average. For the unweighted version (MDMU), all subgroups are weighted
+equally.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">mdmu(
+  pop = NULL,
+  est,
+  se = NULL,
+  scaleval,
+  setting_average = NULL,
+  sim = NULL,
+  seed = 123456,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>pop</code></td>
+<td>
+<p>The number of people within each subgroup.
+Population size must be available for all subgroups.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>est</code></td>
+<td>
+<p>The subgroup estimate.
+Estimates must be available for all subgroups.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>se</code></td>
+<td>
+<p>The standard error of the subgroup estimate.
+If this is missing, 95% confidence intervals of MDMU cannot be calculated.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>scaleval</code></td>
+<td>
+<p>The scale of the indicator. For example, the
+scale of an indicator measured as a percentage is 100. The
+scale of an indicator measured as a rate per 1000 population is 1000.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>setting_average</code></td>
+<td>
+<p>The reported setting average. Setting average must
+be unique for each setting, year, indicator combination.
+If population is not specified for all subgroups, the setting average is
+used.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sim</code></td>
+<td>
+<p>The number of simulations to estimate 95% confidence intervals</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>seed</code></td>
+<td>
+<p>The random number generator (RNG) state for the 95% confidence
+interval simulation</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Further arguments passed to or from other methods.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The unweighted version (MDMU) is calculated as the sum of the absolute
+differences between the subgroup estimates  and the setting average, divided
+by the number of subgroups. For more information on this inequality measure
+see Schlotheuber, A., &amp; Hosseinpoor, A. R. (2022) below.
+</p>
+<p>95% confidence intervals are calculated using a methodology of simulated
+estimates. The dataset is simulated a large number of times (e.g., 100)
+and MDMU is calculated for each of the simulated samples. The 95%
+confidence intervals are based on the 2.5th and 97.5th percentiles of the
+MDMU results.
+</p>
+<p><strong>Interpretation:</strong> MDMU only has positive values, with larger values
+indicating higher levels of inequality. MDMU is zero if there is no
+inequality.
+</p>
+<p><strong>Type of summary measure:</strong> Complex; absolute; non-weighted
+</p>
+<p><strong>Applicability:</strong> Non-ordered; more than two subgroups
+</p>
+
+
+<h3>Value</h3>
+
+<p>The estimated MDMU value, corresponding estimated standard error,
+and confidence interval as a <code>data.frame</code>.
+</p>
+
+
+<h3>References</h3>
+
+<p>Schlotheuber, A., &amp; Hosseinpoor, A. R. (2022).
+Summary measures of health inequality: A review of existing
+measures and their application. International Journal of
+Environmental Research and Public Health, 19 (6), 3697.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># example code
+data(NonorderedSample)
+head(NonorderedSample)
+with(NonorderedSample,
+     mdmu(pop = population,
+          est = estimate,
+          se = se,
+          scaleval = indicator_scale,
+          setting_average
+         )
+     )
+</code></pre>
+
+
+</div>

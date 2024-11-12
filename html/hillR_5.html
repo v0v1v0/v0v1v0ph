@@ -1,0 +1,142 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hill_func_parti_pairwise</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Pairwise comparisons for all sites.</h2>
+
+<h3>Description</h3>
+
+<p>Calculate pairwise functional gamma, alpha, and beta diversity for communities, as
+well as site similarity. It is based on <code>hill_func_parti</code>.
+If comm has &gt;2 sites, this function will give results for all pairwise comparisons.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hill_func_parti_pairwise(
+  comm,
+  traits,
+  traits_as_is = FALSE,
+  q = 0,
+  rel_then_pool = TRUE,
+  output = c("data.frame", "matrix"),
+  pairs = c("unique", "full"),
+  .progress = TRUE,
+  show_warning = TRUE,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>comm</code></td>
+<td>
+<p>A data frame of vegetation data. Sites as rows, species as columns.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>traits</code></td>
+<td>
+<p>A data frame of species functional traits data. Species as rows, traits as columns.
+It can include both continuous and categorical data. It will be transformed into a distance
+matrix using 'FD::gowdis(traits)'. If all traits are numeric, then it will use Euclidean distance.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>traits_as_is</code></td>
+<td>
+<p>if <code>FALSE</code> (default) traits data frame will be transformed into a distance
+matrix. Otherwise, will use as is (i.e. traits is a symmetric distance matrix).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>q</code></td>
+<td>
+<p>Hill number, <code>q</code> = 0 (default) to get species richness,
+<code>q</code> = 1 to get shannon entropy, <code>q</code> = 2 will give inverse Simpson.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rel_then_pool</code></td>
+<td>
+<p>default is <code>TRUE.</code> Abundance of species are first changed to relative abundance within sites,
+then pooled into one assemblage. If <code>FALSE</code>, sites are pooled first, then change abundance of species
+to relative abundance.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>output</code></td>
+<td>
+<p>output type: data.frame (default) or matrix. If matrix, then this function will return a list of matrices.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pairs</code></td>
+<td>
+<p>full or unique (default). Do you want to compare all possible pairs (i.e. n^2) or just unique pairs (i.e. <code>choose(n, 2))</code>?</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.progress</code></td>
+<td>
+<p>Whether to show progress bar. Default is 'TRUE'.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>show_warning</code></td>
+<td>
+<p>whether to print warning, default is <code>TRUE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>additional arguments for <code>hill_func_parti</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>a data frame with results for all pairwise comparisons.
+</p>
+
+
+<h3>References</h3>
+
+<p>Chao, Anne, Chun-Huo Chiu, and Lou Jost. Unifying Species Diversity, Phylogenetic Diversity, Functional Diversity, and Related Similarity and Differentiation Measures Through Hill Numbers. Annual Review of Ecology, Evolution, and Systematics 45, no. 1 (2014): 297–324. &lt;doi:10.1146/annurev-ecolsys-120213-091540&gt;.
+</p>
+<p>Chiu, Chun-Huo, and Anne Chao. Distance-Based Functional Diversity Measures and Their Decomposition: A Framework Based on Hill Numbers. PLoS ONE 9, no. 7 (July 7, 2014): e100014. &lt;doi:10.1371/journal.pone.0100014&gt;.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>hill_func_parti</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+dummy = FD::dummy
+hill_func_parti_pairwise(comm = dummy$abun, traits = dummy$trait, q = 0)
+hill_func_parti_pairwise(comm = dummy$abun, traits = dummy$trait, q = 0,
+                         output = 'matrix')
+hill_func_parti_pairwise(comm = dummy$abun, traits = dummy$trait, q = 0,
+                         output = 'matrix', pairs = 'full')
+hill_func_parti_pairwise(comm = dummy$abun, traits = dummy$trait, q = 1)
+hill_func_parti_pairwise(comm = dummy$abun, traits = dummy$trait, q = 0.9999)
+hill_func_parti_pairwise(comm = dummy$abun, traits = dummy$trait, q = 2)
+hill_func_parti_pairwise(comm = dummy$abun, traits = dummy$trait, q = 3)
+
+## End(Not run)
+</code></pre>
+
+
+</div>

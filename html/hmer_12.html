@@ -1,0 +1,138 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>directional_proposal</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Emulated Derivative Point Proposal</h2>
+
+<h3>Description</h3>
+
+<p>Proposes a new point by applying ‘emulated gradient descent’ on an existing point.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">directional_proposal(
+  ems,
+  x,
+  targets,
+  accept = 2,
+  hstart = 1e-04,
+  hcutoff = 1e-09,
+  iteration.measure = "exp",
+  iteration.steps = 100,
+  nv = 500
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>ems</code></td>
+<td>
+<p>The emulators to evaluate with respect to.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>The original point.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>targets</code></td>
+<td>
+<p>The list of emulator targets.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>accept</code></td>
+<td>
+<p>The implausibility below which we allow an output to worsen.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>hstart</code></td>
+<td>
+<p>The initial step size.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>hcutoff</code></td>
+<td>
+<p>The minimum allowed step size.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>iteration.measure</code></td>
+<td>
+<p>Either ‘exp’ for expectation or ‘imp’ for implausibility.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>iteration.steps</code></td>
+<td>
+<p>The number of allowed iterations.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nv</code></td>
+<td>
+<p>The number of directions on the n-sphere to try.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Given a point (preferably close to the implausibility boundary) <code>x</code>, we can calculate
+the emulated gradient at this point for each emulator. If the estimate of the expectation
+at this point for a given emulator is larger than the target value, then we would like to
+move in the direction of greatest decrease for this emulator, and conversely for an estimate
+of the expectation that's smaller than the target value. The combination of this information
+for every emulator under consideration defines a preferred set of directions of travel from
+this point.
+</p>
+<p>We may try to find a shared direction which improves (or at least does not worsen) all
+emulator evaluations. If a point is already well inside the implausibility boundary for a given
+output (where ‘well inside’ is defined by the value of <code>accept</code>), we may allow this
+output to worsen in order to improve the others.
+</p>
+<p>Provided a shared direction, v, can be identified, we iteratively move in this direction. Define
+the new proposed point x' = x + h*v, where h is a step-size given by <code>hstart</code>. Compare
+the summary statistic (either expectational difference or implausibility) to that provided by
+the original point; if the new point gives improvement, then continue to move in this direction
+until no further improvement is possible for this step-size. The step-size is reduced (up to
+a minimum of <code>hcutoff</code>) and the process is repeated. Only finitely many iteration steps
+are permitted; this can be tuned by supplying a value of <code>iteration.steps</code>.
+</p>
+
+
+<h3>Value</h3>
+
+<p>Either a new proposal point, or the original point if an improvement could not be found.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"> # Take a point from the SIR system at later waves with low (but &gt;3) implausibility
+ start_point &lt;- SIRMultiWaveData[[2]][90,1:3]
+ ems &lt;- SIRMultiWaveEmulators[[3]]
+ targs &lt;- SIREmulators$targets
+ # Using expected error as measure
+ new_point1 &lt;- directional_proposal(ems, start_point, targs, iteration.steps = 50,
+  nv = 100)
+ # Using implausibility as measure
+ new_point2 &lt;- directional_proposal(ems, start_point, targs, iteration.measure = 'imp',
+  iteration.steps = 50, nv = 100)
+ all_points &lt;- do.call('rbind.data.frame', list(start_point, new_point1, new_point2))
+ nth_implausible(ems, all_points, targs)
+
+</code></pre>
+
+
+</div>

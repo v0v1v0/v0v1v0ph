@@ -1,0 +1,173 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>sab</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+"Shake and Bake" sampler
+</h2>
+
+<h3>Description</h3>
+
+<p>The "Shake and Bake" method generates a Markov Chain whose stable state converges on the uniform distribution over the boundary of a convex polytope defined by a set of linear constraints.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">sab(x0, i0, constr, N, thin=1, homogeneous=FALSE, transform=NULL)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x0</code></td>
+<td>
+<p>Starting point (must be in the polytope)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>i0</code></td>
+<td>
+<p>Index of the closest face to the starting point</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>constr</code></td>
+<td>
+<p>Constraint definition (see details)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>N</code></td>
+<td>
+<p>Number of iterations to run</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>thin</code></td>
+<td>
+<p>Thinning factor (keep every 'thin'-th sample)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>homogeneous</code></td>
+<td>
+<p>Whether x0, constr and transform are given in homogeneous coordinate representation (see details)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>transform</code></td>
+<td>
+<p>Transformation matrix to apply to the generated samples (optional)</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The constraints, starting point and transformation matrix can be given in homogeneous coordinate representation (an extra component is added to each vector, equal to 1.0).
+This enables affine transformations (such as translation) to be applied to the coordinate vectors by the constraint and transformation matrices.
+Be aware that while non-affine (perspective) transformations are also possible, they will not in general preserve uniformity of the generated samples.
+</p>
+<p>Constraints are given as a list(constr=A, rhs=b, dir=d), where d should contain only "&lt;=".
+See <code>shakeandbake</code> for a "Shake and Bake" sampler that also supports equality constraints.
+The constraints define the polytope as usual for linear programming: <code class="reqn">Ax \leq b</code>.
+In particular, it must be true that <code class="reqn">A x_0 \leq b</code>.
+Points are generated from the boundary of the polytope (where equality holds for one of the constraints), using the "running" shake and bake sampler, which samples the direction vector so that every move point is accepted (Boender et al. 1991).
+</p>
+
+
+<h3>Value</h3>
+
+<p>A list, containing:
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>samples</code></td>
+<td>
+<p>A matrix containing the generated samples as rows.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>faces</code></td>
+<td>
+<p>A vector containing the indices of the faces on which the samples lie.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>xN</code></td>
+<td>
+<p>The last generated sample, untransformed. Can be used as the starting point for a continuation of the chain.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>iN</code></td>
+<td>
+<p>Face on which the last generated sample lies.</p>
+</td>
+</tr>
+</table>
+<h3>Note</h3>
+
+<p>"Shake and Bake" is a Markov Chain Monte Carlo (MCMC) method, so generated samples form a correlated time series.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Gert van Valkenhoef
+</p>
+
+
+<h3>References</h3>
+
+<p>Boender, C. G. E., Caron, R. J., McDonald, J. F., Rinnooy Kan, A. H. G., Romeijn, H. E., Smith, R. L., Telgen, J., and Vorst, A. C. F. (1991) "Shake-and-Bake Algorithms for Generating Uniform Points on the Boundary of Bounded Polyhedra". <em>Operations Research</em> 39(6):945-954. doi: <a href="https://doi.org/10.1287/opre.39.6.945">10.1287/opre.39.6.945</a>
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>harConstraints</code>
+<code>shakeandbake</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># constraints: x_1 &gt;= 0, x_2 &gt;= 0, x_1 + x_2 &lt;= 1
+A &lt;- rbind(c(-1, 0), c(0, -1), c(1, 1))
+b &lt;- c(0, 0, 1)
+d &lt;- c("&lt;=", "&lt;=", "&lt;=")
+constr &lt;- list(constr=A, rhs=b, dir=d)
+
+# take a point x0 within the polytope
+x0 &lt;- c(0.25, 0.25)
+
+# sample 10,000 points
+result &lt;- sab(x0, 1, constr, 1E4)
+samples &lt;- result$samples
+
+# Check dimension of result
+stopifnot(dim(samples) == c(1E4, 2))
+
+# Check that x_i &gt;= 0
+stopifnot(samples &gt;= -1E-15)
+
+# Check that x_1 + x_2 &lt;= 1
+stopifnot(samples[,1] + samples[,2] &lt;= 1 + 1E-15)
+
+# check that the results lie on the faces
+faces &lt;- result$faces
+stopifnot(all.equal(samples[faces==1,1], rep(0, sum(faces==1))))
+stopifnot(all.equal(samples[faces==2,2], rep(0, sum(faces==2))))
+stopifnot(all.equal(samples[faces==3,1] + samples[faces==3,2], rep(1, sum(faces==3))))
+
+plot(samples)
+
+</code></pre>
+
+
+</div>

@@ -1,0 +1,73 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>kappa</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>kappa</h2>
+
+<h3>Description</h3>
+
+<p>Calculates kappa for all thresholds
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">kappa(perf, max = FALSE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>perf</code></td>
+<td>
+<p>a h2o object of class <code>"H2OBinomialMetrics"</code> which is provided
+by 'h2o.performance' function.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>max</code></td>
+<td>
+<p>logical. default is FALSE. if TRUE, instead of providing the F-Measure
+for all the thresholds, the highest F-Measure is reported.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>a matrix of F-Measures for different thresholds or the highest F-Measure value
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>E. F. Haghish
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+## Not run: 
+library(h2o)
+h2o.init(ignore_config = TRUE, nthreads = 2, bind_to_localhost = FALSE, insecure = TRUE)
+prostate_path &lt;- system.file("extdata", "prostate.csv", package = "h2o")
+prostate &lt;- h2o.importFile(path = prostate_path, header = TRUE)
+y &lt;- "CAPSULE"
+prostate[,y] &lt;- as.factor(prostate[,y])  #convert to factor for classification
+aml &lt;- h2o.automl(y = y, training_frame = prostate, max_runtime_secs = 30)
+
+# evaluate the model performance
+perf &lt;- h2o.performance(aml@leader, xval = TRUE)
+
+# evaluate F-Measure for a Beta = 3
+kappa(perf, max = TRUE)
+
+## End(Not run)
+</code></pre>
+
+
+</div>

@@ -1,0 +1,93 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>rmed0non0u95</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Draw random numbers with LOD median but non-zero upper 95th percentile</h2>
+
+<h3>Description</h3>
+
+<p>This function draws N random numbers from a distribution that approximates
+a median that is equal to the limit of detection (LOD, value x.LOD) but has 
+an upper 95th percentile (x.u95) that is above x.LOD. We make the assumption 
+that values above x.u95 are uniformly distributed between x.u95 and x.u95 +
+(x.u95 - x.LOD)
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">rmed0non0u95(n, x.u95, x.min = 0, x.LOD = 0.005)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>n</code></td>
+<td>
+<p>Number of samples to draw</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x.u95</code></td>
+<td>
+<p>The upper limit on the 95th confidence/credible intervale (this
+is the 97.5 percentile)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x.min</code></td>
+<td>
+<p>The minimum allowed value (defaults to 0)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x.LOD</code></td>
+<td>
+<p>The limit of detection (defaults to 0.005)</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A vector of N samples where the 50th and 97.5th quantiles approximate
+x.LOD and x.u95 respectively
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>John Wambaugh
+</p>
+
+
+<h3>References</h3>
+
+<p>Breen M, Wambaugh JF, Bernstein A, Sfeir M, Ring CL (2022).
+“Simulating toxicokinetic variability to identify susceptible and highly exposed populations.”
+<em>Journal of Exposure Science &amp; Environmental Epidemiology</em>, <b>32</b>(6), 855–863.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">Fup.95 &lt;- 0.02
+N &lt;- 1000
+
+set.seed(1235)
+Fup.vec &lt;- rmed0non0u95(n=N, x.u95=Fup.95)
+quantile(Fup.vec,c(0.5,0.975))
+
+quantile(rmed0non0u95(200,x.u95=0.05,x.min=10^-4,x.LOD=0.01),c(0.5,0.975))
+hist(rmed0non0u95(1000,x.u95=0.05,x.min=10^-4,x.LOD=0.01))
+
+quantile(rmed0non0u95(200,x.u95=0.005,x.min=10^-4,x.LOD=0.01),c(0.5,0.975))
+hist(rmed0non0u95(1000,x.u95=0.005,x.min=10^-4,x.LOD=0.01))
+
+</code></pre>
+
+
+</div>

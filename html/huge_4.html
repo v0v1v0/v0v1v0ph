@@ -1,0 +1,177 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>huge.generator</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Data generator</h2>
+
+<h3>Description</h3>
+
+<p>Implements the data generation from multivariate normal distributions with different graph structures, including <code>"random"</code>, <code>"hub"</code>, <code>"cluster"</code>, <code>"band"</code> and <code>"scale-free"</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">huge.generator(
+  n = 200,
+  d = 50,
+  graph = "random",
+  v = NULL,
+  u = NULL,
+  g = NULL,
+  prob = NULL,
+  vis = FALSE,
+  verbose = TRUE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>n</code></td>
+<td>
+<p>The number of observations (sample size). The default value is <code>200</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>d</code></td>
+<td>
+<p>The number of variables (dimension). The default value is <code>50</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>graph</code></td>
+<td>
+<p>The graph structure with 4 options: <code>"random"</code>, <code>"hub"</code>, <code>"cluster"</code>, <code>"band"</code> and <code>"scale-free"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>v</code></td>
+<td>
+<p>The off-diagonal elements of the precision matrix, controlling the magnitude of partial correlations with <code>u</code>. The default value is <code>0.3</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>u</code></td>
+<td>
+<p>A positive number being added to the diagonal elements of the precision matrix, to control the magnitude of partial correlations. The default value is <code>0.1</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>g</code></td>
+<td>
+<p>For <code>"cluster"</code> or <code>"hub"</code> graph, <code>g</code> is the number of hubs or clusters in the graph. The default value is about <code>d/20</code> if <code>d &gt;= 40</code> and <code>2</code> if <code>d &lt; 40</code>. For <code>"band"</code> graph, <code>g</code> is the bandwidth and the default value is <code>1</code>. NOT applicable to <code>"random"</code> graph.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>prob</code></td>
+<td>
+<p>For <code>"random"</code> graph, it is the probability that a pair of nodes has an edge. The default value is <code>3/d</code>. For <code>"cluster"</code> graph, it is the probability that a pair of nodes has an edge in each cluster. The default value is <code>6*g/d</code> if <code>d/g &lt;= 30</code> and <code>0.3</code> if <code>d/g &gt; 30</code>. NOT applicable to <code>"hub"</code> or <code>"band"</code> graphs.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>vis</code></td>
+<td>
+<p>Visualize the adjacency matrix of the true graph structure, the graph pattern, the covariance matrix and the empirical covariance matrix. The default value is <code>FALSE</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p>If <code>verbose = FALSE</code>, tracing information printing is disabled. The default value is <code>TRUE</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Given the adjacency matrix <code>theta</code>, the graph patterns are generated as below:<br><br>
+(I) <code>"random"</code>: Each pair of off-diagonal elements are randomly set <code>theta[i,j]=theta[j,i]=1</code> for <code>i!=j</code> with probability <code>prob</code>, and <code>0</code> other wise. It results in about <code>d*(d-1)*prob/2</code> edges in the graph.<br><br>
+(II)<code>"hub"</code>:The row/columns are evenly partitioned into <code>g</code> disjoint groups. Each group is associated with a "center" row <code>i</code> in that group. Each pair of off-diagonal elements are set <code>theta[i,j]=theta[j,i]=1</code> for <code>i!=j</code> if <code>j</code> also belongs to the same group as <code>i</code> and <code>0</code> otherwise. It results in <code>d - g</code> edges in the graph.<br><br>
+(III)<code>"cluster"</code>:The row/columns are evenly partitioned into <code>g</code> disjoint groups. Each pair of off-diagonal elements are set <code>theta[i,j]=theta[j,i]=1</code> for <code>i!=j</code> with the probability <code>prob</code>if both <code>i</code> and <code>j</code> belong to the same group, and <code>0</code> other wise. It results in about <code>g*(d/g)*(d/g-1)*prob/2</code> edges in the graph.<br><br>
+(IV)<code>"band"</code>: The off-diagonal elements are set to be <code>theta[i,j]=1</code> if <code>1&lt;=|i-j|&lt;=g</code> and <code>0</code> other wise. It results in <code>(2d-1-g)*g/2</code> edges in the graph.<br><br>
+(V) <code>"scale-free"</code>: The graph is generated using B-A algorithm. The initial graph has two connected nodes and each new node is connected to only one node in the existing graph with the probability proportional to the degree of the each node in the existing graph. It results in <code>d</code> edges in the graph.
+</p>
+<p>The adjacency matrix <code>theta</code> has all diagonal elements equal to <code>0</code>. To obtain a positive definite precision matrix, the smallest eigenvalue of <code>theta*v</code> (denoted by <code>e</code>) is computed. Then we set the precision matrix equal to <code>theta*v+(|e|+0.1+u)I</code>. The covariance matrix is then computed to generate multivariate normal data.
+</p>
+
+
+<h3>Value</h3>
+
+<p>An object with S3 class "sim" is returned:
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+
+<p>The <code>n</code> by <code>d</code> matrix for the generated data
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sigma</code></td>
+<td>
+
+<p>The covariance matrix for the generated data
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>omega</code></td>
+<td>
+
+<p>The precision matrix for the generated data
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sigmahat</code></td>
+<td>
+
+<p>The empirical covariance matrix for the generated data
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>theta</code></td>
+<td>
+
+<p>The adjacency matrix of true graph structure (in sparse matrix representation) for the generated data
+</p>
+</td>
+</tr>
+</table>
+<h3>See Also</h3>
+
+<p><code>huge</code> and <code>huge-package</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## band graph with bandwidth 3
+L = huge.generator(graph = "band", g = 3)
+plot(L)
+
+## random sparse graph
+L = huge.generator(vis = TRUE)
+
+## random dense graph
+L = huge.generator(prob = 0.5, vis = TRUE)
+
+## hub graph with 6 hubs
+L = huge.generator(graph = "hub", g = 6, vis = TRUE)
+
+## hub graph with 8 clusters
+L = huge.generator(graph = "cluster", g = 8, vis = TRUE)
+
+## scale-free graphs
+L = huge.generator(graph="scale-free", vis = TRUE)
+</code></pre>
+
+
+</div>

@@ -1,0 +1,231 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>genwwn.thpower</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Compute (approximation) to the theoretical power of the
+<code>genwwn.test</code> test for
+ARMA processes (including, of course, white noise itself).
+</h2>
+
+<h3>Description</h3>
+
+<p>Compute (approximation) to the theoretical power of the
+<code>genwwn.test</code> test. Note: this
+function does no simulation, it merely computes an approximation
+to the likely statistical power (or size) of the
+<code>genwwn.test</code> function. It can be useful to establish
+the reverse question: what sample size do I require to 
+achieve a certain power for a given ARMA process?
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">genwwn.thpower(N = 128, ar = NULL, ma = NULL, plot.it = FALSE,
+	sigsq = 1, alpha = 0.05, away.from = "standard",
+	filter.number = 10, family = "DaubExPhase", verbose = FALSE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>N</code></td>
+<td>
+<p>The length of the series you want to get a theoretical power
+result for.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ar</code></td>
+<td>
+<p>Autoregressive parameters. A vector with p entries for AR(p)
+with the first entry being the value for lag-one term (alpha_1),
+the second
+entry being the value for the lag-two term (alpha_2) etc.
+If this argument is NULL then there are no AR terms.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ma</code></td>
+<td>
+<p>Similar to the <code>ar</code> argument except for MA terms. 
+A vector of length q for MA(q) parameters, with first entry
+being beta_1, the second being beta_2, etc. If this argument
+is NULL then there are no MA terms.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>plot.it</code></td>
+<td>
+<p>If <code>TRUE</code> then two plots are produced. The first is
+of the time series spectrum you are considering (controlled by
+the <code>N</code>, <code>ar</code> and <code>ma</code> arguments.) The second
+is a plot of the wavelet coefficients of the normalized
+spectrum.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sigsq</code></td>
+<td>
+<p>The theoretical innovation variance (also the variance
+of white noise if <code>ar=ma=NULL</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alpha</code></td>
+<td>
+<p>The nominal size of the test for this theoretical power
+calculation.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>away.from</code></td>
+<td>
+<p>Describes how many fine scales to exclude, the
+same as in <code>genwwn.test</code>. This can be an integer
+up to the number of scales. However, mostly you can leave this
+at "standard" where the scales calculation is automatically determined.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>filter.number</code></td>
+<td>
+<p>The number of vanishing moments in the Daubechies
+series of wavelets.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>family</code></td>
+<td>
+<p>The wavelet family.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p>If TRUE then informative messages are printed during
+the progress of the function.
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Function calculates the value of the power function at
+the specified arguments. It does this by: (i) specifying the
+functional spectrum of the ARMA process
+(which can be flat, ie white noise);
+(ii) calculating the variance of the ARMA process by numerical
+integration of the spectrum; (iii) calculating the spectrum
+values at the Fourier frequencies; (iv) calculating the wavelet
+coefficients at the exact spectrum values; (v) computing the
+exact variance of the wavelet coefficients of the squared normalized
+spectrum; (vi) computing the approximate power of the whole lot.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A list containing the following components.
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>C.alpha.c</code></td>
+<td>
+<p>The critical value for the test, which is the nominal
+size critical value after correction for multiple hypothesis
+tests (correction using Bonferroni).
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>th.power</code></td>
+<td>
+<p>The computed theoretical power</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>norspecwd</code></td>
+<td>
+<p>The wavelet coefficients of the true spectrum</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>norspecvarwd</code></td>
+<td>
+<p>The squared wavelet transform of the squared normalized
+spectrum</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>all.hwc</code></td>
+<td>
+<p>All of the wavelet coefficients from the normalized true
+specturm as a single vector</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>all.sdwc</code></td>
+<td>
+<p>The ‘true’ standard deviations of the wavelet coefficients</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>Delyan Savchev and Guy Nason
+</p>
+
+
+<h3>References</h3>
+
+<p>Nason, G.P. and Savchev, D. (2014) White noise testing using
+wavelets. <em>Stat</em>, <b>3</b>, 351-362.
+<a href="https://doi.org/10.1002/sta4.69">doi:10.1002/sta4.69</a>
+</p>
+
+
+<h3>See Also</h3>
+
+ <p><code>genwwn.test</code>, <code>sqwd</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">#
+# Calculate what the theoretical actual size is likely to be for the
+# genwwn.test for a white noise sequence of T=64, nominal size=0.05
+#
+genwwn.thpower(N=64)$th.power
+#[1] 0.04894124
+#
+# This is pretty close to the nominal size of 5%. Good.
+#
+# What is the power of detection for the AR(1) process with alpha=0.3?
+# Let's say with sample size of T=32
+#
+genwwn.thpower(N=32, ar=0.3)$th.power 
+#[1] 0.2294128
+#
+# That's pretty poor, we'll only detect about 23% of cases. Can we achieve
+# a power of 90%? Actually, it turns out that by repeating these above
+# functions with N=128 gives a power of 61%, and for N=256 we get a power of
+# 90%. 
+</code></pre>
+
+
+</div>

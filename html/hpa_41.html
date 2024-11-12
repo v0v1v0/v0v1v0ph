@@ -1,0 +1,139 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>polynomialIndex</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Multivariate Polynomial Representation</h2>
+
+<h3>Description</h3>
+
+<p>Function <code>polynomialIndex</code> 
+provides matrix which allows to iterate through the elements 
+of multivariate polynomial being aware of these elements powers. 
+So (i, j)-th element of the matrix is power of j-th variable in i-th 
+multivariate polynomial element.
+</p>
+<p>Function <code>printPolynomial</code> prints multivariate polynomial
+given its degrees (<code>pol_degrees</code>) and coefficients 
+(<code>pol_coefficients</code>) vectors.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">polynomialIndex(pol_degrees = numeric(0), is_validation = TRUE)
+
+printPolynomial(pol_degrees, pol_coefficients, is_validation = TRUE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>pol_degrees</code></td>
+<td>
+<p>non-negative integer vector of polynomial 
+degrees (orders).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>is_validation</code></td>
+<td>
+<p>logical value indicating whether function input 
+arguments should be validated.  Set it to <code>FALSE</code> for slight
+performance boost (default value is <code>TRUE</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pol_coefficients</code></td>
+<td>
+<p>numeric vector of polynomial coefficients.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Multivariate polynomial of degrees   
+<code class="reqn">(K_{1},...,K_{m})</code> (<code>pol_degrees</code>) has the form:
+</p>
+<p style="text-align: center;"><code class="reqn">a_{(0,...,0)}x_{1}^{0}*...*x_{m}^{0}+ ... + 
+a_{(K_{1},...,K_{m})}x_{1}^{K_{1}}*...*x_{m}^{K_{m}},</code>
+</p>
+
+<p>where <code class="reqn">a_{(i_{1},...,i_{m})}</code> are polynomial coefficients, while
+polynomial elements are:
+</p>
+<p style="text-align: center;"><code class="reqn">a_{(i_{1},...,i_{m})}x_{1}^{i_{1}}*...*x_{m}^{i_{m}},</code>
+</p>
+
+<p>where <code class="reqn">(i_{1},...,i_{m})</code> are polynomial element's powers corresponding
+to variables <code class="reqn">(x_{1},...,x_{m})</code> respectively. Note that 
+<code class="reqn">i_{j}\in \{0,...,K_{j}\}</code>. 
+</p>
+<p>Function <code>printPolynomial</code> removes polynomial elements 
+which coefficients are zero and variables which powers are zero. Output may 
+contain long coefficients representation as they are not rounded.
+</p>
+
+
+<h3>Value</h3>
+
+<p>Function <code>polynomialIndex</code> 
+returns matrix which rows are 
+responsible for variables while columns are related to powers. 
+So <code class="reqn">(i, j)</code>-th element of this matrix corresponds to the 
+power <code class="reqn">i_{j}</code> of the <code class="reqn">x_{j}</code> variable in <code class="reqn">i</code>-th polynomial 
+element. Therefore <code class="reqn">i</code>-th column of this matrix contains vector of
+powers <code class="reqn">(i_{1},...,i_{m})</code> for the <code class="reqn">i</code>-th polynomial element.
+So the function transforms <code class="reqn">m</code>-dimensional elements indexing
+to one-dimensional.
+</p>
+<p>Function <code>printPolynomial</code> returns the string which 
+contains polynomial symbolic representation.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Get polynomial indexes matrix for the polynomial 
+## which degrees are (1, 3, 5)
+
+polynomialIndex(c(1, 3, 5))
+
+## Consider multivariate polynomial of degrees (2, 1) such that coefficients
+## for elements which powers sum is even are 2 and for those which powers sum
+## is odd are 5. So the polynomial is 2+5x2+5x1+2x1x2+2x1^2+5x1^2x2 where
+## x1 and x2 are polynomial variables.
+
+# Create variable to store polynomial degrees
+pol_degrees &lt;- c(2, 1)
+
+# Let's represent its powers (not coefficients) in a matrix form
+pol_matrix &lt;- polynomialIndex(pol_degrees)
+
+# Calculate polynomial elements' powers sums
+pol_powers_sum &lt;- pol_matrix[1, ] + pol_matrix[2, ]
+
+# Let's create polynomial coefficients vector filling it
+# with NA values
+pol_coefficients &lt;- rep(NA, (pol_degrees[1] + 1) * (pol_degrees[2] + 1))
+
+# Now let's fill coefficients vector with correct values
+pol_coefficients[pol_powers_sum %% 2 == 0] &lt;- 2
+pol_coefficients[pol_powers_sum %% 2 != 0] &lt;- 5
+
+# Finally, let's check that correspondence is correct
+printPolynomial(pol_degrees, pol_coefficients)
+
+## Let's represent polynomial 0.3+0.5x2-x2^2+2x1+1.5x1x2+x1x2^2
+
+pol_degrees &lt;- c(1, 2)
+pol_coefficients &lt;- c(0.3, 0.5, -1, 2, 1.5, 1)
+
+printPolynomial(pol_degrees, pol_coefficients)
+</code></pre>
+
+
+</div>

@@ -1,0 +1,111 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hc_add_series_map</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Add a map series</h2>
+
+<h3>Description</h3>
+
+<p>Add a map series
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hc_add_series_map(hc, map, df, value, joinBy, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>hc</code></td>
+<td>
+<p>A <code>highchart</code> <code>htmlwidget</code> object.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>map</code></td>
+<td>
+<p>A <code>list</code> object loaded from a geojson file.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>df</code></td>
+<td>
+<p>A <code>data.frame</code> object with data to chart. Code region and value are
+required.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>value</code></td>
+<td>
+<p>A string value with the name of the variable to chart.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>joinBy</code></td>
+<td>
+<p>What property to join the  <code>map</code> and <code>df</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Additional shared arguments for the data series
+(<a href="https://api.highcharts.com/highcharts/series">https://api.highcharts.com/highcharts/series</a>).</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>This function force the highchart object to be map type.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+library("dplyr")
+
+data("USArrests", package = "datasets")
+data("usgeojson")
+
+USArrests &lt;- mutate(USArrests, state = rownames(USArrests))
+
+highchart() %&gt;%
+  hc_title(text = "Violent Crime Rates by US State") %&gt;%
+  hc_subtitle(text = "Source: USArrests data") %&gt;%
+  hc_add_series_map(usgeojson, USArrests,
+    name = "Murder arrests (per 100,000)",
+    value = "Murder", joinBy = c("woename", "state"),
+    dataLabels = list(
+      enabled = TRUE,
+      format = "{point.properties.postalcode}"
+    )
+  ) %&gt;%
+  hc_colorAxis(stops = color_stops()) %&gt;%
+  hc_legend(valueDecimals = 0, valueSuffix = "%") %&gt;%
+  hc_mapNavigation(enabled = TRUE)
+## Not run: 
+
+data(worldgeojson, package = "highcharter")
+data("GNI2014", package = "treemap")
+
+highchart(type = "map") %&gt;%
+  hc_add_series_map(map = worldgeojson, df = GNI2014, value = "GNI", joinBy = "iso3") %&gt;%
+  hc_colorAxis(stops = color_stops()) %&gt;%
+  hc_tooltip(
+    useHTML = TRUE, headerFormat = "",
+    pointFormat = "this is {point.name} and have {point.population} people with gni of {point.GNI}"
+  )
+
+## End(Not run)
+
+</code></pre>
+
+
+</div>

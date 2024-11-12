@@ -1,0 +1,114 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>compare_AICc</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Compares the AICc of several outputs</h2>
+
+<h3>Description</h3>
+
+<p>This function is used to compare the AICc of several outputs obtained with the same data but with different set of parameters.<br>
+Each object must have associated <code>logLik()</code> method with df and nobs attributes.<br>
+AICc for object x will be calculated as <code>2*factor.value*logLik(x)+(2*attributes(logLik(x))$df*(attributes(logLik(x))$df+1)/(attributes(logLik(x))$nobs-attributes(logLik(x))$df-1)</code>.<br></p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">compare_AICc(
+  ...,
+  factor.value = -1,
+  silent = FALSE,
+  FUN = function(x) specify_decimal(x, decimals = 2)
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Successive results to be compared as lists.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>factor.value</code></td>
+<td>
+<p>The $value of the list object is multiplied by factor.value to calculate BIC.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>silent</code></td>
+<td>
+<p>If TRUE, nothing is displayed.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>FUN</code></td>
+<td>
+<p>Function used to show values</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>compare_AICc compares the AICc of several outputs obtained with the same data.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A list with DeltaAICc and Akaike weight for the models.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Marc Girondot <a href="mailto:marc.girondot@gmail.com">marc.girondot@gmail.com</a>
+</p>
+
+
+<h3>See Also</h3>
+
+<p>Other AIC: 
+<code>ExtractAIC.glm()</code>,
+<code>FormatCompareAIC()</code>,
+<code>compare_AIC()</code>,
+<code>compare_BIC()</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+library("HelpersMG")
+# Here two different models are fitted
+x &lt;- 1:30
+y &lt;- rnorm(30, 10, 2)+log(x)
+plot(x, y)
+d &lt;- data.frame(x=x, y=y)
+m1 &lt;- lm(y ~ x, data=d)
+m2 &lt;- lm(y ~ log(x), data=d)
+compare_BIC(linear=m1, log=m2, factor.value=-1)
+# Here test if two datasets can be modeled with a single model
+x2 &lt;- 1:30
+y2 &lt;- rnorm(30, 15, 2)+log(x2)
+plot(x, y, ylim=c(5, 25))
+plot_add(x2, y2, col="red")
+d2 &lt;- data.frame(x=x2, y=y2)
+m1_2 &lt;- lm(y ~ x, data=d2)
+x_grouped &lt;- c(x, x2)
+y_grouped &lt;- c(y, y2)
+d_grouped &lt;- data.frame(x=x_grouped, y=y_grouped)
+m1_grouped &lt;- lm(y ~ x, data=d_grouped)
+compare_AICc(separate=list(m1, m1_2), grouped=m1_grouped, factor.value=-1)
+# Or simply
+compare_AICc(m1=list(AICc=100), m2=list(AICc=102))
+
+## End(Not run)
+</code></pre>
+
+
+</div>

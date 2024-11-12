@@ -1,0 +1,231 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>parameterize_schmitt</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Parameters for Schmitt's (2008) Tissue Partition Coefficient Method</h2>
+
+<h3>Description</h3>
+
+<p>This function provides the necessary parameters to run
+<code>predict_partitioning_schmitt</code>, excluding the data in table
+<code>tissue.data</code>. The model is based on the Schmitt (2008) method
+for predicting tissue:plasma partition coefficients as modified by Pearce 
+et al. (2017). The modifications include approaches adapted from Peyret 
+et al. (2010).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">parameterize_schmitt(
+  chem.cas = NULL,
+  chem.name = NULL,
+  dtxsid = NULL,
+  parameters = NULL,
+  species = "Human",
+  default.to.human = FALSE,
+  force.human.fup = FALSE,
+  adjusted.Funbound.plasma = TRUE,
+  suppress.messages = FALSE,
+  class.exclude = TRUE,
+  minimum.Funbound.plasma = 1e-04
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>chem.cas</code></td>
+<td>
+<p>Chemical Abstract Services Registry Number (CAS-RN) – if
+parameters is not specified then the chemical must be identified by either
+CAS, name, or DTXISD</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>chem.name</code></td>
+<td>
+<p>Chemical name (spaces and capitalization ignored) –  if
+parameters is not specified then the chemical must be identified by either
+CAS, name, or DTXISD</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dtxsid</code></td>
+<td>
+<p>EPA's DSSTox Structure ID (<a href="https://comptox.epa.gov/dashboard">https://comptox.epa.gov/dashboard</a>)
+– if parameters is not specified then the chemical must be identified by 
+either CAS, name, or DTXSIDs</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>parameters</code></td>
+<td>
+<p>Chemcial and physiological description parameters needed
+to run the Schmitt et al. (2008) model</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>species</code></td>
+<td>
+<p>Species desired (either "Rat", "Rabbit", "Dog", "Mouse", or
+default "Human").</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>default.to.human</code></td>
+<td>
+<p>Substitutes missing fraction of unbound plasma with
+human values if true.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>force.human.fup</code></td>
+<td>
+<p>Returns human fraction of unbound plasma in
+calculation for rats if true.
+When species is specified as rabbit, dog, or mouse, the human unbound
+fraction is substituted.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>adjusted.Funbound.plasma</code></td>
+<td>
+<p>Uses Pearce et al. (2017) lipid binding adjustment
+for Funbound.plasma (which impacts partition coefficients) when set to TRUE (Default).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>suppress.messages</code></td>
+<td>
+<p>Whether or not the output message is suppressed.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>class.exclude</code></td>
+<td>
+<p>Exclude chemical classes identified as outside of 
+domain of applicability by relevant modelinfo_[MODEL] file (default TRUE).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>minimum.Funbound.plasma</code></td>
+<td>
+<p>Monte Carlo draws less than this value are set 
+equal to this value (default is 0.0001 – half the lowest measured Fup in our
+dataset).</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>Funbound.plasma</code></td>
+<td>
+<p>Unbound fraction in plasma, adjusted for lipid binding according to Pearce et al. (2017)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>unadjusted.Funbound.plasma</code></td>
+<td>
+<p>measured unbound fraction in plasma (0.005
+if below limit of detection)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Pow</code></td>
+<td>
+<p>octanol:water partition coefficient
+(not log transformed)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pKa_Donor</code></td>
+<td>
+<p>compound H dissociation equilibrium
+constant(s)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pKa_Accept</code></td>
+<td>
+<p>compound H association equilibrium
+constant(s)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>MA</code></td>
+<td>
+<p>phospholipid:water distribution coefficient, membrane
+affinity</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Fprotein.plasma</code></td>
+<td>
+<p>protein fraction in plasma</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>plasma.pH</code></td>
+<td>
+<p>pH of the plasma</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>Robert Pearce and John Wambaugh
+</p>
+
+
+<h3>References</h3>
+
+<p>Pearce RG, Setzer RW, Strope CL, Wambaugh JF, Sipes NS (2017).
+“Httk: R package for high-throughput toxicokinetics.”
+<em>Journal of Statistical Software</em>, <b>79</b>(4), 1.
+</p>
+<p>Schmitt W (2008).
+“General approach for the calculation of tissue to plasma partition coefficients.”
+<em>Toxicology in vitro</em>, <b>22</b>(2), 457–467.
+</p>
+<p>Schmitt W (2008).
+“Corrigendum to:'General approach for the calculation of tissue to plasma partition coefficients'[Toxicology in Vitro 22 (2008) 457–467].”
+<em>Toxicology in Vitro</em>, <b>22</b>(6), 1666.
+</p>
+<p>Pearce RG, Setzer RW, Davis JL, Wambaugh JF (2017).
+“Evaluation and calibration of high-throughput predictions of chemical distribution to tissues.”
+<em>Journal of pharmacokinetics and pharmacodynamics</em>, <b>44</b>, 549–565.
+</p>
+<p>Peyret T, Poulin P, Krishnan K (2010).
+“A unified algorithm for predicting partition coefficients for PBPK modeling of drugs and environmental chemicals.”
+<em>Toxicology and applied pharmacology</em>, <b>249</b>(3), 197–207.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>predict_partitioning_schmitt</code>
+</p>
+<p><code>tissue.data</code>
+</p>
+<p><code>calc_ma</code>
+</p>
+<p><code>apply_fup_adjustment</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+parameterize_schmitt(chem.name='bisphenola')
+
+</code></pre>
+
+
+</div>

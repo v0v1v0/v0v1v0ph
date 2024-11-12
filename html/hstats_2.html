@@ -1,0 +1,248 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>average_loss</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Average Loss</h2>
+
+<h3>Description</h3>
+
+<p>Calculates the average loss of a model on a given dataset,
+optionally grouped by a variable. Use <code>plot()</code> to visualize the results.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">average_loss(object, ...)
+
+## Default S3 method:
+average_loss(
+  object,
+  X,
+  y,
+  pred_fun = stats::predict,
+  loss = "squared_error",
+  agg_cols = FALSE,
+  BY = NULL,
+  by_size = 4L,
+  w = NULL,
+  ...
+)
+
+## S3 method for class 'ranger'
+average_loss(
+  object,
+  X,
+  y,
+  pred_fun = function(m, X, ...) stats::predict(m, X, ...)$predictions,
+  loss = "squared_error",
+  agg_cols = FALSE,
+  BY = NULL,
+  by_size = 4L,
+  w = NULL,
+  ...
+)
+
+## S3 method for class 'explainer'
+average_loss(
+  object,
+  X = object[["data"]],
+  y = object[["y"]],
+  pred_fun = object[["predict_function"]],
+  loss = "squared_error",
+  agg_cols = FALSE,
+  BY = NULL,
+  by_size = 4L,
+  w = object[["weights"]],
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>object</code></td>
+<td>
+<p>Fitted model object.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Additional arguments passed to <code>pred_fun(object, X, ...)</code>,
+for instance <code>type = "response"</code> in a <code>glm()</code> model, or <code>reshape = TRUE</code> in a
+multiclass XGBoost model.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>X</code></td>
+<td>
+<p>A data.frame or matrix serving as background dataset.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+<p>Vector/matrix of the response, or the corresponding column names in <code>X</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pred_fun</code></td>
+<td>
+<p>Prediction function of the form <code style="white-space: pre;">⁠function(object, X, ...)⁠</code>,
+providing <code class="reqn">K \ge 1</code> predictions per row. Its first argument represents the
+model <code>object</code>, its second argument a data structure like <code>X</code>. Additional arguments
+(such as <code>type = "response"</code> in a GLM, or <code>reshape = TRUE</code> in a multiclass XGBoost
+model) can be passed via <code>...</code>. The default, <code>stats::predict()</code>, will work in
+most cases.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>loss</code></td>
+<td>
+<p>One of "squared_error", "logloss", "mlogloss", "poisson",
+"gamma", or "absolute_error". Alternatively, a loss function
+can be provided that turns observed and predicted values into a numeric vector or
+matrix of unit losses of the same length as <code>X</code>.
+For "mlogloss", the response <code>y</code> can either be a dummy matrix or a discrete vector.
+The latter case is handled via a fast version of <code>model.matrix(~ as.factor(y) + 0)</code>.
+For "squared_error", the response can be a factor with levels in column order of
+the predictions. In this case, squared error is evaluated for each one-hot-encoded column.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>agg_cols</code></td>
+<td>
+<p>Should multivariate losses be summed up? Default is <code>FALSE</code>.
+In combination with the squared error loss, <code>agg_cols = TRUE</code> gives
+the Brier score for (probabilistic) classification.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>BY</code></td>
+<td>
+<p>Optional grouping vector or column name.
+Numeric <code>BY</code> variables with more than <code>by_size</code> disjoint values will be
+binned into <code>by_size</code> quantile groups of similar size.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>by_size</code></td>
+<td>
+<p>Numeric <code>BY</code> variables with more than <code>by_size</code> unique values will
+be binned into quantile groups. Only relevant if <code>BY</code> is not <code>NULL</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>w</code></td>
+<td>
+<p>Optional vector of case weights. Can also be a column name of <code>X</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>An object of class "hstats_matrix" containing these elements:
+</p>
+
+<ul>
+<li> <p><code>M</code>: Matrix of statistics (one column per prediction dimension), or <code>NULL</code>.
+</p>
+</li>
+<li> <p><code>SE</code>: Matrix with standard errors of <code>M</code>, or <code>NULL</code>.
+Multiply with <code>sqrt(m_rep)</code> to get <em>standard deviations</em> instead.
+Currently, supported only for <code>perm_importance()</code>.
+</p>
+</li>
+<li> <p><code>m_rep</code>: The number of repetitions behind standard errors <code>SE</code>, or <code>NULL</code>.
+Currently, supported only for <code>perm_importance()</code>.
+</p>
+</li>
+<li> <p><code>statistic</code>: Name of the function that generated the statistic.
+</p>
+</li>
+<li> <p><code>description</code>: Description of the statistic.
+</p>
+</li>
+</ul>
+<h3>Methods (by class)</h3>
+
+
+<ul>
+<li> <p><code>average_loss(default)</code>: Default method.
+</p>
+</li>
+<li> <p><code>average_loss(ranger)</code>: Method for "ranger" models.
+</p>
+</li>
+<li> <p><code>average_loss(explainer)</code>: Method for DALEX "explainer".
+</p>
+</li>
+</ul>
+<h3>Losses</h3>
+
+<p>The default <code>loss</code> is the "squared_error". Other choices:
+</p>
+
+<ul>
+<li>
+<p> "absolute_error": The absolute error is the loss corresponding to median regression.
+</p>
+</li>
+<li>
+<p> "poisson": Unit Poisson deviance, i.e., the loss function used in
+Poisson regression. Actual values <code>y</code> and predictions must be non-negative.
+</p>
+</li>
+<li>
+<p> "gamma": Unit gamma deviance, i.e., the loss function of Gamma regression.
+Actual values <code>y</code> and predictions must be positive.
+</p>
+</li>
+<li>
+<p> "logloss": The Log Loss is the loss function used in logistic regression,
+and the top choice in probabilistic binary classification. Responses <code>y</code> and
+predictions must be between 0 and 1. Predictions represent probabilities of
+having a "1".
+</p>
+</li>
+<li>
+<p> "mlogloss": Multi-Log-Loss is the natural loss function in probabilistic multi-class
+situations. If there are K classes and n observations, the predictions form
+a (n x K) matrix of probabilities (with row-sums 1).
+The observed values <code>y</code> are either passed as (n x K) dummy matrix,
+or as discrete vector with corresponding levels.
+The latter case is turned into a dummy matrix by a fast version of
+<code>model.matrix(~ as.factor(y) + 0)</code>.
+</p>
+</li>
+<li>
+<p> A function with signature <code>f(actual, predicted)</code>, returning a numeric
+vector or matrix of the same length as the input.
+</p>
+</li>
+</ul>
+<h3>Examples</h3>
+
+<pre><code class="language-R"># MODEL 1: Linear regression
+fit &lt;- lm(Sepal.Length ~ ., data = iris)
+average_loss(fit, X = iris, y = "Sepal.Length")
+average_loss(fit, X = iris, y = iris$Sepal.Length, BY = iris$Sepal.Width)
+average_loss(fit, X = iris, y = "Sepal.Length", BY = "Sepal.Width")
+
+# MODEL 2: Multi-response linear regression
+fit &lt;- lm(as.matrix(iris[, 1:2]) ~ Petal.Length + Petal.Width + Species, data = iris)
+average_loss(fit, X = iris, y = iris[, 1:2])
+L &lt;- average_loss(
+  fit, X = iris, y = iris[, 1:2], loss = "gamma", BY = "Species"
+)
+L
+plot(L)
+</code></pre>
+
+
+</div>

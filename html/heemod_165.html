@@ -1,0 +1,147 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>define_parameters</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Define Markov Model Parameters</h2>
+
+<h3>Description</h3>
+
+<p>Define parameters called to compute the transition matrix
+or state values for a Markov model. Parameters can be
+time dependent by using the <code>model_time</code>
+parameter.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">define_parameters(...)
+
+define_parameters_(.dots)
+
+## S3 method for class 'uneval_parameters'
+modify(.OBJECT, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Name-value pairs of expressions defining
+parameters.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.dots</code></td>
+<td>
+<p>Used to work around non-standard evaluation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.OBJECT</code></td>
+<td>
+<p>An object of class
+<code>uneval_parameters</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Parameters are defined sequentially, parameters defined
+earlier can be called in later expressions.
+</p>
+<p>Vector length should not be explicitly set, but should
+instead be stated relatively to <code>model_time</code>
+(whose length depends on the number of simulation
+cycles). Alternatively, <code>dplyr</code> functions such as
+<code>dplyr::n()</code> can be used.
+</p>
+<p>This function relies heavily on the <code>dplyr</code> package.
+Parameter definitions should thus mimic the use of
+functions such as <code>dplyr::mutate()</code>.
+</p>
+<p>Variable names are searched first in the parameter
+definition (only parameters defined earlier are visible)
+then in the environment where <code>define_parameters</code>
+was called.
+</p>
+<p>For the <code>modify</code> function, existing parameters are
+modified, but no new parameter can be added. Parameter
+order matters since only parameters defined earlier can
+be referenced in later expressions.
+</p>
+
+
+<h3>Value</h3>
+
+<p>An object of class <code>uneval_parameters</code>
+(actually a named list of quosures).
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+# parameter 'age' depends on time:
+# simulating a cohort starting at 60 yo
+
+define_parameters(
+  age_start = 60,
+  age = age_start + model_time
+)
+
+# other uses of model_time are possible
+
+define_parameters(
+  top_time = ifelse(model_time &lt; 10, 1, 0)
+)
+
+# more elaborate: risk function
+
+define_parameters(
+  rate = 1 - exp(- model_time * .5)
+)
+
+# dont explicitly state lengths
+# define_parameters(
+#   var = seq(1, 15, 2)
+# )
+
+
+# instead rely on model_time or dplyr 
+# functions such as n() or row_number()
+
+define_parameters(
+  var = seq(from = 1, length.out = n(), by = 3),
+  var2 = seq(1, length(model_time), 2)
+)
+
+param &lt;- define_parameters(
+  age_start = 60,
+  age = age_start + model_time
+)
+
+# modify existing parameters
+
+modify(
+  param,
+  age_start = 40
+)
+
+# cannot add new parameters
+
+# modify(
+#   param,
+#   const = 4.4,
+#   age_2 = age ^ 2
+# )
+
+</code></pre>
+
+
+</div>

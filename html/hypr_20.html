@@ -1,0 +1,95 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>filler_contrasts</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Generate filler contrasts</h2>
+
+<h3>Description</h3>
+
+<p>Fill free degrees of freedom with orthogonal filler contrasts.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">filler_contrasts(x, how.many = nlevels(x), rescale = FALSE)
+
+which_filler(x)
+
+which_target(x)
+
+filler_names(x)
+
+target_names(x)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>A hypr object</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>how.many</code></td>
+<td>
+<p>The total number of contrasts for the new hypr object</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rescale</code></td>
+<td>
+<p>If <code>TRUE</code>, the contrast weights will be rescaled</p>
+</td>
+</tr>
+</table>
+<h3>Functions</h3>
+
+
+<ul>
+<li> <p><code>which_filler()</code>: Return indices of filler contrasts
+</p>
+</li>
+<li> <p><code>which_target()</code>: Return indices of filler contrasts
+</p>
+</li>
+<li> <p><code>filler_names()</code>: Return names of filler contrasts
+</p>
+</li>
+<li> <p><code>target_names()</code>: Return names of target contrasts
+</p>
+</li>
+</ul>
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+# A complete Helmert contrast matrix for 4 levels:
+h1 &lt;- hypr(~ (mu2-mu1)/2,
+          ~ (mu3-(mu1+mu2)/2)/3,
+          ~ (mu4-(mu1+mu2+mu3)/3)/4,
+          levels = c("mu1", "mu2", "mu3", "mu4")
+          )
+cmat(h1)
+
+# An incomplete Helmer contrast matrix (2nd contrast dropped)
+h2 &lt;- hypr(~ (mu2-mu1)/2,
+           ~ (mu4-(mu1+mu2+mu3)/3)/4,
+           levels = c("mu1", "mu2", "mu3", "mu4")
+           )
+cmat(h2)
+
+# Filling the remaining degree of freedom retrieves the contrast
+h3 &lt;- filler_contrasts(h2, rescale = TRUE)
+cmat(h3)
+
+stopifnot(all.equal(cmat(h3)[,3], cmat(h1)[,2], check.attributes = FALSE))
+
+</code></pre>
+
+
+</div>

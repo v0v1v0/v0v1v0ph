@@ -1,0 +1,148 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>GOF_summary</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Calculate Goodness-of-fit metrics and output into table</h2>
+
+<h3>Description</h3>
+
+<p>Calculate Goodness-of-fit (GOF) metrics for correlation, Kling–Gupta efficiency,
+mean absolute error, mean error, Nash–Sutcliffe efficiency, percent bias,
+root-mean-square error, normalized root-mean-square error, and volumetric efficiency, and output
+into a table.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">GOF_summary(
+  mod,
+  obs,
+  metrics = c("cor", "kge", "mae", "me", "nse", "pb", "rmse", "nrmse", "ve"),
+  censor_threshold = NULL,
+  censor_symbol = NULL,
+  na.rm = TRUE,
+  kge_modified = FALSE,
+  nse_j = 2,
+  rmse_normalize = c("mean", "range", "stdev", "iqr", "iqr-1", "iqr-2", "iqr-3", "iqr-4",
+    "iqr-5", "iqr-6", "iqr-7", "iqr-8", "iqr-9", NULL),
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>mod</code></td>
+<td>
+<p>'numeric' vector. Modeled or simulated values. Must be same length as <code>obs</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>obs</code></td>
+<td>
+<p>'numeric' vector. Observed or comparison values. Must be same length as <code>mod</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>metrics</code></td>
+<td>
+<p>'character' vector. Which GOF metrics should be computed and output. Default is
+<code>c("cor", "kge", "mae", "me", "nse", "pb", "rmse", "nrmse", "ve")</code>.<br><code>"cor"</code>. Correlation tests computed from <code>GOF_correlation_tests</code>.<br><code>"kge"</code>. Kling–Gupta efficiency computed from <code>GOF_kling_gupta_efficiency</code>.<br><code>"mae"</code>. Mean absolute error computed from <code>GOF_mean_absolute_error</code>.<br><code>"me"</code>. Mean error computed from <code>GOF_mean_error</code>.<br><code>"nse"</code>. Nash–Sutcliffe efficiency computed from<br><code>GOF_nash_sutcliffe_efficiency</code> with option for modified NSE specified by
+parameter <code>nse_j</code>.<br><code>"pb"</code>. Percent bias computed from <code>GOF_percent_bias</code>.<br><code>"rmse"</code>. Root-mean-square error computed from <code>GOF_rmse</code>.<br><code>"nrmse"</code>. Normalized root-mean-square error computed from <code>GOF_rmse</code> and
+"normalize" option specified in parameter <code>rmse_normalize</code>.<br><code>"ve"</code>. Volumetric efficiency computed from <code>GOF_volumetric_efficiency</code>.<br></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>censor_threshold</code></td>
+<td>
+<p>'numeric' value. Threshold to censor values on utilizing
+<code>censor_values</code> function. Default is <code>NULL</code>, no censoring. If level specified, must also
+specify<br><code>censor_symbol</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>censor_symbol</code></td>
+<td>
+<p>'character' string. Inequality symbol to censor values based on
+<code>censor_threshold</code> utilizing <code>censor_values</code> function. Accepted values are<br><code>"gt"</code> (greater than),<br><code>"gte"</code> (greater than or equal to),<br><code>"lt"</code> (less than),<br>
+or <code>"lte"</code> (less than or equal to).<br>
+Default is <code>NULL</code>, no censoring. If symbol specified, must also specify <code>censor_value</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>na.rm</code></td>
+<td>
+<p>'boolean' <code>TRUE</code> or <code>FALSE</code>. Should <code>NA</code> values be removed before computing. If any
+<code>NA</code> values are present in <code>mod</code> or <code>obs</code>, the <em>i</em>th position from each will be removed before
+calculating. If <code>NA</code> values are present and <code>na.rm = FALSE</code>, then function will return <code>NA</code>.
+Default is <code>TRUE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>kge_modified</code></td>
+<td>
+<p>'boolean' <code>TRUE</code> or <code>FALSE</code>. Should the KGE calculation use the original
+variability ratio in the standard deviations (<code>kge_modified  = FALSE</code>) or the modified
+variability ratio in the coefficient of variations (<code>kge_modified = TRUE</code>). Default is <code>FALSE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nse_j</code></td>
+<td>
+<p>'numeric' value. Exponent value for modified NSE (mNSE) equation, utilized if
+<code>"nse"</code> option is in parameter <code>metrics</code>. Default value is <code>nse_j = 2</code>, which is traditional
+NSE equation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rmse_normalize</code></td>
+<td>
+<p>'character' value. Normalize option for NRMSE, utilized if "nrmse" option
+is in paramter <code>metrics</code>. Default is <code>"mean"</code>. Options are<br><code>'mean'</code>. RMSE is normalized by the mean of <code>obs</code>.<br><code>'range'</code>. RMSE is normalized by the range <code>(max - min)</code> of <code>obs</code>.<br><code>'stdev'</code>. RMSE is normalized by the standard deviation of <code>obs</code>.<br><code>'iqr-#'</code>. RMSE is normalized by the inter-quartile range of <code>obs</code>, with distribution type
+(see <code>stats::quantile</code> function) indicated by integer number (for example <code>"iqr-8"</code>).
+If no type specified, default type is <code>iqr-7</code>, the quantile function default.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Further arguments to be passed to or from <code>stats::cor.test</code> if <code>"cor"</code> is in
+<code>metrics</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>See <code>GOF_correlation_tests</code>, <code>GOF_kling_gupta_efficiency</code>,<br><code>GOF_mean_absolute_error</code>, <code>GOF_mean_error</code>, <br><code>GOF_nash_sutcliffe_efficiency</code>, <code>GOF_percent_bias</code>, <code>GOF_rmse</code>,<br>
+and <code>GOF_volumetric_efficiency</code>.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A tibble (see <code>tibble::tibble</code>) with GOF metrics
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>censor_values</code>, <code>GOF_correlation_tests</code>,
+<code>GOF_kling_gupta_efficiency</code>,
+<code>GOF_mean_absolute_error</code>, <code>GOF_mean_error</code>, <br><code>GOF_nash_sutcliffe_efficiency</code>, <code>GOF_percent_bias</code>,
+<code>GOF_rmse</code>, <br><code>GOF_volumetric_efficiency</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">GOF_summary(mod = example_mod$streamflow_cfs, obs = example_obs$streamflow_cfs)
+
+</code></pre>
+
+
+</div>

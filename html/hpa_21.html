@@ -1,0 +1,486 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hpaML</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Semi-nonparametric maximum likelihood estimation</h2>
+
+<h3>Description</h3>
+
+<p>This function performs semi-nonparametric (SNP)
+maximum likelihood estimation of unknown (possibly truncated) multivariate  
+density using Hermite polynomial based approximating function proposed by 
+Gallant and Nychka in 1987. Please, see <code>dhpa</code> 'Details' 
+section to get more information concerning this approximating function.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hpaML(
+  data,
+  pol_degrees = numeric(0),
+  tr_left = numeric(0),
+  tr_right = numeric(0),
+  given_ind = numeric(0),
+  omit_ind = numeric(0),
+  x0 = numeric(0),
+  cov_type = "sandwich",
+  boot_iter = 100L,
+  is_parallel = FALSE,
+  opt_type = "optim",
+  opt_control = NULL,
+  is_validation = TRUE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>numeric matrix which rows are realizations of independent 
+identically distributed random vectors while columns correspond to
+variables.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pol_degrees</code></td>
+<td>
+<p>non-negative integer vector of polynomial 
+degrees (orders).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tr_left</code></td>
+<td>
+<p>numeric vector of left (lower) truncation limits.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tr_right</code></td>
+<td>
+<p>numeric vector of right (upper) truncation limits.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>given_ind</code></td>
+<td>
+<p>logical or numeric vector indicating whether corresponding 
+random vector component is conditioned. By default it is a logical 
+vector of <code>FALSE</code> values. If <code>give_ind[i]</code> equals <code>TRUE</code> or 
+<code>i</code> then <code>i</code>-th column of <code>x</code> matrix will contain 
+conditional values.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>omit_ind</code></td>
+<td>
+<p>logical or numeric vector indicating whether corresponding
+random component is omitted. By default it is a logical vector 
+of <code>FALSE</code> values. If <code>omit_ind[i]</code> equals <code>TRUE</code> or <code>i</code> 
+then values in <code>i</code>-th column of <code>x</code> matrix will be ignored.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x0</code></td>
+<td>
+<p>numeric vector of optimization routine initial values.
+Note that <code>x0=c(pol_coefficients[-1], mean, sd)</code>. For 
+<code>pol_coefficients</code>, <code>mean</code> and <code>sd</code> documentation 
+see <code>dhpa</code> function.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cov_type</code></td>
+<td>
+<p>character determining the type of covariance matrix to be
+returned and used for summary. If <code>cov_type = "hessian"</code> then negative
+inverse of Hessian matrix will be applied. If <code>cov_type = "gop"</code> then
+inverse of Jacobian outer products will be used.
+If <code>cov_type = "sandwich"</code> (default) then sandwich covariance matrix
+estimator will be applied. If <code>cov_type = "bootstrap"</code> then bootstrap
+with <code>boot_iter</code> iterations will be used.
+If <code>cov_type = "hessianFD"</code> or <code>cov_type = "sandwichFD"</code> then
+(probably) more accurate but computationally demanding central difference 
+Hessian approximation will be calculated for the inverse Hessian and 
+sandwich estimators correspondingly. Central differences are computed via
+analytically provided gradient. This Hessian matrix estimation approach
+seems to be less accurate than BFGS approximation if polynomial order
+is high (usually greater then 5).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>boot_iter</code></td>
+<td>
+<p>the number of bootstrap iterations
+for <code>cov_type = "bootstrap"</code> covariance matrix estimator type.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>is_parallel</code></td>
+<td>
+<p>if <code>TRUE</code> then multiple cores will be
+used for some calculations. It usually provides speed advantage for
+large enough samples (about more than 1000 observations).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>opt_type</code></td>
+<td>
+<p>string value determining the type of the optimization
+routine to be applied. The default is <code>"optim"</code> meaning that BFGS method
+from the <code>optim</code> function will be applied.
+If <code>opt_type = "GA"</code> then <code>ga</code> function will be
+additionally applied.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>opt_control</code></td>
+<td>
+<p>a list containing arguments to be passed to the
+optimization routine depending on <code>opt_type</code> argument value.
+Please see details to get additional information.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>is_validation</code></td>
+<td>
+<p>logical value indicating whether function input 
+arguments should be validated.  Set it to <code>FALSE</code> for slight
+performance boost (default value is <code>TRUE</code>).</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Densities Hermite polynomial approximation approach has been
+proposed by A. Gallant and D. W. Nychka in 1987. The main idea is to
+approximate unknown distribution density with scaled Hermite polynomial.
+For more information please refer to the literature listed below.
+</p>
+<p>Let's use notations introduced in <code>dhpa</code> 'Details' 
+section. Function <code>hpaML</code> maximizes the following
+quasi log-likelihood function:
+</p>
+<p style="text-align: center;"><code class="reqn">\ln L(\alpha, \mu, \sigma; x) = \sum\limits_{i=1}^{n} 
+\ln\left(f_{\xi}(x_{i};\alpha, \mu, \sigma)\right),</code>
+</p>
+
+<p>where (in addition to previously defined notations):
+</p>
+<p><code class="reqn">x_{i}</code> - are observations i.e. <code>data</code> matrix rows.
+</p>
+<p><code class="reqn">n</code> - is sample size i.e. the number of <code>data</code> matrix rows.
+</p>
+<p>Arguments <code>pol_degrees</code>, <code>tr_left</code>, <code>tr_right</code>,
+<code>given_ind</code> and <code>omit_ind</code> affect the form of 
+<code class="reqn">f_{\xi}\left(x_{i};\alpha, \mu, \sigma)\right)</code> in a way described in 
+<code>dhpa</code> 'Details' section. Note that change of
+<code>given_ind</code> and <code>omit_ind</code> values may result in estimator which
+statistical properties has not been rigorously investigated yet.
+</p>
+<p>The first polynomial coefficient (zero powers) 
+set to 1 for identification purposes i.e. <code class="reqn">\alpha_{(0,...,0)}=1</code>.
+</p>
+<p>All <code>NA</code> and <code>NaN</code> values will be removed from <code>data</code> matrix.
+</p>
+<p>The function calculates standard errors via sandwich estimator
+and significance levels are reported taking into account quasi maximum
+likelihood estimator (QMLE) asymptotic normality. If one wants to switch
+from QMLE to semi-nonparametric estimator (SNPE) during hypothesis testing
+then covariance matrix should be estimated again using bootstrap.
+</p>
+<p>This function maximizes (quasi) log-likelihood function 
+via <code>optim</code> function setting its <code>method</code> 
+argument to "BFGS". If <code>opt_type = "GA"</code> then genetic
+algorithm from <code>ga</code> function
+will be additionally (after <code>optim</code> putting its
+solution (<code>par</code>) into <code>suggestions</code> matrix) applied in order to 
+perform global optimization. Note that global optimization takes
+much more time (usually minutes but sometimes hours or even days). 
+The number of iterations and population size of the genetic algorithm
+will grow linearly along with the number of estimated parameters. 
+If it seems that global maximum has not been found then it
+is possible to continue the search restarting the function setting 
+its input argument <code>x0</code> to <code>x1</code> output value. Note that
+if <code>cov_type = "bootstrap"</code> then <code>ga</code>
+function will not be used for bootstrap iterations since it
+may be extremely time consuming.
+</p>
+<p>If <code>opt_type = "GA"</code> then <code>opt_control</code> should be the
+list containing the values to be passed to <code>ga</code>
+function. It is possible to pass arguments <code>lower</code>, <code>upper</code>,
+<code>popSize</code>, <code>pcrossover</code>, <code>pmutation</code>, <code>elitism</code>,
+<code>maxiter</code>, <code>suggestions</code>, <code>optim</code>, <code>optimArgs</code>,
+<code>seed</code> and <code>monitor</code>. 
+Note that it is possible to set <code>population</code>,
+<code>selection</code>, <code>crossover</code> and <code>mutation</code> arguments changing
+<code>ga</code> default parameters via <code>gaControl</code> 
+function. These arguments information reported in <code>ga</code>.
+In order to provide manual values for <code>lower</code> and <code>upper</code> bounds
+please follow parameters ordering mentioned above for the
+<code>x0</code> argument. If these bounds are not provided manually then
+they (except those related to the polynomial coefficients)
+will depend on the estimates obtained
+by local optimization via <code>optim</code> function
+(this estimates will be in the middle
+between <code>lower</code> and <code>upper</code>).
+Specifically for each sd parameter <code>lower</code> (<code>upper</code>) bound
+is 5 times lower (higher) than this
+parameter <code>optim</code> estimate.
+For each mean and regression coefficient parameter its lower and 
+upper bounds deviate from corresponding <code>optim</code> estimate
+by two absolute values of this estimate.
+Finally, lower and upper bounds for each polynomial
+coefficient are <code>-10</code> and <code>10</code> correspondingly (do not depend
+on their <code>optim</code> estimates).
+</p>
+<p>The following arguments are differ from their defaults in
+<code>ga</code>:
+</p>
+
+<ul>
+<li> <p><code>pmutation = 0.2</code>,
+</p>
+</li>
+<li> <p><code>optim = TRUE</code>,
+</p>
+</li>
+<li> <p><code>optimArgs =
+list("method" = "Nelder-Mead", "poptim" = 0.2, "pressel" = 0.5)</code>,
+</p>
+</li>
+<li> <p><code>seed = 8</code>,
+</p>
+</li>
+<li> <p><code>elitism = 2 + round(popSize * 0.1)</code>.</p>
+</li>
+</ul>
+<p>The arguments <code>popSize</code> and <code>maxiter</code> of
+<code>ga</code> function have been set proportional to the number of
+estimated polynomial coefficients:
+</p>
+
+<ul>
+<li> <p><code>popSize = 10 + (prod(pol_degrees + 1) - 1) * 2</code>.
+</p>
+</li>
+<li> <p><code>maxiter = 50 * (prod(pol_degrees + 1))</code></p>
+</li>
+</ul>
+<h3>Value</h3>
+
+<p>This function returns an object of class "hpaML".<br><br>
+An object of class "hpaML" is a list containing the following components:
+</p>
+
+<ul>
+<li> <p><code>optim</code> - <code>optim</code> function output. 
+If <code>opt_type = "GA"</code> then it is the list containing 
+<code>optim</code> and <code>ga</code> functions outputs.
+</p>
+</li>
+<li> <p><code>x1</code> - numeric vector of distribution parameters estimates.
+</p>
+</li>
+<li> <p><code>mean</code> - density function mean vector estimate.
+</p>
+</li>
+<li> <p><code>sd</code> - density function sd vector estimate.
+</p>
+</li>
+<li> <p><code>pol_coefficients</code> - polynomial coefficients estimates.
+</p>
+</li>
+<li> <p><code>tr_left </code>- the same as <code>tr_left</code> input parameter.
+</p>
+</li>
+<li> <p><code>tr_right</code> - the same as <code>tr_right</code> input parameter.
+</p>
+</li>
+<li> <p><code>omit_ind </code>- the same as <code>omit_ind</code> input parameter.
+</p>
+</li>
+<li> <p><code>given_ind</code> - the same as <code>given_ind</code> input parameter.
+</p>
+</li>
+<li> <p><code>cov_mat</code> - covariance matrix estimate.
+</p>
+</li>
+<li> <p><code>results</code> - numeric matrix representing estimation results.
+</p>
+</li>
+<li> <p><code>log-likelihood</code> - value of Log-Likelihood function.
+</p>
+</li>
+<li> <p><code>AIC</code> - AIC value.
+</p>
+</li>
+<li> <p><code>data</code> - the same as <code>data</code> input parameter but without <code>NA</code> observations.
+</p>
+</li>
+<li> <p><code>n_obs</code> - number of observations.
+</p>
+</li>
+<li> <p><code>bootstrap</code> - list where bootstrap estimation results are stored.</p>
+</li>
+</ul>
+<h3>References</h3>
+
+<p>A. Gallant and D. W. Nychka (1987) &lt;doi:10.2307/1913241&gt;
+</p>
+
+
+<h3>See Also</h3>
+
+<p>summary.hpaML, predict.hpaML, 
+logLik.hpaML, plot.hpaML
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+## Approximate Student (t) distribution
+
+# Set seed for reproducibility
+set.seed(123)
+
+# Simulate 5000 realizations of Student distribution 
+# with 5 degrees of freedom
+n &lt;- 5000
+df &lt;- 5
+x &lt;- matrix(rt(n, df), ncol = 1)
+pol_degrees &lt;- c(4)
+
+# Apply pseudo maximum likelihood routine
+ml_result &lt;- hpa::hpaML(data = x, pol_degrees = pol_degrees)
+summary(ml_result)
+
+# Get predicted probabilites (density values) approximations
+predict(ml_result)
+
+# Plot density approximation
+plot(ml_result)
+
+## Approximate chi-squared distribution
+
+# Set seed for reproducibility
+set.seed(123)
+
+# Simulate 5000 realizations of chi-squared distribution 
+# with 5 degrees of freedom
+
+n &lt;- 5000
+df &lt;- 5
+x &lt;- matrix(rchisq(n, df), ncol = 1)
+pol_degrees &lt;- c(5)
+
+# Apply pseudo maximum likelihood routine
+ml_result &lt;- hpaML(data = x, pol_degrees = as.vector(pol_degrees), 
+				tr_left = 0)
+summary(ml_result)
+
+# Get predicted probabilites (density values) approximations
+predict(ml_result)
+
+# Plot density approximation
+plot(ml_result)
+
+## Approximate multivariate Student (t) distribution
+## Note that calculations may take up to a minute
+
+# Set seed for reproducibility
+set.seed(123)
+
+# Simulate 5000 realizations of three dimensional Student distribution 
+# with 5 degrees of freedom
+library("mvtnorm")
+cov_mat &lt;- matrix(c(1, 0.5, -0.5, 0.5, 1, 0.5, -0.5, 0.5, 1), ncol = 3)
+x &lt;- rmvt(n = 5000, sigma = cov_mat, df = 5)
+
+# Estimate approximating joint distribution parameters
+ml_result &lt;- hpaML(data = x, pol_degrees = c(1, 1, 1))
+
+# Get summary
+summary(ml_result)
+
+# Get predicted values for joint density function
+predict(ml_result)
+
+# Plot density approximation for the
+# second random variable
+plot(ml_result, ind = 2)
+
+# Plot density approximation for the
+# second random variable conditioning
+# on x1 = 1
+plot(ml_result, ind = 2, given = c(1, NA, NA))
+
+## Approximate Student (t) distribution and plot densities approximated
+## under different hermite polynomial degrees against 
+## true density (of Student distribution)
+
+# Simulate 5000 realizations of t-distribution with 5 degrees of freedom
+n &lt;- 5000
+df &lt;- 5
+x &lt;- matrix(rt(n, df), ncol=1)
+
+# Apply pseudo maximum likelihood routine
+# Create matrix of lists where i-th element contains hpaML results for K=i
+ml_result &lt;- matrix(list(), 4, 1)
+for(i in 1:4)
+{
+ ml_result[[i]] &lt;- hpa::hpaML(data = x, pol_degrees = i)
+}
+
+# Generate test values
+test_values &lt;- seq(qt(0.001, df), qt(0.999, df), 0.001)
+n0 &lt;- length(test_values)
+
+# t-distribution density function at test values points
+true_pred &lt;- dt(test_values, df)
+
+# Create matrix of lists where i-th element contains 
+# densities predictions for K=i
+PGN_pred &lt;- matrix(list(), 4, 1)
+for(i in 1:4)
+{
+  PGN_pred[[i]] &lt;- predict(object = ml_result[[i]], 
+                           newdata = matrix(test_values, ncol=1))
+}
+# Plot the result
+library("ggplot2")
+
+# prepare the data
+h &lt;- data.frame("values" = rep(test_values,5),
+                "predictions" = c(PGN_pred[[1]],PGN_pred[[2]],
+                                  PGN_pred[[3]],PGN_pred[[4]],
+                                  true_pred), 
+                "Density" = c(
+                  rep("K=1",n0), rep("K=2",n0),
+                  rep("K=3",n0), rep("K=4",n0),
+                  rep("t-distribution",n0))
+                  )
+                  
+# build the plot
+ggplot(h, aes(values, predictions)) + geom_point(aes(color = Density)) +
+  theme_minimal() + theme(legend.position = "top", 
+                          text = element_text(size=26),
+                          legend.title=element_text(size=20), 
+                          legend.text=element_text(size=28)) +
+  guides(colour = guide_legend(override.aes = list(size=10))
+  )
+
+# Get informative estimates summary for K=4
+summary(ml_result[[4]])
+
+
+</code></pre>
+
+
+</div>

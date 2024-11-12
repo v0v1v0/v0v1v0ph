@@ -1,0 +1,126 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>plot.hda</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Plot transformed data</h2>
+
+<h3>Description</h3>
+
+<p>Visualizes the scores on selected components of the  
+discriminant space of reduced dimension.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">## S3 method for class 'hda'
+plot(x, comps = 1:x$reduced.dimension, scores = TRUE, col = x$grouping, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>An object of class <code>hda</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>comps</code></td>
+<td>
+<p>A vector of component ids for which the data should be displayed.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>scores</code></td>
+<td>
+<p>Logical indicating whether the scores in the projected space should be plotted. 
+If FALSE estimated densities are plotted.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>col</code></td>
+<td>
+<p>Color vector for the data to be displayed. Per default, different colors represent the classes.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Further arguments to be passed to the plot function.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Scatterplots of the scores or estimated densities.        
+</p>
+
+
+<h3>Value</h3>
+
+<p>No value is returned.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Gero Szepannek</p>
+
+
+<h3>References</h3>
+
+<p>Kumar, N. and Andreou, A. (1998): <em>Heteroscedastic discriminant analysis and reduced rank HMMs 
+for improved speech recognition.</em> Speech Communication 25, pp.283-297.
+</p>
+<p>Szepannek G., Harczos, T., Klefenz, F. and Weihs, C. (2009): <em>Extending features for automatic speech recognition 
+by means of auditory modelling.</em> In: Proceedings of European Signal Processing Conference (EUSIPCO) 2009, Glasgow, pp.1235-1239. 
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>hda</code>, <code>predict.hda</code>, <code>showloadings</code></p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">library("mvtnorm")
+library("MASS")
+
+# simulate data for two classes
+n           &lt;- 50
+meana       &lt;- meanb &lt;- c(0,0,0,0,0)
+cova        &lt;- diag(5)
+cova[1,1]   &lt;- 0.2
+for(i in 3:4){
+  for(j in (i+1):5){
+    cova[i,j] &lt;- cova[j,i] &lt;- 0.75^(j-i)}
+  }
+covb       &lt;- cova
+diag(covb)[1:2]  &lt;- c(1,0.2)
+
+xa      &lt;- rmvnorm(n, meana, cova)
+xb      &lt;- rmvnorm(n, meanb, covb)
+x       &lt;- rbind(xa,xb)
+classes &lt;- as.factor(c(rep(1,n), rep(2,n)))
+## rotate simulated data
+symmat &lt;- matrix(runif(5^2),5)
+symmat &lt;- symmat + t(symmat)
+even   &lt;- eigen(symmat)$vectors
+rotatedspace &lt;- x %*% even
+plot(as.data.frame(rotatedspace), col = classes)
+
+# apply heteroscedastic discriminant analysis and plot data in discriminant space
+hda.res &lt;- hda(rotatedspace, classes)
+
+# plot scores
+plot(hda.res)
+</code></pre>
+
+
+</div>

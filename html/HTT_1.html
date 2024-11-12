@@ -1,0 +1,99 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>ENB</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Energy efficiency dataset
+</h2>
+
+<h3>Description</h3>
+
+<p>The data is about energy performance of buildings, containing eight input variables: relative compactness, surface area, wall area, roof area, overall height, orientation, glazing area, glazing area distribution and two output variables: heating load (HL) and cooling load (CL) of residential buildings. The goal is to predict two real valued responses from eight input variables. It can also be used as a multi-class classification problem if the response is rounded to the nearest integer.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">data("ENB")</code></pre>
+
+
+<h3>Format</h3>
+
+<p>A data frame with 768 observations on the following 10 variables.
+</p>
+
+<dl>
+<dt><code>X1</code></dt>
+<dd>
+<p>Relative Compactness</p>
+</dd>
+<dt><code>X2</code></dt>
+<dd>
+<p>Surface Area</p>
+</dd>
+<dt><code>X3</code></dt>
+<dd>
+<p>Wall Area</p>
+</dd>
+<dt><code>X4</code></dt>
+<dd>
+<p>Roof Area</p>
+</dd>
+<dt><code>X5</code></dt>
+<dd>
+<p>Overall Height</p>
+</dd>
+<dt><code>X6</code></dt>
+<dd>
+<p>Orientation</p>
+</dd>
+<dt><code>X7</code></dt>
+<dd>
+<p>Glazing Area</p>
+</dd>
+<dt><code>X8</code></dt>
+<dd>
+<p>Glazing Area Distribution</p>
+</dd>
+<dt><code>Y1</code></dt>
+<dd>
+<p>Heating Load</p>
+</dd>
+<dt><code>Y2</code></dt>
+<dd>
+<p>Cooling Load</p>
+</dd>
+</dl>
+<h3>Source</h3>
+
+<p>UCI Machine Learning Repository: <a href="https://archive.ics.uci.edu/ml/datasets/Energy+efficiency">https://archive.ics.uci.edu/ml/datasets/Energy+efficiency</a>.
+</p>
+
+
+<h3>References</h3>
+
+<p>A. Tsanas, A. Xifara: 'Accurate quantitative estimation of energy performance of residential buildings using statistical machine learning tools', Energy and Buildings, Vol. 49, pp. 560-567, 2012
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(ENB)
+set.seed(1)
+idx = sample(1:nrow(ENB), floor(nrow(ENB)*0.8))
+train = ENB[idx, ]
+test = ENB[-idx, ]
+htt_enb = HTT(cbind(Y1, Y2) ~ . , data = train, controls = htt_control(pt = 0.05, R = 99))
+# prediction
+pred = predict(htt_enb, newdata = test)
+test_y = test[, 9:10]
+# MAE
+colMeans(abs(pred - test_y))
+# MSE
+colMeans(abs(pred - test_y)^2)
+</code></pre>
+
+
+</div>

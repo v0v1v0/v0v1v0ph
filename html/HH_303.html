@@ -1,0 +1,260 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>mmcisomeans</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Functions used by mmcplot.
+</h2>
+
+<h3>Description</h3>
+
+<p>Functions used by mmcplot.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">mmcisomeans(mmc, col=c("black","red"), lwd=c(1,1), lty=c(2,1),
+            type = "mca", xlim = NULL, ylim = NULL, ...,
+            axis.right=2.2,
+            ylab=paste(
+              mmc$none$ylabel, "means",
+              " | ",
+              mmc$none$focus, "level"),
+            ylab.right=NULL,
+            xlab="contrast value",
+            contrast.label=TRUE,
+            means.height=TRUE)
+
+mmcmatch(mmc, col=c("black","red"), lwd=c(1,1), lty=c(2,1),
+         type = "mca", xlim = NULL, ylim = NULL, ...,
+         axis.right=2.2,
+         ylab=NULL,
+         ylab.right=NULL,
+         xlab="contrast value",
+         contrast.label=TRUE,
+         xlim.match=(type != "none"))
+
+mmcboth(mmc, col=c("black","red"), lwd=c(1,1), lty=c(2,1),
+        type = "mca", h = c(0.7, 0.3), xlim = NULL, ylim = NULL, ...,
+        ylab.right=NULL, MMCname="MMC", Tiebreakername="Tiebreaker")
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>mmc</code></td>
+<td>
+
+<p><code>mmc</code> object or other object as indicated by method.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>type</code></td>
+<td>
+
+<p>One of <code>c("mca", "lmat", "linfct", "none")</code>.
+For the default <code>"mca"</code>, an MMC plot is drawn of the pairwise contrasts.
+For  <code>"lmat"</code> or <code>"linfct"</code>, an MMC plot is drawn of the
+contrasts specified to <code>mmc</code> in the <code>lmat</code> or
+<code>linfct</code> argument.  For <code>"none"</code>, a confidence interval
+plot for the group means is drawn.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>h</code></td>
+<td>
+
+<p><code>h</code> argument for <code>resizePanels</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>xlim, ylim, xlab, ylab, ylab.right</code></td>
+<td>
+<p>Standard
+<code>xyplot</code> arguments.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>col, lwd, lty</code></td>
+<td>
+<p>Standard
+<code>xyplot</code> arguments applied to the line segments
+representing the contrasts.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+
+<p>Other arguments, to be forwarded to methods.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>axis.right</code></td>
+<td>
+
+<p>Value used internally for<br><code>par.settings=list(layout.widths=list(axis.right=axis.right))</code>.
+The user may need to set this in two circumstances.  First, if the
+contrast names overflow the right edge of the plotting window, then use
+a larger value than the default.
+Second, if there is a <code>ylab.right</code> and it is too far away from the
+figure,
+then use a smaller value than the default.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>contrast.label</code></td>
+<td>
+
+<p>Logical.  The default <code>TRUE</code> means place the word <code>contrasts</code>
+at the bottom of the right axis under the tick labels.
+<code>FALSE</code> means don't place anything there.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>MMCname, Tiebreakername</code></td>
+<td>
+
+<p>Panel names when <code>mmcplot</code> is used with <code>style="both"</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>xlim.match</code></td>
+<td>
+
+<p>Logical.  If <code>TRUE</code>, use <code>xlim</code> based on the contrasts in the <code>mca</code>
+component.  If <code>FALSE</code>, use <code>xlim</code> based on the values of the
+estimates
+in the current component.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>means.height</code></td>
+<td>
+<p>Logical, with default value <code>TRUE</code>.  When
+<code>TRUE</code>, then display the values of the group means as the left axis tick labels.
+</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A <code>"trellis"</code> object.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p> Richard M. Heiberger &lt;rmh@temple.edu&gt; </p>
+
+
+<h3>References</h3>
+
+<p>See <code>mmc</code> for the references.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>mmc</code> for the discussion of the MMC.
+<code>mmcplot</code> for the user calls that get executed by the
+functions documented here.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+  ## these examples exercise all optional arguments
+data(catalystm)
+catalystm1.aov &lt;- aov(concent ~ catalyst, data=catalystm)
+
+catalystm.glht &lt;-
+   glht(catalystm1.aov, linfct = mcp(catalyst = "Tukey"))
+confint(catalystm.glht)
+
+plot(catalystm.glht)  ## this is the multcomp:::plot.glht
+
+mmcplot(catalystm.glht)  ## mmcplot.glht sends its argument to HH:::as.multicomp.glht with
+## the default arguments (estimate.sign = 1, order.contrasts = TRUE) unless overridden:
+##
+mmcplot(catalystm.glht, order.contrasts=FALSE, estimate.sign=0, main="B'")
+
+catalystm.lmat &lt;- cbind("AB-D" =c(1, 1, 0,-2),
+                        "A-B"  =c(1,-1, 0, 0),
+                        "ABD-C"=c(1, 1,-3, 1))
+dimnames(catalystm.lmat)[[1]] &lt;- levels(catalystm$catalyst)
+catalystm.mmc &lt;-
+   mmc(catalystm1.aov,
+       linfct = mcp(catalyst = "Tukey"),
+       focus.lmat=catalystm.lmat)
+
+mmcplot(catalystm.mmc, type="mca",  style="confint")
+mmcplot(catalystm.mmc, type="lmat", style="confint")
+mmcplot(catalystm.mmc, type="none", style="confint")
+mmcplot(catalystm.mmc, type="none", style="confint", xlim.match=FALSE,
+        main="xlim.match=FALSE is default for none confint")
+mmcplot(catalystm.mmc, type="none", style="confint", xlim.match=TRUE, main="out of bounds")
+
+mmcplot(catalystm.mmc$mca,  style="confint")
+mmcplot(catalystm.mmc$lmat, style="confint")
+mmcplot(catalystm.mmc$none, style="confint")
+
+plot(catalystm.mmc) ## HH:::plot.mmc.multicomp method
+
+mmcplot(catalystm.mmc)
+
+mmcplot(catalystm.mmc)
+mmcplot(catalystm.mmc, style="isomeans")
+mmcplot(catalystm.mmc, style="confint")
+mmcplot(catalystm.mmc, style="both")
+
+mmcplot(catalystm.mmc, style="isomeans", type="mca")
+mmcplot(catalystm.mmc, style="isomeans", type="lmat")
+mmcplot(catalystm.mmc, style="isomeans", type="linfct")
+mmcplot(catalystm.mmc, style="isomeans", type="none")
+mmcplot(catalystm.mmc, style="isomeans", type="none", xlim.match=FALSE)
+
+mmcplot(catalystm.mmc, style="confint",  type="mca")
+mmcplot(catalystm.mmc, style="confint",  type="lmat")
+mmcplot(catalystm.mmc, style="confint",  type="linfct")
+mmcplot(catalystm.mmc, style="confint",  type="none")
+mmcplot(catalystm.mmc, style="confint",  type="none", xlim.match=FALSE)
+
+mmcplot(catalystm.mmc, style="both",     type="mca")
+mmcplot(catalystm.mmc, style="both",     type="lmat")
+mmcplot(catalystm.mmc, style="both",     type="linfct")
+mmcplot(catalystm.mmc, style="both",     type="none")
+mmcplot(catalystm.mmc, style="both",     type="none", xlim.match=FALSE)
+
+mmcplot(catalystm.mmc$mca)
+mmcplot(catalystm.mmc$mca$glht)
+mmcplot(catalystm.mmc$none)
+mmcplot(catalystm.mmc$none$glht)
+mmcplot(catalystm.mmc$lmat)
+mmcplot(catalystm.mmc$lmat$glht)
+
+mmcplot(catalystm.mmc, type="none")
+mmcplot(catalystm.mmc, type="none", xlim.match=FALSE)
+mmcplot(catalystm.mmc$none)
+
+## End(Not run)
+</code></pre>
+
+
+</div>

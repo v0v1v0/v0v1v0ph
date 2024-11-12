@@ -1,0 +1,146 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hypervolume_n_occupancy_permute</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Hypervolumes through permuting labels of n pairwise groups of hypervolumes
+</h2>
+
+<h3>Description</h3>
+
+<p>Permute labels of an <code>hypervolume_n_occupancy()</code> object and calculate <code>hypervolume_n_occupancy()</code> for the permuted objects. This function is meant for taking a sample of all permutations and does not guarantee that permutations are not repeated. Newly generated hypervolume objects are written to file. This function is to be used within the occupancy routine.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hypervolume_n_occupancy_permute(name, 
+                                hv_list1,
+                                hv_list2,
+                                verbose = TRUE,
+                                n = 9,
+                                cores = 1)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>name</code></td>
+<td>
+
+<p>File name; The function writes hypervolumes to file in ./Objects/&lt;name&gt;
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>hv_list1</code></td>
+<td>
+
+<p>An hypervolume list generated with <code>hypervolume_n_occupancy()</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>hv_list2</code></td>
+<td>
+
+<p>The hypervolume list used to generate <code>hv_list1</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+
+<p>Logical value; outputs progress bar in console.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n</code></td>
+<td>
+
+<p>Number of permutations to take.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cores</code></td>
+<td>
+
+<p>Number of logical cores to use while generating permuted hypervolumes. If parallel backend already registered to <code>doParallel</code>, function will use that backend and ignore the argument in <code>cores</code>.
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p><code>hypervolume_n_occupancy_permute()</code> creates a directory called Objects in the current working directory if a directory of that name doesn't already exist. Within this directory, it creates a directory for each pairwise combinations of elements within <code>hv_list1</code>. Group labels are permuted and a new <code>HypervolumeList</code> is saved as a rds file for each pairwise combination. IMPORTANT: only group labels are permuted, random points are kept fixed and will be the same across all the permuted hypervolumes. 
+</p>
+<p><code>hypervolume_n_occupancy_test()</code> takes in a <code>hypervolume_n_occupuancy_permute()</code> filepath output.
+</p>
+<p>It is also possible to access the hypervolumes by using readRDS to read the hypervolume objects in one by one.
+</p>
+
+
+<h3>Value</h3>
+
+<p>Returns a string containing an absolute path equivalent to ./Objects/&lt;name&gt;
+</p>
+
+
+<h3>Warning</h3>
+
+<p><code>hypervolume_n_occupancy_permute()</code> requires a lot of disk space especially when building occupancy hypervolumes with <code>method = "box"</code>. Try with a small number of replications and check the folder Objects for memory usage before to proceed.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>hypervolume_n_occupancy</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+data(penguins,package='palmerpenguins')
+penguins_no_na = as.data.frame(na.omit(penguins))
+
+
+# split the dataset on species and sex
+penguins_no_na_split = split(penguins_no_na, 
+                        paste(penguins_no_na$species, penguins_no_na$sex, sep = "_"))
+
+
+# calculate the hypervolume for each element of the splitted dataset
+hv_list = mapply(function(x, y) 
+  hypervolume_gaussian(x[, c("bill_length_mm", "flipper_length_mm")],
+                       samples.per.point=100, name = y), 
+  x = penguins_no_na_split, 
+  y = names(penguins_no_na_split))
+  
+
+names(hv_list) &lt;- names(penguins_no_na_split)
+hv_list &lt;- hypervolume_join(hv_list)
+
+
+hv_occupancy_list_sex &lt;- hypervolume_n_occupancy(hv_list, 
+                              classification = rep(c("female", "male"), each = 3))
+
+# takes 9 permutations on 1 core
+hypervolume_n_occupancy_permute("permute", hv_occupancy_list_sex,
+                                hv_list , n = 9, cores = 1)
+
+
+
+
+## End(Not run)
+</code></pre>
+
+
+</div>

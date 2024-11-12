@@ -1,0 +1,78 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>calcStats</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Extract statistics from events</h2>
+
+<h3>Description</h3>
+
+<p>Given the start and end indices of events statistics are calculated for the values in
+between the start and end points inclusive.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">calcStats(srt, end, data, f.vec = c("which.max", "max", "min"))
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>srt</code></td>
+<td>
+<p>Vector of indices for the event start</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>end</code></td>
+<td>
+<p>Vector of indices for the event end</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>Vector of data</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>f.vec</code></td>
+<td>
+<p>c("which.max", "max", "min") Functions to be applied to the events</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>Returns a dataframe where the row is each event and the column is each statistic. If <code>which.min</code> or
+<code>which.max</code> are called the indices returned are global, that is, relative to the start of <code>data</code>.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>eventPOT</code> <code>eventBaseflow</code> <code>eventMaxima</code> <code>eventMinima</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Extract event statistics and plot the maxima
+event.indices = eventPOT(dataLoch, out.style = "none")
+event.stats = calcStats(event.indices$srt, event.indices$end, dataLoch)
+print(event.stats)
+
+plot(1:length(dataLoch), dataLoch, type = "h", lwd = 2, col = "steelblue",
+     ylab = "Rainfall (mm)", xlab = "Time index", mgp = c(2, 0.6, 0))
+points(event.stats$which.max, event.stats$max, col = "red", pch = 16, cex = 1.2)
+legend("topright", legend = c("Rainfall", "Max"), cex = 0.8,
+       lwd = c(2, NA), pch = c(NA, 16), col = c("steelblue", "red"), bty = "n")
+</code></pre>
+
+
+</div>

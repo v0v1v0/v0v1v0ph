@@ -1,0 +1,127 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>resp_body_raw</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Extract body from response</h2>
+
+<h3>Description</h3>
+
+
+<ul>
+<li> <p><code>resp_body_raw()</code> returns the raw bytes.
+</p>
+</li>
+<li> <p><code>resp_body_string()</code> returns a UTF-8 string.
+</p>
+</li>
+<li> <p><code>resp_body_json()</code> returns parsed JSON.
+</p>
+</li>
+<li> <p><code>resp_body_html()</code> returns parsed HTML.
+</p>
+</li>
+<li> <p><code>resp_body_xml()</code> returns parsed XML.
+</p>
+</li>
+<li> <p><code>resp_has_body()</code> returns <code>TRUE</code> if the response has a body.
+</p>
+</li>
+</ul>
+<p><code>resp_body_json()</code> and <code>resp_body_xml()</code> check that the content-type header
+is correct; if the server returns an incorrect type you can suppress the
+check with <code>check_type = FALSE</code>. These two functions also cache the parsed
+object so the second and subsequent calls are low-cost.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">resp_body_raw(resp)
+
+resp_has_body(resp)
+
+resp_body_string(resp, encoding = NULL)
+
+resp_body_json(resp, check_type = TRUE, simplifyVector = FALSE, ...)
+
+resp_body_html(resp, check_type = TRUE, ...)
+
+resp_body_xml(resp, check_type = TRUE, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>resp</code></td>
+<td>
+<p>A httr2 response object, created by <code>req_perform()</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>encoding</code></td>
+<td>
+<p>Character encoding of the body text. If not specified,
+will use the encoding specified by the content-type, falling back to
+UTF-8 with a warning if it cannot be found. The resulting string is
+always re-encoded to UTF-8.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>check_type</code></td>
+<td>
+<p>Check that response has expected content type? Set to
+<code>FALSE</code> to suppress the automated check</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>simplifyVector</code></td>
+<td>
+<p>Should JSON arrays containing only primitives (i.e.
+booleans, numbers, and strings) be caused to atomic vectors?</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Other arguments passed on to <code>jsonlite::fromJSON()</code> and
+<code>xml2::read_xml()</code> respectively.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+
+<ul>
+<li> <p><code>resp_body_raw()</code> returns a raw vector.
+</p>
+</li>
+<li> <p><code>resp_body_string()</code> returns a string.
+</p>
+</li>
+<li> <p><code>resp_body_json()</code> returns NULL, an atomic vector, or list.
+</p>
+</li>
+<li> <p><code>resp_body_html()</code> and <code>resp_body_xml()</code> return an <code>xml2::xml_document</code>
+</p>
+</li>
+</ul>
+<h3>Examples</h3>
+
+<pre><code class="language-R">resp &lt;- request("https://httr2.r-lib.org") |&gt; req_perform()
+resp
+
+resp |&gt; resp_has_body()
+resp |&gt; resp_body_raw()
+resp |&gt; resp_body_string()
+
+if (requireNamespace("xml2", quietly = TRUE)) {
+  resp |&gt; resp_body_html()
+}
+</code></pre>
+
+
+</div>

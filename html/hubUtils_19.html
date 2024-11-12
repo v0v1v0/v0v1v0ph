@@ -1,0 +1,86 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>model_id_merge</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Merge/Split model output tbl <code>model_id</code> column</h2>
+
+<h3>Description</h3>
+
+<p>Merge/Split model output tbl <code>model_id</code> column
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">model_id_merge(tbl, sep = "-")
+
+model_id_split(tbl, sep = "-")
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>tbl</code></td>
+<td>
+<p>a <code>data.frame</code> or <code>tibble</code> of model output data returned from a query
+to a <code style="white-space: pre;">⁠&lt;hub_connection&gt;⁠</code> object.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sep</code></td>
+<td>
+<p>character string. Character used as separator when concatenating
+<code>team_abbr</code> and <code>model_abbr</code> values into a single <code>model_id</code> string or splitting
+<code>model_id</code> into component <code>team_abbr</code> and <code>model_abbr</code>. When splitting, if
+multiple instances of the separator exist in a <code>model_id</code> stringing,
+splitting occurs occurs on the first instance.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p><code>tbl</code> with either <code>team_abbr</code> and <code>model_abbr</code> merged into a single <code>model_id</code>
+column or <code>model_id</code> split into columns <code>team_abbr</code> and <code>model_abbr</code>.
+</p>
+<p>a tibble with <code>model_id</code> column split into separate
+<code>team_abbr</code> and <code>model_abbr</code> columns
+</p>
+
+
+<h3>Functions</h3>
+
+
+<ul>
+<li> <p><code>model_id_merge()</code>: merge <code>team_abbr</code> and <code>model_abbr</code> into a single
+<code>model_id</code> column.
+</p>
+</li>
+<li> <p><code>model_id_split()</code>: split <code>model_id</code> column into separate <code>team_abbr</code>
+and <code>model_abbr</code> columns.
+</p>
+</li>
+</ul>
+<h3>Examples</h3>
+
+<pre><code class="language-R">tbl_split &lt;- model_id_split(hub_con_output)
+tbl_split
+
+# Merge model_id
+tbl_merged &lt;- model_id_merge(tbl_split)
+tbl_merged
+
+# Split / Merge using custom separator
+tbl_sep &lt;- hub_con_output
+tbl_sep$model_id &lt;- gsub("-", "_", tbl_sep$model_id)
+tbl_sep &lt;- model_id_split(tbl_sep, sep = "_")
+tbl_sep
+tbl_sep &lt;- model_id_merge(tbl_sep, sep = "_")
+tbl_sep
+</code></pre>
+
+
+</div>

@@ -1,0 +1,95 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>getReadMatrix.CP</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Simulate a read matrix from compound Poisson mixed effect models (CPMM).</h2>
+
+<h3>Description</h3>
+
+<p>Simulate a (possibly unbalanced) read matrix from CPMM.
+For a compound Poisson (CP) random variable <code class="reqn">Y_{gsr}</code> with mean 
+<code class="reqn">\mu_{gs}</code>, its variance can be expressed as 
+<code class="reqn">\phi_g\mu_{gs}^{p_g}</code>, for some <code class="reqn">1&lt;p_g&lt;2</code>. Under the CPMM, with 
+a <code class="reqn">\log</code>-link, the regression on the mean has the form:<br><code class="reqn">\log(\mu_{gs}) = \alpha_g+ b_{gs}, \;\;b_{gs}\sim N(0, \sigma^2_g).</code>
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">getReadMatrix.CP(vec.num.rep, alphas, sigma2s, ps, phis)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>vec.num.rep</code></td>
+<td>
+<p>A vector of replicate numbers for each strain.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alphas</code></td>
+<td>
+<p>Intercept vector <code class="reqn">\alpha_g</code>'s, 
+<code class="reqn">1 \times \texttt{num.features}</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sigma2s</code></td>
+<td>
+<p>Random effect variance vector <code class="reqn">\sigma^2_g</code>'s, 
+<code class="reqn">1 \times \texttt{num.features}</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ps</code></td>
+<td>
+<p>Tweedie parameter in CP models, <code class="reqn">p_g</code>'s, a 
+<code class="reqn">1 \times \texttt{num.features}</code> vector.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>phis</code></td>
+<td>
+<p>Dispersion parameter in CP models, <code class="reqn">\phi_g</code>'s, a 
+<code class="reqn">1 \times \texttt{num.features}</code> vector.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A <code class="reqn">G \times N</code> matrix with CP reads. <code class="reqn">N</code> is the 
+total number of samples; <code class="reqn">G</code> is the number of features. Column names 
+are sample names of the form "Ss_r", where S stands for sample, s is the 
+strain number, r is the replicate number within the strain. Row names 
+are the feature names of the form "Gene g", where g is the feature index.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Generate a sequencing dataset with 5 features and 6 strains. 
+## Assign parameter values.
+rep.num &lt;- c(3, 5, 2, 3, 4, 2)
+a0s &lt;- c(-1, 1, 2, 5, 10)
+sig2s &lt;- c(10, 0.2, 0.1, 0.03, 0.01)
+ps &lt;- rep(1.5, 5)
+phis &lt;- c(1.5, 1, 0.5, 0.1, 0.1)
+
+set.seed(1234)
+## Generate reads:
+cpData &lt;- getReadMatrix.CP(rep.num, a0s, sig2s, ps, phis)
+## Generate strain names:
+str &lt;- sapply(1:length(rep.num), function(x){
+  str.x &lt;- paste0("S", x)
+  return(rep(str.x, rep.num[x]))
+})
+str &lt;- do.call(c, str)
+</code></pre>
+
+
+</div>

@@ -1,0 +1,266 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hima2</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>High-dimensional Mediation Analysis</h2>
+
+<h3>Description</h3>
+
+<p><code>hima2</code> is a wrapper function designed to perform various HIMA methods for estimating and testing high-dimensional mediation effects.
+<code>hima2</code> can automatically select the appropriate HIMA method based on the outcome and mediator data type specified by the user.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hima2(
+  formula,
+  data.pheno,
+  data.M,
+  outcome.family = c("gaussian", "binomial", "survival", "quantile"),
+  mediator.family = c("gaussian", "negbin", "compositional"),
+  penalty = c("DBlasso", "MCP", "SCAD", "lasso"),
+  efficient = FALSE,
+  scale = TRUE,
+  Sigcut = 0.05,
+  verbose = FALSE,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>formula</code></td>
+<td>
+<p>an object of class <code>formula</code>: a symbolic description of the overall effect model, i.e., 
+<code>outcome ~ exposure + covariates</code>, to be fitted. Make sure the "exposure" is the variable of interest, which
+must be listed as the first variable in the right hand side of the formula.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>data.pheno</code></td>
+<td>
+<p>a data frame containing exposure and covariates that are listed in the right hand side of the <code>formula</code>.
+The variable names must match those listed in <code>formula</code>. By default <code>hima2</code> will scale <code>data.pheno</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>data.M</code></td>
+<td>
+<p>a <code>data.frame</code> or <code>matrix</code> of high-dimensional mediators. Rows represent samples, columns 
+represent variables. By default <code>hima2</code> will scale <code>data.M</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>outcome.family</code></td>
+<td>
+<p>either <code>'gaussian'</code> (default, for normally distributed continuous outcome), <code>'binomial'</code> 
+(for binary outcome), <code>'survival'</code> (for time-to-event outcome), or <code>'quantile'</code> (for quantile mediation analysis)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mediator.family</code></td>
+<td>
+<p>either <code>'gaussian'</code> (default, for continuous mediators), <code>'negbin'</code> (i.e., negative binomial, 
+for RNA-seq data as mediators), or <code>'compositional'</code> (for microbiome data as mediators), depending on the data type of 
+high-dimensional mediators (<code>data.M</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>penalty</code></td>
+<td>
+<p>the penalty to be applied to the model. Either <code>'DBlasso'</code> (De-biased LASSO, default), 
+<code>'MCP'</code>, <code>'SCAD'</code>, or <code>'lasso'</code>. Please note, survival HIMA and microbiome HIMA can be only performed with <code>'DBlasso'</code>; 
+Quantile HIMA cannot be performed with <code>'DBlasso'</code>. Not applicable for efficient HIMA (when <code>efficient = TRUE</code>), as it will always apply <code>'MCP'</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>efficient</code></td>
+<td>
+<p>use efficient HIMA (<code>eHIMA</code>). Only applicable for linear HIMA with continuous outcome (i.e., <code>outcome.family = "gaussian"</code> 
+and <code>mediator.family = "gaussian"</code>). Default = <code>FALSE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>scale</code></td>
+<td>
+<p>logical. Should the function scale the data (exposure, mediators, and covariates)? Default = <code>TRUE</code>. Note: for simulation study, scale
+can be turned off to avoid estimate compression.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Sigcut</code></td>
+<td>
+<p>cutoff applied to select significant mediators. Default = <code>0.05</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p>logical. Should the function be verbose and show the progression? Default = <code>FALSE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>reserved passing parameter.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A data.frame containing mediation testing results of selected mediators. 
+</p>
+
+<dl>
+<dt>ID: </dt>
+<dd>
+<p>Mediator ID/name.</p>
+</dd>
+<dt>alpha: </dt>
+<dd>
+<p>Coefficient estimates of exposure (X) –&gt; mediators (M) (adjusted for covariates).</p>
+</dd>
+<dt>beta: </dt>
+<dd>
+<p>Coefficient estimates of mediators (M) –&gt; outcome (Y) (adjusted for covariates and exposure).</p>
+</dd>
+<dt>alpha*beta: </dt>
+<dd>
+<p>Mediation (indirect) effect.</p>
+</dd>
+<dt>Relative Importance: </dt>
+<dd>
+<p>Relative importance of the mediator. It is the proportion of the mediation effect for each mediator 
+out of the sum of the mediation effect (absolute value) across all significant mediators selected.</p>
+</dd>
+<dt>p-value: </dt>
+<dd>
+<p>Joint raw p-value of significant mediators selected based on corresponding approach.</p>
+</dd>
+<dt>tau: </dt>
+<dd>
+<p>Quantile level of the outcome (applicable only to the quantile mediation model).</p>
+</dd>
+</dl>
+<h3>References</h3>
+
+<p>1. Zhang H, Zheng Y, Zhang Z, Gao T, Joyce B, Yoon G, Zhang W, Schwartz J, Just A, Colicino E, Vokonas P, Zhao L, 
+Lv J, Baccarelli A, Hou L, Liu L. Estimating and Testing High-dimensional Mediation Effects in Epigenetic Studies. 
+Bioinformatics. 2016. DOI: 10.1093/bioinformatics/btw351. PMID: 27357171; PMCID: PMC5048064
+</p>
+<p>2. Zhang H, Zheng Y, Hou L, Zheng C, Liu L. Mediation Analysis for Survival Data with High-Dimensional Mediators. 
+Bioinformatics. 2021. DOI: 10.1093/bioinformatics/btab564. PMID: 34343267; PMCID: PMC8570823
+</p>
+<p>3. Zhang H, Chen J, Feng Y, Wang C, Li H, Liu L. Mediation Effect Selection in High-dimensional and Compositional Microbiome data. 
+Stat Med. 2021. DOI: 10.1002/sim.8808. PMID: 33205470; PMCID: PMC7855955
+</p>
+<p>4. Zhang H, Chen J, Li Z, Liu L. Testing for Mediation Effect with Application to Human Microbiome Data. 
+Stat Biosci. 2021. DOI: 10.1007/s12561-019-09253-3. PMID: 34093887; PMCID: PMC8177450
+</p>
+<p>5. Perera C, Zhang H, Zheng Y, Hou L, Qu A, Zheng C, Xie K, Liu L. HIMA2: High-dimensional Mediation Analysis and Its Application in 
+Epigenome-wide DNA Methylation Data. BMC Bioinformatics. 2022. DOI: 10.1186/s12859-022-04748-1. PMID: 35879655; PMCID: PMC9310002
+</p>
+<p>6. Zhang H, Hong X, Zheng Y, Hou L, Zheng C, Wang X, Liu L. High-Dimensional Quantile Mediation Analysis with Application to a Birth 
+Cohort Study of Mother–Newborn Pairs. Bioinformatics. 2024. DOI: 10.1093/bioinformatics/btae055. PMID: 38290773; PMCID: PMC10873903
+</p>
+<p>7. Bai X, Zheng Y, Hou L, Zheng C, Liu L, Zhang H. An Efficient Testing Procedure for High-dimensional Mediators with FDR Control. 
+Statistics in Biosciences. 2024. DOI: 10.1007/s12561-024-09447-4.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+# Note: In the following examples, M1, M2, and M3 are true mediators.
+data(himaDat)
+
+# Example 1 (continous outcome - linear hima): 
+head(himaDat$Example1$PhenoData)
+
+e1 &lt;- hima2(Outcome ~ Treatment + Sex + Age, 
+      data.pheno = himaDat$Example1$PhenoData, 
+      data.M = himaDat$Example1$Mediator,
+      outcome.family = "gaussian",
+      mediator.family = "gaussian",
+      penalty = "MCP", # Can be "DBlasso" for dblassoHIMA
+      scale = FALSE) # Disabled only for simulation data
+e1
+attributes(e1)$variable.labels
+
+# Efficient HIMA (only applicable to mediators and outcomes that are 
+# both continuous and normally distributed.)
+e1e &lt;- hima2(Outcome ~ Treatment + Sex + Age,
+             data.pheno = himaDat$Example1$PhenoData,
+             data.M = himaDat$Example1$Mediator,
+             outcome.family = "gaussian",
+             mediator.family = "gaussian",
+             efficient = TRUE,
+             scale = FALSE) # Disabled only for simulation data
+e1e
+attributes(e1e)$variable.labels
+
+# Example 2 (binary outcome - logistic hima): 
+head(himaDat$Example2$PhenoData)
+
+e2 &lt;- hima2(Disease ~ Treatment + Sex + Age, 
+      data.pheno = himaDat$Example2$PhenoData, 
+      data.M = himaDat$Example2$Mediator,
+      outcome.family = "binomial",
+      mediator.family = "gaussian",
+      penalty = "MCP",
+      scale = FALSE) # Disabled only for simulation data
+e2
+attributes(e2)$variable.labels
+
+# Example 3 (time-to-event outcome - survival hima): 
+head(himaDat$Example3$PhenoData)
+
+e3 &lt;- hima2(Surv(Status, Time) ~ Treatment + Sex + Age, 
+      data.pheno = himaDat$Example3$PhenoData, 
+      data.M = himaDat$Example3$Mediator,
+      outcome.family = "survival",
+      mediator.family = "gaussian",
+      penalty = "DBlasso",
+      scale = FALSE) # Disabled only for simulation data
+e3
+attributes(e3)$variable.labels
+
+# Example 4 (compositional data as mediator, e.g., microbiome): 
+head(himaDat$Example4$PhenoData)
+
+e4 &lt;- hima2(Outcome ~ Treatment + Sex + Age, 
+      data.pheno = himaDat$Example4$PhenoData, 
+      data.M = himaDat$Example4$Mediator,
+      outcome.family = "gaussian",
+      mediator.family = "compositional",
+      penalty = "DBlasso") # Scaling is always enabled for microHIMA
+e4
+attributes(e4)$variable.labels
+
+#' # Example 5 (quantile mediation anlaysis - quantile hima): 
+head(himaDat$Example5$PhenoData)
+
+# Note that the function will prompt input for quantile level.
+e5 &lt;- hima2(Outcome ~ Treatment + Sex + Age, 
+      data.pheno = himaDat$Example5$PhenoData, 
+      data.M = himaDat$Example5$Mediator,
+      outcome.family = "quantile",
+      mediator.family = "gaussian",
+      penalty = "MCP", # Quantile HIMA does not support DBlasso
+      scale = FALSE, # Disabled only for simulation data
+      tau = c(0.3, 0.5, 0.7)) # Specify multiple quantile level
+e5
+attributes(e5)$variable.labels
+
+## End(Not run)
+                  
+</code></pre>
+
+
+</div>

@@ -1,0 +1,190 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>sp</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Calculate the conditional state probabilities.
+</h2>
+
+<h3>Description</h3>
+
+<p>Returns the probabilities that the underlying hidden
+state is equal to each of the possible state values,
+at each time point, given the observation sequence.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">sp(y, model = NULL, tpm=NULL, Rho=NULL, ispd=NULL, X=NULL,
+   addIntercept=NULL, warn=TRUE, drop=TRUE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+<p>The observations on the basis of which the probabilities
+of the underlying hidden states are to be calculated.  May be
+a vector of a one or two column matrix of observations, or
+a list each component of which is such a vector or matrix.
+If <code>y</code> is missing it is set equal to the <code>y</code> component
+of <code>model</code>, given that that argument is non-<code>NULL</code>
+and that that component exists.  Otherwise an error is given.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>model</code></td>
+<td>
+
+<p>An object of class <code>hmm.discnp</code> as returned by
+<code>hmm()</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tpm</code></td>
+<td>
+
+<p>The transition probability matrix for the underlying hidden
+Markov chain.  Ignored if <code>model</code> is not <code>NULL</code>
+(in which case <code>tpm</code> is extracted from <code>model</code>).
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Rho</code></td>
+<td>
+
+<p>An object specifying the distribution of the observations, given
+the underlying state.  I.e. the “emission” probabilities.
+See <code>hmm()</code>.  Ignored if <code>model</code> is not
+<code>NULL</code> (in which case <code>Rho</code> is extracted from
+<code>model</code>).
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ispd</code></td>
+<td>
+
+<p>Vector specifying the initial state probability distribution
+of the underlying hidden Markov chain.  Ignored if <code>model</code>
+is not <code>NULL</code> (in which case <code>ispd</code> is extracted from
+<code>model</code>).  If both <code>model[["ispd"]]</code> and <code>ispd</code>
+are NULL then <code>ispd</code> is calculated to be the stationary
+distribution of the chain as determined by <code>tpm</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>X</code></td>
+<td>
+<p>An optional <em>numeric</em> matrix, or a list of
+such matrices, of <em>predictors</em>.  Ignored if <code>model</code>
+is not <code>NULL</code> (in which case <code>X</code> is extracted from
+<code>model</code>).
+</p>
+<p>The use of such predictors is (currently, at least) applicable
+only in the univariate emissions setting.  If <code>X</code> is a list it
+must be of the same length as <code>y</code> and all entries of this list
+must have the same number of columns.  The number of rows of each
+entry must be equal to the length of the corresponding entry of
+<code>y</code>. If <code>X</code> is a matrix then <code>y</code> should be a vector
+or one-column matrix (or a list with a single entry equal to such).
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>addIntercept</code></td>
+<td>
+
+<p>Logical scalar.  See the documentation of <code>hmm()</code>.
+Ignored if <code>model</code> is not <code>NULL</code> (in which case
+<code>addIntercept</code> is extracted from <code>model</code>).
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>warn</code></td>
+<td>
+<p>Logical scalar; should a warning be issued if <code>Rho</code>
+hasn't got relevant dimension names?  (Note that if this is so,
+then the corresponding dimension names are formed from the sorted
+unique values of <code>y</code> or of the appropriate column(s) of <code>y</code>.
+And if <em>this</em> is so, then the user should be sure that the
+ordering of the entries of <code>Rho</code> corresponds properly to the
+the sorted unique values of <code>y</code>.)  This argument is passed
+to the utility function <code>check.yval()</code> which actually issues
+the warning if <code>warn=TRUE</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>drop</code></td>
+<td>
+<p>Logical scalar.  If <code>y</code> is a matrix, or a
+list of length 1, and if <code>drop</code> is <code>FALSE</code> then the
+returned value is a list whose sole entry is the matrix that
+would have been returned were <code>drop</code> equal to <code>TRUE</code>.
+The argument <code>drop</code> is ignored if <code>y</code> is a list of
+length greater than 1.
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Note that in contrast to <code>predict.hmm.discnp()</code>, components
+in <code>model</code> take precendence over individually supplied
+components (<code>tpm</code>, <code>Rho</code>, <code>ispd</code>, <code>X</code>
+and <code>addIntercept</code>).
+</p>
+
+
+<h3>Value</h3>
+
+<p>If <code>y</code> is a single matrix of observations or a list of
+length 1, and if <code>drop</code> is <code>TRUE</code> then the returned
+value is a matrix whose rows correspond to the states of
+the hidden Markov chain, and whose columns correspond to the
+observation times.  Otherwise  the returned value is a list of such
+matrices, one for each matrix of observations.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Rolf Turner
+<a href="mailto:r.turner@auckland.ac.nz">r.turner@auckland.ac.nz</a><br></p>
+
+
+<h3>See Also</h3>
+
+<p><code>hmm()</code>, <code>mps()</code>,
+<code>viterbi()</code>, <code>pr()</code>,
+<code>fitted.hmm.discnp()</code></p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">P &lt;- matrix(c(0.7,0.3,0.1,0.9),2,2,byrow=TRUE)
+R &lt;- matrix(c(0.5,0,0.1,0.1,0.3,
+              0.1,0.1,0,0.3,0.5),5,2)
+set.seed(42)
+y    &lt;- rhmm(ylengths=rep(300,20),nsim=1,tpm=P,Rho=R,drop=TRUE)
+fit  &lt;- hmm(y,K=2,verb=TRUE,keep.y=TRUE,itmax=10)
+cpe1 &lt;- sp(model=fit) # Using the estimated parameters.
+cpe2 &lt;- sp(y,tpm=P,Rho=R,warn=FALSE) # Using the ``true'' parameters.
+# The foregoing would issue a warning that Rho had no row names
+# were it not for the fact that "warn" has been set to FALSE.
+</code></pre>
+
+
+</div>

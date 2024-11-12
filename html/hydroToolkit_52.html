@@ -1,0 +1,60 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>Qmm_to_Dm</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>River discharge [m3/s] to  volume [hm3]</h2>
+
+<h3>Description</h3>
+
+<p>Converts mean monthly river discharge [m3/s] to total volume discharge [hm3].
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">Qmm_to_Dm(df)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table><tr style="vertical-align: top;">
+<td><code>df</code></td>
+<td>
+<p>data frame with class Date in the first column. By default the function converts the second column only. If you have daily or hourly data see agg_serie.</p>
+</td>
+</tr></table>
+<h3>Value</h3>
+
+<p>A data frame with two columns: Date and total volume discharge.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Create BDHI hydro-met station
+guido &lt;- create_hydroMet(class_name = 'BDHI')
+
+# List with meteorological variables (slots in BDHI's object)
+cargar &lt;- list('precip', 'Qmd', 'Qmm')
+
+# Now assign as names the files
+hydro_files   &lt;- list.files( system.file('extdata', package = "hydroToolkit"), pattern = 'Guido' )
+names(cargar) &lt;- hydro_files
+
+# Build the object with the met records
+guido &lt;- build_hydroMet(obj = guido, slot_list = cargar, 
+               path = system.file('extdata', package = "hydroToolkit") )
+               
+# Now get mean monthly discharge
+Qmm &lt;- get_hydroMet(obj = guido, name = 'Qmm')[[1]]
+
+# Get the monthly water volume
+Qmm_vol &lt;- Qmm_to_Dm(df = Qmm)
+
+</code></pre>
+
+
+</div>

@@ -1,0 +1,78 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>uweights</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Compute unit weights underlying the small area estimates or their aggregate.</h2>
+
+<h3>Description</h3>
+
+<p>The small area estimates can be interpreted as weighted sums of the response variable. This function computes the weights
+corresponding to the aggregated small area estimates or the weights corresponding to a specific small area estimate. The
+weights applied to the response variable need not exactly reproduce the Hierarchical Bayes estimate since the latter
+is averaged over the posterior distribution for the variance ratio whereas the weights are evaluated at the posterior mean.
+Under the default prior for the fixed effects, the weights applied to the design matrix reproduce the corresponding population numbers.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">uweights(x, areaID = NULL, forTotal = FALSE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>sae object.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>areaID</code></td>
+<td>
+<p>if left unspecified (<code>NULL</code>), weights corresponding to the overall (aggregated) estimate are returned.
+Otherwise weights that reproduce the estimate for a specific area are returned.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>forTotal</code></td>
+<td>
+<p>if <code>FALSE</code> weights will be divided by the corresponding population size.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>An object of class <code>weights</code>.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>summary.weights</code>, <code>plot.weights</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">d &lt;- generateFakeData()
+
+# compute small area estimates
+sae &lt;- fSAE(y0 ~ x + area2, data=d$sam, area="area", popdata=d$Xpop,
+            method="hybrid", keep.data=TRUE)
+
+# compute unit weights
+w &lt;- uweights(sae, forTotal=TRUE)
+summary(w)  # summary statistics
+plot(w)  # histogram of weights
+# checks
+all.equal(sum(w * sae$y), sum(EST(sae) * sae$Narea))
+all.equal(colSums(w * as.matrix(sae$X)), colSums(sae$Xp * sae$Narea))
+</code></pre>
+
+
+</div>

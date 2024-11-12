@@ -1,0 +1,87 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>reoptimize_strategy</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>reoptimize_strategy</h2>
+
+<h3>Description</h3>
+
+<p>Optimize a gating strategy given a manual selection of channels
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">reoptimize_strategy(
+  gate,
+  channels_subset,
+  xp,
+  gate_vector,
+  level,
+  beta = 1,
+  verbose = FALSE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>gate</code></td>
+<td>
+<p>A return from hypergate</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>channels_subset</code></td>
+<td>
+<p>Character vector identifying the channels that will be retained (others are ignored). The form is e.g. c("CD4_min","CD8_max")</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>xp</code></td>
+<td>
+<p>Expression matrix as in the hypergate call</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>gate_vector</code></td>
+<td>
+<p>Categorical vector as in the hypergate call</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>level</code></td>
+<td>
+<p>Level of gate_vector identifying the population of interest</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>beta</code></td>
+<td>
+<p>Yield / purity trade-off</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p>Whether to print information about optimization status</p>
+</td>
+</tr>
+</table>
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(Samusik_01_subset)
+xp=Samusik_01_subset$xp_src[,Samusik_01_subset$regular_channels]
+gate_vector=Samusik_01_subset$labels
+hg=hypergate(xp=xp,gate_vector=gate_vector,level=23,delta_add=0)
+contribs=channels_contributions(gate=hg,xp=xp,gate_vector=gate_vector,level=23,beta=1)
+significant_channels=names(contribs)[contribs&gt;=0.01]
+hg_reoptimized=reoptimize_strategy(gate=hg,channels_subset=significant_channels,xp,gate_vector,23)
+</code></pre>
+
+
+</div>

@@ -1,0 +1,185 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hardycross</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Applies the Hardy-Cross method to solve for pipe flows in a network.</h2>
+
+<h3>Description</h3>
+
+<p>This function uses the Hardy-Cross method to iteratively solve the
+equations for conservation of mass and energy in a water pipe network.
+The input consists of a data frame with the pipe characteristics and lists 
+of the pipes in each loop (listed in a clockwise direction) and the initial
+guesses of flows in each pipe (positive flows are in a clockwise direction).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hardycross(
+  dfpipes = dfpipes,
+  loops = loops,
+  Qs = Qs,
+  n_iter = 1,
+  units = c("SI", "Eng"),
+  ret_units = FALSE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>dfpipes</code></td>
+<td>
+<p>data frame with the pipe data. Format is described above, but must contain a column named _ID_.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>loops</code></td>
+<td>
+<p>integer list defining pipes in each loop of the network.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Qs</code></td>
+<td>
+<p>numeric list of initial flows for each pipe in each loop [<code class="reqn">m^3 s^{-1}</code> or <code class="reqn">ft^3 s^{-1}</code>]</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n_iter</code></td>
+<td>
+<p>integer identifying the number of iterations to perform.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>units</code></td>
+<td>
+<p>character vector that contains the system of units [options are
+<code>SI</code> for International System of Units and <code>Eng</code> for English (US customary)
+units.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ret_units</code></td>
+<td>
+<p>If set to TRUE the value(s) returned for pipe flows are of 
+class <code>units</code> with units attached to the value. [Default is FALSE]</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The input data frame with the pipe data must contain a pipe ID column with 
+the pipe numbers used in the loops input list. There are three options for 
+input column of the pipe roughness data frame:
+</p>
+
+<table>
+<tr>
+<td style="text-align: left;">
+  <strong>Column Name</strong> </td>
+<td style="text-align: left;"> <strong>Approach for Determining K</strong> </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+  ks </td>
+<td style="text-align: left;"> f calculated using Colebrook equation, K using Darcy-Weisbach </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+  f </td>
+<td style="text-align: left;"> f treated as fixed, K calculated using Darcy-Weisbach </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+  K </td>
+<td style="text-align: left;"> K treated as fixed
+  </td>
+</tr>
+</table>
+<p>In the case where absolute pipe roughness, <code class="reqn">ks</code> (in m or ft), is input, 
+the input pipe data frame must also include columns for the length, <code class="reqn">L</code> and
+diameter, <code class="reqn">D</code>, (both in m or ft) so <code class="reqn">K</code> can be calculated. In this case, 
+a new <code class="reqn">f</code> and <code class="reqn">K</code> are calculated at each iteration, the final values of 
+which are included in the output. If input <code class="reqn">K</code> or <code class="reqn">f</code> columns are provided, values 
+for <code class="reqn">ks</code> are ignored. If an input <code class="reqn">K</code> column is provided, <code class="reqn">ks</code> and <code class="reqn">f</code> are 
+ignored. If the Colebrook equation is used to determine <code class="reqn">f</code>, a water 
+temperature of <code class="reqn">20^{o}C</code> or <code class="reqn">68^{o}F</code> is used.
+</p>
+<p>The number of iterations to perform may be specified with the n_iter input
+value, but execution stops if the average flow adjustment becomes smaller 
+than 1 percent of the average flow in all pipes.
+</p>
+<p>The Darcy-Weisbach equation is used to estimate the head loss in each
+pipe segment, expressed in a condensed form as <code class="reqn">h_f = KQ^{2}</code>
+where: </p>
+<p style="text-align: center;"><code class="reqn">K = \frac{8fL}{\pi^{2}gD^{5}}</code>
+</p>
+  
+<p>If needed, the friction factor <code class="reqn">f</code> is calculated using the Colebrook 
+equation. The flow adjustment in each loop is calculated at each iteration as: 
+</p>
+<p style="text-align: center;"><code class="reqn">\Delta{Q_i} = -\frac{\sum_{j=1}^{p_i} K_{ij}Q_j|Q_j|}{\sum_{j=1}^{p_i} 2K_{ij}Q_j^2}</code>
+</p>
+
+<p>where <code class="reqn">i</code> is the loop number, <code class="reqn">j</code> is the pipe number, <code class="reqn">p_i</code> is the number of 
+pipes in loop <code class="reqn">i</code> and <code class="reqn">\Delta{Q_i}</code> is the flow adjustment to be applied 
+to each pipe in loop <code class="reqn">i</code> for the next iteration.
+</p>
+
+
+<h3>Value</h3>
+
+<p>Returns a list of two data frames:
+</p>
+
+<ul>
+<li>
+<p> dfloops - the final flow magnitude and direction (clockwise positive) for each loop and pipe
+</p>
+</li>
+<li>
+<p> dfpipes - the input pipe data frame, with additional columns including final Q
+</p>
+</li>
+</ul>
+<h3>See Also</h3>
+
+<p><code>colebrook</code>, <code>darcyweisbach</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+#              A----------B --&gt; 0.5m^3/s
+#              |\   (4)   |
+#              | \        |
+#              |  \       |
+#              |   \(2)   |
+#              |    \     |(5)
+#              |(1)  \    |
+#              |      \   |
+#              |       \  |
+#              |        \ |
+#              |   (3)   \|
+# 0.5m^3/s --&gt; C----------D
+
+#Input pipe characteristics data frame. With K given other columns not needed
+dfpipes &lt;- data.frame(
+ID = c(1,2,3,4,5),                     #pipe ID
+K = c(200,2500,500,800,300)            #resistance used in hf=KQ^2
+)
+loops &lt;- list(c(1,2,3),c(2,4,5))
+Qs &lt;- list(c(0.3,0.1,-0.2),c(-0.1,0.2,-0.3))
+hardycross(dfpipes = dfpipes, loops = loops, Qs = Qs, n_iter = 1, units = "SI")
+
+</code></pre>
+
+
+</div>

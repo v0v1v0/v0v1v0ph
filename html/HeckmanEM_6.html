@@ -1,0 +1,147 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>Influence</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Influence Analysis for the Heckman Selection model</h2>
+
+<h3>Description</h3>
+
+<p>This function conducts influence analysis for a given 'HeckmanEM' object.
+The influence analysis can be conducted using several types of perturbations (not available for the
+contaminated Normal model).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">Influence(object, type, colx = NULL, k = 3.5)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>object</code></td>
+<td>
+<p>A 'HeckmanEM' object to perform the analysis on.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>type</code></td>
+<td>
+<p>A character string indicating the type of perturbation to perform.
+The types can be one of "case-weight","scale","response" and"exploratory".</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>colx</code></td>
+<td>
+<p>Optional integer specifying the position of the column in the
+object's matrix <code>x</code> that will undergo perturbation. Only required when type is
+"exploratory".</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>k</code></td>
+<td>
+<p>A positive real constant to be used in the benchmark calculation: <code class="reqn">M_0 + k\times \mathrm{sd}(M_0)</code>. Default is 3.5.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>Returns a list of class <code>HeckmanEM.influence</code> with the following elements:
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>M0</code></td>
+<td>
+<p>A vector of length <code class="reqn">n</code> with the aggregated contribution of all eigenvectors of the matrix associated with the normal curvature.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>benchmark</code></td>
+<td>
+<p><code class="reqn">M_0 + k\times \mathrm{sd}(M_0)</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>influent</code></td>
+<td>
+<p>A vector with the influential observations' positions.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>type</code></td>
+<td>
+<p>The perturbation type.</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>Marcos Oliveira
+</p>
+
+
+<h3>References</h3>
+
+<p>Insert any relevant references here.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>HeckmanEM</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">n    &lt;- 100
+nu   &lt;- 3
+cens &lt;- 0.25
+
+set.seed(13)
+w &lt;- cbind(1, runif(n, -1, 1), rnorm(n))
+x &lt;- cbind(w[,1:2])
+c &lt;- qt(cens, df = nu)
+
+sigma2   &lt;- 1
+beta     &lt;- c(1, 0.5)
+gamma    &lt;- c(1, 0.3, -.5)
+gamma[1] &lt;- -c * sqrt(sigma2)
+
+datas &lt;- rHeckman(x, w, beta, gamma, sigma2, rho = 0.6, nu, family = "T")
+y     &lt;- datas$y
+cc    &lt;- datas$cc
+
+heckmodel &lt;- HeckmanEM(y, x, w, cc, family = "Normal", iter.max = 50)
+
+global &lt;- CaseDeletion(heckmodel)
+plot(global)
+
+local_case &lt;- Influence(heckmodel, type = "case-weight")
+local_case$influent # influential values here!
+plot(local_case)
+
+local_scale &lt;- Influence(heckmodel, type = "scale")
+local_scale$influent # influential values here!
+plot(local_scale)
+
+local_response &lt;- Influence(heckmodel, type = "response")
+local_response$influent # influential values here!
+plot(local_response)
+
+local_explore &lt;- Influence(heckmodel, type = "exploratory", colx = 2)
+local_explore$influent # influential values here!
+plot(local_explore)
+
+
+</code></pre>
+
+
+</div>

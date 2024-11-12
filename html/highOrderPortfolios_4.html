@@ -1,0 +1,203 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>design_MVSK_portfolio_via_skew_t</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Design MVSK portfolio without shorting based on the parameters of generalized hyperbolic skew-t distribution</h2>
+
+<h3>Description</h3>
+
+<p>Design MVSK portfolio without shorting based on the parameters of generalized hyperbolic skew-t distribution:
+</p>
+<pre>
+  minimize     - lambda1*phi1(w) + lambda2*phi2(w)
+               - lambda3*phi3(w) + lambda4*phi4(w)
+  subject to   w&gt;=0, sum(w) == 1.
+</pre>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">design_MVSK_portfolio_via_skew_t(
+  lambda,
+  X_skew_t_params,
+  w_init = rep(1/length(X_skew_t_params$mu), length(X_skew_t_params$mu)),
+  method = c("L-MVSK", "DC", "Q-MVSK", "SQUAREM", "RFPA", "PGD"),
+  gamma = 1,
+  zeta = 1e-08,
+  tau_w = 0,
+  beta = 0.5,
+  tau = 1e+05,
+  initial_eta = 5,
+  maxiter = 1000,
+  ftol = 1e-06,
+  wtol = 1e-06,
+  stopval = -Inf
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>lambda</code></td>
+<td>
+<p>Numerical vector of length 4 indicating the weights of first four moments.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>X_skew_t_params</code></td>
+<td>
+<p>List of fitted parameters, including location vector, skewness vector, scatter matrix, and the degree of freedom,
+see <code>estimate_skew_t()</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>w_init</code></td>
+<td>
+<p>Numerical vector indicating the initial value of portfolio weights.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+<p>String indicating the algorithm method, must be one of: "L-MVSK", "DC", "Q-MVSK", "SQUAREM", "RFPA", "PGD".</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>gamma</code></td>
+<td>
+<p>Number (0 &lt; gamma &lt;= 1) indicating the initial value of gamma for the Q-MVSK method.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>zeta</code></td>
+<td>
+<p>Number (0 &lt; zeta &lt; 1) indicating the diminishing parameter of gamma for the Q-MVSK method.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tau_w</code></td>
+<td>
+<p>Number (&gt;= 0) guaranteeing the strong convexity of approximating function.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>beta</code></td>
+<td>
+<p>Number (0 &lt; beta &lt; 1) decreasing the step size of the projected gradient methods.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tau</code></td>
+<td>
+<p>Number (tau &gt; 0) hyper-parameters for the fixed-point acceleration.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>initial_eta</code></td>
+<td>
+<p>Initial eta for projected gradient methods</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>maxiter</code></td>
+<td>
+<p>Positive integer setting the maximum iteration.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ftol</code></td>
+<td>
+<p>Positive number setting the convergence criterion of function objective.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>wtol</code></td>
+<td>
+<p>Positive number setting the convergence criterion of portfolio weights.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>stopval</code></td>
+<td>
+<p>Number setting the stop value of objective.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A list containing the following elements:
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>w</code></td>
+<td>
+<p>Optimal portfolio vector.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cpu_time_vs_iterations</code></td>
+<td>
+<p>Time usage over iterations.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>objfun_vs_iterations</code></td>
+<td>
+<p>Objective function over iterations.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>iterations</code></td>
+<td>
+<p>Iterations index.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>convergence</code></td>
+<td>
+<p>Boolean flag to indicate whether or not the optimization converged.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>moments</code></td>
+<td>
+<p>Moments of portfolio return at optimal portfolio weights.</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>Xiwen Wang, Rui Zhou and Daniel P. Palomar
+</p>
+
+
+<h3>References</h3>
+
+<p>X. Wang, R. Zhou, J. Ying, and D. P. Palomar, "Efficient and Scalable High-Order Portfolios Design via Parametric Skew-t Distribution,"
+Available in arXiv, 2022. &lt;https://arxiv.org/pdf/2206.02412.pdf&gt;.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">library(highOrderPortfolios)
+data(X50)
+
+# estimate skew t distribution
+X_skew_t_params &lt;- estimate_skew_t(X50)
+
+# decide moment weights
+xi &lt;- 10
+lambda &lt;- c(1, 4, 10, 20)
+
+# portfolio optimization
+sol &lt;- design_MVSK_portfolio_via_skew_t(lambda, X_skew_t_params, method = "RFPA", tau = 10)
+
+</code></pre>
+
+
+</div>

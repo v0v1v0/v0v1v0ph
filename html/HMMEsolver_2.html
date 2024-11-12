@@ -1,0 +1,126 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>SolveHMME</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Solve Henderson's Mixed Model Equation.</h2>
+
+<h3>Description</h3>
+
+<p>Consider a linear mixed model with normal random effects,
+</p>
+<p style="text-align: center;"><code class="reqn">Y_{ij} = X_{ij}^T\beta + v_i + \epsilon_{ij}</code>
+</p>
+
+<p>where <code class="reqn">i=1,\ldots,n,\quad j=1,\ldots,m</code>, or it can be equivalently expressed using matrix notation,
+</p>
+<p style="text-align: center;"><code class="reqn">Y = X\beta + Zv + \epsilon</code>
+</p>
+
+<p>where <code class="reqn">Y\in \mathrm{R}^{nm}</code> is a known vector of observations, <code class="reqn">X \in \mathrm{R}^{nm\times p}</code> and
+<code class="reqn">Z \in \mathrm{R}^{nm\times n} </code> design matrices for <code class="reqn">\beta</code> and <code class="reqn">v</code> respectively,
+<code class="reqn">\beta \in \mathrm{R}^p</code> and <code class="reqn">v\in \mathrm{R}^n</code> unknown vectors of fixed effects and random effects where
+<code class="reqn">v_i \sim N(0,\lambda_i)</code>, and
+<code class="reqn">\epsilon \in \mathrm{R}^{nm}</code> an unknown vector random errors independent of random effects. Note that <code class="reqn">Z</code>
+does not need to be provided by a user since it is automatically created accordingly to the problem specification.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">SolveHMME(X, Y, Mu, Lambda)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>X</code></td>
+<td>
+<p>an <code class="reqn">(nm\times p)</code> design matrix for <code class="reqn">\beta</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Y</code></td>
+<td>
+<p>a length-<code class="reqn">nm</code> vector of observations.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Mu</code></td>
+<td>
+<p>a length-<code class="reqn">nm</code> vector of initial values for <code class="reqn">\mu_i = E(Y_i)</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Lambda</code></td>
+<td>
+<p>a length-<code class="reqn">n</code> vector of initial values for <code class="reqn">\lambda</code>, variance of <code class="reqn">v_i \sim N(0,\lambda_i)</code></p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>a named list containing </p>
+
+<dl>
+<dt>beta</dt>
+<dd>
+<p>a length-<code class="reqn">p</code> vector of BLUE <code class="reqn">\hat{beta}</code>.</p>
+</dd>
+<dt>v</dt>
+<dd>
+<p>a length-<code class="reqn">n</code> vector of BLUP <code class="reqn">\hat{v}</code>.</p>
+</dd>
+<dt>leverage</dt>
+<dd>
+<p>a length-<code class="reqn">(mn+n)</code> vector of leverages.</p>
+</dd>
+</dl>
+<h3>References</h3>
+
+<p>Henderson CR, Kempthorne O, Searle SR, von
+Krosigk CM (1959).
+“The Estimation of Environmental and Genetic Trends from Records Subject to Culling.”
+<em>Biometrics</em>, <b>15</b>(2), 192.
+ISSN 0006341X, doi: <a href="http://doi.org/10.2307/2527669">10.2307/2527669</a>, <a href="http://www.jstor.org/stable/2527669?origin=crossref">http://www.jstor.org/stable/2527669?origin=crossref</a>.
+</p>
+<p>Robinson GK (1991).
+“That BLUP is a Good Thing: The Estimation of Random Effects.”
+<em>Statistical Science</em>, <b>6</b>(1), 15–32.
+ISSN 0883-4237, doi: <a href="http://doi.org/10.1214/ss/1177011926">10.1214/ss/1177011926</a>, <a href="http://projecteuclid.org/euclid.ss/1177011926">http://projecteuclid.org/euclid.ss/1177011926</a>.
+</p>
+<p>McLean RA, Sanders WL, Stroup WW (1991).
+“A Unified Approach to Mixed Linear Models.”
+<em>The American Statistician</em>, <b>45</b>(1), 54.
+ISSN 00031305, doi: <a href="http://doi.org/10.2307/2685241">10.2307/2685241</a>, <a href="http://www.jstor.org/stable/2685241?origin=crossref">http://www.jstor.org/stable/2685241?origin=crossref</a>.
+</p>
+<p>Kim J (2017).
+“A Fast Algorithm for Solving Henderson's Mixed Model Equation.”
+<em>ArXiv e-prints</em>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## small setting for data generation
+n = 100; m = 2; p = 2
+nm = n*m;   nmp = n*m*p
+
+## generate artifical data
+X = matrix(rnorm(nmp, 2,1), nm,p) # design matrix
+Y = rnorm(nm, 2,1)                # observation
+
+Mu = rep(1, times=nm)
+Lambda = rep(1, times=n)
+
+## solve
+ans = SolveHMME(X, Y, Mu, Lambda)
+
+
+</code></pre>
+
+
+</div>

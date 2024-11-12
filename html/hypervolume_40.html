@@ -1,0 +1,130 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hypervolume_n_resample</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Bootstrap n hypervolumes
+</h2>
+
+<h3>Description</h3>
+
+<p>The function <code>hypervolume_n_resample()</code> generates n hypervolumes using data bootstrapped from original data of the input hypervolumes.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hypervolume_n_resample(name,
+                       hv_list,
+                       n = 10,
+                       points_per_resample = 'sample_size',
+                       cores = 1,
+                       verbose = TRUE,
+                       seed = NULL)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>name</code></td>
+<td>
+
+<p>File name; The function writes hypervolumes to file in "./Objects/&lt;name&gt;""
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>hv_list</code></td>
+<td>
+
+<p>A <code>Hypervolume</code> or <code>HypervolumeList</code> object.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n</code></td>
+<td>
+
+<p>Number of resamples to take.
+Used for every method.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>points_per_resample</code></td>
+<td>
+
+<p>Number of points in each resample. If the input is <code>sample_size</code>, then the same number of points as the original sample is used.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cores</code></td>
+<td>
+
+<p>Number of logical cores to use while generating bootstraped hypervolumes. If parallel backend already registered to <code>doParallel</code>, function will use that backend and ignore the argument in <code>cores</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+
+<p>Logical value; If function is being run sequentially, outputs progress bar in console.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>seed</code></td>
+<td>
+
+<p>Set seed for random number generation.
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p><code>hypervolume_n_resample()</code> creates a directory called Objects in the current working directory if a directory of that name doesn't already exist. A directory is then created for each hypervolume in <code>hv_list</code>. Returns an absolute path to directory with resampled hypervolumes. <br>
+It is possible to access the hypervolumes by using readRDS to read the hypervolume objects one by one. <br>
+The resampled hypervolumes are generated using the same parameters used to generate the input hypervolume. The only exception is that the bandwidth is re-estimated if <code>method = "gaussian"</code> or <code>method = "box"</code>. See <code>copy_param_hypervolume</code> for more details.
+</p>
+
+
+<h3>Value</h3>
+
+<p>Returns a string containing an absolute path equivalent to ./Objects/&lt;name&gt;
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>hypervolume_n_occupancy_bootstrap</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+
+library(palmerpenguins)
+data(penguins)
+bill_data = na.omit(penguins[,3:4])
+hv = hypervolume(bill_data)
+
+# Example 1: get 50 resampled hypervolumes for each input hypervolume
+# Use detectCores to see how many cores are availible in current environment
+# Set cores = 1 to run sequentially (default)
+# bootstrap the hypervolumes
+hv_list_boot = hypervolume_n_resample(name = "example", hv_list, n = 50)
+
+
+## End(Not run)
+</code></pre>
+
+
+</div>

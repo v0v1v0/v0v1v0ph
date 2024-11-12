@@ -1,0 +1,169 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>dggamma</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Generalized gamma distribution.</h2>
+
+<h3>Description</h3>
+
+<p>Generalized gamma distribution
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">dggamma(x, theta, kappa, delta, log = FALSE)
+
+pggamma(q, theta, kappa, delta, lower.tail = TRUE, log.p = FALSE)
+
+qggamma(p, theta, kappa, delta, lower.tail = TRUE, log.p = FALSE)
+
+rggamma(n, theta, kappa, delta)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x, q</code></td>
+<td>
+<p>vector of quantiles.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>theta</code></td>
+<td>
+<p>scale parameter.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>kappa</code></td>
+<td>
+<p>shape parameter.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>delta</code></td>
+<td>
+<p>shape parameter.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>log, log.p</code></td>
+<td>
+<p>logical; if TRUE, probabilities <em>p</em> are given as <em>log(p)</em>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lower.tail</code></td>
+<td>
+<p>logical; if TRUE (default), probabilities are <em>P[X &lt;= x]</em> otherwise, <em>P[X &gt; x]</em>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>p</code></td>
+<td>
+<p>vector of probabilities.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n</code></td>
+<td>
+<p>number of observations.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p><code>pggamma</code>, <code>qggamma</code>, <code>dggamma</code>, and <code>rggamma</code> are used to model the
+generalized gamma distribution.
+</p>
+<p>The code is modified from <a href="https://rpubs.com/FJRubio/GG">https://rpubs.com/FJRubio/GG</a>.
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>dggamma</code> gives the density, <code>pggamma</code> gives the distribution function,
+<code>qggamma</code> gives the quantile function, and <code>rggamma</code> generates random deviates.
+</p>
+
+
+<h3>Functions</h3>
+
+
+<ul>
+<li> <p><code>dggamma()</code>: Density of the generalized gamma.
+</p>
+</li>
+<li> <p><code>pggamma()</code>: Distribution function of the generalized gamma.
+</p>
+</li>
+<li> <p><code>qggamma()</code>: Quantile of the generalized gamma.
+</p>
+</li>
+<li> <p><code>rggamma()</code>: Random of the generalized gamma.
+</p>
+</li>
+</ul>
+<h3>More details here</h3>
+
+<p>The generalized gamma is described here <a href="https://en.wikipedia.org/wiki/Generalized_gamma_distribution">https://en.wikipedia.org/wiki/Generalized_gamma_distribution</a>.<br>
+With <code>a</code> being <code>theta</code>, <code>b</code> being <code>kappa</code>, and <code>p</code> being <code>delta</code>.<br><code>theta</code>, <code>kappa</code> and <code>delta</code> must be all &gt; 0.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Marc Girondot <a href="mailto:marc.girondot@gmail.com">marc.girondot@gmail.com</a>
+</p>
+
+
+<h3>See Also</h3>
+
+<p>Other Distributions: 
+<code>cutter()</code>,
+<code>dSnbinom()</code>,
+<code>dbeta_new()</code>,
+<code>dcutter()</code>,
+<code>logLik.cutter()</code>,
+<code>plot.cutter()</code>,
+<code>print.cutter()</code>,
+<code>r2norm()</code>,
+<code>rcutter()</code>,
+<code>rmnorm()</code>,
+<code>rnbinom_new()</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># To reproduce the wikipedia page graphic
+x &lt;- seq(from=0, to=8, by=0.1)
+plot(x, dggamma(x, theta=2, kappa=0.5, delta=0.5), lty=1, col="blue", 
+     type="l", lwd=2, xlab="x", ylab="PDF")
+lines(x, dggamma(x, theta=1, kappa=1, delta=0.5), lty=1, col="green", lwd=2)
+lines(x, dggamma(x, theta=2, kappa=1, delta=2), lty=1, col="red", lwd=2)
+lines(x, dggamma(x, theta=5, kappa=1, delta=5), lty=1, col="yellow", lwd=2)
+lines(x, dggamma(x, theta=7, kappa=1, delta=7), lty=1, col="grey", lwd=2)
+legend("topright", legend=c("a=2, d=0.5, p=0.5", "a=1, d=1, p=0.5", 
+                            "a=2, d=1, p=2", "a=5, d=1, p=5", "a=7, d=1, p=7"), 
+                            col=c("blue", "green", "red", "yellow", "grey"), 
+                            lty=1, lwd=2, bty="n")
+par &lt;- c(theta=2, kappa=0.5, delta=0.5)
+# Mean, var and sd
+mean.ggamma &lt;- function(theta, kappa, delta) 
+       return(theta*(gamma((kappa+1)/delta))/gamma(kappa/delta))
+var.ggamma &lt;- function(theta, kappa, delta) 
+       return(theta^2* ( ( (gamma((kappa+2)/delta))/gamma(kappa/delta) ) - 
+                ( (gamma((kappa+1)/delta))/gamma(kappa/delta) )^2 ) )
+sd.ggamma &lt;- function(theta, kappa, delta) 
+       return(sqrt(theta^2* ( ( (gamma((kappa+2)/delta))/gamma(kappa/delta) ) - 
+                ( (gamma((kappa+1)/delta))/gamma(kappa/delta) )^2 ) ))
+</code></pre>
+
+
+</div>

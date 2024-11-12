@@ -1,0 +1,237 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>modalreg</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Nonparametric Multimodal Regression</h2>
+
+<h3>Description</h3>
+
+<p>Nonparametric multi-valued regression based on the modes of conditional
+density estimates.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">modalreg(
+  x,
+  y,
+  xfix = seq(min(x), max(x), l = 50),
+  a,
+  b,
+  deg = 0,
+  iter = 30,
+  P = 2,
+  start = "e",
+  prun = TRUE,
+  prun.const = 10,
+  plot.type = c("p", 1),
+  labels = c("", "x", "y"),
+  pch = 20,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>Numerical vector: the conditioning variable.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+<p>Numerical vector: the response variable.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>xfix</code></td>
+<td>
+<p>Numerical vector corresponding to the input values of which the
+fitted values shall be calculated.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>a</code></td>
+<td>
+<p>Optional bandwidth in <code class="reqn">x</code>-direction.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>b</code></td>
+<td>
+<p>Optional bandwidth in <code class="reqn">y</code>-direction.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>deg</code></td>
+<td>
+<p>Degree of local polynomial used in estimation (0 or 1).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>iter</code></td>
+<td>
+<p>Positive integer giving the number of mean shift iterations per
+point and branch.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>P</code></td>
+<td>
+<p>Maximal number of branches.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>start</code></td>
+<td>
+<p>Character determining how the starting points are selected.
+<code>"q"</code>: proportional to quantiles; <code>"e"</code>: equidistant; <code>"r"</code>:
+random.  All, <code>"q"</code>, <code>"e"</code>, and <code>"r"</code>, give starting points
+which are constant over <code>x</code>.  As an alternative, the choice <code>"v"</code>
+gives variable starting points, which are equal to <code>"q"</code> for the
+smallest <code>x</code>, and equal to the previously fitted values for all
+subsequent <code>x</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>prun</code></td>
+<td>
+<p>Boolean. If TRUE, parts of branches are dismissed (in the
+plotted output) where their associated kernel density value falls below the
+threshold <code>1/(prun.const*(max(x)-min(x))*(max(y)-min(y)))</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>prun.const</code></td>
+<td>
+<p>Numerical value giving the constant used above (the
+higher, the less pruning)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>plot.type</code></td>
+<td>
+<p>Vector with two elements. The first one is
+character-valued, with possible values <code>"p"</code>, <code>"l"</code>, and
+<code>"n"</code>.  If equal to <code>"n"</code>, no plotted output is given at all. If
+equal to <code>"p"</code>, fitted curves are symbolized as points in the graphical
+output, otherwise as lines.  The second vector component is a numerical
+value either being 0 or 1. If 1, the position of the starting points is
+depicted in the plot, otherwise omitted.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>labels</code></td>
+<td>
+<p>Vector of three character strings.  The first one is the
+"main" title of the graphical output, the second one is the label of the
+<code class="reqn">x</code> axis, and the third one the label of the <code class="reqn">y</code> axis.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pch</code></td>
+<td>
+<p>Plotting character. The default corresponds to small bullets.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Other arguments passed to <code>cde.bandwidths</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Computes multi-modal nonparametric regression curves based on the maxima of
+conditional density estimates. The tool for the estimation is the
+conditional mean shift as outlined in Einbeck and Tutz (2006).  Estimates of
+the conditional modes might fluctuate highly if <code>deg=1</code>.  Hence,
+<code>deg=0</code> is recommended. For bandwidth selection, the hybrid rule
+introduced by Bashtannyk and Hyndman (2001) is employed if <code>deg=0</code>.
+This corresponds to the setting <code>method=1</code> in function
+<code>cde.bandwidths</code>. For <code>deg=1</code> automatic bandwidth selection is not
+supported.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A list with the following components: </p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>xfix</code></td>
+<td>
+<p>Grid of predictor
+values at which the fitted values are calculated.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fitted.values</code></td>
+<td>
+<p>A
+<code>[P x length(xfix)]</code>- matrix with fitted j-th branch in the j-th row
+(<code class="reqn">1 \le j \le P</code>) </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>bandwidths</code></td>
+<td>
+<p>A vector with
+bandwidths <code>a</code> and <code>b</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>density</code></td>
+<td>
+<p>A <code>[P x
+length(xfix)]</code>- matrix with estimated kernel densities. This will only be
+computed if <code>prun=TRUE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>threshold</code></td>
+<td>
+<p>The pruning threshold.</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>Jochen Einbeck (2007)
+</p>
+
+
+<h3>References</h3>
+
+<p>Einbeck, J., and Tutz, G. (2006) "Modelling beyond regression
+functions: an application of multimodal regression to speed-flow data".
+<em>Journal of the Royal Statistical Society, Series C (Applied
+Statistics)</em>, <b>55</b>, 461-475.
+</p>
+<p>Bashtannyk, D.M., and Hyndman, R.J. (2001) "Bandwidth selection for kernel
+conditional density estimation". <em>Computational Statistics and Data
+Analysis</em>, <b>36</b>(3), 279-298.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>cde.bandwidths</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">lane2.fit &lt;- modalreg(lane2$flow, lane2$speed, xfix=(1:55)*40, a=100, b=4)
+</code></pre>
+
+
+</div>

@@ -1,0 +1,102 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hce</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Helper function for <code>hce</code> objects</h2>
+
+<h3>Description</h3>
+
+<p>Helper function for <code>hce</code> objects
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hce(
+  GROUP = character(),
+  TRTP = character(),
+  AVAL0 = 0,
+  ORD = sort(unique(GROUP))
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>GROUP</code></td>
+<td>
+<p>a character vector of the same length as <code>AVAL</code> containing events.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>TRTP</code></td>
+<td>
+<p>a character vector of the same length as <code>AVAL</code> containing assigned treatment groups.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>AVAL0</code></td>
+<td>
+<p>a numeric vector of analysis values within each category. The default is 0.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ORD</code></td>
+<td>
+<p>a character vector containing ordered unique values of the <code>GROUP</code> variable for determining the hierarchy of events.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>an object of class <code>hce</code>. Its is a subject-level data frame (each row corresponds to one subject), containing the following columns:
+</p>
+
+<ul>
+<li>
+<p> SUBJID subject ID.
+</p>
+</li>
+<li>
+<p> GROUP a character vector specifying the type of the outcome the patient experienced - either a TTE (time-to-event) or C (continuous).
+</p>
+</li>
+<li>
+<p> GROUPN a numeric vector version of the <code>GROUP</code> column.
+</p>
+</li>
+<li>
+<p> AVAL0 original analysis values - time of the time-to-event outcomes or the continuous outcome.
+</p>
+</li>
+<li>
+<p> AVAL derived analysis value <code>AVAL = AVAL0 + GROUPN</code>.
+</p>
+</li>
+<li>
+<p> TRTP assigned treatment groups.
+</p>
+</li>
+</ul>
+<h3>See Also</h3>
+
+<p><code>as_hce()</code> for coercing to <code>hce</code> objects.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Example 1
+set.seed(2022)
+d &lt;- hce(GROUP = sample(x = c("A", "B", "C"), size = 10, replace = TRUE), 
+TRTP = rep(c("Active", "Control"), each = 5), 
+AVAL0 = c(rnorm(5, mean = 1), rnorm(5)), ORD = c("A", "B", "C"))
+calcWO(d, ref = "Control")
+</code></pre>
+
+
+</div>

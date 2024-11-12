@@ -1,0 +1,77 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>canopy_fisheye</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Calculate canopy attributes from angular gap fraction data derived from fisheye images</h2>
+
+<h3>Description</h3>
+
+<p>The function calculate canopy attributes from angular distribution of gap fraction.
+It returns both the effective (Le) and actual (L) leaf area index following the Miller theorem (1967).
+The Lang and Xiang (1986) clumping index LX is calculated as the ratio of Le to L;  two additional clumping indices (LXG1, LXG2) are derived from ordered weighted average gap fraction as in Chianucci et al. (2019).
+The mean leaf angle (MTA) and the ellipsoidal x are derived from Norman and Campbell (1989).
+Canopy openness is also provided as weighted diffuse non-interceptance (DIFN), following the LAI-2200 manual (Li-Cor Inc., Nebraska US).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">canopy_fisheye(rdfw)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table><tr style="vertical-align: top;">
+<td><code>rdfw</code></td>
+<td>
+<p>Dataframe. The input dataframe generated from <code>gapfrac_fisheye()</code>, which contains gap fraction for zenith and azimuth bins.</p>
+</td>
+</tr></table>
+<h3>Value</h3>
+
+<p>A dataframe of canopy attributes from classified fisheye images.
+</p>
+
+
+<h3>See Also</h3>
+
+<p>Chianucci F., Zou J., Leng P., Zhuang Y., Ferrara C. 2019. A new method to estimate clumping index integrating gap fraction averaging with the analysis of gap size distribution. Canadian Journal of Forest Research 49 <a href="https://doi.org/10.1139/cjfr-2018-0213">doi:10.1139/cjfr-2018-0213</a> <br><br>
+LAI-2200C Plant Canopy Analyzer - Instruction Manuals. Licor.<br><br>
+Lang A.R.G., Xiang Y. 1986. Estimation of leaf area index from transmission of direct sunlight in discontinuous canopies. Agricultural and Forest Meteorology 37, 228-243. <a href="https://doi.org/10.1016/0168-1923%2886%2990033-X">doi:10.1016/0168-1923(86)90033-X</a> <br><br>
+Miller J.B. 1967. A formula for average foliage density. Australian Journal of Botany 15(1) 141 - 144. <a href="https://doi.org/10.1071/BT9670141">doi:10.1071/BT9670141</a> .<br><br>
+Norman J.M., Campbell G.S. 1986. Canopy structure. In: Plant Physiological Ecology, pp. 301-325 <a href="https://doi.org/10.1007/978-94-009-2221-1_14">doi:10.1007/978-94-009-2221-1_14</a>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+
+c.im&lt;-system.file('extdata/circular_coolpix4500+FC-E8_chestnut.jpg',package='hemispheR')
+c.im |&gt;
+  import_fisheye(circ.mask=camera_fisheye('Coolpix4500+FC-E8')) |&gt;
+  binarize_fisheye() |&gt;
+  gapfrac_fisheye(lens='FC-E8',nrings=7,nseg=8,endVZA=70) |&gt;
+  canopy_fisheye()
+
+#Zenith rings similar to LAI-2000/2200:
+c.im |&gt;
+ import_fisheye(circ.mask=camera_fisheye('Coolpix4500+FC-E8')) |&gt;
+  binarize_fisheye() |&gt;
+  gapfrac_fisheye(lens='FC-E8',nrings=5,nseg=8,endVZA=75) |&gt;
+  canopy_fisheye()
+
+#The hinge angle method close to 1 radian (57 degree):
+c.im |&gt;
+ import_fisheye(circ.mask=camera_fisheye('Coolpix4500+FC-E8')) |&gt;
+  binarize_fisheye() |&gt;
+  gapfrac_fisheye(lens='FC-E8',nrings=1,nseg=8,startVZA=55,endVZA=60) |&gt;
+  canopy_fisheye()
+
+</code></pre>
+
+
+</div>

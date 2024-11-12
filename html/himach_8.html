@@ -1,0 +1,168 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>find_leg</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Find best non-stop route between 2 airports</h2>
+
+<h3>Description</h3>
+
+<p><code>find_leg</code> finds the quickest non-stop route for <code>ac</code> between
+two airports <code>ap2</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">find_leg(
+  ac,
+  ap2,
+  route_grid,
+  fat_map,
+  ap_loc,
+  avoid = NA,
+  enforce_range = TRUE,
+  best_by_time = TRUE,
+  grace_km = NA,
+  shortcuts = TRUE,
+  ad_dist_m = 100 * 1000,
+  ad_nearest = 12,
+  max_leg_circuity = 1.4,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>ac, ap2, route_grid, fat_map, ap_loc, avoid</code></td>
+<td>
+<p>See <code>find_route</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>enforce_range</code></td>
+<td>
+<p>If TRUE (default) then leg is constrained to aircraft range,
+otherwise routes of excess range can be found.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>best_by_time</code></td>
+<td>
+<p>If TRUE (default) then the quickest route is found,
+else the shortest distance.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>grace_km</code></td>
+<td>
+<p>Default NA. Otherwise, if great circle distance is within
+3pct of aircraft range, then add <code>grace_km</code>km to the range.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>shortcuts</code></td>
+<td>
+<p>If TRUE (default) then path will be checked for great circle shortcuts.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ad_dist_m</code></td>
+<td>
+<p>The length of arrival/departure links, in m. (Default 100,000=100km)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ad_nearest</code></td>
+<td>
+<p>The number of arrival/departure links to create (Default 12)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>max_leg_circuity</code></td>
+<td>
+<p>The maximum detour over great circle distance that
+can be flown to find a quick over-sea route. Default 1.4.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Other parameters, passed to <code>make_route_envelope</code></p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>This function finds the quickest non-stop route between two airports. A
+'route' is made up of one or two 'legs' (airport to airport without
+intermediate stop). <code>find_route</code> makes one or more calls to
+<code>find_leg</code> as required.
+</p>
+<p>It assumes that the routing grid, <code>route_grid</code>, has already been classified as
+land or sea using the map <code>fat_map</code>. The map is further used when
+converting the grid-based route to one of great-circle segments.
+</p>
+<p>In fact <code>find_leg</code> finds up to 4 versions of the path:
+</p>
+
+<ol>
+<li>
+<p> A great circle, direct between the airports
+</p>
+</li>
+<li>
+<p> A grid path, consisting of segments of the routing grid, plus departure
+and arrival routes from the airports
+</p>
+</li>
+<li>
+<p> A simplification of the grid path to great circle segments
+</p>
+</li>
+<li> <p><code>shortcuts</code> defaults to TRUE. Without this, you see near-raw
+Dijkstra results, which are _not_ shortest great circle.
+</p>
+</li>
+</ol>
+<p>Legs are automatically saved in <code>route_cache</code> and retrieved from here if
+available rather than re-calculated. See
+<a href="../doc/Supersonic_routes_in_depth.html#cache">vignette on caching</a> for cache
+management.
+</p>
+
+
+<h3>Value</h3>
+
+<p>Dataframe with details of the leg
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># need to load some of the built-in data (not run)
+## Not run: 
+aircraft &lt;- make_aircraft(warn = FALSE)
+airports &lt;- make_airports(crs = crs_Pacific)
+# get test datasets
+NZ_buffer30 &lt;- hm_get_test("buffer")
+NZ_grid &lt;- hm_get_test("grid")
+
+options("quiet" = 4) #for heavy reporting
+# from Auckland to Christchurch
+ap2 &lt;- make_AP2("NZAA","NZCH",airports)
+routes &lt;- find_leg(aircraft[4,],
+                    ap2,
+                    fat_map = NZ_buffer30,
+                    route_grid = NZ_grid,
+                    ap_loc = airports)
+
+## End(Not run)
+</code></pre>
+
+
+</div>

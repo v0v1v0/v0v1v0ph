@@ -1,0 +1,92 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>eventPOT</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Event identification (using a peak over threshold algorithm)</h2>
+
+<h3>Description</h3>
+
+<p>Identify events using a specified threshold value over which an event is considered to have occurred.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">eventPOT(data, threshold = 0, min.diff = 1, out.style = "summary")
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>A data vector</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>threshold</code></td>
+<td>
+<p>Value above which an event is considered to have occurred</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>min.diff</code></td>
+<td>
+<p>Spacing required for two events to be considered separate</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>out.style</code></td>
+<td>
+<p>The type of output (currently either "summary" or "none")</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The <code>threshold</code> can be thought of a value below which the <code>data</code> are considered to be "zero".
+The <code>min.diff</code> can be viewed as the minimum spacing for event independence.
+</p>
+
+
+<h3>Value</h3>
+
+<p>By default, the <code>out.style</code> returns the indices of the maximum in each event, as well as the value of
+the maximum and the sum of the <code>data</code> in each event, alongside the start and end of the events. Otherwise just
+the indices of start and end of events as a two column dataframe are returned.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>calcStats</code> <code>eventBaseflow</code> <code>eventMaxima</code> <code>eventMinima</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Example using streamflow data
+bf = baseflowB(dataBassRiver, alpha = 0.925)
+qf = dataBassRiver - bf$bf
+events = eventPOT(qf)
+plotEvents(qf, dates = NULL, events = events, type = "lineover",
+   main = "Events (plotted on quickflow)")
+plotEvents(dataBassRiver, dates = NULL, events = events, type = "lineover",
+   main = "Events (plotted on streamflow)")
+
+# Examples using rainfall data
+events = eventPOT(dataLoch, threshold = 0, min.diff = 1)
+plotEvents(dataLoch, dates = NULL, events = events, type = "hyet",
+   main = "Rainfall Events (threshold = 0, min.diff = 1)")
+
+events = eventPOT(dataLoch, threshold = 2, min.diff = 2)
+plotEvents(dataLoch, dates = NULL, events = events, type = "hyet",
+   main = "Rainfall Events (threshold = 2, min.diff = 2)")
+</code></pre>
+
+
+</div>

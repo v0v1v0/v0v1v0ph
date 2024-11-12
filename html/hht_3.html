@@ -1,0 +1,224 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>EEMD</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Ensemble Empirical Mode Decomposition</h2>
+
+<h3>Description</h3>
+
+<p>This function performs ensemble empirical mode decomposition (EEMD).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">EEMD(sig, tt, noise.amp, trials, nimf, trials.dir = NULL, verbose = TRUE, 
+    spectral.method = "arctan", diff.lag = 1, tol = 5, max.sift = 200,
+    stop.rule = "type5", boundary = "wave", sm = "none",
+    smlevels = c(1), spar = NULL, max.imf = 100, interm = NULL, 
+    noise.type = "gaussian", noise.array = NULL)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>sig</code></td>
+<td>
+<p>a time series to be decomposed (vector)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tt</code></td>
+<td>
+<p>The sample times of <code>sig</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>noise.amp</code></td>
+<td>
+<p>Amplitude of white noise to use in denoising algorithm</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>trials</code></td>
+<td>
+<p>Number of times to run EMD</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nimf</code></td>
+<td>
+<p>Number of IMFs to record, IMFs past this number will not be saved</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>trials.dir</code></td>
+<td>
+<p>Directory where EEMD trial files will be stored, defaults to “trials.”  This will create a directory if none exists.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p>If TRUE, notify when each trial is complete</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>spectral.method</code></td>
+<td>
+<p>See <code>Sig2IMF</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>diff.lag</code></td>
+<td>
+<p>See <code>Sig2IMF</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tol</code></td>
+<td>
+<p>See <code>Sig2IMF</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>max.sift</code></td>
+<td>
+<p>See <code>Sig2IMF</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>stop.rule</code></td>
+<td>
+<p>See <code>Sig2IMF</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>boundary</code></td>
+<td>
+<p>See <code>Sig2IMF</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sm</code></td>
+<td>
+<p>See <code>Sig2IMF</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>smlevels</code></td>
+<td>
+<p>See <code>Sig2IMF</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>spar</code></td>
+<td>
+<p>See <code>Sig2IMF</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>max.imf</code></td>
+<td>
+<p>See <code>Sig2IMF</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>interm</code></td>
+<td>
+<p>See <code>Sig2IMF</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>noise.type</code></td>
+<td>
+<p>If unspecified or <code>gaussian</code>, produce a Gaussian noise series with length <code>length(sig)</code> and standard deviation <code>noise.amp</code>.
+If <code>uniform</code>, produce a uniform random distribution with length <code>length(sig)</code> and maximum absolute value of <code>noise.amp</code>.
+If <code>custom</code>, then use a custom noise array as defined in input parameter <code>noise.array</code> (see below).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>noise.array</code></td>
+<td>
+<p>If <code>noise.type = "custom"</code>, this array must be a TRIALS x LENGTH(TT) collection of time series to be used in the place of uniform or gaussian noise.
+Each row in the array corresponds to the noise series added for that particular trial during the EEMD run.
+By default, <code>noise.array = NULL</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>This function performs ensemble empirical mode decomposition, a noise assisted version of the EMD algorithm.
+The EEMD works by adding a certain amplitude of white noise to a time series, decomposing it via EMD, and saving the result.
+If this is done enough times, the averages of the noise perturbed IMFs will approach the “true” IMF set.
+The EEMD can ameliorate mode mixing and intermittency problems (see references section).
+</p>
+<p>This EEMD algorithm creates a directory <code>trials.dir</code> and saves each EMD trial into this directory.
+The number of trials is defined using <code>trials</code>.
+The trial files in this directory can then be processed using <code>EEMDCompile</code> to produce the averaged IMF set, or to plot the Hilbert spectrogram of the data.
+Keep in mind that the EEMD is an expensive algorithm and may take significant time to run.
+</p>
+
+
+<h3>Value</h3>
+
+ 
+<table><tr style="vertical-align: top;">
+<td><code>emd.result</code></td>
+<td>
+<p>The result of each individual EMD trial. This is saved directly to files in directory <code>trials.dir</code> (i.e. it is not returned by <code>EEMD</code>.)</p>
+</td>
+</tr></table>
+<h3>Note</h3>
+
+<p>Previous versions of this function used a uniform random noise distribution (i.e. <code>runif</code>) to generate the noise time series.
+The default noise time series is now Gaussian in accordance with existing EEMD literature.</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Daniel Bowman <a href="mailto:danny.c.bowman@gmail.com">danny.c.bowman@gmail.com</a></p>
+
+
+<h3>References</h3>
+
+<p>Wu, Z. A. and Huang, N. E. (2009) Ensemble empirical mode decomposition: A noise assisted data analysis method.
+<em>Advances in Adaptive Data Analysis</em>, <b>1</b>, 1-41.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>Sig2IMF</code>, <code>CombineTrials</code>, <code>EEMDCompile</code>, <code>PlotIMFs</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(PortFosterEvent)
+trials &lt;- 10
+nimf &lt;- 10
+noise.amp &lt;- 6.4e-07
+trials.dir &lt;- "test"
+
+set.seed(628)
+#Run EEMD (this may take some time)
+## Not run: EEMD(sig, tt, noise.amp, trials, nimf, trials.dir = trials.dir)
+
+#Compile the results
+## Not run: EEMD.result &lt;- EEMDCompile(trials.dir, trials, nimf)
+
+#Plot the IMFs
+time.span &lt;- c(5, 10)
+imf.list &lt;- 1:3
+os &lt;- TRUE
+res &lt;- TRUE
+## Not run: PlotIMFs(EEMD.result, time.span, imf.list, os, res)
+</code></pre>
+
+
+</div>

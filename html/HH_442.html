@@ -1,0 +1,257 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>as.multicomp</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Support functions in R for MMC (mean–mean multiple comparisons) plots.</h2>
+
+<h3>Description</h3>
+
+<p>MMC plots: In R, functions used to interface the <code>glht</code> in R to the MMC
+functions designed with S-Plus <code>multicomp</code> notation.  These are
+all internal functions that the user doesn't see.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">## S3 method for class 'mmc.multicomp'
+print(x, ..., width.cutoff=options()$width-5)
+
+## S3 method for class 'multicomp'
+print(x, ...)
+
+## print.multicomp.hh(x, digits = 4, ..., height=T) ## S-Plus only
+
+## S3 method for class 'multicomp.hh'
+print(x, ...) ## R only
+
+
+
+as.multicomp(x, ...)
+
+## S3 method for class 'glht'
+as.multicomp(x,       ## glht object
+           focus=x$focus,
+           ylabel=deparse(terms(x$model)[[2]]),
+           means=model.tables(x$model, type="means",
+                              cterm=focus)$tables[[focus]],
+           height=rev(1:nrow(x$linfct)),
+           lmat=t(x$linfct),
+           lmat.rows=lmatRows(x, focus),
+           lmat.scale.abs2=TRUE,
+           estimate.sign=1,
+           order.contrasts=TRUE,
+           contrasts.none=FALSE,
+           level=0.95,
+           calpha=NULL,
+           method=x$type,
+           df,
+           vcov.,
+           ...
+           )
+
+as.glht(x, ...)
+
+## S3 method for class 'multicomp'
+as.glht(x, ...)
+
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p><code>"glht"</code> object for <code>as.multicomp</code>.
+A <code>"mmc.multicomp"</code> object for <code>print.mmc.multicomp</code>.
+
+A <code>"multicomp"</code> object for <code>as.glht</code> and <code>print.multicomp</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>other arguments.</p>
+</td>
+</tr>
+</table>
+<table>
+<tr style="vertical-align: top;">
+<td><code>focus</code></td>
+<td>
+<p>name of focus factor.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ylabel</code></td>
+<td>
+<p>response variable name on the graph.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>means</code></td>
+<td>
+<p>means of the response variable on the <code>focus</code> factor.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lmat, lmat.rows</code></td>
+<td>
+<p><code>mmc</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lmat.scale.abs2</code></td>
+<td>
+<p>logical, almost always <code>TRUE</code>.  If it is
+not <code>TRUE</code>, then the contrasts will not be properly placed
+on the MMC plot.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>estimate.sign</code></td>
+<td>
+<p>numeric. 1: force all contrasts to be positive by
+reversing negative contrasts. $-1$: force all contrasts to be negative by
+reversing positive contrasts.  Leave contrasts as they are constructed
+by <code>glht</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>order.contrasts, height</code></td>
+<td>
+<p>logical.  If <code>TRUE</code>, order contrasts by
+<code>height</code> (see <code>mmc</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>contrasts.none</code></td>
+<td>
+<p>logical.  This is an internal detail.  The
+“contrasts” for the group means are not real contrasts in the
+sense they don't compare anything.  <code>mmc.glht</code> sets this
+argument to <code>TRUE</code> for the <code>none</code> component.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>level</code></td>
+<td>
+<p>Confidence level.  Defaults to 0.95.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>calpha</code></td>
+<td>
+<p>R only.  User-specified critical point.
+See
+
+<code>confint.glht</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>df, vcov.</code></td>
+<td>
+<p>R only.  Arguments forwarded through <code>glht</code> to
+
+<code>modelparm</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+<p>R only.  See <code>type</code> in
+
+<code>confint.glht</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>width.cutoff</code></td>
+<td>
+<p>See <code>deparse</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The <code>mmc.multicomp</code> <code>print</code>
+method displays the confidence intervals and heights on the
+MMC plot for each component of the <code>mmc.multicomp</code> object.
+</p>
+<p><code>print.multicomp</code> displays the confidence intervals and heights for
+a single component.
+</p>
+
+
+
+
+
+<h3>Value</h3>
+
+<p><code>as.multicomp</code> is a generic function to change its argument to a
+<code>"multicomp"</code> object.
+</p>
+<p><code>as.multicomp.glht</code> changes an <code>"glht"</code> object to a
+<code>"multicomp"</code> object.  If the model component of the argument <code>"x"</code>
+is an <code>"aov"</code> object then the standard error is taken from the
+<code>anova(x$model)</code> table, otherwise from the <code>summary(x)</code>.
+With a large number of levels for the focus factor, the
+<code>summary(x)</code>
+function is exceedingly slow (80 minutes for 30 levels on 1.5GHz Windows
+XP).
+For the same example, the <code>anova(x$model)</code> takes a fraction of
+a second.</p>
+
+
+<h3>Note</h3>
+
+<p>The multiple comparisons calculations in R and S-Plus use
+completely different functions.
+MMC plots in R are based on
+
+<code>glht</code>.
+</p>
+<p>MMC plots in S-Plus are based on
+
+<code>multicomp</code>.
+</p>
+<p>The MMC plot is the same in both systems.  The details of gettting the
+plot differ.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p> Richard M. Heiberger &lt;rmh@temple.edu&gt; </p>
+
+
+<h3>References</h3>
+
+<p>Heiberger, Richard M. and Holland, Burt (2015).
+<em>Statistical Analysis and Data Display: An Intermediate Course with Examples in R</em>.
+Second Edition.
+Springer-Verlag, New York.
+<a href="https://link.springer.com/book/10.1007/978-1-4939-2122-5">https://link.springer.com/book/10.1007/978-1-4939-2122-5</a>
+</p>
+<p>Heiberger, Richard M. and Holland, Burt (2006).
+"Mean–mean multiple comparison displays for families of linear contrasts."
+<em>Journal of Computational and Graphical Statistics</em>, 15:937–955.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>mmc</code>,
+
+<code>glht</code>.
+</p>
+
+
+</div>

@@ -1,0 +1,230 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>predict_partitioning_schmitt</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Predict partition coefficients using the method from Schmitt (2008).</h2>
+
+<h3>Description</h3>
+
+<p>This function implements the method from Schmitt (2008) for predicting the 
+tissue to unbound plasma partition coefficients for the tissues contained 
+in the <code>tissue.data</code> table. The method has been modified
+by Pearce et al. (2017) based on an evaluation using in vivo measured 
+partition coefficients.
+</p>
+<p>To understand this method, it is 
+important to recognize that in  a given media the fraction unbound in that 
+media is inverse of the media:water partition coefficient. 
+In Schmitt's model, each tissue is composed of cells and
+interstitium, with each cell consisting of neutral lipid,
+neutral phospholipid, water, protein, and acidic phospholipid.
+Each tissue cell is defined as the sum of separate
+compartments for each constituent, all of which partition
+with a shared water compartment. The partitioning between
+the cell components and cell water is compound specific
+and determined by log Pow (in neutral lipid partitioning),
+membrane affinity (phospholipid and protein partitioning),
+and pKa (neutral lipid and acidic phospholipid partitioning).
+For a given compound the partitioning into each
+component is identical across tissues. Thus the differences
+among tissues are driven by their composition, that is, the
+varying volumes of components such as neutral lipid.
+However, pH differences across tissues also determine
+small differences in partitioning between cell and plasma
+water. The fup is used as the plasma water to total plasma
+partition coefficient and to approximate the partitioning
+between interstitial protein and water.
+</p>
+<p>A regression is used to predict membrane affinity when measured values are 
+not available (<code>calc_ma</code>).  The
+regressions for correcting each tissue are performed on tissue plasma
+partition coefficients (Ktissue2pu * Funbound.plasma) calculated with the
+corrected Funbound.plasma value and divided by this value to get Ktissue2pu.
+Thus the regressions should be used with the corrected Funbound.plasma.
+</p>
+<p>A separate regression is used when adjusted.Funbound.plasma is FALSE.
+</p>
+<p>The red blood cell regression can be used but is not by default because of
+the span of the data used for evaluation, reducing confidence in the 
+regression for higher and lower predicted values.
+</p>
+<p>Human tissue volumes are used for species other than Rat.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">predict_partitioning_schmitt(
+  chem.name = NULL,
+  chem.cas = NULL,
+  dtxsid = NULL,
+  species = "Human",
+  model = "pbtk",
+  default.to.human = FALSE,
+  parameters = NULL,
+  alpha = 0.001,
+  adjusted.Funbound.plasma = TRUE,
+  regression = TRUE,
+  regression.list = c("brain", "adipose", "gut", "heart", "kidney", "liver", "lung",
+    "muscle", "skin", "spleen", "bone"),
+  tissues = NULL,
+  minimum.Funbound.plasma = 1e-04,
+  suppress.messages = FALSE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>chem.name</code></td>
+<td>
+<p>Either the chemical name or the CAS number must be
+specified.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>chem.cas</code></td>
+<td>
+<p>Either the chemical name or the CAS number must be
+specified.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dtxsid</code></td>
+<td>
+<p>EPA's DSSTox Structure ID (<a href="https://comptox.epa.gov/dashboard">https://comptox.epa.gov/dashboard</a>)
+the chemical must be identified by either CAS, name, or DTXSIDs</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>species</code></td>
+<td>
+<p>Species desired (either "Rat", "Rabbit", "Dog", "Mouse", or
+default "Human").</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>model</code></td>
+<td>
+<p>Model for which partition coefficients are neeeded (for example,
+"pbtk", "3compartment")</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>default.to.human</code></td>
+<td>
+<p>Substitutes missing animal values with human values
+if true (hepatic intrinsic clearance or fraction of unbound plasma).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>parameters</code></td>
+<td>
+<p>Chemical parameters from <code>parameterize_schmitt</code>
+overrides chem.name, dtxsid, and chem.cas.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alpha</code></td>
+<td>
+<p>Ratio of Distribution coefficient D of totally charged species
+and that of the neutral form</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>adjusted.Funbound.plasma</code></td>
+<td>
+<p>Whether or not to use Funbound.plasma
+adjustment.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>regression</code></td>
+<td>
+<p>Whether or not to use the regressions.  Regressions are
+used by default.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>regression.list</code></td>
+<td>
+<p>Tissues to use regressions on.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tissues</code></td>
+<td>
+<p>Vector of desired partition coefficients.  Returns all by
+default.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>minimum.Funbound.plasma</code></td>
+<td>
+<p>Monte Carlo draws less than this value are set 
+equal to this value (default is 0.0001 – half the lowest measured Fup in our
+dataset).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>suppress.messages</code></td>
+<td>
+<p>Whether or not the output message is suppressed.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>Returns tissue to unbound plasma partition coefficients for each
+tissue.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Robert Pearce
+</p>
+
+
+<h3>References</h3>
+
+<p>Schmitt, Walter. "General approach for the calculation of tissue to plasma 
+partition coefficients." Toxicology in Vitro 22.2 (2008): 457-467.
+</p>
+<p>Birnbaum, L., et al. "Physiological parameter values for PBPK models." 
+International Life Sciences Institute, Risk Science Institute, Washington, 
+DC (1994).
+</p>
+<p>Pearce, Robert G., et al. "Evaluation and calibration of high-throughput 
+predictions of chemical distribution to tissues." Journal of pharmacokinetics 
+and pharmacodynamics 44.6 (2017): 549-565.
+</p>
+<p>Yun, Y. E., and A. N. Edginton. "Correlation-based prediction of 
+tissue-to-plasma partition coefficients using readily available input 
+parameters." Xenobiotica 43.10 (2013): 839-852.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>parameterize_schmitt</code>
+</p>
+<p><code>tissue.data</code>
+</p>
+<p><code>calc_ma</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+predict_partitioning_schmitt(chem.name='ibuprofen',regression=FALSE)
+
+</code></pre>
+
+
+</div>

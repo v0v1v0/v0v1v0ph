@@ -1,0 +1,142 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hsaDist</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Probabilities and Moments Hermite Spline Approximation</h2>
+
+<h3>Description</h3>
+
+<p>The set of functions similar to <code>dhpa</code>-like
+functions. The difference is that instead of polynomial these functions
+utilize spline.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">dhsa(x, m, knots, mean = 0, sd = 1, log = FALSE)
+
+ehsa(m, knots, mean = 0, sd = 1, power = 1)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>numeric vector of values for which the function should 
+be estimated.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>m</code></td>
+<td>
+<p>numeric matrix which rows correspond to spline intervals
+while columns represent variables powers. Therefore the element 
+in i-th row and j-th column represents the coefficient associated with
+the variable that 1) belongs to the i-th interval i.e. between i-th and
+(i + 1)-th knots 2) raised to the power of (j - 1).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>knots</code></td>
+<td>
+<p>sorted in ascending order numeric vector representing
+knots of the spline.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mean</code></td>
+<td>
+<p>expected value of a normal distribution.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sd</code></td>
+<td>
+<p>standard deviation of a normal distribution.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>log</code></td>
+<td>
+<p>logical; if <code>TRUE</code> then probabilities p are given as log(p)
+or derivatives will be given respect to log(p).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>power</code></td>
+<td>
+<p>non-negative integer representing the power of the 
+expected value i.e. E(X ^ power) will be estimated.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>In contrast to <code>dhpa</code>-like functions these
+functions may deal with univariate distributions only. In future this
+functions will be generalized to work with multivariate distributions.
+The main idea of these functions is to use squared spline instead of squared 
+polynomial in order to provide greater numeric stability and approximation 
+accuracy. To provide spline parameters please use <code>m</code> and <code>knots</code>
+arguments (i.e. instead of <code>pol_degrees</code> and <code>pol_coefficients</code>
+arguments that where used to specify the polynomial
+for <code>dhpa</code>-like functions).
+</p>
+
+
+<h3>Value</h3>
+
+<p>Function <code>dhsa</code> returns vector of probabilities
+of the same length as <code>x</code>. Function <code>ehsa</code> 
+returns moment value.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>dhpa</code>, <code>bsplineGenerate</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Examples demonstrating dhsa and ehsa functions application.
+
+# Generate a b-splines
+b &lt;- bsplineGenerate(knots = c(-2.1, 1.5, 1.5, 2.2, 3.7, 4.2, 5),
+                     degree = 3)
+                      
+# Combine b-splines into a spline
+spline &lt;- bsplineComb(splines = b, weights = c(1.6, -1.2, 3.2))
+
+# Assign parameters using the spline created above
+knots &lt;- spline$knots
+m &lt;- spline$m
+mean &lt;- 1
+sd &lt;- 2
+
+# Estimate the density at particular points
+x &lt;- c(2, 3.7, 8)
+dhsa(x, 
+     m = m, knots = knots,
+     mean = mean, sd = sd)
+     
+# Calculate expected value
+ehsa(m = m, knots = knots,
+     mean = mean, sd = sd,
+     power = 1) 
+     
+# Evaluate the third moment
+ehsa(m = m, knots = knots,
+     mean = mean, sd = sd,
+     power = 3) 
+</code></pre>
+
+
+</div>

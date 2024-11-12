@@ -1,0 +1,113 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>subset_hydroMet</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Subset your data</h2>
+
+<h3>Description</h3>
+
+<p>This method allows you to easily cut the data stored in an <code>hydroMet_XXX</code> class object by dates.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">subset_hydroMet(obj, slot_name, from = NULL, to = NULL)
+
+## S4 method for signature 'hydroMet_BDHI'
+subset_hydroMet(obj, slot_name, from = NULL, to = NULL)
+
+## S4 method for signature 'hydroMet_DGI'
+subset_hydroMet(obj, slot_name, from = NULL, to = NULL)
+
+## S4 method for signature 'hydroMet_CR2'
+subset_hydroMet(obj, slot_name, from = NULL, to = NULL)
+
+## S4 method for signature 'hydroMet_IANIGLA'
+subset_hydroMet(obj, slot_name, from = NULL, to = NULL)
+
+## S4 method for signature 'hydroMet_compact'
+subset_hydroMet(obj, slot_name, from = NULL, to = NULL)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>obj</code></td>
+<td>
+<p>an <code>hydroMet_XXX</code> class object.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>slot_name</code></td>
+<td>
+<p>string vector with the slot(s) name(s) to subset. <strong>NOTE</strong>: in case you want to subset a <code>hydroMet_IANIGLA</code> object is recommended to consider all the slots with data.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>from</code></td>
+<td>
+<p>string (or <code>POSIXct</code> - valid only in 'BDHI' and  'IANIGLA') with the starting <code>Date</code>. You can use <code>from</code> without <code>to</code>. In this case you will subset your data 'from' till the end.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>to</code></td>
+<td>
+<p>string (or <code>POSIXct</code> - valid only in 'BDHI' and  'IANIGLA') with the ending <code>Date</code>. You can use <code>to</code> without <code>from</code>. In this case you will subset your data from the beginning till 'to'.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>The same <code>hydroMet_XXX</code> class provided in <code>obj</code> but subsetted.
+</p>
+
+
+<h3>Functions</h3>
+
+
+<ul>
+<li> <p><code>subset_hydroMet,hydroMet_BDHI-method</code>: subset method for BDHI data
+</p>
+</li>
+<li> <p><code>subset_hydroMet,hydroMet_DGI-method</code>: subset method for DGI data
+</p>
+</li>
+<li> <p><code>subset_hydroMet,hydroMet_CR2-method</code>: subset method for CR2 data
+</p>
+</li>
+<li> <p><code>subset_hydroMet,hydroMet_IANIGLA-method</code>: subset method for IANIGLA data
+</p>
+</li>
+<li> <p><code>subset_hydroMet,hydroMet_compact-method</code>: subset method for <code>compact</code> data
+</p>
+</li>
+</ul>
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Create BDHI hydro-met station
+guido &lt;- create_hydroMet(class_name = 'BDHI')
+
+# List with meteorological variables (slots in BDHI's object)
+cargar &lt;- list('precip', 'Qmd', 'Qmm')
+
+# Assign as names the files
+hydro_files   &lt;- list.files( system.file('extdata', package = "hydroToolkit"), pattern = 'Guido' )
+names(cargar) &lt;- hydro_files
+
+# Build the object with the met records
+guido &lt;- build_hydroMet(obj = guido, slot_list = cargar, 
+               path = system.file('extdata', package = "hydroToolkit") )
+               
+# Subset daily mean discharge
+guido &lt;- subset_hydroMet(obj = guido, slot_name = 'Qmd', from = '2005-01-01',
+            to = '2010-12-31')
+
+</code></pre>
+
+
+</div>

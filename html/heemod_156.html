@@ -1,0 +1,191 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>distributions</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Probability Density Functions for Probabilistic
+Uncertainty Analysis</h2>
+
+<h3>Description</h3>
+
+<p>Define a distribution for PSA parameters.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">normal(mean, sd)
+
+lognormal(mean, sd, meanlog, sdlog)
+
+gamma(mean, sd)
+
+binomial(prob, size)
+
+multinomial(...)
+
+logitnormal(mu, sigma)
+
+beta(shape1, shape2)
+
+triangle(lower, upper, peak = (lower + upper)/2)
+
+poisson(mean)
+
+define_distribution(x)
+
+beta(shape1, shape2)
+
+triangle(lower, upper, peak = (lower + upper)/2)
+
+use_distribution(distribution, smooth = TRUE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>mean</code></td>
+<td>
+<p>Distribution mean.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sd</code></td>
+<td>
+<p>Distribution standard deviation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>meanlog</code></td>
+<td>
+<p>Mean on the log scale.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sdlog</code></td>
+<td>
+<p>SD on the log scale.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>prob</code></td>
+<td>
+<p>Proportion.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>size</code></td>
+<td>
+<p>Size of sample used to estimate
+proportion.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Dirichlet distribution parameters.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mu</code></td>
+<td>
+<p>Mean on the logit scale.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sigma</code></td>
+<td>
+<p>SD on the logit scale.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>shape1</code></td>
+<td>
+<p>for beta distribution</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>shape2</code></td>
+<td>
+<p>for beta distribution</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lower</code></td>
+<td>
+<p>lower bound of triangular
+distribution.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>upper</code></td>
+<td>
+<p>upper bound of triangular
+distribution.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>peak</code></td>
+<td>
+<p>peak of triangular distribution.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>A distribution function, see details.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>distribution</code></td>
+<td>
+<p>A numeric vector of
+observations defining a distribution, usually
+the output from an MCMC fit.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>smooth</code></td>
+<td>
+<p>Use gaussian kernel smoothing?</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>These functions are not exported, but only used
+in <code>define_psa()</code>. To specify a user-made
+function use <code>define_distribution()</code>.
+</p>
+<p><code>use_distribution()</code> uses gaussian kernel
+smoothing with a bandwidth parameter calculated
+by <code>stats::density()</code>. Values for unobserved
+quantiles are calculated by linear
+interpolation.
+</p>
+<p><code>define_distribution()</code> takes as argument a
+function with a single argument, <code>x</code>,
+corresponding to a vector of quantiles. It
+returns the distribution values for the given
+quantiles. See examples.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">define_distribution(
+  function(x) stats::qexp(p = x, rate = 0.5)
+)
+
+# a mixture of 2 gaussians
+x &lt;- c(rnorm(100), rnorm(100, 6))
+plot(density(x))
+
+use_distribution(x)
+</code></pre>
+
+
+</div>

@@ -1,0 +1,104 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>displayTable</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Table for displaying summary</h2>
+
+<h3>Description</h3>
+
+<p>This is the main function for displaying summary from model training and scoring
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">displayTable(
+  data,
+  columnName = NULL,
+  value = NULL,
+  tableType = "summary",
+  scroll = FALSE,
+  limit = 100
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>List. A listed object from trainHVT or scoreHVT</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>columnName</code></td>
+<td>
+<p>Character. Name of the column that needs highlighting.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>value</code></td>
+<td>
+<p>Numeric. The value above will be highlighted in red or green.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tableType</code></td>
+<td>
+<p>Character. Type of table to generate ('summary', 'compression' and 'metrics')</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>scroll</code></td>
+<td>
+<p>Logical. A value to have a scroll or not in the table.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>limit</code></td>
+<td>
+<p>Numeric. A value to indicate how many rows to display.
+Applicable for summary tableType.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A consolidated table of results from trainHVT and scoreHVT.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Vishwavani &lt;vishwavani@mu-sigma.com&gt;, Alimpan Dey &lt;alimpan.dey@mu-sigma.com&gt;
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>trainHVT</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data &lt;- datasets::EuStockMarkets
+dataset &lt;- as.data.frame(data)
+#model training
+hvt.results &lt;- trainHVT(dataset, n_cells = 60, depth = 1, quant.err = 0.1,
+                      distance_metric = "L1_Norm", error_metric = "max",
+                      normalize = TRUE, quant_method = "kmeans", dim_reduction_method = 'sammon')
+displayTable(data =  hvt.results$model_info$distance_measures, tableType = "metrics")
+displayTable(data = hvt.results[[3]]$compression_summary,
+columnName = 'percentOfCellsBelowQuantizationErrorThreshold', 
+value = 0.8, tableType = "compression")
+displayTable(data =hvt.results[[3]][['summary']], columnName= 'Quant.Error',
+value = 0.1, tableType = "summary", scroll = TRUE)
+</code></pre>
+
+
+</div>

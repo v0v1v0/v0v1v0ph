@@ -1,0 +1,130 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>sweep</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Sweep Summary Statistic out of an hyperSpec Object
+<code>sweep</code> for <code>hyperSpec</code> objects.</h2>
+
+<h3>Description</h3>
+
+<p>Calls <code>sweep</code> for the spectra matrix.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">## S4 method for signature 'hyperSpec'
+sweep(x, MARGIN, STATS, FUN = "-", check.margin = TRUE, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>a <code>hyperSpec object.</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>MARGIN</code></td>
+<td>
+<p>direction of the spectra matrix that <code>STATS</code> goees
+along.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>STATS</code></td>
+<td>
+<p>the summary statistic to sweep out. Either a vector or a
+<code>hyperSpec</code> object.
+</p>
+<p>hyperSpec offers a non-standard convenience function: if <code>STATS</code> is a
+function, this function is applied first (with the same <code>MARGIN</code>) to
+compute the statistic. However, no further arguments to the apply
+function can be given.  See the examples.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>FUN</code></td>
+<td>
+<p>the function to do the sweeping, e.g. '-' or '/'.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>check.margin</code></td>
+<td>
+<p>If <code>TRUE</code> (the default), warn if the length or
+dimensions of <code>STATS</code> do not match the specified dimensions of
+<code>x</code>.  Set to <code>FALSE</code> for a small speed gain when you
+<em>know</em> that dimensions match.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>further arguments for <code>FUN</code></p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p><code>sweep</code> is useful for some spectra preprocessing, like offset
+correction, substraction of background spectra, and normalization of the
+spectra.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A <code>hyperSpec</code> object.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>C. Beleites
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>sweep</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+## Substract the background / slide / blank spectrum
+# the example data does not have spectra of the empty slide,
+# so instead the overall composition of the sample is substracted
+background &lt;- apply (chondro, 2, quantile, probs = 0.05)
+corrected &lt;- sweep (chondro, 2, background, "-")
+plot (corrected, "spcprctl5")
+
+## Offset correction
+offsets &lt;- apply (chondro, 1, min)
+corrected &lt;- sweep (chondro, 1, offsets, "-")
+plot (corrected, "spcprctl5")
+
+## Min-max normalization (on max amide I)
+# the minimum is set to zero by the offset correction.
+factor &lt;- apply (corrected, 1, max)
+mm.corrected &lt;- sweep (corrected, 1, factor, "/")
+plot (mm.corrected, "spcprctl5")
+
+## convenience: give function to compute STATS:
+mm.corrected2 &lt;- sweep (corrected, 1, max, "/")
+plot (mm.corrected2)
+
+## checking
+stopifnot (all (mm.corrected2 == mm.corrected))
+
+</code></pre>
+
+
+</div>

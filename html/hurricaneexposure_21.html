@@ -1,0 +1,187 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>multi_county_rain</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Hurricane exposure by rain for communities</h2>
+
+<h3>Description</h3>
+
+<p>This function takes a dataframe with multi-county communities (see example for
+the proper format) and returns a community-level dataframe of storms to which
+the community was exposed, based on the average distance
+between the storm's track and the population-based centers of each county
+in the community and the given threshold of rainfall, summed over the days
+included in the rainfall measurement.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">multi_county_rain(
+  communities,
+  start_year,
+  end_year,
+  rain_limit,
+  dist_limit,
+  days_included = c(-2, -1, 0, 1)
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>communities</code></td>
+<td>
+<p>A dataframe with the FIPS codes for all counties within
+each community. It must include columns with a column identifier
+(<code>commun</code>) and with the FIPS codes of counties included in each
+community (<code>fips</code>). See the example code.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>start_year</code></td>
+<td>
+<p>Four-digit integer with first year to consider.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>end_year</code></td>
+<td>
+<p>Four-digit integer with last year to consider.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rain_limit</code></td>
+<td>
+<p>Minimum of rainfall, in millimeters, summed across the days
+selected to be included (<code>days_included</code>), that must fall in a
+county for the county to be classified as "exposed" to the storm.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dist_limit</code></td>
+<td>
+<p>Maximum distance, in kilometers, of how close the storm
+track must come to the county's population mean center to classify
+the county as "exposed" to the storm.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>days_included</code></td>
+<td>
+<p>A numeric vector listing the days to include when
+calculating total precipitation. Negative numbers are days before the
+closest date of the storm to a county. For example,
+<code>c(-1, 0, 1)</code> would calculate rain for a county as the sum of the
+rainfall for the day before, the day of, and the day after the date when
+the storm center was closest to the county center. Values can range from
+-5 to 3 (i.e., at most, you can calculate the total rainfall from five days
+to three days after the day when the storm is closest to the
+county).</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>Returns a dataframe with a row for each county-storm pair and with
+columns for:
+</p>
+
+<ul>
+<li>
+<p><code>commun</code>: Each community's unique id
+</p>
+</li>
+<li>
+<p><code>storm_id</code>: Unique storm identifier with the storm name and year,
+separated by a hyphen(e.g., "Alberto-1988",
+"Katrina-2005")
+</p>
+</li>
+<li>
+<p><code>closest_date</code>: Date (based on local time) of the closest
+approach of the storm to the county's population
+mean center.
+</p>
+</li>
+<li>
+<p><code>local_time</code>: Local time of the closest approach of the storm to the
+county's population mean center, based on storm tracks
+linearly interpolated to 15-minute increments.
+</p>
+</li>
+<li>
+<p><code>closest_time_utc</code>: Time, in UTC, of the closest approach of the
+storm to the county's population mean center,
+based on storm tracks linearly interpolated to
+15-minute increments.
+</p>
+</li>
+<li>
+<p><code>mean_dist</code>: Average of the minimum distance (in kilometers)
+between the storm's track and the population
+mean centers of all the counties in the
+community.
+</p>
+</li>
+<li>
+<p><code>mean_rain</code>: Average of cumulative rainfall, in millimeters,
+in the counties in the community for the days
+selected using the <code>days_included</code> option.
+</p>
+</li>
+<li>
+<p><code>min_dist</code>: The smallest minimum distance (in kilometers)
+between the storm's track and the population
+mean centers of any of the counties in the
+community.
+</p>
+</li>
+<li>
+<p><code>max_rain</code>: The maximum cumulative rainfall, in millimeters,
+in any of the counties in the community for
+the days selected using the <code>days_included</code>
+option.
+</p>
+</li>
+</ul>
+<h3>References</h3>
+
+<p>Al-Hamdan MZ, Crosson WL, Economou SA, Estes MG, Estes SM, Hemmings SN,
+Kent ST, Puckette M, Quattrochi DA, Rickman DL, Wade GM, McClure LA, 2014.
+Environmental public health applications using remotely sensed data.
+Geocarto International 29(1):85-98.
+</p>
+<p>North America Land Data Assimilation System (NLDAS) Daily Precipitation
+years 1979-2011 on CDC WONDER Online Database, released 2012.
+<a href="http://wonder.cdc.gov/wonder/help/Precipitation.html">http://wonder.cdc.gov/wonder/help/Precipitation.html</a>
+</p>
+<p>Rui H, Mocko D, 2014. README Document for North America Land Data
+Assimilation System Phase 2 (NLDAS-2) Products. Goddard Earth Sciences
+Data and Information Services Center.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Ensure that data package is available before running the example.
+#  If it is not, see the `hurricaneexposure` package vignette for details
+# on installing the required data package.
+if (requireNamespace("hurricaneexposuredata", quietly = TRUE)) {
+
+communities &lt;- data.frame(community_name = c(rep("ny", 6), "no", "new"),
+                         fips = c("36005", "36047", "36061",
+                                  "36085", "36081", "36119",
+                                  "22071", "51700"))
+rain_storm_df &lt;- multi_county_rain(communities = communities,
+                                   start_year = 1995, end_year = 2005,
+                                   rain_limit = 100, dist_limit = 100)
+}
+</code></pre>
+
+
+</div>

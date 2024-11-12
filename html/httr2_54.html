@@ -1,0 +1,70 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>req_dry_run</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Perform a dry run</h2>
+
+<h3>Description</h3>
+
+<p>This shows you exactly what httr2 will send to the server, without
+actually sending anything. It requires the httpuv package because it
+works by sending the real HTTP request to a local webserver, thanks to
+the magic of <code>curl::curl_echo()</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">req_dry_run(req, quiet = FALSE, redact_headers = TRUE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>req</code></td>
+<td>
+<p>A httr2 request object.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>quiet</code></td>
+<td>
+<p>If <code>TRUE</code> doesn't print anything.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>redact_headers</code></td>
+<td>
+<p>Redact confidential data in the headers? Currently
+redacts the contents of the Authorization header to prevent you from
+accidentally leaking credentials when debugging/reprexing.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>Invisibly, a list containing information about the request,
+including <code>method</code>, <code>path</code>, and <code>headers</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># httr2 adds default User-Agent, Accept, and Accept-Encoding headers
+request("http://example.com") |&gt; req_dry_run()
+
+# the Authorization header is automatically redacted to avoid leaking
+# credentials on the console
+req &lt;- request("http://example.com") |&gt; req_auth_basic("user", "password")
+req |&gt; req_dry_run()
+
+# if you need to see it, use redact_headers = FALSE
+req |&gt; req_dry_run(redact_headers = FALSE)
+</code></pre>
+
+
+</div>

@@ -1,0 +1,134 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>HDGLM_test</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Tests the Coefficients of High Dimensional Generalized Linear Models</h2>
+
+<h3>Description</h3>
+
+<p>Tests for whole or partial regression coefficient vectors for high dimensional generalized linear models.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">HDGLM_test(Y, X, beta_0 = NULL, nuisance = NULL, model = "gaussian")
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>Y</code></td>
+<td>
+<p>a vector of observations of length <code class="reqn">n</code>,  where <code class="reqn">n</code> is the sample size.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>X</code></td>
+<td>
+<p>a design matrix with <code class="reqn">n</code> rows and <code class="reqn">p</code> columns, where <code class="reqn">p</code> is the dimension of the covariates.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>beta_0</code></td>
+<td>
+<p>a vector with length <code class="reqn">p</code>. It is the value of regression coefficient under the null hypothesis in global test.  The default
+is <code class="reqn">\beta_0=0</code> and it can be non-zero in the global test. In the test with nuisance coefficients, we only deal with  <code class="reqn">\beta_0^{(2)}=0</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nuisance</code></td>
+<td>
+<p>an index indicating which coefficients are nuisance parameter. The default is <code>"NULL"</code> (the global test).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>model</code></td>
+<td>
+<p>a character string to describe the model and link function. The default is <code>"gaussian"</code>, which denotes the linear model using identity link.
+The other options are <code>"poisson"</code>, <code>"logistic"</code>  and <code>"negative_binomial"</code> models, where the poisson and negative binomial models using log link.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>An object of class "HDGLM_test" is a list containing the following components:
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>test_stat</code></td>
+<td>
+<p>the standardized test statistic</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>test_pvalue</code></td>
+<td>
+<p>pvalue of the test against the null hypothesis</p>
+</td>
+</tr>
+</table>
+<h3>Note</h3>
+
+<p>In global test,  the function <code>"HDGLM_test"</code> can deal with the null hypothesis with non-zero coefficients (<code class="reqn">\beta_0</code>). However, in test with nuisance coefficient,
+the function can only deal with the null hypothesis with zero coefficients (<code class="reqn">\beta_0^{(2)}</code>) in this version.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Bin Guo
+</p>
+
+
+<h3>References</h3>
+
+<p>Guo, B. and Chen, S. X. (2015). Tests for High Dimensional Generalized Linear Models.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Example: Linear model
+## Global test: if the null hypothesis is true (beta_0=0)
+alpha=runif(5,min=0,max=1)
+## Generate the data
+DGP_0=DGP(80,320,alpha)
+result=HDGLM_test(DGP_0$Y,DGP_0$X)
+## Pvalue
+result$test_pvalue
+
+## Global test: if the alternative hypothesis is true
+## (the square of the norm of the first 5 nonzero coefficients to be 0.2)
+## Generate the data
+DGP_0=DGP(80,320,alpha,sqrt(0.2),5)
+result=HDGLM_test(DGP_0$Y,DGP_0$X)
+## Pvalue
+result$test_pvalue
+
+## Test with nuisance coefficients: if the null hypothesis is true (beta_0^{(2)}=0)
+## The first 10 coefficients to be the nuisance coefficients
+betanui=runif(10,min=0,max=1)
+## Generate the data
+DGP_0=DGP(80,320,alpha,0,no=NA,betanui)
+result=HDGLM_test(DGP_0$Y,DGP_0$X,nuisance=c(1:10))
+## Pvalue
+result$test_pvalue
+
+## Test with nuisance coefficients: if the alternative hypothesis is true
+## (the square of the norm of the first 5 nonzero coefficients in beta_0^{(2)} to be 2)
+## The first 10 coefficients to be the nuisance coefficients
+betanui=runif(10,min=0,max=1)
+## Generate the data
+DGP_0=DGP(80,330,alpha,sqrt(2),no=5,betanui)
+result=HDGLM_test(DGP_0$Y,DGP_0$X,nuisance=c(1:10))
+## Pvalue
+result$test_pvalue
+</code></pre>
+
+
+</div>

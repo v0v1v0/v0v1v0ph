@@ -1,0 +1,322 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hgwr</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Hierarchical and Geographically Weighted Regression</h2>
+
+<h3>Description</h3>
+
+<p>A Hierarchical Linear Model (HLM) with local fixed effects.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hgwr(
+  formula,
+  data,
+  ...,
+  bw = "CV",
+  kernel = c("gaussian", "bisquared"),
+  alpha = 0.01,
+  eps_iter = 1e-06,
+  eps_gradient = 1e-06,
+  max_iters = 1e+06,
+  max_retries = 1e+06,
+  ml_type = c("D_Only", "D_Beta"),
+  verbose = 0
+)
+
+## S3 method for class 'sf'
+hgwr(
+  formula,
+  data,
+  ...,
+  bw = "CV",
+  kernel = c("gaussian", "bisquared"),
+  alpha = 0.01,
+  eps_iter = 1e-06,
+  eps_gradient = 1e-06,
+  max_iters = 1e+06,
+  max_retries = 1e+06,
+  ml_type = c("D_Only", "D_Beta"),
+  verbose = 0
+)
+
+## S3 method for class 'data.frame'
+hgwr(
+  formula,
+  data,
+  ...,
+  coords,
+  bw = "CV",
+  kernel = c("gaussian", "bisquared"),
+  alpha = 0.01,
+  eps_iter = 1e-06,
+  eps_gradient = 1e-06,
+  max_iters = 1e+06,
+  max_retries = 1e+06,
+  ml_type = c("D_Only", "D_Beta"),
+  verbose = 0
+)
+
+hgwr_fit(
+  formula,
+  data,
+  coords,
+  bw = c("CV", "AIC"),
+  kernel = c("gaussian", "bisquared"),
+  alpha = 0.01,
+  eps_iter = 1e-06,
+  eps_gradient = 1e-06,
+  max_iters = 1e+06,
+  max_retries = 1e+06,
+  ml_type = c("D_Only", "D_Beta"),
+  verbose = 0
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>formula</code></td>
+<td>
+<p>A formula.
+Its structure is similar to <code>lmer</code> function
+in <strong>lme4</strong> package.
+Models can be specified with the following form:
+</p>
+<div class="sourceCode r"><pre>response ~ L(local.fixed) + global.fixed + (random | group)
+</pre></div>
+<p>For more information, please see the <code>formula</code> subsection in details.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>The data.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Further arguments for the specified type of <code>data</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>bw</code></td>
+<td>
+<p>A numeric value. It is the value of bandwidth or <code>"CV"</code>.
+In this stage this function only support adaptive bandwidth.
+And its unit must be the number of nearest neighbours.
+If <code>"CV"</code> is specified, the algorithm will automatically select an
+optimized bandwidth value.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>kernel</code></td>
+<td>
+<p>A character value. It specify which kernel function is used
+in GWR part. Possible values are
+</p>
+
+<dl>
+<dt><code>gaussian</code></dt>
+<dd>
+<p>Gaussian kernel function <code class="reqn">k(d)=\exp\left(-\frac{d^2}{b^2}\right)</code></p>
+</dd>
+<dt><code>bisquared</code></dt>
+<dd>
+<p>Bi-squared kernel function. If <code class="reqn">d&lt;b</code> then <code class="reqn">k(d)=\left(1-\frac{d^2}{b^2}\right)^2</code> else <code class="reqn">k(d)=0</code></p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alpha</code></td>
+<td>
+<p>A numeric value. It is the size of the first trial step in
+maximum likelihood algorithm.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>eps_iter</code></td>
+<td>
+<p>A numeric value. Terminate threshold of back-fitting.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>eps_gradient</code></td>
+<td>
+<p>A numeric value. Terminate threshold of
+maximum likelihood algorithm.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>max_iters</code></td>
+<td>
+<p>An integer value. The maximum of iteration.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>max_retries</code></td>
+<td>
+<p>An integer value. If the algorithm tends to be diverge,
+it stops automatically after trying <em>max_retires</em> times.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ml_type</code></td>
+<td>
+<p>An integer value. Represent which maximum likelihood
+algorithm is used. Possible values are:
+</p>
+
+<dl>
+<dt><code>D_Only</code></dt>
+<dd>
+<p>Only <code class="reqn">D</code> is specified by maximum likelihood.</p>
+</dd>
+<dt><code>D_Beta</code></dt>
+<dd>
+<p>Both <code class="reqn">D</code> and <code class="reqn">beta</code> is specified by maximum likelihood.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p>An integer value. Determine the log level.
+Possible values are:
+</p>
+
+<dl>
+<dt>0</dt>
+<dd>
+<p>no log is printed.</p>
+</dd>
+<dt>1</dt>
+<dd>
+<p>only logs in back-fitting are printed.</p>
+</dd>
+<dt>2</dt>
+<dd>
+<p>all logs are printed.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>coords</code></td>
+<td>
+<p>A 2-column matrix.
+It consists of coordinates for each group.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+
+
+<h4>Effect Specification in Formula</h4>
+
+<p>In the HGWR model, there are three types of effects specified by the
+<code>formula</code> argument:
+</p>
+
+<dl>
+<dt>Local fixed effects</dt>
+<dd>
+<p>Effects wrapped by functional symbol <code>L</code>.</p>
+</dd>
+<dt>Random effects</dt>
+<dd>
+<p>Effects specified outside the functional symbol <code>L</code> but to the left of symbol <code>|</code>.</p>
+</dd>
+<dt>Global fixed effects</dt>
+<dd>
+<p>Other effects</p>
+</dd>
+</dl>
+<p>For example, the following formula in the example of this function below is written as
+</p>
+<div class="sourceCode r"><pre>y ~ L(g1 + g2) + x1 + (z1 | group)
+</pre></div>
+<p>where <code>g1</code> and <code>g2</code> are local fixed effects,
+<code>x1</code> is the global fixed effects,
+and <code>z1</code> is the random effects grouped by the group indicator <code>group</code>.
+Note that random effects can only be specified once!
+</p>
+
+
+
+<h3>Value</h3>
+
+<p>A list describing the model with following fields.
+</p>
+
+<dl>
+<dt><code>gamma</code></dt>
+<dd>
+<p>Coefficients of local fixed effects.</p>
+</dd>
+<dt><code>beta</code></dt>
+<dd>
+<p>Coefficients of global fixed effects.</p>
+</dd>
+<dt><code>mu</code></dt>
+<dd>
+<p>Coefficients of random effects.</p>
+</dd>
+<dt><code>D</code></dt>
+<dd>
+<p>Variance-covariance matrix of random effects.</p>
+</dd>
+<dt><code>sigma</code></dt>
+<dd>
+<p>Variance of errors.</p>
+</dd>
+<dt><code>effects</code></dt>
+<dd>
+<p>A list including names of all effects.</p>
+</dd>
+<dt><code>call</code></dt>
+<dd>
+<p>Calling of this function.</p>
+</dd>
+<dt><code>frame</code></dt>
+<dd>
+<p>The DataFrame object sent to this call.</p>
+</dd>
+<dt><code>frame.parsed</code></dt>
+<dd>
+<p>Variables extracted from the data.</p>
+</dd>
+<dt><code>groups</code></dt>
+<dd>
+<p>Unique group labels extracted from the data.</p>
+</dd>
+</dl>
+<h3>Functions</h3>
+
+
+<ul><li> <p><code>hgwr_fit()</code>: Fit a HGWR model
+</p>
+</li></ul>
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(multisampling)
+hgwr(formula = y ~ L(g1 + g2) + x1 + (z1 | group),
+     data = multisampling$data,
+     coords = multisampling$coords,
+     bw = 10)
+
+</code></pre>
+
+
+</div>

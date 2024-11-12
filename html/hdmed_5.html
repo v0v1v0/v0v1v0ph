@@ -1,0 +1,161 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>mediate_hima</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>High-Dimensional Mediation Analysis</h2>
+
+<h3>Description</h3>
+
+<p><code>mediate_hima</code> fits a high-dimensional mediation model with
+the minimax concave penalty as proposed by Zhang et al. (2016),
+estimating the mediation contributions of potential mediators.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">mediate_hima(
+  A,
+  M,
+  Y,
+  C1 = NULL,
+  C2 = NULL,
+  binary_y = FALSE,
+  n_include = NULL,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>A</code></td>
+<td>
+<p>length <code>n</code> numeric vector containing exposure variable</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>M</code></td>
+<td>
+<p><code>n x p</code> numeric matrix of high-dimensional mediators.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Y</code></td>
+<td>
+<p>length <code>n</code> numeric vector containing continuous or binary outcome variable.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>C1</code></td>
+<td>
+<p>optional numeric matrix of covariates to include in the outcome model.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>C2</code></td>
+<td>
+<p>optional numeric matrix of covariates to include in the mediator model.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>binary_y</code></td>
+<td>
+<p>logical flag for whether <code>Y</code> should be interpreted as a
+binary variable with 1/0 coding rather than as continuous. Default is <code>FALSE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n_include</code></td>
+<td>
+<p>integer specifying the number of top markers from sure
+independent screening to be included. Default is <code>NULL</code>, in which case
+<code>n_include</code> will be either <code>ceiling(n/log(n))</code> if
+<code>binary_Y = F</code>, or <code>ceiling(n/(2*log(n)))</code> if <code>binary_Y = T</code>.
+If <code>n_include &gt;= p</code>, all mediators are included with no screening. Note
+that if <code>binary_y = F</code>, screening is performed based on the single-mediator
+outcome model p-values, and if <code>binary_y = F</code>, screening is based on the
+the mediator model p-values.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>other arguments passed to <code>hdi</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The first step in HIMA is to perform sure independence
+screening (SIS) to choose the <code>n_include</code> mediators that are most
+associated with the outcome (when Y is continuous) or the exposure
+(when Y is binary), based on p-values from linear regression. The second step
+is to fit the outcome model for the remaining mediators with the minimax
+concave penalty. HIMA then fits the mediator models using linear regression
+among those mediators that have both survived SIS (in step 1) and been
+selected by the MCP (in step 2), which enables estimation of the mediation
+contributions. The global indirect effect is estimated by summing these
+contributions, and the direct effect is estimated by subtracting the global
+indirect effect from an estimate of the total effect. We compute p-values for
+the mediation contributions by taking the maximum of the <code class="reqn">\alpha_a</code> and <code class="reqn">\beta_m</code>
+p-values, where the beta p-values are obtained via a second, unpenalized generalized
+linear model containing only the mediators selected by the MCP. We include this
+p-value computation so that our function replicates the behavior of the
+<code>HIMA</code> function from <a href="https://CRAN.R-project.org/package=HIMA">HIMA</a>
+package, the function on which ours is based, but we caution that the beta
+p-values may be over-optimistic due to double-dipping, since the mediators tested in
+the unpenalized model are only those chosen by the penalized model. Note also
+that the HIMA authors apply Bonferroni correction to the final, maxed p-values
+to account for multiple testing, which we choose to leave up to the user. For
+more information, see the "HIMA" R package along with the provided reference.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A list containing:
+</p>
+
+<ul>
+<li> <p><code>contributions</code>: a data frame containing the estimates and p-values
+of the mediation contributions.
+</p>
+</li>
+<li> <p><code>effects</code>: a data frame containing the estimated direct, global
+mediation, and total effects.
+</p>
+</li>
+</ul>
+<h3>References</h3>
+
+<p>Zhang, H. et al. Estimating and testing high-dimensional mediation effects
+in epigenetic studies. Bioinformatics 32, 3150-3154 (2016).
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">A &lt;- med_dat$A
+M &lt;- med_dat$M
+Y &lt;- med_dat$Y
+
+# Fit hima with continuous outcome
+out &lt;- mediate_hima(A, M, Y)
+head(out$contributions)
+out$effects
+
+# Fit hima with binary outcome
+Y1 &lt;- as.numeric(Y &gt; mean(Y))
+out1 &lt;- mediate_hima(A, M, Y1, binary_y = TRUE)
+head(out1$contributions)
+out1$effects
+
+</code></pre>
+
+
+</div>

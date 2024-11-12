@@ -1,0 +1,226 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>curegmifs</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Fit penalized parametric mixture cure model using the GMIFS algorithm</h2>
+
+<h3>Description</h3>
+
+<p>Fits a penalized Weibull or exponential mixture cure model using the generalized monotone incremental forward stagewise (GMIFS) algorithm and yields solution paths for parameters in the incidence and latency portions of the model.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">curegmifs(
+  formula,
+  data,
+  subset,
+  x.latency = NULL,
+  model = "weibull",
+  penalty.factor.inc = NULL,
+  penalty.factor.lat = NULL,
+  epsilon = 0.001,
+  thresh = 1e-05,
+  scale = TRUE,
+  maxit = 10000,
+  inits = NULL,
+  verbose = TRUE,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>formula</code></td>
+<td>
+<p>an object of class "<code>formula</code>" (or one that can be coerced to that class): a symbolic description of the model to be fitted. The response must be a survival object as returned by the <code>Surv</code> function while the variables on the right side of the formula are the covariates that are included in the incidence portion of the model.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>a data.frame in which to interpret the variables named in the <code>formula</code> or in the <code>subset</code> argument.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>subset</code></td>
+<td>
+<p>an optional expression indicating which subset of observations to be used in the fitting process, either a numeric or factor variable should be used in subset, not a character variable. All observations are included by default.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x.latency</code></td>
+<td>
+<p>specifies the variables to be included in the latency portion of the model and can be either a matrix of predictors, a model formula with the right hand side specifying the latency variables, or the same data.frame passed to the <code>data</code> parameter. Note that when using the model formula syntax for <code>x.latency</code> it cannot handle <code>x.latency = ~ .</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>model</code></td>
+<td>
+<p>type of regression model to use for the latency portion of mixture cure model. Can be "weibull" or "exponential"; default is "weibull".</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>penalty.factor.inc</code></td>
+<td>
+<p>vector of binary indicators representing the penalty to apply to each incidence coefficient: 0 implies no shrinkage and 1 implies shrinkage. If not supplied, 1 is applied to all incidence variables.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>penalty.factor.lat</code></td>
+<td>
+<p>vector of binary indicators representing the penalty to apply to each latency coefficient: 0 implies no shrinkage and 1 implies shrinkage. If not supplied, 1 is applied to all latency variables.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>epsilon</code></td>
+<td>
+<p>small numeric value reflecting the incremental value used to update a coefficient at a given step (default is 0.001).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>thresh</code></td>
+<td>
+<p>small numeric value. The iterative process stops when the differences between successive expected penalized complete-data log-likelihoods for both incidence and latency components are less than this specified level of tolerance (default is 10^-5).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>scale</code></td>
+<td>
+<p>logical, if TRUE the predictors are centered and scaled.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>maxit</code></td>
+<td>
+<p>integer specifying the maximum number of steps to run in the iterative algorithm (default is 10^4).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>inits</code></td>
+<td>
+<p>an optional list specifiying the initial value for the incidence intercept (<code>itct</code>), a numeric vector for the unpenalized incidence coefficients (<code>b_u</code>), and a numeric vector for unpenalized latency coefficients (<code>beta_u</code>), a numeric value for the rate parameter (<code>lambda</code>), and a numeric value for the shape parameter (<code>alpha</code>) when <code>model = "weibull"</code>. If not supplied or improperly supplied, initialization is automatically provided by the function.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p>logical, if TRUE running information is printed to the console (default is FALSE).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>additional arguments.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>b_path</code></td>
+<td>
+<p>Matrix representing the solution path of the coefficients in the incidence portion of the model. Row is step and column is variable.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>beta_path</code></td>
+<td>
+<p>Matrix representing the solution path of lthe coefficients in the latency portion of the model. Row is step and column is variable.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>b0_path</code></td>
+<td>
+<p>Vector representing the solution path of the intercept in the incidence portion of the model.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rate_path</code></td>
+<td>
+<p>Vector representing the solution path of the rate parameter for the Weibull or exponential density in the latency portion of the model.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>logLik</code></td>
+<td>
+<p>Vector representing the log-likelihood for each step in the solution path.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x.incidence</code></td>
+<td>
+<p>Matrix representing the design matrix of the incidence predictors.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x.latency</code></td>
+<td>
+<p>Matrix representing the design matrix of the latency predictors.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+<p>Vector representing the survival object response as returned by the <code>Surv</code> function </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>model</code></td>
+<td>
+<p>Character string indicating the type of regression model used for the latency portion of mixture cure model ("weibull" or "exponential").</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>scale</code></td>
+<td>
+<p>Logical value indicating whether the predictors were centered and scaled.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alpha_path</code></td>
+<td>
+<p>Vector representing the solution path of the shape parameter for the Weibull density in the latency portion of the model.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>call</code></td>
+<td>
+<p>the matched call.</p>
+</td>
+</tr>
+</table>
+<h3>References</h3>
+
+<p>Fu, H., Nicolet, D., Mrozek, K., Stone, R. M., Eisfeld, A. K., Byrd, J. C., Archer, K. J. (2022) Controlled variable selection in Weibull mixture cure models for high-dimensional data. <em>Statistics in Medicine</em>, <b>41</b>(22), 4340–4366.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>cv_curegmifs</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">library(survival)
+set.seed(1234)
+temp &lt;- generate_cure_data(N = 100, J = 10, nTrue = 10, A = 1.8)
+training &lt;- temp$Training
+
+fit &lt;- curegmifs(Surv(Time, Censor) ~ .,
+         data = training, x.latency = training,
+         model = "weibull", thresh = 1e-4, maxit = 2000, epsilon = 0.01,
+         verbose = FALSE)
+</code></pre>
+
+
+</div>

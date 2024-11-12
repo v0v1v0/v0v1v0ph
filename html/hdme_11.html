@@ -1,0 +1,107 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>mus</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Matrix Uncertainty Selector</h2>
+
+<h3>Description</h3>
+
+<p>Matrix Uncertainty Selector for linear regression.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">mus(W, y, lambda = NULL, delta = NULL)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>W</code></td>
+<td>
+<p>Design matrix, measured with error. Must be a numeric matrix.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+<p>Vector of responses.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lambda</code></td>
+<td>
+<p>Regularization parameter.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>delta</code></td>
+<td>
+<p>Additional regularization parameter, bounding the measurement error.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>This function is just a
+wrapper for <code>gmus(W, y, lambda, delta, family = "gaussian")</code>.
+</p>
+
+
+<h3>Value</h3>
+
+<p>An object of class "gmus".
+</p>
+
+
+<h3>References</h3>
+
+<p>Rosenbaum M, Tsybakov AB (2010).
+“Sparse recovery under matrix uncertainty.”
+<em>Ann. Statist.</em>, <b>38</b>(5), 2620–2651.
+</p>
+<p>Sorensen O, Hellton KH, Frigessi A, Thoresen M (2018).
+“Covariate Selection in High-Dimensional Generalized Linear Models With Measurement Error.”
+<em>Journal of Computational and Graphical Statistics</em>, <b>27</b>(4), 739-749.
+<a href="https://doi.org/10.1080/10618600.2018.1425626">doi:10.1080/10618600.2018.1425626</a>, https://doi.org/10.1080/10618600.2018.1425626.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Example with Gaussian response
+set.seed(1)
+# Number of samples
+n &lt;- 100
+# Number of covariates
+p &lt;- 50
+# True (latent) variables
+X &lt;- matrix(rnorm(n * p), nrow = n)
+# Measurement matrix (this is the one we observe)
+W &lt;- X + matrix(rnorm(n*p, sd = 1), nrow = n, ncol = p)
+# Coefficient vector
+beta &lt;- c(seq(from = 0.1, to = 1, length.out = 5), rep(0, p-5))
+# Response
+y &lt;- X %*% beta + rnorm(n, sd = 1)
+# Run the MU Selector
+fit1 &lt;- mus(W, y)
+# Draw an elbow plot to select delta
+plot(fit1)
+coef(fit1)
+
+# Now, according to the "elbow rule", choose the final delta where the curve has an "elbow".
+# In this case, the elbow is at about delta = 0.08, so we use this to compute the final estimate:
+fit2 &lt;- mus(W, y, delta = 0.08)
+plot(fit2) # Plot the coefficients
+coef(fit2)
+coef(fit2, all = TRUE)
+
+</code></pre>
+
+
+</div>

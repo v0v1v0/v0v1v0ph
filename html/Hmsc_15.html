@@ -1,0 +1,89 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>evaluateModelFit</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>evaluateModelFit</h2>
+
+<h3>Description</h3>
+
+<p>Computes measures of model fit for a <code>Hmsc</code> model
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">evaluateModelFit(hM, predY)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>hM</code></td>
+<td>
+<p>a fitted <code>Hmsc</code> model object</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>predY</code></td>
+<td>
+<p>array of predictions, typically posterior sample</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>All measures of model fit are based on comparing the posterior predictive distribution (<code>predY)</code>)
+to the observed values (<code>hM$Y</code>). The predicted distribution is first summarized to
+a single matrix of predicted values by taking the posterior mean (for normal and probit models)
+or posterior median (for Poisson models). All measures of model fit are given as vectors with
+one value for each species.
+</p>
+<p>The kinds of measures of model fit depend on the type of response variable.
+For all types of response variables, root-mean-square error (RMSE) between predicted
+and observed values is computed.
+For normal models, R2 is computed as squared pearson
+correlation between observed and predicted values, times the sign of the correlation.
+For probit models, Tjur R2 and AUC are
+computed. For Poisson models, a pseudo-R2 is computed as
+squared spearman correlation between observed and predicted values, times the sign of the correlation (SR2).
+For Poisson models, the observed and predicted data are also truncated to occurrences (presence-absences),
+for which the same measures are given as for the probit models (O.RMSE, O.AUC and O.TjurR2).
+For Poisson models, the observed and predicted data are also subsetted to conditional on presence,
+for which the root-mean-square error and pseudo-R2 based on squared spearman correlation
+are computed (C.RMSE, C.SR2).
+</p>
+<p>The measures O.RMSE, O.AUC, O.TjurR2, C.RMSE and C.SR2 can be computed only if the option
+<code>expected=FALSE</code> has been used when making the predictions
+</p>
+<p>If the model includes a mixture of response variable types, the resulting measures of model fit
+contain NA's for those response variables for which they cannot be computed.
+</p>
+
+
+<h3>Value</h3>
+
+<p>a list of measures of model fit
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Evaluate model fit
+preds = computePredictedValues(TD$m)
+MF = evaluateModelFit(hM=TD$m, predY=preds)
+
+# Evaluate model performance based on cross validation: this will be slow
+## Not run: 
+partition = createPartition(TD$m, nfolds = 2)
+predsCV1 = computePredictedValues(TD$m, partition=partition)
+MF = evaluateModelFit(hM=TD$m, predY=predsCV1)
+
+## End(Not run)
+</code></pre>
+
+
+</div>

@@ -1,0 +1,91 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>define_psa</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Define Parameters Distribution for Probabilistic Analysis</h2>
+
+<h3>Description</h3>
+
+<p>Define the properties of parameter distributions and
+their correlation structure for probabilistic uncertainty
+analysis of Markov models.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">define_psa(..., correlation)
+
+define_psa_(.dots = list(), correlation)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Formulas defining parameter distributions.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>correlation</code></td>
+<td>
+<p>A correlation matrix for parameters or
+the output of <code>define_correlation()</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.dots</code></td>
+<td>
+<p>Pair/values of expressions coercible to quosures.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The distributions must be defined within <code>heemod</code>
+(see distributions), or defined with
+<code>define_distribution()</code>.
+</p>
+<p>If no correlation matrix is specified parameters are
+assumed to be independant.
+</p>
+<p>The correlation matrix need only be specified for
+correlated parameters.
+</p>
+
+
+<h3>Value</h3>
+
+<p>An object of class <code>resamp_definition</code>.
+Contains <code>list_qdist</code>, a list of quantile
+functions and <code>correlation</code> a correlation matrix.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">mc &lt;- define_correlation(
+  age_init, cost_init, .4
+)
+
+define_psa(
+    age_init ~ normal(60, 10),
+    cost_init ~ normal(1000, 100),
+    correlation = mc
+)
+
+# example with multinomial parameters
+
+define_psa(
+  rate1 + rate2 + rate3 ~ multinomial(10, 50, 40),
+  a + b ~ multinomial(15, 30)
+)
+</code></pre>
+
+
+</div>

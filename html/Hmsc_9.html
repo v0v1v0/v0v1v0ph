@@ -1,0 +1,105 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>computeVariancePartitioning</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>computeVariancePartitioning</h2>
+
+<h3>Description</h3>
+
+<p>Computes variance components with respect to given grouping of fixed effects and levels
+of random effects
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">computeVariancePartitioning(
+  hM,
+  group = NULL,
+  groupnames = NULL,
+  start = 1,
+  na.ignore = FALSE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>hM</code></td>
+<td>
+<p>a fitted <code>Hmsc</code> model object</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>group</code></td>
+<td>
+<p>vector of numeric values corresponding to group
+identifiers in groupnames. If the model was defined with
+<code>XData</code> and <code>XFormula</code>, the default is to use model
+terms.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>groupnames</code></td>
+<td>
+<p>vector of names for each group of fixed
+effect. Should match <code>group</code>. If the model was defined
+with <code>XData</code> and <code>XFormula</code>, the default is to use
+the labels of model terms.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>start</code></td>
+<td>
+<p>index of first MCMC sample included</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>na.ignore</code></td>
+<td>
+<p>logical. If TRUE, covariates are ignored for sites
+where the focal species is NA when computing
+variance-covariance matrices for each species</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The vector <code>group</code> has one value for each column of the matrix <code>hM$X</code>, describing the index of the
+group in which this column is to be included. The names of the group are given by <code>groupnames</code>. The output object
+<code>VP$vals</code> gives the variance proportion for each group and species. The output object <code>VP$R2T</code> gives the
+variance among species explained by traits, measured for species' responses to covariates (<code>VP$R2T$Beta</code>) and species occurrences
+(<code>VP$R2T$Y</code>)
+</p>
+
+
+<h3>Value</h3>
+
+<p>returns an object VP with components VP$vals, VP$R2T, VP$group and VP$groupnames.
+</p>
+
+
+<h3>See Also</h3>
+
+<p>Use <code>plotVariancePartitioning</code> to display the result object.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Partition the explained variance for a previously fitted model
+# without grouping environmental covariates
+VP = computeVariancePartitioning(TD$m)
+
+# Partition the explained variance for a previously fitted model
+# while grouping the two environmental variables together
+VP = computeVariancePartitioning(TD$m, group=c(1,1), groupnames = c("Habitat"))
+
+</code></pre>
+
+
+</div>

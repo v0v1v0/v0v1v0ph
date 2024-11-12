@@ -1,0 +1,140 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hypervolume_n_occupancy_test</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Significance of random points occupancy
+</h2>
+
+<h3>Description</h3>
+
+<p>The function <code>hypervolume_n_occupancy_test()</code> calculates the significance of the difference between occupancy values for each random point and for all the pairwise combinations of groups in objects generated with <code>hypervolume_n_occupancy()</code> and <code>hypervolume_n_occupancy_permute()</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hypervolume_n_occupancy_test(observed,
+                             path,
+                             alternative = "two_sided",
+                             significance = 0.05,
+                             cores = 1, 
+                             p_adjust = "none",
+                             multi_comp_type = "pairwise")
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>observed</code></td>
+<td>
+
+<p>An <code>HypervolumeList</code> generated from <code>hypervolume_n_occupancy()</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>path</code></td>
+<td>
+
+<p>A path to a directory of permuted hypervolumes generated with <code>hypervolume_n_occupancy_permute()</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alternative</code></td>
+<td>
+
+<p>Alternative hypothesis, can be one of <code>two_sided</code>, <code>more</code> or <code>less</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>significance</code></td>
+<td>
+
+<p>Significance values lower than this threshold will be retained.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cores</code></td>
+<td>
+
+<p>Number of logical cores to use while generating permuted hypervolumes. If parallel backend already registered to <code>doParallel</code>, function will use that backend and ignore the argument in <code>cores</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>p_adjust</code></td>
+<td>
+
+<p>Method of correction for multiple comparisons, set to <code>none</code> by default. Otherwise look at <code>p.adjust</code> of the <code>stats</code> package for alternatives.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>multi_comp_type</code></td>
+<td>
+
+<p>Type of multiple comparison. Can be <code>pairwise</code>, for which the number of comparisons is set to the length of <code>ValueAtRandomPoints</code>, <code>all</code>,  for which the number of comparisons is set to the length of <code>ValueAtRandomPoints</code> times the number of groups, or <code>none</code>.
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The observed difference between <code>ValueAtRandomPoints</code> of two groups is compared against null expectations generated with <code>hypervolume_n_occupancy_permute()</code>. 
+</p>
+
+
+<h3>Value</h3>
+
+<p>An <code>HypervolumeList</code> of length equal to the number of pairwise combinations of the observed <code>HypervolumeList</code> elements. <code>ValueAtRandomPoints</code> are calculated as the difference between the <code>ValueAtRandomPoints</code> of the first and the second group for each pairwise combination. Only significant values are retained according to <code>significance</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+data(penguins,package='palmerpenguins')
+penguins_no_na = as.data.frame(na.omit(penguins))
+
+
+# split the dataset on species and sex
+penguins_no_na_split = split(penguins_no_na, 
+                        paste(penguins_no_na$species, penguins_no_na$sex, sep = "_"))
+
+
+# calculate the hypervolume for each element of the splitted dataset
+hv_list = mapply(function(x, y) 
+  hypervolume_gaussian(x[, c("bill_length_mm", "flipper_length_mm")],
+                       samples.per.point=100, name = y), 
+  x = penguins_no_na_split, 
+  y = names(penguins_no_na_split))
+
+names(hv_list) &lt;- names(penguins_no_na_split)
+hv_list &lt;- hypervolume_join(hv_list)
+
+
+hv_occupancy_list_sex &lt;- hypervolume_n_occupancy(hv_list, 
+                              classification = rep(c("female", "male"), each = 3))
+
+# takes 9 permutations on 1 core
+hyper_permuted &lt;- hypervolume_n_occupancy_permute("permute", hv_occupancy_list_sex,
+                                hv_list , n = 99, cores = 1)
+
+hypervolume_test &lt;- hypervolume_n_occupancy_test(hv_occupancy_list_sex, hyper_permuted, 
+                      alternative = "more", significance = 0.1)
+
+
+
+## End(Not run)
+</code></pre>
+
+
+</div>

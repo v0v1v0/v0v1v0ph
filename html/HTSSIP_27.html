@@ -1,0 +1,117 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>HTSSIP_sim</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Simulate a HTS-SIP dataset</h2>
+
+<h3>Description</h3>
+
+<p>This is a simple method for simulating high thoughput sequencing
+stable isotope probing datasets and is mainly used for package testing
+purposes. See <code>SIPSim</code> for more detailed and simulation pipeline.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">HTSSIP_sim(locs, params, responseModel = "gaussian",
+  countModel = "poisson", meta = NULL, sim_tree = FALSE,
+  parallel = FALSE, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>locs</code></td>
+<td>
+<p>Buoyant densities of each gradient fraction</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>params</code></td>
+<td>
+<p>A matrix of parameters for <code>coenocliner::coenocline()</code>.
+See that function's documentation for more details.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>responseModel</code></td>
+<td>
+<p>See <code>coenocliner::coenocline()</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>countModel</code></td>
+<td>
+<p>See <code>coenocliner::coenocline()</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>meta</code></td>
+<td>
+<p>Data.frame object of metadata to add to <code>sample_data</code> table.
+The data.frame object must have a 'Gradient' column, which is used for joining
+with <code>dplyr::left_join()</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sim_tree</code></td>
+<td>
+<p>Simulate a tree?</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>parallel</code></td>
+<td>
+<p>Parallel processing. See <code>.parallel</code> option in
+<code>dplyr::mdply()</code> for more details.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Other parameters passed to <code>coenocliner::coenocline()</code></p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A phyloseq object
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># setting parameters for tests
+set.seed(2)
+M = 10                                  # number of species
+ming = 1.67                             # gradient minimum...
+maxg = 1.78                                # ...and maximum
+nfrac = 24                                 # number of gradient fractions
+locs = seq(ming, maxg, length=nfrac)       # gradient locations
+tol  = rep(0.005, M)                       # species tolerances
+h    = ceiling(rlnorm(M, meanlog=11))    # max abundances
+## creating parameter matrices for each density gradient
+opt1 = rnorm(M, mean=1.7, sd=0.005)      # species optima
+params1 = cbind(opt=opt1, tol=tol, h=h)  # put in a matrix
+opt2 = rnorm(M, mean=1.7, sd=0.005)      # species optima
+params2 = cbind(opt=opt2, tol=tol, h=h)  # put in a matrix
+param_l = list(
+  '12C-Con_rep1' = params1,
+  '13C-Cel_rep1' = params2
+)
+## Not run: 
+# simulating phyloseq object
+physeq = HTSSIP_sim(locs, param_l)
+physeq
+
+## End(Not run)
+
+</code></pre>
+
+
+</div>

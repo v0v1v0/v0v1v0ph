@@ -1,0 +1,117 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>snpPos</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Find the column numbers of SNP identifiers/SNP numbers in a ped file</h2>
+
+<h3>Description</h3>
+
+<p>Gives the column numbers of SNP identifiers or SNP numbers in a standard ped file, calculated from the SNP's positions in the corresponding map file. The column numbers are sorted in the same order as <code>snp.select</code>.
+These positions may be useful when extracting a selection of SNPs from a ped file.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">snpPos(snp.select, map.file, blank.lines.skip = TRUE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>snp.select</code></td>
+<td>
+<p>A character vector of the SNP identifiers (RS codes) or a numeric vector of the SNP numbers.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>map.file</code></td>
+<td>
+<p>A character string giving the name and path of the standard map file to be used.  See Details for a description of the standard map format.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>blank.lines.skip</code></td>
+<td>
+<p>Logical. If "TRUE" (default), <code>snpPos</code> ignores blank lines in <code>map.file</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>To extract certain SNPs from a standard ped file, one has to know their positions in the ped file.
+This can be obtained from the corresponding map file.<br></p>
+<p>The map file should look something like this:
+</p>
+<pre>
+Chromosome SNP-identifier Base-pair-position
+1               RS9629043             554636
+1              RS12565286             711153 
+1              RS12138618             740098
+</pre>
+<p>Alternatively, the map file could contain four columns. The column values should then be:
+Chromosome, SNP-identifier, Genetic-distance, Base-pair-position.<br>
+A header must be added to the map file if this does not already exist.<br><br>
+The format of the corresponding ped file should be something like this:
+</p>
+<pre>
+1104  1104-1  1104-2  1104-3  1  2  4  1  3  2
+1104  1104-2       0       0  1  1  4  1  2  2
+1104  1104-3       0       0  2  1  0  0  0  0
+1105  1105-1  1105-2  1105-3  2  2  1  1  2  2
+1105  1105-2       0       0  1  1  1  1  2  2
+1105  1105-3       0       0  2  1  1  1  3  2
+</pre>
+<p>The column values are: Family id, Individual id, Father's id, Mother's id, Sex (1 = male, 2 = female, alternatively: 1 = male, 0 = female), and Case-control status (1 = controls, 2 = cases, alternatively: 0 = controls, 1 = cases).<br>
+Column 7 and onwards contain the genotype data, with alleles in separate columns. A “0” is used to denote missing data.<br></p>
+
+
+<h3>Value</h3>
+
+<p>A vector of the column numbers of the SNP identifiers/SNP numbers in the ped file, sorted in the same order as given in <code>snp.select</code>.
+</p>
+
+
+<h3>Note</h3>
+
+<p>The function does not check if the map file is formatted correctly or if the map and ped file have the same number of SNPs. The corresponding positions of the SNPs in the ped file may not be correct if the ped file has a different format from the given example.</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Miriam Gjerdevik,<br>
+with Hakon K. Gjessing<br>
+Professor of Biostatistics<br>
+Division of Epidemiology<br>
+Norwegian Institute of Public Health<br><a href="mailto:hakon.gjessing@uib.no">hakon.gjessing@uib.no</a></p>
+
+
+<h3>References</h3>
+
+<p>Web Site: <a href="https://haplin.bitbucket.io">https://haplin.bitbucket.io</a></p>
+
+
+<h3>See Also</h3>
+
+<p><code>convertPed</code>, <code>lineByLine</code></p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+## Not run: 
+
+# Find the column numbers of the SNP identifiers "RS9629043" and "RS12565286" in 
+# a standard ped file
+snpPos(snp.select = c("RS9629043", "RS12565286"), map.file = "mygwas.map")
+
+## End(Not run)
+
+</code></pre>
+
+
+</div>

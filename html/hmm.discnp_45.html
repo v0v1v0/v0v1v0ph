@@ -1,0 +1,187 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>logLikHmm</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Log likelihood of a hidden Markov model
+</h2>
+
+<h3>Description</h3>
+
+<p>Calculate the log likelihood of a hidden Markov model with
+discrete non-parametric observation distributions.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">logLikHmm(y, model=NULL, tpm=NULL, ispd=NULL, Rho=NULL, X=NULL,
+          addIntercept=NULL, warn=TRUE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+
+<p>A vector, or list of vectors, or a one or two column matrix or a
+list of such matrics, whose entries consist of observations from
+a hidden Markov model with discrete non-parametric observation
+distributions.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>model</code></td>
+<td>
+<p>An object specifying a hidden Markov model, usually
+returned by <code>hmm()</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tpm</code></td>
+<td>
+<p>The transition probability matrix of the Markov chain.
+Ignored (and extracted from <code>model</code>) if <code>model</code>
+is non-<code>NULL</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ispd</code></td>
+<td>
+<p>The vector of probabilities specifying the initial
+state probability distribution, or a matrix each of whose columns
+is a trivial (“delta function”) vector specifying the
+“most probable” initial state for each observation sequence.
+If <code>ispd</code> is missing then <code>ispd</code> is calculated as the
+stationary distribution determined by <code>tpm</code>.  Ignored (and
+extracted from <code>model</code>) if <code>model</code> is non-<code>NULL</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Rho</code></td>
+<td>
+<p>An object specifying the “emission” probabilities
+of the observations.  (See the <b>Details</b> in the help for
+<code>hmm()</code>.)  Ignored (and extracted from <code>model</code>)
+if <code>model</code> is non-<code>NULL</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>X</code></td>
+<td>
+<p>An optional <em>numeric</em> matrix, or a list of such
+matrices, of <em>predictors</em>.  The use of such predictors is
+(currently, at least) applicable only in the univariate emissions
+setting.  If <code>X</code> is a list it must be of the same length as
+<code>y</code> and all entries of this list must have the same number
+of columns.  The number of rows of each entry must be equal to
+the length of the corresponding entry of <code>y</code>. If <code>X</code>
+is a matrix then <code>y</code> should be a vector or one-column matrix
+(or a list with a single entry equal to such).
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>addIntercept</code></td>
+<td>
+
+<p>Logical scalar.  See the documentation of <code>hmm()</code>.
+If this argument is not specified, and if <code>model</code> is
+<code>NULL</code> then an error is thrown.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>warn</code></td>
+<td>
+<p>Logical scalar; should a warning be issued if <code>Rho</code>
+hasn't got relevant dimension names?  (Note that if this is so,
+then the corresponding dimension names are formed from the sorted
+unique values of <code>y</code> or of the appropriate column(s) of <code>y</code>.
+And if <em>this</em> is so, then the user should be sure that the
+ordering of the entries of <code>Rho</code> corresponds properly to the
+the sorted unique values of <code>y</code>.)  This argument is passed
+to the utility function <code>check.yval()</code> which actually issues
+the warning if <code>warn=TRUE</code>.
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>If <code>y</code> is not provided the function simply returns the
+<code>log.like</code> component of <code>model</code> (which could be
+<code>NULL</code> if <code>model</code> was not produced by <code>hmm()</code>.
+</p>
+<p>The observation values (the entries of the vector or matrix <code>y</code>,
+or of the vectors or matrices which constitute the entries of
+<code>y</code> if <code>y</code> is a list) must be consistent with the
+appropriate dimension names of <code>Rho</code> or of its entries when
+<code>Rho</code> is a list.  More specifically, if <code>Rho</code> has dimension
+names (or its entries have dimension names) then the observation
+values must all be found as entries of the appropriate dimension
+name vector.  If a vector of dimension names is <code>NULL</code> then
+the corresponding dimension must be equal to the number of unique
+observations of the appropriate variate.  integers between <code>1</code>
+and <code>nrow(Rho)</code>.
+</p>
+
+
+<h3>Value</h3>
+
+<p>The loglikehood of <code>y</code> given the parameter values specified
+in <code>par</code>.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Rolf Turner
+<a href="mailto:r.turner@auckland.ac.nz">r.turner@auckland.ac.nz</a><br></p>
+
+
+<h3>References</h3>
+
+<p>See <code>hmm()</code> for references.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>hmm()</code>, <code>pr()</code>, <code>sp()</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># TO DO:  One or more bivariate examples.
+P &lt;- matrix(c(0.7,0.3,0.1,0.9),2,2,byrow=TRUE)
+R &lt;- matrix(c(0.5,0,0.1,0.1,0.3,
+              0.1,0.1,0,0.3,0.5),5,2)
+set.seed(42)
+lll   &lt;- sample(250:350,20,TRUE)
+set.seed(909)
+y.num &lt;- rhmm(ylengths=lll,nsim=1,tpm=P,Rho=R,drop=TRUE)
+set.seed(909)
+y.let &lt;- rhmm(ylengths=lll,nsim=1,tpm=P,Rho=R,yval=letters[1:5],drop=TRUE)
+row.names(R) &lt;- 1:5
+ll1   &lt;- logLikHmm(y.num,tpm=P,Rho=R)
+row.names(R) &lt;- letters[1:5]
+ll2   &lt;- logLikHmm(y.let,tpm=P,Rho=R)
+ll3   &lt;- logLikHmm(y.let,tpm=P,Rho=R,ispd=c(0.5,0.5))
+fit   &lt;- hmm(y.num,K=2,itmax=10)
+ll4   &lt;- logLikHmm(y.num,fit) # Use the fitted rather than the "true" parameters.
+</code></pre>
+
+
+</div>

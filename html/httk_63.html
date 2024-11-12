@@ -1,0 +1,363 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>create_mc_samples</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Create a table of parameter values for Monte Carlo</h2>
+
+<h3>Description</h3>
+
+<p>This is the HTTK master function for creating a data table for use with 
+Monte Carlo methods to simulate parameter uncertainty and variabilit.
+Each column of the output table corresponds to an HTTK model parameter and 
+each row corresponds
+to a different random draw (for example, different individuals when 
+considering biological variability). This function call three different key
+functions to simulate parameter parameter uncertainty and/or variability in
+one of three ways. First parameters can be varied in an uncorrelated manner
+using truncated normal distributions by the function 
+<code>monte_carlo</code>. Then,
+physiological parameters can be varied in a correlated manner according to
+the Ring et al. (2017) 
+(<a href="https://doi.org/10.1016/j.envint.2017.06.004">doi:10.1016/j.envint.2017.06.004</a>) <em>httk-pop</em> 
+approach by the function <code>httkpop_mc</code>. Next, both uncertainty
+and variability of in vitro HTTK parameters can be simulated by the function
+<code>invitro_mc</code> as described by 
+Wambaugh et al. (2019) 
+(<a href="https://doi.org/10.1093/toxsci/kfz205">doi:10.1093/toxsci/kfz205</a>). Finally, tissue-specific partition 
+coefficients are predicted for each draw using the 
+Schmitt (2008)
+(<a href="https://doi.org/10.1016/j.tiv.2007.09.010">doi:10.1016/j.tiv.2007.09.010</a>) method as calibrated to <em>in vivo</em>
+data by Pearce et al. (2017) 
+(<a href="https://doi.org/10.1007/s10928-017-9548-7">doi:10.1007/s10928-017-9548-7</a>) and 
+implemented in <code>predict_partitioning_schmitt</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">create_mc_samples(
+  chem.cas = NULL,
+  chem.name = NULL,
+  dtxsid = NULL,
+  parameters = NULL,
+  samples = 1000,
+  species = "Human",
+  suppress.messages = FALSE,
+  model = "3compartmentss",
+  httkpop = TRUE,
+  invitrouv = TRUE,
+  calcrb2p = TRUE,
+  censored.params = list(),
+  vary.params = list(),
+  return.samples = FALSE,
+  tissue = NULL,
+  httkpop.dt = NULL,
+  invitro.mc.arg.list = NULL,
+  adjusted.Funbound.plasma = TRUE,
+  adjusted.Clint = TRUE,
+  httkpop.generate.arg.list = list(method = "direct resampling"),
+  convert.httkpop.arg.list = NULL,
+  propagate.invitrouv.arg.list = NULL,
+  parameterize.arg.list = NULL,
+  Caco2.options = NULL
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>chem.cas</code></td>
+<td>
+<p>Chemical Abstract Services Registry Number (CAS-RN) – if
+parameters is not specified then the chemical must be identified by either
+CAS, name, or DTXISD</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>chem.name</code></td>
+<td>
+<p>Chemical name (spaces and capitalization ignored) –  if
+parameters is not specified then the chemical must be identified by either
+CAS, name, or DTXISD</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dtxsid</code></td>
+<td>
+<p>EPA's DSSTox Structure ID (<a href="https://comptox.epa.gov/dashboard">https://comptox.epa.gov/dashboard</a>)
+– if parameters is not specified then the chemical must be identified by 
+either CAS, name, or DTXSIDs</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>parameters</code></td>
+<td>
+<p>Parameters from the appropriate parameterization function
+for the model indicated by argument model</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>samples</code></td>
+<td>
+<p>Number of samples generated in calculating quantiles.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>species</code></td>
+<td>
+<p>Species desired (either "Rat", "Rabbit", "Dog", "Mouse", or
+default "Human"). Species must be set to "Human" to run httkpop model.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>suppress.messages</code></td>
+<td>
+<p>Whether or not to suppress output message.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>model</code></td>
+<td>
+<p>Model used in calculation: 'pbtk' for the multiple compartment
+model,'3compartment' for the three compartment model, '3compartmentss' for
+the three compartment steady state model, and '1compartment' for one
+compartment model.  This only applies when httkpop=TRUE and species="Human",
+otherwise '3compartmentss' is used.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>httkpop</code></td>
+<td>
+<p>Whether or not to use the 
+Ring et al. (2017) "httkpop"
+population generator. Species must be 'Human'.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>invitrouv</code></td>
+<td>
+<p>Logical to indicate whether to include in vitro parameters
+such as intrinsic hepatic clearance rate and fraction unbound in plasma
+in uncertainty and variability analysis</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>calcrb2p</code></td>
+<td>
+<p>Logical determining whether or not to recalculate the 
+chemical ratio of blood to plasma</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>censored.params</code></td>
+<td>
+<p>The parameters listed in censored.params are sampled
+from a normal distribution that is censored for values less than the limit
+of detection (specified separately for each parameter). This argument should
+be a list of sub-lists. Each sublist is named for a parameter in
+"parameters" and contains two elements: "CV" (coefficient of variation) and
+"LOD" (limit of detection, below which parameter values are censored. New
+values are sampled with mean equal to the value in "parameters" and standard
+deviation equal to the mean times the CV.  Censored values are sampled on a
+uniform distribution between 0 and the limit of detection. Not used with
+httkpop model.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>vary.params</code></td>
+<td>
+<p>The parameters listed in vary.params are sampled from a
+normal distribution that is truncated at zero. This argument should be a
+list of coefficients of variation (CV) for the normal distribution. Each
+entry in the list is named for a parameter in "parameters". New values are
+sampled with mean equal to the value in "parameters" and standard deviation
+equal to the mean times the CV. Not used with httkpop model.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>return.samples</code></td>
+<td>
+<p>Whether or not to return the vector containing the
+samples from the simulation instead of the selected quantile.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tissue</code></td>
+<td>
+<p>Desired steady state tissue conentration.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>httkpop.dt</code></td>
+<td>
+<p>A data table generated by <code>httkpop_generate</code>.
+This defaults to NULL, in which case <code>httkpop_generate</code> is 
+called to generate this table.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>invitro.mc.arg.list</code></td>
+<td>
+<p>Additional parameters passed to 
+<code>invitro_mc</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>adjusted.Funbound.plasma</code></td>
+<td>
+<p>Uses 
+Pearce et al. (2017) lipid binding adjustment
+for Funbound.plasma when set to TRUE (Default).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>adjusted.Clint</code></td>
+<td>
+<p>Uses 
+Kilford et al. (2008) hepatocyte incubation
+binding adjustment for Clint when set to TRUE (Default).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>httkpop.generate.arg.list</code></td>
+<td>
+<p>Additional parameters passed to 
+<code>httkpop_generate</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>convert.httkpop.arg.list</code></td>
+<td>
+<p>Additional parameters passed to the 
+convert_httkpop_* function for the model.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>propagate.invitrouv.arg.list</code></td>
+<td>
+<p>Additional parameters passed to model's
+associated in vitro uncertainty and variability propagation function</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>parameterize.arg.list</code></td>
+<td>
+<p>Additional parameters passed to the 
+parameterize_* function for the model.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Caco2.options</code></td>
+<td>
+<p>Arguments describing how to handle Caco2 absorption data
+that are passed to <code>invitro_mc</code> and the parameterize_[MODEL] 
+functions.
+See <code>get_fbio</code> for further details.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The Monte Carlo methods used here were recently updated and described by
+Breen et al. (2022).
+</p>
+<p>We aim to make any function that uses chemical identifiers 
+(name, CAS, DTXSID) 
+also work if passed a complete vector of parameters (that is, a row from the
+table generated by this function). This allows the
+use of Monte Carlo to vary the parameters and therefore vary the function
+output. Depending on the type of parameters (for example, physiological vs. 
+in vitro measurements) we vary the parameters in different ways with 
+different functions.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A data table where each column corresponds to parameters needed for the 
+specified model and each row represents a different Monte Carlo sample of
+parameter values.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Caroline Ring, Robert Pearce, and John Wambaugh
+</p>
+
+
+<h3>References</h3>
+
+<p>Breen M, Wambaugh JF, Bernstein A, Sfeir M, Ring CL (2022).
+“Simulating toxicokinetic variability to identify susceptible and highly exposed populations.”
+<em>Journal of Exposure Science &amp; Environmental Epidemiology</em>, <b>32</b>(6), 855–863.<br><br> Kilford PJ, Gertz M, Houston JB, Galetin A (2008).
+“Hepatocellular binding of drugs: correction for unbound fraction in hepatocyte incubations using microsomal binding or drug lipophilicity data.”
+<em>Drug Metabolism and Disposition</em>, <b>36</b>(7), 1194–1197.<br><br> Pearce RG, Setzer RW, Davis JL, Wambaugh JF (2017).
+“Evaluation and calibration of high-throughput predictions of chemical distribution to tissues.”
+<em>Journal of pharmacokinetics and pharmacodynamics</em>, <b>44</b>, 549–565.<br><br> Ring CL, Pearce RG, Setzer RW, Wetmore BA, Wambaugh JF (2017).
+“Identifying populations sensitive to environmental chemicals by simulating toxicokinetic variability.”
+<em>Environment International</em>, <b>106</b>, 105–118.<br><br> Schmitt W (2008).
+“General approach for the calculation of tissue to plasma partition coefficients.”
+<em>Toxicology in vitro</em>, <b>22</b>(2), 457–467.<br><br> Wambaugh JF, Wetmore BA, Ring CL, Nicolas CI, Pearce RG, Honda GS, Dinallo R, Angus D, Gilbert J, Sierra T, others (2019).
+“Assessing toxicokinetic uncertainty and variability in risk prioritization.”
+<em>Toxicological Sciences</em>, <b>172</b>(2), 235–251.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+
+# We can use the Monte Carlo functions by passing a table
+# where each row represents a different Monte Carlo draw of parameters:
+p &lt;- create_mc_samples(chem.cas="80-05-7")
+
+# Use data.table for steady-state plasma concentration (Css) Monte Carlo:
+calc_mc_css(parameters=p)
+
+# Using the same table gives the same answer:
+calc_mc_css(parameters=p)
+
+# Use Css for 1 mg/kg/day for simple reverse toxicokinetics 
+# in Vitro-In Vivo Extrapolation to convert 15 uM to mg/kg/day:
+15/calc_mc_css(parameters=p, output.units="uM")
+
+# Can do the same with calc_mc_oral_equiv:
+calc_mc_oral_equiv(15, parameters=p)
+
+#Generate a population using the virtual-individuals method,
+#including 80 females and 20 males,
+#including only ages 20-65,
+#including only Mexican American and
+#Non-Hispanic Black individuals,
+#including only non-obese individuals
+set.seed(42)
+mypop &lt;- httkpop_generate(method = 'virtual individuals',
+                          gendernum=list(Female=80,
+                          Male=20),
+                          agelim_years=c(20,65),
+                          reths=c('Mexican American',
+                          'Non-Hispanic Black'),
+                          weight_category=c('Underweight',
+                          'Normal',
+                          'Overweight'))
+# Including a httkpop.dt argument will overwrite the number of sample and
+# the httkpop on/off logical switch:
+samps1 &lt;- create_mc_samples(chem.name="bisphenola",
+                           httkpop=FALSE,
+                           httkpop.dt=mypop)
+samps2 &lt;- create_mc_samples(chem.name="bisphenola",
+                           httkpop.dt=mypop)
+# But we can turn httkpop off altogether if desired:
+samps3 &lt;- create_mc_samples(chem.name="bisphenola",
+                           httkpop=FALSE)
+
+
+</code></pre>
+
+
+</div>

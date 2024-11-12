@@ -1,0 +1,101 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>get_location_info</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Retrieve additional information for wms layer</h2>
+
+<h3>Description</h3>
+
+<p>For some wms layer more information can be found with GetFeatureInfo request.
+This function first check if info are available. If not, available layers
+are returned.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">get_location_info(x,
+                  apikey = "ortho",
+                  layer = "ORTHOIMAGERY.ORTHOPHOTOS",
+                  read_sf = TRUE,
+                  version = "1.3.0")
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>Object of class <code>sf</code> or <code>sfc</code>. Only single point are supported for now.
+Needs to be located in France.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>apikey</code></td>
+<td>
+<p><code>character</code>; API key from get_apikeys() or directly from the IGN website</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>layer</code></td>
+<td>
+<p><code>character</code>; layer name obtained from
+<code>get_layers_metadata("wms-r")</code> or the
+<a href="https://geoservices.ign.fr/services-web-experts">IGN website</a>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>read_sf</code></td>
+<td>
+<p><code>logical</code>; if <code>TRUE</code> an <code>sf</code> object is returned but
+response times may be higher.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>version</code></td>
+<td>
+<p><code>character</code>; old param</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p><code>character</code> or <code>sf</code> containing additional information about the layer
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+library(sf)
+library(tmap)
+
+# From single point
+x &lt;- st_centroid(read_sf(system.file("extdata/penmarch.shp", package = "happign")))
+location_info &lt;- get_location_info(x, "ortho", "ORTHOIMAGERY.ORTHOPHOTOS", read_sf = F)
+location_info$date_vol
+
+# From multiple point
+x1 &lt;- st_sfc(st_point(c(-3.549957, 47.83396)), crs = 4326) # Carnoet forest
+x2 &lt;- st_sfc(st_point(c(-3.745995, 47.99296)), crs = 4326) # Coatloch forest
+
+forests &lt;- lapply(list(x1, x2),
+                  get_location_info,
+                  apikey = "environnement",
+                  layer = "FORETS.PUBLIQUES",
+                  read_sf = T)
+
+qtm(forests[[1]]) + qtm(forests[[2]])
+
+# Find all queryable layers
+queryable_layers &lt;- lapply(get_apikeys(), are_queryable) |&gt; unlist()
+
+## End(Not run)
+</code></pre>
+
+
+</div>

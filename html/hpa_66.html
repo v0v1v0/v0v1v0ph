@@ -1,0 +1,219 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>truncatedNormalMoment</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Calculate k-th order moment of truncated normal distribution</h2>
+
+<h3>Description</h3>
+
+<p>This function recursively calculates k-th order moment of 
+truncated normal distribution.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">truncatedNormalMoment(
+  k = 1L,
+  x_lower = numeric(0),
+  x_upper = numeric(0),
+  mean = 0,
+  sd = 1,
+  pdf_lower = numeric(0),
+  cdf_lower = numeric(0),
+  pdf_upper = numeric(0),
+  cdf_upper = numeric(0),
+  cdf_difference = numeric(0),
+  return_all_moments = FALSE,
+  is_validation = TRUE,
+  is_parallel = FALSE,
+  diff_type = "NO"
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>k</code></td>
+<td>
+<p>non-negative integer moment order.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x_lower</code></td>
+<td>
+<p>numeric vector of lower truncation points.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x_upper</code></td>
+<td>
+<p>numeric vector of upper truncation points.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mean</code></td>
+<td>
+<p>numeric expected value.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sd</code></td>
+<td>
+<p>positive numeric standard deviation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pdf_lower</code></td>
+<td>
+<p>non-negative numeric matrix of precalculated normal
+density functions with mean <code>mean</code> and standard deviation <code>sd</code> at
+points given by <code>x_lower</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cdf_lower</code></td>
+<td>
+<p>non-negative numeric matrix of 
+precalculated normal cumulative distribution functions
+with mean <code>mean</code> and standard deviation 
+<code>sd</code> at points given by <code>x_lower</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pdf_upper</code></td>
+<td>
+<p>non-negative numeric matrix of precalculated normal
+density functions with mean <code>mean</code> and standard deviation <code>sd</code> at
+points given by <code>x_upper</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cdf_upper</code></td>
+<td>
+<p>non-negative numeric matrix of
+precalculated normal cumulative distribution functions
+with mean <code>mean</code> and standard deviation
+<code>sd</code> at points given by <code>x_upper</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cdf_difference</code></td>
+<td>
+<p>non-negative numeric matrix of 
+precalculated <code>cdf_upper-cdf_lower</code> values.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>return_all_moments</code></td>
+<td>
+<p>logical; if <code>TRUE</code>, function returns the 
+matrix of moments of normally distributed random variable with 
+mean = <code>mean</code> and standard deviation = <code>sd</code> under lower and upper 
+truncation points <code>x_lower</code> and <code>x_upper</code> correspondingly. 
+Note that element in i-th row and j-th column of this matrix corresponds to 
+the i-th observation (j-1)-th order moment.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>is_validation</code></td>
+<td>
+<p>logical value indicating whether function input 
+arguments should be validated.  Set it to <code>FALSE</code> for slight
+performance boost (default value is <code>TRUE</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>is_parallel</code></td>
+<td>
+<p>if <code>TRUE</code> then multiple cores will be
+used for some calculations. It usually provides speed advantage for
+large enough samples (about more than 1000 observations).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>diff_type</code></td>
+<td>
+<p>string value indicating the type of the argument
+the moment should be differentiated respect to.
+Default value is <code>"NO"</code> so the moments itself will be returned. 
+Alternative values are <code>"mean"</code> and <code>"sd"</code>. Also 
+<code>"x_lower"</code> and <code>"x_upper"</code> values are available for 
+<code>truncatedNormalMoment</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>This function estimates <code>k</code>-th order moment of
+normal distribution which mean equals to <code>mean</code> and standard deviation 
+equals to <code>sd</code> truncated at points given by <code>x_lower</code> and 
+<code>x_upper</code>. Note that the function is vectorized so you can provide
+<code>x_lower</code> and <code>x_upper</code> as vectors of equal size. If vectors values 
+for <code>x_lower</code> and <code>x_upper</code> are not provided then their default 
+values will be set to <code>-(.Machine$double.xmin * 0.99)</code> and 
+<code>(.Machine$double.xmax * 0.99)</code> correspondingly.
+</p>
+<p>Note that parameter <code>k</code> value automatically converts 
+to integer. So passing non-integer <code>k</code> value will not cause 
+any errors but the calculations will be performed for rounded 
+<code>k</code> value only.
+</p>
+<p>If there is precalculated density or cumulative distribution
+functions at standardized truncation points (subtract <code>mean</code> 
+and then divide by <code>sd</code>) then it is possible to provide
+them through <code>pdf_lower</code>, <code>pdf_upper</code>, 
+<code>cdf_lower</code> and <code>cdf_upper</code> arguments in
+order to decrease number of calculations.
+</p>
+
+
+<h3>Value</h3>
+
+<p>This function returns vector of k-th order moments for normally 
+distributed random variable with mean = <code>mean</code> and standard 
+deviation = <code>sd</code> under <code>x_lower</code> and <code>x_upper</code> truncation 
+points <code>x_lower</code> and <code>x_upper</code> correspondingly. 
+If <code>return_all_moments</code> is <code>TRUE</code> then see this argument 
+description above for output details.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Calculate 5-th order moment of three truncated normal random  
+## variables (x1, x2, x3) which mean is 5 and standard deviation is 3. 
+## These random variables truncation points are given 
+## as follows:-1&lt;x1&lt;1, 0&lt;x2&lt;2, 1&lt;x3&lt;3.
+k &lt;- 3
+x_lower &lt;- c(-1, 0, 1, -Inf, -Inf)
+x_upper &lt;- c(1, 2 , 3, 2, Inf)
+mean &lt;- 3
+sd &lt;- 5
+
+# get the moments
+truncatedNormalMoment(k, x_lower, x_upper, mean, sd)
+
+# get matrix of (0-5)-th moments (columns) for each variable (rows)
+truncatedNormalMoment(k, x_lower, x_upper, 
+                      mean, sd, 
+                      return_all_moments = TRUE)
+
+# get the moments derivatives respect to mean
+truncatedNormalMoment(k, x_lower, x_upper, 
+                      mean, sd, 
+                      diff_type = "mean")
+
+# get the moments derivatives respect to standard deviation
+truncatedNormalMoment(k, x_lower, x_upper, 
+                      mean, sd, 
+                      diff_type = "sd")
+
+</code></pre>
+
+
+</div>

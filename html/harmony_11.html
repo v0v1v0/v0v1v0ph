@@ -1,0 +1,215 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>RunHarmony.default</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>This is the primary harmony interface.</h2>
+
+<h3>Description</h3>
+
+<p>Use this generic with a cell embeddings matrix, a metadata table
+and a categorical covariate to run the Harmony algorithm directly
+on cell embedding matrix.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">## Default S3 method:
+RunHarmony(
+  data_mat,
+  meta_data,
+  vars_use,
+  theta = NULL,
+  sigma = 0.1,
+  lambda = 1,
+  nclust = NULL,
+  max_iter = 10,
+  early_stop = TRUE,
+  ncores = 1,
+  plot_convergence = FALSE,
+  return_object = FALSE,
+  verbose = TRUE,
+  .options = harmony_options(),
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>data_mat</code></td>
+<td>
+<p>Matrix of cell embeddings. Cells can be rows or
+columns and will be inferred by the rows of meta_data.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>meta_data</code></td>
+<td>
+<p>Either (1) Dataframe with variables to integrate
+or (2) vector with labels.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>vars_use</code></td>
+<td>
+<p>If meta_data is dataframe, this defined which
+variable(s) to remove (character vector).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>theta</code></td>
+<td>
+<p>Diversity clustering penalty parameter. Specify for
+each variable in vars_use Default theta=2. theta=0 does not
+encourage any diversity. Larger values of theta result in more
+diverse clusters.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sigma</code></td>
+<td>
+<p>Width of soft kmeans clusters. Default
+sigma=0.1. Sigma scales the distance from a cell to cluster
+centroids. Larger values of sigma result in cells assigned to
+more clusters. Smaller values of sigma make soft kmeans cluster
+approach hard clustering.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lambda</code></td>
+<td>
+<p>Ridge regression penalty. Default lambda=1. Bigger
+values protect against over correction. If several covariates
+are specified, then lambda can also be a vector which needs to
+be equal length with the number of variables to be
+corrected. In this scenario, each covariate level group will be
+assigned the scalars specified by the user. If set to NULL,
+harmony will start lambda estimation mode to determine lambdas
+automatically and try to minimize overcorrection (Use with caution still
+in beta testing).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nclust</code></td>
+<td>
+<p>Number of clusters in model. nclust=1 equivalent to
+simple linear regression.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>max_iter</code></td>
+<td>
+<p>Maximum number of rounds to run Harmony. One round
+of Harmony involves one clustering and one correction step.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>early_stop</code></td>
+<td>
+<p>Enable early stopping for harmony. The
+harmonization process will stop when the change of objective
+function between corrections drops below 1e-4</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ncores</code></td>
+<td>
+<p>Number of processors to be used for math operations
+when optimized BLAS is available. If BLAS is not supporting
+multithreaded then this option has no effect. By default,
+ncore=1 which runs as a single-threaded process. Although
+Harmony supports multiple cores, it is not optimized for
+multithreading. Increase this number for large datasets iff
+single-core performance is not adequate.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>plot_convergence</code></td>
+<td>
+<p>Whether to print the convergence plot of
+the clustering objective function. TRUE to plot, FALSE to
+suppress. This can be useful for debugging.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>return_object</code></td>
+<td>
+<p>(Advanced Usage) Whether to return the Harmony
+object or only the corrected PCA embeddings.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p>Whether to print progress messages. TRUE to print,
+FALSE to suppress.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.options</code></td>
+<td>
+<p>Setting advanced parameters of RunHarmony. This must be the
+result from a call to 'harmony_options'. See ?'harmony_options' for 
+parameters not listed above and more details.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>other parameters that are not part of the API</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>By default, matrix with corrected PCA embeddings. If
+return_object is TRUE, returns the full Harmony object (R6
+reference class type).
+</p>
+
+
+<h3>See Also</h3>
+
+<p>Other RunHarmony: 
+<code>RunHarmony.Seurat()</code>,
+<code>RunHarmony.SingleCellExperiment()</code>,
+<code>RunHarmony()</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+
+## By default, Harmony inputs a cell embedding matrix
+## Not run: 
+harmony_embeddings &lt;- RunHarmony(cell_embeddings, meta_data, 'dataset')
+
+## End(Not run)
+
+## If PCA is the input, the PCs need to be scaled
+data(cell_lines_small)
+pca_matrix &lt;- cell_lines_small$scaled_pcs
+meta_data &lt;- cell_lines_small$meta_data
+harmony_embeddings &lt;- RunHarmony(pca_matrix, meta_data, 'dataset')
+
+## Output is a matrix of corrected PC embeddings
+dim(harmony_embeddings)
+harmony_embeddings[seq_len(5), seq_len(5)]
+
+## Finally, we can return an object with all the underlying data structures
+harmony_object &lt;- RunHarmony(pca_matrix, meta_data, 'dataset', return_object=TRUE)
+dim(harmony_object$Y) ## cluster centroids
+dim(harmony_object$R) ## soft cluster assignment
+dim(harmony_object$Z_corr) ## corrected PCA embeddings
+head(harmony_object$O) ## batch by cluster co-occurence matrix
+
+</code></pre>
+
+
+</div>

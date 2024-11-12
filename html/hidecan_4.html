@@ -1,0 +1,87 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>apply_threshold</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Filters GWAS or DE results based on a threshold</h2>
+
+<h3>Description</h3>
+
+<p>Filters markers or genes/transcripts based on a threshold applied to their
+GWAS or DE score, and log2(fold-change) (if applicable). For a set of
+candidate genes, simply returns the list. Note that markers or genes with
+a missing score or log2(fold-change) will be removed from the dataset.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">apply_threshold(x, score_thr = 0, log2fc_thr = 0)
+
+## S3 method for class 'GWAS_data'
+apply_threshold(x, score_thr = 0, log2fc_thr = 0)
+
+## S3 method for class 'DE_data'
+apply_threshold(x, score_thr = 0, log2fc_thr = 0)
+
+## S3 method for class 'CAN_data'
+apply_threshold(x, score_thr = 0, log2fc_thr = 0)
+
+## Default S3 method:
+apply_threshold(x, score_thr = 0, log2fc_thr = 0)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>Either a <code>GWAS_data</code>, <code>DE_data</code> or <code>CAN_data</code> object.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>score_thr</code></td>
+<td>
+<p>Numeric, threshold to use on markers' or genes/transcripts' score.
+Only markers or genes with a score equal to or higher than this threshold
+will be retained. Default value is 0. Ignored for <code>CAN_data</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>log2fc_thr</code></td>
+<td>
+<p>Numeric, threshold to use on the absolute value of genes/
+transcripts' log2(fold-change). Only genes/transcripts with an absolute
+log2(fold-change) equal to or higher than this threshold will be retained.
+Ignored for <code>GWAS_data</code> and <code>CAN_data</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A filtered tibble (of class <code>GWAS_data_thr</code>, <code>DE_data_thr</code> or
+<code>CAN_data_thr</code>).
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">x &lt;- get_example_data()
+
+## For GWAS results
+apply_threshold(GWAS_data(x[["GWAS"]]), score_thr = 4)
+
+## For DE results - in second line, no threshold is applied
+## on the log2(fold-change)
+apply_threshold(DE_data(x[["DE"]]), score_thr = -log10(0.05), log2fc_thr = 1)
+apply_threshold(DE_data(x[["DE"]]), score_thr = -log10(0.05), log2fc_thr = 0)
+
+## No effect on the Candidate genes
+apply_threshold(CAN_data(x[["CAN"]]))
+</code></pre>
+
+
+</div>

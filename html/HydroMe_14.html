@@ -1,0 +1,109 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>SSkosugi</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+A Kosugi water retention model
+</h2>
+
+<h3>Description</h3>
+
+<p>This is a four- parameter function to determine water retention hydraulic parameters contained in the Kosugi water retention model
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">SSkosugi(x, thr, ths, alp, nscal)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+
+<p>Suction potential/head as contained in the x-column of the xy water retention table or data
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>thr</code></td>
+<td>
+
+<p>This is the residual moisture content. It's the moisture content when suction potential is very high (almost at the drying point)
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ths</code></td>
+<td>
+
+<p>This is the saturated moisture content. It's the moisture content when suction potential is very low (almost at the saturation point)
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alp</code></td>
+<td>
+
+<p>It's the inverse of air-entry potential or bubbling pressure
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nscal</code></td>
+<td>
+
+<p>This is a parameter or index for the pore-size distribution
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>A Kosugi model is a type of self-starting nonlinear curve fitting model for fitting water retention characteristics using experimental data. If warnings are given during the estimation process, try to increase the iteration limit using control function. Sometimes the warnings can be suppressed using (warn=-1)/ignored since they do not terminate the process
+</p>
+
+
+<h3>Value</h3>
+
+<p>A list of objects returned by standard R regression functions such as nls and lm
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Christian Thine Omuto
+</p>
+
+
+<h3>References</h3>
+
+<p>Kosugi, K. 1996. Lognormal distribution model for unsaturated soil hydraulic properties. Water Resources Research 32: 2697-2703
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>SSomuto</code>, <code>SSvgm</code>, <code>SSgard</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(isric)
+library(minpack.lm)
+suppressWarnings(
+kosugi.ns &lt;- nlsLM(y ~ SSkosugi(x,thr,ths,alp,nscal),
+                   data = subset(isric, Sample=="Benin2"),
+                   control = nls.lm.control(maxiter=200)))
+summary(kosugi.ns)
+</code></pre>
+
+
+</div>

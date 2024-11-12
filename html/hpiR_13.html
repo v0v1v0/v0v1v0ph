@@ -1,0 +1,102 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>calcSeriesVolatility</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Calculate volatility of a series of indexes</h2>
+
+<h3>Description</h3>
+
+<p>Calculates volatility over a (progressive) series of indexes
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">calcSeriesVolatility(series_obj, window = 3, smooth = FALSE,
+  in_place_name = "volatility", ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>series_obj</code></td>
+<td>
+<p>Series object to be calculated</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>window</code></td>
+<td>
+<p>default = 3; Rolling periods over which to calculate the volatility</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>smooth</code></td>
+<td>
+<p>default = FALSE; Also calculate volatilities for smoothed indexes</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>in_place_name</code></td>
+<td>
+<p>name if saving in place</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Additional Arguments</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>'serieshpi' object
+</p>
+
+
+<h3>Further Details</h3>
+
+<p>Leaving order blank default to a moving average with order 3.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+# Load example sales
+ data(ex_sales)
+
+ # Create Index
+ rt_index &lt;- rtIndex(trans_df = ex_sales,
+                     periodicity = 'monthly',
+                     min_date = '2010-06-01',
+                     max_date = '2015-11-30',
+                     adj_type = 'clip',
+                     date = 'sale_date',
+                     price = 'sale_price',
+                     trans_id = 'sale_id',
+                     prop_id = 'pinx',
+                     estimator = 'robust',
+                     log_dep = TRUE,
+                     trim_model = TRUE,
+                     max_period = 48,
+                     smooth = FALSE)
+
+ # Create Series (Suppressing messages do to small sample size of this example)
+ suppressMessages(
+    hpi_series &lt;- createSeries(hpi_obj = rt_index,
+                               train_period = 12))
+
+ # Calculate series volatility
+ series_vol &lt;- calcSeriesVolatility(series_obj = hpi_series,
+                                    window= 3)
+
+</code></pre>
+
+
+</div>

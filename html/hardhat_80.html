@@ -1,0 +1,87 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>shrink</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Subset only required columns</h2>
+
+<h3>Description</h3>
+
+<p><code>shrink()</code> subsets <code>data</code> to only contain the required columns specified by
+the prototype, <code>ptype</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">shrink(data, ptype)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>A data frame containing the data to subset.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ptype</code></td>
+<td>
+<p>A data frame prototype containing the required columns.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p><code>shrink()</code> is called by <code>forge()</code> before <code>scream()</code> and before the actual
+processing is done.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A tibble containing the required columns.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># ---------------------------------------------------------------------------
+# Setup
+
+train &lt;- iris[1:100, ]
+test &lt;- iris[101:150, ]
+
+# ---------------------------------------------------------------------------
+# shrink()
+
+# mold() is run at model fit time
+# and a formula preprocessing blueprint is recorded
+x &lt;- mold(log(Sepal.Width) ~ Species, train)
+
+# Inside the result of mold() are the prototype tibbles
+# for the predictors and the outcomes
+ptype_pred &lt;- x$blueprint$ptypes$predictors
+ptype_out &lt;- x$blueprint$ptypes$outcomes
+
+# Pass the test data, along with a prototype, to
+# shrink() to extract the prototype columns
+shrink(test, ptype_pred)
+
+# To extract the outcomes, just use the
+# outcome prototype
+shrink(test, ptype_out)
+
+# shrink() makes sure that the columns
+# required by `ptype` actually exist in the data
+# and errors nicely when they don't
+test2 &lt;- subset(test, select = -Species)
+try(shrink(test2, ptype_pred))
+</code></pre>
+
+
+</div>

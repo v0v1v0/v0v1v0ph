@@ -1,0 +1,72 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hypervolume_variable_importance</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Hypervolume variable importance
+</h2>
+
+<h3>Description</h3>
+
+<p>Assesses the contribution of each variable to the total hypervolume as a rough metric of variable importance.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hypervolume_variable_importance(hv, verbose = TRUE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>hv</code></td>
+<td>
+
+<p>A hypervolume for which the importance of each variable should be calculated.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+
+<p>If <code>TRUE</code>, prints diagnostic progress messages.
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The algorithm proceeds by comparing the n-dimensional input hypervolume's volume to all possible n-1 dimensional hypervolumes where each variable of interest has been deleted. The importance score reported is the ratio of the n-dimensional hypervolume relative to each of the n-1 dimensional hypervolumes. Larger values indicate that a variable makes a proportionally higher contribution to the overall volume.
+</p>
+<p>The algorithm can only be used on Hypervolumes that have a <code>Data</code> and <code>Method</code> value, because the variable deletion process is not well defined for objects that are not associated with a particular set of observations and construction method.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A named vector with importance scores for each axis. Note that these scores are not dimensionless but rather have units corresponding to the original units of each variable.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># low parameter values for speed
+data(penguins,package='palmerpenguins')
+penguins_no_na = as.data.frame(na.omit(penguins))
+penguins_adelie = penguins_no_na[penguins_no_na$species=="Adelie",
+                    c("bill_length_mm","bill_depth_mm","flipper_length_mm")]
+
+hv = hypervolume_box(penguins_adelie,name='Adelie')
+
+varimp = hypervolume_variable_importance(hv,verbose=FALSE)
+barplot(varimp,ylab='Importance',xlab='Variable')
+</code></pre>
+
+
+</div>

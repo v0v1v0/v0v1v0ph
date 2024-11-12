@@ -1,0 +1,100 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hist_start</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Initializes a design based on historical controls before the start of the study.</h2>
+
+<h3>Description</h3>
+
+<p>Initializes a design based on historical controls before the start of the study.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hist_start(hist_data, formula, phi = "odds_ratio", c1, modelfit = NULL,
+  mean0 = NULL, mean1 = NULL, alpha = 0.05, beta = 0.2)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>hist_data</code></td>
+<td>
+<p>A data frame containing covariates and binary responses for historical controls.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>formula</code></td>
+<td>
+<p>A formula which is used for fitting a logistic regression model on the historical data.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>phi</code></td>
+<td>
+<p>The relation between the response rate under the null and the response rate under the interesting alternative.
+"odds_ratio" assumes that the odds ratio (OR) between these response rates is constant with OR = <code>c1+1</code>.
+"difference" assumes that the response rate under the alternative is <code>c1</code> higher than under the null.
+Can also be specified by the user by providing a function with arguments <code>c</code> and <code>x</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>c1</code></td>
+<td>
+<p>parameter for obtaining the response rate under the alternative, see description of phi.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>modelfit</code></td>
+<td>
+<p>Can be used instead of <code>formula</code> and <code>hist_data</code> to provide an arbitrary fitted model that is
+compatible with <code>predict(modelfit, type="response")</code>. <code>formula</code> and <code>hist_data</code> are ignored if <code>modelfit</code> is
+specified.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mean0</code></td>
+<td>
+<p>Optional: Can be used to overwrite the estimated average response rate under the null of the fitted model.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mean1</code></td>
+<td>
+<p>Optional: Can be used to overwrite the estimated average response rate under the alternative of the fitted model.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alpha</code></td>
+<td>
+<p>Specified type I error of the trial.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>beta</code></td>
+<td>
+<p>Specified type II error of the trial.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A list returning the arguments of the function and the preliminary design for starting the stratified trial.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">X &lt;- abs(rnorm(1000, 0, 1))
+Y &lt;- rbinom(1000, 1, 1-exp(-X))
+mydata &lt;- data.frame("X" = X, "Y" = Y)
+hist_start(mydata, Y~X, c1 = 2)
+</code></pre>
+
+
+</div>

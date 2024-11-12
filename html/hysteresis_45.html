@@ -1,0 +1,179 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>plot.fittedloop</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Plot a fitted ellipse or hysteresis loop.
+</h2>
+
+<h3>Description</h3>
+
+<p>A scatterplot of x and y fitted with an ellipse or hysteresis loop. Uses objects created by <code>fel</code>, <code>summary.ellipsefit</code> and <code>floop</code>. Can also plot an <code>ellipsefitlist</code> or <code>ellipsesummarylist</code> object that contains multiple ellipses.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">## S3 method for class 'ellipsefit'
+plot(x,putNumber=FALSE,values=NULL,
+xlim=NULL,ylim=NULL,main=NULL,newPred=TRUE,show=NULL,split.line=FALSE,...)
+## S3 method for class 'ellipsesummary'
+plot(x,putNumber=FALSE,values=NULL,
+xlim=NULL,ylim=NULL,main=NULL,newPred=TRUE,split.line=FALSE,...)
+
+## S3 method for class 'ellipsefitlist'
+plot(x,main=NULL, values=NULL, ...) 
+## S3 method for class 'ellipsesummarylist'
+plot(x,main=NULL, values=NULL, ...) 
+
+## S3 method for class 'fittedloop'
+plot(x,split.line=TRUE,xlim=NULL,
+ylim=NULL,putNumber=FALSE,values=NULL,main=NULL,show=NULL,...)
+## S3 method for class 'loopsummary'
+plot(x,split.line=TRUE,xlim=NULL,
+ylim=NULL,putNumber=FALSE,values=NULL,main=NULL,...)
+
+## S3 method for class 'fittedlooplist'
+plot(x,main=NULL,values=NULL,...)
+## S3 method for class 'loopsummarylist'
+plot(x,main=NULL,values=NULL,...)
+## S3 method for class 'fittedlooplist2r'
+plot(x,main=NULL,values=NULL,...)
+## S3 method for class 'loopsummarylist2r'
+plot(x,main=NULL,values=NULL,...)
+
+## S3 method for class 'loop2r'
+plot(x,split.line=TRUE,xlim=NULL,ylim=NULL,putNumber=FALSE,main=NULL,values=NULL,...)
+## S3 method for class 'loop2rsummary'
+plot(x,split.line=TRUE,xlim=NULL,ylim=NULL,putNumber=FALSE,main=NULL,values=NULL,...)
+
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+
+<p>a fitted ellipse or hysteresis loop created by either <code>fel</code>, <code>summary.ellipsefit</code> or <code>floop</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>putNumber</code></td>
+<td>
+
+<p>optional logical that numbers points from first to last. 
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>values</code></td>
+<td>
+
+<p>one of NULL, "hysteresis", "inherent", "derived", "hysteresis.all", "ellipse", or "ellipse.all". Parameter values printed in title. Default is NULL in which case none are printed. See <code>loop.parameters</code> or <code>ellipse.parameters</code>
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>xlim</code></td>
+<td>
+
+<p>limits for x axis.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ylim</code></td>
+<td>
+
+<p>limits for y axis.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>main</code></td>
+<td>
+
+<p>an overall title for the plot.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>newPred</code></td>
+<td>
+
+<p>draw an ellipse with 100 points. If <code>FALSE</code> use predicted ellipse from <code>ellipsefit</code> object which will result in a rougher shape.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>show</code></td>
+<td>
+
+<p>a character vector of parameters to be shown in the plot. 
+Possible values are "retention", "coercion", "b.x", "b.y", "semi.major","semi.minor","rote.deg","focus.x",and "focus.y". 
+<code>show</code> is not available for bootstrapped results. 
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>split.line</code></td>
+<td>
+
+<p>logical. Whether to include the split line, which is the input output relationship when hysteresis is removed.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+
+<p>Arguments to be passed to <code>plot</code>.
+</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>Spencer Maynes, Fan Yang, and Anne Parkhurst.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>fel</code> for fitting points that form an ellipse and <code>summary.ellipsefit</code> for bootstrapping and summarizing an ellipsefit object. Also <code>floop</code> and <code>summary.fittedloop</code> for fitting and summarizing hysteresis loops more generally.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">##Fit and plot an ellipse
+  ellipse1 &lt;- mel(sd.x=0.2,sd.y=0.04)
+  ellipse1.fit &lt;- fel(ellipse1$x,ellipse1$y)
+plot(ellipse1.fit,main="Simulated Ellipse",xlab="X Input",
+ylab="Y Output",show=c("semi.major", "semi.minor"),values="ellipse.all")
+### Bootstrapping
+  booted.ellipse &lt;- fel(ellipse1$x,ellipse1$y,boot=TRUE, seed=123)
+plot(booted.ellipse,xlab="X Input",ylab="Y Output",
+main="Simulated Bootstrap Ellipse",values="ellipse")
+
+##Fit and plot a hysteresis loop
+  loop1 &lt;- mloop(sd.x=0.05,sd.y=0.05,n=5,m=3)
+  loopmodel &lt;- floop(loop1$x,loop1$y,n=5,m=3)
+plot(loopmodel,main="Simulated Hysteresis Loop n=5 m=3",
+xlab="Input",ylab="Output", values="hysteresis.all")
+  booted.loop &lt;- floop(loop1$x,loop1$y,,n=5,m=3,boot=TRUE, seed=1523)
+plot(booted.loop,xlab="Input",ylab="Output",
+main="Simulated Bootstrapped Loop n=5, m=3",putNumber=TRUE)
+plot(booted.loop,main="Simulated Bootstrapped Loop n=5, m=3",
+xlab="Input",ylab="Output",values="hysteresis.all")
+
+</code></pre>
+
+
+</div>

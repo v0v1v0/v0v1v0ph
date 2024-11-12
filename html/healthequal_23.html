@@ -1,0 +1,199 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>rci</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Relative concentration index (RCI)</h2>
+
+<h3>Description</h3>
+
+<p>The relative concentration index (RCI) is a relative measure of inequality
+that shows the gradient across population subgroups. It indicates the extent
+to which an indicator is concentrated among disadvantaged or advantaged
+subgroups, on a relative scale. RCI can be calculated using disaggregated
+data and individual-level data. Subgroups in disaggregated data are weighted
+according to their population share, while individuals are weighted by
+sample weight in the case of data from surveys.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">rci(
+  est,
+  subgroup_order,
+  scaleval = NULL,
+  pop = NULL,
+  weight = NULL,
+  psu = NULL,
+  strata = NULL,
+  fpc = NULL,
+  method = NULL,
+  lmin = NULL,
+  lmax = NULL,
+  conf.level = 0.95,
+  force = FALSE,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>est</code></td>
+<td>
+<p>The subgroup estimate. Estimates must be
+available for all subgroups.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>subgroup_order</code></td>
+<td>
+<p>The order of subgroups in an increasing sequence.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>scaleval</code></td>
+<td>
+<p>The scale of the indicator. For example, the
+scale of an indicator measured as a percentage is 100. The
+scale of an indicator measured as a rate per 1000 population is 1000.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pop</code></td>
+<td>
+<p>The number of people within each subgroup.
+Population size must be available for all subgroups.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>weight</code></td>
+<td>
+<p>Individual sampling weight (required if data come from a
+survey)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>psu</code></td>
+<td>
+<p>Primary sampling unit (required if data come from a survey)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>strata</code></td>
+<td>
+<p>Strata (required if data come from a survey)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fpc</code></td>
+<td>
+<p>Finite population correction</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+<p>Normalisation method for bounded indicators. Options available
+Wagstaff (<code>wagstaff</code>) or Erreygers (<code>erreygers</code>) correction.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lmin</code></td>
+<td>
+<p>Theoretical minimum for bounded indicators.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lmax</code></td>
+<td>
+<p>Theoretical maximum for bounded indicators.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>conf.level</code></td>
+<td>
+<p>confidence level of the interval.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>force</code></td>
+<td>
+<p>TRUE/FALSE statement to force calculation with missing
+indicator estimate values.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Further arguments passed to or from other methods.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>RCI is calculated by dividing the absolute concentration index (ACI)
+by the setting average. RCI may be more easily interpreted
+when multiplied by 100. The calculation of ACI is based on a
+ranking of the whole population from the most-disadvantaged
+subgroup (at rank 0) to the most-advantaged subgroup (at rank 1),
+which is inferred from the ranking and size of the subgroups.
+For more information on this inequality measure see
+Schlotheuber, A., &amp; Hosseinpoor, A. R. (2022) below.
+</p>
+<p><strong>Interpretation:</strong> RCI is bounded between -1 and +1 (or between -100
+and +100, when multiplied by 100). The larger the absolute value of RCI,
+the higher the level of inequality. For favourable indicators, positive
+values indicate a concentration of the indicator among the advantaged,
+while negative values indicate a concentration of the indicator among
+the disadvantaged. For adverse indicators, it is the reverse: positive
+values indicate a concentration of the indicator among the disadvantaged,
+while negative values indicate a concentration of the indicator among the
+advantaged. RCI is zero if there is no inequality.
+</p>
+<p><strong>Type of summary measure:</strong> Complex; relative; weighted
+</p>
+<p><strong>Applicability:</strong> Ordered; more than two subgroups
+</p>
+<p><strong>Warning:</strong> The confidence intervals are approximate
+and might be biased.
+</p>
+
+
+<h3>Value</h3>
+
+<p>The estimated RCI value, corresponding estimated standard error,
+and confidence interval as a <code>data.frame</code>.
+</p>
+
+
+<h3>References</h3>
+
+<p>Schlotheuber, A., &amp; Hosseinpoor, A. R. (2022).
+Summary measures of health inequality: A review of existing
+measures and their application. International Journal of
+Environmental Research and Public Health, 19 (6), 3697.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># example code
+data(IndividualSample)
+head(IndividualSample)
+with(IndividualSample,
+     rci(est = sba,
+         subgroup_order = subgroup_order,
+         weight = weight,
+         psu = psu,
+         strata = strata
+         )
+     )
+</code></pre>
+
+
+</div>

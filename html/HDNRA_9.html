@@ -1,0 +1,116 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>glht_ys2012</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Test proposed by Yamada and Srivastava (2012)</h2>
+
+<h3>Description</h3>
+
+<p>Yamada and Srivastava (2012)'test for general linear hypothesis testing (GLHT) problem for high-dimensional data with assuming that underlying covariance matrices are the same.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">glht_ys2012(Y,X,C)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>Y</code></td>
+<td>
+<p>An <code class="reqn">n\times p</code> response matrix obtained by independently observing a <code class="reqn">p</code>-dimensional response variable for <code class="reqn">n</code> subjects.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>X</code></td>
+<td>
+<p>A known <code class="reqn">n\times k</code> full-rank design matrix with <code class="reqn">\operatorname{rank}(\boldsymbol{G})=k&lt;n</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>C</code></td>
+<td>
+<p>A known matrix of size <code class="reqn">q\times k</code> with <code class="reqn">\operatorname{rank}(\boldsymbol{C})=q&lt;k</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>A high-dimensional linear regression model can be expressed as
+</p>
+<p style="text-align: center;"><code class="reqn">\boldsymbol{Y}=\boldsymbol{X\Theta}+\boldsymbol{\epsilon},</code>
+</p>
+
+<p>where <code class="reqn">\Theta</code> is a <code class="reqn">k\times p</code> unknown parameter matrix and <code class="reqn">\boldsymbol{\epsilon}</code> is an <code class="reqn">n\times p</code> error matrix.
+</p>
+<p>It is of interest to test the following GLHT problem
+</p>
+<p style="text-align: center;"><code class="reqn">H_0: \boldsymbol{C\Theta}=\boldsymbol{0}, \quad \text { vs. } H_1: \boldsymbol{C\Theta} \neq \boldsymbol{0}.</code>
+</p>
+
+<p>Yamada and Srivastava (2012) proposed the following test statistic:
+</p>
+<p style="text-align: center;"><code class="reqn">T_{YS}=\frac{(n-k)\operatorname{tr}(\boldsymbol{S}_h\boldsymbol{D}_{\boldsymbol{S}_e}^{-1})-(n-k)pq/(n-k-2)}{\sqrt{2q[\operatorname{tr}(\boldsymbol{R}^2)-p^2/(n-k)]c_{p,n}}},</code>
+</p>
+
+<p>where <code class="reqn">\boldsymbol{S}_h</code> and <code class="reqn">\boldsymbol{S}_e</code> are the variation matrices due to the hypothesis and error, respectively, and <code class="reqn">\boldsymbol{D}_{\boldsymbol{S}_e}</code> and <code class="reqn">\boldsymbol{R}</code> are diagonal matrix with the diagonal elements of <code class="reqn">\boldsymbol{S}_e</code> and the sample correlation matrix, respectively. <code class="reqn">c_{p, n}</code> is the adjustment coefficient proposed by Yamada and Srivastava (2012).
+They showed that under the null hypothesis, <code class="reqn">T_{YS}</code> is asymptotically normally distributed.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A  (list) object of  <code>S3</code> class <code>htest</code>  containing the following elements:
+</p>
+
+<dl>
+<dt>statistic</dt>
+<dd>
+<p>the test statistic proposed by Yamada and Srivastava (2012).</p>
+</dd>
+<dt>p.value</dt>
+<dd>
+<p>the <code class="reqn">p</code>-value of the test proposed by Yamada and Srivastava (2012).</p>
+</dd>
+</dl>
+<h3>References</h3>
+
+<p>Yamada T, Srivastava MS (2012).
+“A test for multivariate analysis of variance in high dimension.”
+<em>Communications in Statistics-Theory and Methods</em>, <b>41</b>(13-14), 2602–2615.
+<a href="https://doi.org/10.1080/03610926.2011.581786">doi:10.1080/03610926.2011.581786</a>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">set.seed(1234)
+k &lt;- 3
+q &lt;- k-1
+p &lt;- 50
+n &lt;- c(25,30,40)
+rho &lt;- 0.01
+Theta &lt;- matrix(rep(0,k*p),nrow=k)
+X &lt;- matrix(c(rep(1,n[1]),rep(0,sum(n)),rep(1,n[2]),rep(0,sum(n)),rep(1,n[3])),ncol=k,nrow=sum(n))
+y &lt;- (-2*sqrt(1-rho)+sqrt(4*(1-rho)+4*p*rho))/(2*p)
+x &lt;- y+sqrt((1-rho))
+Gamma &lt;- matrix(rep(y,p*p),nrow=p)
+diag(Gamma) &lt;- rep(x,p)
+U &lt;- matrix(ncol = sum(n),nrow=p)
+for(i in 1:sum(n)){
+U[,i] &lt;- rnorm(p,0,1)
+}
+Y &lt;- X%*%Theta+t(U)%*%Gamma
+C &lt;- cbind(diag(q),-rep(1,q))
+glht_ys2012(Y,X,C)
+
+</code></pre>
+
+
+</div>

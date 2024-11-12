@@ -1,0 +1,116 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>HWNetwork</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Autosomal and X-chromosomal exact tests for HWE via a Network algorithm 
+</h2>
+
+<h3>Description</h3>
+
+<p>Program <code>HWNetwork</code> implements a network algorithm for efficient calculation of exact test p-values in HWE tests with multiple alleles.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">HWNetwork(a1, a2, ma = NULL, fe = NULL, gender = NULL, verbose = TRUE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>a1</code></td>
+<td>
+<p>the first allele (expressed as a number)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>a2</code></td>
+<td>
+<p>the second allele (expressed as a number; NA if the variant is X chromosomal)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ma</code></td>
+<td>
+<p>alternative format: vector of male X chromosomal allele counts.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fe</code></td>
+<td>
+<p>triangular matrix of female genotype counts</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>gender</code></td>
+<td>
+<p>gender of the individual (1=male; 2=female)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p>be silent (<code>verbose=FALSE</code>) or informative (<code>verbose=TRUE</code>)</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Function <code>HWNetwork</code> accepts data in two formats. Original genotype data (e.g. repeat numbers of microsatellites) can be supplied, or  the data can be supplied in summarized form as a male genotype count vector and a female genotype count matrix. If one of the two male alleles is missing (NA) the variant will taken to be X-chromosomal. If all males have two alleles, the variant will taken to be autosomal.
+</p>
+
+
+<h3>Value</h3>
+
+<p>the exact p-value of the test.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p> Jan Graffelman <a href="mailto:jan.graffelman@upc.edu">jan.graffelman@upc.edu</a></p>
+
+
+<h3>References</h3>
+
+<p>Aoki, S. (2003) Network algorithm for the Exact Test of Hardy-Weinberg Proportion for Multiple Alleles. <em>Biometrical Journal</em> 45(4),
+pp. 471-490.
+</p>
+<p>Engels, W. R. (2009) Exact Tests for Hardy-Weinberg Proportions. <em>Genetics</em> 183, pp. 1431-1441.
+</p>
+<p>Graffelman, J. (2015) Exploring Diallelic Genetic Markers: The HardyWeinberg Package.
+<em>Journal of Statistical Software</em> 64(3): 1-23. <a href="https://doi.org/10.18637/jss.v064.i03">doi:10.18637/jss.v064.i03</a>.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>HWExact, HWExactStats</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">#
+# From vectors with counts of genotypes
+#
+data(TSIXTriAllelics)
+ma &lt;- as.matrix(TSIXTriAllelics[1,2:4])
+names(ma) &lt;- c("A","B","C")
+
+fe &lt;- TSIXTriAllelics[1,5:10]
+names(fe) &lt;- c("AA","AB","AC","BB","BC","CC")
+
+fe &lt;- HardyWeinberg:::toTriangularfixed(fe)
+
+HWNetwork(ma=ma,fe=fe)
+</code></pre>
+
+
+</div>

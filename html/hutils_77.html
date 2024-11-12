@@ -1,0 +1,76 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>weight2rows</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Expand a weighted data frame to an equivalent unweighted</h2>
+
+<h3>Description</h3>
+
+<p>Present since <code>v1.0.0</code>.
+Argument <code>rows.out</code> available since <code>v1.3.0</code>; 
+<code>rows.out &lt; 1</code> supported since <code>v 1.4.0</code>.
+Argument <code>discard_weight.var</code> available since <code>v1.3.0</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">weight2rows(DT, weight.var, rows.out = NULL, discard_weight.var = FALSE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>DT</code></td>
+<td>
+<p>A <code>data.table</code>. Will be converted to one if possible.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>weight.var</code></td>
+<td>
+<p>Variable in <code>DT</code> to be used as weights.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rows.out</code></td>
+<td>
+<p>If not <code>NULL</code> (the default) specifies the number of rows in the result;
+otherwise the number of rows will be <code>sum(DT[[weight.var]])</code>.
+(Due to rounding, this figures are inexact.)
+</p>
+<p>Since <code>v1.4.0</code>, if <code>0 &lt; rows.out &lt; 1</code> then taken to be a sample of
+the unweighted table. (So <code>rows.out = 0.1</code> would give a 10% sample.)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>discard_weight.var</code></td>
+<td>
+<p>If <code>FALSE</code>, the default, <code>weight.var</code>
+in <code>DT</code> will be <code>1</code> for each row in the result or a new weight 
+if <code>rows.out</code> is given. Otherwise, <code>TRUE</code> drops the column entirely.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p><code>DT</code> but with the number of rows expanded to <code>sum(DT[[weight.var]])</code> to reflect the weighting.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+library(data.table)
+DT &lt;- data.table(x = 1:5, y = c(1, 1, 1, 1, 2))
+weight2rows(DT, "y")
+weight2rows(DT, "y", rows.out = 5)
+
+</code></pre>
+
+
+</div>

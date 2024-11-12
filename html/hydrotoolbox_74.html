@@ -1,0 +1,140 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>roll_fun</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Rolling functions</h2>
+
+<h3>Description</h3>
+
+<p>It provides a generic function to rolling table columns.
+Internally it is using <code>rollapplyr</code> from package <code>zoo</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">roll_fun(
+  x,
+  col_name = "last",
+  k,
+  pos = "c",
+  FUN,
+  ...,
+  out_name = NULL,
+  from = NULL,
+  to = NULL
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>data frame (or tibble) with class <code>Date</code> or
+<code>POSIX*</code> in the first column.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>col_name</code></td>
+<td>
+<p>string vector with the column(s) name(s) of the series to roll.
+The default value uses the <code>'last'</code> column. Another single string choice
+is to use <code>'all'</code>. Is important to keep in mind that this argument
+<b>commands</b>, so if you provide two columns
+names, <code>k</code> and <code>pos</code> arguments must be of length two; if not the
+single value will be recycled.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>k</code></td>
+<td>
+<p>numeric vector with the windows size. E.g.: <code>k = 5</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pos</code></td>
+<td>
+<p>string vector with the position of the windows: </p>
+
+<ul>
+<li>
+<p> 'c': center (default). The output value is in the middle of the window.
+</p>
+</li>
+<li>
+<p> 'l': left aligned. The output value is on the left, so the function weights
+the <code>(k - 1)</code> values at the right side.
+</p>
+</li>
+<li>
+<p> 'r': right aligned. The output value is on the right, so the function weights
+the <code>(k - 1)</code> values at the left side.
+</p>
+</li>
+</ul>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>FUN</code></td>
+<td>
+<p>the function to be applied.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>optional arguments to <code>FUN</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>out_name</code></td>
+<td>
+<p>optional. String vector with new column names. If you set
+it as <code>NULL</code> the function will overwrite the original series.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>from</code></td>
+<td>
+<p>optional. String value for <code>'Date'</code> class or <code>POSIX*</code>
+class for date-time data containing the starting <code>Date</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>to</code></td>
+<td>
+<p>optional. String value for <code>'Date'</code> class or <code>POSIX*</code>
+class for date-time data containing the ending <code>Date</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>The same table but with the rolling series.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+# read guido daily streamflow records
+path &lt;- system.file('extdata', 'snih_qd_guido.xlsx',
+        package = 'hydrotoolbox')
+
+# read and apply the function
+qd_guido &lt;-
+  read_snih(path = path, by = 'day', out_name = 'q(m3/s)') %&gt;%
+  roll_fun(k = 5, FUN = mean, na.rm = TRUE,
+   out_name = 'q_smooth')
+
+
+
+</code></pre>
+
+
+</div>

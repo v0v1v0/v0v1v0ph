@@ -1,0 +1,144 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>buhring</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Evaluation of the hypergeometric function using Buhring's method</h2>
+
+<h3>Description</h3>
+
+<p>Expansion of the hypergeometric function
+using the residue theorem; useful for when the primary argument is close
+to the critical points <code class="reqn">1/2\pm i\sqrt{3}/2</code>
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hypergeo_buhring(A,B,C,z,z0=1/2,tol=0,maxiter=2000,use11=TRUE)
+buhring_eqn11(n,S,A,B,C,z0=1/2)
+buhring_eqn12(n,S,A,B,C,z0=1/2)
+buhring_eqn5_factors(A,B,C,z,z0=1/2)
+buhring_eqn5_series(S,A,B,C,z,z0=1/2,use11=FALSE,tol=0,maxiter=2000)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>A,B,C</code></td>
+<td>
+<p>Parameters (real)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>S</code></td>
+<td>
+<p>Parameter taken to be either <code>A</code> or <code>B</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n</code></td>
+<td>
+<p>Term to calculate in <code>buhring_eqn11()</code> or
+<code>buhring_eqn12()</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>z</code></td>
+<td>
+<p>Primary complex argument</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>z0</code></td>
+<td>
+<p>Centre of circle of non-convergence; series expressed in
+powers of <code class="reqn">1/\left(z-z_0\right)^n</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tol,maxiter</code></td>
+<td>
+<p>tolerance and maximum number of iterations (as
+in <code>hypergeo()</code>)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>use11</code></td>
+<td>
+<p>Boolean with default <code>TRUE</code> meaning to use
+<code>buhring_eqn11()</code> and <code>FALSE</code> meaning to use <code>buhring_eqn12()</code></p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The functions are direct transcriptions of Buhring 1987.  The basic
+idea is to expand the hypergeometric function in powers of
+<code class="reqn">(z-z_0)^{-1}</code>.
+</p>
+<p>Functions <code>buhring_eqn11()</code> and <code>buhring_eqn12()</code> return the
+coefficients <code class="reqn">d_n</code> given by equations 11 and 12 of Buhring
+1987.  
+</p>
+<p>The series do not converge satisfactorily near the critical points due
+to some sort of numerical instability.  But they seem to work OK if
+<code class="reqn">|z-1/2|</code> is large.
+</p>
+
+
+<h3>Note</h3>
+
+<p>There is some issue which prevents the series from converging correctly,
+also sometimes the sequence converges to a demponstrably incorrect
+value. 
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Robin K. S. Hankin</p>
+
+
+<h3>References</h3>
+
+ 
+
+<ul><li>
+<p> W. Buhring 1987.  “An analytic continuation of the
+hypergeometric series”, <em>Siam J. Math. Anal.</em> 18(3)
+</p>
+</li></ul>
+<h3>See Also</h3>
+
+<p><code>residue</code></p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+
+# should be identical:
+buhring_eqn11(n=0:10,S=1/2,A=1/2,B=1/3,C=pi)
+buhring_eqn12(n=0:10,S=1/2,A=1/2,B=1/3,C=pi)
+# but differ in one element
+
+
+a &lt;- hypergeo(1/2,1/3,4,1+8i,maxiter=90)
+b &lt;- hypergeo_buhring(1/2,1/3,4,1+8i,maxiter=90)
+# should be identical but are not 
+
+
+# following command fails due to numerical instability:
+## Not run: 
+hypergeo_buhring(1/2,1/3,pi,z=1/2 + 1i*sqrt(3)/2)
+
+## End(Not run)
+
+</code></pre>
+
+
+</div>

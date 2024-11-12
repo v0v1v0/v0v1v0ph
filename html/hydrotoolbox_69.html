@@ -1,0 +1,104 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>read_mnemos</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Reads data provided by MNEMOS software (SNIH - Argentina)</h2>
+
+<h3>Description</h3>
+
+<p>Reads xlsx files generated with MNEMOS software.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">read_mnemos(
+  path,
+  by = "none",
+  out_name = NULL,
+  sheet = NULL,
+  skip = 3,
+  get_sheet = FALSE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>path</code></td>
+<td>
+<p>path to the xlsx file.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>by</code></td>
+<td>
+<p>string with the time step of the series (e.g.: <code>'month', 'day', '6 hour',
+'3 hour', '1 hour', '15 min' </code>). If you set it as <code>'none'</code>, the function will ignore
+automatic gap filling.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>out_name</code></td>
+<td>
+<p>optional. String vector with user defined variable(s) column(s) name(s).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sheet</code></td>
+<td>
+<p>optional. Sheet to read. Either a string (the name of a sheet), or an integer
+(the position of the sheet). If neither argument specifies the sheet, defaults to the
+first sheet.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>skip</code></td>
+<td>
+<p>optional. Minimum number of rows to skip before reading anything, be it column
+names or data. Leading empty rows are automatically skipped, so this is a lower bound.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>get_sheet</code></td>
+<td>
+<p>logical indicating whether you want to print available variables (<code>TRUE</code>)
+in every file sheet or not.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A data frame with the data inside the specified sheet. Gaps between dates are
+filled with <code>NA_real_</code> and duplicated rows are eliminated automatically. In case
+you set <code>get_sheet = TRUE</code> the function will return a <code>list</code> with the variables
+inside each sheet.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+# list mnemos files
+list.files( system.file('extdata', package = 'hydrotoolbox'), pattern = 'mnemos' )
+
+# set path
+path &lt;- system.file('extdata', 'mnemos_guido.xlsx',  package = 'hydrotoolbox')
+
+# we can see which variables are inside the sheet's file
+read_mnemos(path = path, get_sheet = TRUE)
+
+# now we want to read the maximum temperature
+tmax_guido &lt;- read_mnemos(path = path, by = 'day',
+                          out_name = 'tmax(ºC)', sheet = '11413-016')
+
+
+
+</code></pre>
+
+
+</div>

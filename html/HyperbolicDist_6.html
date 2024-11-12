@@ -1,0 +1,316 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>GeneralizedHyperbolic</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Generalized Hyperbolic Distribution</h2>
+
+<h3>Description</h3>
+
+<p>Density function, distribution function, quantiles and
+random number generation for the generalized hyperbolic distribution
+with parameter vector <code>Theta</code>. Utility routines are included for
+the derivative of the density function and to find suitable break
+points for use in determining the distribution function.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">dghyp(x, Theta)
+pghyp(q, Theta, small = 10^(-6), tiny = 10^(-10),
+      deriv = 0.3, subdivisions = 100, accuracy = FALSE, ...)
+qghyp(p, Theta, small = 10^(-6), tiny = 10^(-10),
+      deriv = 0.3, nInterpol = 100, subdivisions = 100, ...)
+rghyp(n, Theta)
+ddghyp(x, Theta)
+ghypBreaks(Theta, small = 10^(-6), tiny = 10^(-10), deriv = 0.3, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x,q</code></td>
+<td>
+<p>Vector of quantiles.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>p</code></td>
+<td>
+<p>Vector of probabilities.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n</code></td>
+<td>
+<p>Number of observations to be generated.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Theta</code></td>
+<td>
+<p>Parameter vector taking the form
+<code>c(lambda,alpha,beta,delta,mu)</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>small</code></td>
+<td>
+<p>Size of a small difference between the distribution
+function and zero or one. See <b>Details</b>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tiny</code></td>
+<td>
+<p>Size of a tiny difference between the distribution
+function and zero or one. See <b>Details</b>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>deriv</code></td>
+<td>
+<p>Value between 0 and 1. Determines the point where the
+derivative becomes substantial, compared to its maximum value. See
+<b>Details</b>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>accuracy</code></td>
+<td>
+<p>Uses accuracy calculated by~<code>integrate</code>
+to try and determine the accuracy of the distribution function
+calculation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>subdivisions</code></td>
+<td>
+<p>The maximum number of subdivisions used to
+integrate the density returning the distribution function.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nInterpol</code></td>
+<td>
+<p>The number of points used in qghyp for cubic spline
+interpolation (see <code>splinefun</code>) of the distribution function.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Passes arguments to <code>uniroot</code>.  See <b>Details</b>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The generalized hyperbolic distribution has density
+</p>
+<p style="text-align: center;"><code class="reqn">f(x)=c(\lambda,\alpha,\beta,\delta)\times%
+    \frac{K_{\lambda-1/2}(\alpha\sqrt{\delta^2+(x-\mu)^2})}%
+    {(\sqrt{\delta^2+(x-\mu)^2}/\alpha)^{1/2-\lambda}}%
+    e^{\beta(x-\mu)}</code>
+</p>
+
+<p>where <code class="reqn">K_\nu()</code> is the modified Bessel function of the
+third kind with order <code class="reqn">\nu</code>, and
+</p>
+<p style="text-align: center;"><code class="reqn">c(\lambda,\alpha,\beta,\delta)=%
+    \frac{(\sqrt{\alpha^2-\beta^2}/\delta)^\lambda}%
+    {\sqrt{2\pi}K_\lambda(\delta\sqrt{\alpha^2-\beta^2})}</code>
+</p>
+
+<p>Use <code>ghypChangePars</code> to convert from the
+<code class="reqn">(\zeta, \rho)</code>,
+<code class="reqn">(\xi,\chi)</code>, or
+<code class="reqn">(\bar\alpha,\bar\beta)</code> parameterisations
+to the <code class="reqn">(\alpha, \beta)</code> parameterisation used
+above.
+</p>
+<p><code>pghyp</code> breaks the real line into eight regions in order to
+determine the integral of <code>dghyp</code>. The break points determining
+the regions are found by <code>ghypBreaks</code>, based on the values of
+<code>small</code>, <code>tiny</code>, and <code>deriv</code>. In the extreme tails of
+the distribution where the probability is <code>tiny</code> according to
+<code>ghypCalcRange</code>, the probability is taken to be zero.  In the
+inner part of the distribution, the range is divided in 6 regions, 3
+above the mode, and 3 below. On each side of the mode, there are two
+break points giving the required three regions. The outer break point
+is where the probability in the tail has the value given by the variable
+<code>small</code>. The inner break point is where the derivative of the
+density function is <code>deriv</code> times the maximum value of the
+derivative on that side of the mode. In each of the 6 inner regions
+the numerical integration routine <code>safeIntegrate</code> (which
+is a wrapper for <code>integrate</code>) is used to integrate the
+density <code>dghyp</code>.
+</p>
+<p><code>qghyp</code> use the breakup of the real line into the same 8
+regions as <code>pghyp</code>. For quantiles which fall in the 2 extreme
+regions, the quantile is returned as <code>-Inf</code> or <code>Inf</code> as
+appropriate. In the 6 inner regions <code>splinefun</code> is used to fit
+values of the distribution function generated by <code>pghyp</code>. The
+quantiles are then found using the <code>uniroot</code> function.
+</p>
+<p><code>pghyp</code> and <code>qghyp</code> may generally be expected to be
+accurate to 5 decimal places.
+</p>
+<p>The generalized hyperbolic distribution is discussed in Bibby and
+Sörenson (2003). It can be represented as a particular
+mixture of the normal distribution where the mixing distribution is the
+generalized inverse Gaussian.  <code>rghyp</code> uses this representation
+to generate observations from the generalized hyperbolic
+distribution. Generalized inverse Gaussian observations are obtained
+via the algorithm of Dagpunar (1989) which is implemented in
+<code>rgig</code>.
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>dghyp</code> gives the density, <code>pghyp</code> gives the distribution
+function, <code>qghyp</code> gives the quantile function and <code>rghyp</code>
+generates random variates. An estimate of the accuracy of the
+approximation to the distribution function may be found by setting
+<code>accuracy=TRUE</code> in the call to <code>pghyp</code> which then returns
+a list with components <code>value</code> and <code>error</code>.
+</p>
+<p><code>ddghyp</code> gives the derivative of <code>dghyp</code>.
+</p>
+<p><code>ghypBreaks</code> returns a list with components:
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>xTiny</code></td>
+<td>
+<p>Value such that probability to the left is less than
+<code>tiny</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>xSmall</code></td>
+<td>
+<p>Value such that probability to the left is less than
+<code>small</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lowBreak</code></td>
+<td>
+<p>Point to the left of the mode such that the
+derivative of the density is <code>deriv</code> times its maximum value
+on that side of the mode.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>highBreak</code></td>
+<td>
+<p>Point to the right of the mode such that the
+derivative of the density is <code>deriv</code> times its maximum value
+on that side of the mode.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>xLarge</code></td>
+<td>
+<p>Value such that probability to the right is less than
+<code>small</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>xHuge</code></td>
+<td>
+<p>Value such that probability to the right is less than
+<code>tiny</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>modeDist</code></td>
+<td>
+<p>The mode of the given generalized hyperbolic distribution.</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>David Scott <a href="mailto:d.scott@auckland.ac.nz">d.scott@auckland.ac.nz</a>,
+Richard Trendall</p>
+
+
+<h3>References</h3>
+
+<p>Barndorff-Nielsen, O. and Blæsild, P (1983).
+Hyperbolic distributions.
+In <em>Encyclopedia of Statistical Sciences</em>,
+eds., Johnson, N. L., Kotz, S. and Read, C. B., Vol. 3,
+pp. 700–707. New York: Wiley.
+</p>
+<p>Bibby, B. M. and Sörenson, M. (2003).
+Hyperbolic processes in finance.
+In <em>Handbook of Heavy Tailed Distributions in Finance</em>, ed.,
+Rachev, S. T. pp. 212–248. Elsevier Science B.~V.
+</p>
+<p>Dagpunar, J.S. (1989).
+An easily implemented generalised inverse Gaussian generator
+<em>Commun. Statist. -Simula.</em>, <b>18</b>, 703–710.
+</p>
+<p>Prause, K. (1999) <em>The generalized hyperbolic models: Estimation,
+financial derivatives and risk measurement.</em> PhD Thesis, Mathematics
+Faculty, University of Freiburg.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>dhyperb</code> for the hyperbolic distribution,
+<code>dgig</code> for the generalized inverse Gaussian distribution
+<code>safeIntegrate</code>, <code>integrate</code> for its
+shortfalls, <code>splinefun</code>,
+<code>uniroot</code> and <code>ghypChangePars</code> for
+changing parameters to the <code class="reqn">(\alpha,\beta)</code>
+parameterisation
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">Theta &lt;- c(1/2,3,1,1,0)
+ghypRange &lt;- ghypCalcRange(Theta, tol = 10^(-3))
+par(mfrow = c(1,2))
+curve(dghyp(x, Theta), from = ghypRange[1], to = ghypRange[2],
+      n = 1000)
+title("Density of the\n Generalized Hyperbolic Distribution")
+curve(pghyp(x, Theta), from = ghypRange[1], to = ghypRange[2],
+      n = 1000)
+title("Distribution Function of the\n Generalized Hyperbolic Distribution")
+dataVector &lt;- rghyp(500, Theta)
+curve(dghyp(x, Theta), range(dataVector)[1], range(dataVector)[2],
+      n = 500)
+hist(dataVector, freq = FALSE, add =TRUE)
+title("Density and Histogram of the\n Generalized Hyperbolic Distribution")
+logHist(dataVector, main =
+   "Log-Density and Log-Histogramof the\n Generalized Hyperbolic Distribution")
+curve(log(dghyp(x, Theta)), add = TRUE,
+      range(dataVector)[1], range(dataVector)[2], n = 500)
+par(mfrow = c(2,1))
+curve(dghyp(x, Theta), from = ghypRange[1], to = ghypRange[2],
+      n = 1000)
+title("Density of the\n Generalized Hyperbolic Distribution")
+curve(ddghyp(x, Theta), from = ghypRange[1], to = ghypRange[2],
+      n = 1000)
+title("Derivative of the Density of the\n Generalized Hyperbolic Distribution")
+par(mfrow = c(1,1))
+ghypRange &lt;- ghypCalcRange(Theta, tol = 10^(-6))
+curve(dghyp(x, Theta), from = ghypRange[1], to = ghypRange[2],
+      n = 1000)
+bks &lt;- ghypBreaks(Theta)
+abline(v = bks)
+</code></pre>
+
+
+</div>

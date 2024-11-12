@@ -1,0 +1,242 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>NTplot</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Specify plots to illustrate Normal and t Hypothesis Tests or
+Confidence Intervals, including normal approximation to the binomial.</h2>
+
+<h3>Description</h3>
+
+<p>Specify plots to illustrate Normal and t Hypothesis Tests
+or Confidence Intervals, including normal approximation to the binomial.</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">NTplot(mean0, ...)
+## Default S3 method:
+NTplot(mean0=0, ..., shiny=FALSE,
+        distribution.name = c("normal","z","t","binomial"))
+## S3 method for class 'htest'
+NTplot(mean0, ..., shiny=FALSE, NTmethod="htest")
+## S3 method for class 'power.htest'
+NTplot(mean0, ..., shiny=FALSE, xbar=NA, ## these input values are used
+        mean1, n, df, sd, distribution.name, sub, ## these input values ignored
+        alpha.left, alpha.right, number.vars) ## these input values ignored
+        ## NTplot(NTplot(htest.object), n=20) ## allows override of arguments
+## S3 method for class 'NormalAndTplot'
+NTplot(mean0, ..., shiny=FALSE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>mean0</code></td>
+<td>
+
+<p>For the default method, <code>mean0</code> is either missing or a numeric
+argument for the mean under the null hypothesis.
+For the <code>htest</code> method, <code>mean0</code> is an <code>htest</code> object
+from the <code>t.test</code> or the
+<code>z.test</code> function.
+For the <code>NormalAndTplot</code> method
+<code>mean0</code> is a <code>"NormalAndTplot"</code> object from a previous use
+of the <code>NTplot</code> function.
+For the <code>power.htest</code> method, <code>mean0</code> is a <code>power.htest</code>
+object from the <code>power.t.test</code> function.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>xbar</code></td>
+<td>
+<p>See <code>NormalAndTplot</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Other arguments, selected from the options for the
+default method <code>NormalAndTplot</code>.  Three named color schemes
+are available: the default <code>ntcolors="original"</code>,
+<code>ntcolors="stoplight"</code>, and <code>ntcolors="BW"</code>.  Their
+definitions, along with information on specifying other color schemes, are
+shown in <code>NormalAndTplot</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>shiny</code></td>
+<td>
+<p>Logical.  If <code>TRUE</code>, a <code>shiny</code>
+app is started to provide an interactive graphics device in a
+web-browser.  If
+<code>FALSE</code>, a plot is drawn on the current graphics device.
+For short browser windows (<code>height &lt; 800</code> pixels), you may
+adjust the pixel height of the plot in the last user input field on
+the <code>Fonts</code> tab.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>htest</code></td>
+<td>
+<p>logical. <code>TRUE</code> for <code>"htest"</code> objects.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mean1, n, df, sd, sub, alpha.left,
+alpha.right, number.vars</code></td>
+<td>
+<p>These variables are ignored here.  They
+are captured so they won't interfere with similarly named variables
+that are generated in the <code>power.htest</code> method.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>distribution.name</code></td>
+<td>
+<p>Ignored by <code>htest</code> and
+<code>power.htest</code> methods.
+Otherwise passed on to the next method.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>NTmethod</code></td>
+<td>
+<p>Character string used when <code>shiny=TRUE</code>.  It is
+normally calculated by the methods.  <code>NTmethod</code> tells
+<code>shiny</code> how to use or ignore the <code>df</code> and <code>n</code>
+sliders.  See the extended discussion in <code>NormalAndTplot</code>.
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The graphs produced by this single function cover most of the first semester
+introductory Statistics course.
+All options of the <code>t.test</code>, <code>power.t.test</code>, and <code>z.test</code>
+are accepted and displayed.
+</p>
+<p><code>NTplot</code> is built on <code>xyplot</code>.
+Most of the arguments detailed in <code>xyplot</code> documentation work to
+control the appearance of the plot.
+</p>
+<p>The shiny app (called when the argument <code>shiny=TRUE</code>)
+provides animated sliders for the means, standard
+deviation, xlimits, significance levels, df, and n.  The df and n are
+rounded to integers for the sliders (relevant for <code>htest</code> and
+<code>power.htest</code> objects). Checkboxes and Radio buttons are available
+for
+various display options
+</p>
+<p>When you have a graph on the shiny window that you wish to keep, click
+on the "Display Options" tab, and then on the "Display Call" radio
+button.  The main shiny window will show an R command which will
+reproduce the current plot.  Pick it up with the mouse and drop it into
+an R console window.
+</p>
+<p>To get out of the shiny window and return to an interactive R console,
+move the cursor back to the console window and interrupt the shiny call, usually
+by entering <code>Ctrl-C</code> or <code>ESC</code>.
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>"trellis"</code> object. The object can be plotted or fed back into the
+<code>NTplot</code> function with argument <code>shiny=TRUE</code> to allow
+interactive graphical investigation of the hypothesis test or confidence
+interval.
+The attributes of the object\
+<code>NTobj &lt;- NTplot()</code>\
+<code>attr(NTobj, "scales")</code> and <code>attr(NTobj, "prob")</code> make the
+data values and probability values accessible for further R
+computations.
+The <code>"call"</code> attribute
+<code>cat(attr(NT.object, "call"), "\n")</code>
+displays a statement that can be copied back into R to reproduce the graph.
+The <code>cat()</code> is needed to unescape embedded quotes.
+The <code>"call.list"</code> attribute
+<code>attr(NT.object, "call.list")</code>
+is a list that can be used with <code>do.call</code> to reproduce the graph.
+<code>do.call(NTplot, attr(NT.object, "call.list"))</code>.  This is usually
+not needed by the user because the simpler statement
+<code>NTplot(NT.object)</code>
+does it for you.
+</p>
+
+
+<h3>Note</h3>
+
+<p>This function is built on <span class="pkg">lattice</span> and <span class="pkg">latticeExtra</span>.
+It supersedes the similar function
+<code>normal.and.t.dist</code> built on base graphics that is used in many
+displays in the book by Erich Neuwirth and me: <em>R through Excel</em>, Springer
+(2009).
+<a href="https://link.springer.com/book/10.1007/978-1-4419-0052-4">https://link.springer.com/book/10.1007/978-1-4419-0052-4</a>.  Many details,
+particularly the
+alternate color scheme and the concept of floating probability labels,
+grew out of discussions that Erich and I have had since the book was
+published.
+It incorporates ideas that Jay Kerns and I developed at the 2011 UseR! conference.
+This version incorporates some ideas suggested by Moritz Heene.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Richard M. Heiberger (rmh@temple.edu)</p>
+
+
+<h3>See Also</h3>
+
+<p><code>NormalAndTplot</code>, <code>print.NormalAndTplot</code>.</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">x1 &lt;- rnorm(12)
+x2 &lt;- rnorm(12, mean=.5)
+
+NT.object &lt;- NTplot(mean0=0, mean1=1)
+NT.object
+attr(NT.object, "scales")
+attr(NT.object, "prob")
+cat(attr(NT.object, "call"), "\n") ## the cat() is needed to unescape embedded quotes.
+
+NTplot(t.test(x1, x2))
+NTplot(power.t.test(power = .90, delta = 1, alternative = "one.sided"))
+
+## Not run: 
+## 22 distinct calls are shown in
+demo(NTplot, ask=FALSE)
+
+## End(Not run)
+
+## Not run:  ## these are interactive and do not work in static checking of the code
+  if (interactive())
+    NTplot(mean0=0, mean1=1, shiny=TRUE)
+  if (interactive())
+    NTplot(shiny=TRUE, px.height=475) ## default value is 575
+  if (interactive())
+    NTplot(t.test(x1, x2), shiny=TRUE, mean1=1)
+  if (interactive())
+    NTplot(power.t.test(power = .90, delta = 1, alternative = "one.sided"), shiny=TRUE)
+  if (interactive())
+    NTplot(NT.object, shiny=TRUE)
+
+## run the shiny app
+if (interactive())  shiny::runApp(system.file("shiny/NTplot", package="HH"))
+
+## End(Not run)
+
+</code></pre>
+
+
+</div>

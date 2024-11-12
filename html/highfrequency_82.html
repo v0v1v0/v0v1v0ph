@@ -1,0 +1,184 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>rMRCov</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Modulated realized covariance</h2>
+
+<h3>Description</h3>
+
+<p>Calculate univariate or multivariate pre-averaged estimator, as defined in Hautsch and Podolskij (2013).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">rMRCov(
+  pData,
+  pairwise = FALSE,
+  makePsd = FALSE,
+  theta = 0.8,
+  crossAssetNoiseCorrection = FALSE,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>pData</code></td>
+<td>
+<p>a list. Each list-item contains an <code>xts</code> or <code>data.table</code> object with the intraday price data of a stock.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pairwise</code></td>
+<td>
+<p>boolean, should be <code>TRUE</code> when refresh times are based on pairs of assets. <code>FALSE</code> by default.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>makePsd</code></td>
+<td>
+<p>boolean, in case it is <code>TRUE</code>, the positive definite version of rMRCov is returned. <code>FALSE</code> by default.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>theta</code></td>
+<td>
+<p>a <code>numeric</code> controlling the preaveraging horizon. Detaults to <code>0.8</code> as recommended by Hautsch and Podolskij (2013)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>crossAssetNoiseCorrection</code></td>
+<td>
+<p>a <code>logical</code> denoting whether to apply the bias correction term on the off-diagonals (covariance) terms. 
+We set this to <code>FALSE</code> by default as noise is typically seen as independent across assets.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>used internally, do not change.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>In practice, market microstructure noise leads to a departure from the pure semimartingale model. We consider the process <code class="reqn">Y</code> in period <code class="reqn">\tau</code>:
+</p>
+<p style="text-align: center;"><code class="reqn">
+      \mbox{Y}_{\tau} = X_{\tau} + \epsilon_{\tau},
+    </code>
+</p>
+
+<p>where the observed <code class="reqn">d</code> dimensional log-prices are the sum of underlying Brownian semimartingale process <code class="reqn">X</code> and a noise term <code class="reqn">\epsilon_{\tau}</code>.
+</p>
+<p><code class="reqn">\epsilon_{\tau}</code> is an <em>i.i.d.</em> process with <code class="reqn">X</code>.
+</p>
+<p>It is intuitive that under mean zero <em>i.i.d.</em> microstructure noise some form of smoothing of the observed log-price should tend to diminish the impact of the noise.
+Effectively, we are going to approximate a continuous function by an average of observations of <code class="reqn">Y</code> in a neighborhood, the noise being averaged away.
+</p>
+<p>Assume there is <code class="reqn">N</code> equispaced returns in period <code class="reqn">\tau</code> of a list (after refreshing data). 
+Let <code class="reqn">r_{\tau_i}</code> be a return (with <code class="reqn">i=1, \ldots,N</code>) of an asset in period <code class="reqn">\tau</code>. Assume there is <code class="reqn">d</code> assets.
+</p>
+<p>In order to define the univariate pre-averaging estimator, we first define the pre-averaged returns as
+</p>
+<p style="text-align: center;"><code class="reqn">
+    \bar{r}_{\tau_j}^{(k)}= \sum_{h=1}^{k_N-1}g\left(\frac{h}{k_N}\right)r_{\tau_{j+h}}^{(k)}
+  </code>
+</p>
+
+<p>where g is a non-zero real-valued function <code class="reqn">g:[0,1]</code> <code class="reqn">\rightarrow</code> <code class="reqn">R</code> given by <code class="reqn">g(x)</code> = <code class="reqn">\min(x,1-x)</code>. <code class="reqn">k_N</code> is a sequence of integers satisfying  <code class="reqn">\mbox{k}_{N} = \lfloor\theta N^{1/2}\rfloor</code>.
+We use <code class="reqn">\theta = 0.8</code> as recommended in Hautsch and Podolskij (2013). The pre-averaged returns are simply a weighted average over the returns in a local window.
+This averaging diminishes the influence of the noise. The order of the window size <code class="reqn">k_n</code> is chosen to lead to optimal convergence rates.
+The pre-averaging estimator is then simply the analogue of the realized variance but based on pre-averaged returns and an additional term to remove bias due to noise
+</p>
+<p style="text-align: center;"><code class="reqn">
+    \hat{C}= \frac{N^{-1/2}}{\theta \psi_2}\sum_{i=0}^{N-k_N+1}  (\bar{r}_{\tau_i})^2-\frac{\psi_1^{k_N}N^{-1}}{2\theta^2\psi_2^{k_N}}\sum_{i=0}^{N}r_{\tau_i}^2
+  </code>
+</p>
+
+<p>with
+</p>
+<p style="text-align: center;"><code class="reqn">
+    \psi_1^{k_N}= k_N \sum_{j=1}^{k_N}\left(g\left(\frac{j+1}{k_N}\right)-g\left(\frac{j}{k_N}\right)\right)^2,\quad
+  </code>
+</p>
+
+<p style="text-align: center;"><code class="reqn">
+    \psi_2^{k_N}= \frac{1}{k_N}\sum_{j=1}^{k_N-1}g^2\left(\frac{j}{k_N}\right).
+  </code>
+</p>
+
+<p style="text-align: center;"><code class="reqn">
+    \psi_2= \frac{1}{12}
+  </code>
+</p>
+
+<p>The multivariate counterpart is very similar. The estimator is called the Modulated Realized Covariance (rMRCov) and is defined as
+</p>
+<p style="text-align: center;"><code class="reqn">
+    \mbox{MRC}= \frac{N}{N-k_N+2}\frac{1}{\psi_2k_N}\sum_{i=0}^{N-k_N+1}\bar{\boldsymbol{r}}_{\tau_i}\cdot \bar{\boldsymbol{r}}'_{\tau_i} -\frac{\psi_1^{k_N}}{\theta^2\psi_2^{k_N}}\hat{\Psi}
+</code>
+</p>
+
+<p>where <code class="reqn">\hat{\Psi}_N = \frac{1}{2N}\sum_{i=1}^N \boldsymbol{r}_{\tau_i}(\boldsymbol{r}_{\tau_i})'</code>. It is a bias correction to make it consistent.
+However, due to this correction, the estimator is not ensured PSD.
+An alternative is to slightly enlarge the bandwidth such that <code class="reqn">\mbox{k}_{N} = \lfloor\theta N^{1/2+\delta}\rfloor</code>. <code class="reqn">\delta = 0.1</code> results in a consistent estimate without the bias correction and a PSD estimate, in which case:
+</p>
+<p style="text-align: center;"><code class="reqn">
+    \mbox{MRC}^{\delta}= \frac{N}{N-k_N+2}\frac{1}{\psi_2k_N}\sum_{i=0}^{N-k_N+1}\bar{\boldsymbol{r}}_i\cdot \bar{\boldsymbol{r}}'_i
+</code>
+</p>
+
+
+
+<h3>Value</h3>
+
+<p>A <code class="reqn">d \times d</code> covariance matrix.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Giang Nguyen, Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup.
+</p>
+
+
+<h3>References</h3>
+
+<p>Hautsch, N., and Podolskij, M. (2013). Preaveraging-based estimation of quadratic variation in the presence of noise and jumps: theory, implementation, and empirical Evidence. <em>Journal of Business &amp; Economic Statistics</em>, 31, 165-183.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>ICov</code> for a list of implemented estimators of the integrated covariance.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+library("xts")
+# Note that this ought to be tick-by-tick data and this example is only to show the usage.
+a &lt;- list(as.xts(sampleOneMinuteData[as.Date(DT) == "2001-08-04", list(DT, MARKET)]),
+          as.xts(sampleOneMinuteData[as.Date(DT) == "2001-08-04", list(DT, STOCK)]))
+rMRCov(a, pairwise = TRUE, makePsd = TRUE)
+
+
+# We can also add use data.tables and use a named list to convey asset names
+a &lt;- list(foo = sampleOneMinuteData[as.Date(DT) == "2001-08-04", list(DT, MARKET)],
+          bar = sampleOneMinuteData[as.Date(DT) == "2001-08-04", list(DT, STOCK)])
+rMRCov(a, pairwise = TRUE, makePsd = TRUE)
+
+
+## End(Not run)
+</code></pre>
+
+
+</div>

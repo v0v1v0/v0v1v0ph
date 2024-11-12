@@ -1,0 +1,240 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>MinT</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Trace minimization for hierarchical or grouped time series</h2>
+
+<h3>Description</h3>
+
+<p>Using the method of Wickramasuriya et al. (2019), this function combines the
+forecasts at all levels of a hierarchical or grouped time series. The
+<code>forecast.gts</code> calls this function when the <code>MinT</code> method
+is selected.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">MinT(
+  fcasts,
+  nodes = NULL,
+  groups = NULL,
+  residual,
+  covariance = c("shr", "sam"),
+  nonnegative = FALSE,
+  algorithms = c("lu", "cg", "chol"),
+  keep = c("gts", "all", "bottom"),
+  parallel = FALSE,
+  num.cores = 2,
+  control.nn = list()
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>fcasts</code></td>
+<td>
+<p>Matrix of forecasts for all levels of a hierarchical or
+grouped time series. Each row represents one forecast horizon and each
+column represents one time series of aggregated or disaggregated forecasts.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nodes</code></td>
+<td>
+<p>If the object class is hts, a list contains the number of child
+nodes referring to hts.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>groups</code></td>
+<td>
+<p>If the object is gts, a gmatrix is required, which is the same
+as groups in the function gts.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>residual</code></td>
+<td>
+<p>Matrix of insample residuals for all the aggregated and
+disaggregated time series. The columns must be in the same order as
+<code>fcasts</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>covariance</code></td>
+<td>
+<p>Type of the covariance matrix to be used. Shrinking
+towards a diagonal unequal variances (<code>"shr"</code>) or sample covariance matrix
+(<code>"sam"</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nonnegative</code></td>
+<td>
+<p>Logical. Should the reconciled forecasts be non-negative?</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>algorithms</code></td>
+<td>
+<p>Algorithm used to compute inverse of the matrices.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>keep</code></td>
+<td>
+<p>Return a gts object or the reconciled forecasts at the bottom
+level.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>parallel</code></td>
+<td>
+<p>Logical. Import parallel package to allow parallel processing.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>num.cores</code></td>
+<td>
+<p>Numeric. Specify how many cores are going to be used.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>control.nn</code></td>
+<td>
+<p>A list of control parameters to be passed on to the
+block principal pivoting algorithm. See 'Details'.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The <code>control.nn</code> argument is a list that can supply any of the following components:
+</p>
+
+<dl>
+<dt><code>ptype</code></dt>
+<dd>
+<p>Permutation method to be used: <code>"fixed"</code> or <code>"random"</code>. Defaults to <code>"fixed"</code>.</p>
+</dd>
+<dt><code>par</code></dt>
+<dd>
+<p>The number of full exchange rules that may be tried. Defaults to 10.</p>
+</dd>
+<dt><code>gtol</code></dt>
+<dd>
+<p>The tolerance of the convergence criteria. Defaults to <code>sqrt(.Machine$double.eps)</code>.</p>
+</dd>
+</dl>
+<h3>Value</h3>
+
+<p>Return the reconciled <code>gts</code> object or forecasts at the bottom
+level.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Shanika L Wickramasuriya
+</p>
+
+
+<h3>References</h3>
+
+<p>Wickramasuriya, S. L., Athanasopoulos, G., &amp; Hyndman, R. J. (2019).
+Optimal forecast reconciliation for hierarchical and grouped time series through trace minimization.
+<em>Journal of the American Statistical Association</em>, <b>114</b>(526), 804–819. <a href="https://robjhyndman.com/publications/mint/">https://robjhyndman.com/publications/mint/</a>
+</p>
+<p>Wickramasuriya, S. L., Turlach, B. A., &amp; Hyndman, R. J. (to appear). Optimal non-negative forecast reconciliation.
+<em>Statistics and Computing</em>. <a href="https://robjhyndman.com/publications/nnmint/">https://robjhyndman.com/publications/nnmint/</a>
+</p>
+<p>Hyndman, R. J., Lee, A., &amp; Wang, E. (2016).  Fast computation of reconciled
+forecasts for hierarchical and grouped time series.  <em>Computational
+Statistics and Data Analysis</em>, <b>97</b>, 16–32.
+<a href="https://robjhyndman.com/publications/hgts/">https://robjhyndman.com/publications/hgts/</a>
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>hts</code>, <code>gts</code>,
+<code>forecast.gts</code>, <code>combinef</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+# hts example
+## Not run: 
+h &lt;- 12
+ally &lt;- aggts(htseg1)
+n &lt;- nrow(ally)
+p &lt;- ncol(ally)
+allf &lt;- matrix(NA, nrow = h, ncol = p)
+res &lt;- matrix(NA, nrow = n, ncol = p)
+for(i in 1:p)
+{
+  fit &lt;- auto.arima(ally[, i])
+  allf[, i] &lt;- forecast(fit, h = h)$mean
+  res[, i] &lt;- na.omit(ally[, i] - fitted(fit))
+}
+allf &lt;- ts(allf, start = 51)
+y.f &lt;- MinT(allf, get_nodes(htseg1), residual = res, covariance = "shr",
+  keep = "gts", algorithms = "lu")
+plot(y.f)
+y.f_cg &lt;- MinT(allf, get_nodes(htseg1), residual = res, covariance = "shr",
+  keep = "all", algorithms = "cg")
+
+## End(Not run)
+
+## Not run: 
+h &lt;- 12
+ally &lt;- abs(aggts(htseg2))
+allf &lt;- matrix(NA, nrow = h, ncol = ncol(ally))
+res &lt;- matrix(NA, nrow = nrow(ally), ncol = ncol(ally))
+for(i in 1:ncol(ally)) {
+  fit &lt;- auto.arima(ally[, i], lambda = 0, biasadj = TRUE)
+  allf[,i] &lt;- forecast(fit, h = h)$mean
+  res[,i] &lt;- na.omit(ally[, i] - fitted(fit))
+}
+b.f &lt;- MinT(allf, get_nodes(htseg2), residual = res, covariance = "shr",
+  keep = "bottom", algorithms = "lu")
+b.nnf &lt;-  MinT(allf, get_nodes(htseg2), residual = res, covariance = "shr",
+  keep = "bottom", algorithms = "lu", nonnegative = TRUE, parallel = TRUE)
+
+## End(Not run)
+
+# gts example
+## Not run: 
+abc &lt;- ts(5 + matrix(sort(rnorm(200)), ncol = 4, nrow = 50))
+g &lt;- rbind(c(1,1,2,2), c(1,2,1,2))
+y &lt;- gts(abc, groups = g)
+h &lt;- 12
+ally &lt;- aggts(y)
+n &lt;- nrow(ally)
+p &lt;- ncol(ally)
+allf &lt;- matrix(NA,nrow = h,ncol = ncol(ally))
+res &lt;- matrix(NA, nrow = n, ncol = p)
+for(i in 1:p)
+{
+  fit &lt;- auto.arima(ally[, i])
+  allf[, i] &lt;- forecast(fit, h = h)$mean
+  res[, i] &lt;- na.omit(ally[, i] - fitted(fit))
+}
+allf &lt;- ts(allf, start = 51)
+y.f &lt;- MinT(allf, groups = get_groups(y), residual = res, covariance = "shr",
+  keep = "gts", algorithms = "lu")
+plot(y.f)
+
+## End(Not run)
+</code></pre>
+
+
+</div>

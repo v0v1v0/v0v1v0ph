@@ -1,0 +1,176 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>getSpatialMap_mat</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Replot raster matrix</h2>
+
+<h3>Description</h3>
+
+<p>replot the matrix output from <code>getSpatialMap</code>, when <code>output = 'data'</code> or output is default
+value.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">getSpatialMap_mat(
+  matrix,
+  title_d = NULL,
+  catchment = NULL,
+  point = NULL,
+  output = "data",
+  name = NULL,
+  info = FALSE,
+  scale = "identity",
+  color = NULL,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>matrix</code></td>
+<td>
+<p>A matrix raster, should be the result of <code>getSpatialMap()</code>, output should be default
+or 'data'</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>title_d</code></td>
+<td>
+<p>A string showing the title of the plot, defaut is NULL.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>catchment</code></td>
+<td>
+<p>A catchment file geting from <code>shp2cat()</code> in the package, if a catchment is available for background.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>point</code></td>
+<td>
+<p>A dataframe, showing other information, e.g., location of the gauging stations. The 
+the data.frame should be with columes "name, lon, lat, z, value".</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>output</code></td>
+<td>
+<p>A string showing the type of the output, if <code>output = 'ggplot'</code>, the returned 
+data can be used in ggplot and <code>getSpatialMap_comb()</code>; if <code>output = 'plot'</code>, the returned data is the plot containing all 
+layers' information, and can be plot directly or used in grid.arrange; if not set, the raster matrix data
+will be returned.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>name</code></td>
+<td>
+<p>If <code>output = 'ggplot'</code>, name has to be assigned to your output, in order to differentiate
+different outputs in the later multiplot using <code>getSpatialMap_comb</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>info</code></td>
+<td>
+<p>A boolean showing whether the information of the map, e.g., max, mean ..., default is FALSE.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>scale</code></td>
+<td>
+<p>A string showing the plot scale, 'identity' or 'sqrt'.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>color</code></td>
+<td>
+<p>Most of time you don't have to set this, but if you are not satisfied with the 
+default color, you can set your own palette here. e.g., <code>color = c('red', 'blue')</code>, then
+the value from lowest to highest, will have the color from red to blue. More info about color,
+please check ?palette().</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p><code>title, x, y</code> showing the title and x and y axis of the plot. e.g. <code>title = 'aaa'</code>
+default is about precipitation.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A matrix representing the raster map is returned, and the map is plotted.
+</p>
+
+
+<h3>References</h3>
+
+
+<ul>
+<li>
+<p> R Core Team (2015). R: A language and environment for statistical computing. R Foundation for
+Statistical Computing, Vienna, Austria. URL https://www.R-project.org/.
+</p>
+</li>
+<li>
+<p> Hadley Wickham (2007). Reshaping Data with the reshape Package. Journal of Statistical Software,
+21(12), 1-20. URL http://www.jstatsoft.org/v21/i12/.
+</p>
+</li>
+<li>
+<p> Hadley Wickham (2011). The Split-Apply-Combine Strategy for Data Analysis. Journal of Statistical
+Software, 40(1), 1-29. URL http://www.jstatsoft.org/v40/i01/.
+</p>
+</li>
+<li>
+<p> Original S code by Richard A. Becker and Allan R. Wilks. R version by Ray Brownrigg. Enhancements
+by Thomas P Minka &lt;tpminka at media.mit.edu&gt; (2015). maps: Draw Geographical Maps. R package version
+2.3-11. https://CRAN.R-project.org/package=maps
+</p>
+</li>
+<li>
+<p> Pebesma, Edzer, and Roger Bivand. 2023a. Sp: Classes and Methods for Spatial Data. https://CRAN.R-project.org/package=sp.
+</p>
+</li>
+<li>
+<p> Roger Bivand and Colin Rundel (2015). rgeos: Interface to Geometry Engine - Open Source (GEOS). R
+package version 0.3-11. https://CRAN.R-project.org/package=sf
+</p>
+</li>
+</ul>
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+## Not run: 
+data(tgridData)# the result of \code{loadNcdf}
+#the output type of has to be default or 'data'.
+a1 &lt;- getSpatialMap(tgridData, method = 'mean')
+a2 &lt;- getSpatialMap(tgridData, method = 'max')
+a3 &lt;- getSpatialMap(tgridData, method = 'winter')
+a4 &lt;- getSpatialMap(tgridData, method = 'summer')
+#For example, if we want to investigate the difference between mean value and max.
+
+a5 &lt;- a2 - a1
+getSpatialMap_mat(a4)
+
+#Or to investigate the difference between winter value and summer value.
+a6 &lt;- a3 - a4
+getSpatialMap_mat(a6)
+
+
+## End(Not run)
+
+
+# More examples can be found in the user manual on https://yuanchao-xu.github.io/hyfo/
+
+</code></pre>
+
+
+</div>

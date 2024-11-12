@@ -1,0 +1,151 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>howler</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Create a Howler Audio Player</h2>
+
+<h3>Description</h3>
+
+<p><code>howler</code> is used to initialise the 'howler.js' framework by adding all of the specified tracks to the
+player, and can be run by either including UI buttons or server-side actions.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">howler(
+  tracks,
+  options = list(),
+  track_formats = NULL,
+  auto_continue = FALSE,
+  auto_loop = FALSE,
+  seek_ping_rate = 1000L,
+  elementId = NULL
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>tracks</code></td>
+<td>
+<p>A named vector of file paths to sounds. If multiple file extensions are included, then use a named
+list instead, with each list item containing each extension of the sound.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>options</code></td>
+<td>
+<p>A named list of options to add to the player. For a full list of options see
+<a href="https://github.com/goldfire/howler.js?tab=readme-ov-file#options">https://github.com/goldfire/howler.js?tab=readme-ov-file#options</a></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>track_formats</code></td>
+<td>
+<p>An optional list of formats of the sounds. By default 'howler' will guess the format to
+play in. Must be the same length as tracks</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>auto_continue</code></td>
+<td>
+<p>If there are multiple files, would you like to auto play the next file after the current
+one has finished? Defaults to <code>TRUE</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>auto_loop</code></td>
+<td>
+<p>Once all files have been played, would you like to restart playing the playlist?
+Defaults to <code>FALSE</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>seek_ping_rate</code></td>
+<td>
+<p>Number of milliseconds between each update of 'input${id}_seek' while playing. Default is
+set to 1000. If set to 0, then 'input${id}_seek' will not exist.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>elementId</code></td>
+<td>
+<p>HTML id tag to be given to the howler player element</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>All buttons associated with the <code>howler</code> should be given the same <code>id</code> argument. This is to ensure
+that the buttons are linked to the player.
+</p>
+<p>i.e. If <code>howler(id = "howler")</code>, then <code>howlerPlayButton(id = "howler")</code>
+</p>
+
+
+<h3>Value</h3>
+
+<p>A shiny.tag containing all of the required options for a <code>Howl</code> JavaScript
+object to be initialised in a shiny application.
+</p>
+<p>On the server side there will be up to four additional objects available as inputs:
+</p>
+
+<dl>
+<dt><code>{id}_playing</code></dt>
+<dd>
+<p>A logical value as to whether or not the <code>howler</code> is playing audio</p>
+</dd>
+<dt><code>{id}_track</code></dt>
+<dd>
+<p>Basename of the file currently loaded</p>
+</dd>
+<dt><code>{id}_seek</code></dt>
+<dd>
+<p>(If <code>seek_ping_rate &gt; 0</code>) the current time (in seconds) of the track loaded</p>
+</dd>
+<dt><code>{id}_duration</code></dt>
+<dd>
+<p>The duration (in seconds) of the track loaded</p>
+</dd>
+</dl>
+<h3>See Also</h3>
+
+<p><code>howlerButton</code>, <code>howlerServer</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+library(shiny)
+
+ui &lt;- fluidPage(
+  title = "howler.js Player",
+  howler(elementId = "howler", c(sound = "audio/sound.mp3")),
+  howlerPlayPauseButton("howler")
+)
+
+server &lt;- function(input, output) {
+}
+
+shinyApp(ui, server)
+
+# Multiple file formats
+howler(
+  elementId = "howler",
+  list(
+    track_1 = c("audio/sound.webm", "audio/sound.mp3"),
+    track_2 = c("audio/sound2.webm", "audio/sound2.mp3"),
+  )
+)
+
+</code></pre>
+
+
+</div>

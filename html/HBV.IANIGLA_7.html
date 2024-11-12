@@ -1,0 +1,370 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>Routing_HBV</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Routing bucket type models</h2>
+
+<h3>Description</h3>
+
+<p>Implement one of the five different bucket formulations for
+runoff routing. The output of this function is the input series of the
+transfer function (<code>UH</code>).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">Routing_HBV(
+       model,
+       lake,
+       inputData,
+       initCond,
+       param
+       )
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>model</code></td>
+<td>
+<p>numeric integer indicating which reservoir formulation to use:
+</p>
+
+<ul>
+<li>
+<p> 1: Three series of reservoirs. Lake option is allowed.
+</p>
+<p><img src="../help/figures/bucket_3_outlet_3.png" width="200" alt="bucket_3_outlet_3.png"></p>
+</li>
+<li>
+<p> 2: Two series of reservoirs. Lake option is allowed.
+</p>
+<p><img src="../help/figures/bucket_2_outlet_2.png" width="200" alt="bucket_2_outlet_2.png"></p>
+</li>
+<li>
+<p> 3: Two reservoirs and three outlets. Lake option is allowed.
+</p>
+<p><img src="../help/figures/bucket_2_outlet_3.png" width="200" alt="bucket_2_outlet_3.png"></p>
+</li>
+<li>
+<p> 4: One reservoir and two outlets. Lake is NOT allowed.
+</p>
+<p><img src="../help/figures/bucket_1_outlet_2.png" width="200" alt="bucket_1_outlet_2.png"></p>
+</li>
+<li>
+<p> 5: One reservoir and three outlets. Lake is NOT allowed.
+</p>
+<p><img src="../help/figures/bucket_1_outlet_3.png" width="200" alt="bucket_1_outlet_3.png"></p>
+</li>
+</ul>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lake</code></td>
+<td>
+<p>logical. A <code>TRUE</code> value will enable the lake option (only available
+on <strong>models 1, 2 and 3</strong>). When modeling a lake, HBV.IANIGLA considers
+that this water body exist on the bottom bucket, so you will also have to provide
+a lake evaporation and precipitation series in the <strong><code>inputData</code></strong> matrix.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>inputData</code></td>
+<td>
+<p>numeric matrix with three columns (two of them depends on
+<strong><code>lake</code></strong> option).
+</p>
+
+<ul>
+<li> <p><code>column_1</code>: effective runoff series <code class="reqn">[mm/\Delta T]</code>. This is
+the output of the <code>Soil_HBV</code> module.
+</p>
+</li>
+<li> <p><code>column_2</code>: only if  <strong><code>lake = TRUE</code></strong>. Precipitation series
+falling in the lake. <strong>When using it remember that the precipitation should
+be rescaled according to the relative area of the lake in the basin</strong>.
+</p>
+</li>
+<li> <p><code>column_3</code>: only if  <strong><code>lake = TRUE</code></strong>. Lake's evaporation
+series. <strong>When using it remember that the precipitation should
+be rescaled according to the relative area of the lake in the basin</strong>.
+</p>
+</li>
+</ul>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>initCond</code></td>
+<td>
+<p>numeric vector with the following initial state variables.
+</p>
+
+<ul>
+<li> <p><code>SLZ0</code>: initial water content of the lower reservoir <code class="reqn">[mm]</code>. This
+state variable is compulsory for all <strong>model</strong> options.
+</p>
+</li>
+<li> <p><code>SUZ0</code>: initial water content of the intermediate reservoir <code class="reqn">[mm]</code>.
+This option does not make sense for <strong>models 4 and 5</strong>.
+</p>
+</li>
+<li> <p><code>STZ0</code>: initial water content of the upper reservoir <code class="reqn">[mm]</code>.
+This option only make sense for <strong>model 1</strong>.
+</p>
+</li>
+</ul>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>param</code></td>
+<td>
+<p>numeric vector. The length depends on the <strong>model</strong>'s choice:
+</p>
+<p><strong>Model 1</strong>
+</p>
+
+<ul>
+<li> <p><code>K0</code>: top bucket (<code>STZ</code>) storage constant <code class="reqn">[1/\Delta t]</code>.
+</p>
+</li>
+<li> <p><code>K1</code>: intermediate bucket (<code>SUZ</code>) storage constant <code class="reqn">[1/\Delta t]</code>.
+</p>
+</li>
+<li> <p><code>K2</code>: lower bucket (<code>SLZ</code>) storage constant <code class="reqn">[1/\Delta t]</code>.
+</p>
+</li>
+<li> <p><code>UZL</code>: maximum flux rate between <code>STZ</code> and
+<code>SUZ</code> <code class="reqn">[mm/\Delta t]</code>.
+</p>
+</li>
+<li> <p><code>PERC</code>: maximum flux rate between <code>SUZ</code> and
+<code>SLZ</code> <code class="reqn">[mm/\Delta t]</code>.
+</p>
+</li>
+</ul>
+<p><strong>Model 2</strong>
+</p>
+
+<ul>
+<li> <p><code>K1</code>: intermediate bucket (<code>SUZ</code>) storage constant <code class="reqn">[1/\Delta t]</code>.
+</p>
+</li>
+<li> <p><code>K2</code>: lower bucket (<code>SLZ</code>) storage constant <code class="reqn">[1/\Delta t]</code>.
+</p>
+</li>
+<li> <p><code>PERC</code>: maximum flux rate between <code>SUZ</code> and
+<code>SLZ</code> <code class="reqn">[mm/\Delta t]</code>.
+</p>
+</li>
+</ul>
+<p><strong>Model 3</strong>
+</p>
+
+<ul>
+<li> <p><code>K0</code>: top output (<code>Q0</code>) storage constant <code class="reqn">[1/\Delta t]</code>.
+</p>
+</li>
+<li> <p><code>K1</code>: intermediate bucket (<code>SUZ</code>) storage constant <code class="reqn">[1/\Delta t]</code>.
+</p>
+</li>
+<li> <p><code>K2</code>: lower bucket (<code>SLZ</code>) storage constant <code class="reqn">[1/\Delta t]</code>.
+</p>
+</li>
+<li> <p><code>UZL</code>: minimum water content of <code>SUZ</code> for supplying fast runoff
+(<code>Q0</code>) to the total reservoir discharge (<code>Qg</code>) <code class="reqn">[mm]</code>.
+</p>
+</li>
+<li> <p><code>PERC</code>: maximum flux rate between <code>SUZ</code> and
+<code>SLZ</code> <code class="reqn">[mm/\Delta t]</code>.
+</p>
+</li>
+</ul>
+<p><strong>Model 4</strong>
+</p>
+
+<ul>
+<li> <p><code>K1</code>: intermediate output (<code>Q1</code>) storage constant <code class="reqn">[1/\Delta t]</code>.
+</p>
+</li>
+<li> <p><code>K2</code>: lower bucket (<code>SLZ</code>) storage constant <code class="reqn">[1/\Delta t]</code>.
+</p>
+</li>
+<li> <p><code>PERC</code>: minimum water content of <code>SLZ</code> for supplying intermediate
+runoff (<code>Q1</code>) to the total reservoir discharge (<code>Qg</code>) <code class="reqn">[mm]</code>.
+</p>
+</li>
+</ul>
+<p><strong>Model 5</strong>
+</p>
+
+<ul>
+<li> <p><code>K0</code>: top output (<code>Q0</code>) storage constant <code class="reqn">[1/\Delta t]</code>.
+</p>
+</li>
+<li> <p><code>K1</code>: intermediate output (<code>Q1</code>) storage constant <code class="reqn">[1/\Delta t]</code>.
+</p>
+</li>
+<li> <p><code>K2</code>: lower bucket (<code>SLZ</code>) storage constant <code class="reqn">[1/\Delta t]</code>.
+</p>
+</li>
+<li> <p><code>UZL</code>: minimum water content of <code>SLZ</code> for supplying fast runoff
+(<code>Q0</code>) to the total reservoir discharge (<code>Qg</code>) <code class="reqn">[mm]</code>.
+</p>
+</li>
+<li> <p><code>PERC</code>: minimum water content of <code>SLZ</code> for supplying intermediate
+runoff (<code>Q1</code>) to the total reservoir discharge (<code>Qg</code>) <code class="reqn">[mm]</code>.
+</p>
+</li>
+</ul>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>Numeric matrix with the following columns:
+</p>
+<p><strong>Model 1</strong>
+</p>
+
+<ul>
+<li> <p><code>Qg</code>: total buckets output discharge <code class="reqn">[mm/\Delta t]</code>.
+</p>
+</li>
+<li> <p><code>Q0</code>: top bucket discharge <code class="reqn">[mm/\Delta t]</code>.
+</p>
+</li>
+<li> <p><code>Q1</code>: intermediate bucket discharge <code class="reqn">[mm/\Delta t]</code>.
+</p>
+</li>
+<li> <p><code>Q2</code>: lower bucket discharge <code class="reqn">[mm/\Delta t]</code>.
+</p>
+</li>
+<li> <p><code>STZ</code>: top reservoir storage <code class="reqn">[mm]</code>.
+</p>
+</li>
+<li> <p><code>SUZ</code>: intermediate reservoir storage <code class="reqn">[mm]</code>.
+</p>
+</li>
+<li> <p><code>SLZ</code>: lower reservoir storage <code class="reqn">[mm]</code>.
+</p>
+</li>
+</ul>
+<p><strong>Model 2</strong>
+</p>
+
+<ul>
+<li> <p><code>Qg</code>: total buckets output discharge <code class="reqn">[mm/\Delta t]</code>.
+</p>
+</li>
+<li> <p><code>Q1</code>: intermediate bucket discharge <code class="reqn">[mm/\Delta t]</code>.
+</p>
+</li>
+<li> <p><code>Q2</code>: lower bucket discharge <code class="reqn">[mm/\Delta t]</code>.
+</p>
+</li>
+<li> <p><code>SUZ</code>: intermediate reservoir storage <code class="reqn">[mm]</code>.
+</p>
+</li>
+<li> <p><code>SLZ</code>: lower reservoir storage <code class="reqn">[mm]</code>.
+</p>
+</li>
+</ul>
+<p><strong>Model 3</strong>
+</p>
+
+<ul>
+<li> <p><code>Qg</code>: total buckets output discharge <code class="reqn">[mm/\Delta t]</code>.
+</p>
+</li>
+<li> <p><code>Q0</code>: intermediate bucket fast discharge <code class="reqn">[mm/\Delta t]</code>.
+</p>
+</li>
+<li> <p><code>Q1</code>: intermediate bucket discharge <code class="reqn">[mm/\Delta t]</code>.
+</p>
+</li>
+<li> <p><code>Q2</code>: lower bucket discharge <code class="reqn">[mm/\Delta t]</code>.
+</p>
+</li>
+<li> <p><code>SUZ</code>: intermediate reservoir storage <code class="reqn">[mm]</code>.
+</p>
+</li>
+<li> <p><code>SLZ</code>: lower reservoir storage <code class="reqn">[mm]</code>.
+</p>
+</li>
+</ul>
+<p><strong>Model 4</strong>
+</p>
+
+<ul>
+<li> <p><code>Qg</code>: total buckets output discharge <code class="reqn">[mm/\Delta t]</code>.
+</p>
+</li>
+<li> <p><code>Q1</code>: lower bucket intermediate discharge <code class="reqn">[mm/\Delta t]</code>.
+</p>
+</li>
+<li> <p><code>Q2</code>: lower bucket discharge <code class="reqn">[mm/\Delta t]</code>.
+</p>
+</li>
+<li> <p><code>SLZ</code>: lower reservoir storage <code class="reqn">[mm]</code>.
+</p>
+</li>
+</ul>
+<p><strong>Model 5</strong>
+</p>
+
+<ul>
+<li> <p><code>Qg</code>: total buckets output discharge <code class="reqn">[mm/\Delta t]</code>.
+</p>
+</li>
+<li> <p><code>Q0</code>: lower bucket fast discharge <code class="reqn">[mm/\Delta t]</code>.
+</p>
+</li>
+<li> <p><code>Q1</code>: lower bucket intermediate discharge <code class="reqn">[mm/\Delta t]</code>.
+</p>
+</li>
+<li> <p><code>Q2</code>: lower bucket discharge <code class="reqn">[mm/\Delta t]</code>.
+</p>
+</li>
+<li> <p><code>SLZ</code>: lower reservoir storage <code class="reqn">[mm]</code>.
+</p>
+</li>
+</ul>
+<h3>References</h3>
+
+<p>Bergström, S., Lindström, G., 2015. Interpretation of runoff processes in
+hydrological modelling—experience from the HBV approach. Hydrol. Process. 29, 3535–3545.
+https://doi.org/10.1002/hyp.10510
+</p>
+<p>Beven, K.J., 2012. Rainfall - Runoff Modelling, 2 edition. ed. Wiley, Chichester.
+</p>
+<p>Seibert, J., Vis, M.J.P., 2012. Teaching hydrological modeling with a user-friendly
+catchment-runoff-model software package. Hydrol Earth Syst Sci 16, 3315–3325.
+https://doi.org/10.5194/hess-16-3315-2012
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># The following is a toy example. I strongly recommend to see
+# the package vignettes in order to improve your skills on HBV.IANIGLA
+
+## Case example with the first model
+inputMatrix &lt;- cbind(
+                     runif(n = 200, max = 100, min = 0),
+                     runif(n = 200, max = 50, min = 5),
+                     runif(n = 100, max = 3, min = 1)
+                     )
+
+routeMod1   &lt;- Routing_HBV(model = 1, lake = TRUE, inputData = inputMatrix,
+                     initCond = c(10, 15, 20), param = c(0.1, 0.05, 0.001, 1, 0.8))
+
+
+</code></pre>
+
+
+</div>

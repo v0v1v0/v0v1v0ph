@@ -1,0 +1,90 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>att</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Estimating the ATT from an hbal object</h2>
+
+<h3>Description</h3>
+
+<p><code>att</code> estimates the average treatment effect on the treated (ATT) from an 
+hbal object returned by <code>hbal</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">att(hbalobject, method="lm_robust", dr=TRUE, displayAll=FALSE, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>hbalobject</code></td>
+<td>
+<p>an object of class <code>hbal</code> as returned by <code>hbal</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+<p>estimation method for the ATT. Default is the Lin (2016) estimator.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dr</code></td>
+<td>
+<p>doubly robust, whether an outcome model is included in estimating the ATT.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>displayAll</code></td>
+<td>
+<p>only displays treatment effect by default.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>arguments passed to lm_lin or lm_robust</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>This is a wrapper for <code>lm_robust</code> and <code>lm_lin</code> from the estimatr package.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A matrix of estimates with their robust standard errors
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Yiqing Xu, Eddie Yang
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">#EXAMPLE 1
+set.seed(1984)
+N &lt;- 500
+X1 &lt;- rnorm(N)
+X2 &lt;- rbinom(N,size=1,prob=.5)
+X &lt;- cbind(X1, X2)
+treat &lt;- rbinom(N, 1, prob=0.5) # Treatment indicator
+y &lt;- 0.5 * treat + X[,1] + X[,2] + rnorm(N) # Outcome
+dat &lt;- data.frame(treat=treat, X, Y=y)
+out &lt;- hbal(Treat = 'treat', X = c('X1', 'X2'), Y = 'Y', data=dat)
+sout &lt;- summary(att(out))
+</code></pre>
+
+
+</div>

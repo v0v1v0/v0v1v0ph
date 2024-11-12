@@ -1,0 +1,100 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>set_value</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Set user defined values</h2>
+
+<h3>Description</h3>
+
+<p>Specify specific values between dates.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">set_value(x, col_name, out_name = NULL, value, from, to)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>data frame or tibble with class <code>Date</code> or <code>POSIX*</code>
+in the first column.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>col_name</code></td>
+<td>
+<p>string with column(s) name(s) to set.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>out_name</code></td>
+<td>
+<p>optional. String with new column(s) name(s). If you set it
+as <code>NULL</code>, the function will overwrite the original data frame.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>value</code></td>
+<td>
+<p>numeric vector with the numeric values to set between
+dates (<code>from</code> and <code>to</code>). If you provide a number it will be
+recycled. When using a multiple dates (i.e.: "date" vector in <code>from</code>
+and <code>to</code>) use a list with a numeric vector inside each element.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>from</code></td>
+<td>
+<p>string vector for <code>'Date'</code> class or <code>POSIX*</code> class
+for date-time data with the starting date.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>to</code></td>
+<td>
+<p>string vector for <code>'Date'</code> class or <code>POSIX*</code> class
+for date-time data with the ending date.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>The same table but with the set numeric values between the dates.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+# create a data frame
+dates   &lt;- seq.Date(from = as.Date('1990-01-01'), to = as.Date('1990-12-01'), by = 'm')
+met_var &lt;- runif(n = 12, 0, 10)
+
+met_table &lt;- data.frame(dates, met_var)
+
+# set single value recycling
+set_value(x = met_table, col_name = 'met_var', value = 10,
+ from = '1990-01-01', to = '1990-06-01' )
+
+# set different periods
+set_value(x = met_table, col_name = 'met_var', value = list(NA_real_, c(1, 2) ),
+ from = c('1990-01-01', '1990-11-01'), to = c('1990-06-01', '1990-12-01') )
+
+# now set as new columns
+set_value(x = met_table, col_name = 'met_var', out_name = 'met_set',
+ value = list(NA_real_, c(1, 2) ),
+ from = c('1990-01-01', '1990-11-01'),
+  to = c('1990-06-01', '1990-12-01') )
+
+</code></pre>
+
+
+</div>

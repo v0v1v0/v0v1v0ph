@@ -1,0 +1,86 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>flood.length.max</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Calculates the maximum flood length in a time series. 
+</h2>
+
+<h3>Description</h3>
+
+<p>Calculates the maximum flood length above a user defined threshold in a time series. Used with ddply (from the plyr package) it can be used to return a vector of maximum flood lengths for multiple gauges or for multiple years (see examples). Alternatively, the function <code>high.spell.lengths</code> can be used to return the length of all events above a threshold.</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">flood.length.max(flow.ts, threshold, ind.days = 5)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>flow.ts</code></td>
+<td>
+
+<p>Dataframe with date and discharge data in columns named "Date" and "Q" respectively. Date must be in POSIX format (see ts.format)
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>threshold</code></td>
+<td>
+
+<p>A user supplied threshold for defining spells. This would typically be derived from hydraulic models or similar knowledge pertaining to a gauge site</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ind.days</code></td>
+<td>
+
+<p>Periods between spells of less than ind.days (default 5) are considered to be 'in spell' for the purpose of further calculations. A value of 0 means spells 1 day apart are considered indpedendent</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A dataframe with one column (flood.length.max).
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Nick Bond &lt;n.bond@latrobe.edu.au&gt;
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+data(Cooper)
+Cooper&lt;-ts.format(Cooper)
+
+flood.length.max(Cooper, threshold = 50000, ind.days = 5)
+
+# Return annual maximum flood length based on calendar year using ddply (from plyr package) 
+require(plyr)
+Cooper$Year=format(Cooper$Date, format="%Y")
+ddply(Cooper, .(Year), flood.length.max, threshold = 50000)
+
+require(dplyr)
+Cooper %&gt;%
+dplyr::group_by(Year) %&gt;%
+dplyr::do(flood.length.max(., threshold = 50000))
+
+
+# Based on hydrologic year.
+Cooper&lt;-hydro.year(Cooper)
+plyr::ddply(Cooper, .(Year), flood.length.max, threshold = 50000)
+
+</code></pre>
+
+
+</div>

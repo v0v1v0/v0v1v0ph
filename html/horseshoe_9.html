@@ -1,0 +1,103 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>HS.var.select</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Variable selection using the horseshoe prior</h2>
+
+<h3>Description</h3>
+
+<p>The function implements two methods to perform variable selection. The first checks
+whether 0 is contained in the credible set (see Van der Pas et al. (2016)). The second
+is only intended for the sparse normal means problem (regression with identity matrix).
+It is described in Carvalho et al. (2010). The horseshoe posterior mean can be written
+as <code class="reqn">c_i y_i</code>, with <code class="reqn">y_i</code> the observation. A variable is selected if
+<code class="reqn">c_i \geq c</code>, where <code class="reqn">c</code> is a user-specified threshold.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">HS.var.select(hsobject, y, method = c("intervals", "threshold"),
+  threshold = 0.5)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>hsobject</code></td>
+<td>
+<p>The outcome from one of the horseshoe functions <code>horseshoe</code>
+or <code>HS.normal.means</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+<p>The data.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+<p>Use "intervals" to perform variable selection using the credible sets
+(at the level specified when creating the hsobject), "threshold" to perform variable
+selection using the thresholding procedure (only for the sparse normal means problem).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>threshold</code></td>
+<td>
+<p>Threshold for the thresholding procedure. Default is 0.5.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A vector of zeroes and ones. The ones correspond to the selected variables.
+</p>
+
+
+<h3>References</h3>
+
+<p>van der Pas, S.L., Szabo, B., and van der Vaart, A. (2017), Uncertainty
+quantification for the horseshoe (with discussion). Bayesian Analysis
+12(4), 1221-1274.
+</p>
+<p>van der Pas, S.L., Szabo, B., and van der Vaart A. (2017), Adaptive
+posterior contraction rates for the horseshoe. Electronic Journal of
+Statistics 10(1), 3196-3225.
+</p>
+<p>Carvalho, C. M., Polson, N. G., and Scott, J. G. (2010), The Horseshoe
+Estimator for Sparse Signals. Biometrika 97(2), 465–480.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>horseshoe</code> and <code>HS.normal.means</code> to obtain the required
+hsobject.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">#Example with 20 signals (last 20 entries), rest is noise
+truth &lt;- c(rep(0, 80), rep(8, 20))
+data &lt;-  truth + rnorm(100)
+horseshoe.results &lt;- HS.normal.means(data, method.tau = "truncatedCauchy",
+ method.sigma = "fixed")
+#Using credible sets. Ideally, the first 80 entries are equal to 0,
+#and the last 20 entries equal to 1.
+HS.var.select(horseshoe.results, data, method = "intervals")
+#Using thresholding. Ideally, the first 80 entries are equal to 0,
+#and the last 20 entries equal to 1.
+HS.var.select(horseshoe.results, data, method = "threshold")
+
+</code></pre>
+
+
+</div>

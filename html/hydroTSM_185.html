@@ -1,0 +1,105 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>zoo2RHtest</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Zoo -&gt; RHTest 
+</h2>
+
+<h3>Description</h3>
+
+<p>It creates the input file to the <var>'RHtest_dlyPrcp.r'</var> script,  used for testing the homogeneity of climatological time series (available at: <a href="http://etccdi.pacificclimate.org/software.shtml">http://etccdi.pacificclimate.org/software.shtml</a>)
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">zoo2RHtest(x, fname="pcp.txt", tstep.out="daily", dec=".", na="-999.0")
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+
+<p>time series that will be written. class(x) must be a zoo object
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fname</code></td>
+<td>
+
+<p>Character, with the filename of the precipitation time series 
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tstep.out</code></td>
+<td>
+
+<p>Character indicating the time step that have to be used for writing <code>x</code> into the output file
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dec</code></td>
+<td>
+
+<p>the string to use for decimal points in numeric or complex columns: must be a single character.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>na</code></td>
+<td>
+
+<p>character to be used for representing the missing values in the data
+</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>Mauricio Zambrano-Bigiarini, <a href="mailto:mzb.devel@gmail">mzb.devel@gmail</a>
+</p>
+
+
+<h3>References</h3>
+
+
+<p><a href="http://etccdi.pacificclimate.org/software.shtml">http://etccdi.pacificclimate.org/software.shtml</a>
+<a href="http://etccdi.pacificclimate.org/RHtest/RHtestsV4_UserManual_10Dec2014.pdf">http://etccdi.pacificclimate.org/RHtest/RHtestsV4_UserManual_10Dec2014.pdf</a>
+
+</p>
+
+
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Loading the SanMartino precipitation data
+data(SanMartinoPPts)
+x &lt;- SanMartinoPPts
+
+#Getting the monthly ts
+pcp.m &lt;- daily2monthly(x, FUN=sum, na.rm=FALSE)
+
+## Not run: 
+# From zoo to the input format required by 'FindU.dlyPrcp' function
+zoo2RHtest(x=pcp.m, fname="pcp-monthly.txt", tstep.out="monthly", na="-999.0")
+
+# Homogeneity analysis
+FindU.dlyPrcp(InSeries="pcp-monthly.txt", output="pcp-monthly", MissingValueCode="-999.0", 
+GUI=FALSE, pthr=0, Mq=10, p.lev=0.95, Iadj=10000)
+
+## End(Not run)
+</code></pre>
+
+
+</div>

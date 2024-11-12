@@ -1,0 +1,243 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>wilcoxtestClust</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Rank Sum and Signed Rank Tests for Clustered Data</h2>
+
+<h3>Description</h3>
+
+<p>Performs a one-sample or paired cluster-weighted signed rank test, or a cluster- or
+group-weighted rank sum test. These tests are appropriate for clustered data with
+potentially informative cluster size.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">wilcoxtestClust(x, ...)
+
+## Default S3 method:
+wilcoxtestClust(
+  x,
+  y = NULL,
+  idx,
+  idy = NULL,
+  alternative = c("two.sided", "less", "greater"),
+  mu = 0,
+  paired = FALSE,
+  method = c("cluster", "group"),
+  ...
+)
+
+## S3 method for class 'formula'
+wilcoxtestClust(formula, id, data, subset, na.action, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x, y</code></td>
+<td>
+<p>numeric vectors of data values.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>further arguments to be passed to or from methods.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>idx</code></td>
+<td>
+<p>vector or factor object denoting cluster membership for <code>x</code> observations (or cluster
+membership for paired observations when <code>paired</code> is <code>TRUE</code>). Length must be equal
+to length of <code>x</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>idy</code></td>
+<td>
+<p>vector or factor object denoting cluster membership for <code>y</code> observations. Length must be equal
+to length of <code>y</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alternative</code></td>
+<td>
+<p>indicates the alternative hypothesis and must be one of "<code>two.sided</code>", "<code>greater</code>",
+or "<code>less</code>".You can specify just the initial letter.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mu</code></td>
+<td>
+<p>a number specifying an optional parameter used to form the null hypothesis. Ignored when
+performing a rank-sum test. See 'Details'.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>paired</code></td>
+<td>
+<p>a logical indicating whether <code>x</code> and <code>y</code> are paired. When <code>TRUE</code>, the
+cluster-weighted signed rank test is performed.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+<p>a character string specifying the method of rank sum test to be performed. See 'Details'.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>formula</code></td>
+<td>
+<p>a formula of the form <code>lhs</code> ~ <code>rhs</code>, where <code>lhs</code> is a numeric variable
+giving the data values and <code>rhs</code> a numeric or factor with two levels giving the corresponding groups.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>id</code></td>
+<td>
+<p>a vector or factor object denoting cluster membership.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>an optional matrix or data frame containing variables in the formula <code>formula</code> and <code>id</code>.
+By default the variables are taken from <code>environment(formula)</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>subset</code></td>
+<td>
+<p>an optional vector specifying a subset of observations to be used.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>na.action</code></td>
+<td>
+<p>a function which indicates what should happen when data contain <code>NA</code>s. Defaults to
+<code>getOption("na.action")</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The formula interface is only applicable for the 2-sample rank-sum tests.
+</p>
+<p>If only <code>x</code> and <code>idx</code> are given, a cluster-weighted signed rank test of the null that
+the distribution of <code>x</code> is symmetric about <code>mu</code> is performed.
+</p>
+<p>If <code>x</code> and <code>y</code> are given and <code>paired</code> is <code>TRUE</code>, only <code>idx</code> is necessary (<code>idy</code>
+is ignored). In this case, a cluster-weighted signed-rank test of the null that the distribution of <code>x - y</code>
+is symmetric about <code>mu</code> is performed.
+</p>
+<p>When <code>method</code> is <code>cluster</code>, the cluster-weighted rank sum test of Datta and Satten (2005) is performed.
+The data must have complete intra-cluster group distribution (i.e., all clusters must contain observations
+belonging to both groups) for this test to be performed.
+</p>
+<p>When <code>method</code> is <code>group</code>, the group-weighted rank-sum test of Dutta and Datta (2015) is performed.
+This test is appropriate for clustered data with potentially informative intra-cluster group size. Incomplete
+intra-cluster group distribution is permitted.
+</p>
+<p>For the rank sum tests, the null is that the two groups follow the same marginal distribution. <code>mu</code> is
+ignored when performing these tests.
+</p>
+<p>The tests performed by this function involve computation of reweighted empirical CDFs. This is computationally
+intensive and can result in lengthy execution time for large data sets.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A list with class "<code>htest</code>" containing the following components:
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>statistic</code></td>
+<td>
+<p>the value of the test statistic.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>p.value</code></td>
+<td>
+<p>the p-value of the test.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>null.value</code></td>
+<td>
+<p>the location parameter <code>mu</code>. Always 0 for rank sum test.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>data.name</code></td>
+<td>
+<p>a character string giving the name(s) of the data and the total number of clusters.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+<p>a character string indicating the test performed and method of construction.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alternative</code></td>
+<td>
+<p>a character string describing the alternative hypothesis.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>M</code></td>
+<td>
+<p>the number of clusters.</p>
+</td>
+</tr>
+</table>
+<h3>References</h3>
+
+<p>Datta, S., Satten, G. (2005) Rank-sum tests for clustered data.
+<em>J. Am. Stat. Assoc.</em>, <b>100</b>, 908–915.
+</p>
+<p>Datta, S., Satten, G. (2008) A signed-rank test for clustered data.
+<em>Biometrics</em>, <b>64</b>, 501–507.
+</p>
+<p>Dutta, S., Datta, S. (2015) A rank-sum test for clustered data when the number of subjects in a
+group within a cluster is informative. <em>Biometrics</em>, <b>72</b>, 432–440.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+  data(screen8)
+  ## One-sample signed rank test
+  wilcoxtestClust(x=screen8$math, idx=screen8$sch.id, mu=70)
+
+  ## Paired signed rank test
+  wilcoxtestClust(x=screen8$math, y=screen8$read, idx=screen8$sch.id, paired=TRUE, mu=10)
+
+  ## Cluster-weighted rank sum test
+  wilcoxtestClust(math~gender, id=sch.id, data=screen8)
+
+
+  ## Group-weighted rank sum test
+  boys &lt;- subset(screen8, gender=='M')
+  girls &lt;- subset(screen8, gender=='F')
+  wilcoxtestClust(x=boys$math, y=girls$math, idx=boys$sch.id, idy=girls$sch.id, method="group")
+
+  ## Group-weighted rank sum test using formula method
+  wilcoxtestClust(math~gender, id=sch.id, data=screen8, method="group")
+
+</code></pre>
+
+
+</div>

@@ -1,0 +1,83 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>correct_qqplot</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+A function to draw the corrected quantile-quantile plot for p-max using the expected quantiles</h2>
+
+<h3>Description</h3>
+
+<p>A function to draw the corrected quantile-quantile (Q-Q) plots. The corrected quantiles were computed from 
+the mixture null distribution (green dots) and the naive quantiles were computed from the uniform distribution 
+(red dots).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">correct_qqplot(pmax, pnull, opt="all")
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>pmax</code></td>
+<td>
+
+<p>The vector for maximum  p-values </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pnull</code></td>
+<td>
+
+<p>The quantiles of pmax based on the estimated mixture null distribution
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>opt</code></td>
+<td>
+
+<p>Option to draw the plot. opt="all":use all the data points, 
+opt="subset": use a subset of the data points, in case there 
+are too many points in a genome-wide setting, to avoid drawing an overcrowded Q-Q plot with a prohibitive image size.
+</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>James Y. Dai and X. Wang
+</p>
+
+
+<h3>References</h3>
+
+<p>James Y. Dai, Janet L. Stanford, Michael LeBlanc. A multiple-testing 
+procedure for high-dimensional mediation hypotheses, 
+Journal of the American Statistical Association, 2020, DOI: 10.1080/01621459.2020.1765785. 
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(snp_input)
+input_pvalues &lt;- snp_input
+#To save time for illustration, we use 10 percent of rows
+input_pvalues &lt;- input_pvalues[sample(1:nrow(input_pvalues),
+                               size=ceiling(nrow(input_pvalues)/10)),]
+
+pmax &lt;- apply(input_pvalues,1,max)
+nullprop &lt;- null_estimation(input_pvalues)
+pnull1 &lt;- adjust_quantile(nullprop$alpha10,nullprop$alpha01,nullprop$alpha00,
+                          nullprop$alpha1,nullprop$alpha2,input_pvalues,exact=1)
+correct_qqplot(pmax,pnull1)
+</code></pre>
+
+
+</div>

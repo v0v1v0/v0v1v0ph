@@ -1,0 +1,197 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>huge.select</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Model selection for high-dimensional undirected graph estimation</h2>
+
+<h3>Description</h3>
+
+<p>Implements the regularization parameter selection for high dimensional undirected graph estimation. The optional approaches are rotation information criterion (ric), stability approach to regularization selection (stars) and extended Bayesian information criterion (ebic).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">huge.select(
+  est,
+  criterion = NULL,
+  ebic.gamma = 0.5,
+  stars.thresh = 0.1,
+  stars.subsample.ratio = NULL,
+  rep.num = 20,
+  verbose = TRUE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>est</code></td>
+<td>
+<p>An object with S3 class <code>"huge"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>criterion</code></td>
+<td>
+<p>Model selection criterion. <code>"ric"</code> and <code>"stars"</code> are available for all 3 graph estimation methods. <code>ebic</code> is only applicable when <code>est$method = "glasso"</code> in <code>huge()</code>. The default value is <code>"ric"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ebic.gamma</code></td>
+<td>
+<p>The tuning parameter for ebic. The default value is 0.5. Only applicable when <code>est$method = "glasso"</code> and <code>criterion = "ebic"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>stars.thresh</code></td>
+<td>
+<p>The variability threshold in stars. The default value is <code>0.1</code>. An alternative value is <code>0.05</code>. Only applicable when <code>criterion = "stars"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>stars.subsample.ratio</code></td>
+<td>
+<p>The subsampling ratio. The default value is <code>10*sqrt(n)/n</code> when <code>n&gt;144</code> and <code>0.8</code> when <code>n&lt;=144</code>, where <code>n</code> is the sample size. Only applicable when <code>criterion = "stars"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rep.num</code></td>
+<td>
+<p>The number of subsamplings when <code>criterion = "stars"</code> or rotations when <code>criterion = "ric"</code>. The default value is <code>20</code>. NOT applicable when <code>criterion = "ebic"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p>If <code>verbose = FALSE</code>, tracing information printing is disabled. The default value is <code>TRUE</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Stability approach to regularization selection (stars) is a natural way to select optimal regularization parameter for all three estimation methods. It selects the optimal graph by variability of subsamplings and tends to overselect edges in Gaussian graphical models. Besides selecting the regularization parameters, stars can also provide an additional estimated graph by merging the corresponding subsampled graphs using the frequency counts. The subsampling procedure in stars may NOT be very efficient, we also provide the recent developed highly efficient, rotation information criterion approach (ric). Instead of tuning over a grid by cross-validation or subsampling, we directly estimate the optimal regularization parameter based on random Rotations. However, ric usually has very good empirical performances but suffers from underselections sometimes. Therefore, we suggest if user are sensitive of false negative rates, they should either consider increasing <code>r.num</code> or applying the stars to model selection. Extended Bayesian information criterion (ebic) is another competitive approach, but the <code>ebic.gamma</code> can only be tuned by experience.
+</p>
+
+
+<h3>Value</h3>
+
+<p>An object with S3 class "select" is returned:
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>refit</code></td>
+<td>
+
+<p>The optimal graph selected from the graph path
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>opt.icov</code></td>
+<td>
+
+<p>The optimal precision matrix from the path only applicable when <code>method = "glasso"</code>
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>opt.cov</code></td>
+<td>
+
+<p>The optimal covariance matrix from the path only applicable when <code>method = "glasso"</code> and <code>est$cov</code> is available.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>merge</code></td>
+<td>
+
+<p>The graph path estimated by merging the subsampling paths. Only applicable when the input <code>criterion = "stars"</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>variability</code></td>
+<td>
+
+<p>The variability along the subsampling paths. Only applicable when the input <code>criterion = "stars"</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ebic.scores</code></td>
+<td>
+
+<p>Extended BIC scores for regularization parameter selection. Only applicable when <code>criterion = "ebic"</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>opt.index</code></td>
+<td>
+
+<p>The index of the selected regularization parameter. NOT applicable when the input <code>criterion = "ric"</code>
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>opt.lambda</code></td>
+<td>
+
+<p>The selected regularization/thresholding parameter.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>opt.sparsity</code></td>
+<td>
+
+<p>The sparsity level of <code>"refit"</code>.
+</p>
+</td>
+</tr>
+</table>
+<p>and anything else included in the input <code>est</code>
+</p>
+
+
+<h3>Note</h3>
+
+<p>The model selection is NOT available when the data input is the sample covariance matrix.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>huge</code> and <code>huge-package</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">#generate data
+L = huge.generator(d = 20, graph="hub")
+out.mb = huge(L$data)
+out.ct = huge(L$data, method = "ct")
+out.glasso = huge(L$data, method = "glasso")
+
+#model selection using ric
+out.select = huge.select(out.mb)
+plot(out.select)
+
+#model selection using stars
+#out.select = huge.select(out.ct, criterion = "stars", stars.thresh = 0.05,rep.num=10)
+#plot(out.select)
+
+#model selection using ebic
+out.select = huge.select(out.glasso,criterion = "ebic")
+plot(out.select)
+</code></pre>
+
+
+</div>

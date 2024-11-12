@@ -1,0 +1,392 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>ts_model_auto_tune</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Time Series Model Tuner</h2>
+
+<h3>Description</h3>
+
+<p>This function will create a tuned model. It uses the <code>ts_model_spec_tune_template()</code>
+under the hood to get the generic template that is used in the grid search.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">ts_model_auto_tune(
+  .modeltime_model_id,
+  .calibration_tbl,
+  .splits_obj,
+  .drop_training_na = TRUE,
+  .date_col,
+  .value_col,
+  .tscv_assess = "12 months",
+  .tscv_skip = "6 months",
+  .slice_limit = 6,
+  .facet_ncol = 2,
+  .grid_size = 30,
+  .num_cores = 1,
+  .best_metric = "rmse"
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>.modeltime_model_id</code></td>
+<td>
+<p>The .model_id from a calibrated modeltime table.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.calibration_tbl</code></td>
+<td>
+<p>A calibrated modeltime table.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.splits_obj</code></td>
+<td>
+<p>The time_series_split object.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.drop_training_na</code></td>
+<td>
+<p>A boolean that will drop NA values from the training(splits)
+data</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.date_col</code></td>
+<td>
+<p>The column that holds the date values.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.value_col</code></td>
+<td>
+<p>The column that holds the time series values.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.tscv_assess</code></td>
+<td>
+<p>A character expression like "12 months". This gets passed to
+<code>timetk::time_series_cv()</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.tscv_skip</code></td>
+<td>
+<p>A character expression like "6 months". This gets passed to
+<code>timetk::time_series_cv()</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.slice_limit</code></td>
+<td>
+<p>An integer that gets passed to <code>timetk::time_series_cv()</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.facet_ncol</code></td>
+<td>
+<p>The number of faceted columns to be passed to plot_time_series_cv_plan</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.grid_size</code></td>
+<td>
+<p>An integer that gets passed to the <code>dials::grid_latin_hypercube()</code>
+function.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.num_cores</code></td>
+<td>
+<p>The default is 1, you can set this to any integer value as long
+as it is equal to or less than the available cores on your machine.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.best_metric</code></td>
+<td>
+<p>The default is "rmse" and this can be set to any default dials
+metric. This must be passed as a character.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>This function can work with the following parsnip/modeltime engines:
+</p>
+
+<ul>
+<li>
+<p> "auto_arima"
+</p>
+</li>
+<li>
+<p> "auto_arima_xgboost"
+</p>
+</li>
+<li>
+<p> "ets"
+</p>
+</li>
+<li>
+<p> "croston"
+</p>
+</li>
+<li>
+<p> "theta"
+</p>
+</li>
+<li>
+<p> "stlm_ets"
+</p>
+</li>
+<li>
+<p> "tbats"
+</p>
+</li>
+<li>
+<p> "stlm_arima"
+</p>
+</li>
+<li>
+<p> "nnetar"
+</p>
+</li>
+<li>
+<p> "prophet"
+</p>
+</li>
+<li>
+<p> "prophet_xgboost"
+</p>
+</li>
+<li>
+<p> "lm"
+</p>
+</li>
+<li>
+<p> "glmnet"
+</p>
+</li>
+<li>
+<p> "stan"
+</p>
+</li>
+<li>
+<p> "spark"
+</p>
+</li>
+<li>
+<p> "keras"
+</p>
+</li>
+<li>
+<p> "earth"
+</p>
+</li>
+<li>
+<p> "xgboost"
+</p>
+</li>
+<li>
+<p> "kernlab"
+</p>
+</li>
+</ul>
+<p>This function returns a list object with several items inside of it. There are
+three categories of items that are inside of the list.
+</p>
+
+<ul>
+<li> <p><code>data</code>
+</p>
+</li>
+<li> <p><code>model_info</code>
+</p>
+</li>
+<li> <p><code>plots</code>
+</p>
+</li>
+</ul>
+<p>The <code>data</code> section has the following items:
+</p>
+
+<ul>
+<li> <p><code>calibration_tbl</code> This is the calibration data passed into the function.
+</p>
+</li>
+<li> <p><code>calibration_tuned_tbl</code> This is a calibration tibble that has used the
+tuned workflow.
+</p>
+</li>
+<li> <p><code>tscv_data_tbl</code> This is the tibble of the time series cross validation.
+</p>
+</li>
+<li> <p><code>tuned_results</code> This is a tuning results tibble with all slices from the
+time series cross validation.
+</p>
+</li>
+<li> <p><code>best_tuned_results_tbl</code> This is a tibble of the parameters for the best
+test set with the chosen metric.
+</p>
+</li>
+<li> <p><code>tscv_obj</code> This is the actual time series cross validation object returned
+from <code>timetk::time_series_cv()</code>
+</p>
+</li>
+</ul>
+<p>The <code>model_info</code> section has the following items:
+</p>
+
+<ul>
+<li> <p><code>model_spec</code> This is the original modeltime/parsnip model specification.
+</p>
+</li>
+<li> <p><code>model_spec_engine</code> This is the engine used for the model specification.
+</p>
+</li>
+<li> <p><code>model_spec_tuner</code> This is the tuning model template returned from <code>ts_model_spec_tune_template()</code>
+</p>
+</li>
+<li> <p><code>plucked_model</code> This is the model that we have plucked from the calibration tibble
+for tuning.
+</p>
+</li>
+<li> <p><code>wflw_tune_spec</code> This is a new workflow with the <code>model_spec_tuner</code> attached.
+</p>
+</li>
+<li> <p><code>grid_spec</code> This is the grid search specification for the tuning process.
+</p>
+</li>
+<li> <p><code>tuned_tscv_wflw_spec</code> This is the final tuned model where the workflow and
+model have been finalized. This would be the model that you would want to
+pull out if you are going to work with it further.
+</p>
+</li>
+</ul>
+<p>The <code>plots</code> section has the following items:
+</p>
+
+<ul>
+<li> <p><code>tune_results_plt</code> This is a static ggplot of the grid search.
+</p>
+</li>
+<li> <p><code>tscv_pl</code> This is the time series cross validation plan plot.
+</p>
+</li>
+</ul>
+<h3>Value</h3>
+
+<p>A list object with multiple items.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Steven P. Sanderson II, MPH
+</p>
+
+
+<h3>See Also</h3>
+
+<p>Other Model Tuning: 
+<code>ts_model_spec_tune_template()</code>
+</p>
+<p>Other Utility: 
+<code>auto_stationarize()</code>,
+<code>calibrate_and_plot()</code>,
+<code>internal_ts_backward_event_tbl()</code>,
+<code>internal_ts_both_event_tbl()</code>,
+<code>internal_ts_forward_event_tbl()</code>,
+<code>model_extraction_helper()</code>,
+<code>ts_get_date_columns()</code>,
+<code>ts_info_tbl()</code>,
+<code>ts_is_date_class()</code>,
+<code>ts_lag_correlation()</code>,
+<code>ts_model_compare()</code>,
+<code>ts_model_rank_tbl()</code>,
+<code>ts_model_spec_tune_template()</code>,
+<code>ts_qq_plot()</code>,
+<code>ts_scedacity_scatter_plot()</code>,
+<code>ts_to_tbl()</code>,
+<code>util_difflog_ts()</code>,
+<code>util_doublediff_ts()</code>,
+<code>util_doubledifflog_ts()</code>,
+<code>util_log_ts()</code>,
+<code>util_singlediff_ts()</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+suppressPackageStartupMessages(library(modeltime))
+suppressPackageStartupMessages(library(timetk))
+suppressPackageStartupMessages(library(dplyr))
+
+data &lt;- ts_to_tbl(AirPassengers) %&gt;%
+  select(-index)
+
+splits &lt;- time_series_split(
+    data
+    , date_col
+    , assess = 12
+    , skip = 3
+    , cumulative = TRUE
+)
+
+rec_objs &lt;- ts_auto_recipe(
+  .data = data
+  , .date_col = date_col
+  , .pred_col = value
+)
+
+wfsets &lt;- ts_wfs_mars(
+  .model_type = "earth"
+  , .recipe_list = rec_objs
+)
+
+wf_fits &lt;- wfsets %&gt;%
+  modeltime_fit_workflowset(
+    data = training(splits)
+    , control = control_fit_workflowset(
+     allow_par = TRUE
+     , verbose = TRUE
+    )
+  )
+
+models_tbl &lt;- wf_fits %&gt;%
+  filter(.model != "NULL")
+
+calibration_tbl &lt;- models_tbl %&gt;%
+  modeltime_calibrate(new_data = testing(splits))
+
+output &lt;- ts_model_auto_tune(
+  .modeltime_model_id = 1,
+  .calibration_tbl = calibration_tbl,
+  .splits_obj = splits,
+  .drop_training_na = TRUE,
+  .date_col = date_col,
+  .value_col = value,
+  .tscv_assess = "12 months",
+  .tscv_skip = "3 months",
+  .num_cores = parallel::detectCores() - 1
+)
+
+## End(Not run)
+
+</code></pre>
+
+
+</div>

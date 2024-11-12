@@ -1,0 +1,192 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>eff.mu</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Create data sets for plots</h2>
+
+<h3>Description</h3>
+
+<p>These functions create the data sets used in the plots. The first part of the name denotes the 
+output created. Thus, <code>eff.sigma</code>, <code>eff.mu</code>, <code>eff.rho</code> create efficacy values, while 
+<code>pp.sigma</code>, <code>pp.mu</code>, <code>pp.rho</code>  create percent protected values. The second part of the 
+name is the parameter which is changed. For example, <code>eff.sigma</code> creates efficacy values for different 
+values of sigma. See details for a more complete  description. Default for eff. functions is integration, default
+for pp. functions is simulation.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">eff.sigma(mu, sigmas, COLORS = c("red", "green", "blue"), 
+    rho = 0, ...)
+eff.mu(mu, factor = c(1/10, 1/3, 1/2, 1), 
+    COLORS = c("red", "green", "blue", "black"), 
+    sigma = 0.553, rho = 0, ...)
+eff.rho(mu, sigma = 0.553, rho = c(0, 0.25, 0.5, 0.75, 1),
+    COLORS = c("black", "blue", "green", "red", "black"), ...)
+pp.sigma(mu, sigmas, COLORS = c("red", "green", "blue"), 
+    rho = 0, nsim = 10^5)
+pp.mu(mu, factor = c(1/10,1/3,1/2,1), 
+    COLORS = c("red", "green", "blue", "black"), 
+    sigma =0.553, rho = 0, nsim = 10^5)
+pp.rho(mu, sigma = 0.553, rho = c(0, 0.25, 0.5, 0.75, 1), 
+    COLORS = c("black", "blue", "green", "red", "black"), 
+    nsim = 10^5)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>mu</code></td>
+<td>
+<p>a vector of values of the mean of the log10 antibody</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>factor</code></td>
+<td>
+<p>a vector of values for defining the means of the second and third component (see details and warnings)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>COLORS</code></td>
+<td>
+<p>colors for the plots, the ith color corresponds to the ith value of the parameter which is changing</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sigmas</code></td>
+<td>
+<p>a vector of values of the standard deviation of the log10 antibody</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sigma</code></td>
+<td>
+<p>a single value for sigma</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rho</code></td>
+<td>
+<p>correlation vector (of length one for .sigma and .mu functions) of the log10 antibody, negative values not allowed</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nsim</code></td>
+<td>
+<p>number of simulations for hbpp function</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>additional parameters may be added to the <code>hbrr</code> function</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>For <code>eff.sigma</code> and <code>pp.sigma</code> we change sigma over the one, two, and three component model. 
+For <code>eff.mu</code> and <code>pp.mu</code> we change the mean over the two and three component model. For <code>eff.mu</code>
+and <code>pp.mu</code>
+the factor parameter is associated with each level of the second and third component.
+See <code>vignette("hbimdetails")</code> for details. 
+For <code>eff.rho</code> and <code>pp.rho</code>  we change the correlation over the two and three component model; for the jth column of the 
+out2 and out3 matrices, all correlations are given by jth level of factor. Because these calculations may take 
+hours, we save the original calculations used in the paper as output data, 
+<code>deff.sigma</code>,  
+<code>deff.mu</code>,  
+<code>deff.rho</code>, 
+<code>dpp.sigma</code>,  
+<code>dpp.mu</code>, and  
+<code>dpp.rho</code>. These output data set may be accessed by the command data(). For example, to access 
+<code>deff.sigma</code> type <code>data(deff.sigma)</code>. 
+</p>
+
+
+<h3>Value</h3>
+
+<p>A list with items
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>out1</code></td>
+<td>
+<p>response matrix for one component model, ith row corresponds to mu[i] and jth column corresponds to the jth level of the parameter which is changing</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>col1</code></td>
+<td>
+<p>colors corresponding to columns of out1</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>out2</code></td>
+<td>
+<p>response matrix for two component model, ith row corresponds to mu[i] and jth column corresponds to the jth level of the parameter which is changing</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>col2</code></td>
+<td>
+<p>colors corresponding to columns of out2</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>out3</code></td>
+<td>
+<p>response matrix for three component model, ith row corresponds to mu[i] and jth column corresponds to the jth level of the parameter which is changing</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>col3</code></td>
+<td>
+<p>colors corresponding to columns of out3</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cparms</code></td>
+<td>
+<p>input vector of parameter that changes, e.g., factor vector</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sigma</code></td>
+<td>
+<p>input sigma</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rho</code></td>
+<td>
+<p>input rho</p>
+</td>
+</tr>
+</table>
+<h3>Warning</h3>
+
+<p>Note to save computation time these functions do not check that all variance-covariance matrices used 
+in the internal fucntions are positive definite. If you get an error message you do not understand check to see if the variance-covariance matrix is 
+positive definite by checking the eigen values. For example, with sigma=1, rho=-.6, the 3 components model do not have a positive definite variance-covariance
+matrix because there is a negative eigenvalue 
+(to see this run <code>eigen(make.v(3,-.6,1)) </code>). 
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>M.P. Fay</p>
+
+
+<h3>See Also</h3>
+
+ <p><code>vignette("hbimdetails")</code> </p>
+
+
+</div>

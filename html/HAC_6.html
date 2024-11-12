@@ -1,0 +1,154 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>estimate.copula</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Estimation of Hierarchical Archimedean Copulae
+</h2>
+
+<h3>Description</h3>
+
+<p>The function estimates the parameters and determines the structure of Hierarchical Archimedean Copulae.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">estimate.copula(X, type = 1, method = 1, hac = NULL, epsilon = 0, 
+agg.method = "mean", margins = NULL, na.rm = FALSE, max.min = TRUE, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>X</code></td>
+<td>
+
+<p>a <code class="reqn">n \times d</code> matrix. If there are no <code>colnames</code> provided, the names <code>X1, X2, ...</code> will be given.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>type</code></td>
+<td>
+
+<p>defines the copula family, see <code>phi</code> for an overview of implemented families.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+
+<p>the estimation method. Select between quasi Maximum Likelihood <code>1</code>, full Maximum Likelihood <code>2</code>, recursive Maximum Likelihood <code>3</code> and penalized Maximum Likelihood <code>4</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>hac</code></td>
+<td>
+
+<p>a <code>hac</code> object, which determines the structure and provides initial values. An object must be provided, if <code>method = 2</code> referring to the full Maximum Likelihood procedure.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>epsilon</code></td>
+<td>
+
+<p>scalar <code class="reqn">\geq 0</code>. The variables of consecutive nodes are aggregated, if the difference of the dependency parameters is smaller than <code>epsilon</code>. For a detailed explanation see also <code>aggregate.hac</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>agg.method</code></td>
+<td>
+
+<p>if <code class="reqn">\epsilon &gt; 0</code>, the new dependency parameter can be determined by <code>"mean"</code>, <code>"min"</code> or <code>"max"</code> of the two parameters, see <code>aggregate.hac</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>margins</code></td>
+<td>
+
+<p>specifies the margins. The data matrix is assumed to contain the values of the marginal distributions by default, i.e. <code>margins = NULL</code>. If raw data are used, the margins can be determined nonparametrically, <code>"edf"</code>, or in a parametric way, e.g. <code>"norm"</code>. Following the latter approach, the parameters of the distributions are estimated by Maximum Likelihood. Building on these estimates the values of the univariate margins are computed. If the argument is defined as scalar, all margins are computed according to this specification. Otherwise, different margins can be defined, e.g. <code>c("norm", "t", "edf")</code> for a 3-dimensional sample. Almost all continuous functions of <code>Distributions</code> are available. Inappropriate usage of this argument might lead to misspecified margins, e.g. application of <code>"exp"</code> even though the sample contains negative values.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>na.rm</code></td>
+<td>
+
+<p>boolean. If <code>na.rm = TRUE</code>, missing values, <code>NA</code>, contained in <code>X</code> are removed.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>max.min</code></td>
+<td>
+
+<p>boolean. If <code>max.min = TRUE</code> and an element of <code>X</code> is <code class="reqn">\geq 1</code> or <code class="reqn">\leq 0</code>, it is set to <code class="reqn">1-10^{-8}</code> and <code class="reqn">10^{-8}</code> respectively.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+
+<p>further arguments passed to or from other methods, e.g. <code>na.omit</code>.
+</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A <span class="env">hac</span> object is returned.
+</p>
+
+
+<h3>References</h3>
+
+<p>Genest, C., Ghoudi, K., and Rivest, L. P. 1995, A Semiparametric Estimation Procedure of Dependence Parameters in Multivariate Families of Distributions, <em>Biometrika</em> 82, 543-552.
+</p>
+<p>Gorecki, J., Hofert, M. and Holena, M. 2014, On the Consistency of an Estimator for Hierarchical Archimedean Copulas, In Talaysova, J., Stoklasa, J., Talaysek, T. (Eds.) <em>32nd International Conference on Mathematical Methods in Economics, Olomouc: Palacky University</em>, 239-244.
+</p>
+<p>Joe, H. 2005, Asymptotic Efficiency of the Two-Stage Estimation Method for Copula-Based Models, <em>Journal of Multivariate Analysis</em> 94(2), 401-419.
+</p>
+<p>Okhrin, O., Okhrin, Y. and Schmid, W. 2013, On the Structure and Estimation of Hierarchical Archimedean Copulas, <em>Journal of Econometrics</em> 173, 189-204.
+</p>
+<p>Okhrin, O. and Ristig, A. 2014, Hierarchical Archimedean Copulae: The <code style="white-space: pre;">⁠HAC⁠</code> Package", <em>Journal of Statistical Software</em>, 58(4), 1-20, <a href="https://doi.org/10.18637/jss.v058.i04">doi:10.18637/jss.v058.i04</a>.
+</p>
+<p>Okhrin, O., Ristig, A., Sheen J. and Trueck, S. 2015, Conditional Systemic Risk with Penalized Copula, <em>SFB 649 Discussion Paper 2015-038, Sonderforschungsbereich 649, Humboldt University, Germany</em>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># define the copula model
+tree = list(list("X1", "X5", 3), list("X2", "X3", "X4", 4), 2)
+model = hac(type = 1, tree = tree)
+
+# sample from copula model
+x = rHAC(100, model)
+
+# in the following case the true model is binary approximated
+est.obj = estimate.copula(x, type = 1, method = 1, epsilon = 0)
+plot(est.obj)
+
+# consider also the aggregation of the variables
+est.obj = estimate.copula(x, type = 1, method = 1, epsilon = 0.2)
+plot(est.obj)
+
+# full ML estimation to yield more precise parameter
+est.obj.full = estimate.copula(x, type = 1, method = 2, hac = est.obj)
+
+# recursive ML estimation leads to almost identical results
+est.obj.r = estimate.copula(x, type = 1, method = 3)
+</code></pre>
+
+
+</div>

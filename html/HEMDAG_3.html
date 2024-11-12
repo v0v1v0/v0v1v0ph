@@ -1,0 +1,110 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>auprc</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>AUPRC measures</h2>
+
+<h3>Description</h3>
+
+<p>Compute the Area under the Precision Recall Curve (AUPRC) through <span class="pkg">precrec</span> package.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">auprc.single.class(labels, scores, folds = NULL, seed = NULL)
+
+auprc.single.over.classes(target, predicted, folds = NULL, seed = NULL)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>labels</code></td>
+<td>
+<p>vector of the true labels (0 negative, 1 positive examples).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>scores</code></td>
+<td>
+<p>a numeric vector of the values of the predicted labels (scores).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>folds</code></td>
+<td>
+<p>number of folds on which computing the AUPRC. If <code>folds=NULL</code> (<code>def.</code>), the AUPRC is computed one-shot,
+otherwise the AUPRC is computed averaged across folds.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>seed</code></td>
+<td>
+<p>initialization seed for the random generator to create folds. Set <code>seed</code> only if <code>folds</code><code class="reqn">\neq</code><code>NULL</code>.
+If <code>seed=NULL</code> and <code>folds</code><code class="reqn">\neq</code><code>NULL</code>, the AUPRC averaged across folds is computed without seed initialization.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>target</code></td>
+<td>
+<p>matrix with the target multilabel: rows correspond to examples and columns to classes.
+<code class="reqn">target[i,j]=1</code> if example <code class="reqn">i</code> belongs to class <code class="reqn">j</code>, <code class="reqn">target[i,j]=0</code> otherwise.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>predicted</code></td>
+<td>
+<p>a numeric matrix with predicted values (scores): rows correspond to examples and columns to classes.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The AUPRC (for a single class or for a set of classes) is computed either one-shot or averaged across stratified folds.
+</p>
+<p><code>auprc.single.class</code> computes the AUPRC just for a given class.
+</p>
+<p><code>auprc.single.over.classes</code> computes the AUPRC for a set of classes, returning also the averaged values across the classes.
+</p>
+<p>For all those classes having zero annotations, the AUPRC is set to 0. These classes are discarded in the computing of the AUPRC
+averaged across classes, both when the AUPRC is computed one-shot or averaged across stratified folds.
+</p>
+<p>Names of rows and columns of <code>labels</code> and <code>predicted</code> matrix must be provided in the same order, otherwise a stop message is returned.
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>auprc.single.class</code> returns a numeric value corresponding to the AUPRC for the considered class;
+<code>auprc.single.over.classes</code> returns a list with two elements:
+</p>
+
+<ol>
+<li>
+<p> average: the average AUPRC across classes;
+</p>
+</li>
+<li>
+<p> per.class: a named vector with AUPRC for each class. Names correspond to classes.
+</p>
+</li>
+</ol>
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(labels);
+data(scores);
+data(graph);
+root &lt;- root.node(g);
+L &lt;- L[,-which(colnames(L)==root)];
+S &lt;- S[,-which(colnames(S)==root)];
+prc.single.class &lt;- auprc.single.class(L[,3], S[,3], folds=5, seed=23);
+prc.over.classes &lt;- auprc.single.over.classes(L, S, folds=5, seed=23);
+</code></pre>
+
+
+</div>

@@ -1,0 +1,165 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>compare_by_validate</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Compare high-dimensional Cox models by model validation</h2>
+
+<h3>Description</h3>
+
+<p>Compare high-dimensional Cox models by model validation
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">compare_by_validate(
+  x,
+  time,
+  event,
+  model.type = c("lasso", "alasso", "flasso", "enet", "aenet", "mcp", "mnet", "scad",
+    "snet"),
+  method = c("bootstrap", "cv", "repeated.cv"),
+  boot.times = NULL,
+  nfolds = NULL,
+  rep.times = NULL,
+  tauc.type = c("CD", "SZ", "UNO"),
+  tauc.time,
+  seed = 1001,
+  trace = TRUE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>Matrix of training data used for fitting the model;
+on which to run the validation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>time</code></td>
+<td>
+<p>Survival time.
+Must be of the same length with the number of rows as <code>x</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>event</code></td>
+<td>
+<p>Status indicator, normally 0 = alive, 1 = dead.
+Must be of the same length with the number of rows as <code>x</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>model.type</code></td>
+<td>
+<p>Model types to compare. Could be at least two
+of <code>"lasso"</code>, <code>"alasso"</code>, <code>"flasso"</code>, <code>"enet"</code>,
+<code>"aenet"</code>, <code>"mcp"</code>, <code>"mnet"</code>, <code>"scad"</code>,
+or <code>"snet"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+<p>Validation method.
+Could be <code>"bootstrap"</code>, <code>"cv"</code>, or <code>"repeated.cv"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>boot.times</code></td>
+<td>
+<p>Number of repetitions for bootstrap.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nfolds</code></td>
+<td>
+<p>Number of folds for cross-validation and
+repeated cross-validation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rep.times</code></td>
+<td>
+<p>Number of repeated times for repeated cross-validation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tauc.type</code></td>
+<td>
+<p>Type of time-dependent AUC.
+Including <code>"CD"</code> proposed by Chambless and Diao (2006).,
+<code>"SZ"</code> proposed by Song and Zhou (2008).,
+<code>"UNO"</code> proposed by Uno et al. (2007).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tauc.time</code></td>
+<td>
+<p>Numeric vector. Time points at which to evaluate
+the time-dependent AUC.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>seed</code></td>
+<td>
+<p>A random seed for cross-validation fold division.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>trace</code></td>
+<td>
+<p>Logical. Output the validation progress or not.
+Default is <code>TRUE</code>.</p>
+</td>
+</tr>
+</table>
+<h3>References</h3>
+
+<p>Chambless, L. E. and G. Diao (2006).
+Estimation of time-dependent area under the ROC curve for long-term
+risk prediction.
+<em>Statistics in Medicine</em> 25, 3474–3486.
+</p>
+<p>Song, X. and X.-H. Zhou (2008).
+A semiparametric approach for the covariate specific ROC curve with
+survival outcome.
+<em>Statistica Sinica</em> 18, 947–965.
+</p>
+<p>Uno, H., T. Cai, L. Tian, and L. J. Wei (2007).
+Evaluating prediction rules for t-year survivors with censored
+regression models.
+<em>Journal of the American Statistical Association</em> 102, 527–537.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(smart)
+x &lt;- as.matrix(smart[, -c(1, 2)])[1:1000, ]
+time &lt;- smart$TEVENT[1:1000]
+event &lt;- smart$EVENT[1:1000]
+
+# Compare lasso and adaptive lasso by 5-fold cross-validation
+cmp.val.cv &lt;- compare_by_validate(
+  x, time, event,
+  model.type = c("lasso", "alasso"),
+  method = "cv", nfolds = 5, tauc.type = "UNO",
+  tauc.time = seq(0.25, 2, 0.25) * 365, seed = 1001
+)
+
+print(cmp.val.cv)
+summary(cmp.val.cv)
+plot(cmp.val.cv)
+plot(cmp.val.cv, interval = TRUE)
+</code></pre>
+
+
+</div>

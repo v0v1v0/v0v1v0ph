@@ -1,0 +1,122 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>wl2i</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Conversion between Wavelength and Spectra Matrix Column
+Index <code>wl2i</code> returns the column indices for the spectra matrix for the given wavelengths.
+<code>i2wl</code> converts column indices into wavelengths.</h2>
+
+<h3>Description</h3>
+
+<p>If <code>wavelength</code> is numeric, each of its elements is converted to the respective index.
+Values outside the range of <code>x@wavelength</code> become <code>NA</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">wl2i(x, wavelength = stop("wavelengths are required."), unlist = TRUE)
+
+i2wl(x, i)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>a <code>hyperSpec</code> object</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>wavelength</code></td>
+<td>
+<p>the wavelengths to be converted into column indices,
+either numeric or a formula, see details.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>unlist</code></td>
+<td>
+<p>if multiple wavelength ranges are given, should the indices be unlisted or kept in a list?</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>i</code></td>
+<td>
+<p>the column indices into the spectra matrix for which the
+wavelength is to be computed</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>If the range is given as a formula (i.e. <code>start ~ end</code>, a sequence
+</p>
+<p>index corresponding to start : index corresponding to end
+</p>
+<p>is returned. If the wavelengths are not ordered, that may lead to chaos. In this case, call
+<code>orderwl</code> first.
+</p>
+<p>Two special variables can be used: <code>min</code> and <code>max</code>, corresponding to the lowest and
+highest wavelength of <code>x</code>, respectively.
+</p>
+<p>start and end may be complex numbers. The resulting index for a complex x is then
+</p>
+<p>index (Re (x)) + Im (x)
+</p>
+
+
+<h3>Value</h3>
+
+<p>A numeric containing the resulting indices for <code>wl2i</code>
+</p>
+<p><code>i2wl</code> returns a numeric with the wavelengths
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>C. Beleites
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+flu
+wl2i (flu, 405 : 407)
+wl2i (flu, 405 ~ 407)
+  
+## beginning of the spectrum to 407 nm 
+wl2i (flu, min ~ 407)
+
+## 2 data points from the beginning of the spectrum to 407 nm 
+wl2i (flu, min + 2i ~ 407)
+
+## the first 3 data points   
+wl2i (flu, min ~ min + 2i)
+
+## from 490 nm to end of the spectrum 
+wl2i (flu, 490 ~ max)
+  
+## the last 8 data points 
+wl2i (flu, max - 7i ~ max)
+  
+## get 450 nm +- 3 data points
+wl2i (flu, 450 - 3i ~ 450 + 3i) 
+  
+wl2i (flu, 300 : 400) ## all NA: 
+wl2i (flu, 600 ~ 700) ## NULL: completely outside flu's wavelength range
+
+  
+i2wl (chondro, 17:20)
+
+</code></pre>
+
+
+</div>

@@ -1,0 +1,117 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>colebrook</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Calculates the Darcy-Weisbach Friction Factor f</h2>
+
+<h3>Description</h3>
+
+<p>This function calculates the Darcy-Weisbach friction factor
+and is only provided in this package for use with water in circular pipes
+while the equation is technically valid for any liquid or channel.
+As with many parts of this package, techniques and formatting
+were drawn from Irucka Embry's iemisc package, which includes some
+methods with similar functionality. Two utility functions are included for velocity 
+and Reynolds Number.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">velocity(D = NULL, Q = NULL)
+
+reynolds_number(V = NULL, D = NULL, nu = NULL)
+
+colebrook(ks, V, D, nu)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>D</code></td>
+<td>
+<p>numeric vector that contains the pipe diameter [<code class="reqn">m</code> or <code class="reqn">ft</code>]
+which should be D &gt;=0.0025 m (0.0082 ft).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Q</code></td>
+<td>
+<p>(for velocity function only) numeric vector that contains the flow rate
+[<code class="reqn">m^3 s^{-1}</code> or <code class="reqn">ft^3 s^{-1}</code>]</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>V</code></td>
+<td>
+<p>numeric vector that contains the average Velocity of flow in the pipe,
+equal to flow divided by area, <code class="reqn">\frac{Q}{A}</code> [<code class="reqn">m\,s^{-1}</code> or <code class="reqn">ft\,s^{-1}</code>]</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nu</code></td>
+<td>
+<p>numeric vector that contains the kinematic viscosity of water,
+[<code class="reqn">m^2 s^{-1}</code> or <code class="reqn">ft^2 s^{-1}</code>]. Computed with a utility function in water_properties.R:
+kvisc(T=T, units=['SI' or 'Eng'])</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ks</code></td>
+<td>
+<p>numeric vector that contains the 'equivalent sand roughness height
+sand roughness height. Units should be consistent with other input [<code class="reqn">m</code> or <code class="reqn">ft</code>]</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The Colebrook-White equation was developed to estimate the Darcy-Weisbach friction factor
+for commercial pipes under turbulent flow conditions. It is recommended for pipe diameters greater 
+than 2.5 mm (0.1 inch).  The equation is: </p>
+<p style="text-align: center;"><code class="reqn">\frac{1}{\sqrt{f}} = -2\log\left(\frac{\frac{ks}{D}}{3.7} + \frac{2.51}{Re\sqrt{f}}\right)</code>
+</p>
+
+<p>where <code class="reqn">Re = \frac{VD}{nu}</code> is the unitless Reynolds Number.
+</p>
+
+
+<h3>Value</h3>
+
+<p>f Returns a numeric vector containing the Darcy-Weisbach friction
+factor
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Ed Maurer
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>kvisc</code> for kinematic viscosity, <code>velocity</code> for
+calculating <code class="reqn">V=\frac{Q}{A}</code>, <code>reynolds_number</code> for Reynolds number
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+# A Type 1 problem (solve for hf): US units
+D &lt;- 20/12   #diameter of 20 inches
+Q &lt;- 4       #flow in ft^3/s
+T &lt;- 60      #water temperature in F
+ks &lt;- 0.0005 #pipe roughness in ft
+
+f &lt;- colebrook(ks=ks,V=velocity(D,Q), D=D, nu=kvisc(T=T, units="Eng"))
+
+</code></pre>
+
+
+</div>

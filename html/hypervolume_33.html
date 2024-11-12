@@ -1,0 +1,111 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hypervolume_holes</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Hole detection
+</h2>
+
+<h3>Description</h3>
+
+<p>Detects the holes in an observed hypervolume relative to an expectation
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hypervolume_holes(hv.obs, hv.exp, set.num.points.max = NULL, set.check.memory = TRUE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>hv.obs</code></td>
+<td>
+
+<p>The observed hypervolume whose holes are to be detected
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>hv.exp</code></td>
+<td>
+
+<p>The expected hypervolume that provides a baseline expectation geometry
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>set.num.points.max</code></td>
+<td>
+
+<p>Maximum number of points to be used for set operations comparing <code>hv_obs</code> to <code>hv_exp</code>. Defaults to 10^(3+sqrt(n)), where n is the dimensionality of the input hypervolumes.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>set.check.memory</code></td>
+<td>
+
+<p>If <code>TRUE</code>, estimates the memory usage required to perform set operations, then exits. If <code>FALSE</code>, prints resource usage and continues algorithm. It is useful for preventing crashes to check the estimated memory usage on large or high dimensional datasets before running the full algorithm.
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>This algorithm has a good Type I error rate (rarely detects holes that do not actually exist). However it can have a high Type II error rate (failure to find holes when they do exist). To reduce this error rate, make sure to re-run the algorithm with input hypervolumes with higher values of <code>@PointDensity</code>, or increase <code>set.num.points.max</code>.
+</p>
+<p>The algorithm performs the set difference between the observed and expected hypervolumes, then removes stray points in this hypervolume by deleting any random point whose distance from any other random point is greater than expected.
+</p>
+<p>A 'rule of thumb' is that algorithm has acceptable statistical performance when log_e(m) &gt; n, where m is the number of data points and n is the dimensionality.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A <code>Hypervolume</code> object containing a uniformly random set of points describing the holes in <code>hv_obs</code>. Note that the point density of this object is likely to be much lower than that of the input hypervolumes due to the stochastic geometry algorithms used.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+# generate annulus data
+data_annulus &lt;- data.frame(matrix(data=runif(4000),ncol=2))
+names(data_annulus) &lt;- c("x","y")
+data_annulus  &lt;- subset(data_annulus, 
+sqrt((x-0.5)^2+(y-0.5)^2) &gt; 0.4 &amp; sqrt((x-0.5)^2+(y-0.5)^2) &lt; 0.5)
+
+# MAKE HYPERVOLUME (low reps for fast execution)
+hv_annulus &lt;- hypervolume_gaussian(data_annulus,
+                kde.bandwidth=0.05,name='annulus',samples.per.point=1)
+
+# GET CONVEX EXPECTATION
+hv_convex &lt;- expectation_convex(hypervolume_thin(hv_annulus,num.samples=500),
+                check.memory=FALSE,use.random=TRUE)
+
+# DETECT HOLES (low npoints for fast execution)
+features_annulus &lt;- hypervolume_holes(
+                      hv.obs=hv_annulus, 
+                      hv.exp=hv_convex,
+                      set.check.memory=FALSE)
+
+# CLEAN UP RESULTS
+features_segmented &lt;- hypervolume_segment(features_annulus, 
+                        check.memory=FALSE,distance.factor=2)
+features_segmented_pruned &lt;- hypervolume_prune(features_segmented, 
+                                volume.min=0.02)
+
+# PLOT RETAINED HOLE(S)
+plot(hypervolume_join(hv_annulus, features_segmented_pruned))
+
+## End(Not run)
+</code></pre>
+
+
+</div>

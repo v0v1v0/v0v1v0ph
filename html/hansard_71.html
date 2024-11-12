@@ -1,0 +1,118 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>lords_attendance_session</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>House of Lords attendance by session</h2>
+
+<h3>Description</h3>
+
+<p>Imports data on House of Lords attendance from each parliamentary session.
+Please note that the attendance data is not as tidy as some of the others
+that are accessible through this API, and so additional work to prepare
+this data in a way that you want may be required.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">lords_attendance_session(session_id = NULL, extra_args = NULL,
+  tidy = TRUE, tidy_style = "snake", verbose = TRUE)
+
+hansard_lords_attendance_session(session_id = NULL, extra_args = NULL,
+  tidy = TRUE, tidy_style = "snake", verbose = TRUE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>session_id</code></td>
+<td>
+<p>The ID of the House of Lords session. If <code>NULL</code>,
+returns a list of all sessions, subject to other parameters.
+Defaults to <code>NULL</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>extra_args</code></td>
+<td>
+<p>Additional parameters and queries to pass to API. These
+queries must be strings and start with "&amp;". See the
+<a href="http://explore.data.parliament.uk/">API documentation</a>
+or the package vignette for more details. Defaults to <code>NULL</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tidy</code></td>
+<td>
+<p>Logical parameter. If <code>TRUE</code>, fixes the variable names
+in the tibble to remove special characters and superfluous text, and
+converts the variable names to a consistent style. Defaults to <code>TRUE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tidy_style</code></td>
+<td>
+<p>The style to convert variable names to, if
+<code>tidy = TRUE</code>. Accepts any style accepted by to_any_case.
+Defaults to <code>'snake'</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p>If <code>TRUE</code>, displayes messages on the console on the
+progress of the API request. Defaults to <code>TRUE</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>To return a tibble with all codes from available individual sessions, use
+<code>lords_attendance_session(session_id=NULL)</code>, or use
+<code>lords_sessions()</code> to retrieve codes for a given date range.
+Attendance from multiple sessions can be accessed by using <code>lapply</code>
+with the output from <code>lords_sessions()</code>.
+</p>
+<p>Please note that House of Lords attendance data is not as tidy as some of
+the others that are accessible through this API, and so additional work
+on the return from the API may be required.
+</p>
+<p>Also note that this API does not appear to have been
+updated with data after 2017-01-31.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A tibble with details on the lords who attended a given session.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>lords_attendance_date()</code>
+</p>
+<p><code>lords_sessions()</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+x &lt;- lords_attendance_session(session_id = 706178)
+
+# Returns a list of data frames with details of
+# attendance for each day of a given vector of sessions.
+u &lt;- lords_sessions(start_date = "2017-01-01")
+m &lt;- lapply(u$about, lords_attendance_session)
+
+## End(Not run)
+
+</code></pre>
+
+
+</div>

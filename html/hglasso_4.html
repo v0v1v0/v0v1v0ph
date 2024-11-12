@@ -1,0 +1,213 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hcov</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Hub covariance graph
+</h2>
+
+<h3>Description</h3>
+
+<p>Estimates a sparse covariance matrix with hub nodes using a Lasso penalty and a sparse group Lasso penalty.  The estimated covariance matrix Sigma can be decomposed as Sigma = Z + V + t(V).  The details are given in Section 4 in Tan et al. (2014).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hcov(S, lambda1, lambda2=100000, lambda3=100000, convergence = 1e-10, 
+maxiter = 1000, start = "cold", var.init = NULL,trace=FALSE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>S</code></td>
+<td>
+
+<p>A p by p correlation/covariance matrix.  Cannot contain missing values.       
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lambda1</code></td>
+<td>
+
+<p>Non-negative regularization parameter for lasso on the matrix Z.  lambda=0 means no regularization.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lambda2</code></td>
+<td>
+
+<p>Non-negative regularization parameter for lasso on the matrix V.  lambda2=0 means no regularization.  The default value is lambda2=100000, encouraging V to be a zero matrix.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lambda3</code></td>
+<td>
+
+<p>Non-negative regularization parameter for group lasso on the matrix V.  lambda3=0 means no regularization.  The default value is lambda3=100000, encouraging V to be a zero matrix.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>convergence</code></td>
+<td>
+
+<p>Threshold for convergence.  Devault value is 1e-10. 
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>maxiter</code></td>
+<td>
+
+<p>Maximum number of iterations of ADMM algorithm.  Default is 1000 iterations.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>start</code></td>
+<td>
+
+<p>Type of start.  cold start is the default.  Using warm start, one can provide starting values for the parameters using object from hcov.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>var.init</code></td>
+<td>
+
+<p>Object from hcov that provides starting values for all the parameters when start="warm" is specified.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>trace</code></td>
+<td>
+
+<p>Default value of trace=FALSE.  If trace=TRUE, every 10 iterations of the ADMM algorithm is printed.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>This implements hub covariance graph estimation procedure using ADMM algorithm described in Section 4 in Tan et al. (2014), which estimates a sparse covariance matrix with hub nodes.  The estimated covariance matrix can be decomposed into Z + V + t(V): Z is a sparse matrix and V is a matrix that contains dense columns, each column corresponding to a hub node.  For the positive definite constraint Sigma &gt;= epsilon*I that appears in the optimization problem, we choose epsilon to be 0.001 by default.  
+</p>
+<p>The default value of lambda2=100000 and lambda3=100000 will yield  the estimator proposed by Xue et al. (2012).
+</p>
+<p>Note that tuning parameters lambda1 determines the sparsity of the matrix Z, lambda2 determines the sparsity of the selected hub nodes, and lambda3 determines the selection of hub nodes.  
+</p>
+
+
+<h3>Value</h3>
+
+<p>an object of class hcov.
+</p>
+<p>Among some internal variables, this object includes the elements
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>Sigma</code></td>
+<td>
+<p>Sigma is the estimated covariance matrix. Note that Sigma = Z + V + t(V).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>V</code></td>
+<td>
+<p>V is the estimated matrix that contain hub nodes used to compute Sigma.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Z</code></td>
+<td>
+<p>Z is the estimated sparse matrix used to compute Sigma.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>objective</code></td>
+<td>
+<p>Objective is the minimized objective value of the loss-function considered in Section 4 of Tan et al. (2014).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>iteration</code></td>
+<td>
+<p>The number of iterations of the ADMM algorithm until convergence.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>hubind</code></td>
+<td>
+<p>Indices for features that are estimated to be hub nodes</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>Kean Ming Tan
+</p>
+
+
+<h3>References</h3>
+
+<p>Tan et al. (2014). Learning graphical models with hubs. To appear in Journal of Machine Learning Research.  arXiv.org/pdf/1402.7349.pdf.
+</p>
+<p>Xue et al. (2012).  Positive-definite l1-penalized estimation of large covariance matrices.  Journal of the American Staitstical Association, 107:1480-1491.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>image.hcov</code>
+<code>plot.hcov</code>
+<code>summary.hcov</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">#############################################
+# Example for estimating covariance matrix
+# with hubs
+##############################################
+library(mvtnorm)
+set.seed(1)
+n=100
+p=100
+
+# a covariance with 4 hubs
+
+network &lt;- HubNetwork(p,0.95,4,0.1,type="covariance")
+Sigma &lt;- network$Theta
+hubind &lt;- network$hubcol
+x &lt;- rmvnorm(n,rep(0,p),Sigma)
+x &lt;- scale(x)
+
+# Estimate the covariance matrix
+res1&lt;-hcov(cov(x),0.3,0.2,1.2)
+summary(res1)
+# correctly identified two of the hub nodes
+
+# Plot the matrices V and Z 
+image(res1)
+dev.off()
+# Plot a graphical representation of the estimated covariance matrix --- covariance graph
+plot(res1)
+
+# Xue et al cannot identified any hub nodes
+res2 &lt;- hcov(cov(x),0.3)
+summary(res2)
+plot(res2)
+
+</code></pre>
+
+
+</div>

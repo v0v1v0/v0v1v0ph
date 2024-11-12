@@ -1,0 +1,121 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>load_sipes2017</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Load CLint and Fup QSPR predictions from Sipes et al 2017.</h2>
+
+<h3>Description</h3>
+
+<p>This function returns an updated version of 
+<code>chem.physical_and_invitro.data</code>
+that includes quantitative 
+structure-property relationship (QSPR) predictions from Simulations Plus' 
+ADMET predictor as 
+used in Sipes et al. 2017, included in <code>sipes2017</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">load_sipes2017(overwrite = FALSE, target.env = .GlobalEnv)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>overwrite</code></td>
+<td>
+<p>Only matters if load.image=FALSE. If overwrite=TRUE then
+existing data in chem.physical_and_invitro.data will be replaced by any
+predictions in Sipes et al. (2017) that is for the same chemical and
+property. If overwrite=FALSE (DEFAULT) then new data for the same chemical
+and property are ignored. Funbound.plasma values of 0 (below limit of
+detection) are overwritten either way.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>target.env</code></td>
+<td>
+<p>The environment where the new
+<code>chem.physical_and_invitro.data</code> is loaded. Defaults to global environment.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Because Clint and Fup are the only measurements required for many HTTK models,
+changing the number of chemicals for which a value is available will change 
+the number of chemicals which are listed with the <code>get_cheminfo</code>
+command. Use the command <code>reset_httk</code> to return to the initial 
+(measured only) <code>chem.physical_and_invitro.data</code> (for all
+parameters).
+</p>
+
+
+<h3>Value</h3>
+
+<table><tr style="vertical-align: top;">
+<td><code>data.frame</code></td>
+<td>
+<p>An updated version of
+<code>chem.physical_and_invitro.data</code>.</p>
+</td>
+</tr></table>
+<h3>Author(s)</h3>
+
+<p>Robert Pearce and John Wambaugh
+</p>
+
+
+<h3>References</h3>
+
+<p>Sipes, Nisha S., et al. "An intuitive approach for predicting
+potential human health risk with the Tox21 10k library." Environmental
+Science &amp; Technology 51.18 (2017): 10786-10796.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>reset_httk</code>
+</p>
+<p><code>get_cheminfo</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+
+# Count how many chemicals for which HTTK is available without the QSPR:
+num.chems &lt;- length(get_cheminfo())
+print(num.chems)
+
+# For chemicals with Sipes et al. (2017) Clint and Fup QSPR predictions, 
+# add them to our chemical information wherever measured values are 
+# unavailable:
+load_sipes2017()
+
+# Here's a chemical we didn't have before (this one is a good test since the 
+# logP is nearly 10 and it probably wouldn't work in vitro):
+calc_css(chem.cas="26040-51-7")
+
+# Let's see how many chemicals we have now with the Sipes et al. (2017) 
+# predictions data loaded:
+length(get_cheminfo())
+
+# Now let us reset the chemical data to the initial version:
+reset_httk()
+
+# We should be back to our original number:
+num.chems == length(get_cheminfo())
+                        
+
+</code></pre>
+
+
+</div>

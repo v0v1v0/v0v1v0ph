@@ -1,0 +1,621 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hSDM.ZIB.iCAR.alteration</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>ZIB (Zero-Inflated Binomial) model with CAR process taking into
+account site alteration</h2>
+
+<h3>Description</h3>
+
+<p>The <code>hSDM.ZIB.iCAR.alteration</code> function can be
+used to model species distribution including different processes in a
+hierarchical Bayesian framework: (i) a
+<code class="reqn">\mathcal{B}ernoulli</code> suitability process (refering to
+environmental suitability) which takes into account the spatial
+dependence of the observations, (ii) an alteration process (refering
+to anthropogenic disturbances), and (iii) a
+<code class="reqn">\mathcal{B}inomial</code> observability process (refering to
+various ecological and methodological issues explaining the species
+detection). The <code>hSDM.ZIB.iCAR.alteration</code> function calls a
+Gibbs sampler written in C code which uses an adaptive Metropolis
+algorithm to estimate the conditional posterior distribution of
+hierarchical model's parameters.</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hSDM.ZIB.iCAR.alteration(presences, trials, suitability,
+observability, spatial.entity, alteration, data, n.neighbors, neighbors,
+suitability.pred=NULL, spatial.entity.pred=NULL, burnin = 5000, mcmc =
+10000, thin = 10, beta.start, gamma.start, Vrho.start, mubeta = 0, Vbeta
+= 1e+06, mugamma = 0, Vgamma = 1e+06, priorVrho = "1/Gamma", shape =
+0.5, rate = 0.0005, Vrho.max=1000, seed = 1234, verbose = 1, save.rho =
+0, save.p = 0)</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>presences</code></td>
+<td>
+<p>A vector indicating the number of successes (or
+presences) for each observation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>trials</code></td>
+<td>
+<p>A vector indicating the number of trials for each
+observation. <code class="reqn">t_i</code> should be superior to zero and superior or
+equal to <code class="reqn">y_i</code>, the number of successes for observation <code class="reqn">i</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>suitability</code></td>
+<td>
+<p>A one-sided formula of the form
+<code class="reqn">\sim x_1+...+x_p</code> with <code class="reqn">p</code> terms specifying the
+explicative variables for the suitability process.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>observability</code></td>
+<td>
+<p>A one-sided formula of the form
+<code class="reqn">\sim w_1+...+w_q</code> with <code class="reqn">q</code> terms specifying the
+explicative variables for the observability process.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>spatial.entity</code></td>
+<td>
+<p>A vector indicating the spatial entity
+identifier (from one to the total number of entities) for each
+observation. Several observations can occur in one spatial entity. A
+spatial entity can be a raster cell for example.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alteration</code></td>
+<td>
+<p>A vector indicating the proportion of area in the
+spatial cell which is transformed (by anthropogenic activities for
+example) for each observation. Must be between 0 and 1.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>A data frame containing the model's variables.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n.neighbors</code></td>
+<td>
+<p>A vector of integers that indicates the number of
+neighbors (adjacent entities) of each spatial
+entity. <code>length(n.neighbors)</code> indicates the total number of
+spatial entities.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>neighbors</code></td>
+<td>
+<p>A vector of integers indicating the neighbors
+(adjacent entities) of each spatial entity. Must be of the form
+c(neighbors of entity 1, neighbors of entity 2, ... , neighbors of
+the last entity). Length of the <code>neighbors</code> vector should be
+equal to <code>sum(n.neighbors)</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>suitability.pred</code></td>
+<td>
+<p>An optional data frame in which to look for
+variables with which to predict. If NULL, the observations are
+used.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>spatial.entity.pred</code></td>
+<td>
+<p>An optional vector indicating the spatial
+entity identifier (from one to the total number of entities) for
+predictions. If NULL, the vector <code>spatial.entity</code> for
+observations is used.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>burnin</code></td>
+<td>
+<p>The number of burnin iterations for the sampler.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mcmc</code></td>
+<td>
+<p>The number of Gibbs iterations for the sampler. Total
+number of Gibbs iterations is equal to
+<code>burnin+mcmc</code>. <code>burnin+mcmc</code> must be divisible by 10 and
+superior or equal to 100 so that the progress bar can be displayed.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>thin</code></td>
+<td>
+<p>The thinning interval used in the simulation. The number
+of mcmc iterations must be divisible by this value.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>beta.start</code></td>
+<td>
+<p>Starting values for <code class="reqn">\beta</code> parameters of
+the suitability process. This can either be a scalar or a
+<code class="reqn">p</code>-length vector.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>gamma.start</code></td>
+<td>
+<p>Starting values for <code class="reqn">\beta</code> parameters
+of the observability process. This can either be a scalar or a
+<code class="reqn">q</code>-length vector.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Vrho.start</code></td>
+<td>
+<p>Positive scalar indicating the starting value for the
+variance of the spatial random effects.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mubeta</code></td>
+<td>
+<p>Means of the priors for the <code class="reqn">\beta</code> parameters
+of the suitability process. <code>mubeta</code> must be either a scalar or a
+p-length vector. If <code>mubeta</code> takes a scalar value, then that value will
+serve as the prior mean for all of the betas. The default value is set
+to 0 for an uninformative prior.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Vbeta</code></td>
+<td>
+<p>Variances of the Normal priors for the <code class="reqn">\beta</code>
+parameters of the suitability process. <code>Vbeta</code> must be either a
+scalar or a p-length vector. If <code>Vbeta</code> takes a scalar value,
+then that value will serve as the prior variance for all of the
+betas. The default variance is large and set to 1.0E6 for an
+uninformative flat prior.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mugamma</code></td>
+<td>
+<p>Means of the Normal priors for the <code class="reqn">\gamma</code>
+parameters of the observability process. <code>mugamma</code> must be either
+a scalar or a p-length vector. If <code>mugamma</code> takes a scalar value,
+then that value will serve as the prior mean for all of the
+gammas. The default value is set to 0 for an uninformative prior.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Vgamma</code></td>
+<td>
+<p>Variances of the Normal priors for the
+<code class="reqn">\gamma</code> parameters of the observability
+process. <code>Vgamma</code> must be either a scalar or a p-length
+vector. If <code>Vgamma</code> takes a scalar value, then that value will
+serve as the prior variance for all of the gammas. The default
+variance is large and set to 1.0E6 for an uninformative flat prior.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>priorVrho</code></td>
+<td>
+<p>Type of prior for the variance of the spatial random
+effects. Can be set to a fixed positive scalar, or to an inverse-gamma
+distribution ("1/Gamma") with parameters <code>shape</code> and <code>rate</code>,
+or to a uniform distribution ("Uniform") on the interval
+[0,<code>Vrho.max</code>]. Default set to "1/Gamma".</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>shape</code></td>
+<td>
+<p>The shape parameter for the Gamma prior on the precision
+of the spatial random effects. Default value is <code>shape=0.05</code> for
+uninformative prior.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rate</code></td>
+<td>
+<p>The rate (1/scale) parameter for the Gamma prior on the
+precision of the spatial random effects. Default value is
+<code>rate=0.0005</code> for uninformative prior.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Vrho.max</code></td>
+<td>
+<p>Upper bound for the uniform prior of the spatial
+random effect variance. Default set to 1000.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>seed</code></td>
+<td>
+<p>The seed for the random number generator. Default set to
+1234.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p>A switch (0,1) which determines whether or not the
+progress of the sampler is printed to the screen. Default is 1: a
+progress bar is printed, indicating the step (in %) reached by the
+Gibbs sampler.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>save.rho</code></td>
+<td>
+<p>A switch (0,1) which determines whether or not the
+sampled values for rhos are saved. Default is 0: the posterior mean
+is computed and returned in the <code>rho.pred</code> vector. Be careful,
+setting <code>save.rho</code> to 1 might require a large amount of
+memory.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>save.p</code></td>
+<td>
+<p>A switch (0,1) which determines whether or not the
+sampled values for predictions are saved. Default is 0: the
+posterior mean is computed and returned in the <code>prob.p.pred</code>
+vector. Be careful, setting <code>save.p</code> to 1 might require a large
+amount of memory.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The model integrates two processes, an ecological process associated
+to the presence or absence of the species due to habitat suitability
+and an observation process that takes into account the fact that the
+probability of detection of the species is inferior to one. The
+ecological process includes an intrinsic conditional autoregressive
+model (iCAR) model for spatial autocorrelation between observations,
+assuming that the probability of presence of the species at one site
+depends on the probability of presence of the species on neighboring
+sites.
+</p>
+<p><b>Ecological process:</b>
+</p>
+<p style="text-align: center;"><code class="reqn">z_i \sim \mathcal{B}ernoulli(\theta_i)</code>
+</p>
+
+<p style="text-align: center;"><code class="reqn">logit(\theta_i) = X_i \beta + \rho_{j(i)}</code>
+</p>
+
+<p><code class="reqn">\rho_j</code>: spatial random effect
+</p>
+<p><code class="reqn">j(i)</code>: index of the spatial entity for observation <code class="reqn">i</code>.
+</p>
+<p><b>Spatial autocorrelation:</b>
+</p>
+<p>An intrinsic conditional autoregressive model (iCAR) is assumed:
+</p>
+<p style="text-align: center;"><code class="reqn">\rho_j \sim \mathcal{N}ormal(\mu_j,V_{\rho} / n_j)</code>
+</p>
+
+<p><code class="reqn">\mu_j</code>: mean of <code class="reqn">\rho_{j'}</code> in the
+neighborhood of <code class="reqn">j</code>.
+</p>
+<p><code class="reqn">V_{\rho}</code>: variance of the spatial random effects.
+</p>
+<p><code class="reqn">n_j</code>: number of neighbors for spatial entity <code class="reqn">j</code>.
+</p>
+<p><b>Observation process:</b>
+</p>
+<p style="text-align: center;"><code class="reqn">y_i \sim \mathcal{B}inomial(z_i * \delta_i, t_i)</code>
+</p>
+
+<p style="text-align: center;"><code class="reqn">logit(\delta_i) = W_i \gamma</code>
+</p>
+ 
+
+
+<h3>Value</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>mcmc</code></td>
+<td>
+<p>An mcmc object that contains the posterior sample. This
+object can be summarized by functions provided by the coda
+package. The posterior sample of the deviance <code class="reqn">D</code>, with
+<code class="reqn">D=-2\log(\prod_i P(y_i,z_i|...))</code>, is also
+provided.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rho.pred</code></td>
+<td>
+<p>If <code>save.rho</code> is set to 0 (default),
+<code>rho.pred</code> is the predictive posterior mean of the spatial
+random effect associated to each spatial entity. If <code>save.rho</code> is
+set to 1, <code>rho.pred</code> is an <code>mcmc</code> object with sampled
+values for each spatial random effect associated to each spatial
+entity.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>prob.p.pred</code></td>
+<td>
+<p>If <code>save.p</code> is set to 0 (default),
+<code>prob.p.pred</code> is the predictive posterior mean of the
+probability associated to the suitability process for each
+prediction. If <code>save.p</code> is set to 1, <code>prob.p.pred</code> is an
+<code>mcmc</code> object with sampled values of the probability associated
+to the suitability process for each prediction.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>prob.p.latent</code></td>
+<td>
+<p>Predictive posterior mean of the probability
+associated to the suitability process for each observation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>prob.q.latent</code></td>
+<td>
+<p>Predictive posterior mean of the probability
+associated to the observability process for each observation.</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>Ghislain Vieilledent <a href="mailto:ghislain.vieilledent@cirad.fr">ghislain.vieilledent@cirad.fr</a>
+</p>
+
+
+<h3>References</h3>
+
+<p>Gelfand, A. E.; Schmidt, A. M.; Wu, S.; Silander, J. A.; Latimer, A. and
+Rebelo, A. G. (2005) Modelling species diversity through species level
+hierarchical modelling. <em>Applied Statistics</em>, 54, 1-20.
+</p>
+<p>Latimer, A. M.; Wu, S. S.; Gelfand, A. E. and Silander, J. A. (2006) Building
+statistical models to analyze species distributions. <em>Ecological
+Applications</em>, 16, 33-50.
+</p>
+<p>MacKenzie, D. I.; Nichols, J. D.; Lachman, G. B.; Droege, S.; Andrew
+Royle, J. and Langtimm, C. A. (2002) Estimating site occupancy rates when
+detection probabilities are less than one. <em>Ecology</em>, 83, 2248-2255.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>plot.mcmc</code>, <code>summary.mcmc</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+## Not run:  
+
+#==============================================
+# hSDM.ZIB.iCAR.alteration()
+# Example with simulated data
+#==============================================
+
+#============
+#== Preambule
+library(hSDM)
+library(raster)
+library(sp)
+library(mvtnorm)
+
+#==================
+#== Data simulation
+
+# Set seed for repeatability
+seed &lt;- 1234
+
+# Target parameters
+beta.target &lt;- matrix(c(0.2,0.5,0.5),ncol=1)
+gamma.target &lt;- matrix(c(1),ncol=1)
+## Uncomment if you want covariates on the observability process
+## gamma.target &lt;- matrix(c(0.2,0.5,0.5),ncol=1)
+Vrho.target &lt;- 1 # Spatial Variance
+
+# Landscape
+Landscape &lt;- raster(ncol=20,nrow=20,crs='+proj=utm +zone=1')
+ncell &lt;- ncell(Landscape)
+
+# Neighbors
+neighbors.mat &lt;- adjacent(Landscape, cells=c(1:ncell), directions=8, pairs=TRUE, sorted=TRUE)
+n.neighbors &lt;- as.data.frame(table(as.factor(neighbors.mat[,1])))[,2]
+adj &lt;- neighbors.mat[,2]
+
+# Generate symmetric adjacency matrix, A
+A &lt;- matrix(0,ncell,ncell)
+index.start &lt;- 1
+for (i in 1:ncell) {
+    index.end &lt;- index.start+n.neighbors[i]-1
+    A[i,adj[c(index.start:index.end)]] &lt;- 1
+    index.start &lt;- index.end+1
+}
+
+# Spatial effects
+d &lt;- 1	# Spatial dependence parameter = 1 for intrinsic CAR
+Q &lt;- diag(n.neighbors)-d*A + diag(.0001,ncell) # Add small constant to make Q non-singular
+covrho &lt;- Vrho.target*solve(Q) # Covariance of rhos
+set.seed(seed)
+rho &lt;- c(rmvnorm(1,sigma=covrho)) # Spatial Random Effects
+rho &lt;- rho-mean(rho) # Centering rhos on zero
+
+# Visited cells
+n.visited &lt;- 150 # Compare with 400, 350 and 100 for example
+set.seed(seed)
+visited.cells &lt;- sort(sample(1:ncell,n.visited,replace=FALSE)) # Draw visited cells at random
+notvisited.cells &lt;- c(1:ncell)[-visited.cells]
+
+# Number of observations
+nobs &lt;- 300
+
+# Cell vector
+set.seed(seed)
+cells &lt;- c(visited.cells,sample(visited.cells,nobs-n.visited,replace=TRUE))
+coords &lt;- xyFromCell(Landscape,cells) # Get coordinates
+
+# Covariates for "suitability" process
+set.seed(seed)
+X1.cell &lt;- rnorm(n=ncell,0,1)
+set.seed(2*seed)
+X2.cell &lt;- rnorm(n=ncell,0,1)
+X1 &lt;- X1.cell[cells]
+X2 &lt;- X2.cell[cells]
+X &lt;- cbind(rep(1,nobs),X1,X2)
+
+# Alteration
+U &lt;- runif(n=nobs,min=0,max=1)
+
+# Covariates for "observability" process
+W &lt;- cbind(rep(1,nobs))
+## Uncomment if you want covariates on the observability process 
+## set.seed(3*seed)
+## W1 &lt;- rnorm(n=nobs,0,1)
+## set.seed(4*seed)
+## W2 &lt;- rnorm(n=nobs,0,1)
+## W &lt;- cbind(rep(1,nobs),W1,W2)
+
+#== Simulating latent variables
+
+# Suitability
+logit.theta.1 &lt;- vector()
+for (n in 1:nobs) {
+  logit.theta.1[n] &lt;- X[n,]%*%beta.target+rho[cells[n]]
+}
+theta.1 &lt;- inv.logit(logit.theta.1)
+set.seed(seed)
+y.1 &lt;- rbinom(nobs,1,theta.1)
+
+# Alteration
+u &lt;- rbinom(nobs,1,U)
+
+# Observability
+set.seed(seed)
+trials &lt;- rpois(nobs,5)	# Number of trial associated to each observation
+trials[trials==0] &lt;- 1
+logit.theta.2 &lt;- W%*%gamma.target
+theta.2 &lt;- inv.logit(logit.theta.2)
+set.seed(seed)
+y.2 &lt;- rbinom(nobs,trials,theta.2)
+
+#== Simulating response variable
+Y &lt;- y.2*(1-u)*y.1
+
+#== Data-set
+Data &lt;- data.frame(Y,trials,cells,X1,X2,U)
+## Uncomment if you want covariates on the observability process 
+## Data &lt;- data.frame(Y,trials,cells,X1,X2,W1,W2,U)
+Data &lt;- SpatialPointsDataFrame(coords=coords,data=Data)
+plot(Data)
+
+#== Data-set for predictions (suitability on each spatial cell)
+Data.pred &lt;- data.frame(X1=X1.cell,X2=X2.cell,cells=c(1:ncell))
+
+#==================================
+#== Site-occupancy model
+
+mod.hSDM.ZIB.iCAR.alteration &lt;- hSDM.ZIB.iCAR.alteration(presences=Data$Y,
+                                               trials=Data$trials,
+                                               suitability=~X1+X2,
+                                               observability=~1,
+                                               spatial.entity=Data$cells,
+                                               alteration=Data$U,
+                                               data=Data,
+                                               n.neighbors=n.neighbors,
+                                               neighbors=adj,
+                                               ## suitability.pred=NULL,
+                                               ## spatial.entity.pred=NULL,
+                                               suitability.pred=Data.pred,
+                                               spatial.entity.pred=Data.pred$cells,
+                                               burnin=5000, mcmc=5000, thin=5,
+                                               beta.start=0,
+                                               gamma.start=0,
+                                               Vrho.start=10,
+                                               priorVrho="1/Gamma",
+                                               #priorVrho="Uniform",
+                                               #priorVrho=10,
+                                               mubeta=0, Vbeta=1.0E6,
+                                               mugamma=0, Vgamma=1.0E6,
+                                               shape=0.5, rate=0.0005,
+                                               #Vrho.max=1000,
+                                               seed=1234, verbose=1,
+                                               save.rho=1, save.p=0)
+
+#==========
+#== Outputs
+
+#= Parameter estimates
+summary(mod.hSDM.ZIB.iCAR.alteration$mcmc)
+
+#= MCMC and posteriors
+pdf(file="Posteriors_hSDM.ZIB.iCAR.alteration.pdf")
+plot(mod.hSDM.ZIB.iCAR.alteration$mcmc)
+dev.off()
+
+pdf(file="Posteriors.rho_hSDM.ZIB.iCAR.alteration.pdf")
+plot(mod.hSDM.ZIB.iCAR.alteration$rho.pred)
+dev.off()
+
+#= Summary plots
+
+# rho
+r.rho &lt;- r.rho.pred &lt;- r.visited &lt;- Landscape
+r.rho[] &lt;- rho
+rho.pred &lt;- apply(mod.hSDM.ZIB.iCAR.alteration$rho.pred,2,mean)
+r.rho.pred[] &lt;- rho.pred
+r.visited[] &lt;- 0
+r.visited[visited.cells] &lt;- 1
+# prob.p
+r.prob.p &lt;- Landscape
+r.prob.p[] &lt;- mod.hSDM.ZIB.iCAR.alteration$prob.p.pred
+
+pdf(file="Summary_hSDM.ZIB.iCAR.alteration.pdf")
+par(mfrow=c(3,2))
+plot(r.rho, main="rho target")
+plot(r.visited,main="Visited cells and presences")
+plot(Data[Y&gt;0,],add=TRUE,pch=16,cex=0.5)
+plot(r.rho.pred, main="rho estimated")
+plot(rho[visited.cells],rho.pred[visited.cells],
+     xlab="rho target",
+     ylab="rho estimated")
+points(rho[notvisited.cells],rho.pred[notvisited.cells],pch=16,col="blue")
+legend(x=-4,y=3.5,legend="Unvisited cells",col="blue",pch=16,bty="n")
+abline(a=0,b=1,col="red")
+plot(r.prob.p,main="Proba of presence")
+plot(Data[Y&gt;0,],add=TRUE,pch=16,cex=0.5)
+dev.off()
+
+
+## End(Not run)
+
+</code></pre>
+
+
+</div>

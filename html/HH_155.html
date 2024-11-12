@@ -1,0 +1,107 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>emptyMainLeftAxisLeftStripBottomLegend</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Remove main title, left axis tick labels, left strip, bottom legend
+from plot and keep the vertical spacing allocated to those items.
+</h2>
+
+<h3>Description</h3>
+
+<p>Remove main title, left axis tick labels, left strip, bottom legend from
+plot and keep the vertical spacing allocated to those items.  This
+function is used to prepare a trellis object to be placed next to
+another trellis object.  The current object will have much of its
+annotation
+removed with the intent of sharing annotation with the other object.
+This is motivated by the <code>ProfChal</code> example in <code>plot.likert</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">emptyMainLeftAxisLeftStripBottomLegend(x)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table><tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>A <code>"trellis"</code> object.</p>
+</td>
+</tr></table>
+<h3>Details</h3>
+
+<p>We manipulate the items inside the trellis object.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A <code>"trellis"</code> object with the stated items replaced by non-printing
+values.  The vertical spacing of the original object is retained.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p> Richard M. Heiberger &lt;rmh@temple.edu&gt; </p>
+
+
+<h3>References</h3>
+
+<p>The manipulations are similar to those in the
+<code>c.trellis</code> and related functions in the
+<code>latticeExtra</code> package.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>plot.likert</code></p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## This is a small example.
+## See ?plot.likert for the complete example including motivation.
+##
+require(grid)
+require(lattice)
+require(latticeExtra)
+require(HH)
+
+data(ProfChal)
+
+tmp &lt;- data.matrix(ProfChal[,1:5])
+rownames(tmp) &lt;- ProfChal$Question
+ProfChal.list &lt;- split.data.frame(tmp, ProfChal$Subtable)
+
+Empl &lt;- ProfChal.list[[2]]
+
+pct   &lt;- likert(Empl, as.percent="noRightAxis", xlab="Percent")
+pct
+count &lt;- likert(Empl, rightAxis=TRUE,
+                xlab="Count", ylab.right="Row Count Totals",
+                scales=list(x=list(at=c(0, 100, 200))))
+count
+countEmptied &lt;- HH:::emptyMainLeftAxisLeftStripBottomLegend(count)
+countEmptied
+
+tmp &lt;- update(resizePanels(c(pct, countEmptied, y.same=TRUE, layout=c(2,1)), w=c(.8, .2)),
+              scales=list(y=list(alternating=3, limits=count$y.limits),
+                          x=list(at=list(pct$x.scales$at, count$x.scales$at),
+                                 labels=list(pct$x.scales$labels,
+                                             count$x.scales$labels))),
+              xlab=c(" ", pct$xlab, " ", count$xlab),
+              between=list(x=1))
+tmp
+</code></pre>
+
+
+</div>

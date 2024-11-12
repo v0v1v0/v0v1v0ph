@@ -1,0 +1,262 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>glm.rmap</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Posterior of robust meta-analytic predictive prior (RMAP)</h2>
+
+<h3>Description</h3>
+
+<p>Sample from the posterior distribution of a GLM using the robust meta-analytic predictive prior (RMAP)
+by Schmidli et al. (2014) <a href="doi:10.1111/biom.12242">doi:10.1111/biom.12242</a>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">glm.rmap(
+  formula,
+  family,
+  data.list,
+  offset.list = NULL,
+  w = 0.1,
+  meta.mean.mean = NULL,
+  meta.mean.sd = NULL,
+  meta.sd.mean = NULL,
+  meta.sd.sd = NULL,
+  disp.mean = NULL,
+  disp.sd = NULL,
+  norm.vague.mean = NULL,
+  norm.vague.sd = NULL,
+  bridge.args = NULL,
+  iter_warmup = 1000,
+  iter_sampling = 1000,
+  chains = 4,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>formula</code></td>
+<td>
+<p>a two-sided formula giving the relationship between the response variable and covariates.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>family</code></td>
+<td>
+<p>an object of class <code>family</code>. See <code>?stats::family</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>data.list</code></td>
+<td>
+<p>a list of <code>data.frame</code>s. The first element in the list is the current data, and the rest
+are the historical data sets.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>offset.list</code></td>
+<td>
+<p>a list of vectors giving the offsets for each data. The length of <code>offset.list</code> is equal to
+the length of <code>data.list</code>. The length of each element of <code>offset.list</code> is equal to the number
+of rows in the corresponding element of <code>data.list</code>. Defaults to a list of vectors of 0s.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>w</code></td>
+<td>
+<p>a scalar between 0 and 1 giving how much weight to put on the historical data. Defaults to 0.1.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>meta.mean.mean</code></td>
+<td>
+<p>same as <code>meta.mean.mean</code> in <code>glm.bhm()</code>. It is a scalar or a vector whose dimension is equal
+to the number of regression coefficients giving the means for the normal hyperpriors on the
+mean hyperparameters of regression coefficients in Bayesian hierarchical model (BHM). If a
+scalar is provided, <code>meta.mean.mean</code> will be a vector of repeated elements of the given scalar.
+Defaults to a vector of 0s.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>meta.mean.sd</code></td>
+<td>
+<p>same as <code>meta.mean.sd</code> in <code>glm.bhm()</code>. It is a scalar or a vector whose dimension is equal
+to the number of regression coefficients giving the sds for the normal hyperpriors on the
+mean hyperparameters of regression coefficients in BHM. If a scalar is provided, same as for
+<code>meta.mean.mean</code>. Defaults to a vector of 10s.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>meta.sd.mean</code></td>
+<td>
+<p>same as <code>meta.sd.mean</code> in <code>glm.bhm()</code>. It is a scalar or a vector whose dimension is equal
+to the number of regression coefficients giving the means for the half-normal hyperpriors
+on the sd hyperparameters of regression coefficients in BHM. If a scalar is provided, same
+as for <code>meta.mean.mean</code>. Defaults to a vector of 0s.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>meta.sd.sd</code></td>
+<td>
+<p>same as <code>meta.sd.sd</code> in <code>glm.bhm()</code>. It is a scalar or a vector whose dimension is equal to
+the number of regression coefficients giving the sds for the half-normal hyperpriors on the
+sd hyperparameters of regression coefficients in BHM. If a scalar is provided, same as for
+<code>meta.mean.mean</code>. Defaults to a vector of 1s.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>disp.mean</code></td>
+<td>
+<p>a scalar or a vector whose dimension is equal to the number of data sets (including the current
+data) giving the location parameters for the half-normal priors on the dispersion parameters. If
+a scalar is provided, same as for <code>meta.mean.mean</code>. Defaults to a vector of 0s.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>disp.sd</code></td>
+<td>
+<p>a scalar or a vector whose dimension is equal to the number of data sets (including the current
+data) giving the scale parameters for the half-normal priors on the dispersion parameters. If a
+scalar is provided, same as for <code>meta.mean.mean</code>. Defaults to a vector of 10s.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>norm.vague.mean</code></td>
+<td>
+<p>same as <code>beta.mean</code> in <code>glm.post()</code>. It is a scalar or a vector whose dimension is equal to the
+number of regression coefficients giving the means for the vague normal prior on regression
+coefficients. If a scalar is provided, <code>norm.vague.mean</code> will be a vector of repeated elements
+of the given scalar. Defaults to a vector of 0s.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>norm.vague.sd</code></td>
+<td>
+<p>same as <code>beta.sd</code> in <code>glm.post()</code>. It is a scalar or a vector whose dimension is equal to the
+number of regression coefficients giving the sds for the vague normal prior on regression
+coefficients. If a scalar is provided, same as for <code>norm.vague.mean</code>. Defaults to a vector of 10s.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>bridge.args</code></td>
+<td>
+<p>a <code>list</code> giving arguments (other than samples, log_posterior, data, lb, ub) to pass
+onto <code>bridgesampling::bridge_sampler()</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>iter_warmup</code></td>
+<td>
+<p>number of warmup iterations to run per chain. Defaults to 1000. See the argument <code>iter_warmup</code> in
+<code>sample()</code> method in cmdstanr package.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>iter_sampling</code></td>
+<td>
+<p>number of post-warmup iterations to run per chain. Defaults to 1000. See the argument <code>iter_sampling</code>
+in <code>sample()</code> method in cmdstanr package.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>chains</code></td>
+<td>
+<p>number of Markov chains to run. Defaults to 4. See the argument <code>chains</code> in <code>sample()</code> method in
+cmdstanr package.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>arguments passed to <code>sample()</code> method in cmdstanr package (e.g. seed, refresh, init).</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The robust meta-analytic predictive prior (RMAP) is a two-part mixture prior consisting of a meta-analytic
+predictive (MAP) prior (the prior induced by Bayesian hierarchical model (BHM)) and a vague (i.e.,
+non-informative) prior (specifically, the normal/half-normal prior with large variances). Although Schmidli et al.
+(2014) recommends to use a finite mixture of conjugate priors to approximate the BHM, it can be difficult and
+time-consuming to come up with an appropriate approximation.
+</p>
+<p>Instead, the approach taken by hdbayes is to use the marginal likelihood of the MAP and vague priors.
+Specifically, note that the posterior distribution of a GLM under RMAP is also a two-part mixture distribution.
+The updated mixture weight for posterior density under the MAP prior is
+</p>
+<p style="text-align: center;"><code class="reqn">\widetilde{w} = \frac{w Z_I(D, D_0)}{w Z_I(D, D_0) + (1-w) Z_V(D)},</code>
+</p>
+
+<p>where <code class="reqn">w</code> is the prior mixture weight for the MAP prior in RMAP, <code class="reqn">Z_I(D, D_0)</code> is the marginal likelihood
+of the MAP prior, and <code class="reqn">Z_V(D)</code> is the marginal likelihood of the vague prior.
+</p>
+
+
+<h3>Value</h3>
+
+<p>The function returns a <code>list</code> with the following objects
+</p>
+
+<dl>
+<dt>post.samples</dt>
+<dd>
+<p>an object of class <code>draws_df</code> giving posterior samples under the robust meta-analytic predictive prior (RMAP)</p>
+</dd>
+<dt>post.samples.bhm</dt>
+<dd>
+<p>an object of class <code>draws_df</code> giving posterior samples under the Bayesian hierarchical model (BHM),
+obtained from using <code>glm.bhm()</code></p>
+</dd>
+<dt>post.samples.vague</dt>
+<dd>
+<p>an object of class <code>draws_df</code> giving posterior samples under the vague/non-informative prior, obtained
+from using <code>glm.post()</code></p>
+</dd>
+<dt>bs.map</dt>
+<dd>
+<p>output from computing log marginal likelihood of the prior induced by the BHM (referred to as the meta-analytic predictive
+(MAP) prior) via <code>glm.logml.map()</code> function</p>
+</dd>
+<dt>bs.vague</dt>
+<dd>
+<p>output from computing log marginal likelihood of the vague prior via <code>glm.logml.post()</code> function</p>
+</dd>
+</dl>
+<h3>References</h3>
+
+<p>Schmidli, H., Gsteiger, S., Roychoudhury, S., O’Hagan, A., Spiegelhalter, D., and Neuenschwander, B. (2014). Robust meta‐analytic‐predictive priors in clinical trials with historical control information. Biometrics, 70(4), 1023–1032.
+</p>
+<p>Gronau, Q. F., Singmann, H., and Wagenmakers, E.-J. (2020). bridgesampling: An r package for estimating normalizing constants. Journal of Statistical Software, 92(10).
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+  if (instantiate::stan_cmdstan_exists()) {
+    data(actg019) ## current data
+    data(actg036) ## historical data
+    ## take subset for speed purposes
+    actg019 = actg019[1:150, ]
+    actg036 = actg036[1:100, ]
+    data.list = list(actg019, actg036)
+    glm.rmap(
+      formula = outcome ~ scale(age) + race + treatment + scale(cd4),
+      family = binomial('logit'),
+      data.list = data.list,
+      w = 0.1,
+      chains = 1, iter_warmup = 1000, iter_sampling = 2000
+    )
+  }
+
+</code></pre>
+
+
+</div>

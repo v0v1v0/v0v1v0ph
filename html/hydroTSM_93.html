@@ -1,0 +1,120 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>istdx</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Inverse Standarization
+</h2>
+
+<h3>Description</h3>
+
+<p>This function back transforms a standarized vector/matrix <code>z</code> into their original values, i.e., re-scales all the values in the [0,1] interval to the original range of values  <code>z = re-scale(x) = x*[ xmax - xmin ] + xmin</code>.       
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">istdx(x, ...)
+## Default S3 method:
+istdx(x, xmin, xrange, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+
+<p>standarized vector or matrix to be re-scaled, all the values have to be in the range [0,1]
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>xmin</code></td>
+<td>
+
+<p>numeric with the minimum value(s) in the original <code>x</code> <br>
+-) if <code>x</code> is a vector, <code>xmin</code> has to be a real <br>
+-) if <code>x</code> is a matrix/data.frame, <code>xmin</code> has to be a vector, with the minimum values for each column of the original <code>x</code>. In this case, the vector of minimums can be obtained as: <code>xmin &lt;-  apply(x, 2, min, na.rm=TRUE)</code>
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>xrange</code></td>
+<td>
+
+<p>numeric with the range of value(s) in the original <code>x</code> <br>
+-) if <code>x</code> is a vector, <code>xrange</code> has to be a real <br>
+-) if <code>x</code> is a matrix/data.frame, <code>xrange</code> has to be a vector, with the range of values for each column of the original <code>x</code>.
+In this case, the vector of ranges can be obtained as: <br><code>xrange &lt;-  apply(x, 2,range, na.rm=TRUE)</code> <br><code>xrange &lt;-  apply(xrange, 2, diff, na.rm=TRUE)</code> 
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+
+<p>further arguments passed to or from other methods
+</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>Mauricio Zambrano-Bigiarini, <a href="mailto:mzb.devel@gmail">mzb.devel@gmail</a>
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>stdx</code>, <code>scale</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Loading daily streamflows at the station Oca en Ona (Ebro River basin, Spain) ##
+data(OcaEnOnaQts)
+x &lt;- OcaEnOnaQts
+
+## Computing xmin and the range of 'x'
+xmin &lt;- min(x, na.rm=TRUE)
+r &lt;- diff(range(x, na.rm=TRUE))
+
+## Standarized variable
+s &lt;- stdx(x)
+
+## Inverse of the standarized variable
+si &lt;- istdx(s, xmin, xrange=r)
+
+## 'si' and 'x' should be the same
+summary(x-si)
+
+###########
+### Standarizing a subset of the stations 9 to 12 in 'EbroPPtsMonthly'
+
+## Loading the monthly time series of precipitation within the Ebro River basin.
+data(EbroPPtsMonthly)
+
+pp &lt;- EbroPPtsMonthly[1:70,10:13]
+xmin   &lt;- apply(pp, 2, min, na.rm=TRUE)
+xrange &lt;- apply(pp, 2, range, na.rm=TRUE)
+xrange &lt;- apply(xrange, 2, diff, na.rm=TRUE)
+
+## Standarized variable
+s &lt;- stdx(as.matrix(pp))
+
+## Inverse of the standarized variable
+si &lt;- istdx(s, xmin, xrange)
+
+## 'si' and 'pp' should be the same
+summary(pp - si)
+
+</code></pre>
+
+
+</div>

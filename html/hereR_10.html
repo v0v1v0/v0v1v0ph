@@ -1,0 +1,138 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>isoline</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>HERE Isoline Routing API: Calculate Isoline</h2>
+
+<h3>Description</h3>
+
+<p>Calcuates isolines (<code>POLYGON</code> or <code>MULTIPOLYGON</code>) using the HERE 'Isoline Routing' API
+that connect the end points of all routes leaving from defined centers (POIs) with either
+a specified length, a specified travel time or consumption (only the default E-car available).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">isoline(
+  poi,
+  datetime = Sys.time(),
+  arrival = FALSE,
+  range = seq(5, 30, 5) * 60,
+  range_type = "time",
+  routing_mode = "fast",
+  transport_mode = "car",
+  traffic = TRUE,
+  optimize = "balanced",
+  consumption_model = NULL,
+  aggregate = FALSE,
+  url_only = FALSE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>poi</code></td>
+<td>
+<p><code>sf</code> object, Points of Interest (POIs) of geometry type <code>POINT</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>datetime</code></td>
+<td>
+<p><code>POSIXct</code> object, datetime for the departure (or arrival if <code>arrival = TRUE</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>arrival</code></td>
+<td>
+<p>boolean, are the provided Points of Interest (POIs) the origin or destination locations (<code>default = FALSE</code>)?</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>range</code></td>
+<td>
+<p>numeric, a vector of type <code>integer</code> containing the breaks for the generation of the isolines: (1) time in seconds; (2) distance in meters; (3) consumption in Wh.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>range_type</code></td>
+<td>
+<p>character, unit of the isolines: <code>"distance"</code>, <code>"time"</code> or <code>"consumption"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>routing_mode</code></td>
+<td>
+<p>character, set the routing mode: <code>"fast"</code> or <code>"short"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>transport_mode</code></td>
+<td>
+<p>character, set the transport mode: <code>"car"</code>, <code>"pedestrian"</code> or <code>"truck"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>traffic</code></td>
+<td>
+<p>boolean, use real-time traffic or prediction in routing (<code>default = TRUE</code>)? If no traffic is selected, the <code>datetime</code> is set to <code>"any"</code> and the request is processed independently from time.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>optimize, </code></td>
+<td>
+<p>character, specifies how isoline calculation is optimized: <code>"balanced"</code>, <code>"quality"</code> or <code>"performance"</code> (<code>default = "balanced"</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>consumption_model</code></td>
+<td>
+<p>character, specify the consumption model of the vehicle (<code>default = NULL</code> an average electric car is set).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>aggregate</code></td>
+<td>
+<p>boolean, aggregate (with function <code>min</code>) and intersect the isolines from geometry type <code>POLYGON</code> to geometry type <code>MULTIPOLYGON</code> (<code>default = FALSE</code>)?</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>url_only</code></td>
+<td>
+<p>boolean, only return the generated URLs (<code>default = FALSE</code>)?</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>An <code>sf</code> object containing the requested isolines.
+</p>
+
+
+<h3>References</h3>
+
+<p><a href="https://developer.here.com/documentation/isoline-routing-api/dev_guide/index.html">HERE Isoline Routing API</a>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Provide an API Key for a HERE project
+set_key("&lt;YOUR API KEY&gt;")
+
+# Isochrone for 5, 10, 15, 20, 25 and 30 minutes driving time
+isolines &lt;- isoline(
+  poi = poi,
+  range = seq(5, 30, 5) * 60,
+  url_only = TRUE
+)
+</code></pre>
+
+
+</div>

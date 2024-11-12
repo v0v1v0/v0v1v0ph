@@ -1,0 +1,244 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hidecan_plot</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Wrapper to create a HIDECAN plot</h2>
+
+<h3>Description</h3>
+
+<p>Wrapper function to create a HIDECAN plot from GWAS results,
+DE results or candidate genes.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hidecan_plot(
+  gwas_list = NULL,
+  de_list = NULL,
+  can_list = NULL,
+  score_thr_gwas = 4,
+  score_thr_de = 2,
+  log2fc_thr = 1,
+  chrom_length = NULL,
+  colour_genes_by_score = TRUE,
+  remove_empty_chrom = FALSE,
+  chroms = NULL,
+  chrom_limits = NULL,
+  title = NULL,
+  subtitle = NULL,
+  n_rows = NULL,
+  n_cols = 2,
+  legend_position = "bottom",
+  point_size = 3,
+  label_size = 3.5,
+  label_padding = 0.15
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>gwas_list</code></td>
+<td>
+<p>Data-frame or list of data-frames containing GWAS results,
+each with at least a <code>chromosome</code>, <code>position</code> and either <code>padj</code> or <code>score</code>
+columns. If a named list, the names will be used in the plot.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>de_list</code></td>
+<td>
+<p>Data-frame or list of data-frames containing DE results,
+each with at least a <code>chromosome</code>, <code>start</code>, <code>end</code>, <code>log2FoldChange</code> and
+either <code>padj</code> or <code>score</code> columns. If a named list, the names will be used in
+the plot.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>can_list</code></td>
+<td>
+<p>Data-frame or list of data-frames containing candidate genes,
+each with at least a <code>chromosome</code>, <code>start</code>, <code>end</code> and <code>name</code> columns. If a
+named list, the names will be used in the plot.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>score_thr_gwas</code></td>
+<td>
+<p>Numeric, the score threshold for GWAS results that will be used to
+select which markers will be plotted. Default value is 4.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>score_thr_de</code></td>
+<td>
+<p>Numeric, the score threshold for DE results that will be used to
+select which markers will be plotted. Default value is 2.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>log2fc_thr</code></td>
+<td>
+<p>Numeric, the log2(fold-change) threshold that will be used
+to select which genes will be plotted. Default value is 1.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>chrom_length</code></td>
+<td>
+<p>Optional, tibble with columns <code>chromosome</code> and <code>length</code>,
+giving for each chromosome its length in bp. If <code>NULL</code> (the default), will
+be inferred from the GWAS, DE and candidate gene data.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>colour_genes_by_score</code></td>
+<td>
+<p>Logical, whether to colour the genes by score
+(<code>TRUE</code>) or by log2(fold-change) (<code>FALSE</code>). Default value is <code>TRUE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>remove_empty_chrom</code></td>
+<td>
+<p>Logical, should chromosomes with no significant
+markers/genes nor candidate genes be removed from the plot? Default value
+if <code>FALSE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>chroms</code></td>
+<td>
+<p>Character vector, name of chromosomes to include in the plot.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>chrom_limits</code></td>
+<td>
+<p>Integer vector of length 2, or named list where the
+elements are integer vectors of length 2. If vector, gives the lower and upper
+limit of the chromosomes (in bp) to use in the plot. If a named list, names
+should correspond to chromosome names. Gives for each chromosome the lower
+and upper limits (in bp) to use in the plot. Doesn't have to be specified
+for all chromosomes. Default value is <code>NULL</code>, i.e. no limits are applied
+to the chromosomes (they will be plotted in their entirety).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>title</code></td>
+<td>
+<p>Character, title of the plot. Default value is <code>NULL</code> (i.e.
+no title will be added to the plot).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>subtitle</code></td>
+<td>
+<p>Character, subtitle of the plot. Default value is <code>NULL</code>
+(i.e. no subtitle will be added to the plot).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n_rows</code></td>
+<td>
+<p>Integer, number of rows of chromosomes to create in the plot.
+Default value is <code>NULL</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n_cols</code></td>
+<td>
+<p>Integer, number of columns of chromosomes to create in the plot.
+Default value is 2. Will be set to <code>NULL</code> if <code>n_rows</code> is not <code>NULL</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>legend_position</code></td>
+<td>
+<p>Character, position of the legend in the plot. Can be
+<code>bottom</code> (default value), <code>top</code>, <code>right</code>, <code>left</code> or <code>none</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>point_size</code></td>
+<td>
+<p>Numeric, size of the points in the plot. Default value is 3.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>label_size</code></td>
+<td>
+<p>Numeric, size of the gene labels in the plot. Default value is
+3.5 (for <code>geom_label_repel</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>label_padding</code></td>
+<td>
+<p>Numeric, amount of padding around gene labels in the plot,
+as unit or number. Default value is 0.15
+(for geom_label_repel).</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>a <code>ggplot</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">if (interactive()) {
+x &lt;- get_example_data()
+
+## Typical example with one GWAs result table, one DE result table and
+## one table of candidate genes
+hidecan_plot(gwas_list = x[["GWAS"]],
+             de_list = x[["DE"]],
+             can_list = x[["CAN"]],
+             score_thr_gwas = -log10(0.0001),
+             score_thr_de = -log10(0.005),
+             log2fc_thr = 0,
+             label_size = 2)
+
+## Example with two sets of GWAS results
+hidecan_plot(gwas_list = list(x[["GWAS"]], x[["GWAS"]]),
+             score_thr_gwas = 4)
+
+## Example with two sets of DE results, with names
+hidecan_plot(de_list = list("X vs Y" = x[["DE"]],
+                            "X vs Z" = x[["DE"]]),
+             score_thr_de = -log10(0.05),
+             log2fc_thr = 0)
+
+## Set limits on all chromosomes (to "zoom in" to the 10-20Mb region)
+hidecan_plot(gwas_list = x[["GWAS"]],
+             de_list = x[["DE"]],
+             can_list = x[["CAN"]],
+             score_thr_gwas = -log10(0.0001),
+             score_thr_de = -log10(0.005),
+             log2fc_thr = 0,
+             label_size = 2,
+             chrom_limits = c(10e6, 20e6))
+
+## Set limits on some chromosomes only
+hidecan_plot(gwas_list = x[["GWAS"]],
+             de_list = x[["DE"]],
+             can_list = x[["CAN"]],
+             score_thr_gwas = -log10(0.0001),
+             score_thr_de = -log10(0.005),
+             log2fc_thr = 0,
+             label_size = 2,
+             chrom_limits = list("ST4.03ch00" = c(10e6, 20e6),
+                                  "ST4.03ch02" = c(15e6, 25e6)))
+}
+</code></pre>
+
+
+</div>

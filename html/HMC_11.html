@@ -1,0 +1,131 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>simple_pc_testing</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Simple plug-in test for two-sample mean comparison.</h2>
+
+<h3>Description</h3>
+
+<p>Simple plug-in test for two-sample mean comparison.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">simple_pc_testing(
+  sample_1,
+  sample_2 = NULL,
+  pca_method = "sparse_pca",
+  mean_method = "naive",
+  num_latent_factor = 1,
+  n_folds = 5,
+  verbose = TRUE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>sample_1</code></td>
+<td>
+<p>Group 1 sample. Each row is a subject and each column corresponds to a feature.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sample_2</code></td>
+<td>
+<p>Group 2 sample. Each row is a subject and each column corresponds to a feature.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pca_method</code></td>
+<td>
+<p>Methods used to estimate principle component The default is "sparse_pca", using sparse PCA from package PMA. Other choices are "dense_pca"—the regular PCA; and "hard"— hard-thresholding PCA, which also induces sparsity.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mean_method</code></td>
+<td>
+<p>Methods used to estimate the mean vector. Default is sample mean "naive". There is also a hard-thresholding sparse estiamtor "hard".</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>num_latent_factor</code></td>
+<td>
+<p>Number of principle to be estimated/tested. Default is 1.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n_folds</code></td>
+<td>
+<p>Number of splits when performing cross-fitting. The default is 5, if computational time allows, you can try to set it to 10.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p>Print information to the console. Default is TRUE.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A list of test statistics.
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>test_statistics</code></td>
+<td>
+<p>Test statistics. Each entry corresponds to the test result of one principle component.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>standard_error</code></td>
+<td>
+<p>Estimated standard error of test_statistics_before_studentization.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>test_statistics_before_studentization</code></td>
+<td>
+<p>Similar to test_statistics but does not have variance = 1.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>split_data</code></td>
+<td>
+<p>Intermediate quantities needed for further assessment and interpretation of the test results.</p>
+</td>
+</tr>
+</table>
+<h3>Examples</h3>
+
+<pre><code class="language-R">sample_size_1 &lt;- sample_size_2 &lt;- 300
+true_mean_1 &lt;- matrix(c(rep(1, 10), rep(0, 90)), ncol = 1)
+true_mean_2 &lt;- matrix(c(rep(1.5, 10), rep(0, 90)), ncol = 1)
+pc1 &lt;- c(rep(1, 10), rep(0, 90))
+pc1 &lt;- pc1/norm(pc1, type = '2')
+
+simulation_covariance &lt;- 10 * pc1 %*% t(pc1)
+simulation_covariance &lt;- simulation_covariance + diag(1, 100)
+
+sample_1 &lt;- data.frame(MASS::mvrnorm(sample_size_1,
+                                     mu = true_mean_1,
+                                     Sigma = simulation_covariance))
+sample_2 &lt;- data.frame(MASS::mvrnorm(sample_size_2,
+                                     mu = true_mean_2,
+                                     Sigma = simulation_covariance))
+result &lt;- simple_pc_testing(sample_1, sample_2)
+result$test_statistics
+##these are test statistics. Each one of them corresponds to one PC.
+summarize_pc_name(result, latent_fator_index = 1) #shows which features contribute to PC1
+extract_pc(result) # extract the estimated leading PCs.
+
+</code></pre>
+
+
+</div>

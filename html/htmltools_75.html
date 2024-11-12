@@ -1,0 +1,60 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>tagFunction</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Tag function</h2>
+
+<h3>Description</h3>
+
+<p>Create 'lazily' rendered HTML tags (and/or <code>htmlDependencies()</code>).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">tagFunction(func)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table><tr style="vertical-align: top;">
+<td><code>func</code></td>
+<td>
+<p>a function with no arguments that returns HTML tags and/or
+dependencies.</p>
+</td>
+</tr></table>
+<h3>Details</h3>
+
+<p>When possible, use <code>tagAddRenderHook()</code> to provide both a tag
+structure and utilize a render function.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>tagAddRenderHook()</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">myDivDep &lt;- tagFunction(function() {
+  if (isTRUE(getOption("useDep", TRUE))) {
+    htmlDependency(
+      name = "lazy-dependency",
+      version = "1.0", src = ""
+    )
+  }
+})
+myDiv &lt;- attachDependencies(div(), myDivDep)
+renderTags(myDiv)
+withr::with_options(list(useDep = FALSE), renderTags(myDiv))
+
+</code></pre>
+
+
+</div>

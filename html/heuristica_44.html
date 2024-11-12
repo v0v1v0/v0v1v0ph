@@ -1,0 +1,134 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>ttbModel</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Take The Best</h2>
+
+<h3>Description</h3>
+
+<p>An implementation of the Take The Best heuristic.
+It sorts cues in order of <code>cueValidity</code>, making a decision
+based on the first cue that discriminates (has differing values on the
+two objects).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">ttbModel(
+  train_data,
+  criterion_col,
+  cols_to_fit,
+  reverse_cues = TRUE,
+  fit_name = "ttbModel"
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>train_data</code></td>
+<td>
+<p>Training/fitting data as a matrix or data.frame.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>criterion_col</code></td>
+<td>
+<p>The index of the column in train_data that has the
+criterion.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cols_to_fit</code></td>
+<td>
+<p>A vector of column indices in train_data, used to fit
+the criterion.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>reverse_cues</code></td>
+<td>
+<p>Optional parameter to reverse cues as needed.  By
+default, the model will reverse the cue values for cues with cue validity
+&lt; 0.5, so a cue with validity 0 becomes a cue with validity 1.
+Set this to FALSE if you do not want that, i.e. the cue stays validity 0.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fit_name</code></td>
+<td>
+<p>Optional The name other functions can use to label output.
+It defaults to the class name.  It is useful to change this to a unique name
+if you are making multiple fits, e.g. "ttb1", "ttb2", "ttbNoReverse."</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Cues that are tied in validity are sorted once at fitting time, and that
+order is used consistently for all predictions with that model.  But re-
+fitting may lead to a different cue order.  (An alternative would be to
+randomly re-order on every prediction.)
+</p>
+
+
+<h3>Value</h3>
+
+<p>An object of <code>class</code> ttbModel, which can be passed
+to a variety of functions to make predictions, e.g.
+<code>predictPair</code> and <code>percentCorrectList</code>.
+</p>
+
+
+<h3>References</h3>
+
+<p>Gigerenzer, G. &amp; Goldstein, D. G. (1996). "Reasoning the fast and frugal
+way: Models of bounded rationality". Psychological Review, 103, 650-669.
+</p>
+<p>Wikipedia's entry on
+<a href="https://en.wikipedia.org/wiki/Take-the-best_heuristic">https://en.wikipedia.org/wiki/Take-the-best_heuristic</a>.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>cueValidity</code> for the metric used to sort cues.
+</p>
+<p><code>predictPair</code> for predicting whether row1 is greater.
+</p>
+<p><code>predictPairProb</code> for predicting the probability row1 is
+greater.
+</p>
+<p><code>percentCorrectList</code> for the accuracy of predicting all
+row pairs in a matrix or data.frame.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Fit column 1 (y) to columns 2 and 3 (x1 and x2) of train_matrix.
+train_matrix &lt;- cbind(y=c(5,4), x1=c(1,0), x2=c(0,0))
+ttb &lt;- ttbModel(train_matrix, 1, c(2,3))
+# Have ttb predict whether row 1 or 2 has a greater value for y.  The
+# output is 1, meaning it predicts row1 is bigger.
+predictPair(oneRow(train_matrix, 1), oneRow(train_matrix, 2), ttb)
+
+# Now ask it the reverse-- predict whther row 2 or row 1 is greater.  The
+# output is -1, meaning it still predicts row1 is bigger.  (It is a
+# symmetric heuristic.)
+predictPair(oneRow(train_matrix, 2), oneRow(train_matrix, 1), ttb)
+
+# But this test data results in an incorrect prediction-- that row1 has a
+# smaller criterion than row2-- because x1 has a reversed direction.
+test_matrix &lt;- cbind(y=c(5,4), x1=c(0,1), x2=c(0,0))
+predictPair(oneRow(test_matrix, 1), oneRow(test_matrix, 2), ttb)
+
+</code></pre>
+
+
+</div>

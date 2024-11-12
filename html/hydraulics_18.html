@@ -1,0 +1,136 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>pumpcurve</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Fits a polynomial curve to three or more points from a pump characteristic
+curve to be used in solving for an operating point of the pump in a 
+piping system.</h2>
+
+<h3>Description</h3>
+
+<p>Fits a polynomial curve to three or more points from a pump characteristic
+curve. This allows solving for an operating point of the pump in a 
+piping system. A portion of this is based on
+https://github.com/PhDMeiwp/basicTrendline/blob/master/R/trendline.R
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">pumpcurve(Q = NULL, h = NULL, eq = "poly1", units = c("SI", "Eng"))
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>Q</code></td>
+<td>
+<p>Numeric vector of flow rates for selected points on the pump curve [<code class="reqn">m^3 s^{-1}</code> or <code class="reqn">ft^3 s^{-1}</code>]</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>h</code></td>
+<td>
+<p>Numeric vector of heads for selected points on the pump curve [<code class="reqn">m</code> or <code class="reqn">ft</code>]</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>eq</code></td>
+<td>
+<p>Character vector identifying the for of equation to fit (see details)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>units</code></td>
+<td>
+<p>character vector that contains the system of units [options are
+<code>SI</code> for International System of Units and <code>Eng</code> for English (US customary)
+units.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The form of the equation fit to the input points may be one of the 
+following, as determined by the <code>eq</code> input parameter.
+</p>
+
+<table>
+<tr>
+<td style="text-align: left;">
+  <strong>eq</strong> </td>
+<td style="text-align: left;"> <strong>equation form</strong> </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+  poly1 </td>
+<td style="text-align: left;"> <code class="reqn">h = a + {b}{Q} + {c}{Q}^2</code> </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+  poly2 </td>
+<td style="text-align: left;"> <code class="reqn">h = a + {c}{Q}^2</code> </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+  poly3 </td>
+<td style="text-align: left;"> <code class="reqn">h = h_{shutoff} + {c}{Q}^2</code>
+  </td>
+</tr>
+</table>
+<p>where <code class="reqn">h_{shutoff}</code> is the head on the pump curve associated with 
+<code class="reqn">Q=0</code>. The shutoff head at <code class="reqn">Q=0</code> should be included in the input
+vectors if the <code>poly3</code> equation form is to be used.
+</p>
+
+
+<h3>Value</h3>
+
+<p>Returns an object of class <code>pumpcurve</code> consisting of a list including:
+</p>
+
+<ul>
+<li>
+<p> curve - a function defining the curve that is fit to the data
+</p>
+</li>
+<li>
+<p> eqn - a character vector of the equation for the curve
+</p>
+</li>
+<li>
+<p> r2 - the coefficient of determination for the curve fit, <code class="reqn">R^2</code>
+</p>
+</li>
+<li>
+<p> p - a plot object of the fit curve
+</p>
+</li>
+<li>
+<p> units - the units system passed to the function
+</p>
+</li>
+</ul>
+<h3>Author(s)</h3>
+
+<p>Ed Maurer
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+#Input in Eng units - use \code{units} package for easy unit conversion
+qgpm &lt;- units::set_units(c(0, 5000, 7850), gallons/minute)
+qcfs &lt;- units::set_units(qgpm, ft^3/s)
+hft &lt;- c(81, 60, 20) #units are already in ft so setting units is optional
+pumpcurve(Q = qcfs, h = hft, eq = "poly2", units = "Eng")
+
+</code></pre>
+
+
+</div>

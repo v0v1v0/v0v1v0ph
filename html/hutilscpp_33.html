@@ -1,0 +1,136 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>match_nrst_haversine</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Match coordinates to nearest coordinates</h2>
+
+<h3>Description</h3>
+
+<p>When geocoding coordinates to known addresses, an efficient way to
+match the given coordinates with the known is necessary. This function provides this
+efficiency by using <code>C++</code> and allowing approximate matching.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">match_nrst_haversine(
+  lat,
+  lon,
+  addresses_lat,
+  addresses_lon,
+  Index = seq_along(addresses_lat),
+  cartesian_R = NULL,
+  close_enough = 10,
+  excl_self = FALSE,
+  as.data.table = TRUE,
+  .verify_box = TRUE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>lat, lon</code></td>
+<td>
+<p>Coordinates to be geocoded. Numeric vectors of equal length.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>addresses_lat, addresses_lon</code></td>
+<td>
+<p>Coordinates of known locations. Numeric vectors of equal length
+(likely to be a different length than the length of <code>lat</code>, except when <code>excl_self = TRUE</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Index</code></td>
+<td>
+<p>A vector the same length as <code>lat</code> to encode the match between <code>lat,lon</code>
+and <code>addresses_lat,addresses_lon</code>. The default is to use the integer position
+of the nearest match to
+<code>addresses_lat,addresses_lon</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cartesian_R</code></td>
+<td>
+<p>The maximum radius of any address from the points to be geocoded. Used
+to accelerate the detection of minimum distances. Note, as the argument name suggests,
+the distance is in cartesian coordinates, so a small number is likely.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>close_enough</code></td>
+<td>
+<p>The distance, in metres, below which a match will be considered to have occurred.
+(The distance that is considered "close enough" to be a match.)
+</p>
+<p>For example, <code>close_enough = 10</code> means the first location within ten metres will be matched,
+even if a closer match occurs later.
+</p>
+<p>May be provided as a string to emphasize the units, e.g. <code>close_enough = "0.25km"</code>.
+Only <code>km</code> and <code>m</code> are permitted.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>excl_self</code></td>
+<td>
+<p>(bool, default: <code>FALSE</code>) For each <code class="reqn">x_i</code> of the first coordinates,
+exclude the <code class="reqn">y_i</code>-th point when determining closest match. Useful to determine the
+nearest neighbour within a set of coordinates, <em>viz.</em>
+<code>match_nrst_haversine(x, y, x, y, excl_self = TRUE)</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>as.data.table</code></td>
+<td>
+<p>Return result as a <code>data.table</code>?
+If <code>FALSE</code>, a list is returned. <code>TRUE</code> by default to
+avoid dumping a huge list to the console.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.verify_box</code></td>
+<td>
+<p>Check the initial guess against other points within the
+box of radius <code class="reqn">\ell^\infty</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A list (or <code>data.table</code> if <code>as.data.table = TRUE</code>) with two elements,
+both the same length as <code>lat</code>, giving for point <code>lat,lon</code>:
+</p>
+
+<dl>
+<dt><code>pos</code></dt>
+<dd>
+<p>the position (or corresponding value in <code>Table</code>)
+in <code>addresses_lat,addresses_lon</code> nearest to <code>lat, lon</code>.</p>
+</dd>
+<dt><code>dist</code></dt>
+<dd>
+<p>the distance, in kilometres, between the two points.</p>
+</dd>
+</dl>
+<h3>Examples</h3>
+
+<pre><code class="language-R">lat2 &lt;- runif(5, -38, -37.8)
+lon2 &lt;- rep(145, 5)
+
+lat1 &lt;- c(-37.875, -37.91)
+lon1 &lt;- c(144.96, 144.978)
+
+match_nrst_haversine(lat1, lon1, lat2, lon2)
+match_nrst_haversine(lat1, lon1, lat1, lon1, 11:12, excl_self = TRUE)
+
+</code></pre>
+
+
+</div>

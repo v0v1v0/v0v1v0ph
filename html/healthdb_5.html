@@ -1,0 +1,126 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>collapse_episode</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Group records no more than n days apart as episodes</h2>
+
+<h3>Description</h3>
+
+<p>This function is useful for collapsing, e.g., medication dispensation or hospitalization, records into episodes if the records' dates are no more than n days gap apart. The length of the gap can be relaxed by another grouping variable. This function is implemented for data.frame input only.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">collapse_episode(
+  data,
+  clnt_id,
+  start_dt,
+  end_dt = NULL,
+  gap,
+  overwrite = NULL,
+  gap_overwrite = Inf,
+  .dt_trans = data.table::as.IDate,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>A data.frame that contains the id and date variables.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>clnt_id</code></td>
+<td>
+<p>Column name of subject/person ID.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>start_dt</code></td>
+<td>
+<p>Column name of the starting date of records.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>end_dt</code></td>
+<td>
+<p>Column name of the end date of records. The default is NULL assuming the record last one day and only the start date will be used to calculate the gaps between records.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>gap</code></td>
+<td>
+<p>A number in days that will be used to separate episodes. For example, gap = 7 means collapsing records no more than 7 days apart. Note that the number of days apart will be calculated as numeric difference between two days, so that Monday and Sunday is considered as 6 days apart.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>overwrite</code></td>
+<td>
+<p>Column name of a grouping variable determining whether the consecutive records are related and should have a different gap value. For example, dispensing records may have the same original prescription number, and a different gap value can be assigned for such situation, e.g., the days between two records is &gt; gap, but these records still belong to the same prescription.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>gap_overwrite</code></td>
+<td>
+<p>A different gap value used for related records. The default is Inf, which means all records with the same overwrite variable will be collapsed.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.dt_trans</code></td>
+<td>
+<p>Function to transform start_dt/end_dt. Default is <code>data.table::as.IDate()</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Additional arguments passing to the .dt_trans function.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>The original data.frame with new columns indicating episode grouping. The new variables include:
+</p>
+
+<ul>
+<li>
+<p> epi_id: unique identifier of episodes across the whole data set
+</p>
+</li>
+<li>
+<p> epi_no: identifier of episodes within a client/group
+</p>
+</li>
+<li>
+<p> epi_seq: identifier of records within an episode
+</p>
+</li>
+<li>
+<p> epi_start/stop_dt: start and end dates corresponding to epi_id
+</p>
+</li>
+</ul>
+<h3>Examples</h3>
+
+<pre><code class="language-R"># make toy data
+df &lt;- make_test_dat() %&gt;%
+dplyr::select(clnt_id, dates)
+
+head(df)
+
+# collapse records no more than 90 days apart
+# end_dt could be absent then it is assumed to be the same as start_dt
+collapse_episode(df, clnt_id, start_dt = dates, gap = 90)
+</code></pre>
+
+
+</div>

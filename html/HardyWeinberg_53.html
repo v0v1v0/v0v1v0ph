@@ -1,0 +1,195 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>HWPerm.mult</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Permutation tests fo variants with multiple alleles
+</h2>
+
+<h3>Description</h3>
+
+<p>Function <code>HWPerm.mult</code> implements permutation tests for
+Hardy-Weinberg equilibrium for autosomal and X-chromosomal variants.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">HWPerm.mult(x, y = NULL, nperm = 17000, eps = 1e-10, verbose = TRUE, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>vector or triangular matrix with male genotype counts</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+<p>vector or triangular matrix with female genotype counts</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nperm</code></td>
+<td>
+<p>number of permutations (17.000 by default)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>eps</code></td>
+<td>
+<p>a tolerance for the comparison of floating point numbers</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p>print output or not</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>addtional arguments</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>This function approximates exact test probabilities for joint tests
+for HWE and equality of allele frequencies for variants with multiple
+alleles. For purely bi-allelic variant <code>HWPerm</code> can be used which
+allows for more statistics than just probabilities.
+</p>
+<p>If argument <code>y</code> is not specified, gender is considered
+irrelevant, and <code>x</code> contains total genotype counts. If <code>x</code>
+and <code>y</code> are specified, <code>x</code> should contain male genotype
+counts and <code>y</code> female genotype counts. <code>x</code> and <code>y</code> can
+be vectors if the variant is bi-allelic, but are assumed lower
+triangular if there are more than two alleles. <code>x</code> is still a
+vector if there are multiple alleles but the variant is
+X-chromosomal. See the examples given below.
+</p>
+
+
+<h3>Value</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>pofthesample</code></td>
+<td>
+<p>probability of the observed sample</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pseudodist</code></td>
+<td>
+<p>probabilities of simulated samples</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pval</code></td>
+<td>
+<p>p-value</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>Jan Graffelman <a href="mailto:jan.graffelman@upc.edu">jan.graffelman@upc.edu</a>
+</p>
+
+
+<h3>References</h3>
+
+<p>Graffelman, J. and Weir, B.S. (2017) Multi-allelic exact tests for Hardy-Weinberg equilibrium that account for gender.
+Molecular Ecology Resources. 18(3) pp. 461–473. <a href="https://doi.org/10.1111/1755-0998.12748">doi:10.1111/1755-0998.12748</a>
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>HWPerm</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">#
+# bi-allelic autosomal
+#
+
+x1 &lt;- c(AA=298,AB=489,BB=213)
+## Not run: 
+out &lt;- HWPerm.mult(x1)
+
+## End(Not run)
+
+#
+# bi-allelic X-chromosomal
+#
+
+x2.m &lt;- c(A=39, B=21)
+x2.f &lt;- toTriangular(c(AA=28, AB=30, BB=8))
+## Not run: 
+out &lt;- HWPerm.mult(x2.m,x2.f)
+
+## End(Not run)
+
+#
+# autosomal k alleles not accounting for gender
+#
+
+x3 &lt;- c(AA=12,AB=19,AC=13,BB=7,BC=5,CC=0)
+x3 &lt;- toTriangular(x3)
+## Not run: 
+out &lt;- HWPerm.mult(x3)
+
+## End(Not run)
+
+#
+# X-chromosomal k alleles 
+#
+
+x4.m &lt;- c(A=15,B=17,C=24) 
+x4.f &lt;- toTriangular(c(AA=4,AB=2,AC=13,BB=6,BC=19,CC=4))
+## Not run: 
+out &lt;- HWPerm.mult(x4.m,x4.f)
+
+## End(Not run)
+
+#
+# Autosomal k alleles accounting for gender
+#
+
+x5.m &lt;- toTriangular(c(AA=12,AB=19,AC=13,BB=7,BC=5,CC=0))
+x5.f &lt;- toTriangular(c(AA=8,AB=12,AC=13,BB=8,BC=7,CC=0))
+## Not run: 
+out &lt;- HWPerm.mult(x5.m,x5.f)
+
+## End(Not run)
+
+#
+# Autosomal STR with multipe alleles
+#
+
+data(NistSTRs)
+A1 &lt;- NistSTRs[,1]
+A2 &lt;- NistSTRs[,2]
+GenotypeCounts &lt;- AllelesToTriangular(A1,A2)
+print(GenotypeCounts)
+## Not run: 
+out &lt;- HWPerm.mult(GenotypeCounts)
+
+## End(Not run)
+</code></pre>
+
+
+</div>

@@ -1,0 +1,110 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>markedBlock</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2> Create a markedBlock Object </h2>
+
+<h3>Description</h3>
+
+<p>This function creates a <code>"markedBlock"</code> object, which is
+a description of a block of binary data.  This can be used
+as part of a description of a binary format.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">markedBlock(marker=integer4,
+            switch=function(marker) { ASCIIchar },
+            markerLabel="marker", blockLabel="block")
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>marker</code></td>
+<td>
+<p> A <code>"memBlock"</code> object. </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>switch</code></td>
+<td>
+<p> A function that returns a <code>"memBlock"</code> object,
+or <code>NULL</code>. </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>markerLabel</code></td>
+<td>
+<p> A label to name the marker component of the
+<code>"markedBlock"</code> object.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>blockLabel</code></td>
+<td>
+<p> A label to name the component that is read
+after the marker component of the
+<code>"markedBlock"</code> object.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>A <code>"markedBlock"</code> object describes a block of binary data that consists
+of a “marker” block containing information on further blocks.
+The <code>marker</code> block is read first, then this block is passed
+to the <code>switch</code> function.  The <code>switch</code> function
+can look at the contents of the <code>marker</code> block and decide
+what sort of block should be read next (the <code>blockValue()</code>
+function may be useful here).  The result of the
+<code>switch</code> function is read from the end of the <code>marker</code>
+block.  The <code>marker</code> block and the result of the <code>switch</code>
+function can be any type
+of <code>"memBlock"</code> object.  If the result of the <code>switch()</code>
+function is <code>NULL</code> then only the <code>marker</code> block is returned
+(no further memory is read).
+</p>
+
+
+<h3>Value</h3>
+
+<p>A <code>"markedBlock"</code> object.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p> Paul Murrell </p>
+
+
+<h3>See Also</h3>
+
+<p><code>memFormat</code>
+<code>readFormat</code>
+<code>memBlock</code>
+<code>atomicBlock</code>
+<code>vectorBlock</code>
+<code>lengthBlock</code>
+<code>mixedBlock</code>
+<code>blockValue</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># A single-byte integer which dictates how many
+# subsequent four-byte reals to read
+markedBlock(integer1,
+            function(marker) {
+              lengthBlock(real4, blockValue(marker))
+            })
+</code></pre>
+
+
+</div>

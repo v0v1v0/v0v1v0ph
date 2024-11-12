@@ -1,0 +1,108 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hommel class</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Class "hommel" for storing the result of Hommel's multiple testing method.</h2>
+
+<h3>Description</h3>
+
+<p>The class hommel is the output of a call to <code>hommel</code>. It stores the adjusted p-values of all elementary hypotheses, as well as information needed to quickly calculate other results about the underlying closed testing procedure.</p>
+
+
+<h3>Slots</h3>
+
+<p>These slots are not meant to be directly accessed by the user.
+</p>
+
+<dl>
+<dt>
+<code>p</code>:</dt>
+<dd>
+<p>Object of class "numeric". Stores original (unadjusted) p-values for all hypotheses.</p>
+</dd>
+<dt>
+<code>sorter</code>:</dt>
+<dd>
+<p>Object of class "integer". Stores the permutation to sort p.</p>
+</dd>
+<dt>
+<code>jumpalpha</code>:</dt>
+<dd>
+<p>Object of class "numeric". Stores the alpha-values where the function h jumps.</p>
+</dd>
+<dt>
+<code>adjusted</code>:</dt>
+<dd>
+<p>Object of class "numeric". Stores adjusted p-values for all elementary hypotheses.</p>
+</dd>
+<dt>
+<code>simesfactor</code>:</dt>
+<dd>
+<p>Object of class "numeric". The denominator of the local test that is used.</p>
+</dd>
+<dt>
+<code>simes</code>:</dt>
+<dd>
+<p>Object of class "logical". Is TRUE if the adjusted p-values are calculated based on Simes' test that assumes the Simes inequality. If FALSE if they are based on Hommel's robust test.</p>
+</dd>
+</dl>
+<h3>Methods</h3>
+
+
+<dl>
+<dt>p.adjust</dt>
+<dd>
+<p>(hommel): Retrieves adjusted pvalues for all elementary hypotheses.</p>
+</dd>
+<dt>summary</dt>
+<dd>
+<p>(hommel, alpha=0.05): Summarizes the results of hommel's method for the specified level of alpha.</p>
+</dd>
+</dl>
+<h3>Author(s)</h3>
+
+<p>Jelle Goeman, Rosa Meijer, Thijmen Krebs.</p>
+
+
+<h3>References</h3>
+
+<p>Hommel, G. (1988). A stagewise rejective multiple test procedure based on a modified Bonferroni test. Biometrika, 75(2), 383-386.
+</p>
+<p>Meijer, R. J., Krebs, T. J., &amp; Goeman, J. J. (2019). Hommel's procedure in linear time. Biometrical Journal, 61(1), 73-82.
+</p>
+<p>Goeman, J., Meijer, R., Krebs, T., &amp; Solari, A. (2016). Simultaneous control of all false discovery proportions in large-scale multiple hypothesis testing. arXiv preprint arXiv:1611.06739.
+</p>
+
+
+<h3>See Also</h3>
+
+<p>select, concentration.</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">  #Generate a vector of pvalues
+  set.seed(102)
+  m &lt;- 10
+  pvalues &lt;- c(runif(0.5*m,0,0.02), runif(0.5*m,0,1))
+  
+  # First step: create a hommel object.
+  # Use Simes'test (simes = TRUE) or Hommel's robust test (simes = FALSE)
+  hom &lt;- hommel(pvalues, simes = TRUE)
+
+  hom
+  summary(hom)
+  
+  # retrieve familywise error adjusted p-values
+  p.adjust(hom)
+  
+  # Find lower confidence bounds 
+  # for the number of false null hypotheses (discoveries)
+  # In any subset of interest
+  discoveries(hom, 1:2)
+</code></pre>
+
+
+</div>

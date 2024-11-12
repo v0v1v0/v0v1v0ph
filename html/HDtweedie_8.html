@@ -1,0 +1,111 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>predict.cv.HDtweedie</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>make predictions from a "cv.HDtweedie" object.</h2>
+
+<h3>Description</h3>
+
+<p>This function makes predictions from a cross-validated <code>HDtweedie</code> model,
+using the stored <code>"cv.HDtweedie"</code> object, and the optimal value
+chosen for <code>lambda</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">## S3 method for class 'cv.HDtweedie'
+predict(object, newx, s=c("lambda.1se","lambda.min"),...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>object</code></td>
+<td>
+<p>fitted <code>cv.HDtweedie</code> object.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>newx</code></td>
+<td>
+<p>matrix of new values for <code>x</code> at which predictions are
+to be made. Must be a matrix. See documentation for <code>predict.HDtweedie</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>s</code></td>
+<td>
+<p>value(s) of the penalty parameter <code>lambda</code> at which
+predictions are required. Default is the value <code>s="lambda.1se"</code> stored
+on the CV object. Alternatively <code>s="lambda.min"</code> can be
+used. If <code>s</code> is numeric, it is taken as the value(s) of
+<code>lambda</code> to be used.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>not used. Other arguments to predict. </p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>This function makes it easier to use the results of
+cross-validation to make a prediction.</p>
+
+
+<h3>Value</h3>
+
+<p>The returned object depends on the ... argument which is passed on
+to the <code>predict</code> method for <code>HDtweedie</code> objects.</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Wei Qian, Yi Yang and Hui Zou<br>
+Maintainer: Wei Qian  &lt;weiqian@stat.umn.edu&gt;</p>
+
+
+<h3>References</h3>
+
+<p>Qian, W., Yang, Y., Yang, Y. and Zou, H. (2016), “Tweedie's Compound
+Poisson Model With Grouped Elastic Net,” <em>Journal of Computational and Graphical Statistics</em>, 25, 606-625.<br></p>
+
+
+<h3>See Also</h3>
+
+<p><code>cv.HDtweedie</code>, and <code>coef.cv.HDtweedie</code> methods.</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># load HDtweedie library
+library(HDtweedie)
+
+# load data set
+data(auto)
+
+# 5-fold cross validation using the lasso
+cv0 &lt;- cv.HDtweedie(x=auto$x,y=auto$y,p=1.5,nfolds=5) 
+
+# predicted mean response at lambda = lambda.1se, newx = x[1,]
+pre = predict(cv0, newx = auto$x[1,], type = "response")
+
+# define group index
+group1 &lt;- c(rep(1,5),rep(2,7),rep(3,4),rep(4:14,each=3),15:21)
+
+# 5-fold cross validation using the grouped lasso 
+cv1 &lt;- cv.HDtweedie(x=auto$x,y=auto$y,group=group1,p=1.5,nfolds=5)
+
+# predicted the log mean response at lambda = lambda.min, x[1:5,]
+pre = predict(cv1, newx = auto$x[1:5,], s = cv1$lambda.min, type = "link")
+</code></pre>
+
+
+</div>

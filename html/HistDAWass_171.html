@@ -1,0 +1,162 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>WH_adaptive_fcmeans</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Fuzzy c-means with adaptive distances for histogram-valued data</h2>
+
+<h3>Description</h3>
+
+<p>Fuzzy c-means of a dataset of histogram-valued data using different adaptive distances based on the L2 Wasserstein metric.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">WH_adaptive_fcmeans(
+  x,
+  k = 5,
+  schema,
+  m = 1.6,
+  rep,
+  simplify = FALSE,
+  qua = 10,
+  standardize = FALSE,
+  init.weights = "EQUAL",
+  weight.sys = "PROD",
+  theta = 2,
+  verbose = FALSE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>A MatH object (a matrix of distributionH).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>k</code></td>
+<td>
+<p>An integer, the number of groups.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>schema</code></td>
+<td>
+<p>An integer. 1=one weight per variable, 2=two weights per variables (one for each component: the mean and the variability component),
+3=one weight per variable and per cluster, 4= two weights per variable and per cluster.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>m</code></td>
+<td>
+<p>A number grater than 0, a fuzziness coefficient (default <code>m</code>=1.6).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rep</code></td>
+<td>
+<p>An integer, maximum number of repetitions of the algorithm (default <code>rep</code>=5).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>simplify</code></td>
+<td>
+<p>A logic value (default is FALSE), if TRUE histograms are recomputed in order to speed-up the algorithm.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>qua</code></td>
+<td>
+<p>An integer, if <code>simplify</code>=TRUE is the number of quantiles used for recodify the histograms.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>standardize</code></td>
+<td>
+<p>A logic value (default is FALSE). If TRUE, histogram-valued data are standardized,  variable by variable, using the Wassertein based standard deviation. Use if one wants to have variables with std equal to one.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>init.weights</code></td>
+<td>
+<p>A string. (default='EQUAL'). EQUAL, all variables or components have the same weight; 'RANDOM', a random assignment is done.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>weight.sys</code></td>
+<td>
+<p>A string. (default='PROD') PROD, Weights product is equal to one. SUM, the weights sum up to one.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>theta</code></td>
+<td>
+<p>A number. (default=2) A parameter for the system of weights summing up to one.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p>A logic value (default is FALSE). If TRUE  some details are provided.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>The results of the fuzzy c-means of the set of Histogram-valued data <code>x</code> into  <code>k</code> cluster.
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>solution</code></td>
+<td>
+<p>A list.Returns the best solution among the <code>rep</code>etitions, i.e. the ona having the minimum sum of squares deviation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>solution$membership</code></td>
+<td>
+<p>A matrix. The membership degree of each unit to each cluster.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>solution$IDX</code></td>
+<td>
+<p>A vector. The crisp assignement to a cluster.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>solution$cardinality</code></td>
+<td>
+<p>A vector. The cardinality of each final cluster (after the crisp assignement).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>solution$Crit</code></td>
+<td>
+<p>A number. The criterion (Sum od square deviation from the prototypes) value at the end of the run.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>quality</code></td>
+<td>
+<p>A number. The percentage of Sum of square deviation explained by the model. (The higher the better)</p>
+</td>
+</tr>
+</table>
+<h3>Examples</h3>
+
+<pre><code class="language-R">results &lt;- WH_adaptive_fcmeans(
+  x = BLOOD, k = 2, schema = 4, m = 1.5, rep = 3, simplify = TRUE,
+  qua = 10, standardize = TRUE, init.weights = "EQUAL", weight.sys = "PROD"
+)
+</code></pre>
+
+
+</div>

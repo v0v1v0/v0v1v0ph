@@ -1,0 +1,99 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>eval_strategy_newdata</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Iteratively Evaluate a Markov Model With New Parameter
+Values</h2>
+
+<h3>Description</h3>
+
+<p>Given a data.frame with on set of new parameters values
+per row, iteratively evaluate the model over the set of
+new values.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">eval_strategy_newdata(x, strategy = 1, newdata)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>Result from <code>run_model()</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>strategy</code></td>
+<td>
+<p>Name or index of model to recompute.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>newdata</code></td>
+<td>
+<p>a data.frame whose names match parameters
+names. <code>strategy</code> will be evaluated iteratively,
+taking successive values from each row.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>New parameters with a missing value (<code>NA</code>) do not
+replace existing parameters.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A data.frame containing the values of
+<code>newdata</code> and each Markov Model evaluation in
+<code>res</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">par1 &lt;- define_parameters(
+  a = 1,
+  b = 1 / (model_time + a)
+)
+
+mat1 &lt;- define_transition(
+  1-b, b,
+  0, 1
+)
+mod1 &lt;- define_strategy(
+  transition = mat1,
+  define_state(var = a),
+  define_state(var = a * model_time)
+)
+
+res1 &lt;- run_model(
+  mod1,
+  parameters = par1,
+  cycles = 5,
+  init = 1:0,
+  method = "end"
+)
+
+new_tab &lt;- data.frame(
+  a = 1:10
+)
+
+heemod:::eval_strategy_newdata(
+  res1,
+  newdata = new_tab
+)
+</code></pre>
+
+
+</div>

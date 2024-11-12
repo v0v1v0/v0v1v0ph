@@ -1,0 +1,96 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>simplex.createConstraints</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Create constraints that define the (n-1)-simplex
+</h2>
+
+<h3>Description</h3>
+
+<p>This function takes a transformation matrix from the plane coincident with the (n-1) simplex and (optionally) additional constraints defined in n-dimensional space, and generates a set of constraints defining the simplex and (optionally) the additional constraints in the (n-1)-dimensional homogeneous coordinate system.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">simplex.createConstraints(transform, userConstr=NULL)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>transform</code></td>
+<td>
+<p>Transformation matrix</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>userConstr</code></td>
+<td>
+<p>Additional constraints</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The transformation of the constraint matrix to (n-1)-dimensional homogeneous coordinates is a necessary preprocessing step for applying "Hit and Run" to subsets of the simplex defined by <code>userConstr</code>.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A set of constraints in the (n-1)-dimensional homogeneous coordinate system.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Gert van Valkenhoef
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>simplex.createTransform</code>
+<code>har</code>
+<code>harConstraints</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">n &lt;- 3
+userConstr &lt;- mergeConstraints(
+	ordinalConstraint(3, 1, 2), ordinalConstraint(3, 2, 3))
+
+transform &lt;- simplex.createTransform(n)
+constr &lt;- simplex.createConstraints(transform, userConstr)
+seedPoint &lt;- createSeedPoint(constr, homogeneous=TRUE)
+
+N &lt;- 10000
+samples &lt;- har(seedPoint, constr, N, 1, homogeneous=TRUE, transform=transform)$samples
+
+# Check dimension
+stopifnot(dim(samples) == c(N, n))
+
+# Check that w_i &gt;= w_i+1
+stopifnot(sapply(1:(n-1), function(i) {
+	all(samples[,i]&gt;=samples[,i+1])
+}))
+
+# Check that w_i &gt;= 0
+stopifnot(samples &gt;= 0)
+
+# Check that sum_i w_i = 1
+E &lt;- 1E-12
+stopifnot(apply(samples, 1, sum) &gt; 1 - E)
+stopifnot(apply(samples, 1, sum) &lt; 1 + E)
+</code></pre>
+
+
+</div>

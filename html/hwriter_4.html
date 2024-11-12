@@ -1,0 +1,124 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hwriteImage</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Insert an HTML image</h2>
+
+<h3>Description</h3>
+
+<p>Inserts one or several images in an HTML document. The images can be either
+external ones specified by URL or file path, or captured from the current
+graphic device.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hwriteImage(image.url, page=NULL, ..., image.border=0, width=NULL,
+height=NULL, capture=FALSE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>image.url</code></td>
+<td>
+<p>a character vector or matrix containing the URL or the file path of images.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>page</code></td>
+<td>
+<p>an optional connection, a character string naming the file to write
+to or a page object returned by <code>openPage</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>image.border</code></td>
+<td>
+<p>an optional numeric value specifiying the width of the image border. 
+Default is 0.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>width, height</code></td>
+<td>
+<p>an optional HTML length unit (in pixels) specifiying the width (resp. height) at which the image
+should be rendered. If missing, the default image width
+(resp. height) will be used.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>capture</code></td>
+<td>
+<p>a logical. If <code>TRUE</code> the image from the current
+graphic device is captured and written as a PNG file to the filename specified by
+<code>image.url</code>. Capture resolution is controlled by <code>width</code>
+and <code>height</code>, which have a default value of 400 pixels. Default is <code>FALSE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>optional arguments that will be dispatched to the
+underlying <code>hwrite</code> call.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p><code>hwriteImage</code> constructs an HTML &lt;img&gt; tag to insert one or several images. This function can be seamlessly in conjuction with <code>hwrite</code>
+to position an image. The <code>capture</code> argument enables to capture
+easily a current plot and to insert it in a web page.
+</p>
+<p>By default, if <code>image.url</code> is a vector the output value will be a
+character string containing the HTML code of a table containing the
+images. This behaviour is dictated by the underlying <code>hwrite</code> call
+made by <code>hwriteImage</code>. The argument <code>table</code> can be set to
+<code>TRUE</code> to obtain a vector of HTML image tags instead.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A character vector containing the output HTML code.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Gregoire Pau, <a href="mailto:gpau@ebi.ac.uk">gpau@ebi.ac.uk</a>, 2008
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>hwrite</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Creates a new web page 'test.html'
+tmpdir &lt;- tempdir()
+p &lt;- openPage('test.html', dirname=tmpdir)
+
+## Insert an external image
+img &lt;- hwriteImage('http://www.ebi.ac.uk/~gpau/hwriter/iris1.jpg', center=TRUE)
+hwrite(c(img,caption='Iris'), p, dim=c(2,1),
+row.style=list(caption='text-align:center;background-color:#fac'),
+row.names=FALSE, br=TRUE)
+
+## Closes the web page
+closePage(p)
+
+## Opens a web browser to see the result
+if (interactive()) try(browseURL(file.path(tmpdir, 'test.html')))
+</code></pre>
+
+
+</div>

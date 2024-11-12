@@ -1,0 +1,108 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>interpolate</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Interpolation</h2>
+
+<h3>Description</h3>
+
+<p>This function applies interpolation to fill in missing
+(or non-recorded) values.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">interpolate(
+  x,
+  col_name,
+  out_name = NULL,
+  miss_table,
+  threshold,
+  method = "linear"
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>data frame with class <code>Date</code> or <code>POSIX*</code>
+in the first column and numeric on the others.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>col_name</code></td>
+<td>
+<p>string with column name of the series to interpolate.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>out_name</code></td>
+<td>
+<p>optional. String with new column name. If you set
+it as <code>NULL</code>, the function will overwrite the original data frame.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>miss_table</code></td>
+<td>
+<p>data frame with three columns: first and last date
+of interpolation (first and second column respectively). The last and
+third column, is of class <code>numeric</code> with the number of steps
+to interpolate. See report_miss.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>threshold</code></td>
+<td>
+<p>numeric variable with the maximum number of dates
+in which to apply the interpolation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+<p>string with the interpolation method. In this version only
+<code>'linear'</code> method is allowed.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>The same data frame but with interpolated values.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+# read cuevas station file
+path &lt;- system.file('extdata', 'ianigla_cuevas.csv',
+        package = 'hydrotoolbox')
+
+cuevas &lt;- read_ianigla(path = path)
+
+# get the miss_table
+miss_data &lt;- report_miss(x = cuevas, col_name = 'Irradiancia')[[1]]
+
+# apply interpolation function when gap is less than 3 hours
+cuevas_interpo &lt;- interpolate(x = cuevas,
+                              col_name = 'Irradiancia',
+                              out_name = 'kin_interpo',
+                              miss_table = miss_data,
+                              threshold = 3)
+
+report_miss(x = cuevas_interpo,
+            col_name = c('Irradiancia', 'kin_interpo'))
+
+
+</code></pre>
+
+
+</div>

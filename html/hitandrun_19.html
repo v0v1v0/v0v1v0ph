@@ -1,0 +1,138 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>harConstraints</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Constraint formulation utility functions
+</h2>
+
+<h3>Description</h3>
+
+<p>These utility functions generate linear constraints
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">simplexConstraints(n)
+lowerBoundConstraint(n, i, x)
+upperBoundConstraint(n, i, x)
+lowerRatioConstraint(n, i, j, x)
+upperRatioConstraint(n, i, j, x)
+exactRatioConstraint(n, i, j, x)
+ordinalConstraint(n, i, j)
+mergeConstraints(...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>n</code></td>
+<td>
+<p>Number of dimensions (vector components)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>i</code></td>
+<td>
+<p>Index of first component</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>j</code></td>
+<td>
+<p>Index of second component</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>Scalar bound</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Constraint definitions, or a single list of constraint definitions</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>See <code>har</code> for a description of the constraint format.
+</p>
+<p><code>simplexConstraints</code> encodes the n-simplex: <code class="reqn">\forall_k w_{k} \geq 0</code> and <code class="reqn">\sum_k w_k = 1</code>
+</p>
+<p><code>lowerBoundConstraint</code> encodes <code class="reqn">w_{i} \geq x</code>
+</p>
+<p><code>upperBoundConstraint</code> encodes <code class="reqn">w_{i} \leq x</code>
+</p>
+<p><code>lowerRatioConstraint</code> encodes <code class="reqn">w_{i} / w_{j} \geq x</code>
+</p>
+<p><code>upperRatioConstraint</code> encodes <code class="reqn">w_{i} / w_{j} \leq x</code>
+</p>
+<p><code>exactRatioConstraint</code> encodes <code class="reqn">w_{i} / w_{j} = x</code>
+</p>
+<p><code>ordinalConstraint</code> encodes <code class="reqn">w_{i} \geq w_{j}</code>
+</p>
+<p><code>mergeConstraints</code> merges the constraints it is given. Alternatively, the function takes a single list of constraint definitions which are to be merged.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A constraint definition (concatenation of the given constraint definitions).
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Gert van Valkenhoef
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>eliminateRedundant</code>
+<code>hitandrun</code>
+<code>har</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># create an ordinal constraint
+c1 &lt;- ordinalConstraint(2, 1, 2)
+stopifnot(c1$constr == c(-1, 1))
+stopifnot(c1$rhs == c(0))
+stopifnot(c1$dir == c("&lt;="))
+
+# create our own constraints
+c2 &lt;- list(constr=t(c(-1, 0)), rhs=c(0), dir=c("&lt;="))
+c3 &lt;- list(constr=t(c(1, 1)), rhs=c(1), dir=c("&lt;="))
+
+# merge the constraints into a single definition
+c &lt;- mergeConstraints(c1, c2, c3)
+stopifnot(c$constr == rbind(c(-1, 1), c(-1, 0), c(1, 1)))
+stopifnot(c$rhs == c(0, 0, 1))
+stopifnot(c$dir == c("&lt;=", "&lt;=", "&lt;="))
+
+# test the alternative (list) method
+l &lt;- mergeConstraints(list(c1, c2, c3))
+stopifnot(c$constr == l$constr)
+stopifnot(c$rhs == l$rhs)
+stopifnot(c$dir == l$dir)
+
+# test iteratively merging
+l &lt;- mergeConstraints(mergeConstraints(c1, c2), c3)
+stopifnot(c$constr == l$constr)
+stopifnot(c$rhs == l$rhs)
+stopifnot(c$dir == l$dir)
+</code></pre>
+
+
+</div>

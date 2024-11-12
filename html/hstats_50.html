@@ -1,0 +1,101 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>univariate_grid</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Univariate Grid</h2>
+
+<h3>Description</h3>
+
+<p>Creates evaluation grid for any numeric or non-numeric vector <code>z</code>.
+</p>
+<p>For discrete <code>z</code> (non-numeric, or numeric with at most <code>grid_size</code> unique values),
+this is simply <code>sort(unique(z))</code>.
+</p>
+<p>Otherwise, if <code>strategy = "uniform"</code> (default), the evaluation points form a regular
+grid over the trimmed range of <code>z</code>. By trimmed range we mean the
+range of <code>z</code> after removing values outside <code>trim[1]</code> and <code>trim[2]</code> quantiles.
+Set <code>trim = 0:1</code> for no trimming.
+</p>
+<p>If <code>strategy = "quantile"</code>, the evaluation points are quantiles over a regular grid
+of probabilities from <code>trim[1]</code> to <code>trim[2]</code>.
+</p>
+<p>Quantiles are calculated via the inverse of the ECDF, i.e., via
+<code style="white-space: pre;">⁠stats::quantile(..., type = 1⁠</code>).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">univariate_grid(
+  z,
+  grid_size = 49L,
+  trim = c(0.01, 0.99),
+  strategy = c("uniform", "quantile"),
+  na.rm = TRUE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>z</code></td>
+<td>
+<p>A vector or factor.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>grid_size</code></td>
+<td>
+<p>Approximate grid size.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>trim</code></td>
+<td>
+<p>The default <code>c(0.01, 0.99)</code> means that values outside the
+1% and 99% quantiles of non-discrete numeric columns are removed before calculation
+of grid values. Set to <code>0:1</code> for no trimming.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>strategy</code></td>
+<td>
+<p>How to find grid values of non-discrete numeric columns?
+Either "uniform" or "quantile", see description of <code>univariate_grid()</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>na.rm</code></td>
+<td>
+<p>Should missing values be dropped from the grid? Default is <code>TRUE</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A vector or factor of evaluation points.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>multivariate_grid()</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">univariate_grid(iris$Species)
+univariate_grid(rev(iris$Species))                       # Same
+
+x &lt;- iris$Sepal.Width
+univariate_grid(x, grid_size = 5)                        # Uniform binning
+univariate_grid(x, grid_size = 5, strategy = "quantile")  # Quantile
+</code></pre>
+
+
+</div>

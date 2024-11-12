@@ -1,0 +1,100 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>dfr_page_hinkley</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Adapted Page Hinkley method</h2>
+
+<h3>Description</h3>
+
+<p>Change-point detection method works by computing the observed values and their mean up to the current moment <a href="doi:10.2307/2333009">doi:10.2307/2333009</a>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">dfr_page_hinkley(
+  target_feat,
+  min_instances = 30,
+  delta = 0.005,
+  threshold = 50,
+  alpha = 1 - 1e-04
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>target_feat</code></td>
+<td>
+<p>Feature to be monitored.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>min_instances</code></td>
+<td>
+<p>The minimum number of instances before detecting change</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>delta</code></td>
+<td>
+<p>The delta factor for the Page Hinkley test</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>threshold</code></td>
+<td>
+<p>The change detection threshold (lambda)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alpha</code></td>
+<td>
+<p>The forgetting factor, used to weight the observed value and the mean</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p><code>dfr_page_hinkley</code> object
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">library(daltoolbox)
+library(heimdall)
+
+# This example assumes a model residual where 1 is an error and 0 is a correct prediction.
+
+data(st_drift_examples)
+data &lt;- st_drift_examples$univariate
+data$event &lt;- NULL
+data$prediction &lt;- st_drift_examples$univariate$serie &gt; 4
+
+
+model &lt;- dfr_page_hinkley(target_feat='serie')
+
+detection &lt;- c()
+output &lt;- list(obj=model, drift=FALSE)
+for (i in 1:length(data$serie)){
+ output &lt;- update_state(output$obj, data$serie[i])
+ if (output$drift){
+   type &lt;- 'drift'
+   output$obj &lt;- reset_state(output$obj)
+ }else{
+   type &lt;- ''
+ }
+ detection &lt;- rbind(detection, list(idx=i, event=output$drift, type=type))
+}
+
+detection &lt;- as.data.frame(detection)
+detection[detection$type == 'drift',]
+</code></pre>
+
+
+</div>

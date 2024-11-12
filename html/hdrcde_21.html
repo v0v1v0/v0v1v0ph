@@ -1,0 +1,88 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>plot.hdrconf</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Plot HDRs with confidence intervals</h2>
+
+<h3>Description</h3>
+
+<p>Plots Highest Density Regions with confidence intervals.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">## S3 method for class 'hdrconf'
+plot(x, den, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>Output from <code>hdrconf</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>den</code></td>
+<td>
+<p>Density of data as list with components <code>x</code> and <code>y</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Other arguments are passed to plot.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>None
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Rob J Hyndman
+</p>
+
+
+<h3>References</h3>
+
+<p>Hyndman, R.J. (1996) Computing and graphing highest density
+regions <em>American Statistician</em>, <b>50</b>, 120-126.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>hdrconf</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">x &lt;- c(rnorm(100,0,1),rnorm(100,4,1))
+den &lt;- density(x,bw=bw.SJ(x))
+trueden &lt;- den
+trueden$y &lt;- 0.5*(exp(-0.5*(den$x*den$x)) + exp(-0.5*(den$x-4)^2))/sqrt(2*pi)
+sortx &lt;- sort(x)
+
+par(mfcol=c(2,2))
+for(conf in c(50,95))
+{
+  m &lt;- hdrconf(sortx,trueden,conf=conf)
+  plot(m,trueden,main=paste(conf,"% HDR from true density"))
+  m &lt;- hdrconf(sortx,den,conf=conf)
+  plot(m,den,main=paste(conf,"% HDR from empirical density\n(n=200)"))
+}
+</code></pre>
+
+
+</div>

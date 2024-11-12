@@ -1,0 +1,110 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>SupportRegionMiSSE</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Adaptive Sampling of the Likelihood Surface under MiSSE</h2>
+
+<h3>Description</h3>
+
+<p>Adaptively samples points for each parameter to obtain an estimate of the confidence intervals.</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">SupportRegionMiSSE(misse.obj, n.points=1000, scale.int=0.1, desired.delta=2, 
+min.number.points=10, verbose=TRUE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>misse.obj</code></td>
+<td>
+<p>an object of class <code>misse.fit</code> that contains the MLE from a model run.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n.points</code></td>
+<td>
+<p>indicates the number of points to sample.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>scale.int</code></td>
+<td>
+<p>the scaling multiplier that defines interval to randomly sample. By default the value is set to 0.1, meaning that values are drawn at random along an interval that encompasses 10 percent above and below the MLE.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>desired.delta</code></td>
+<td>
+<p>defines the number lnL units away from the MLE to include. By default the value is set to 2.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>min.number.points</code></td>
+<td>
+<p>sets the minimum number of points that can be returned. By default the value is set to 10.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p>a logical indicating whether progress should be printed to the screen. The default is <code>TRUE</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>This function provides a means for sampling the likelihood surface quickly to estimate confidence intervals that reflect the uncertainty in the MLE. The function starts with the MLE from the hisse run. It then uses a scaling multiplier to generate an interval by which to randomly alter each parameter. However, the algorithm was designed to “feel” the boundaries of the random search. In other words, when the algorithm begins to sample the hinterlands of the surface, it will know to restrict the boundary to allow sampling of more reasonable values based on the currently sampled set. The goal of this sampling process is to find points within some desired distance from the MLE; by default we assume this distance is 2 lnLik. The confidence interval can be estimated directly from these points. The full set of points tried are also provided and can be used to generate contour plots (though, it is not entirely straightforward to do so – but certainly doable).
+</p>
+<p>Note the scale.int option. This roughly sets the variance for sampling points. If this seems to take a long while to find enough points within the desired likelihood region consider reducing scale.int to either 0.05 or, in some cases, 0.01. 
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>SupportRegionMiSSE</code> returns an object of class <code>misse.support</code>. This is a list with elements:
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>$ci</code></td>
+<td>
+<p>the sampled confidence interval.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>$points.within.region</code></td>
+<td>
+<p>the sampled points that within 2lnL units from the MLE.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>$all.points</code></td>
+<td>
+<p>all points sampled by the adaptive sampler.</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>Jeremy M. Beaulieu</p>
+
+
+<h3>References</h3>
+
+<p>Beaulieu, J.M, and B.C. O'Meara. 2016. Detecting hidden diversification shifts in models of trait-dependent speciation and extinction. Syst. Biol. 65:583-601. 
+</p>
+<p>FitzJohn R.G., Maddison W.P., and Otto S.P. 2009. Estimating trait-dependent speciation and extinction rates from incompletely resolved phylogenies. Syst. Biol. 58:595-611.
+</p>
+<p>Maddison W.P., Midford P.E., and Otto S.P. 2007. Estimating a binary characters effect on speciation and extinction. Syst. Biol. 56:701-710.
+</p>
+<p>Nee S., May R.M., and Harvey P.H. 1994. The reconstructed evolutionary process. Philos. Trans. R. Soc. Lond. B Biol. Sci. 344:305-311.
+</p>
+
+
+</div>

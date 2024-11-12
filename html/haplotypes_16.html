@@ -1,0 +1,175 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>as.dna-methods</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Coerces an object to a <code>Dna</code> object</h2>
+
+<h3>Description</h3>
+
+<p>Coerces an object that contains DNA sequences to an object of Class <code>Dna</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">## S4 method for signature 'matrix'
+as.dna(x)
+## S4 method for signature 'data.frame'
+as.dna(x)
+## S4 method for signature 'list'
+as.dna(x)
+## S4 method for signature 'character'
+as.dna(x)
+## S4 method for signature 'Haplotype'
+as.dna(x)
+## S4 method for signature 'DNAbin'
+as.dna(x)
+## S4 method for signature 'phyDat'
+as.dna(x)
+
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table><tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p> a matrix, a data.frame, a list, a character, an object of class <code>Haplotype</code>, <code>DNAbin</code> <code>{ape}</code> or <code>phyDat</code> <code>{phangorn}</code> object containing the DNA sequences.</p>
+</td>
+</tr></table>
+<h3>Details</h3>
+
+<p>Elements of the list must be vectors. Each element of the list contains a single DNA sequence. If the sequence lengths differ, the longest sequence is taken into account and gaps are introduced to the shorter sequences at the end of the matrix in the slot <code>sequence</code>. Sequence length information is stored in the slot <code>seqlengths</code>.
+</p>
+<p>Valid characters for the slot <code>sequence</code> are "A","C","G","T","a","c","g","t","-","?". During the conversion of the object to the class <code>Dna</code>, integers 0,1,2,3,4,5 or characters "0","1","2","3","4","5" are converted to "?","A","C","G","T","-", respectively. Invalid characters are replaced with "?" with a warning message.  
+</p>
+
+
+<h3>Value</h3>
+
+<p>an object of class <code>Dna.</code>
+</p>
+
+
+<h3>Methods</h3>
+
+
+<dl>
+<dt><code>signature(x = "matrix")</code></dt>
+<dd>
+<p>coerces matrix to a <code>Dna</code> object.
+</p>
+</dd>
+<dt><code>signature(x = "data.frame")</code></dt>
+<dd>
+<p>coerces data.frame to a <code>Dna</code> object.
+</p>
+</dd>
+<dt><code>signature(x = "list")</code></dt>
+<dd>
+<p>coerces list to a <code>Dna</code> object.
+</p>
+</dd>
+<dt><code>signature(x = "character")</code></dt>
+<dd>
+<p>coerces characters to a <code>Dna</code> object.
+</p>
+</dd>
+<dt><code>signature(x = "Haplotype")</code></dt>
+<dd>
+<p>coerces a <code>Haplotype</code> object to a <code>Dna</code> object.
+</p>
+</dd>
+<dt><code>signature(x = "DNAbin")</code></dt>
+<dd>
+<p>coerces a <code>DNAbin</code> object to a <code>Dna</code> object.
+</p>
+</dd>
+<dt><code>signature(x = "phyDat")</code></dt>
+<dd>
+<p>coerces a <code>phyDat</code> object to a <code>Dna</code> object.
+</p>
+</dd>
+</dl>
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+## Coercing a matrix to a 'Dna' object.
+# all valid characters
+x&lt;-matrix(c("?","A","C","g","t","-","0","1","2","3","4","5"),4,6)
+rownames(x)&lt;-c("seq1","seq2","seq3","seq4") 
+dna.obj&lt;-as.dna(x) 
+dna.obj
+# the sequence matrix
+dna.obj@sequence
+
+## Not run: 
+# includes invalid characters
+x&lt;-matrix(c("X","y","*","?","t","-","0","1","2","3","4","5"),4,6) 
+rownames(x)&lt;-c("seq1","seq2","seq3","seq4") 
+dna.obj&lt;-as.dna(x) 
+dna.obj
+dna.obj@sequence
+
+# all valid integers
+x&lt;-matrix(c(0,1,2,3,4,5,0,1,2,3,4,5),4,6) 
+rownames(x)&lt;-c("seq1","seq2","seq3","seq4") 
+dna.obj&lt;-as.dna(x) 
+dna.obj
+dna.obj@sequence
+
+## Coercing a data.frame to a 'Dna' object.
+x&lt;-data.frame(matrix(c("?","A","C","g","t","-","0","1","2","3","4","5"),4,6)) 
+rownames(x)&lt;-c("seq1","seq2","seq3","seq4") 
+dna.obj&lt;-as.dna(x) 
+dna.obj
+dna.obj@sequence
+
+## Coercing a list to a 'Dna' object.
+seq1&lt;-c("?","A","C","g","t","-","0","1")
+seq2&lt;-c("?","A","C","g","t","-","0","1","2")
+seq3&lt;-c("?","A","C","g","t","-","0","1","2","3")
+x&lt;-list(seq1=seq1,seq2=seq2,seq3=seq3) 
+dna.obj&lt;-as.dna(x)
+
+# sequence lengths differ 
+dna.obj@seqlengths
+dna.obj@sequence
+
+## Coercing a character vector to a Dna object.
+seq&lt;-c("?","A","C","g","t","-","0","1")
+x&lt;-as.dna(seq)
+x
+
+
+## Coercing a Haplotype object to a Dna object.
+data("dna.obj")
+x&lt;-dna.obj
+h&lt;-haplotype(x)
+
+# DNA Sequences of unique haplotypes  
+dna.obj&lt;-as.dna(h)
+dna.obj
+
+d&lt;-distance(x)
+
+# if 'Haplotype' object does not contain 'DNA' Sequences
+h&lt;-haplotype(d)
+
+# returns an error
+as.dna(h)
+
+## Coercing a DNAbin object to a Dna object.
+require(ape)
+data(woodmouse)
+x&lt;-as.dna(woodmouse)
+x
+
+
+## End(Not run)</code></pre>
+
+
+</div>

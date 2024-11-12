@@ -1,0 +1,188 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>SimulateHisse</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Simulate under a HiSSE model</h2>
+
+<h3>Description</h3>
+
+<p>Flexible simulation function allowing checkpointing</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">SimulateHisse(turnover.rates, eps.values, transition.rates, max.taxa=Inf, max.t=Inf, 
+max.wall.time=Inf, x0, nstart=1, checkpoint.file=NULL, checkpoint.frequency=100, 
+checkpoint.start.object=NULL, override.safeties=FALSE, mass.extinction.heights=c(),
+mass.extinction.magnitudes=c())
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>turnover.rates</code></td>
+<td>
+<p>a vector of turnover rates.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>eps.values</code></td>
+<td>
+<p>a vector of extinction fractions.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>transition.rates</code></td>
+<td>
+<p>a matrix of transition rates.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>max.taxa</code></td>
+<td>
+<p>have the simulation stop at <code>max.taxa</code> surviving taxa.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>max.t</code></td>
+<td>
+<p>have the simulation stop at <code>max.t</code> height (including stem).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>max.wall.time</code></td>
+<td>
+<p>have the simulation stop at this many seconds of running.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x0</code></td>
+<td>
+<p>the starting state.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nstart</code></td>
+<td>
+<p>how many taxa you want to start from. Usual values are 1 (start with single lineage) or 2 (crown group).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>checkpoint.file</code></td>
+<td>
+<p>if you want to save progress (so you can restart from last saved point) include the name of a file.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>checkpoint.frequency</code></td>
+<td>
+<p>if there is a checkpoint file, frequency (in terms of number of steps: births, deaths, or transitions) at which this is saved.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>checkpoint.start.object</code></td>
+<td>
+<p>if you are starting from a checkpointed.file, the object loaded from that file. Typically called <code>checkpoint.result</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>override.safeties</code></td>
+<td>
+<p>simulate even if there is no limit on number of taxa, depth of tree, or wall time.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mass.extinction.heights</code></td>
+<td>
+<p>vector of times above the root [NOT from the present] to have a mass extinction.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mass.extinction.magnitudes</code></td>
+<td>
+<p>vector of per species extinction probability at mass extinctions.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Note that currently, the simulator assumes <code>turnover.rates</code>, <code>eps.values</code>, and <code>transition rates</code> are in the same state order. Remember that <code>turnover.rates</code> are birth + death rates, and <code>eps.values</code> are death / birth rates. 
+</p>
+<p>We strongly advise putting some limits to stop the run. These can be any combination of <code>max.taxa</code>, <code>max.t</code>, and <code>max.wall.time</code>. For example, you could set up the run to stop when you hit 1000 taxa or 3600 seconds (one hour) of running on your computer, whichever comes first. If you want to run with no limits, you have to specify <code>override.safeties=TRUE</code>, and you should know what you're doing here (the runs might never finish). There is only one starting state (<code>x0</code>), which should be the index into the rate vectors, starting with 0: that is, if your states are 0A, 0B, 1A, and 1B, x0=0 would start in 0A, x0=3 would start in 1B. <code>nstart</code> lets you choose how many taxa to start with: it could be one lineage to start from a single taxon, in which case you'll have to wait some time for the first speciation event, or you could start with two, to start simulation with a clade of this size (though, if extinction is nonzero, you are not guaranteed to have the final crown group include both of these descendants). You can choose numbers higher than two, to start with, say, a 50-species polytomy. We're not sure why you would. You can add checkpointing: runs take a long time, and if it crashes, this will let you start from the same point in the last saved file (though with a different seed, unless you specify this yourself). If you want to save checkpoints as you go along, specify a file in <code>checkpoint.file</code>. Every <code>checkpoint.frequency</code> events, where an event is a speciation, extinction, or transition event, it will save current progress to a file. The smaller this value, the more frequently the simulation will be saved: fewer lost steps if you have to re-simulate, but slower during the run because it spends time writing to disk. If you want to start from a checkpointed analysis, load the file into R and then specify the object within R [not the file] containing the checkpointed results (by default, saved in an object called <code>checkpoint.result</code>) and the simulation will continue from that point. 
+</p>
+<p>Results are returned in a list, containing a dataframe with the outcome of the simulation (one row per edge in the tree, and containing information on the lengths, ancestor, tipward height from the original root, and state at the tipward end of the edge (you can get state at the rootward end by getting the tipward state of the ancestral edge). It may be of interest to know how many events of each type occurred, which is saved in <code>$birth.counts</code>, <code>$death.counts</code>, <code>$transition.counts</code>. The total number of surviving taxa is stored in <code>$n.surviving</code>. 
+</p>
+<p>The output can be returned as an ape <code>phylo</code> tree by passing the <code>$results</code> element of the final output to <code>SimToPhylo()</code>.
+</p>
+
+
+<h3>Value</h3>
+
+<p>This returns a list, with the following elements:
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>$results</code></td>
+<td>
+<p>a dataframe containing the simulation output: states at nodes and tips, ancestor-descendant pairs, branch lengths.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>$birth.counts</code></td>
+<td>
+<p>a vector, in the same state order as turnover.rates et al., that includes the counts for the number of times species in each state speciated.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>$death.counts</code></td>
+<td>
+<p>same as birth.counts, but counting extinction events in each state outside of mass extinctions.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>$mass.extinction.death.counts</code></td>
+<td>
+<p>total number of species that went extinct during a mass extinction event (which is assumed to be trait-independent).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>$transition.counts</code></td>
+<td>
+<p>matrix of counts of transitions from one state to another.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>$n.surviving</code></td>
+<td>
+<p>the number of taxa alive at the end of the simulation.</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>Brian O'Meara</p>
+
+
+<h3>References</h3>
+
+<p>Beaulieu, J.M, and B.C. O'Meara. 2016. Detecting hidden diversification shifts in models of trait-dependent speciation and extinction. Syst. Biol. 65:583-601. 
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+simulated.result &lt;- SimulateHisse(c(.3, .1), c(.1, 0), 
+matrix(c(NA, 0.2, .3, NA), nrow=2), max.taxa=35, x0=1)	
+par(mfcol=c(1,2))
+plot(SimToPhylo(simulated.result$results, include.extinct=TRUE))
+plot(SimToPhylo(simulated.result$results, include.extinct=FALSE))
+ 	
+</code></pre>
+
+
+</div>

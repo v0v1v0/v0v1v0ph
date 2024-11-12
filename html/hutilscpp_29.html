@@ -1,0 +1,146 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>is_constant</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Is a vector constant?</h2>
+
+<h3>Description</h3>
+
+<p>Efficiently decide whether an atomic vector is constant; that is,
+contains only one value.
+</p>
+<p>Equivalent to
+</p>
+<p><code>data.table::uniqueN(x) == 1L</code>
+</p>
+<p>or
+</p>
+<p><code>forecast::is.constant(x)</code>
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">is_constant(x, nThread = getOption("hutilscpp.nThread", 1L))
+
+isntConstant(x)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>An atomic vector. Only logical, integer, double, and character
+vectors are supported. Others may work but have not been tested.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nThread</code></td>
+<td>
+
+<dl>
+<dt><code>integer(1)</code></dt>
+<dd>
+<p>Number of threads to use in <code>is_constant</code>.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>Whether or not the vector <code>x</code> is constant:
+</p>
+
+<dl>
+<dt><code>is_constant</code></dt>
+<dd>
+<p><code>TRUE</code> or <code>FALSE</code>. Missing values are considered to
+be the same as each other, so a vector entirely composed of missing values is
+considered constant. Note that <code>is_constant(c(NA_real_, NaN))</code> is <code>TRUE</code>.</p>
+</dd>
+<dt><code>isntConstant</code></dt>
+<dd>
+<p>If constant, <code>0L</code>; otherwise, the first integer position at
+which <code>x</code> has a different value to the first.
+</p>
+<p>This has the virtue of <code>!isntConstant(x) == is_constant(x)</code>.</p>
+</dd>
+</dl>
+<p>Multithreaded <code>is_constant(x, nThread)</code> should only be used if
+<code>x</code> is expected to be true. It will be faster when
+<code>x</code> is constant but much slower otherwise.
+</p>
+<p>Empty vectors are constant, as are length-one vectors.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">library(hutilscpp)
+library(data.table)
+setDTthreads(1L)
+N &lt;- 1e9L
+N &lt;- 1e6  # to avoid long-running examples on CRAN
+
+## Good-cases
+nonconst &lt;- c(integer(1e5), 13L, integer(N))
+bench_system_time(uniqueN(nonconst) == 1L)
+#&gt; process    real
+#&gt; 15.734s  2.893s
+bench_system_time(is_constant(nonconst))
+#&gt; process    real
+#&gt;   0.000   0.000
+bench_system_time(isntConstant(nonconst))
+#&gt; process    real
+#&gt;   0.000   0.000
+
+## Worst-cases
+consti &lt;- rep(13L, N)
+bench_system_time(uniqueN(consti) == 1L)
+#&gt; process    real
+#&gt;  5.734s  1.202s
+bench_system_time(is_constant(consti))
+#&gt;   process      real
+#&gt; 437.500ms 437.398ms
+bench_system_time(isntConstant(consti))
+#&gt;   process      real
+#&gt; 437.500ms 434.109ms
+
+nonconsti &lt;- c(consti, -1L)
+bench_system_time(uniqueN(nonconsti) == 1L)
+#&gt; process    real
+#&gt; 17.812s  3.348s
+bench_system_time(is_constant(nonconsti))
+#&gt;   process      real
+#&gt; 437.500ms 431.104ms
+bench_system_time(isntConstant(consti))
+#&gt;   process      real
+#&gt; 484.375ms 487.588ms
+
+constc &lt;- rep("a", N)
+bench_system_time(uniqueN(constc) == 1L)
+#&gt; process    real
+#&gt; 11.141s  3.580s
+bench_system_time(is_constant(constc))
+#&gt; process    real
+#&gt;  4.109s  4.098s
+
+nonconstc &lt;- c(constc, "x")
+bench_system_time(uniqueN(nonconstc) == 1L)
+#&gt; process    real
+#&gt; 22.656s  5.629s
+bench_system_time(is_constant(nonconstc))
+#&gt; process    real
+#&gt;  5.906s  5.907s
+
+
+</code></pre>
+
+
+</div>

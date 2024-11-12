@@ -1,0 +1,149 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>simulator_plot</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Plot simulator outputs for multiple waves</h2>
+
+<h3>Description</h3>
+
+<p>Plots the simulator results for points at successive waves.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">simulator_plot(
+  wave_points,
+  z,
+  zero_in = TRUE,
+  palette = NULL,
+  wave_numbers = seq(ifelse(zero_in, 0, 1), length(wave_points) - ifelse(zero_in, 1, 0)),
+  normalize = FALSE,
+  logscale = FALSE,
+  byhit = FALSE,
+  barcol = "#444444",
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>wave_points</code></td>
+<td>
+<p>The set of wave points, as a list of data.frames</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>z</code></td>
+<td>
+<p>The set of target values for each output</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>zero_in</code></td>
+<td>
+<p>Is wave zero included? Default: TRUE</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>palette</code></td>
+<td>
+<p>If a larger palette is required, it should be supplied here.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>wave_numbers</code></td>
+<td>
+<p>Which waves to plot. If not supplied, all waves are plotted.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>normalize</code></td>
+<td>
+<p>If true, plotting is done with rescaled target bounds.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>logscale</code></td>
+<td>
+<p>If true, targets are log-scaled before plotting.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>byhit</code></td>
+<td>
+<p>Should runs be grouped by number of targets hit, rather than wave?</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>barcol</code></td>
+<td>
+<p>The colour of the target error bars/bounds</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Optional parameters (not to be used directly)</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The values plotted are the outputs from the simulator; the points passed to it are the
+points suggested by that wave of emulators. By default, wave 0 is included. A colour
+scheme is chosen outright for all invocations of this function: it is a 10-colour
+palette. If more waves are required, then an alternative palette should be selected.
+</p>
+<p>The output can be plotted in a number of ways: raw; with outputs transformed to log scale;
+or with targets normalised so that target bounds are all [-1, 1]. These two options may
+be helpful in visualising behaviour when outputs have vastly different scales, but one
+still wishes to see them all in the same plot: these options can be toggled by setting
+<code>logscale = TRUE</code> or <code>normalize = TRUE</code> respectively. The data can be grouped in
+two ways, either colouring by wave of emulation (default) or by the number of targets hit;
+the latter option is enabled by setting <code>byhit = TRUE</code>.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A ggplot object.
+</p>
+
+
+<h3>See Also</h3>
+
+<p>Other visualisation tools: 
+<code>behaviour_plot()</code>,
+<code>diagnostic_wrap()</code>,
+<code>effect_strength()</code>,
+<code>emulator_plot()</code>,
+<code>hit_by_wave()</code>,
+<code>output_plot()</code>,
+<code>plot_actives()</code>,
+<code>plot_lattice()</code>,
+<code>plot_wrap()</code>,
+<code>space_removed()</code>,
+<code>validation_pairs()</code>,
+<code>wave_dependencies()</code>,
+<code>wave_points()</code>,
+<code>wave_values()</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"> simulator_plot(SIRMultiWaveData, SIREmulators$targets)
+ simulator_plot(SIRMultiWaveData[2:4], SIREmulators$targets,
+  zero_in = FALSE, wave_numbers = c(1,3))
+ simulator_plot(SIRMultiWaveData, SIREmulators$targets, byhit = TRUE)
+
+</code></pre>
+
+
+</div>

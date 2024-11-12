@@ -1,0 +1,528 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>IndivCtstm</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Individual-level continuous time state transition model</h2>
+
+<h3>Description</h3>
+
+<p>Simulate outcomes from an individual-level continuous time state transition
+model (CTSTM). The class supports "clock-reset"
+(i.e., semi-Markov), "clock-forward" (i.e., Markov), and mixtures of
+clock-reset and clock-forward multi-state models as described in
+<code>IndivCtstmTrans</code>.
+</p>
+
+
+<h3>Format</h3>
+
+<p>An R6::R6Class object.
+</p>
+
+
+<h3>Public fields</h3>
+
+<div class="r6-fields">
+
+<dl>
+<dt><code>trans_model</code></dt>
+<dd>
+<p>The model for health state transitions. Must be an object
+of class <code>IndivCtstmTrans</code>.</p>
+</dd>
+<dt><code>utility_model</code></dt>
+<dd>
+<p>The model for health state utility. Must be an object of
+class <code>StateVals</code>.</p>
+</dd>
+<dt><code>cost_models</code></dt>
+<dd>
+<p>The models used to predict costs by health state.
+Must be a list of objects of class <code>StateVals</code>, where each element of the
+list represents a different cost category.</p>
+</dd>
+<dt><code>disprog_</code></dt>
+<dd>
+<p>An object of class <code>disprog</code>.</p>
+</dd>
+<dt><code>stateprobs_</code></dt>
+<dd>
+<p>An object of class <code>stateprobs</code> simulated using <code style="white-space: pre;">⁠$sim_stateprobs()⁠</code>.</p>
+</dd>
+<dt><code>qalys_</code></dt>
+<dd>
+<p>An object of class <code>qalys</code> simulated using <code style="white-space: pre;">⁠$sim_qalys()⁠</code>.</p>
+</dd>
+<dt><code>costs_</code></dt>
+<dd>
+<p>An object of class <code>costs</code> simulated using <code style="white-space: pre;">⁠$sim_costs()⁠</code>.</p>
+</dd>
+</dl>
+</div>
+
+
+<h3>Methods</h3>
+
+
+
+<h4>Public methods</h4>
+
+
+<ul>
+<li> <p><a href="#method-IndivCtstm-new"><code>IndivCtstm$new()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-IndivCtstm-sim_disease"><code>IndivCtstm$sim_disease()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-IndivCtstm-sim_stateprobs"><code>IndivCtstm$sim_stateprobs()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-IndivCtstm-sim_qalys"><code>IndivCtstm$sim_qalys()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-IndivCtstm-sim_costs"><code>IndivCtstm$sim_costs()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-IndivCtstm-summarize"><code>IndivCtstm$summarize()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-IndivCtstm-clone"><code>IndivCtstm$clone()</code></a>
+</p>
+</li>
+</ul>
+<hr>
+<a id="method-IndivCtstm-new"></a>
+
+
+
+<h4>Method <code>new()</code>
+</h4>
+
+<p>Create a new <code>IndivCtstm</code> object.
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>IndivCtstm$new(trans_model = NULL, utility_model = NULL, cost_models = NULL)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>trans_model</code></dt>
+<dd>
+<p>The <code>trans_model</code> field.</p>
+</dd>
+<dt><code>utility_model</code></dt>
+<dd>
+<p>The <code>utility_model</code> field.</p>
+</dd>
+<dt><code>cost_models</code></dt>
+<dd>
+<p>The <code>cost_models</code> field.</p>
+</dd>
+</dl>
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>A new <code>IndivCtstm</code> object.
+</p>
+
+
+<hr>
+<a id="method-IndivCtstm-sim_disease"></a>
+
+
+
+<h4>Method <code>sim_disease()</code>
+</h4>
+
+<p>Simulate disease progression (i.e., individual trajectories through a multi-state
+model) using <code>IndivCtstmTrans$sim_disease()</code>.
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>IndivCtstm$sim_disease(max_t = 100, max_age = 100, progress = NULL)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>max_t</code></dt>
+<dd>
+<p>A scalar or vector denoting the length of time to simulate the model.
+If a vector, must be equal to the number of simulated patients.</p>
+</dd>
+<dt><code>max_age</code></dt>
+<dd>
+<p>A scalar or vector denoting the maximum age to simulate each patient until.
+If a vector, must be equal to the number of simulated patients.</p>
+</dd>
+<dt><code>progress</code></dt>
+<dd>
+<p>An integer, specifying the PSA iteration (i.e., sample) that should be
+printed every <code>progress</code> PSA iterations. For example, if <code>progress = 2</code>,
+then every second PSA iteration is printed. Default is <code>NULL</code>,
+in which case no output is printed.</p>
+</dd>
+</dl>
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>An instance of self with simulated output stored in <code>disprog_</code>.
+</p>
+
+
+<hr>
+<a id="method-IndivCtstm-sim_stateprobs"></a>
+
+
+
+<h4>Method <code>sim_stateprobs()</code>
+</h4>
+
+<p>Simulate health state probabilities as a function of time using the
+simulation output stored in <code>disprog</code>.
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>IndivCtstm$sim_stateprobs(t)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>t</code></dt>
+<dd>
+<p>A numeric vector of times.</p>
+</dd>
+</dl>
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>An instance of <code>self</code> with simulated output of class <code>stateprobs</code>
+stored in <code>stateprobs_</code>.
+</p>
+
+
+<hr>
+<a id="method-IndivCtstm-sim_qalys"></a>
+
+
+
+<h4>Method <code>sim_qalys()</code>
+</h4>
+
+<p>Simulate quality-adjusted life-years (QALYs) as a function of <code>disprog_</code> and
+<code>utility_model</code>.
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>IndivCtstm$sim_qalys(
+  dr = 0.03,
+  type = c("predict", "random"),
+  lys = TRUE,
+  by_patient = FALSE
+)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>dr</code></dt>
+<dd>
+<p>Discount rate.</p>
+</dd>
+<dt><code>type</code></dt>
+<dd>
+<p><code>"predict"</code> for mean values or <code>"random"</code> for random samples
+as in <code style="white-space: pre;">⁠$sim()⁠</code> in <code>StateVals</code>.</p>
+</dd>
+<dt><code>lys</code></dt>
+<dd>
+<p>If <code>TRUE</code>, then life-years are simulated in addition to QALYs.</p>
+</dd>
+<dt><code>by_patient</code></dt>
+<dd>
+<p>If <code>TRUE</code>, then QALYs and/or costs are computed at the patient level.
+If <code>FALSE</code>, then they are averaged across patients by health state.</p>
+</dd>
+</dl>
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>An instance of <code>self</code> with simulated output of
+class qalys stored in <code>qalys_</code>.
+</p>
+
+
+<hr>
+<a id="method-IndivCtstm-sim_costs"></a>
+
+
+
+<h4>Method <code>sim_costs()</code>
+</h4>
+
+<p>Simulate costs as a function of <code>disprog_</code> and <code>cost_models</code>.
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>IndivCtstm$sim_costs(
+  dr = 0.03,
+  type = c("predict", "random"),
+  by_patient = FALSE,
+  max_t = Inf
+)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>dr</code></dt>
+<dd>
+<p>Discount rate.</p>
+</dd>
+<dt><code>type</code></dt>
+<dd>
+<p><code>"predict"</code> for mean values or <code>"random"</code> for random samples
+as in <code style="white-space: pre;">⁠$sim()⁠</code> in <code>StateVals</code>.</p>
+</dd>
+<dt><code>by_patient</code></dt>
+<dd>
+<p>If <code>TRUE</code>, then QALYs and/or costs are computed at the patient level.
+If <code>FALSE</code>, then they are averaged across patients by health state.</p>
+</dd>
+<dt><code>max_t</code></dt>
+<dd>
+<p>Maximum time duration to compute costs once a patient has
+entered a (new) health state. By default, equal to <code>Inf</code>,
+so that costs are computed over the entire duration that a patient is in
+a given health state. If time varies by each cost category, then time
+can also be passed as a numeric vector of length equal to the number of
+cost categories (e.g., <code>c(1, 2, Inf, 3)</code> for a model with four cost categories).</p>
+</dd>
+</dl>
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>An instance of <code>self</code> with simulated output of class costs
+stored in <code>costs_</code>.
+</p>
+
+
+<hr>
+<a id="method-IndivCtstm-summarize"></a>
+
+
+
+<h4>Method <code>summarize()</code>
+</h4>
+
+<p>Summarize costs and QALYs so that cost-effectiveness analysis can be performed.
+See <code>summarize_ce()</code>.
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>IndivCtstm$summarize(by_grp = FALSE)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>by_grp</code></dt>
+<dd>
+<p>If <code>TRUE</code>, then costs and QALYs are computed by subgroup. If
+<code>FALSE</code>, then costs and QALYs are aggregated across all patients (and subgroups).</p>
+</dd>
+</dl>
+</div>
+
+
+<hr>
+<a id="method-IndivCtstm-clone"></a>
+
+
+
+<h4>Method <code>clone()</code>
+</h4>
+
+<p>The objects of this class are cloneable with this method.
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>IndivCtstm$clone(deep = FALSE)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>deep</code></dt>
+<dd>
+<p>Whether to make a deep clone.</p>
+</dd>
+</dl>
+</div>
+
+
+
+
+<h3>References</h3>
+
+<p><a href="https://arxiv.org/abs/2102.09437">Incerti and Jansen (2021)</a>.
+See Section 2.2 for a mathematical description of an individual-level CTSTM and Section 4.1 for
+an example in oncology.
+</p>
+
+
+<h3>See Also</h3>
+
+<p>The <code>IndivCtstmTrans</code> documentation
+describes the class for the transition model and the <code>StateVals</code> documentation
+describes the class for the cost and utility models. An <code>IndivCtstmTrans</code>
+object is typically created using <code>create_IndivCtstmTrans()</code>.
+</p>
+<p>There are currently two relevant vignettes. <code>vignette("mstate")</code> shows how to
+parameterize <code>IndivCtstmTrans</code> objects in cases where patient-level data is
+available by fitting a multi-state models. <code>vignette("markov-inhomogeneous-indiv")</code>
+shows how the time inhomogeneous Markov cohort model in
+<code>vignette("markov-inhomogeneous-cohort")</code> can be developed as an individual
+patient simulation; in doing so, it shows how <code>IndivCtstm</code> models can be
+used even without access to patient-level data.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">library("flexsurv")
+
+# Treatment strategies, target population, and model structure
+strategies &lt;- data.frame(strategy_id = c(1, 2))
+patients &lt;- data.frame(patient_id = seq(1, 3),
+                       age = c(45, 50, 60),
+                       female = c(0, 0, 1))
+states &lt;- data.frame(state_id = c(1, 2))
+hesim_dat &lt;- hesim_data(strategies = strategies,
+                        patients = patients,
+                        states = states)
+
+# Parameter estimation
+## Multi-state model
+tmat &lt;- rbind(c(NA, 1, 2),
+              c(3, NA, 4),
+              c(NA, NA, NA))
+fits &lt;- vector(length = max(tmat, na.rm = TRUE), mode = "list")
+surv_dat &lt;- data.frame(mstate3_exdata$transitions)
+for (i in 1:length(fits)){
+  fits[[i]] &lt;- flexsurvreg(Surv(years, status) ~ factor(strategy_id),
+                           data = surv_dat,
+                           subset = (trans == i),
+                           dist = "weibull")
+}
+fits &lt;- flexsurvreg_list(fits)
+
+## Utility
+utility_tbl &lt;- stateval_tbl(data.frame(state_id = states$state_id,
+                                       mean = mstate3_exdata$utility$mean,
+                                       se = mstate3_exdata$utility$se),
+                            dist = "beta")
+## Costs
+drugcost_tbl &lt;- stateval_tbl(data.frame(strategy_id = strategies$strategy_id,
+                                        est = mstate3_exdata$costs$drugs$costs),
+                             dist = "fixed")
+medcost_tbl &lt;- stateval_tbl(data.frame(state_id = states$state_id,
+                                       mean = mstate3_exdata$costs$medical$mean,
+                                       se = mstate3_exdata$costs$medical$se),
+                            dist = "gamma")
+
+# Economic model
+n_samples = 2
+
+## Construct model
+### Transitions
+transmod_data &lt;- expand(hesim_dat)
+transmod &lt;- create_IndivCtstmTrans(fits, input_data = transmod_data,
+                                   trans_mat = tmat,
+                                   n = n_samples)
+
+### Utility
+utilitymod &lt;- create_StateVals(utility_tbl, n = n_samples, hesim_data = hesim_dat)
+
+### Costs
+drugcostmod &lt;- create_StateVals(drugcost_tbl, n = n_samples, hesim_data = hesim_dat)
+medcostmod &lt;- create_StateVals(medcost_tbl, n = n_samples, hesim_data = hesim_dat)
+costmods &lt;- list(drugs = drugcostmod,
+                 medical = medcostmod)
+
+### Combine
+ictstm &lt;- IndivCtstm$new(trans_model = transmod,
+                         utility_model = utilitymod,
+                         cost_models = costmods)
+
+
+## Simulate outcomes
+head(ictstm$sim_disease()$disprog_)
+head(ictstm$sim_stateprobs(t = c(0, 5, 10))$stateprobs_[t == 5])
+ictstm$sim_qalys(dr = .03)
+ictstm$sim_costs(dr = .03)
+
+### Summarize cost-effectiveness
+ce &lt;- ictstm$summarize()
+head(ce)
+format(summary(ce), pivot_from = "strategy")
+</code></pre>
+
+
+</div>

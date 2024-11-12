@@ -1,0 +1,181 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>contingencyTable.compare</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Contingency table comparison using Akaike weight</h2>
+
+<h3>Description</h3>
+
+<p>This function is used as a replacement of chisq.test() to not use p-value.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">contingencyTable.compare(
+  table,
+  criterion = c("AIC", "AICc", "BIC"),
+  probs = NULL
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>table</code></td>
+<td>
+<p>A matrix or a data.frame with series in rows and number of each category in column</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>criterion</code></td>
+<td>
+<p>Which criterion is used for model selection</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>probs</code></td>
+<td>
+<p>Series of probabilities used for conformity comparison</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>contingencyTable.compare compares contingency table using Akaike weight.
+</p>
+
+
+<h3>Value</h3>
+
+<p>The probability that a single proportion model is sufficient to explain the data
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Marc Girondot <a href="mailto:marc.girondot@gmail.com">marc.girondot@gmail.com</a>
+</p>
+
+
+<h3>References</h3>
+
+<p>Girondot, M., Guillon, J.-M., 2018. The w-value: An alternative to t- and X2 tests. Journal of Biostatistics &amp; Biometrics 1, 1-4.
+</p>
+
+
+<h3>See Also</h3>
+
+<p>Other w-value functions: 
+<code>compare()</code>,
+<code>series.compare()</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+library("HelpersMG")
+
+# Symmetry of Lepidochelys olivacea scutes
+table &lt;- t(data.frame(SriLanka=c(200, 157), AfricaAtl=c(19, 12), 
+                      Guyana=c(8, 6), Suriname=c(162, 88), 
+                      MexicoPac1984=c(42, 34), MexicoPac2014Dead=c(8, 9),
+                      MexicoPac2014Alive=c(13, 12), 
+                      row.names =c("Symmetric", "Asymmetric")))
+table
+contingencyTable.compare(table)
+
+table &lt;- t(data.frame(SriLanka=c(200, 157), AfricaAtl=c(19, 12), Guyana=c(8, 6),
+                      Suriname=c(162, 88), MexicoPac1984=c(42, 34), 
+                      MexicoPac2014Dead=c(8, 9),
+                      MexicoPac2014Alive=c(13, 12), Lepidochelys.kempii=c(99, 1), 
+                      row.names =c("Symmetric", "Asymmetric")))
+table
+contingencyTable.compare(table)
+
+# Conformity to a model
+table &lt;- matrix(c(33, 12, 25, 75), ncol = 2, byrow = TRUE)
+probs &lt;- c(0.5, 0.5)
+contingencyTable.compare(table, probs=probs)
+
+# Conformity to a model
+table &lt;- matrix(c(33, 12), ncol = 2, byrow = TRUE)
+probs &lt;- c(0.5, 0.5)
+contingencyTable.compare(table, probs=probs)
+
+# Conformity to a model
+table &lt;- matrix(c(33, 12, 8, 25, 75, 9), ncol = 3, byrow = TRUE)
+probs &lt;- c(0.8, 0.1, 0.1)
+contingencyTable.compare(table, probs=probs)
+
+# Comparison of chisq.test() and this function
+table &lt;- matrix(c(NA, NA, 25, 75), ncol = 2, byrow = TRUE)
+
+pv &lt;- NULL
+aw &lt;- NULL
+par(new=FALSE)
+n &lt;- 100
+
+for (GroupA in 0:n) {
+  table[1, 1] &lt;- GroupA
+  table[1, 2] &lt;- n-GroupA
+  pv &lt;- c(pv, chisq.test(table)$p.value)
+  aw &lt;- c(aw, contingencyTable.compare(table, criterion="BIC")[1])
+}
+
+x &lt;- 0:n
+y &lt;- pv
+y2 &lt;- aw
+plot(x=x, y=y, type="l", bty="n", las=1, xlab="Number of type P in Group B", ylab="Probability", 
+     main="", lwd=2)
+lines(x=x, y=y2, type="l", col="red", lwd=2)
+
+# w-value
+(l1 &lt;- x[which(aw&gt;0.05)[1]])
+(l2 &lt;- rev(x)[which(rev(aw)&gt;0.05)[1]])
+
+aw[l1]
+pv[l1]
+
+aw[l2+2]
+pv[l2+2]
+
+# p-value
+l1 &lt;- which(pv&gt;0.05)[1]
+l2 &lt;- max(which(pv&gt;0.05))
+
+aw[l1]
+pv[l1]
+
+aw[l2]
+pv[l2]
+
+y[which(y2&gt;0.05)[1]]
+y[which(rev(y2)&gt;0.05)[1]]
+
+par(xpd=TRUE)
+text(x=25, y=1.15, labels="Group A: 25 type P / 100", pos=1)
+
+segments(x0=25, y0=0, x1=25, y1=1, lty=3)
+
+# plot(1, 1)
+
+v1 &lt;- c(expression(italic("p")*"-value"), expression("after "*chi^2*"-test"))
+v2 &lt;- c(expression(italic("w")*"-value for A"), expression("and B identical models"))
+legend("topright", legend=c(v1, v2), 
+       y.intersp = 1, 
+       col=c("black", "black", "red", "red"), bty="n", lty=c(1, 0, 1, 0))
+
+segments(x0=0, x1=n, y0=0.05, y1=0.05, lty=2)
+text(x=101, y=0.05, labels = "0.05", pos=4)
+
+## End(Not run)
+</code></pre>
+
+
+</div>

@@ -1,0 +1,207 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>groupBound</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Lower bound on the l1-norm of groups of regression variables</h2>
+
+<h3>Description</h3>
+
+<p>Computes a lower bound that forms a one-sided confidence interval for
+the group l1-norm of a specified group of regression parameters. It is
+assumed that errors have a Gaussian distribution with unknown noise
+level.  The underlying vector that inference is made about is the
+l1-sparsest approximation to the noiseless data.
+
+
+
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">groupBound(x, y, group, alpha = 0.05, eps = 0.1, nsplit = 11,
+           s = min(10, ncol(x) - 1), setseed = TRUE,
+           silent = FALSE, lpSolve = TRUE, parallel = FALSE,
+           ncores = getOption("mc.cores", 2L))
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>numeric design matrix of the regression <code class="reqn">n \times p</code>
+with <code class="reqn">p</code> columns for <code class="reqn">p</code> predictor variables and <code class="reqn">n</code>
+rows corresponding to <code class="reqn">n</code> observations.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+<p>numeric response variable of length <code class="reqn">n</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>group</code></td>
+<td>
+<p>either a numeric vector with entries in <code class="reqn">\{1,...,p\}</code>
+or a <code>list</code> with such numeric vectors. If <code>group</code>
+is a numeric vector, this is the group of variables for which a
+lower bound is computed. If <code>group</code> is a list, the lower bound
+is computed for each group in the list.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alpha</code></td>
+<td>
+<p>numeric level in <code class="reqn">(0,1)</code> at which the test /
+confidence interval is computed.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>eps</code></td>
+<td>
+<p>a level of eps * alpha is used and the values of different
+splits are aggregated using the (1 - eps) quantile. See reference
+below for more details.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nsplit</code></td>
+<td>
+<p>the number of data splits used.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>s</code></td>
+<td>
+<p>the dimensionality of the projection that is used.  Lower
+values lead to faster computation and if <code class="reqn">n &gt; 50</code>, then <code>s</code>
+is set to 50 if left unspecified, to avoid lengthy computations.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>setseed</code></td>
+<td>
+<p>a logical; if this is true (recommended), then the same
+random seeds are used for all groups, which makes the confidence
+intervals simultaneously valid over all groups of variables tested.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>silent</code></td>
+<td>
+<p>logical enabling progress output.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lpSolve</code></td>
+<td>
+<p>logical; only set it to false if <code>lpSolve()</code> is not
+working on the current machine: setting it to false will result in
+much slower computations; only use on small problems.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>parallel</code></td>
+<td>
+<p>should parallelization be used? (logical)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ncores</code></td>
+<td>
+<p>number of cores used for parallelization.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The data are split since the noise level is unknown.  On the
+first part of the random split, a cross-validated lasso solution is
+computed, using the <a href="https://CRAN.R-project.org/package=glmnet"><span class="pkg">glmnet</span></a> implementation.  This estimator
+is used as an initial estimator on the second half of the data.
+Results at level <code>alpha</code> are aggregated over <code>nsplit</code> splits
+via the median of results at levels <code>alpha/2</code>.
+</p>
+
+
+<h3>Value</h3>
+
+<p>If <code>group</code> is a single numeric vector, a scalar containg the lower
+bound for this group of variables is returned. If <code>group</code> is a
+list, a numeric vector is retuned where each entry corresponds to the
+group of variables defined in the same order in <code>group</code>.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Nicolai Meinshausen</p>
+
+
+<h3>References</h3>
+
+<p>Meinshausen, N. (2015)
+Group bound: confidence intervals for groups of variables in sparse
+high dimensional regression without assumptions on the design.
+<em>Journal of the Royal Statistical Society: Series B</em>, <b>77</b>,
+923–945; doi: <a href="https://doi.org/10.1111/rssb.12094">10.1111/rssb.12094</a>.
+</p>
+
+
+<h3>See Also</h3>
+
+<p>Use <code>clusterGroupBound</code> to test all groups in a
+hierarchical clustering tree.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Create a regression problem with correlated design: p = 6, n = 50,
+## block size B = 3 and within-block correlation of rho = 0.99
+p   &lt;- 6
+n   &lt;- 50
+B   &lt;- 3
+rho &lt;- 0.99
+
+ind   &lt;- rep(1:ceiling(p / B), each = B)[1:p]
+Sigma &lt;- diag(p)
+
+for (ii in unique(ind)){
+  id &lt;- which(ind == ii)
+  Sigma[id, id] &lt;- rho
+}
+diag(Sigma) &lt;- 1
+
+x &lt;- matrix(rnorm(n * p), nrow = n) %*% chol(Sigma)
+
+## Create response with active variable 1
+beta    &lt;- rep(0, p)
+beta[1] &lt;- 5
+
+y  &lt;- as.numeric(x %*% beta + rnorm(n))
+
+## Compute lower bounds:
+
+## Lower bound for the L1-norm of *all* variables 1-6 of the sparsest
+## optimal vector
+nsplit &lt;- 4  ## to make example run fast (use larger value)
+lowerBoundAll &lt;- groupBound(x, y, 1:p, nsplit = nsplit)
+cat("\nlower bound for all variables 1-6: ", lowerBoundAll, "\n")
+
+## Compute additional lower bounds:
+q()## Lower bounds for variable 1 itself, then group {1,3}, 1-2, 1-3, 2-6,
+lowerBound &lt;- groupBound(x, y, list(1, c(1,3), 1:2, 1:3, 2:6),
+                         nsplit = nsplit)
+cat("lower bound for the groups\n\t {1}, {1,3}, {1,2}, {1..3}, {2..6}:\n\t",
+    format(formatC(c(lowerBound))), "\n")
+</code></pre>
+
+
+</div>

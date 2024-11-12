@@ -1,0 +1,137 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>as_Workbook</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Convert a huxtable for Excel</h2>
+
+<h3>Description</h3>
+
+<p>If the <code>openxlsx</code> package is installed, Huxtables can be converted to
+<code>openxlsx::openxlsx()</code> Worbook objects, for use in Excel documents.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">as_Workbook(ht, ...)
+
+## S3 method for class 'huxtable'
+as_Workbook(
+  ht,
+  Workbook = NULL,
+  sheet = "Sheet 1",
+  write_caption = TRUE,
+  start_row = 1,
+  start_col = 1,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>ht</code></td>
+<td>
+<p>A huxtable.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Not used.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Workbook</code></td>
+<td>
+<p>An existing <code>Workbook</code> object. By default, a new workbook will be created.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sheet</code></td>
+<td>
+<p>Name for the worksheet where the huxtable will be created.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>write_caption</code></td>
+<td>
+<p>If <code>TRUE</code>, print any caption in the row above or below the table.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>start_row, start_col</code></td>
+<td>
+<p>Number. Write data starting at the given row and column.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Use <code>openxlsx::saveWorkbook()</code> to save the resulting object to an Excel file.
+</p>
+<p>Properties are supported with the following exceptions:
+</p>
+
+<ul>
+<li>
+<p> Non-numeric column widths and row heights, table width and height.
+</p>
+</li>
+<li>
+<p> Decimal padding.
+</p>
+</li>
+<li>
+<p> Cell padding.
+</p>
+</li>
+<li>
+<p> Table position.
+</p>
+</li>
+<li>
+<p> Caption width.
+</p>
+</li>
+</ul>
+<p>Huxtable tries to guess appropriate widths and height for rows and columns; numeric <code>width()</code> and
+<code>height()</code> are treated as scaling factors.
+</p>
+<p>Contents are only stored as numbers if a whole column is "numeric", i.e. can
+be converted by <code>as.numeric()</code>). Otherwise, they are stored as text.
+</p>
+
+
+<h3>Value</h3>
+
+<p>An object of class <code>Workbook</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">wb &lt;- as_Workbook(jams)
+
+## Not run: 
+  openxlsx::saveWorkbook(wb,
+        "my-excel-file.xlsx")
+
+## End(Not run)
+
+# multiple sheets in a single workbook:
+wb &lt;- openxlsx::createWorkbook()
+wb &lt;- as_Workbook(jams,
+      Workbook = wb, sheet = "sheet1")
+wb &lt;- as_Workbook(
+      hux("Another", "huxtable"),
+      Workbook = wb,
+      sheet = "sheet2")
+</code></pre>
+
+
+</div>

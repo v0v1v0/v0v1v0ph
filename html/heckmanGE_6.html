@@ -1,0 +1,183 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>heckmanGE</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>heckmanGE: A Package for Fitting Sample Selection Models</h2>
+
+<h3>Description</h3>
+
+<p>This package provides functions for fitting sample selection models,
+specifically the Heckman-Ge model. It includes functionality for specifying
+selection and outcome equations, as well as adjusting parameters for dispersion
+and correlation.
+</p>
+<p>Estimates the parameters of the Generalized Heckman model
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">heckmanGE(
+  selection,
+  outcome,
+  dispersion,
+  correlation,
+  data = sys.frame(sys.parent()),
+  weights = NULL,
+  cluster = NULL,
+  start = NULL
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>selection</code></td>
+<td>
+<p>A formula. Selection equation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>outcome</code></td>
+<td>
+<p>A formula. Outcome Equation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dispersion</code></td>
+<td>
+<p>A right-handed formula. The equation for fitting of the
+Dispersion Parameter.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>correlation</code></td>
+<td>
+<p>A right-handed formula. The equation for fitting of the
+Correlation Parameter.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>A data.frame.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>weights</code></td>
+<td>
+<p>an optional vector of weights to be used in the fitting process.
+Should be NULL or a numeric vector.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cluster</code></td>
+<td>
+<p>a variable indicating the clustering of observations, a list
+(or data.frame) thereof, or a formula specifying which variables from the
+fitted model should be used. See documentation for sandwich::vcovCL. A formula
+or list specifying the clusters for robust standard errors. Clustering adjusts
+the standard errors by accounting for correlations within clusters.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>start</code></td>
+<td>
+<p>Optional. A numeric vector with the initial values for the
+parameters.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Optimized Function for fitting the Generalized Heckman Model
+</p>
+<p>(original version: package ssmodels. Modified by Rogerio Barbosa)
+</p>
+<p>The heckmanGE() function fits a generalization of the Heckman sample
+selection model, allowing sample selection bias and dispersion parameters
+to depend on covariates.
+The <code>heckmanGE()</code> function fits a generalization of the Heckman sample
+selection model, and is compatible with robust variance-covariance estimation
+using packages such as <span class="pkg">sandwich</span>. In particular, the
+<code>vcovCL</code> function can be used for clustering, which
+adjusts the standard errors by accounting for intra-cluster correlations in the data.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A list of results from the fitted model, including parameter estimates,
+the Hessian matrix, number of observations, and other relevant statistics. If
+initial values are not provided, the function estimates them using the Heckman
+two-step method.
+</p>
+<p>A list containing:
+</p>
+
+<dl>
+<dt>call</dt>
+<dd>
+<p>The matched function call.</p>
+</dd>
+<dt>coefficients</dt>
+<dd>
+<p>Estimated coefficients for the selection, outcome,
+dispersion, and correlation equations.</p>
+</dd>
+<dt>vcov</dt>
+<dd>
+<p>The covariance matrix of the estimated coefficients.</p>
+</dd>
+<dt>logLik</dt>
+<dd>
+<p>The log-likelihood of the fitted model.</p>
+</dd>
+<dt>model.frames</dt>
+<dd>
+<p>List of model frames for each equation (selection, outcome,
+dispersion, and correlation).</p>
+</dd>
+<dt>fitted.values</dt>
+<dd>
+<p>Fitted values of the outcome equation.</p>
+</dd>
+</dl>
+<h3>Author(s)</h3>
+
+<p>Fernando de Souza Bastos
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>vcovCL</code> for computing robust standard errors with clustering.
+The function is compatible with the <span class="pkg">sandwich</span> package for estimating
+heteroskedasticity-consistent and cluster-robust standard errors.
+This can be useful for adjusting the standard errors when dealing with grouped
+or clustered data. For more details, see the documentation for
+<code>vcovCL</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(MEPS2001)
+selectEq  &lt;- dambexp ~ age + female + educ + blhisp + totchr + ins + income
+outcomeEq &lt;- lnambx ~ age + female + educ + blhisp + totchr + ins
+dispersion  &lt;- ~ age + female + totchr + ins
+correlation  &lt;- ~ age
+fit &lt;- heckmanGE(selection = selectEq,
+                 outcome = outcomeEq,
+                 dispersion = dispersion,
+                 correlation = correlation,
+                 data = MEPS2001)
+summary(fit)
+</code></pre>
+
+
+</div>

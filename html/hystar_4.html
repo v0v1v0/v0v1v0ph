@@ -1,0 +1,222 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hystar_sim</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Simulate data from the HysTAR model</h2>
+
+<h3>Description</h3>
+
+<p>With this function, you can simulate observations from the
+HysTAR model, given its parameter values.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hystar_sim(z, r, d, phi_R0, phi_R1, resvar = c(1, 1), start_regime = NULL)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>z</code></td>
+<td>
+<p>A numeric vector representing the observed threshold variable.
+You can simulate <code>z</code> with <code>z_sim()</code>. Can not have missing values.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>r</code></td>
+<td>
+<p>A numeric vector of length 2, representing the threshold values
+<code class="reqn">r_0</code> and <code class="reqn">r_1</code>. The values must be inside the range of z, that is,
+larger than <code>min(z)</code> and smaller than <code>max(z)</code>. Otherwise, only one regime will
+be active so you might as well simulate an AR process, e.g. with <code>arima.sim()</code>.
+If you simulated <code>z</code> with <code>z_sim()</code> and <code>start_hyst = TRUE</code>, make sure to
+set the threshold values around the middle of the range of <code>z</code>, otherwise,
+the start will not be hysteretic.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>d</code></td>
+<td>
+<p>A positive whole number representing the value of the
+delay parameter. It must be smaller than <code>length(z)</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>phi_R0</code></td>
+<td>
+<p>A vector containing the constant and autoregressive parameters
+<code class="reqn">(\phi_0^{(0)}, \phi_1^{(0)}, \dots, \phi_{p_0}^{(0)})</code> of Regime 0.
+Note that the first value of this vector is <em>always</em> interpreted as the
+constant, so for an AR(1) process with no constant, you must use
+<code>phi_R0 = c(0, .5)</code>, for example. Both orders must be smaller than <code>length(z)</code>.
+For valid standard errors of the estimates in <code>hystar_fit()</code>, the coefficients
+should imply that <code>y</code> is stationary, see Details.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>phi_R1</code></td>
+<td>
+<p>The same as <code>phi_R0</code>, but for Regime 1.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>resvar</code></td>
+<td>
+<p>A numeric vector of length 2 representing the variances of the
+residuals <code class="reqn">\sigma_{(0)}^2</code> and <code class="reqn">\sigma_{(1)}^2</code>. The residuals are
+sampled from a normal distribution in the current implementation, but note
+that the model is defined for any i.i.d. vector of residuals with zero mean and
+finite variance.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>start_regime</code></td>
+<td>
+<p>Optionally, a 0 or 1 that indicates which regime should be the
+first, in case the <code>z</code> variable starts in the hysteresis zone.
+This is only necessary when you use your 'own' <code>z</code> variable
+AND <code>z</code> starts in the hysteresis zone.
+A vector <code>z</code> simulated with <code>z_sim()</code> will contain information about if
+the start is hysteretic and what the starting regime is supposed to be
+(in the <code>attributes()</code> of <code>z</code>).</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Some details:
+</p>
+
+<ul>
+<li>
+<p> To simulate <code>y</code>, 50 burn-in samples according the starting regime are used.
+</p>
+</li>
+<li>
+<p> The coefficients imply a stationary process of <code class="reqn">y_t</code> if
+<code class="reqn">\sum_{i=1}^{p_0} \phi_i^{(0)} &lt; 1</code> and
+<code class="reqn">\sum_{i=1}^{p_1} \phi_i^{(1)} &lt; 1</code>. See Zhu, Yu and Li (2013), p5.
+</p>
+</li>
+</ul>
+<h3>Value</h3>
+
+<p>A list of class <code>hystar_sim</code> with elements
+</p>
+
+<ul>
+<li> <p><code style="white-space: pre;">⁠$data⁠</code>, a <code>data.frame</code> with <code>length(z)</code> rows and 4 columns:
+</p>
+
+<ul>
+<li> <p><code>y</code>, the outcome variable
+</p>
+</li>
+<li> <p><code>z</code>, the threshold variable
+</p>
+</li>
+<li> <p><code>H</code>, a logical vector that indicates at which time
+points the hysteresis effect is happening. Note that this vector starts
+with <code>NA</code>(s), since the first <code class="reqn">d</code> time points have no values observed
+for <code class="reqn">z_{t-d}</code>.
+</p>
+</li>
+<li> <p><code>R</code>, the regime indicator vector.
+</p>
+</li>
+</ul>
+</li>
+<li> <p><code style="white-space: pre;">⁠$r⁠</code>, a numeric vector with the two threshold values,
+</p>
+</li>
+<li> <p><code style="white-space: pre;">⁠$d⁠</code>, the delay parameter,
+</p>
+</li>
+<li> <p><code style="white-space: pre;">⁠$phi⁠</code>, a numeric vector containing the coefficients. The names are such
+that <code>phi_R1_2</code> represents <code class="reqn">\phi_{2}^{(1)}</code>, the second lag
+autoregressive coefficient in Regime 1,
+</p>
+</li>
+<li> <p><code style="white-space: pre;">⁠$orders⁠</code>, a numeric vector containing the two orders, and
+</p>
+</li>
+<li> <p><code style="white-space: pre;">⁠$resvar⁠</code>, a numeric vector with the residual variances of both regimes.
+</p>
+</li>
+</ul>
+<p>Implemented generics for the <code>hystar_sim</code> class:
+</p>
+
+<ul>
+<li> <p><code>plot()</code> plots the <code>z</code> variable and the <code>y</code> variable above one another.
+Shading of the background visualizes the regimes. Thresholds are drawn as
+horizontal lines in the <code>z</code> plot. You can provide regime_names (char vector of 2),
+main (char vector of 1), xlab (char vector of 1) and ylab (char vector of 2).
+</p>
+</li>
+<li> <p><code>summary()</code> gives an overview of the true parameter values that were used.
+</p>
+</li>
+<li> <p><code>print()</code> prints the parameter values within the mathematical representation
+of the model. Note that the scalar multiplied with <code>e[t]</code> is the standard deviation
+of the residuals, <em>not</em> the variance. See also the model definition above.
+</p>
+</li>
+</ul>
+<h3>The HysTAR model</h3>
+
+<p>The HysTAR model is defined as:
+</p>
+<p><code class="reqn"> y_t = \begin{cases} \phi_{00} + \phi_{01} y_{t-1} + \cdots +
+  \phi_{0 p_0} y_{t-p_0} + \sigma_{0} \epsilon_{t} \quad \mathrm{if}~R_{t} = 0 \\
+  \phi_{10} + \phi_{11} y_{t-1} + \cdots + \phi_{1 p_1} y_{t-p_1} + \sigma_{1} \epsilon_{t}
+  \quad \mathrm{if}~R_{t} = 1, \\ \end{cases} </code>
+</p>
+<p>with <code class="reqn"> R_t = \begin{cases} 0 \quad \quad \mathrm{if} \, z_{t-d} \in (-\infty, r_{0}] \\
+  R_{t-1} \quad \mathrm{if} \, z_{t-d} \in (r_0, r_1] \\ 1 \quad \quad \mathrm{if} \, z_{t-d}
+  \in (r_1, \infty), \\ \end{cases} </code>
+</p>
+<p>where <code class="reqn">p_j</code> denotes the order of regime <code class="reqn">j \in \{0,1\}</code> with
+coefficients <code class="reqn">\phi_{j0}, \dots, \phi_{j p_j \in (-1, 1)}</code>,
+<code class="reqn">\sigma_{j}</code> is the standard deviation of the residuals, and <code class="reqn">d \in
+  \{0, 1, 2, \dots\}</code> is a delay parameter. The parameters of primary interest are
+the thresholds <code class="reqn">r_0 \le r_1</code>. We let <code class="reqn">t = 0, 1, 2, ..., T</code>, where <code class="reqn">T</code>
+is the number of observations.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Daan de Jong.
+</p>
+
+
+<h3>References</h3>
+
+<p>Li, Guodong, Bo Guan, Wai Keung Li, en Philip L. H. Yu.
+‘Hysteretic Autoregressive Time Series Models’. Biometrika 102, nr. 3
+(september 2015): 717–23.
+</p>
+<p>Zhu, Ke, Philip L H Yu, en Wai Keung Li. ‘Testing for the Buffered
+Autoregressive Process’. Munich Personal RePEc Archive, (november 2013).
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">z &lt;- z_sim(n_t = 200, n_switches = 5, start_regime = 1)
+sim &lt;- hystar_sim(z = z, r = c(-.5, .5), d = 2, phi_R0 = c(0, .6), phi_R1 = 1)
+plot(sim)
+fit &lt;- hystar_fit(sim$data)
+summary(fit)
+</code></pre>
+
+
+</div>

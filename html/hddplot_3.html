@@ -1,0 +1,280 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>cvdisc</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Cross-validated accuracy, in linear discriminant calculations</h2>
+
+<h3>Description</h3>
+
+<p>Determine cross-validated accuracy, for each of a number of features in
+a specified range, with feature selection repeated at each step of the
+cross-validation.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">cvdisc(x, cl, nfold = c(10,1), test = "f", nfeatures = 2, seed = 31,
+       funda = lda, print.progress = TRUE, subset = NULL)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>Matrix; rows are features, and columns are observations
+('samples')</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cl</code></td>
+<td>
+<p>Factor that classifies columns into groups</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nfold</code></td>
+<td>
+<p>Number of folds for the cross-validation. Optionally, a second
+number species the number of repeats of the cross-validation.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>test</code></td>
+<td>
+<p>What statistic will be used to measure separation between
+groups? Currently <code>"f"</code> is the only possibility.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nfeatures</code></td>
+<td>
+<p>Specifies the different numbers of features (e.g., 1:10)
+that will be tried, to determine cross-validation accuracy in each
+instance</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>seed</code></td>
+<td>
+<p>This can be used to specify a starting value for the random
+number generator, in order to make calculations repeatable</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>funda</code></td>
+<td>
+<p>Function that will be used for discrimination.  Currently
+<code>lda</code> is the only option</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>print.progress</code></td>
+<td>
+<p>Set to <code>TRUE</code> (default) for printing out,
+as calculations proceed, the number of the current fold</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>subset</code></td>
+<td>
+<p>Allows the use of a subset of the samples (observations)</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>folds</code></td>
+<td>
+<p>Each column gives, for one run of the cross-validation,
+numbers that identify the <code>nfold</code> distinct folds of the
+cross-validation</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>xUsed</code></td>
+<td>
+<p>returns the rows of <code>x</code> that were used,
+in at least one fold</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cl</code></td>
+<td>
+<p>Factor that classifies columns into groups</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>acc.cv</code></td>
+<td>
+<p>Cross-validated accuracy</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>genelist</code></td>
+<td>
+<p>Array: <code>max(nfeatures)</code> by number of folds by
+number of repeats, identifying the features chosen at each repeat of
+each fold.  (for <code>k</code> &lt; <code>max(nfeatures)</code> features, take the
+initial <code>k</code> rows</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Fmatrix</code></td>
+<td>
+<p>Array, with the same dimensions as <code>genelist</code>,
+that gives the anova F-statistic when that feature is used on its own
+to separate groups</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nfeatures</code></td>
+<td>
+<p>Specifies the different numbers of features that were
+tried, to determine cross-validation accuracy in each instance</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>John Maindonald</p>
+
+
+<h3>See Also</h3>
+
+<p>See also <code>cvscores</code>, <code>scoreplot</code></p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Use first 500 rows (expression values) of Golub, for demonstration.
+data(Golub)
+data(golubInfo)
+attach(golubInfo)
+miniG.BM &lt;- Golub[1:500, BM.PB=="BM"]  # 1st 500 rows only
+cancer.BM &lt;- cancer[BM.PB=="BM"]
+miniG.cv &lt;- cvdisc(miniG.BM, cl=cancer.BM, nfeatures=1:10,
+                    nfold=c(3,1))
+## Plot cross-validated accuracy, as a function of number of features
+plot(miniG.cv$acc.cv, type="l")
+
+
+## The function is currently defined as
+function(x, cl, nfold=NULL, test="f",
+           nfeatures=2, seed=31, funda=lda, print.progress=TRUE,
+           subset=NULL){
+    ## If nfold is not specified, use leave-one-out CV
+    if(is.null(nfold))nfold &lt;- sum(!is.na(cl))
+    ## Option to omit one or more points
+    if(!is.null(subset)){cl[!is.na(cl)][!subset] &lt;- NA
+                         nfold[1] &lt;- min(nfold[1], sum(!is.na(cl)))
+                       }
+    if(any(is.na(cl))){x &lt;- x[,!is.na(cl)]
+                       cl &lt;- cl[!is.na(cl)]
+                     }
+    if(length(nfold)==1)nfold &lt;- c(nfold,1)
+    cl &lt;- factor(cl)
+    ngp &lt;- length(levels(cl))
+    genes &lt;- rownames(x)
+    nobs &lt;- dim(x)[2]
+    if(is.null(genes)){
+      genes &lt;- paste(1:dim(x)[1])
+      print("Input rows (features) are not named. Names")
+      print(paste(1,":", dim(x)[1], " will be assigned.", sep=""))
+      rownames(x) &lt;- genes
+    }
+    require(MASS)
+    if(!is.null(seed))set.seed(seed)
+    Fcut &lt;- NULL
+    maxgenes &lt;- max(nfeatures)
+    ## Cross-validation calculations
+    if(nfold[1]==nobs)foldids &lt;- matrix(sample(1:nfold[1]),ncol=1) else
+    foldids &lt;- sapply(1:nfold[2], function(x)
+                     divideUp(cl, nset=nfold[1]))
+    genelist &lt;- array("", dim=c(nrow=maxgenes, ncol=nfold[1], nleaf=nfold[2]))
+    Fmatrix &lt;- array(0, dim=c(nrow=maxgenes, ncol=nfold[1], nleaf=nfold[2]))
+    testscores &lt;- NULL
+    acc.cv &lt;- numeric(maxgenes)
+    if(print.progress)
+      cat("\n", "Preliminary per fold calculations","\n")
+    for(k in 1:nfold[2])
+      {
+        foldk &lt;- foldids[,k]
+    ufold &lt;- sort(unique(foldk))
+    for(i in ufold){
+      if(print.progress) cat(paste(i,":",sep=""))
+      trainset &lt;- (1:nobs)[foldk!=i]
+      cli &lt;- factor(cl[trainset])
+
+      stat &lt;- aovFbyrow(x=x[, trainset], cl=cli)
+      ordi &lt;- order(-abs(stat))[1:maxgenes]
+      genelist[,i, k] &lt;- genes[ordi]
+      Fmatrix[, i, k] &lt;- stat[ordi]
+    }
+  }
+    ulist &lt;- unique(as.vector(genelist))
+    df &lt;- data.frame(t(x[ulist, , drop=FALSE]))
+    names(df) &lt;- ulist
+#######################################################################
+    if(print.progress)cat("\n", "Show each choice of number of features:","\n")
+    for(ng in nfeatures){
+      hat &lt;- cl
+      if(print.progress)cat(paste(ng,":",sep=""))
+    for(k in 1:nfold[2])
+      {
+        foldk &lt;- foldids[,k]
+        ufold &lt;- sort(unique(foldk))
+      for(i in ufold){
+        testset &lt;- (1:nobs)[foldk==i]
+        trainset &lt;- (1:nobs)[foldk!=i]
+        ntest &lt;- length(testset)
+        ntrain &lt;- nobs-ntest
+        genes.i &lt;- genelist[1:ng, i, k]
+        dfi &lt;- df[-testset, genes.i, drop=FALSE]
+        newdfi &lt;- df[testset, genes.i, drop=FALSE]
+        cli &lt;- cl[-testset]
+        xy.xda &lt;- funda(cli~., data=dfi)
+        subs &lt;- match(colnames(dfi), rownames(df))
+        newpred.xda &lt;- predict(xy.xda, newdata=newdfi, method="debiased")
+        hat[testset] &lt;- newpred.xda$class
+      }
+        tabk &lt;- table(hat,cl)
+        if(k==1)tab &lt;- tabk else tab &lt;- tab+tabk
+      }
+      acc.cv[ng] &lt;- sum(tab[row(tab)==col(tab)])/sum(tab)
+    }
+    cat("\n")
+    if(length(nfeatures)&gt;1&amp;all(diff(nfeatures)==1)){
+      nobs &lt;- length(cl)
+      ng1 &lt;- length(acc.cv)
+      maxacc1 &lt;- max(acc.cv)
+      sub1 &lt;- match(maxacc1, acc.cv)
+      nextacc1 &lt;- max(acc.cv[acc.cv&lt;1])
+      lower1 &lt;- maxacc1-sqrt(nextacc1*(1-nextacc1)/nobs)
+      lsub1 &lt;- min((1:ng1)[acc.cv&gt;lower1])
+      lower &lt;- c("Best accuracy, less 1SD  ",
+                 paste(paste(round(c(lower1),2), c(lsub1),
+                             sep=" ("), " features)   ", sep=""))
+      best &lt;- c("Best accuracy",
+                paste(paste(round(c(maxacc1),2), c(sub1),
+                            sep=" ("), " features)", sep=""))
+      acc.df &lt;- cbind(lower, best)
+      dimnames(acc.df) &lt;- list(c("Accuracy",
+                                 "(Cross-validation)"),c("",""))
+      print(acc.df, quote=FALSE)
+    }
+    invisible(list(foldids=foldids, xUsed=df, cl=cl, acc.cv=acc.cv,
+                   genelist=genelist, Fmatrix=Fmatrix, nfeatures=nfeatures))
+  }
+</code></pre>
+
+
+</div>

@@ -1,0 +1,236 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>tradesCleanup</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Cleans trade data</h2>
+
+<h3>Description</h3>
+
+<p>This is a wrapper function for cleaning the trade data of all stock data inside the folder dataSource. 
+The result is saved in the folder dataDestination. 
+</p>
+<p>In case you supply the argument <code>rawtData</code>, the on-disk functionality is ignored. The function returns a vector
+indicating how many trades were removed at each cleaning step in this case.
+and the function returns an <code>xts</code> or <code>data.table</code> object.
+</p>
+<p>The following cleaning functions are performed sequentially:
+<code>noZeroPrices</code>, <code>autoSelectExchangeTrades</code> or <code>selectExchange</code>, <code>tradesCondition</code>, and
+<code>mergeTradesSameTimestamp</code>.
+</p>
+<p>Since the function <code>rmTradeOutliersUsingQuotes</code>
+also requires cleaned quote data as input, it is not incorporated here and
+there is a separate wrapper called <code>tradesCleanupUsingQuotes</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">tradesCleanup(
+  dataSource = NULL,
+  dataDestination = NULL,
+  exchanges = "auto",
+  tDataRaw = NULL,
+  report = TRUE,
+  selection = "median",
+  validConds = c("", "@", "E", "@E", "F", "FI", "@F", "@FI", "I", "@I"),
+  marketOpen = "09:30:00",
+  marketClose = "16:00:00",
+  printExchange = TRUE,
+  saveAsXTS = FALSE,
+  tz = NULL
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>dataSource</code></td>
+<td>
+<p>character indicating the folder in which the original data is stored.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dataDestination</code></td>
+<td>
+<p>character indicating the folder in which the cleaned data is stored.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>exchanges</code></td>
+<td>
+<p>vector of stock exchange symbols for all data in <code>dataSource</code>, 
+e.g. <code>exchanges = c("T","N")</code> retrieves all stock market data from both NYSE and NASDAQ.
+The possible exchange symbols are:
+</p>
+
+<ul>
+<li>
+<p> A: AMEX
+</p>
+</li>
+<li>
+<p> N: NYSE
+</p>
+</li>
+<li>
+<p> B: Boston
+</p>
+</li>
+<li>
+<p> P: Arca
+</p>
+</li>
+<li>
+<p> C: NSX
+</p>
+</li>
+<li>
+<p> T/Q: NASDAQ
+</p>
+</li>
+<li>
+<p> D: NASD ADF and TRF
+</p>
+</li>
+<li>
+<p> X: Philadelphia
+</p>
+</li>
+<li>
+<p> I: ISE
+</p>
+</li>
+<li>
+<p> M: Chicago
+</p>
+</li>
+<li>
+<p> W: CBOE
+</p>
+</li>
+<li>
+<p> Z: BATS
+</p>
+</li>
+</ul>
+<p> The default value is <code>"auto"</code> which automatically selects the exchange for the stocks and days independently using the <code>autoSelectExchangeTrades</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tDataRaw</code></td>
+<td>
+<p><code>xts</code> object containing raw trade data. This argument is <code>NULL</code> by default. Enabling it means the arguments
+<code>from</code>, <code>to</code>, <code>dataSource</code> and <code>dataDestination</code> will be ignored (only advisable for small chunks of data).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>report</code></td>
+<td>
+<p>boolean and <code>TRUE</code> by default. In case it is true the function returns (also) a vector indicating how many trades remained after each cleaning step.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>selection</code></td>
+<td>
+<p>argument to be passed on to the cleaning routine <code>mergeTradesSameTimestamp</code>. The default is "median".</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>validConds</code></td>
+<td>
+<p>character vector containing valid sales conditions. Passed through to <code>tradesCondition</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>marketOpen</code></td>
+<td>
+<p>character in the format of <code>"HH:MM:SS"</code>,
+specifying the opening time of the exchange(s).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>marketClose</code></td>
+<td>
+<p>character in the format of <code>"HH:MM:SS"</code>,
+specifying the closing time of the exchange(s).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>printExchange</code></td>
+<td>
+<p>Argument passed to <code>autoSelectExchangeTrades</code> indicates whether the chosen exchange is printed on the console, 
+default is TRUE. This is only used when <code>exchanges</code> is <code>"auto"</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>saveAsXTS</code></td>
+<td>
+<p>indicates whether data should be saved in <code>xts</code> format instead of <code>data.table</code> when using on-disk functionality. FALSE by default.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tz</code></td>
+<td>
+<p>fallback time zone used in case we we are unable to identify the timezone of the data, by default: <code>tz = NULL</code>. 
+With the non-disk functionality, we attempt to extract the timezone from the DT column (or index) of the data, which may fail. 
+In case of failure we use <code>tz</code> if specified, and if it is not specified, we use <code>"UTC"</code>. 
+In the on-disk functionality, if <code>tz</code> is not specified, the timezone used will be the system default.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Using the on-disk functionality with .csv.zip files from the WRDS database
+will write temporary files on your machine in order to unzip the files - we try to clean up after it,
+but cannot guarantee that there won't be files that slip through the crack if the permission settings on your machine does not match 
+ours.
+</p>
+<p>If the input <code>data.table</code> does not contain a DT column but it does contain DATE and TIME_M columns, we create the DT column by REFERENCE, altering the <code>data.table</code> that may be in the user's environment.
+</p>
+
+
+<h3>Value</h3>
+
+<p>For each day an <code>xts</code> or <code>data.table</code> object is saved into the folder of that date, containing the cleaned data.
+This procedure is performed for each stock in <code>"ticker"</code>.
+The function returns a vector indicating how many trades remained after each cleaning step.
+</p>
+<p>In case you supply the argument <code>rawtData</code>, the on-disk functionality is ignored
+and the function returns a list with the cleaned trades as <code>xts</code> object (see examples).
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup
+</p>
+
+
+<h3>References</h3>
+
+<p>Barndorff-Nielsen, O. E., Hansen, P. R., Lunde, A., and Shephard, N. (2009). Realized kernels in practice: Trades and quotes. <em>Econometrics Journal</em>, 12, C1-C32.
+</p>
+<p>Brownlees, C.T. and Gallo, G.M. (2006). Financial econometric analysis at ultra-high frequency: Data handling concerns. <em>Computational Statistics &amp; Data Analysis</em>, 51, 2232-2245.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Consider you have raw trade data for 1 stock for 2 days 
+head(sampleTDataRaw)
+dim(sampleTDataRaw)
+tDataAfterFirstCleaning &lt;- tradesCleanup(tDataRaw = sampleTDataRaw, 
+                                         exchanges = list("N"))
+tDataAfterFirstCleaning$report
+dim(tDataAfterFirstCleaning$tData)
+# In case you have more data it is advised to use the on-disk functionality
+# via "dataSource" and "dataDestination" arguments
+
+</code></pre>
+
+
+</div>

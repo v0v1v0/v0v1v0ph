@@ -1,0 +1,150 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>full_wave</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Automatic Wave Calculation</h2>
+
+<h3>Description</h3>
+
+<p>Performs a full wave of emulation and history matching, given data.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">full_wave(
+  data,
+  ranges,
+  targets,
+  old_emulators = NULL,
+  prop_train = 0.7,
+  cutoff = 3,
+  nth = 1,
+  verbose = interactive(),
+  n_points = nrow(data),
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>The data to train with.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ranges</code></td>
+<td>
+<p>The ranges of the input parameters</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>targets</code></td>
+<td>
+<p>The output targets to match to.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>old_emulators</code></td>
+<td>
+<p>Any emulators from previous waves.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>prop_train</code></td>
+<td>
+<p>What proportion of the data is used for training.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cutoff</code></td>
+<td>
+<p>The implausibility cutoff for point generation and diagnostics.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nth</code></td>
+<td>
+<p>The level of maximum implausibility to consider.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p>Should progress be printed to console?</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n_points</code></td>
+<td>
+<p>The number of points to generate from <code>generate_new_design</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Any arguments to be passed to <code>emulator_from_data</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>This function uses all of the functionality from the package in a relatively conservative form.
+The function performs the following steps:
+</p>
+<p>1) Split the data into a training set and a validation set, where <code>prop_train</code> indicates
+what proportion of the data is used to train.
+</p>
+<p>2) Perform emulator training using <code>emulator_from_data</code>. If a more involved
+specification is desired, optional arguments can be passed to <code>emulator_from_data</code> using
+the <code>...</code> argument.
+</p>
+<p>3) Perform diagnostics on the trained emulators, removing emulators that do not display
+acceptable performance. Global emulator variance may also be modified to ensure that none of
+the emulators demonstrate misclassification errors (from <code>classification_diag</code>).
+</p>
+<p>4) Ordering the remaining emulators from most restrictive to least restrictive on the dataset
+provided at this wave. Some point generation mechanisms terminate early if a point is ruled
+out by a single emulator, so the ordering ensures this happens earlier rather than later.
+</p>
+<p>5) Generate the new points using the default method of <code>generate_new_design</code>, using
+the normal procedure (for details, see the description for generate_new_design). By default, it
+generates the same number of points as it was provided to train and validate on.
+</p>
+<p>If the parameter <code>old_emulators</code> is provided, this should be a list of emulators used
+at all previous waves - for example if <code>full_wave</code> is used to do a second wave of
+history matching, then <code>old_emulators</code> would contain the list of first-wave emulators.
+</p>
+<p>The function returns a list of two objects: <code>emulators</code> corresponding to this wave's
+emulators, and <code>points</code> corresponding to the new proposed points. The points can then
+be put into the simulator to generate runs for a subsequent wave.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A list of two objects: <code>points</code> and <code>emulators</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"> #excessive runtime
+ ranges &lt;- list(aSI = c(0.1, 0.8), aIR = c(0, 0.5), aSR = c(0, 0.05))
+ default &lt;- full_wave(do.call('rbind.data.frame', SIRSample), ranges,
+  SIREmulators$targets)
+ non_quad &lt;- full_wave(do.call('rbind.data.frame', SIRSample), ranges,
+  SIREmulators$targets, quadratic = FALSE)
+ second &lt;- full_wave(SIRMultiWaveData[[2]], ranges, SIREmulators$targets,
+  old_emulators = SIRMultiWaveEmulators[[1]])
+ 
+</code></pre>
+
+
+</div>

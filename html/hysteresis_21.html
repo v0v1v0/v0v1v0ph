@@ -1,0 +1,331 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>floop</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Fit a Hysteresis Loop
+</h2>
+
+<h3>Description</h3>
+
+<p>Fits a hysteresis loop given values of n and m chosen by the user. <code>floop2r</code> fits an asymetric loop with different values
+for retention above and below the split line.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">floop(x,y=NULL,n=1,m=1,times="equal",period=NULL,
+subjects=NULL, subset=NULL,na.action=getOption("na.action"),
+extended.classical=FALSE,boot=FALSE,method="harmonic2",
+...) 
+floop2r(x,y=NULL,n=1,m=1,times="equal",period=NULL,
+subjects=NULL, subset=NULL,na.action=getOption("na.action"),
+extended.classical=FALSE,boot=FALSE,method="harmonic2",
+...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+
+<p>numeric input vector.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+
+<p>numeric output vector.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n</code></td>
+<td>
+
+<p>a positive integer. Shape parameter regulating the central "plateau" of the hysteresis loop. Default is 1, which makes loop an ellipse when m is also equal to 1. See details.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>m</code></td>
+<td>
+
+<p>an odd positive number. Bulging parameter of the hysteresis loop. Default is 1, which makes loop an ellipse when n is also equal to 1. In this case floop will automatically make a call to <code>fel</code>. See details.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>period</code></td>
+<td>
+
+<p>length of time required to make a full loop. Reciprocal of frequency, and if times = "equal", the number of points needed to make a full loop.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>subjects</code></td>
+<td>
+
+<p>an optional factor or list of factors, each of the same length as x. Use to identify a list of different loops to be fit from one set of data, in which case <code>floop</code> returns an object of class <code>fittedlooplist</code> instead of <code>fittedloop</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>times</code></td>
+<td>
+
+<p>either a numeric vector of length nrow(x) or the default "equal". If the times at which loop observations are taken are known, a numeric vector can be used to give those times. 
+If the default "equal" is used instead, time points are assumed to be equally spaced in a counterclockwise fashion.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>subset</code></td>
+<td>
+
+<p>an optional vector specifying a subset of observations to be used in the fitting process.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>na.action</code></td>
+<td>
+
+<p>a function which indicates what should happen when the data contain NAs. The default is set by the <code>na.action</code> setting of <code>options</code>, the factory-fresh default 
+is <code>na.omit</code>. Value <code>na.exclude</code> can be useful.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>extended.classical</code></td>
+<td>
+ 
+<p>logical. If true, uses </p>
+<p style="text-align: center;"><code class="reqn">y_t=sign(cos(2*pi*t/period))*b.y*abs(cos(2*pi*t/period))^n + retention*sin(2*pi*t/period)^m+cy+e_{y,t}</code>
+</p>
+<p> instead of 
+</p>
+<p style="text-align: center;"><code class="reqn">y_t=b.y*cos(2*pi*t/period)^n+retention*sin(2*pi*t/period)^m+cy+e_{y,t}</code>
+</p>
+
+<p>Allows the user to fit sinusoidal hysteresis loops with any positive real value of n &gt; 1 instead of just odd numbered n. 
+Default is false.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>boot</code></td>
+<td>
+
+<p>logical, if TRUE results will be bootstrapped by the default arguments of <code>summary.fittedloop</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+
+<p>if the default "harmonic2" is used, times along with m and n are either supplied by the user or given default values. Otherwise a non-linear "geometric" method that minimizes the sum of squared geometric residuals will be utilized.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+
+<p>other optional arguments such as <code>seed</code>, N=number of realizations, <code>cbb</code> for circular block bootstrapping, are passed to <code>summary.fittedloop</code> if <code>boot=TRUE</code>.
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Fits sinusoidal input and output variables x and y that form a hysteresis loop of the form
+</p>
+<p style="text-align: center;"><code class="reqn">x_t=b.x*cos(2pi*t/period+phase.angle)+cx+e_{x,t}</code>
+</p>
+ <p style="text-align: center;"><code class="reqn">y_t=b.y*cos(2pi*t/period+phase.angle)^n+
+retention*sin(2pi*t/period+phase.angle)^m+cy+e_{y,t}</code>
+</p>
+<p>  where </p>
+<p style="text-align: center;"><code class="reqn">t=0,...,(n.points-1) if times='equal'</code>
+</p>
+<p> and the error terms, e, are independently and normally distributed. Also produces a vector of derived values.
+If <code>floop2r</code> is used, retention is assumed to be different above and below the split line that seperates the upper and lower loop trajectories, and 
+addition terms are included in the model.
+</p>
+<p style="text-align: center;"><code class="reqn">y_t=b.y*cos(2pi*t/period+phase.angle)^n+retention.above*sin(2pi*t/period+phase.angle)^m*I(0 &lt; 2pi*t/period+phase.angle &lt; pi)+retention.below*sin(2pi*t/period+phase.angle)^m*I(pi &lt; 2pi*t/period+phase.angle &lt; 2*pi)+cy+e_{y,t}</code>
+</p>
+ 
+<p>where retention.above and retention.below are retention above and below the split line.
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>floop</code> returns an object of class <code>fittedloop</code> while  <code>floop2r</code> returns an object of class <code>splitloop</code>.
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>call</code></td>
+<td>
+<p>the function call.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fit</code></td>
+<td>
+<p>information dependent on the fitting method used.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>the input.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+<p>the output.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pred.x</code></td>
+<td>
+<p>fitted x values.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pred.y</code></td>
+<td>
+<p>fitted y values.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>period.time</code></td>
+<td>
+<p>time vector used to fit x and y.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>residuals</code></td>
+<td>
+<p>residuals measured by Euclidean distance.The function <code>residuals.fittedloop</code> can produce other types of residuals</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>extended.classical</code></td>
+<td>
+<p>whether or not an extended loop is fit.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fit.statistics</code></td>
+<td>
+<p>rudimentary measures, based on the "harmonic2" method, include the Multivariate Final Prediction Error (MFPE) and the AIC for both the output alone and the two variables in combination. 
+Although degree of freedom adjustments are made for other methods, measures of fit require further study.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>values</code></td>
+<td>
+<p>a named vector of parameter estimates. See <code>loop.parameters</code>, same as Estimates here.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Estimates</code></td>
+<td>
+<p>a named vector of parameter estimates. See <code>loop.parameters</code>, same as values.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Std.Errors</code></td>
+<td>
+<p>standard errors for parameters derived using the delta method.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+<p>fitting method used.</p>
+</td>
+</tr>
+</table>
+<p>if <code>boot==TRUE</code> <code>floop</code> returns an object of class <code>loopsummary</code> by making a call to <code>summary.fittedloop</code>. See <code>summary.fittedloop</code>.
+</p>
+<p>For bootstrapping
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>Boot.Estimates</code></td>
+<td>
+<p>bootstrapped estimates.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Boot.Std.Errors</code></td>
+<td>
+<p>bootstrap standard errors.</p>
+</td>
+</tr>
+</table>
+<p>If multiple loops are fit simultaneously there will be three arguments to the response, models which will contain the separate model fits for each loop, Estimates which will have all of the parameter estimates in matrix form, and Std.Errors which will have all of the delta method standard errors in matrix form. See <code>floop.repeated</code>.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Spencer Maynes, Fan Yang, and Anne Parkhurst.
+</p>
+
+
+<h3>References</h3>
+
+<p>Lapshin, R. (1995) Analytical model for the approximation of hysteresis loop and its application to the scanning tunneling microscope.
+</p>
+
+
+<h3>See Also</h3>
+
+<p>Simulate a hysteresis loop with the function <code>mloop</code>. Alternatively see <code>fel</code> for fitting an ellipse (a hysteresis loop with parameters m=1, n=1) using a variety of methods. Also <code>residuals.fittedloop</code>. If a loop is an ellipse, use of fel is strongly recommended instead of floop. 
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">### Simulate and fit a hysteresis loop with n=1 and m=3.
+loopf &lt;- mloop(sd.x=0.07,sd.y=0.05,n=3,m=3, retention=.5)
+loopf.model &lt;- floop(loopf$x,loopf$y,n=3,m=3)
+loopf.model                #Gives estimate and delta standard errors
+loopf.model$Estimates      #List estimates only  
+loopf.model$Std.Errors     #List delta standard errors  
+
+### Plot hysteresis loop.
+plot(loopf.model,main="Simulated Hysteresis Loop n=3 m=3", values="hysteresis.all")
+### Show characteristics of loop on plot
+plot(loopf.model,main="Simulated Hysteresis Loop n=3 m=3",values="hysteresis.all",
+show=c("retention","coercion"))
+          
+### Bootstrap estimates and standard errors (Seed is necessary if want to reproduce results)
+booted.loopf &lt;- floop(loopf$x,loopf$y,retention=.5,n=3,m=3,
+boot=TRUE, seed=1523)
+booted.loopf                   #Gives boot estimates, boot bias, boot SE and boot quartiles
+booted.loopf$Boot.Estimates    #Gives boot estimates 
+booted.loopf$Boot.Std.Errors   #Gives boot standard errors 
+plot(booted.loopf,main="Simulated Bootstrapped Loop n=1, m=3",
+putNumber=TRUE,values="hysteresis.all")
+
+</code></pre>
+
+
+</div>

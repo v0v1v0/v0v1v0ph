@@ -1,0 +1,82 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>match.mat2vec</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Transform a binary matching matrix to a matching vector
+</h2>
+
+<h3>Description</h3>
+
+<p>This function transforms a binary matching matrix to a matching vector. A matching vector is of length N where each element indicates the submatch to which the observation belongs to. Notice that this is not the same as the group allocation vector that is provided by the match.allocate-function. The binary matching matrix is of size N x N where 0 indicates that the observations have been part of a different submatch, and 1 indicates that the observations have been part of the same submatch. Diagonal is always 0 although an observation is always in the same submatch with its self.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">match.mat2vec(xmat)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table><tr style="vertical-align: top;">
+<td><code>xmat</code></td>
+<td>
+
+<p>A binary matching matrix 'xmat'
+</p>
+</td>
+</tr></table>
+<h3>Value</h3>
+
+<p>A matching vector where each element indicates submatch the observation belongs to
+</p>
+
+
+<h3>Note</h3>
+
+<p>Notice that the particular index numbers produced by match.mat2vec may be different to that of the branch and bound solution vector, but that the submatches shared by observations are common.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Teemu Daniel Laajala &lt;teelaa@utu.fi&gt;
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>match.allocate</code>
+<code>match.bb</code>
+<code>match.vec2mat</code>
+<code>match.dummy</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(vcapwide)
+
+# Construct an Euclidean distance example distance matrix using 15 observations from the VCaP study
+d &lt;- as.matrix(dist(vcapwide[1:15,c("PSAWeek10", "BWWeek10")]))
+
+bb3 &lt;- match.bb(d, g=3)
+str(bb3)
+
+mat &lt;- bb3$matrix 
+# matching vector, where each element indicates to which submatch each observation belongs to
+
+mat
+solvec &lt;- match.mat2vec(mat)
+which(mat[1,] == 1) 
+# E.g. the first, third and thirteenth observation are part of the same submatch
+which(solvec == solvec[1]) 
+# Similarly
+</code></pre>
+
+
+</div>

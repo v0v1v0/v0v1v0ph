@@ -1,0 +1,118 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>HPLBmatrix</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Pairwise Total Variation Distance Lower Bound Matrix for the Multi-Class Setting</h2>
+
+<h3>Description</h3>
+
+<p>Pairwise Total Variation Distance Lower Bound Matrix for the Multi-Class Setting
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">HPLBmatrix(
+  labels,
+  ordering.array,
+  alpha = 0.05,
+  computation.type = "non-optimized",
+  seed = 0,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>labels</code></td>
+<td>
+<p>a numeric vector value. The labels of the classes, should be encoded in [0,nclass-1].</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ordering.array</code></td>
+<td>
+<p>a numeric array of size (nclass, nclass, nobs) such that the value (i,j,k) represents a propensity of being of class j instead of i for observation k.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alpha</code></td>
+<td>
+<p>a numeric value. The type-I error level.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>computation.type</code></td>
+<td>
+<p>a character value. For the moment only "non-optimized" (default) available.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>seed</code></td>
+<td>
+<p>an integer value. The seed for reproducility.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>additional parameters to be passed to the HPLB function.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>a numeric matrix of size (nclass, nclass) giving the matrix of pairwise total variation lower bounds.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Loris Michel, Jeffrey Naef
+</p>
+
+
+<h3>References</h3>
+
+<p>L. Michel, J. Naef and N. Meinshausen (2020). High-Probability Lower Bounds for the Total Variation Distance <br></p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"> # iris example
+ require(HPLB)
+ require(ranger)
+
+ # training a multi-class classifier on iris and getting tv lower bounds between classes
+ data("iris")
+
+ ind.train &lt;- sample(1:nrow(iris), size = nrow(iris)/2, replace = FALSE)
+
+ rf &lt;- ranger(Species~., data = iris[ind.train, ], probability = TRUE)
+ preds &lt;- predict(rf, iris[-ind.train,])$predictions
+
+ # creating the ordering array based on prediction differences
+ ar &lt;- array(dim = c(3, 3, nrow(preds)))
+ for (i in 1:3) {
+   for (j in 1:3) {
+    ar[i,j,] &lt;- preds[,j] - preds[,i]
+   }
+ }
+
+ # encoding the class response
+ y &lt;- factor(iris$Species)
+ levels(y) &lt;- c(0,1,2)
+ y &lt;- as.numeric(y)-1
+
+ # getting the lower bound matrix
+ tvhat.iris &lt;- HPLBmatrix(labels = y[-ind.train], ordering.array = ar)
+ tvhat.iris
+</code></pre>
+
+
+</div>

@@ -1,0 +1,182 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>Sig2IMF</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Empirical Mode Decomposition wrapper</h2>
+
+<h3>Description</h3>
+
+<p>This function wraps the <code>emd</code> function in the <code>EMD</code> package.
+<code>Sig2IMF</code> is used in <code>EEMD</code> and others.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">Sig2IMF(sig, tt, spectral.method = "arctan", diff.lag = 1, stop.rule = "type5", 
+    tol = 5, boundary = "wave", sm = "none", smlevels = c(1), spar = NULL, 
+    max.sift = 200, max.imf = 100, interm = NULL)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>sig</code></td>
+<td>
+<p>a time series to be decomposed (vector)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tt</code></td>
+<td>
+<p>A vector of sample times for <code>sig</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>spectral.method</code></td>
+<td>
+<p>defines how to calculate instantaneous frequency - whether to use the arctangent of the analytic signal with numeric differentiation (“arctan”)
+or the result of the chain rule applied to the arctangent, then numerically differentiated ("chain");  see <code>InstantaneousFrequency</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>diff.lag</code></td>
+<td>
+<p>specifies if you want to do naive differentiation (<code>diff.lag</code> = 1), central difference method (<code>diff.lag = 2</code> or higher difference methods (<code>diff.lag</code> &gt; 2) 
+to determine instantaneous frequency; see <code>InstantaneousFrequency</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>stop.rule</code></td>
+<td>
+<p>As quoted from the EMD package documentation:  ”The stop rule of sifting. 
+The type1 stop rule indicates that absolute values 
+of envelope mean must be less than the user-specified tolerance level in the sense
+that the local average of upper and lower envelope is zero. The stopping rules
+type2, type3, type4 and type5 are the stopping rules given by equation (5.5)
+of Huang et al. (1998), equation (11a), equation (11b) and S stoppage of Huang
+and Wu (2008), respectively.”</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tol</code></td>
+<td>
+<p>Determines what value is used to stop the sifting - this will depend on which stop rule you use.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>boundary</code></td>
+<td>
+<p>how the beginning and end of the signal are handled</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sm</code></td>
+<td>
+<p>Specifies how the signal envelope is constructed, see Kim et al, 2012.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>smlevels</code></td>
+<td>
+<p>Specifies what level of the IMF is obtained by smoothing other than interpolation, see EMD package documentation</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>spar</code></td>
+<td>
+<p>User-defined smoothing parameter for spline, kernel, or local polynomial smoothing.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>max.sift</code></td>
+<td>
+<p>How many sifts are allowed - if this value is exceeded the IMF is returned as-is.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>max.imf</code></td>
+<td>
+<p>Maximum number of IMFs allowed.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>interm</code></td>
+<td>
+<p>Specifies vector of periods to be excluded from IMFs to cope with mode mixing.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>This function configures and performs empirical mode decomposition using the <code>emd</code> function in the <code>EMD</code> package.
+</p>
+
+
+<h3>Value</h3>
+
+ 
+<table><tr style="vertical-align: top;">
+<td><code>emd.result</code></td>
+<td>
+<p>The intrinsic mode functions (IMFs), instantaneous frequencies, and instantaneous amplitudes of <code>sig</code>.</p>
+</td>
+</tr></table>
+<h3>References</h3>
+
+<p>Kim, D., Kim, K. and Oh, H.-S. (2012) Extending the scope of empirical mode decomposition by smoothing.
+<em>EURASIP Journal on Advances in Signal Processing</em>, <b>2012</b>, 168.
+</p>
+<p>Huang, N. E., Shen, Z., Long, S. R., Wu, M. L. Shih, H. H.,
+Zheng, Q., Yen, N. C., Tung, C. C. and Liu, H. H. (1998) The empirical
+mode decomposition and Hilbert spectrum for nonlinear and
+nonstationary time series analysis. <em>Proceedings of the Royal
+Society London A</em>, <b>454</b>, 903–995.
+</p>
+<p>Huang, N. E. and Wu Z. A. (2008) A review on Hilbert-Huang Transform: Method and its applications to geophysical studies.
+<em>Reviews of Geophysics</em>, <b>46</b>, RG2006.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>EEMD</code>, <code>PlotIMFs</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(PortFosterEvent)
+
+#Run EMD
+emd.result=Sig2IMF(sig, tt)
+
+#Display IMFs
+
+time.span &lt;- c(5, 10)
+imf.list &lt;- 1:3
+original.signal &lt;- TRUE
+residue &lt;- TRUE
+
+PlotIMFs(emd.result, time.span, imf.list, original.signal, residue)
+
+#Plot spectrogram
+sdt &lt;- tt[2] - tt[1]
+dfreq &lt;- 0.25
+freq.span &lt;- c(0, 25)
+hgram &lt;- HHRender(emd.result, sdt, dfreq, freq.span = freq.span, verbose = FALSE)
+
+time.span &lt;- c(4, 10)
+freq.span &lt;- c(0, 25)
+amp.span &lt;- c(0.000001, 0.00001)
+HHGramImage(hgram, time.span = time.span, 
+freq.span = freq.span, amp.span = amp.span,
+pretty = TRUE)
+</code></pre>
+
+
+</div>

@@ -1,0 +1,278 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>fel</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Fitting Ellipses
+</h2>
+
+<h3>Description</h3>
+
+<p>Fit a sinusoidal hysteretic (elliptical) process between an input and an output.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">fel(x, y=NULL, method = "harmonic2", period = NULL, subjects = NULL,
+  times="unknown",subset = NULL,na.action= getOption("na.action"),
+  control=nls.control(), boot=FALSE,...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+
+<p>input
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+
+<p>output
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+
+<p>the method to be used for fitting; one of either the default <code>method="harmonic2"</code>, <code>method="nls"</code>, <code>method="direct"</code>, <code>method="lm"</code> or <code>method="geometric"</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>period</code></td>
+<td>
+
+<p>an optional number that defines the length of the <code>period</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>subjects</code></td>
+<td>
+
+<p>an optional factor or list of factors, each of the same length as x. Use to identify several different ellipses to fit at once, in which case <code>fel</code> returns an object of class <code>ellipsefitlist</code> instead of <code>ellipsefit</code>. If <code>subjects</code> is a list of factors each combination of the factors must be present in the data or an error will be produced.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>times</code></td>
+<td>
+
+<p>either a numeric vector of length <code>nrow(x)</code> or one of the two options "equal" or the default "unknown". If the times at which ellipse observations are taken are known, a numeric vector
+can be used to give those times. If not, predicted values are found by minimizing geometric distances from the fitted ellipse to the observations. If "equal", time points are assumed to be equally spaced in a counterclockwise fashion. Do not use the "harmonic2" method unless times are either known or are known to be equal. Bootstrapping results are also more accurate if correct times are used.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>subset</code></td>
+<td>
+
+<p>an optional vector specifying a subset of observations to be used in the fitting process.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>control</code></td>
+<td>
+
+<p>optional and only used if <code>method="nls"</code> or <code>"geometric"</code>. See <code>nls.control</code> for <code>method="nls"</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>na.action</code></td>
+<td>
+
+<p>a function which indicates what should happen when the data contain NAs. The default is set by the <code>na.action</code> setting of <code>options</code>, the factory-fresh default 
+is <code>na.omit</code>. Value <code>na.exclude</code> can be useful.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>boot</code></td>
+<td>
+
+<p>logical, if <code>TRUE</code> results will be bootstrapped by <code>summary.ellipsefit</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+
+<p>other othrt optional arguments passed to <code>summary.ellipsefit</code> if <code>boot=TRUE</code>.
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Where the response y is a sinusoidal process with an element of randomness that lags the controlling input x, which is also a stochastic sinusoidal process, an ellipse can be used to fit the relationship between
+x and y.
+</p>
+<p>The values of parameters such as area, lag, retention, coercion, split angle and hysteresis.y are estimated from this ellipse. See <code>loop.parameters</code>.
+</p>
+<p>The harmonic2 method is a two step harmonic least squares model using generalized transcendental equations presented by Lapshin (1995).  Yang and Parkhurst provide the efficient estimates 
+for parameters and as such "harmonic2" is used as the default. Direct specific least squares (<code>method="direct"</code>) based on the work of Radim Halir and Jan Flusser is also available although work on delta method standard errors is still in progress. The geometric method is based on the work of Gander, Golub and Strebel and uses the results of an initial direct method to produce an ellipse that minimizes the sum of the squared geometric distances. Finally <code>method="lm"</code> and 
+ellipse specific non-linear least squares (<code>method="nls"</code>) are included as well.
+</p>
+<p>If x and y contain more than 1 ellipse that needs to be fit, the argument <code>subjects</code> can be used to identify a period of data to fit separate ellipses.
+</p>
+<p>Bootstrapped estimates for parameter values are provided with <code>summary.ellipsefit</code>.  These bootstrapped estimates are generally less biased than those provided by <code>fel</code> in isolation.
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>fel</code> returns an object of class <code>ellipsefit</code> or <code>ellipsefitlist</code>.
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>call</code></td>
+<td>
+<p>the function call.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fit</code></td>
+<td>
+<p>information dependent on the fitting method used.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+<p>the <code>method</code> used.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>the input x used.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+<p>the output y used.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pred.x</code></td>
+<td>
+<p>the fitted values for x.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pred.y</code></td>
+<td>
+<p>the fitted values for y.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>period.time</code></td>
+<td>
+<p>a vector that contains times converted to radians for observations, either estimated after the ellipse has been fitted or given beforehand by <code>times</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fit.statistics</code></td>
+<td>
+<p>rudimentary measures, based on the "harmonic2" method, include the Multivariate Final Prediction Error (MFPE) and the AIC for both the output alone and the two variables in combination. 
+Although degree of freedom adjustments are made for other methods, measures of fit require further study.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>values</code></td>
+<td>
+<p>a named vector of parameter estimates. See <code>loop.parameters</code>, same as Estimates here.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Estimates</code></td>
+<td>
+<p>a named vector of parameter estimates. See <code>loop.parameters</code>, same as values.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Std.Errors</code></td>
+<td>
+<p>Delta standard errors produced by the delta method.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>residuals</code></td>
+<td>
+<p>algebraic residuals from the model. The function <code>residuals.ellipsefit</code> can produce other types of residuals from an <code>ellipsefit</code> object.</p>
+</td>
+</tr>
+</table>
+<p>if <code>boot==TRUE</code> <code>fel</code> returns an object of class <code>ellipsesummary</code> by making a call to <code>summary.ellipsefit</code>. See <code>summary.ellipsefit</code>.
+</p>
+<p>For bootstrapping
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>Boot.Estimates</code></td>
+<td>
+<p>bootstrapped estimates.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Boot.Std.Errors</code></td>
+<td>
+<p>bootstrap standard errors.</p>
+</td>
+</tr>
+</table>
+<p>If multiple ellipses are fit simultaneously there will be three arguments to the response, models which will contain the separate model fits for each ellipse, Estimates which will have all of the parameter estimates in matrix form, and Std.Errors which will have all of the delta method standard errors in matrix form. See <code>fel.repeated</code>.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Spencer Maynes, Fan Yang, and Anne Parkhurst.
+</p>
+
+
+<h3>References</h3>
+
+<p>Yang, F and A. Parkhurst, "Efficient Estimation of Elliptical Hysteresis with 
+Application to the Characterization of Heat Stress" DOI:10.1007/s13253-015-0213-6
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>plot.ellipsefit</code> for plotting and <code>summary.ellipsefit</code> for summarizing and bootstrapping an <code>ellipsefit</code> object. Also <code>residuals.ellipsefit</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">### Simulate and fit a Single ellipse.
+Sellipse &lt;- mel(method=2,sd.x=0.2,sd.y=0.04)
+Sellipse.fit &lt;- fel(Sellipse$x,Sellipse$y)
+Sellipse.fit  #Gives estimates, delta standard errors and 95% CI
+Sellipse.fit$Estimates  
+
+### Bootstrap estimates and standard errors (Seed is necessary if want to reproduce results)
+booted.Sellipse &lt;- fel(Sellipse$x,Sellipse$y,boot=TRUE, seed=123)
+booted.Sellipse   #Gives boot estimates, boot bias, boot SE and boot quartiles
+plot(booted.Sellipse,main="Simulated Bootstrap Ellipse Loop",xlab="X Input",
+ylab="Y Output",values="ellipse.all")
+
+</code></pre>
+
+
+</div>

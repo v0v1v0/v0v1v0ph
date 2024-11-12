@@ -1,0 +1,65 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>phyloseq_subset</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Make a list of phyloseq object subsets</h2>
+
+<h3>Description</h3>
+
+<p>Create a list of phyloseq object subsets based on phyloseq
+sample data parameters (e.g., a phyloseq subset for each treatment)
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">phyloseq_subset(physeq, params, ex)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>physeq</code></td>
+<td>
+<p>Phyloseq object</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>params</code></td>
+<td>
+<p>data.frame of parameters supplies to <code>ex</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ex</code></td>
+<td>
+<p>Expression for subsetting the phyloseq object</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A list of Phyloseq objects
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(physeq_S2D2)
+# making subsets by substrate and time point
+params = get_treatment_params(physeq_S2D2, c('Substrate', 'Day'))
+# filtering out controls
+params = dplyr::filter(params, Substrate!='12C-Con')
+# making expression for subsetting labeled-unlabeled gradient comparisons
+ex = "(Substrate=='12C-Con' &amp; Day=='${Day}') | (Substrate=='${Substrate}' &amp; Day == '${Day}')"
+physeq_l = phyloseq_subset(physeq_S2D2, params, ex)
+physeq_l
+
+</code></pre>
+
+
+</div>

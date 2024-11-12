@@ -1,0 +1,195 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>higrad</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Fitting HiGrad</h2>
+
+<h3>Description</h3>
+
+<p><code>higrad</code> is used to implement hierarchical incremental gradient descent (HiGrad), an algorithm that conducts statistical inference for online learning.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">higrad(x, y, model = "lm", nsteps = nrow(x), nsplits = 2, nthreads = 2,
+  step.ratio = 1, n0 = NA, skip = 0, eta = 1/2, alpha = 1/2,
+  burnin = round(nsteps/10), start = rnorm(ncol(x), 0, 0.01),
+  replace = FALSE, track = FALSE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>input matrix of features. Each row is an observation vector, and each column is a feature.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+<p>response variable. Quantitative for <code>model = "lm"</code>. For <code>model = "logistic"</code> it should be a factor with two levels.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>model</code></td>
+<td>
+<p>type of model to fit. Currently only linear regression (<code>"lm"</code>) and logistic regression (<code>"logistic"</code>) are supported.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nsteps</code></td>
+<td>
+<p>total number of steps. This is equivalent to the number of queries made to get a noisy evaluation of the gradient.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nsplits</code></td>
+<td>
+<p>number of splits in the HiGrad tree.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nthreads</code></td>
+<td>
+<p>numbers of threads each previous thread is split into. Either a number (equal split size throughout) or a vector.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>step.ratio</code></td>
+<td>
+<p>ratio of the lengths of the threads from the two adjacent levels (the latter one divided by the previous). Either a number (equal ratio throughout) or a vector.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n0</code></td>
+<td>
+<p>length of the 0th-level thread.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>skip</code></td>
+<td>
+<p>number of steps to skip when estimating the coefficients by averaging.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>eta</code></td>
+<td>
+<p>constant in front of the step size. See Details for the formula of the step size.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alpha</code></td>
+<td>
+<p>exponent of the step size. See Details for the formula of the step size.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>burnin</code></td>
+<td>
+<p>number of steps as the burn-in period. The burn-in period is not accounted for in the total budget <code>nsteps</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>start</code></td>
+<td>
+<p>starting values of the coefficients.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>replace</code></td>
+<td>
+<p>logical; whether or not to sample the data with replacement.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>track</code></td>
+<td>
+<p>logical; whether or not to store the entire path for plotting.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>HiGrad is designed to conduct statistical inference for online learning, without incurring additional computational cost compared with the vanilla stochastic gradient descent (SGD).
+The HiGrad procedure begins by performing SGD iterations for a while and then split the single thread into a few, and this procedure hierarchically operates in this fashion along each thread.
+With predictions provided by multiple threads in place, a t-based confidence interval is constructed by de-correlating predictions using covariance structures given by the Ruppert–Polyak averaging scheme.
+In order to implement HiGrad, a configuration of the tree structure needs to be specified. The default setting is a binary tree with 2 splits.
+The step size is set to be <code>eta*t^(-alpha)</code>.
+</p>
+
+
+<h3>Value</h3>
+
+<p>An object with S3 class <code>higrad</code>.
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>coefficients</code></td>
+<td>
+<p>estimate of the coefficients.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>coefficients.bootstrap</code></td>
+<td>
+<p>matrix of estimates of the coefficients along each HiGrad threads.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>model</code></td>
+<td>
+<p>model type.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Sigma0</code></td>
+<td>
+<p>covariance structure <code class="reqn">\Sigma</code> of the estimates.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>track</code></td>
+<td>
+<p>entire path of the estimates along each thread. Can be used for diagnostic and check for convergence.</p>
+</td>
+</tr>
+</table>
+<h3>References</h3>
+
+<p>Weijie Su and Yuancheng Zhu. (2018) <em>Statistical Inference for Online Learning and Stochastic Approximation via Hierarchical Incremental Gradient Descent</em>. <a href="https://arxiv.org/abs/1802.04876">https://arxiv.org/abs/1802.04876</a>.
+</p>
+
+
+<h3>See Also</h3>
+
+<p>See <code>print.higrad</code>, <code>plot.higrad</code>, <code>predict.higrad</code> for other methods for the <code>higrad</code> class.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># fitting linear regression on a simulated dataset
+n &lt;- 1e3
+d &lt;- 10
+sigma &lt;- 0.1
+theta &lt;- rep(1, d)
+x &lt;- matrix(rnorm(n * d), n, d)
+y &lt;- as.numeric(x %*% theta + rnorm(n, 0, sigma))
+fit &lt;- higrad(x, y, model = "lm")
+print(fit)
+# predict for 10 new samples
+newx &lt;- matrix(rnorm(10 * d), 10, d)
+pred &lt;- predict(fit, newx)
+pred
+
+</code></pre>
+
+
+</div>

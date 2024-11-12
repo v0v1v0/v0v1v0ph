@@ -1,0 +1,199 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>SubidAttributeSummary</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Summarize subbasin attributes</h2>
+
+<h3>Description</h3>
+
+<p>Prepare data frame containing summary of subbasin attributes.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">SubidAttributeSummary(
+  subids = NULL,
+  gd,
+  bd = NULL,
+  gc = NULL,
+  desc = NULL,
+  group = NULL,
+  group.upstream = TRUE,
+  signif.digits = NULL,
+  progbar = FALSE,
+  summarize.landuse = TRUE,
+  summarize.soil = TRUE,
+  summarize.crop = TRUE,
+  summarize.upstreamarea = TRUE,
+  unweighted.gd.cols = NULL,
+  upstream.gd.cols = NULL,
+  olake.slc = NULL,
+  bd.weight = FALSE,
+  mapoutputs = NULL
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>subids</code></td>
+<td>
+<p>Vector containing SUBIDs of subbasins to summarize.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>gd</code></td>
+<td>
+<p>Imported HYPE GeoData.txt file. See <code>ReadGeoData</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>bd</code></td>
+<td>
+<p>Imported HYPE BranchData.txt file. See <code>ReadBranchData</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>gc</code></td>
+<td>
+<p>Imported HYPE GeoClass.txt file. See <code>ReadGeoClass</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>desc</code></td>
+<td>
+<p>Optional, Imported HYPE Description file. If provided, then dataframe columns will be renamed using the short names in the description file. See <code>ReadDescription</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>group</code></td>
+<td>
+<p>Optional, Integer vector of same length as number of SLC classes in gd. Alternative grouping index specification to gcl + type for <code>UpstreamGroupSLCClasses</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>group.upstream</code></td>
+<td>
+<p>Logical, if <code>TRUE</code>, then SLC fractions will be summarized for upstream areas using <code>UpstreamGroupSLCClasses</code>.
+If <code>FALSE</code>, then SLC fractions will be summarized for subbasin area only using <code>GroupSLCClasses</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>signif.digits</code></td>
+<td>
+<p>Optional, Integer specifying number of significant digits to round outputs to. Used by <code>UpstreamGroupSLCClasses</code> and <code>UpstreamGeoData</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>progbar</code></td>
+<td>
+<p>Logical, display a progress bar while calculating summary information. Used by <code>UpstreamGroupSLCClasses</code> and <code>UpstreamGeoData</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>summarize.landuse</code></td>
+<td>
+<p>Logical, specify whether or not subbasin upstream landuse fractions should be calculated.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>summarize.soil</code></td>
+<td>
+<p>Logical, specify whether or not subbasin upstream soil fractions should be calculated.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>summarize.crop</code></td>
+<td>
+<p>Logical, specify whether or not subbasin upstream crop fractions should be calculated.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>summarize.upstreamarea</code></td>
+<td>
+<p>Logical, specify whether or not subbasin upstream area should be calculated.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>unweighted.gd.cols</code></td>
+<td>
+<p>Vector, names of <code>gd</code> columns which should be joined to the output data frame without any additional processing.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>upstream.gd.cols</code></td>
+<td>
+<p>Vector, specify column names of <code>gd</code> which should be summarized using <code>UpstreamGeoData</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>olake.slc</code></td>
+<td>
+<p>Integer, SLC class number representing outlet lake fractions. Used by <code>UpstreamGeoData</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>bd.weight</code></td>
+<td>
+<p>Logical, if set to TRUE, flow weights will be applied for areas upstream of stream bifurcations. See <code>UpstreamGeoData</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mapoutputs</code></td>
+<td>
+<p>Vector, paths to mapoutput files that should be read by <code>ReadMapOutput</code> and joined to the output data frame.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p><code>SubidAttributeSummary</code> can be used to create a data frame object containing subbasin attribute summary information. This data frame can then be used as the <code>attributes</code>
+input for <code>PlotPerformanceByAttribute</code>. The function can summarize subbasin upstream landuse, soil, and crop fractions using <code>UpstreamGroupSLCClasses</code>. In addition, the
+function can summarize upstream GeoData information using <code>UpstreamGeoData</code>. Finally, the function can join mapoutput and GeoData columns directly to the output data frame (i.e without further processing).
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>SubidAttributeSummary</code> returns a data frame object containing subbasin attribute summary information.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>UpstreamGroupSLCClasses</code>, <code>GroupSLCClasses</code>, <code>UpstreamGeoData</code>, <code>ReadMapOutput</code> for subbasin attribute summary functions; <code>PlotPerformanceByAttribute</code> for related plotting function.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+subass &lt;- ReadSubass(filename = system.file("demo_model", "results",
+  "subass1.txt",
+  package = "HYPEtools"
+), check.names = TRUE)
+gd &lt;- ReadGeoData(filename = system.file("demo_model",
+  "GeoData.txt",
+  package = "HYPEtools"
+))
+gc &lt;- ReadGeoClass(filename = system.file("demo_model",
+  "GeoClass.txt",
+  package = "HYPEtools"
+))
+
+SubidAttributeSummary(subids &lt;- subass$SUBID,
+  gd = gd, gc = gc,
+  mapoutputs = c(system.file("demo_model", "results", "mapCOUT.txt", package = "HYPEtools")),
+  upstream.gd.cols = c("SLOPE_MEAN")
+)
+
+
+</code></pre>
+
+
+</div>

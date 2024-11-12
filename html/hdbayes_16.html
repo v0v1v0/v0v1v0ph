@@ -1,0 +1,87 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>glm.logml.post</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Log marginal likelihood of a GLM under a normal/half-normal prior</h2>
+
+<h3>Description</h3>
+
+<p>Uses bridge sampling to estimate the logarithm of the marginal likelihood of a GLM under the normal/half-normal prior.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">glm.logml.post(post.samples, bridge.args = NULL)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>post.samples</code></td>
+<td>
+<p>output from <code>glm.post()</code> giving posterior samples of a GLM under the normal/half-normal
+prior, with an attribute called 'data' which includes the list of variables specified
+in the data block of the Stan program.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>bridge.args</code></td>
+<td>
+<p>a <code>list</code> giving arguments (other than <code>samples</code>, <code>log_posterior</code>, <code>data</code>, <code>lb</code>, and <code>ub</code>) to
+pass onto <code>bridgesampling::bridge_sampler()</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>The function returns a <code>list</code> with the following objects
+</p>
+
+<dl>
+<dt>model</dt>
+<dd>
+<p>"Normal/Half-Normal"</p>
+</dd>
+<dt>logml</dt>
+<dd>
+<p>the estimated logarithm of the marginal likelihood</p>
+</dd>
+<dt>bs</dt>
+<dd>
+<p>an object of class <code>bridge</code> or <code>bridge_list</code> containing the output from using <code>bridgesampling::bridge_sampler()</code>
+to compute the logarithm of the marginal likelihood of the normal/half-normal prior</p>
+</dd>
+</dl>
+<h3>References</h3>
+
+<p>Gronau, Q. F., Singmann, H., and Wagenmakers, E.-J. (2020). bridgesampling: An r package for estimating normalizing constants. Journal of Statistical Software, 92(10).
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">if (instantiate::stan_cmdstan_exists()) {
+  data(actg019)
+  actg019 = actg019[1:100, ]
+  data.list = list(currdata = actg019)
+  formula = cd4 ~ treatment + age + race
+  family = poisson('log')
+  d.post = glm.post(
+    formula = formula, family = family,
+    data.list = data.list,
+    chains = 1, iter_warmup = 500, iter_sampling = 1000
+  )
+  glm.logml.post(
+    post.samples = d.post,
+    bridge.args = list(silent = TRUE)
+  )
+}
+</code></pre>
+
+
+</div>

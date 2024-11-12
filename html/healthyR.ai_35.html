@@ -1,0 +1,186 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hai_distribution_comparison_tbl</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Compare Data Against Distributions</h2>
+
+<h3>Description</h3>
+
+<p>This function will attempt to get some key information on the
+data you pass to it. It will also automatically normalize the data from 0 to 1.
+This will not change the distribution just it's scale in order to make sure
+that many different types of distributions can be fit to the data, which
+should help identify what the distribution of the passed data could be.
+</p>
+<p>The resulting output has attributes added to it that get used in other functions
+that are meant to compliment each other.
+</p>
+<p>This function will automatically pass the <code>.x</code> parameter to <code>hai_skewness_vec()</code>
+and <code>hai_kurtosis_vec()</code> in order to help create the random data
+from the distributions.
+</p>
+<p>The distributions that can be chosen from are:</p>
+
+<table>
+<tr>
+<td style="text-align: left;">
+   Distribution </td>
+<td style="text-align: left;"> R stats::dist </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+   normal </td>
+<td style="text-align: left;"> rnorm </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+   uniform </td>
+<td style="text-align: left;"> runif </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+   exponential </td>
+<td style="text-align: left;"> rexp </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+   logistic </td>
+<td style="text-align: left;"> rlogis </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+   beta </td>
+<td style="text-align: left;"> rbeta </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+   lognormal </td>
+<td style="text-align: left;"> rlnorm </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+   gamma </td>
+<td style="text-align: left;"> rgamma </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+   weibull </td>
+<td style="text-align: left;"> weibull </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+   chisquare </td>
+<td style="text-align: left;"> rchisq </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+   cauchy </td>
+<td style="text-align: left;"> rcauchy </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+   hypergeometric </td>
+<td style="text-align: left;"> rhyper </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+   f </td>
+<td style="text-align: left;"> rf </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+   poisson </td>
+<td style="text-align: left;"> rpois </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+</td>
+</tr>
+</table>
+<h3>Usage</h3>
+
+<pre><code class="language-R">hai_distribution_comparison_tbl(
+  .x,
+  .distributions = c("gamma", "beta"),
+  .normalize = TRUE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>.x</code></td>
+<td>
+<p>The numeric vector to analyze.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.distributions</code></td>
+<td>
+<p>A character vector of distributions to check. For example,
+c("gamma","beta")</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.normalize</code></td>
+<td>
+<p>A boolean value of TRUE/FALSE, the default is TRUE. This
+will normalize the data using the <code>hai_scale_zero_one_vec</code> function.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Get information on the empirical distribution of your data along with
+generated densities of other distributions. This information is in the resulting
+tibble that is generated. Three columns will generate, Distribution, from the
+<code style="white-space: pre;">⁠param .distributions⁠</code>, <code>dist_data</code> which is a list vector of density
+values passed to the underlying stats r distribution function, and <code>density_data</code>,
+which is the <code>dist_data</code> column passed to <code>list(stats::density(unlist(dist_data)))</code>
+</p>
+<p>This has the effect of giving you the desired vector that can be used in resultant
+plots (<code>dist_data</code>) or you can interact with the <code>density</code> object itself.
+</p>
+<p>If the skewness of the distribution is negative, then for the gamma and beta
+distributions the skew is set equal to the kurtosis and the kurtosis is set
+equal to <code>sqrt((skew)^2)</code>
+</p>
+
+
+<h3>Value</h3>
+
+<p>A tibble.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Steven P. Sanderson II, MPH
+</p>
+
+
+<h3>See Also</h3>
+
+<p>Other Distribution Functions: 
+<code>hai_get_density_data_tbl()</code>,
+<code>hai_get_dist_data_tbl()</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">x_vec &lt;- hai_scale_zero_one_vec(mtcars$mpg)
+df &lt;- hai_distribution_comparison_tbl(
+  .x = x_vec,
+  .distributions = c("beta", "gamma")
+)
+df
+
+</code></pre>
+
+
+</div>

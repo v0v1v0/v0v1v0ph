@@ -1,0 +1,116 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>pixar_films</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>This data comes from <a href="https://github.com/erictleung/pixarfilms/"><code>pixarfilms</code></a>
+package by Eric Leung (2022)</h2>
+
+<h3>Description</h3>
+
+<p>The data has box office sales, audience ratings, and release dates for each Pixar film
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">pixar_films
+</code></pre>
+
+
+<h3>Format</h3>
+
+<p>A tibble with 22 rows and 10 columns:
+</p>
+
+<dl>
+<dt>order</dt>
+<dd>
+<p>order of release</p>
+</dd>
+<dt>film</dt>
+<dd>
+<p>name of film</p>
+</dd>
+<dt>release_date</dt>
+<dd>
+<p>date film premiered</p>
+</dd>
+<dt>year</dt>
+<dd>
+<p>the year the film premiered</p>
+</dd>
+<dt>run_time</dt>
+<dd>
+<p>film length in minutes</p>
+</dd>
+<dt>film_rating</dt>
+<dd>
+<p>rating based on Motion Picture Association (MPA) film
+rating system</p>
+</dd>
+<dt>rotten_tomatoes</dt>
+<dd>
+<p>score from the American review-aggregation website
+Rotten Tomatoes; scored out of 100</p>
+</dd>
+<dt>metacritic</dt>
+<dd>
+<p>score from Metacritic where scores are weighted average
+of reviews; scored out of 100</p>
+</dd>
+<dt>bo_domestic</dt>
+<dd>
+<p>box office gross amount in U.S. dollars (millions) for
+U.S. and Canada</p>
+</dd>
+<dt>bo_intl</dt>
+<dd>
+<p>box office gross amount in U.S. dollars (millions) for other
+territories</p>
+</dd>
+</dl>
+<h3>Examples</h3>
+
+<pre><code class="language-R">pixar_films
+
+library(ggplot2)
+
+headline(
+  x = min(pixar_films$run_time),
+  y = max(pixar_films$run_time),
+  headline =
+    "The shortest film was {delta} minutes less than the longest film ({orig_values} minutes)"
+)
+
+ggplot(pixar_films, aes(bo_intl, rating)) +
+  geom_boxplot() +
+  xlim(0, NA) +
+  labs(title = "International Box Office by MPA Rating")
+
+
+ggplot(pixar_films, aes(release_date, run_time)) +
+  geom_line() +
+  geom_point() +
+  ylim(0, NA) +
+  labs(title = "Film runtimes by release date")
+
+
+ggplot(pixar_films, aes(y = reorder(film, rotten_tomatoes))) +
+  geom_linerange(aes(xmin = rotten_tomatoes, xmax = metacritic), size = 2, color = "grey85") +
+  geom_point(aes(x = rotten_tomatoes, color = "rotten_tomatoes")) +
+  geom_point(aes(x = metacritic, color = "metacritic")) +
+  scale_color_manual(values = c("steelblue1", "coral2")) +
+  theme_minimal(base_size = 9) +
+  labs(
+    title = "Rotten Tomatoes vs Metacritic by film",
+    color = NULL,
+    y = NULL,
+    x = "Audience Score"
+  )
+
+</code></pre>
+
+
+</div>

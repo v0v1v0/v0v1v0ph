@@ -1,0 +1,279 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>cde</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Conditional Density Estimation</h2>
+
+<h3>Description</h3>
+
+<p>Calculates kernel conditional density estimate using local polynomial
+estimation.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">cde(
+  x,
+  y,
+  deg = 0,
+  link = "identity",
+  a,
+  b,
+  mean = NULL,
+  x.margin,
+  y.margin,
+  x.name,
+  y.name,
+  use.locfit = FALSE,
+  fw = TRUE,
+  rescale = TRUE,
+  nxmargin = 15,
+  nymargin = 100,
+  a.nndefault = 0.3,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>Numerical vector or matrix: the conditioning variable(s).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+<p>Numerical vector: the response variable.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>deg</code></td>
+<td>
+<p>Degree of local polynomial used in estimation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>link</code></td>
+<td>
+<p>Link function used in estimation. Default "identity". The other
+possibility is "log" which is recommended if degree &gt; 0.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>a</code></td>
+<td>
+<p>Optional bandwidth in x direction.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>b</code></td>
+<td>
+<p>Optional bandwidth in y direction.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mean</code></td>
+<td>
+<p>Estimated mean of y|x. If present, it will adjust conditional
+density to have this mean.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x.margin</code></td>
+<td>
+<p>Values in x-space on which conditional density is
+calculated. If not specified, an equi-spaced grid of <code>nxmargin</code> values
+over the range of x is used.  If x is a matrix, x.margin should be a list of
+two numerical vectors.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>y.margin</code></td>
+<td>
+<p>Values in y-space on which conditional density is
+calculated. If not specified, an equi-spaced grid of <code>nymargin</code> values
+over the range of y is used.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x.name</code></td>
+<td>
+<p>Optional name of x variable used in plots.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>y.name</code></td>
+<td>
+<p>Optional name of y variable used in plots.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>use.locfit</code></td>
+<td>
+<p>If TRUE, will use <code>locfit</code> for
+estimation. Otherwise <code>ksmooth</code> is used.
+<code>locfit</code> is used if degree&gt;0 or link not the identity or
+the dimension of x is greater than 1 even if <code>use.locfit=FALSE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fw</code></td>
+<td>
+<p>If TRUE (default), will use fixed window width estimation.
+Otherwise nearest neighbourhood estimation is used. If the dimension of x is
+greater than 1, nearest neighbourhood must be used.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rescale</code></td>
+<td>
+<p>If TRUE (default), will rescale the conditional densities to
+integrate to one.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nxmargin</code></td>
+<td>
+<p>Number of values used in <code>x.margin</code> by default.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nymargin</code></td>
+<td>
+<p>Number of values used in <code>y.margin</code> by default.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>a.nndefault</code></td>
+<td>
+<p>Default nearest neighbour bandwidth (used only if
+<code>fw=FALSE</code> and <code>a</code> is missing.).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Additional arguments are passed to locfit.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>If bandwidths are omitted, they are computed using normal reference rules
+described in Bashtannyk and Hyndman (2001) and Hyndman and Yao (2002). Bias
+adjustment uses the method described in Hyndman, Bashtannyk and Grunwald
+(1996). If deg&gt;1 then estimation is based on the local parametric estimator
+of Hyndman and Yao (2002).
+</p>
+
+
+<h3>Value</h3>
+
+<p>A list with the following components: </p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>grid in x direction
+on which density evaluated. Equal to x.margin if specified.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+<p>grid
+in y direction on which density is evaluated. Equal to y.margin if
+specified. </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>z</code></td>
+<td>
+<p>value of conditional density estimate returned as a
+matrix. </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>a</code></td>
+<td>
+<p>window width in x direction.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>b</code></td>
+<td>
+<p>window width in y
+direction.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x.name</code></td>
+<td>
+<p>Name of x variable to be used in plots.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>y.name</code></td>
+<td>
+<p>Name of y variable to be used in plots.</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>Rob J Hyndman
+</p>
+
+
+<h3>References</h3>
+
+<p>Hyndman, R.J., Bashtannyk, D.M. and Grunwald, G.K. (1996)
+"Estimating and visualizing conditional densities". <em>Journal of
+Computational and Graphical Statistics</em>, <b>5</b>, 315-336.
+</p>
+<p>Bashtannyk, D.M., and Hyndman, R.J. (2001) "Bandwidth selection for kernel
+conditional density estimation". <em>Computational statistics and data
+analysis</em>, <b>36</b>(3), 279-298.
+</p>
+<p>Hyndman, R.J. and Yao, Q. (2002) "Nonparametric estimation and symmetry
+tests for conditional density functions". <em>Journal of Nonparametric
+Statistics</em>, <b>14</b>(3), 259-278.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>cde.bandwidths</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Old faithful data
+faithful.cde &lt;- cde(faithful$waiting, faithful$eruptions,
+  x.name="Waiting time", y.name="Duration time")
+plot(faithful.cde)
+plot(faithful.cde, plot.fn="hdr")
+
+# Melbourne maximum temperatures with bias adjustment
+x &lt;- maxtemp[1:3649]
+y &lt;- maxtemp[2:3650]
+maxtemp.cde &lt;- cde(x, y,
+  x.name="Today's max temperature", y.name="Tomorrow's max temperature")
+# Assume linear mean
+fit &lt;- lm(y~x)
+fit.mean &lt;- list(x=6:45,y=fit$coef[1]+fit$coef[2]*(6:45))
+maxtemp.cde2 &lt;- cde(x, y, mean=fit.mean,
+	 x.name="Today's max temperature", y.name="Tomorrow's max temperature")
+plot(maxtemp.cde)
+</code></pre>
+
+
+</div>

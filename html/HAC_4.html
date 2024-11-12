@@ -1,0 +1,129 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>emp.copula</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Empirical copula </h2>
+
+<h3>Description</h3>
+
+<p><code>emp.copula</code> and <code>emp.copula.self</code> compute the empirical copula for a given sample. The difference between these 
+functions is, that <code>emp.copula.self</code> does not require a matrix <code>u</code>, at which the function is evaluated.</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">emp.copula(u, x, proc = "M", sort = "none", margins = NULL, 
+na.rm = FALSE, ...)
+emp.copula.self(x, proc = "M", sort = "none", margins = NULL, 
+na.rm = FALSE, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>u</code></td>
+<td>
+
+<p>a matrix, at which the function is evaluated. According to the dimension of the data matrix <code>x</code>, it can be a scalar, a vector or a matrix. The entries of <code>u</code> should be within the interval <code class="reqn">[0, 1]</code>. </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+ 
+<p>denotes the matrix of marginal distributions, if <code>margins = NULL</code>. The number of columns should be equal the dimension <code class="reqn">d</code>, whereas the number of rows should be equal to the number of observations 
+<code class="reqn">n</code>, with <code class="reqn">n &gt; d</code>. </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>proc</code></td>
+<td>
+
+<p>enables the user to choose between two different methods. It is recommended to use the default method, <code>"M"</code>, because it takes only a small fraction of the computational time of method <code>"A"</code>. However, method 
+<code>"M"</code> is sensitive with respect to the size of the working memory and therefore, non-applicable for very large datasets.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sort</code></td>
+<td>
+
+<p>defines, whether the output is ordered. <code>sort = "asc"</code> refers to ascending values, which might be interesting for plotting and <code>sort = "desc"</code> refers to descending values.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>margins</code></td>
+<td>
+
+<p>specifies the margins. The data matrix is assumed to contain the values of the marginal distributions by default, i.e. <code>margins = NULL</code>. If raw data are used, the margins can be determined nonparametrically, <code>"edf"</code>, or in parametric way, e.g. <code>"norm"</code>. See <code>estimate.copula</code> for a detailed explanation.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>na.rm</code></td>
+<td>
+
+<p>boolean. If <code>na.rm = TRUE</code>, missing values, <code>NA</code>, contained in <code>x</code> and <code>u</code> are removed.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+
+<p>arguments to be passed to <code>na.omit</code>.
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The estimated copula follows the formula </p>
+<p style="text-align: center;"><code class="reqn">\widehat{C} \left(u_{1}, \dots, u_{d} \right) = n^{-1} \sum_{i=1}^{n} \prod_{j=1}^{d} \mathbf{I} \left\{ \widehat{F}_{j} \left( X_{ij} \right) \leq u_{j} \right\},</code>
+</p>
+<p> where <code class="reqn">\widehat{F}_{j}</code> denotes the empirical marginal distribution function of variable <code class="reqn">X_{j}</code>.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A vector containing the values of the empirical copula.
+</p>
+
+
+<h3>References</h3>
+
+<p>Okhrin, O. and Ristig, A. 2014, Hierarchical Archimedean Copulae: The <code style="white-space: pre;">⁠HAC⁠</code> Package", <em>Journal of Statistical Software</em>, 58(4), 1-20, <a href="https://doi.org/10.18637/jss.v058.i04">doi:10.18637/jss.v058.i04</a>.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>pHAC</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">v = seq(-4, 4, 0.05)
+X = cbind(matrix(pt(v, 1), 161, 1), matrix(pnorm(v), 161, 1))
+
+# both methods lead to the same result 
+z = emp.copula.self(X, proc = "M") 
+which(((emp.copula.self(X[1:100, ], proc = "M") - emp.copula.self(X[1:100, ],
+proc = "A")) == 0) == "FALSE")
+# integer(0)
+
+# the contour plot
+out = outer(z, z)
+contour(x = X[,1], y = X[,2], out, main = "Contour Plot", 
+xlab = "Cauchy Margin", ylab = "Standard Normal Margin", 
+labcex = 1, lwd = 1.5, nlevels = 15)
+</code></pre>
+
+
+</div>

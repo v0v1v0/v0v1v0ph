@@ -1,0 +1,178 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>ridge.proj</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>P-values based on ridge projection method</h2>
+
+<h3>Description</h3>
+
+<p>Compute p-values for lasso-type regression coefficients
+based on the ridge projection method.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">ridge.proj(x, y, family = "gaussian", standardize = TRUE,
+           lambda = 1, betainit = "cv lasso", sigma = NULL,
+           suppress.grouptesting = FALSE,
+           multiplecorr.method = "holm", N = 10000)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>design matrix (without intercept).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+<p>response vector.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>family</code></td>
+<td>
+<p>family</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>standardize</code></td>
+<td>
+<p>Should design matrix be standardized to unit column
+standard deviation (logical)?</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lambda</code></td>
+<td>
+<p>Value of penalty parameter lambda (ridge regression).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>betainit</code></td>
+<td>
+<p>Either a numeric vector, corresponding to a sparse
+estimate of the coefficient vector, or the method to be used for the
+initial estimation, "scaled lasso" or "cv lasso".</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sigma</code></td>
+<td>
+<p>Estimate of the standard deviation of the error term. This
+estimate needs to be compatible with the initial
+estimate (see betainit) provided or calculated. Otherwise, results
+won't be correct.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>suppress.grouptesting</code></td>
+<td>
+<p>A boolean to optionally suppress the
+preparations made for testing groups. This will avoid quite a bit of
+computation and memory usage. The output will also be smaller.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>multiplecorr.method</code></td>
+<td>
+<p>Either "WY" or any of
+<code>p.adjust.methods</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>N</code></td>
+<td>
+<p>number of empirical samples (only used if
+<code>multiplecorr.method = "WY"</code>).</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>pval</code></td>
+<td>
+<p>Individual p-values for each parameter.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pval.corr</code></td>
+<td>
+<p>Multiple testing corrected p-values for each
+parameter.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>groupTest</code></td>
+<td>
+<p>Function to perform groupwise tests.  Groups are
+indicated using an index vector with entries in <code class="reqn">{1,\ldots,p}</code>
+or a list thereof.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>clusterGroupTest</code></td>
+<td>
+<p>Function to perform groupwise tests based on
+hierarchical clustering. You can either provide a distance matrix
+and clustering method or the output of hierarchical clustering from
+the function <code>hclust</code> as for
+<code>clusterGroupBound</code>. P-values are adjusted for multiple testing.</p>
+</td>
+</tr>
+</table>
+<table><tr style="vertical-align: top;">
+<td><code>sigmahat</code></td>
+<td>
+<p><code class="reqn">\widehat{\sigma}</code> coming from the scaled lasso.</p>
+</td>
+</tr></table>
+<h3>Author(s)</h3>
+
+<p>Peter Buehlmann, Ruben Dezeure, Lukas Meier</p>
+
+
+<h3>References</h3>
+
+<p>Bühlmann, P. (2013)
+Statistical significance in high-dimensional linear models.
+<em>Bernoulli</em> <b>19</b>, 1212–1242.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">x &lt;- matrix(rnorm(100 * 100), nrow = 100, ncol = 100)
+y &lt;- x[,1] + x[,2] + rnorm(100)
+fit.ridge &lt;- ridge.proj(x, y)
+which(fit.ridge$pval.corr &lt; 0.05)
+
+## Use the scaled lasso for the initial estimate
+fit.ridge.scaled  &lt;- ridge.proj(x, y, betainit = "scaled lasso")
+which(fit.ridge.scaled$pval.corr &lt; 0.05)
+
+## Group-wise testing of the first two coefficients
+fit.ridge$groupTest(1:2)
+
+## Hierarchical testing using distance matrix based on
+## correlation matrix
+out.clust &lt;- fit.ridge$clusterGroupTest()
+plot(out.clust)
+
+## Fit the method without doing the preparations
+## for group testing (saves time and memory)
+fit.ridge.faster &lt;- ridge.proj(x, y, suppress.grouptesting = TRUE)
+</code></pre>
+
+
+</div>

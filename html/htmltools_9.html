@@ -1,0 +1,104 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>capturePlot</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Capture a plot as a saved file</h2>
+
+<h3>Description</h3>
+
+<p>Easily generates a .png file (or other graphics file) from a plotting
+expression.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">capturePlot(
+  expr,
+  filename = tempfile(fileext = ".png"),
+  device = defaultPngDevice(),
+  width = 400,
+  height = 400,
+  res = 72,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>expr</code></td>
+<td>
+<p>A plotting expression that generates a plot (or yields an object
+that generates a plot when printed, like a ggplot2). We evaluate this
+expression after activating the graphics device (<code>device</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>filename</code></td>
+<td>
+<p>The output filename. By default, a temp file with <code>.png</code>
+extension will be used; you should provide a filename with a different
+extension if you provide a non-PNG graphics device function.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>device</code></td>
+<td>
+<p>A graphics device function; by default, this will be either
+<code>grDevices::png()</code>, <code>ragg::agg_png()</code>, or <code>Cairo::CairoPNG()</code>, depending on
+your system and configuration. See <code>defaultPngDevice()</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>width, height, res, ...</code></td>
+<td>
+<p>Additional arguments to the <code>device</code> function.</p>
+</td>
+</tr>
+</table>
+<h3>See Also</h3>
+
+<p><code>plotTag()</code> saves plots as a self-contained <code style="white-space: pre;">⁠&lt;img&gt;⁠</code>
+tag.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+# Default settings
+res &lt;- capturePlot(plot(cars))
+
+# View result
+browseURL(res)
+
+# Clean up
+unlink(res)
+
+# Custom width/height
+pngpath &lt;- tempfile(fileext = ".png")
+capturePlot(plot(pressure), pngpath, width = 800, height = 375)
+browseURL(pngpath)
+unlink(pngpath)
+
+# Use a custom graphics device (e.g., SVG)
+if (capabilities("cairo")) {
+  svgpath &lt;- capturePlot(
+    plot(pressure),
+    tempfile(fileext = ".svg"),
+    grDevices::svg,
+    width = 8, height = 3.75
+  )
+  browseURL(svgpath)
+  unlink(svgpath)
+}
+
+</code></pre>
+
+
+</div>

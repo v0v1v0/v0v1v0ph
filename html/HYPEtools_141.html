@@ -1,0 +1,131 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>UpstreamGroupSLCClasses</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Calculate area-weighted upstream averages of grouped SLC class fractions.</h2>
+
+<h3>Description</h3>
+
+<p>Function to calculate averages of grouped SLC class fractions calculated from imported GeoData.txt and GeoClass.txt or any other user-defined grouping.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">UpstreamGroupSLCClasses(
+  subid = NULL,
+  gd,
+  bd = NULL,
+  gcl = NULL,
+  type = c("landuse", "soil", "crop"),
+  group = NULL,
+  signif.digits = 3,
+  progbar = TRUE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>subid</code></td>
+<td>
+<p>Integer vector of SUBIDs for which to calculate upstream properties (must exist in <code>gd</code>).
+If <code>NULL</code> (default), upstream areas for all SUBIDs will be calculated.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>gd</code></td>
+<td>
+<p>A data frame containing a column with SUBIDs and a column with areas, e.g. an imported 'GeoData.txt' file imported with <code>ReadGeoData</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>bd</code></td>
+<td>
+<p>A data frame, containing 'BRANCHID' and 'SOURCEID' columns, e.g. an imported 'BranchData.txt' file. Optional argument.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>gcl</code></td>
+<td>
+<p>Data frame containing columns with SLCs and corresponding land use and soil class IDs, typically a 'GeoClass.txt'
+file imported with <code>ReadGeoClass</code>. Must be provided if no <code>group</code> argument is given.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>type</code></td>
+<td>
+<p>Keyword character string for use with <code>gcl</code>. Type of grouping index, choice of <code>"landuse"</code>, <code>"soil"</code>, and/or <code>"crop"</code>,
+can be abbreviated.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>group</code></td>
+<td>
+<p>Integer vector, of same length as number of SLC classes in <code>gd</code>. Alternative grouping index specification to <code>gcl</code> + <code>type</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>signif.digits</code></td>
+<td>
+<p>Integer, number of significant digits to round upstream SLCs to. See also <code>signif</code>. Set to <code>NULL</code> to prevent rounding.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>progbar</code></td>
+<td>
+<p>Logical, display a progress bar while calculating SLC class fractions. Adds overhead to calculation time but useful when <code>subid</code>
+is <code>NULL</code> or contains many SUBIDs.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p><code>UpstreamGroupSLCClasses</code> calculates area-weighted upstream averages of CropID fractions from SLC class fractions in a GeoData table and corresponding
+grouping columns in a GeoClass table or a user-provided vector. Upstream calculations include branch connections in case of stream bifurcations but not
+potential irrigation links or groundwater flows. Averages are weighted by sub-catchment area.
+</p>
+<p>The function builds on <code>GroupSLCClasses</code>, which provides grouped sums of SLC classes for several or all sub-basins in a GeoData dataframe.
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>UpstreamGroupSLCClasses</code> returns a data frame with SUBIDs in the first column, and upstream group fractions in the following columns.
+</p>
+
+
+<h3>Note</h3>
+
+<p><code>UpstreamGroupSLCClasses</code> expects SLC class columns in argument <code>gd</code> to be ordered in ascending order.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>GroupSLCClasses</code>
+<code>UpstreamSLCClasses</code>
+<code>UpstreamGeoData</code>
+<code>SumUpstreamArea</code>
+<code>AllUpstreamSubids</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Import source data
+te1 &lt;- ReadGeoData(filename = system.file("demo_model", "GeoData.txt", package = "HYPEtools"))
+te2 &lt;- ReadGeoClass(filename = system.file("demo_model", "GeoClass.txt", package = "HYPEtools"))
+# Upstream land use fractions for single SUBID
+UpstreamGroupSLCClasses(subid = 63794, gd = te1, gcl = te2, type = "landuse", progbar = FALSE)
+# Upstream soil fraction for all SUBIDs in GeoData
+UpstreamGroupSLCClasses(gd = te1, gcl = te2, type = "soil")
+
+</code></pre>
+
+
+</div>

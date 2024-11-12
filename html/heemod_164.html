@@ -1,0 +1,175 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>define_transition</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Define Transition Matrix for Markov Model</h2>
+
+<h3>Description</h3>
+
+<p>Define a matrix of transition probabilities. Probability
+can depend on parameters defined with
+<code>define_parameters()</code>, and can thus be time-dependent.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">define_transition(..., state_names)
+
+define_transition_(.dots, state_names)
+
+## S3 method for class 'uneval_matrix'
+modify(.OBJECT, ...)
+
+## S3 method for class 'uneval_matrix'
+plot(x, relsize = 0.75, shadow.size = 0, latex = TRUE, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Name-value pairs of expressions defining matrix
+cells. Can refer to parameters defined with
+<code>define_parameters()</code>. For <code>plot</code>, additional arguments
+passed to <code>diagram::plotmat()</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>state_names</code></td>
+<td>
+<p>character vector, optional. State
+names.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.dots</code></td>
+<td>
+<p>Used to work around non-standard evaluation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.OBJECT</code></td>
+<td>
+<p>An object of class <code>uneval_matrix</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>An <code>uneval_matrix</code> to plot.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>relsize</code></td>
+<td>
+<p>Argument passed to <code>diagram::plotmat()</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>shadow.size</code></td>
+<td>
+<p>Argument passed to
+<code>diagram::plotmat()</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>latex</code></td>
+<td>
+<p>Argument passed to <code>diagram::plotmat()</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Matric cells are listed by row.
+</p>
+<p>Parameters names are searched first in a parameter object
+defined with <code>define_parameters()</code> and linked with the
+matrix through <code>define_strategy()</code>; then in the
+environment where the matrix was defined.
+</p>
+<p>The complementary probability of all other row
+probabilities can be conveniently referred to as <code>C</code>.
+</p>
+<p>The matrix code can be re-indented for readability with
+<code>reindent_transition()</code>.
+</p>
+<p>Only matrix size is checked during this step (the matrix
+must be square). Other conditions (such as row sums being
+equal to 1) are tested later, during model evaluation.
+</p>
+<p>For the <code>modify</code> function, existing matrix cells are
+replaced with the new expression. Cells are referenced by
+name. Cell naming follows the <code>cell_x_y</code> convention, with
+<code>x</code> being the row number and <code>y</code> the column number.
+</p>
+
+
+<h3>Value</h3>
+
+<p>An object of class <code>uneval_matrix</code> (actually a
+named list of <code>quosures</code> expressions).
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+# simple 3x3 transition matrix
+
+mat_1 &lt;- define_transition(
+  .2, 0, .8,
+  0, .1, .9,
+  0, 0, 1
+)
+mat_1
+
+plot(mat_1)
+
+# referencing parameters
+# rr must be present in a parameter object
+# that must later be linked with define_strategy
+
+mat_2 &lt;- define_transition(
+  .5 - rr, rr,
+  .4, .6
+)
+mat_2
+
+reindent_transition(mat_2)
+
+# can also use C
+
+define_transition(
+  C, rr,
+  .4, .6
+)
+
+# updating cells from mat_1
+
+modify(
+  mat_1,
+  cell_2_1 = .2,
+  cell_2_3 = .7
+)
+
+# only matrix size is check, it is thus possible
+# to define an incorrect matrix
+
+# this matrix will generate an error later,
+# during model evaluation
+
+define_transition(
+  .5, 3,
+  -1, 2
+)
+</code></pre>
+
+
+</div>

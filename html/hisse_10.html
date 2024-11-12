@@ -1,0 +1,290 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hisse.null4.old</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Original Four state trait-independent Hidden State Speciation and Extinction</h2>
+
+<h3>Description</h3>
+
+<p>Sets up and executes the original four state trait-independent HiSSE model (Hidden State Speciation and Extinction) on a phylogeny and character set.</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hisse.null4.old(phy, data, f=c(1,1), turnover.anc=rep(c(1,2,3,4),2), 
+eps.anc=rep(c(1,2,3,4),2), trans.type="equal", condition.on.survival=TRUE, 
+root.type="madfitz", root.p=NULL,  output.type="turnover", sann=TRUE, 
+sann.its=1000, bounded.search=TRUE, max.tol=.Machine$double.eps^.50,
+starting.vals=NULL, turnover.upper=10000, eps.upper=3, trans.upper=100,
+ode.eps=0)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>phy</code></td>
+<td>
+<p>a phylogenetic tree, in <code>ape</code> “phylo” format and with internal nodes labeled denoting the ancestral selective regimes.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>a data matrix containing species information (see Details).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>f</code></td>
+<td>
+<p>vector of length 2 with the estimated proportion of extant species in state 0 and 1 that are included in the phylogeny. A value of c(0.25, 0.5) means that 25 percent of species in state 0 and 50 percent of species in state 1 are included in the phylogeny. By default all species are assumed to be sampled.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>turnover.anc</code></td>
+<td>
+<p>a vector of length 8, indicating the free parameters associated with the net turnover rates. Default setting assumes character independent diversification (see Details).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>eps.anc</code></td>
+<td>
+<p>a vector of length 8, indicating the free parameters associated with the extinction fractions. Default setting assumes character independent diversification (see Details).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>trans.type</code></td>
+<td>
+<p>provides the type of transition rate model. Currently this model allows two types: “equal”, the default, which assumes all transitions are equal, and “three.rate”, that assumes three rates (see Details).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>condition.on.survival</code></td>
+<td>
+<p>a logical indicating whether the likelihood should be conditioned on the survival of two lineages and the speciation event subtending them (Nee et al. 1994). The default is <code>TRUE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>root.type</code></td>
+<td>
+<p>indicates whether root summarization follow the procedure described by FitzJohn et al. 2009, “madfitz” or Herrera-Alsina et al. 2018, “herr_als”.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>root.p</code></td>
+<td>
+<p>a vector indicating fixed root state probabilities. The default is <code>NULL</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>output.type</code></td>
+<td>
+<p>indicates whether the rates should be printed onscreen as the optimized variables, “turnover”, transformed to reflect net diversification, “net.div”, or transformed to reflect <code class="reqn">\lambda</code> and <code class="reqn">\mu</code>, “raw”.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sann</code></td>
+<td>
+<p>a logical indicating whether a two-step optimization procedure is to be used. The first includes a simulate annealing approach, with the second involving a refinement using <code>subplex</code>. The default is <code>TRUE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sann.its</code></td>
+<td>
+<p>a numeric indicating the number of times the simulated annealing algorithm should call the objective function.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>bounded.search</code></td>
+<td>
+<p>a logical indicating whether or not bounds should be enforced during optimization. The default is is <code>TRUE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>max.tol</code></td>
+<td>
+<p>supplies the relative optimization tolerance to <code>subplex</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>starting.vals</code></td>
+<td>
+<p>a vector of starting values to be used instead of the default settings. These are just three values given in the following order: turnover (1), extinction fraction (2), and a single transition rate (3)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>turnover.upper</code></td>
+<td>
+<p>sets the upper bound for the turnover parameters. The default upper bound assumes an event occurs every 100 years.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>eps.upper</code></td>
+<td>
+<p>sets the upper bound for the extinction fraction parameters.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>trans.upper</code></td>
+<td>
+<p>sets the upper bound for the transition rate parameters.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ode.eps</code></td>
+<td>
+<p>sets the tolerance for the integration at the end of a branch. Essentially if the sum of compD is less than this tolerance, then it assumes the results are unstable and discards them. The default is set to zero, but in testing a value of 1e-8 can sometimes produce stable solutions for both easy and very difficult optimization problems.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>This function sets up and executes a four-state trait independent HiSSE model. The model closely follows <code>hisse.old</code>. However, note that this function is no longer necessary and can be called and evaluated directly using the new <code>hisse</code> function.
+</p>
+<p>Like <code>hisse.old</code>, users input vectors containing values to indicate how many free parameters are to be estimated for each of the variables in the model. However, the null-four model assumes that “turnover.anc” and “eps.anc” are linked between the two observed states. Thus, users are unlikely to alter the inputs much, aside from perhaps fixing “turnover.anc” or “eps.anc” to be equal across the four hidden states, where the “turnover.anc” input vector is set as rep(c(1,1,1,1),2). For a Yule equivalent, the input vector for “eps.anc” would be rep(c(0,0,0,0),2). For how to setup a null-two model see the example code below.
+</p>
+<p>For user-specified “root.p”, you should specify the probability for each state. See help for “hisse.old” for more on other parameters for this function.
+</p>
+<p>For the “root.type” option, we are currently maintaining the previous default of 
+“madfitz”. However, it was recently pointed out by Herrera-Alsina et al. (2018)
+that at the root, the individual likelihoods for each possible state should be conditioned
+prior to averaging the individual likelihoods across states. This can be set doing 
+“herr_als”. It is unclear to us which is exactly correct, but it does seem that 
+both “madfitz” and “herr_als” behave exactly as they should in the case of 
+character-independent diversification (i.e., reduces to likelihood of tree + likelihood of
+trait model). We've also tested the behavior and the likelihood differences are very 
+subtle and the parameter estimates in simulation are nearly indistinguishable from the
+“madfitz” conditioning scheme. We provide both options and encourage users to try 
+both and let us know conditions in which the result vary dramatically under the two root
+implementations. We suspect they do not. 
+</p>
+<p>Also, note, that in the case of “root.type=user” and “root.type=equal” are
+no longer explicit “root.type” options. Instead, either “madfitz” or 
+“herr_als” are specified and the “root.p” can be set to allow for custom
+root options.  
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>hisse.null4.old</code> returns an object of class <code>hisse.fit</code>. This is a list with elements:
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>$loglik</code></td>
+<td>
+<p>the maximum negative log-likelihood.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>$AIC</code></td>
+<td>
+<p>Akaike information criterion.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>$AICc</code></td>
+<td>
+<p>Akaike information criterion corrected for sample-size.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>$solution</code></td>
+<td>
+<p>a matrix containing the maximum likelihood estimates of the model parameters.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>$index.par</code></td>
+<td>
+<p>an index matrix of the parameters being estimated.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>$f</code></td>
+<td>
+<p>user-supplied sampling frequencies.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>$condition.on.surivival</code></td>
+<td>
+<p>a logical indicating whether the likelihood was conditioned on the survival of two lineages and the speciation event subtending them.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>$root.type</code></td>
+<td>
+<p>indicates the user-specified root prior assumption.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>$root.p</code></td>
+<td>
+<p>indicates whether the user-specified fixed root probabilities.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>$phy</code></td>
+<td>
+<p>user-supplied tree</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>$data</code></td>
+<td>
+<p>user-supplied dataset</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>$output.type</code></td>
+<td>
+<p>the user-specified output.type to be printed on the screen.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>$trans.type</code></td>
+<td>
+<p>the user-specified transition model.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>$trans.mat</code></td>
+<td>
+<p>the index matrix that specifies the free parameters in the transition model.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>$max.tol</code></td>
+<td>
+<p>relative optimization tolerance.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>$upper.bounds</code></td>
+<td>
+<p>the vector of upper limits to the optimization search.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>$lower.bounds</code></td>
+<td>
+<p>the vector of lower limits to the optimization search.</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>Jeremy M. Beaulieu</p>
+
+
+<h3>References</h3>
+
+<p>Beaulieu, J.M, and B.C. O'Meara. 2016. Detecting hidden diversification shifts in models of trait-dependent speciation and extinction. Syst. Biol. 65:583-601. 
+</p>
+
+
+</div>

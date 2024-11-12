@@ -1,0 +1,195 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>PlotSubbasinRouting</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Plot HYPE model subbasin routing.</h2>
+
+<h3>Description</h3>
+
+<p>Plot routing of subbasins for a HYPE model on an interactive map.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">PlotSubbasinRouting(
+  map,
+  map.subid.column = 1,
+  gd = NULL,
+  bd = NULL,
+  plot.scale = TRUE,
+  plot.searchbar = FALSE,
+  weight = 0.5,
+  opacity = 1,
+  fillColor = "#4d4d4d",
+  fillOpacity = 0.25,
+  line.weight = 5,
+  line.opacity = 1,
+  seed = NULL,
+  darken = 0,
+  font.size = 10,
+  file = "",
+  vwidth = 1424,
+  vheight = 1000,
+  html.name = ""
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>map</code></td>
+<td>
+<p>Path to file containing subbasin polygon GIS data (e.g. shapefile or geopackage) or a <code>SpatialPolygonsDataFrame</code>
+or <code>sf</code> object. For large maps, a small/simplified polygon file should be used as larger files can take an excessive amount of time to render.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>map.subid.column</code></td>
+<td>
+<p>Integer, column index in the <code>map</code> 'data' <code>slot</code> holding SUBIDs (sub-catchment IDs).
+Only required if providing GeoData information with <code>gd</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>gd</code></td>
+<td>
+<p>Path to model GeoData.txt or a GeoData object from <code>ReadGeoData</code>. Only required if <code>map</code> does not contain SUBID and/or MAINDOWN fields.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>bd</code></td>
+<td>
+<p>Path to model BranchData.txt or a BranchData object from <code>ReadBranchData</code>. Only required if model has a BranchData.txt file.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>plot.scale</code></td>
+<td>
+<p>Logical, include a scale bar on the map.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>plot.searchbar</code></td>
+<td>
+<p>Logical, if <code>TRUE</code>, then a search bar will be included. See <code>leaflet.extras::addSearchFeatures()</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>weight</code></td>
+<td>
+<p>Numeric, weight of subbasin boundary lines. See <code>leaflet::addPolygons()</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>opacity</code></td>
+<td>
+<p>Numeric, opacity of subbasin boundary lines. See <code>leaflet::addPolygons()</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fillColor</code></td>
+<td>
+<p>String, color of subbasin polygons. See <code>leaflet::addPolygons()</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fillOpacity</code></td>
+<td>
+<p>Numeric, opacity of subbasin polygons. See <code>leaflet::addPolygons()</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>line.weight</code></td>
+<td>
+<p>Numeric, weight of routing lines. See <code>leaflet::addPolylines()</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>line.opacity</code></td>
+<td>
+<p>Numeric, opacity of routing lines. See <code>leaflet::addPolylines()</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>seed</code></td>
+<td>
+<p>Integer, seed number to to produce repeatable color palette.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>darken</code></td>
+<td>
+<p>Numeric specifying the amount of darkening applied to the random color palette. Negative values will lighten the palette. See <code>distinctColorPalette</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>font.size</code></td>
+<td>
+<p>Numeric, font size (px) for map subbasin labels.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>file</code></td>
+<td>
+<p>Save map to an image file by specifying the path to the desired output file using this argument. File extension must be specified.
+See <code>mapview::mapshot()</code>.
+You may need to run <code>webshot::install_phantomjs()</code> the first time you save a map to an image file.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>vwidth</code></td>
+<td>
+<p>Numeric, width of the exported map image in pixels. See <code>webshot::webshot()</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>vheight</code></td>
+<td>
+<p>Numeric, height of the exported map image in pixels. See <code>webshot::webshot()</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>html.name</code></td>
+<td>
+<p>Save map to an interactive HTML file by specifying the path to the desired output file using this argument. File extension must be specified.
+See <code>htmlwidgets::saveWidget()</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p><code>PlotSubbasinRouting</code> generates an interactive Leaflet map with lines indicating the routing of flow between subbasins. GeoData information only needs
+to be provided if the <code>map</code> GIS data does not include SUBID and/or MAINDOWN fields. BranchData information only needs to be provided if model has a
+BranchData.txt file. Subbasin routing lines are randomly assigned a color using <code>distinctColorPalette</code>.
+</p>
+
+
+<h3>Value</h3>
+
+<p>Returns an interactive Leaflet map.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+PlotSubbasinRouting(
+  map = system.file("demo_model",
+                    "gis", "Nytorp_map.gpkg",
+                    package = "HYPEtools"
+  ),
+  gd = system.file("demo_model", "GeoData.txt", package = "HYPEtools"),
+  map.subid.column = 25
+)
+
+## End(Not run)
+
+</code></pre>
+
+
+</div>

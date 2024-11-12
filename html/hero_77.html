@@ -1,0 +1,78 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>rh.seq</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Apply <code>rh</code> sequentially</h2>
+
+<h3>Description</h3>
+
+<p><code>rh.seq</code> sequentially applies the <code>rh</code>
+function to <code>a</code>.  Specifically, if the length of
+<code>x</code> is <code>d</code>, then <code>rh.seq(x, a)</code> is
+equivalent to <code>rh(x[[d]], rh(x[[d - 1]], ..., rh(x[[2]], rh(x[[1]], a))..))</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">rh.seq(x, a, transpose = FALSE)
+
+rh_seq(x, a, transpose = FALSE)
+
+rhSeq(x, a, transpose = FALSE)
+
+RhSeq(x, a, transpose = FALSE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>A list of matrix-like objects</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>a</code></td>
+<td>
+<p>A matrix-like object (with dimensions)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>transpose</code></td>
+<td>
+<p>A logical value.  The Default is
+<code>FALSE</code>.  If <code>TRUE</code>, then the transpose of
+<code>A</code></p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A <code>matrix</code> or <code>Matrix-class</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># generate x, a
+x = list(matrix(rnorm(100), nrow = 10),
+         matrix(rnorm(100), nrow = 10))
+a = matrix(rnorm(100), nrow = 10)
+
+# three equivalent forms
+rhs1 = rh.seq(x, a)
+rhs2 = rh(x[[2]], rh(x[[1]], a))
+rhs3 = x[[1]] %*% a %*% t(x[[2]])
+
+# check equality
+all.equal(rhs1, rhs2)
+all.equal(rhs1, rhs3)
+</code></pre>
+
+
+</div>

@@ -1,0 +1,165 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>plot.IconoCorel</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Clean the dataframe before to be used with IC_threshold_matrix</h2>
+
+<h3>Description</h3>
+
+<p>This function plots the data as a network. It returns an invisible object that can be used with visIgraph from package visNetwork.
+<code>https://fr.wikipedia.org/wiki/Iconographie_des_corrélations</code>
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">## S3 method for class 'IconoCorel'
+plot(
+  x,
+  ...,
+  show.legend.direction = "bottomright",
+  show.legend.strength = "topleft",
+  title = "Correlation iconography",
+  vertex.label.color = "black",
+  vertex.label = NULL,
+  vertex.color = "white",
+  vertex.label.cex = 1,
+  plot = TRUE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>The correlation matrix to show</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>other options of plot.igraph()</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>show.legend.direction</code></td>
+<td>
+<p>the position of the legend of direction; FALSE to not show it</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>show.legend.strength</code></td>
+<td>
+<p>the position of the legend with intensity of correlation; FALSE to not show it</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>title</code></td>
+<td>
+<p>the title of the plot</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>vertex.label.color</code></td>
+<td>
+<p>a vector with the colors of labels</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>vertex.label</code></td>
+<td>
+<p>a vector with the labels</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>vertex.color</code></td>
+<td>
+<p>a vector of colors</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>vertex.label.cex</code></td>
+<td>
+<p>a vector of cex</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>plot</code></td>
+<td>
+<p>if TRUE, the plot is shown</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>plot.IconoCorel checks and corrects the dataframe to be used with IC_threshold_matrix
+</p>
+
+
+<h3>Value</h3>
+
+<p>A igraph object
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Marc Girondot <a href="mailto:marc.girondot@gmail.com">marc.girondot@gmail.com</a>
+</p>
+
+
+<h3>References</h3>
+
+<p>Lesty, M., 1999. Une nouvelle approche dans le choix des régresseurs de la régression multiple en présence d’interactions et de colinéarités. Revue de Modulad 22, 41-77.
+</p>
+
+
+<h3>See Also</h3>
+
+<p>Other Iconography of correlations: 
+<code>IC_clean_data()</code>,
+<code>IC_correlation_simplify()</code>,
+<code>IC_threshold_matrix()</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+library("HelpersMG")
+es &lt;- structure(list(Student = c("e1", "e2", "e3", "e4", "e5", "e6", "e7", "e8"), 
+                 Mass = c(52, 59, 55, 58, 66, 62, 63, 69), 
+                 Age = c(12, 12.5, 13, 14.5, 15.5, 16, 17, 18), 
+                 Assiduity = c(12, 9, 15, 5, 11, 15, 12, 9), 
+                 Note = c(5, 5, 9, 5, 13.5, 18, 18, 18)), 
+                 row.names = c(NA, -8L), class = "data.frame")
+
+es
+
+df &lt;- IC_clean_data(es, debug = TRUE)
+cor_matrix &lt;- IC_threshold_matrix(data=df, threshold = NULL, progress=FALSE)
+cor_threshold &lt;- IC_threshold_matrix(data=df, threshold = 0.3)
+par(mar=c(1,1,1,1))
+set.seed(4)
+library("igraph")
+library("visNetwork")
+kk &lt;- plot(cor_threshold, vertex.color="red")
+# it can be shown also with the visNetwork package
+visIgraph(kk)
+cor_threshold_Note &lt;- IC_correlation_simplify(matrix=cor_threshold, variable="Note")
+plot(cor_threshold_Note)
+
+# You can record the position of elements and use them later
+ly &lt;- layout_nicely(kk)
+plot(cor_threshold, vertex.color="red", layout=ly)
+
+## End(Not run)
+</code></pre>
+
+
+</div>

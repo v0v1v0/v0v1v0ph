@@ -1,0 +1,167 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>coicop</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Working with COICOP codes</h2>
+
+<h3>Description</h3>
+
+<p>Function <code>is.coicop()</code> checks if the input is a valid COICOP code while <code>level()</code> returns the COICOP level (e.g. division or subclass). Function <code>parent()</code> derives the higher-level parent of a COICOP code if available in the data supplied. The function <code>child()</code> does the same for lower-level children.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">is.coicop(id, settings=list())
+
+level(id, label=FALSE, settings=list())
+
+child(id, flag=TRUE, direct=FALSE, settings=list())
+
+parent(id, flag=TRUE, direct=FALSE, settings=list())
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>id</code></td>
+<td>
+<p>character vector of COICOP ids.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>label</code></td>
+<td>
+<p>logical indicating if the number of digits or the labels (e.g., division, subclass) should be returned.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>flag</code></td>
+<td>
+<p>for <code>flag=TRUE</code>, parent or child codes are available in the data are flagged by a logical. Otherwise, the parent or child codes are returned.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>direct</code></td>
+<td>
+<p>logical indicating if only direct relatives should be flagged as <code>TRUE</code> (e.g. <code>03-&gt;031</code>) or also indirect relatives (e.g. <code>03-&gt;0311</code>) if direct relatives in between are missing.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>settings</code></td>
+<td>
+<p>a list of control settings to be used. The following settings are supported:
+</p>
+
+<ul>
+<li> <p><code>coicop.version</code> : character specifying the COICOP version to be used when checking for valid COICOP codes. See details for the allowed values. The default is <code>getOption("hicp.coicop.version")</code>.
+</p>
+</li>
+<li> <p><code>unbundle</code> : logical indicating if COICOP bundles (e.g. 08X, 0531_2) as defined in <code>coicop.bundles</code> should be taken into account or not. The default is <code>getOption("hicp.unbundle")</code>.
+</p>
+</li>
+<li> <p><code>all.items.code</code> : character specifying the code internally used for the all-items index. The default is taken from <code>getOption("hicp.all.items.code")</code>. Not used by <code>is.coicop()</code>.
+</p>
+</li>
+</ul>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The following COICOP versions are supported:
+</p>
+
+<ul>
+<li>
+<p> Classification of Individual Consumption According to Purpose (<a href="https://unstats.un.org/unsd/classifications/Econ/Structure">COICOP-1999</a>): <code>coicop1999</code>
+</p>
+</li>
+<li>
+<p> European COICOP (<a href="https://op.europa.eu/de/web/eu-vocabularies/dataset/-/resource?uri=http://publications.europa.eu/resource/dataset/ecoicop">ECOICOP</a>): <code>ecoicop</code>
+</p>
+</li>
+<li>
+<p> ECOICOP adopted to the needs of the HICP (<a href="https://op.europa.eu/de/web/eu-vocabularies/dataset/-/resource?uri=http://publications.europa.eu/resource/dataset/ecoicop-hicp">ECOICOP-HICP</a>): <code>ecoicop-hicp</code>
+</p>
+</li>
+<li> <p><a href="https://unstats.un.org/unsd/classifications/Econ">COICOP-2018</a>: <code>coicop2018</code>
+</p>
+</li>
+</ul>
+<p>None of the COICOP versions include a code for the all-items index. The internal package code for the all-items index is globally defined by <code>options(hicp.all.items.code="00")</code> but can be changed by the user. The <code>level()</code> is always 1.
+</p>
+<p>If <code>settings$unbundle=TRUE</code>, COICOP bundle codes are resolved into their component ids and processed in that way. By contrast, if <code>settings$unbundle=FALSE</code>, COICOP bundle codes are internally set to <code>NA</code>. Consequently, they can't be a parent or a child of some other COICOP code.
+</p>
+
+
+<h3>Value</h3>
+
+<p>Function <code>is.coicop()</code> returns a logical vector and function <code>level()</code> a numeric vector. If argument <code>flag=TRUE</code>, functions <code>parent()</code> and <code>child()</code> both return a logical vector. If <code>flag=FALSE</code>, <code>parent()</code> gives a character vector, while <code>child()</code> returns a list. In any case, all function outputs have the same length as <code>id</code>.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Sebastian Weinand</p>
+
+
+<h3>See Also</h3>
+
+<p><code>unbundle</code>, <code>tree</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">### EXAMPLE 1
+
+# validity of coicop id:
+is.coicop(id=c("00","CP00","13","08X"), settings=list(unbundle=TRUE))
+is.coicop(id=c("00","CP00","13","08X"), settings=list(unbundle=FALSE))
+
+# coicop level:
+level(id=c("00","05","053","0531_2"))
+level(id=c("00","05","053","0531_2"), label=TRUE)
+
+# check for children in data:
+child(id=c("0111"), flag=FALSE) # false, no child found
+child(id=c("0111", "01"), flag=FALSE, direct=TRUE) # still false
+child(id=c("0111", "01"), flag=FALSE, direct=FALSE) # now TRUE
+
+# check for parent in data, including coicop bundles:
+ids &lt;- c("053","0531_2","05311","05321")
+parent(id=ids, flag=FALSE, direct=TRUE, settings=list(unbundle=FALSE))
+parent(id=ids, flag=FALSE, direct=TRUE, settings=list(unbundle=TRUE))
+
+### EXAMPLE 2
+
+# set cores for testing on CRAN:
+library(restatapi)
+options(restatapi_cores=1)
+library(data.table)
+
+# load hicp item weights:
+coicops &lt;- hicp.dataimport(id="prc_hicp_inw", filter=list(geo="EA"))
+coicops &lt;- coicops[grepl("^CP", coicop),]
+coicops[, "coicop":=gsub("^CP", "", coicop)]
+
+# get frequency of coicop levels:
+coicops[, .N, by=list(time, "lvl"=level(coicop))]
+
+# get coicop parent from the data:
+coicops[, "parent":=parent(id=coicop, flag=FALSE), by="time"]
+
+# flag if coicop has child available in the data:
+coicops[, "has_child":=child(id=coicop, flag=TRUE), by="time"]
+coicops[has_child==FALSE, sum(values, na.rm=TRUE), by="time"]
+# coicop bundles and their component ids are both taken into
+# account. this double counting explains some differences
+</code></pre>
+
+
+</div>

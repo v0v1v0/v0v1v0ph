@@ -1,0 +1,108 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hc_drilldown</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Drilldown options for highcharter objects</h2>
+
+<h3>Description</h3>
+
+<p>Options for drill down, the concept of inspecting increasingly high
+resolution data through clicking on chart items like columns or pie slices.
+The drilldown feature requires the drilldown.js file to be loaded,
+found in the modules directory of the download package, or online at
+code.highcharts.com/modules/drilldown.js.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hc_drilldown(hc, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>hc</code></td>
+<td>
+<p>A <code>highchart</code> <code>htmlwidget</code> object.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Arguments defined in <a href="https://api.highcharts.com/highcharts/drilldown">https://api.highcharts.com/highcharts/drilldown</a>.</p>
+</td>
+</tr>
+</table>
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+library(highcharter)
+library(dplyr)
+library(purrr)
+
+df &lt;- tibble(
+  name = c("Animals", "Fruits"),
+  y = c(5, 2),
+  drilldown = tolower(name)
+)
+
+df
+
+hc &lt;- highchart() %&gt;%
+  hc_title(text = "Basic drilldown") %&gt;%
+  hc_xAxis(type = "category") %&gt;%
+  hc_legend(enabled = FALSE) %&gt;%
+  hc_plotOptions(
+    series = list(
+      boderWidth = 0,
+      dataLabels = list(enabled = TRUE)
+    )
+  ) %&gt;%
+  hc_add_series(
+    data = df,
+    type = "column",
+    hcaes(name = name, y = y),
+    name = "Things",
+    colorByPoint = TRUE
+  )
+
+dfan &lt;- data.frame(
+  name = c("Cats", "Dogs", "Cows", "Sheep", "Pigs"),
+  value = c(4, 3, 1, 2, 1)
+)
+
+dffru &lt;- data.frame(
+  name = c("Apple", "Organes"),
+  value = c(4, 2)
+)
+
+
+dsan &lt;- list_parse2(dfan)
+
+dsfru &lt;- list_parse2(dffru)
+
+hc &lt;- hc %&gt;%
+  hc_drilldown(
+    allowPointDrilldown = TRUE,
+    series = list(
+      list(
+        id = "animals",
+        data = dsan
+      ),
+      list(
+        id = "fruits",
+        data = dsfru
+      )
+    )
+  )
+
+hc
+</code></pre>
+
+
+</div>

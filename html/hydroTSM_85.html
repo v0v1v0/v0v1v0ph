@@ -1,0 +1,420 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hydroplot</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Hydrological time series plotting and extraction.
+</h2>
+
+<h3>Description</h3>
+
+<p><code>hydroplot</code>: When <code>x</code> is a zoo object it plots (a maximum of) 9 graphs (lines plot, boxplots and/or histograms) of the daily, monthly, annual and/or seasonal time series. <br></p>
+<p><code>sname2plot</code>: When <code>x</code> is a data frame whose columns contain the time series of several gauging stations, it takes the name of one gauging station and plots the graphs described above.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hydroplot(x, ...)
+sname2plot(x, ...)
+
+## Default S3 method:
+hydroplot(x, FUN, na.rm=TRUE, ptype="ts+boxplot+hist", pfreq="dma",                      
+          var.type, var.unit="units", main=NULL, xlab="Time", ylab,
+          win.len1=0, win.len2=0, tick.tstep="auto", lab.tstep="auto", 
+          lab.fmt=NULL, cex=0.3, cex.main=1.3, cex.lab=1.3, cex.axis=1.3, 
+          col=c("blue", "lightblue", "lightblue"), 
+          from=NULL, to=NULL, dates=1, date.fmt= "%Y-%m-%d", 
+          stype="default", season.names=c("Winter", "Spring", "Summer", "Autumn"), 
+          h=NULL, ...)
+
+## S3 method for class 'zoo'
+hydroplot(x, FUN, na.rm=TRUE, ptype="ts+boxplot+hist", pfreq="dma",                      
+          var.type, var.unit="units", main=NULL, xlab="Time", ylab,
+          win.len1=0, win.len2=0, tick.tstep="auto", lab.tstep="auto", 
+          lab.fmt=NULL, cex=0.3, cex.main=1.3, cex.lab=1.3, cex.axis=1.3, 
+          col=c("blue", "lightblue", "lightblue"), 
+          from=NULL, to=NULL, dates=1, date.fmt= "%Y-%m-%d", 
+          stype="default", season.names=c("Winter", "Spring", "Summer", "Autumn"), 
+          h=NULL, ...)
+
+## S3 method for class 'data.frame'
+hydroplot(x, FUN, na.rm=TRUE, ptype="ts+boxplot+hist", pfreq="dma",                      
+          var.type, var.unit="units", main=NULL, xlab="Time", ylab,
+          win.len1=0, win.len2=0, tick.tstep="auto", lab.tstep="auto", 
+          lab.fmt=NULL, cex=0.3, cex.main=1.3, cex.lab=1.3, cex.axis=1.3, 
+          col=c("blue", "lightblue", "lightblue"), 
+          from=NULL, to=NULL, dates=1, date.fmt= "%Y-%m-%d", 
+          stype="default", season.names=c("Winter", "Spring", "Summer", "Autumn"), 
+          h=NULL, ...)
+
+## Default S3 method:
+sname2plot(x, sname, FUN, na.rm=TRUE, ptype="ts+boxplot+hist", 
+           pfreq="dma", var.type, var.unit="units", main=NULL, 
+           xlab="Time", ylab=NULL, win.len1=0, win.len2=0, 
+           tick.tstep="auto", lab.tstep="auto", lab.fmt=NULL, 
+           cex=0.3, cex.main=1.3, cex.lab=1.3, cex.axis=1.3,
+           col=c("blue", "lightblue", "lightblue"), 
+           dates=1, date.fmt = "%Y-%m-%d", from=NULL, to=NULL, stype="default", 
+           season.names=c("Winter", "Spring", "Summer", "Autumn"), 
+           h=NULL, ...)
+
+## S3 method for class 'zoo'
+sname2plot(x, sname, FUN, na.rm=TRUE, ptype="ts+boxplot+hist", 
+           pfreq="dma", var.type, var.unit="units", main=NULL, 
+           xlab="Time", ylab=NULL, win.len1=0, win.len2=0, 
+           tick.tstep="auto", lab.tstep="auto", lab.fmt=NULL, 
+           cex=0.3, cex.main=1.3, cex.lab=1.3, cex.axis=1.3,
+           col=c("blue", "lightblue", "lightblue"), 
+           dates=1, date.fmt = "%Y-%m-%d", from=NULL, to=NULL, stype="default", 
+           season.names=c("Winter", "Spring", "Summer", "Autumn"), 
+           h=NULL, ...)
+
+## S3 method for class 'data.frame'
+sname2plot(x, sname, FUN, na.rm=TRUE, ptype="ts+boxplot+hist", 
+           pfreq="dma", var.type, var.unit="units", main=NULL, 
+           xlab="Time", ylab=NULL, win.len1=0, win.len2=0, 
+           tick.tstep="auto", lab.tstep="auto", lab.fmt=NULL, 
+           cex=0.3, cex.main=1.3, cex.lab=1.3, cex.axis=1.3,
+           col=c("blue", "lightblue", "lightblue"), 
+           dates=1, date.fmt = "%Y-%m-%d", from=NULL, to=NULL, stype="default", 
+           season.names=c("Winter", "Spring", "Summer", "Autumn"), 
+           h=NULL, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+
+<p>zoo, xts or data.frame object, with columns storing the time series of one or more gauging stations.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sname</code></td>
+<td>
+
+<p>ONLY required when <code>x</code> is a data frame. <br>
+Character representing the name of a station, which have to correspond to one column name in <code>x</code>
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>FUN</code></td>
+<td>
+
+<p>ONLY required when <code>var.type</code> is missing AND <code>pfreq != "o"</code>. <br>
+Function that have to be applied for transforming from daily to monthly or annual time step (e.g., For precipitation <code>FUN=sum</code> and for temperature and flow ts, <code>FUN=mean</code>) 
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>na.rm</code></td>
+<td>
+
+<p>Logical. Should missing values be removed before the computations?
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ptype</code></td>
+<td>
+
+<p>Character indicating the type of plot that will be plotted. Valid values are: <br>
+-) <kbd>ts</kbd>              =&gt; only time series                  <br>
+-) <kbd>ts+boxplot</kbd>      =&gt; only time series + boxplot        <br>       
+-) <kbd>ts+hist</kbd>         =&gt; only time series + histogram      <br>
+-) <kbd>ts+boxplot+hist</kbd> =&gt; time series + boxplot + histogram 
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pfreq</code></td>
+<td>
+
+<p>Character indicating how many plots are desired by the user. Valid values are: <br>                    
+-) <kbd>dma</kbd>     : Daily, Monthly and Annual values are plotted <br>
+-) <kbd>dm</kbd>      : Daily and Monthly values are plotted  <br>
+-) <kbd>ma</kbd>      : Monthly and Annual values are plotted <br>
+-) <kbd>o</kbd>       : Only the original zoo object is plotted, and <code>ptype</code> is changed to <kbd>ts</kbd> <br>
+-) <kbd>seasonal</kbd>: Line and bloxplots of seasonal time series (see <code>stype</code> and <code>season.names</code>). When <code>pfreq</code> is <kbd>seasonal</kbd>, <code>ptype</code> is set to  <kbd>ts+boxplot</kbd>
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>var.type</code></td>
+<td>
+
+<p>ONLY required when <code>FUN</code> is missing. <br>
+character representing the type of variable being plotted. Used for determining the function used for computing the monthly and annual values when <code>FUN</code> is missing. Valid values are: <br>
+-) <kbd>Precipitation</kbd> =&gt; <code>FUN=sum</code>  <br>
+-) <kbd>Temperature</kbd>   =&gt; <code>FUN=mean</code> <br>
+-) <kbd>Flow</kbd>          =&gt; <code>FUN=mean</code> <br></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>var.unit</code></td>
+<td>
+
+<p>Character representing the measurement unit of the variable being plotted. ONLY used for labelling the axes (e.g., "mm" for precipitation, "C" for temperature, and "m3/s" for flow.)
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>main</code></td>
+<td>
+
+<p>Character representing the main title of the plot. If the user do not provide a title, this is created automatically as: <code>main= paste(var.type, "at", sname, sep=" ")</code>, 
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>xlab</code></td>
+<td>
+
+<p>A title for the x axis. See <code>plot</code>. 
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ylab</code></td>
+<td>
+
+<p>A title for the y axis. See <code>plot</code>. 
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>win.len1</code></td>
+<td>
+
+<p>number of days for being used in the computation of the first moving average. A value equal to zero indicates that this moving average is not going to be computed.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>win.len2</code></td>
+<td>
+
+<p>number of days for being used in the computation of the second moving average. A value equal to zero indicates that this moving average is not going to be computed.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tick.tstep</code></td>
+<td>
+
+<p>Character indicating the time step that have to be used for putting the ticks on the time axis. Valid values are: <br>
+-) <kbd>days</kbd>,    <br>
+-) <kbd>months</kbd>,  <br>
+-) <kbd>years</kbd> 
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lab.tstep</code></td>
+<td>
+
+<p>Character indicating the time step that have to be used for putting the labels on the time axis. Valid values are: <br>
+-) <kbd>days</kbd>,   <br>
+-) <kbd>months</kbd>, <br>
+-) <kbd>years</kbd> 
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lab.fmt</code></td>
+<td>
+
+<p>Character indicating with the format to be used for the label of the axis. See <code>format</code> in <code>as.Date</code>. If not specified, it will try <kbd>"%Y-%m-%d"</kbd> when <code>lab.tstep=="days"</code>, <kbd>"%b"</kbd> when <code>lab.tstep=="month"</code>, and <kbd>"%Y"</kbd> when <code>lab.tstep=="year"</code>. 
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cex</code></td>
+<td>
+
+<p>A numerical value giving the amount by which plotting text and symbols should be magnified relative to the default. (See <code>par</code>).
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cex.main</code></td>
+<td>
+
+<p>The magnification to be used for main titles relative to the current setting of <code>cex</code> (See <code>par</code>).
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cex.lab</code></td>
+<td>
+
+<p>The magnification to be used for x and y labels relative to the current setting of <code>cex</code> (See <code>par</code>).
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cex.axis</code></td>
+<td>
+
+<p>The magnification to be used for axis annotation relative to the current setting of <code>cex</code> (See <code>par</code>).
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>col</code></td>
+<td>
+
+<p>A character vector with 3 elements, representing the colors to be used for plotting the lines of the ts, the boxplots, and the histograms, respectively. <br>
+When <code>pfreq="o"</code>, only one character element is needed.
+See <code>plot.default</code>).
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dates</code></td>
+<td>
+
+<p>ONLY required when <code>x</code> is a data frame. It is a numeric, factor or Date object indicating how to obtain the dates corresponding to the <code>sname</code> station. <br>
+If <code>dates</code> is a number (default), it indicates the index of the column in <code>x</code> that stores the dates <br>
+If <code>dates</code> is a factor, it is converted into Date class, using the date format  specified by <code>date.fmt</code> <br>
+If <code>dates</code> is already of Date class, the code verifies that the number of days in <code>dates</code> be equal to the number of element in <code>x</code>
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>date.fmt</code></td>
+<td>
+
+<p>Character indicating the format in which the dates are stored in <var>dates</var>, <var>from</var> and <var>to</var>. See <code>format</code> in <code>as.Date</code>. <br>
+ONLY required when <code>class(dates)=="factor"</code> or <code>class(dates)=="numeric"</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>from</code></td>
+<td>
+
+<p>OPTIONAL, used for extracting a subset of values. <br>
+Character indicating the starting date for the values to be extracted. It must be provided in the format specified by <code>date.fmt</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>to</code></td>
+<td>
+
+<p>OPTIONAL, used for extracting a subset of values. <br>
+Character indicating the ending date for the values to be extracted. It must be provided in the format specified by <code>date.fmt</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>stype</code></td>
+<td>
+
+<p>OPTIONAL, only used when <code>pfreq=seasonal</code>. <br>
+character, indicating which weather seasons will be used for computing the output. Possible values are: <br>
+-) <kbd>default</kbd>          =&gt;  "winter"= DJF  = Dec, Jan, Feb;      "spring"= MAM = Mar, Apr, May;  "summer"= JJA  = Jun, Jul, Aug;       "autumn"= SON = Sep, Oct, Nov  <br>
+-) <kbd>FrenchPolynesia</kbd>  =&gt;  "winter"= DJFM = Dec, Jan, Feb, Mar; "spring"= AM  = Apr, May;       "summer"= JJAS = Jun, Jul, Aug, Sep;  "autumn"= ON  = Oct, Nov 
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>season.names</code></td>
+<td>
+
+<p>OPTIONAL, only used when <code>pfreq=seasonal</code>. <br>
+character of length 4 indicating the names of each one of the weather seasons defined by <code>stype</code>.These names are only used for plotting purposes
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>h</code></td>
+<td>
+
+<p>OPTIONAL, only used when <code>pfreq=seasonal</code>, for plotting horizontal lines in each seasonal plot. <br>
+numeric, with 1 or 4 elements, with the value used for plotting an horizontal line in each seasonal plot, in the following order: winter (DJF), spring (MAM), summer (JJA), autumn (SON).
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+
+<p>further arguments passed to the <code>plot.zoo</code> and <code>axis</code> functions or from other methods.
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Plots of the daily/monthly/annual/seasonal values of the time series given as input. <br>
+Depending on the value of <code>pfreq</code>, daily, monthly, annual and/or seasonal time series plots, boxplots and histograms are produced. <br>
+Depending on the value of <code>ptype</code>, time series plots, boxplots and/or histograms are produced.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Mauricio Zambrano-Bigiarini, <a href="mailto:mzb.devel@gmail">mzb.devel@gmail</a>
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>sname2ts</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">#############
+## Loading daily streamflows at the station Oca en Ona (Ebro River basin, Spain) ##
+data(OcaEnOnaQts)
+
+## 3 ts, 3 boxplots and 3 histograms
+hydroplot(OcaEnOnaQts, FUN=mean, ylab= "Q", var.unit = "m3/s")
+
+## only the original time series
+hydroplot(OcaEnOnaQts, pfreq="o")
+
+## only the year 1962 of the original time series
+hydroplot(OcaEnOnaQts, pfreq="o", from="1962-01-01", to="1962-12-31")
+
+## Not run: 
+## seasonal plots
+hydroplot(OcaEnOnaQts, pfreq="seasonal", FUN=mean, stype="default")
+
+## custom season names (let's assume to be in the Southern Hemisphere)
+hydroplot(OcaEnOnaQts, pfreq="seasonal", FUN=mean, 
+          stype="default", season.names=c("Summer","Autumn", "Winter","Spring"))
+
+## End(Not run)
+
+#############
+## Loading the monthly time series of precipitation within the Ebro River basin.
+data(EbroPPtsMonthly)
+
+## Plotting the monthly and annual values of precipitation at station "P9001", 
+## stored in 'EbroPPtsMonthly'.
+sname2plot(EbroPPtsMonthly, sname="P9001", var.type="Precipitation", dates=1, 
+           pfreq="ma")
+
+## Plotting seasonal precipitation at station "P9001"
+par(mar=c(5.1, 4.1, 4.1, 2.1))
+
+sname2plot(EbroPPtsMonthly, sname="P9001", FUN=sum, dates=1, pfreq="seasonal", 
+           stype="default")
+
+</code></pre>
+
+
+</div>

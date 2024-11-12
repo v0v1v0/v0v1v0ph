@@ -1,0 +1,416 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>HWTernaryPlot</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2> Ternary plot with the Hardy-Weinberg acceptance region </h2>
+
+<h3>Description</h3>
+
+<p><code>HWTernaryPlot</code> is a routine that draws a ternary plot for three-way genotypic compositions (AA,AB,BB), and represents
+the acceptance region for different tests for Hardy-Weinberg equilibrium (HWE) in the plot. This allows for graphical
+testing of a large set of markers (e.g. SNPs) for HWE. The (non) significance of the test
+for HWE can be inferred from the position of the marker in the ternary plot. Different statistical tests for HWE
+can be done graphically with this routine: the ordinary chisquare test, the chisquare test with continuity
+correction and the Haldane's exact test.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">HWTernaryPlot(X, n = NA, addmarkers = TRUE, newframe = TRUE, hwcurve = TRUE, 
+vbounds = FALSE, mafbounds = FALSE, mafvalue = 0.05, axis = 0, region = 1, 
+vertexlab = colnames(X), alpha = 0.05, vertex.cex = 1, pch = 19, cc = 0.5, 
+markercol = "black", markerbgcol = "black", cex = 0.75, axislab = "", 
+verbose = FALSE, markerlab = NULL, markerpos = NULL, mcex = 1, connect =
+FALSE, curvecols = rep("black",5), signifcolour = TRUE, patternsigsymbol = 19,
+curtyp = "solid", ssf = "max", pvaluetype = "selome", grid = FALSE,
+gridlabels = TRUE, patternramp = FALSE, axisticklabels = FALSE, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>X</code></td>
+<td>
+<p> a matrix of <code>n</code> genotypic compositions or counts. If it
+is a matrix of compositions, X should have (<code>n</code> rows that sum
+1, and 3 columns, with the relative frequencies of AA, AB and BB
+respectively. Argument <code>n</code> should be supplied as well. If X is
+a matrix of raw genotypic counts, it should have 3 columns with the
+absolute counts of AA, AB and BB respectively. Argument <code>n</code> may
+be supplied and will be used for painting acceptance regions. If not
+supplied <code>n</code> is computed from the data in <code>X</code>. </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n</code></td>
+<td>
+<p> the samples size (for a complete composition with no missing data). </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>addmarkers</code></td>
+<td>
+<p> represent markers by dots in the triangle (<code>addmarkers=TRUE</code>) or not <br> 
+(<code>addmarkers=FALSE</code>). </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>newframe</code></td>
+<td>
+<p> allows for plotting additional markers in an already existing ternary plot. Overplotting
+is achieved by setting <code>newframe</code> to <code>FALSE</code>. Setting <code>newframe = TRUE</code> (default) will 
+create a new ternary plot. </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>hwcurve</code></td>
+<td>
+<p> draw the HW parabola in the plot (<code>hwcurve=TRUE)</code> or not (<code>hwcurve=FALSE</code>). </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>vbounds</code></td>
+<td>
+<p> indicate the area corresponding to expected counts &gt; 5 (<code>vbounds=TRUE</code>) or not 
+(<code>vbounds=FALSE</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mafbounds</code></td>
+<td>
+<p> indicate the area corresponding to MAF &lt; <code>mafvalue</code>. </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mafvalue</code></td>
+<td>
+<p> a critical value for the minor allele frequency (MAF).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>axis</code></td>
+<td>
+<p> draw a vertex axis <br>
+0 = no axis is drawn <br>
+1 = draw the AA axis <br>
+2 = draw the AB axis <br>
+3 = draw the BB axis <br>
+4 = draw tick on the A-B axis</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>region</code></td>
+<td>
+<p> the type of acceptance region to be delimited in the triangle <br> 
+0 = no acceptance region is drawn <br>
+1 = draw the acceptance region corresponding to a Chi-square test <br> 
+2 = draw the acceptance region corresponding to a Chi-square test with continuity correction <br>
+3 = draw the acceptance region corresponding to a Chi-square test with continuity correction for D &gt; 0 <br>
+4 = draw the acceptance region corresponding to a Chi-square test with continuity correction for D &lt; 0 <br> 
+5 = draw the acceptance regions for all preceding tests simultaneously <br> 
+6 = draw the acceptance region corresponding to a Chi-square test with continuity correction with the upper
+limit for D &gt; 0 and the lower limit for D &lt; 0 <br>
+7 = draw the acceptance region corresponding to a two-sided exact test <br></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>vertexlab</code></td>
+<td>
+<p> labels for the three vertices of the triangle </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alpha</code></td>
+<td>
+<p> significance level (0.05 by default) </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>vertex.cex</code></td>
+<td>
+<p> character expansion factor for the labels of the vertices of the triangle. </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pch</code></td>
+<td>
+<p> the plotting character used to represent the markers. </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cc</code></td>
+<td>
+<p> value for the continuity correction parameter (0.5 by default). </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>markercol</code></td>
+<td>
+<p> vector with colours for the marker points in the triangle. </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>markerbgcol</code></td>
+<td>
+<p> vector with background colours for the marker points in the triangle. </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cex</code></td>
+<td>
+<p> expansion factor for the marker points in the triangle. </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>axislab</code></td>
+<td>
+<p> a label to be put under the horizontal axis. </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p> print information on the numerically found cut-points between curves of the acceptance region and 
+the edges of the triangle. </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>markerlab</code></td>
+<td>
+<p> labels for the markers in the triangle. </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>markerpos</code></td>
+<td>
+<p> positions for the marker labels in the triangle
+(1,2,3 or 4).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mcex</code></td>
+<td>
+<p> character expansion factor for the labels of the markers in the ternary plot. </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>connect</code></td>
+<td>
+<p> connect the represented markers by a line in the ternary plot. </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>curvecols</code></td>
+<td>
+<p> a vector with four colour specifications for the different curves that can be used
+to delimit the HW acceptance region. E.g. <code>curvecols=c("red",
+        "green","blue","black","purple")</code> will paint
+the Hardy-Weinberg curve red, the limits of the acceptance region for an ordinary chi-square test
+for HWE green, the limits of the acceptance region for a chi-square test with continuity correction
+when D &gt; 0 blue and the limits of the acceptance region for a chi-square test with continuity 
+correction when D &lt; 0 black, and the limits of the exact acceptance region purple. </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>signifcolour</code></td>
+<td>
+<p> colour the marker points automatically according to the result of a signifance test 
+(green markers non-siginficant, red markers significant). 
+<code>signifcolour</code> only takes effect if <code>region</code> is set to
+1, 2 or 7.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>patternsigsymbol</code></td>
+<td>
+<p> plotting character used to represent significant makers when <code>patternramp=TRUE</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>curtyp</code></td>
+<td>
+<p> style of the drawn curves (<code>"dashed","solid","dotted",...</code>)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ssf</code></td>
+<td>
+<p> sample size function (<code>"max","min","mean","median",...</code>). Indicates how the sample size for
+drawing acceptance regions is determined from the matrix
+of counts.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pvaluetype</code></td>
+<td>
+<p> method to compute p-values in an exact test
+(<code>"dost"</code> or <code>"selome"</code>)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>grid</code></td>
+<td>
+<p> draw a reference grid for genotype frequencies at (0.2,0.4,0.6,0.8)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>gridlabels</code></td>
+<td>
+<p> if <code>grid=TRUE</code> plot labels at the grid</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>patternramp</code></td>
+<td>
+<p> paint a colour ramp for patterns of genotype frequencies. This will ignore <code>signifcolour</code>, and
+use colour to represent marker frequencies. The ramp is a green-red gradient for the relative frequency of the pattern. </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>axisticklabels</code></td>
+<td>
+<p> place numeric labels for allele frequencies on the A-B axis. </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p> other arguments passed on to the plot function (e.g. <code>main</code> for a main title). </p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p><code>HWTernaryPlot</code> automatically colours significant markers in
+red, and non-significant markers in green if <code>region</code> is set to
+1, 2 or 7.
+</p>
+
+
+<h3>Value</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>minp </code></td>
+<td>
+<p>minimum allele frequency above which testing for HWE is appropriate (expected counts exceeding 5).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>maxp </code></td>
+<td>
+<p>maximum allele frequency below which testing for HWE is appropriate.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>inrange </code></td>
+<td>
+<p>number of markers in the appropriate range.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>percinrange </code></td>
+<td>
+<p>percentage of markers in the appropriate.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nsignif </code></td>
+<td>
+<p>number of significant markers (only if <code>region</code> equals 1,2 or 7.)</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p> Jan Graffelman <a href="mailto:jan.graffelman@upc.edu">jan.graffelman@upc.edu</a> </p>
+
+
+<h3>References</h3>
+
+<p>Graffelman, J. and Morales, J. (2008) Graphical Tests for Hardy-Weinberg Equilibrium 
+Based on the Ternary Plot. <em>Human Heredity</em> 65(2):77-84. 
+</p>
+<p>Graffelman, J. (2015) Exploring Diallelic Genetic Markers: The HardyWeinberg Package.
+<em>Journal of Statistical Software</em> 64(3): 1-23. <a href="https://doi.org/10.18637/jss.v064.i03">doi:10.18637/jss.v064.i03</a>.
+</p>
+
+
+<h3>See Also</h3>
+
+ <p><code>HWChisq</code> </p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">#
+# Ternary plot with 1000 SNPs and HWE curve
+#
+
+X &lt;- HWData(nm=1000,n=100)
+HWTernaryPlot(X,100,region=0,vertex.cex=2,pch=1)
+
+#
+# Genotype frequency pattern of simulated SNPs with uniform
+# allele frequency distribution
+#
+
+X &lt;- HWData(nm=1000,n=100)
+HWTernaryPlot(X,patternramp = TRUE)
+
+#
+# Genotype frequency pattern of simulated SNPs with skewed 
+# allele frequency distribution
+#
+
+X &lt;- HWData(nm=1000,n=100,shape1=1,shape2=20)
+HWTernaryPlot(X,patternramp = TRUE)
+
+#
+# Genotype frequency pattern of SNPs simulated under HWE with
+# allele frequency of 0.50
+#
+
+X &lt;- HWData(nm=1000,n=100,p=0.25)
+HWTernaryPlot(X,patternramp = TRUE)
+
+#
+# Genotype frequency pattern of SNPs simulated under HWE with
+# allele frequency of 0.25
+#
+
+X &lt;- HWData(nm=1000,n=100,p=0.25)
+HWTernaryPlot(X,patternramp = TRUE)
+
+#
+# Genotype frequency pattern of SNPs simulated under HWE with
+# allele frequency of 0.25, using a triangle to mark siginficant markers
+#
+
+X &lt;- HWData(nm=1000,n=100,p=0.25)
+HWTernaryPlot(X,patternramp = TRUE, region=1, patternsigsymbol = 2)
+
+#
+# Ternary plot of 1000 SNPs simulated under HWE and uniform allele frequency, with
+# acceptance region for a chi-square test and significant markers in red.
+#
+
+X &lt;- HWData(nm=1000,n=100)
+HWTernaryPlot(X)
+
+#
+# Ternary plot of 100 SNPs simulated under HWE and uniform allele frequency, with
+# acceptance region for an exact test and significant markers in red.
+#
+
+X &lt;- HWData(nm=100,n=100)
+## Not run: HWTernaryPlot(X,region=7)
+</code></pre>
+
+
+</div>

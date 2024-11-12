@@ -1,0 +1,134 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>wolbachia</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+<em>Trichogramma galloi</em> parasitism data
+</h2>
+
+<h3>Description</h3>
+
+<p>Viability of <em>Trichogramma galloi</em>, a parasitoid wasp, when infected with <em>Wolbachia</em>, a bacteria known to change its reproductive aspects.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">data(wolbachia)</code></pre>
+
+
+<h3>Format</h3>
+
+<p>A data frame with 106 observations on the following 3 variables.
+</p>
+
+<table>
+<tr>
+<td style="text-align: left;">
+<code>y</code>
+</td>
+<td style="text-align: left;"> numeric; number of eggs with an orifice</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+<code>m</code>
+</td>
+<td style="text-align: left;"> numeric; total number of parasitised eggs</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+<code>treat</code>
+</td>
+<td style="text-align: left;"> a factor with levels <code>m+f+</code>, <code>m+f-</code>, <code>f+</code>, <code>m-f-</code> and <code>f-</code>,</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+</td>
+<td style="text-align: left;"> where <code>m</code> stands for male, <code>f</code> stands for female, <code>+</code> means infected and <code>-</code> means non-infected;</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+</td>
+<td style="text-align: left;"> <code>f+</code> and <code>f-</code> represent virgin infected and non-infected females, respectively.
+  </td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The bacteria <em>Wolbachia</em> is commonly found in various insect
+species and has the ability to change reproductive aspects of its
+host. When it infects the wasp <em>Trichogramma galloi</em> it is known to induce
+thelythokous parthenogenesis, i.e., only females are produced from
+unfertilized eggs. Souza (2011) conducted
+an experiment to assess the effects of <em>Wolbachia</em> on the
+viability of <em>T. galloi</em> eggs. Around 100 <em>Diatraea saccharalis</em>
+eggs (the host) were offered to infected (+) or non-infected (-)
+parasitoid couples or virgin females every day until the death of
+the female. The parasitised eggs, easily identifiable
+because they become dark, were then kept on moist filter paper for
+twenty days when counts were then made of the number of
+eggs that had an orifice, which meant that an adult parasitoid had
+emerged and thus the parasitoid was viable.
+</p>
+
+
+<h3>Source</h3>
+
+<p>Demétrio, C. G. B., Hinde, J. and Moral, R. A. (2014) Models for overdispersed data in entomology. In Godoy, W. A. C. and Ferreira, C. P. (Eds.) Ecological modelling applied to entomology. Springer.
+</p>
+
+
+<h3>References</h3>
+
+<p>Souza, A. R. (2011) A interacao <em>Wolbachia</em> - <em>Trichogramma galloi Zucchi</em>, 1988 (<em>Hymenoptera: Trichogrammatidae</em>). Master's dissertation, ESALQ-USP
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(wolbachia)
+
+# Binomial fit
+model1 &lt;- glm(cbind(y, m-y) ~ treat, family=binomial, data=wolbachia)
+anova(model1, test="Chisq")
+
+# Quasi-binomial fit
+model2 &lt;- glm(cbind(y, m-y) ~ treat, family=quasibinomial, data=wolbachia)
+summary(model2)
+anova(model2,test="F")
+
+## half normal plots
+par(mfrow=c(1,2),cex=1.2, cex.main=1.1)
+hnp(model1, print=TRUE, pch=4, main="(a) Binomial",
+    xlab="Half-normal scores", ylab="Deviance residuals")
+hnp(model2, print=TRUE, pch=4, main="(b) Quasi-binomial",
+    xlab="Half-normal scores", ylab='')
+
+## Not run: 
+# Beta-binomial fit                                                
+### using package aods3
+require(aods3)                                                     
+                                                                   
+model3 &lt;- aodml(cbind(y, m-y) ~ treat, family='bb', data=wolbachia)
+hnp(model3, print=TRUE, pch=4,                                     
+    xlab="Half-normal scores", ylab='Deviance residuals')          
+
+### using package VGAM
+require(VGAM)
+
+model3a &lt;- vglm(cbind(y, m-y) ~ treat, family=betabinomial,
+                data=wolbachia)
+summary(model3a)
+1/(1+exp(-coef(model3a)[2])) # phi estimate
+hnp(model3a, data=wolbachia)
+
+## End(Not run)
+
+## for discussion on the analysis of this data set,
+## see Demetrio et al. (2014)
+</code></pre>
+
+
+</div>

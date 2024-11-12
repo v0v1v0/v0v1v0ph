@@ -1,0 +1,199 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>PlotAnnualRegime</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Plot annual regimes</h2>
+
+<h3>Description</h3>
+
+<p>Convenience wrapper function for a combined line <code>plot</code> with <code>polygon</code> variation ranges.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">PlotAnnualRegime(
+  x,
+  line = c("mean", "median"),
+  band = c("none", "p05p95", "p25p75", "minmax"),
+  add.legend = FALSE,
+  l.legend = NULL,
+  l.position = c("topright", "bottomright", "right", "topleft", "left", "bottomleft"),
+  log = FALSE,
+  ylim = NULL,
+  ylab = expression(paste("Q (m"^3, " s"^{
+     -1
+ }, ")")),
+  xlab = paste(format(attr(x, "period"), format = "%Y"), collapse = " to "),
+  col = "blue",
+  alpha = 30,
+  lty = 1,
+  lwd = 1,
+  mar = c(3, 3, 1, 1) + 0.1,
+  verbose = TRUE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>List, typically a result from <code>AnnualRegime</code>, containing data frames with aggregated long-term average
+regime data and two attributes <code>period</code> and <code>timestep</code>.
+See Details and Value sections there.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>line</code></td>
+<td>
+<p>Character string, keyword for type of average line to plot. Either <code>"mean"</code> or <code>"median"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>band</code></td>
+<td>
+<p>Character vector, keyword for variation bands. If <code>"none"</code> (default), plot average line(s) only. <code>"minmax"</code>,
+<code>"p25p75"</code>, or <code>p5p95</code> to include bands of variation. Combinations of bands are allowed, but providing <code>"none"</code>
+will always prevent plotting of any band. See details.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>add.legend</code></td>
+<td>
+<p>Logical. If <code>TRUE</code>, a legend will be added to the plot.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>l.legend</code></td>
+<td>
+<p>Character vector. If non-NULL, legend labels are read from here instead of from column names in <code>x$mean</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>l.position</code></td>
+<td>
+<p>Legend position, keyword string. One of <code>"left"</code>, <code>"topleft"</code>, <code>"topright"</code>,
+<code>"right"</code>, <code>"bottomright"</code>, <code>"bottomleft"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>log</code></td>
+<td>
+<p>Logical, if <code>TRUE</code>, y-axis will be log-scaled.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ylim</code></td>
+<td>
+<p>Numeric vector of length two, giving y-axis limits. Defaults to min-max range of all plotted data.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ylab</code></td>
+<td>
+<p>Character or <code>plotmath</code> expression string. Y-axis label, with a default for discharge regimes.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>xlab</code></td>
+<td>
+<p>Character string or <code>plotmath</code> expression string, x-axis label. Default prints the time period on which the
+regime is based, read from <code>x$period</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>col</code></td>
+<td>
+<p>Line color specification, see <code>par</code> for details. Defaults to blue. Either a single value or a vector of the same length as quantile
+series in <code>freq</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alpha</code></td>
+<td>
+<p>Numeric, alpha transparency value for variation bands. Value between <code>0</code> (transparent) and <code>255</code> (opaque), see
+also <code>rgb</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lty</code></td>
+<td>
+<p>Line type specification, see <code>par</code> for details. Either a single value or a vector of the same length as quantile
+series in <code>freq</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lwd</code></td>
+<td>
+<p>Line width specification, see <code>par</code> for details. Either a single value or a vector of the same length as quantile
+series in <code>freq</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mar</code></td>
+<td>
+<p>Numeric vector of length 4, margin specification as in <code>par</code> with modified default. Details see there.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p>Logical, print warnings if <code>NA</code> values are found in <code>x</code>. Defaults to <code>TRUE</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p><code>PlotAnnualRegime</code> plots contents from lists as returned by <code>AnnualRegime</code> (for format details, see there). If
+<code>NA</code> values are present in the plot data, the function will throw a warning if <code>verbose = TRUE</code> and proceed with plotting
+all available data.
+</p>
+<p>Argument <code>band</code> allows to plot variation bands to be plotted in addition to average lines. These can be (combinations of) ranges
+between minima and maxima, 5th and 95th percentiles, and 25th and 75th percentiles, i.e. all moments available in <code>AnnualRegime</code>
+results.
+</p>
+<p>Grid lines plotted in the background are mid-month lines.
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>PlotAnnualRegime</code> returns a plot to the currently active plot device.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>AnnualRegime</code>, <code>PlotSimObsRegime</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+# Source data, HYPE basin output with a number of result variables
+te1 &lt;- ReadBasinOutput(filename = system.file("demo_model",
+                                              "results", "0003587.txt",
+                                              package = "HYPEtools"))
+# Daily discharge regime, computed and observed,
+# hydrological year from October, aggregated to weekly means
+te2 &lt;- AnnualRegime(te1[, c("DATE", "COUT", "ROUT")],
+                    ts.in = "day",
+                    ts.out = "week", start.mon = 10)
+                    
+# Screen devices should not be used in examples
+PlotAnnualRegime(x = te2)
+PlotAnnualRegime(x = te2, line = "median", band = "p05p95",
+  add.legend = TRUE, col = c("red", "blue"))
+
+## End(Not run)
+
+</code></pre>
+
+
+</div>

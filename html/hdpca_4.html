@@ -1,0 +1,149 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>select.nspike</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Finding Distant Spikes</h2>
+
+<h3>Description</h3>
+
+<p>Estimates the number of distant spikes in the population based on the Generalized Spiked Population model. A finite upper bound (<code>n.spikes.max</code>) of the number of distant spikes must be provided.</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">select.nspike(samp.eval, p, n, n.spikes.max, evals.out = FALSE, smooth = TRUE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>samp.eval</code></td>
+<td>
+
+<p>Numeric vector containing the sample eigenvalues. The vector must have dimension <code>n</code> or <code>n-1</code>, it may be unordered.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>p</code></td>
+<td>
+
+<p>The number of features.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n</code></td>
+<td>
+
+<p>The number of samples.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n.spikes.max</code></td>
+<td>
+
+<p>Upper bound of the number of distant spikes in the population.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>evals.out</code></td>
+<td>
+
+<p>Logical. If <code>TRUE</code>, the estimated spikes and non-spikes are returned.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>smooth</code></td>
+<td>
+
+<p>Logical. If <code>TRUE</code>, kernel smoothing will be performed on the estimated population eigenvalue spectrum. Default is <code>TRUE</code>.
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The function searches between <code class="reqn">0</code> and <code>n.spikes.max</code> to find out the number of distant spikes in the population. It also estimates both non-spiked and spiked eigenvalues based on the <code class="reqn">\lambda</code>-estimation method.
+</p>
+<p>The argument <code>smooth</code> is useful when the user assumes the population spectral distribution to be continuous.
+</p>
+
+
+<h3>Value</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>n.spikes</code></td>
+<td>
+<p>Estimated number of distant spikes.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>spikes</code></td>
+<td>
+<p>If <code>evals.out=TRUE</code>, estimated distant spikes are returned.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nonspikes</code></td>
+<td>
+<p>If <code>evals.out=TRUE</code>, estimated non-spikes are returned.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>loss</code></td>
+<td>
+<p>If <code>evals.out=TRUE</code>, L-infinity loss function for the spectrum estimation is returned.</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>Rounak Dey, <a href="mailto:deyrnk@umich.edu">deyrnk@umich.edu</a>
+</p>
+
+
+<h3>References</h3>
+
+<p>Dey, R. and Lee, S. (2019).
+<em>Asymptotic properties of principal component analysis and shrinkage-bias adjustment under the generalized spiked population model.</em>
+Journal of Multivariate Analysis, Vol 173, 145-164.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>hdpc_est,pc_adjust</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(hapmap)
+#n = 198, p = 75435 for this data
+
+####################################################
+## Not run: 
+#If you just want the estimated number of spikes
+train.eval&lt;-hapmap$train.eval
+n&lt;-hapmap$nSamp
+p&lt;-hapmap$nSNP
+
+select.nspike(train.eval,p,n,n.spikes.max=10,evals.out=FALSE)
+
+#If you want the estimated spikes and non-spikes
+out&lt;-select.nspike(train.eval,p,n,n.spikes.max=10,evals.out=TRUE)
+
+## End(Not run)
+</code></pre>
+
+
+</div>

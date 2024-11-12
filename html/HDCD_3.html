@@ -1,0 +1,253 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>ESAC</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Efficient Sparsity Adaptive Change-point estimator</h2>
+
+<h3>Description</h3>
+
+<p>R wrapper for C function implementing the full ESAC algorithm (see Moen et al. 2023).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">ESAC(
+  X,
+  threshold_d = 1.5,
+  threshold_s = 1,
+  alpha = 1.5,
+  K = 5,
+  debug = FALSE,
+  empirical = FALSE,
+  tol = 0.001,
+  N = 1000,
+  thresholds = NULL,
+  thresholds_test = NULL,
+  threshold_d_test = threshold_d,
+  threshold_s_test = threshold_s,
+  fast = FALSE,
+  rescale_variance = TRUE,
+  trim = FALSE,
+  NOT = TRUE,
+  midpoint = FALSE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>X</code></td>
+<td>
+<p>Matrix of observations, where each row contains a time series</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>threshold_d</code></td>
+<td>
+<p>Leading constant for <code class="reqn">\lambda(t) \propto r(t)</code> for <code class="reqn">t= p</code>. Only relevant when <code>thresholds=NULL</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>threshold_s</code></td>
+<td>
+<p>Leading constant for <code class="reqn">\lambda(t) \propto r(t)</code> for <code class="reqn">t\leq \sqrt{p\log n}</code>.  Only relevant when <code>thresholds=NULL</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alpha</code></td>
+<td>
+<p>Parameter for generating seeded intervals</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>K</code></td>
+<td>
+<p>Parameter for generating seeded intervals</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>debug</code></td>
+<td>
+<p>If <code>TRUE</code>, diagnostic prints are provided during execution</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>empirical</code></td>
+<td>
+<p>If <code>TRUE</code>, detection thresholds are based on Monte Carlo simulation using <code>ESAC_calibrate</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tol</code></td>
+<td>
+<p>If <code>empirical=TRUE</code>, <code>tol</code> is the false error probability tolerance</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>N</code></td>
+<td>
+<p>If <code>empirical=TRUE</code>, <code>N</code> is the number of Monte Carlo samples used</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>thresholds</code></td>
+<td>
+<p>Vector of manually chosen values of <code class="reqn">\lambda(t)</code> for <code class="reqn">t \in \mathcal{T}</code>, decreasing in <code class="reqn">t</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>thresholds_test</code></td>
+<td>
+<p>Vector of manually chosen values of <code class="reqn">\gamma(t)</code> for <code class="reqn">t \in \mathcal{T}</code>, decreasing in <code class="reqn">t</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>threshold_d_test</code></td>
+<td>
+<p>Leading constant for <code class="reqn">\gamma(t) \propto r(t)</code> for <code class="reqn">t=p</code>.  Only relevant when <code>empirical=FALSE</code> and <code>thresholds_test=NULL</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>threshold_s_test</code></td>
+<td>
+<p>Leading constant for <code class="reqn">\gamma(t) \propto r(t)</code> for <code class="reqn">t\leq \sqrt{p\log n}</code>. Only relevant when <code>empirical=FALSE</code> and <code>thresholds_test=NULL</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fast</code></td>
+<td>
+<p>If <code>TRUE</code>, ESAC only tests for a change-point at the midpoint of each seeded interval</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rescale_variance</code></td>
+<td>
+<p>If <code>TRUE</code>, each row of the data is re-scaled by a MAD estimate using <code>rescale_variance</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>trim</code></td>
+<td>
+<p>If <code>TRUE</code>, interval trimming is performed</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>NOT</code></td>
+<td>
+<p>If <code>TRUE</code>, ESAC uses Narrowest-Over-Threshold selection of change-points</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>midpoint</code></td>
+<td>
+<p>If <code>TRUE</code>, change-point positions are estimated by the mid-point of the seeded interval in which the penalized score is the largest</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A list containing 
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>changepoints</code></td>
+<td>
+<p>vector of estimated change-points</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>changepointnumber</code></td>
+<td>
+<p>number of changepoints</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>CUSUMval</code></td>
+<td>
+<p>the penalized score at the corresponding change-point in <code>changepoints</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>coordinates</code></td>
+<td>
+<p>a matrix of zeros and ones indicating which time series are affected by a change in mean, with each row corresponding to the change-point in <code>changepoints</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>scales</code></td>
+<td>
+<p>vector of estimated noise level for each series</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>startpoints</code></td>
+<td>
+<p>start point of the seeded interval detecting the corresponding change-point in <code>changepoints</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>endpoints</code></td>
+<td>
+<p>end point of the seeded interval detecting the corresponding change-point in <code>changepoints</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>thresholds</code></td>
+<td>
+<p>vector of values of <code class="reqn">\lambda(t)</code> for <code class="reqn">t \in \mathcal{T}</code> in decreasing order</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>thresholds_test</code></td>
+<td>
+<p>vector of values of <code class="reqn">\gamma(t)</code> for <code class="reqn">t \in \mathcal{T}</code> in decreasing order</p>
+</td>
+</tr>
+</table>
+<h3>References</h3>
+
+<p>Moen PAJ, Glad IK, Tveten M (2023).
+“Efficient sparsity adaptive changepoint estimation.”
+Arxiv preprint, 2306.04702, <a href="https://doi.org/10.48550/arXiv.2306.04702">https://doi.org/10.48550/arXiv.2306.04702</a>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">library(HDCD)
+n = 50
+p = 50
+set.seed(100)
+# Generating data
+X = matrix(rnorm(n*p), ncol = n, nrow=p)
+# Adding a single sparse change-point:
+X[1:5, 26:n] = X[1:5, 26:n] +1
+
+# Vanilla ESAC:
+res = ESAC(X)
+res$changepoints
+
+# Manually setting leading constants for \lambda(t) and \gamma(t)
+res = ESAC(X, 
+           threshold_d = 2, threshold_s = 2, #leading constants for \lambda(t)
+           threshold_d_test = 2, threshold_s_test = 2 #leading constants for \gamma(t)
+)
+res$changepoints #estimated change-point locations
+
+# Empirical choice of thresholds:
+res = ESAC(X, empirical = TRUE, N = 100, tol = 1/100)
+res$changepoints
+
+# Manual empirical choice of thresholds (equivalent to the above)
+thresholds_emp = ESAC_calibrate(n,p, N=100, tol=1/100)
+res = ESAC(X, thresholds_test = thresholds_emp[[1]])
+res$changepoints
+</code></pre>
+
+
+</div>

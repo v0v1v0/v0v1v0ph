@@ -1,0 +1,233 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>CIplot</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Illustration of the meaning of confidence levels.
+</h2>
+
+<h3>Description</h3>
+
+<p>Illustration of the meaning of confidence levels.  Generate sets of
+confidence intervals for independent randomly generated sets of normally
+distributed numbers.  Low confidence levels give narrow intervals that
+are less likely to bracket the true value.  Higher confidence levels
+increase the probability of bracketing the true value, and are also much
+wider and therefore less precise.  The shiny app can animate how the
+increase in confidence level and width leads to a consequent decrease in
+precision.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">CIplot(n.intervals = 100,
+       n.per.row = 40,
+       pop.mean = 0,
+       pop.sd = 1,
+       conf.level = 0.95,
+       ...)
+
+confintervaldata(n.intervals = 100,
+                 n.per.row = 40,
+                 pop.mean = 0,
+                 pop.sd = 1,
+                 conf.level = 0.95,
+                 seed,
+                 ...)
+
+confinterval.matrix(x,
+                    conf.level = attr(x, "conf.level"),
+                    ...)
+
+confintervalplot(x.ci,
+                 n.intervals = nrow(x.ci),
+                 pop.mean = attr(x.ci, "pop.mean"),
+                 pop.sd = attr(x.ci, "pop.sd"),
+                 n.per.row = attr(x.ci, "n.per.row"),
+                 xlim, ylim, ...)
+
+shiny.CIplot(height = "auto")
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>n.intervals</code></td>
+<td>
+
+<p>Number of sets of observations to generate.
+Each set leads to one confidence interval on the plot.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n.per.row</code></td>
+<td>
+
+<p>Number of observations in each set.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pop.mean, pop.sd</code></td>
+<td>
+
+<p>Population mean and standard deviation for generated set of
+<code>n.per.row</code> independent normally distributed random numbers.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>conf.level</code></td>
+<td>
+
+<p>Confidence level of each of the <code>n.per.row</code> confidence intervals
+calculated from the generated datasets.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>seed</code></td>
+<td>
+<p>Standard argument to <code>rnorm</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>Output matrix from <code>confintervaldata</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x.ci</code></td>
+<td>
+<p>Output <code>data.frame</code> from <code>confinterval.matrix</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>xlim, ylim</code></td>
+<td>
+<p>Standard <code>xyplot</code> arguments.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>height</code></td>
+<td>
+<p>Height of graph on web page in pixels.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+
+<p>Additional arguments.  For <code>CIplot</code>,  <code>seed</code> will be forwarded
+to <code>confintervaldata</code>, and <code>xlim</code> and <code>ylim</code> will be
+forwarded to <code>confintervalplot</code>.  Any other additional arguments
+will be ignored.
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The shiny app has sliders for the <code>n.intervals</code>, <code>n.per.row</code>,
+<code>pop.mean</code>, <code>pop.sd</code>, and <code>conf.level</code>.
+Changes in the <code>conf.level</code> slider, either manually by animation,
+use the same set of generated data to show how increasing the confidence
+level increases the width of the confidence interval and consequently
+decreases the precision of the interval estimator.
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>CIplot</code> and <code>confintervalplot</code> return a <code>"trellis"</code>
+plot containing a plot of Confidence Intervals.
+</p>
+<p><code>confintervaldata</code> returns a matrix of <code>n.intervals</code> rows by
+<code>n.per.row</code> columns of independent normally distributed random
+numbers.
+The matrix has a set of attributes recording the arguments to the
+function.
+</p>
+<p><code>confinterval.matrix</code> returns a <code>data.frame</code> of  <code>n.intervals</code>
+with three columns containing the lower bound, center, and upper bound
+of the confidence interval for each row of its input matrix.
+The <code>data.frame</code> has a set of attributes recording the arguments to the
+function.
+</p>
+<p><code>shiny.CIplot</code> returns a shiny app object which, when printed,
+runs a shiny app displaying the Confidence Interval plot and several
+slider controls.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p> Richard M. Heiberger &lt;rmh@temple.edu&gt; </p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+## A. from the console
+
+## example 1
+CIplot()
+
+## example 2
+## Not run: 
+CIplot(n.intervals=100,
+       n.per.row=40,
+       pop.mean=0,
+       pop.sd=1,
+       conf.level=.95)
+
+## End(Not run)
+
+## example 3
+## Not run: 
+tmp.data &lt;- confintervaldata()
+tmp.ci &lt;- confinterval.matrix(tmp.data)
+confintervalplot(tmp.ci)
+
+## End(Not run)
+
+## example 4
+## Not run: 
+tmp.data &lt;- confintervaldata(n.intervals=100,
+                             n.per.row=40,
+                             pop.mean=0,
+                             pop.sd=1,
+                             conf.level=.95)
+tmp.ci &lt;- confinterval.matrix(tmp.data)
+confintervalplot(tmp.ci)
+
+## End(Not run)
+
+
+## B. shiny, initiated from the console
+
+## example 5
+## Not run: 
+  if (interactive())
+    shiny.CIplot()
+
+## End(Not run)
+
+## example 6
+## Not run: 
+  if (interactive())
+    shiny.CIplot(height=800)  ## px
+  ## take control of the height of the graph in the web page
+
+## End(Not run)
+</code></pre>
+
+
+</div>

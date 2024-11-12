@@ -1,0 +1,145 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>aovSufficient</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Analysis of variance from sufficient statistics for groups.</h2>
+
+<h3>Description</h3>
+
+<p>Analysis of variance from sufficient statistics for groups.
+For each group, we need the factor level, the response mean, the
+within-group standard deviation, and the sample size.
+The correct ANOVA table is produced.  The residuals are fake.
+The generic <code>vcov</code> and <code>summary.lm</code> don't work for the
+variance of the regression coefficients in this case.
+Use <code>vcovSufficient</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">aovSufficient(formula, data = NULL,
+              projections = FALSE, qr = TRUE, contrasts = NULL,
+              weights = data$n, sd = data$s,
+              ...)
+
+vcovSufficient(object, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>formula, data, projections, qr, contrasts, ...</code></td>
+<td>
+<p>See
+
+<code>aov</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>weights</code></td>
+<td>
+<p>See
+
+<code>lm</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sd</code></td>
+<td>
+<p>vector of within-group standard deviations.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>object</code></td>
+<td>
+<p><code>"aov"</code> object constructed by
+<code>aovSufficient</code>.  It also works with regular <code>aov</code> objects.
+</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>For <code>aovSufficient</code>, an object of class c("aov", "lm").
+For <code>vcovSufficient</code>, a function that returns the covariance
+matrix of the regression coefficients.</p>
+
+
+<h3>Note</h3>
+
+<p>The residuals are fake.  They are all identical and equal to the MLE
+standard error (<code>sqrt(SumSq.res/df.tot)</code>).  They give the right
+ANOVA table.  They may cause confusion or warnings in other programs.
+The standard errors and t-tests of the coefficients are not calculated
+by <code>summary.lm</code>.
+Using the <code>aov</code> object from <code>aovSufficient</code> in <code>glht</code>
+requires the <code>vcov.</code> and <code>df</code> arguments.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p> Richard M. Heiberger &lt;rmh@temple.edu&gt; </p>
+
+
+<h3>See Also</h3>
+
+<p><code>MMC</code> and
+
+<code>aov</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## This example is from Hsu and Peruggia
+
+## This is the R version
+## See ?mmc.mean for S-Plus
+
+if.R(s={},
+r={
+
+data(pulmonary)
+pulmonary
+pulmonary.aov &lt;- aovSufficient(FVC ~ smoker,
+                                data=pulmonary)
+summary(pulmonary.aov)
+
+## Not run: 
+pulmonary.mmc &lt;- mmc(pulmonary.aov,
+                     linfct=mcp(smoker="Tukey"),
+                     df=pulmonary.aov$df.residual,
+                     vcov.=vcovSufficient)
+mmcplot(pulmonary.mmc, style="both")
+
+## orthogonal contrasts
+pulm.lmat &lt;- cbind("npnl-mh"=c( 1, 1, 1, 1,-2,-2), ## not.much vs lots
+                   "n-pnl"  =c( 3,-1,-1,-1, 0, 0), ## none vs light
+                   "p-nl"   =c( 0, 2,-1,-1, 0, 0), ## {} arbitrary 2 df
+                   "n-l"    =c( 0, 0, 1,-1, 0, 0), ## {} for 3 types of light
+                   "m-h"    =c( 0, 0, 0, 0, 1,-1)) ## moderate vs heavy
+dimnames(pulm.lmat)[[1]] &lt;- row.names(pulmonary)
+pulm.lmat
+
+pulmonary.mmc &lt;- mmc(pulmonary.aov,
+                     linfct=mcp(smoker="Tukey"),
+                     df=pulmonary.aov$df.residual,
+                     vcov.=vcovSufficient,
+                     focus.lmat=pulm.lmat)
+
+mmcplot(pulmonary.mmc, style="both", type="lmat")
+
+## End(Not run)
+})
+</code></pre>
+
+
+</div>

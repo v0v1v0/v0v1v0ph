@@ -1,0 +1,131 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>plot.hdc</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Cattell's Scree-Test for 'hdc' class objects.
+</h2>
+
+<h3>Description</h3>
+
+<p>This function plots Cattell's scree-test or the BIC selection, using parameters coming from <var>hdda</var> or <var>hddc</var> functions.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">## S3 method for class 'hdc'
+plot(x, method = NULL, threshold = NULL, noise.ctrl=1e-8, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+
+<p>A 'hdc' class object obtained using <var>hdda</var> or <var>hddc</var> methods.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+
+<p>The method used to select the intrinsic dimension. It can be "BIC" or "Cattell". By default it takes the method used when obtaining the parameters using <var>hdda</var> or <var>hddc</var>.
+Note that "Cattell" (resp. "BIC") can be abreviated to "C" (resp. "B") and that this argument is not case sensitive.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>threshold</code></td>
+<td>
+
+<p>The threshold used in Cattell's Scree-Test. By default it takes the threshold in the argument x, if none, the default value of the threshold is 0.2.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>noise.ctrl</code></td>
+<td>
+
+<p>This parameter avoids to have a too low value of the 'noise' parameter b. It garantees that the dimension selection process do not select too many dimensions (which leads to a potential too low value of the noise parameter b). When selecting the intrinsic dimensions using Cattell's scree-test or BIC, the function doesn't use the eigenvalues inferior to noise.ctrl, so that the intrinsic dimensions selected can't be higher or equal to the order of these eigenvalues.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+
+<p>Arguments based from or to other methods.
+</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+
+<dl>
+<dt>If method = "Cattell"</dt>
+<dd>
+<p> The plot of the eigen values and of the sequential differences of the eigen values. The dimension to retain is the one before the last fall of the eigenvalues' differences below the threshold.</p>
+</dd>
+<dt>If method = "BIC"</dt>
+<dd>
+<p>The BIC related to the dimension for each class. It stops after the first fall of the BIC.</p>
+</dd>
+</dl>
+<h3>Author(s)</h3>
+
+<p>Laurent Berge, Charles Bouveyron and Stephane Girard
+</p>
+
+
+<h3>References</h3>
+
+<p>Bouveyron, C. Girard, S. and Schmid, C. (2007) “High Dimensional Discriminant Analysis”, <em>Communications in Statistics: Theory and Methods</em>, vol. <b>36</b> (14), pp. 2607–2623
+</p>
+<p>Bouveyron, C. Girard, S. and Schmid, C. (2007) “High-Dimensional Data Clustering”, <em>Computational Statistics and Data Analysis</em>, vol. <b>52</b> (1), pp. 502–519
+</p>
+<p>Berge, L. Bouveyron, C. and Girard, S. (2012) “HDclassif: An R Package for Model-Based 
+Clustering and Discriminant Analysis of High-Dimensional Data”, <em>Journal of Statistical Software</em>, 
+<b>46</b>(6), 1–29, url: <a href="https://doi.org/10.18637/jss.v046.i06">doi:10.18637/jss.v046.i06</a>
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>hdda</code>, <code>hddc</code>, <code>predict.hdc</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Example 1 :
+data(wine)
+a &lt;- wine[,-1]
+z &lt;- wine[,1]
+
+prms1 &lt;- hdda(a, z, model="AkBkQkDk", scaling=TRUE, d_select="bic")
+
+#the plot related to the selection that has been done: BIC
+plot(prms1)     
+
+#it shows the plot of Cattell's scree-test, with a threshold of .3
+plot(prms1,"Cattell",0.3)                         
+
+
+prms2 &lt;- hdda(a, z, model="AkBkQkD", scaling=TRUE, d_select="cattell")
+#the plot related to the selection that has been done: Cattell's scree-test
+plot(prms2) 
+#the plot of the BIC
+plot(prms2,"b") 
+
+</code></pre>
+
+
+</div>

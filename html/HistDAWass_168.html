@@ -1,0 +1,243 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>WH_2d_Adaptive_Kohonen_maps</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Batch Kohonen self-organizing 2d maps using adaptive distances for  histogram-valued data</h2>
+
+<h3>Description</h3>
+
+<p>The function implements a Batch Kohonen self-organizing 2d maps algorithm for  histogram-valued data.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">WH_2d_Adaptive_Kohonen_maps(
+  x,
+  net = list(xdim = 4, ydim = 3, topo = c("rectangular")),
+  kern.param = 2,
+  TMAX = -9999,
+  Tmin = -9999,
+  niter = 30,
+  repetitions,
+  simplify = FALSE,
+  qua = 10,
+  standardize = FALSE,
+  schema = 6,
+  init.weights = "EQUAL",
+  weight.sys = "PROD",
+  theta = 2,
+  Wfix = FALSE,
+  verbose = FALSE,
+  atleast = 2
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>A MatH object (a matrix of distributionH).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>net</code></td>
+<td>
+<p>a list describing the topology of the net <code>list(xdim=number of rows,
+ydim=numbers of columns,topo=c('rectangular' or 'hexagonal'))</code>, see <code>somgrid</code> sintax in package<span class="pkg">class</span>
+default <code>net=list(xdim=4,ydim=3,topo=c('rectangular'))</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>kern.param</code></td>
+<td>
+<p>(default =2) the kernel parameter for the RBF kernel used in the algorithm</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>TMAX</code></td>
+<td>
+<p>a parameter useful for the iterations (default=2)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Tmin</code></td>
+<td>
+<p>a parameter useful for the iterations (default=0.2)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>niter</code></td>
+<td>
+<p>maximum number of iterations (default=30)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>repetitions</code></td>
+<td>
+<p>number of repetion of the algorithm (default=5), beacuase each launch may generate a local optimum</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>simplify</code></td>
+<td>
+<p>a logical parameter for speeding up computations (default=FALSE). If true data are recoded in order to have fast computations</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>qua</code></td>
+<td>
+<p>if <code>simplify=TRUE</code> number of equally spaced quantiles for recodify the histograms (default=10)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>standardize</code></td>
+<td>
+<p>A logic value (default is FALSE). If TRUE, histogram-valued data are standardized,  variable by variable,
+using the Wassertein based standard deviation. Use if one wants to have variables with std equal to one.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>schema</code></td>
+<td>
+<p>a number from 1 to 4 <br>
+1=A weight for each variable (default) <br>
+2=A weight for the average and the dispersion component of each variable<br>
+3=Same as 1 but a different set of weights for each cluster<br>
+4=Same as 2 but a different set of weights for each cluster</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>init.weights</code></td>
+<td>
+<p>a string how to initialize weights: 'EQUAL' (default), all weights are the same,</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>weight.sys</code></td>
+<td>
+<p>a string. Weights may add to one ('SUM') or their product is equal to 1 ('PROD', default).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>theta</code></td>
+<td>
+<p>a number. A parameter if <code>weight.sys='SUM'</code>, default is 2.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Wfix</code></td>
+<td>
+<p>a logical parameter (default=FALSE). If TRUE the algorithm does not use adaptive distances.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p>a logical parameter (default=FALSE). If TRUE details of
+computation are shown during the execution.
+#'</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>atleast</code></td>
+<td>
+<p>integer. Check for degeneration of the map into a very low number of
+voronoi sets. (default 2) 2 means that the map will have at least 2 neurons
+attracting data instances in their voronoi sets.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>An extension of Batch Self Organised Map (BSOM) is here proposed for  histogram data.
+These kind of data have been defined in the context of symbolic data analysis.
+The BSOM cost function is then based on a distance
+function: the L2 Wasserstein distance. This distance has been widely proposed in several
+techniques of analysis (clustering, regression) when input data are expressed by distributions
+(empirical by histograms or theoretical by probability distributions).
+The peculiarity of such distance is to be an Euclidean distance between quantile functions so
+that all the properties proved for L2 distances are verified again. An adaptative versions of
+BSOM is also introduced considering an automatic system of weights in the cost function in
+order to take into account the different effect of the several variables in the Self-Organised Map
+grid.
+</p>
+
+
+<h3>Value</h3>
+
+<p>a list with the results of the Batch Kohonen map
+</p>
+
+
+<h3>Slots</h3>
+
+
+<dl>
+<dt><code>solution</code></dt>
+<dd>
+<p>A list.Returns the best solution among the <code>repetitions</code>etitions, i.e.
+the one having the minimum sum of squares criterion.</p>
+</dd>
+<dt><code>solution$MAP</code></dt>
+<dd>
+<p>The map topology.</p>
+</dd>
+<dt><code>solution$IDX</code></dt>
+<dd>
+<p>A vector. The clusters at which the objects are assigned.</p>
+</dd>
+<dt><code>solution$cardinality</code></dt>
+<dd>
+<p>A vector. The cardinality of each final cluster.</p>
+</dd>
+<dt><code>solution$proto</code></dt>
+<dd>
+<p>A <code>MatH</code> object with the description of centers.</p>
+</dd>
+<dt><code>solution$Crit</code></dt>
+<dd>
+<p>A number. The criterion (Sum od square deviation
+from the centers) value at the end of the run.</p>
+</dd>
+<dt><code>solution$Weights.comp</code></dt>
+<dd>
+<p>the final weights assigned to each component of the histogram variables</p>
+</dd>
+<dt><code>solution$Weight.sys</code></dt>
+<dd>
+<p>a string the type of weighting system ('SUM' or 'PRODUCT')</p>
+</dd>
+<dt><code>quality</code></dt>
+<dd>
+<p>A number. The percentage of Sum of square deviation explained by the model.
+(The higher the better)</p>
+</dd>
+</dl>
+<h3>References</h3>
+
+<p>Irpino A, Verde R, De Carvalho FAT (2012). Batch self organizing maps for interval and histogram data.
+In: Proceedings of COMPSTAT 2012. p. 143-154, ISI/IASC, ISBN: 978-90-73592-32-2
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+results &lt;- WH_2d_Adaptive_Kohonen_maps(
+  x = BLOOD,
+  net = list(xdim = 2, ydim = 3, topo = c("rectangular")),
+  repetitions = 2, simplify = TRUE,
+  qua = 10, standardize = TRUE
+)
+
+## End(Not run)
+</code></pre>
+
+
+</div>

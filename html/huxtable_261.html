@@ -1,0 +1,160 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>number_format</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Set how numbers are formatted in cells</h2>
+
+<h3>Description</h3>
+
+<p>If <code>number_format</code> is:
+</p>
+
+<ul>
+<li>
+<p> numeric, numbers will be rounded to that many decimal places;
+</p>
+</li>
+<li>
+<p> character, it will be used as an argument to <code>sprintf()</code>;
+</p>
+</li>
+<li>
+<p> a function, the function will be applied to the numbers;
+</p>
+</li>
+<li> <p><code>NA</code>, then numbers will not be formatted (except by conversion with
+<code>as.character</code>).
+</p>
+</li>
+</ul>
+<h3>Usage</h3>
+
+<pre><code class="language-R">number_format(ht)
+number_format(ht) &lt;- value
+set_number_format(ht, row, col, value )
+map_number_format(ht, row, col, fn)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>ht</code></td>
+<td>
+<p>A huxtable.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>row</code></td>
+<td>
+<p>A row specifier. See rowspecs for details.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>col</code></td>
+<td>
+<p>An optional column specifier.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fn</code></td>
+<td>
+<p>A mapping function. See mapping-functions for details.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>value</code></td>
+<td>
+<p>A character or integer vector,
+</p>
+<p>Note that setting to <code>NA</code> does not reset to the default.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Number formatting is applied to any parts of cells that look like numbers.
+The exception is exponents in
+scientific notation; huxtable attempts to detect and ignore these.
+</p>
+<p>The default value is "%.3g", which rounds numbers if they have more than 3
+significant digits, and which may use scientific notation for large numbers.
+</p>
+<p>Note that if your cells are of type numeric, a number format of <code>NA</code> doesn't
+guarantee you get back what you typed in, since R's default conversion may
+apply scientific notation and rounding.
+</p>
+<p>To set number_format to a function, enclose the function in <code>list</code>. The function should
+take one argument and return a string. <code>fmt_pretty()</code> and <code>fmt_percent()</code>
+are useful shortcuts for common formatting functions.
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>number_format()</code> returns the <code>number_format</code> property.
+<code>set_number_format()</code> returns the modified huxtable.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>fmt_pretty()</code> and <code>fmt_percent()</code>.<code>options("huxtable.long_minus")</code>
+in huxtable-options for pretty-printing minus signs.
+</p>
+<p>Other formatting functions: 
+<code>background_color()</code>,
+<code>bold()</code>,
+<code>font()</code>,
+<code>font_size()</code>,
+<code>na_string()</code>,
+<code>text_color()</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">ht &lt;- huxtable(
+        number_format = c(
+          "Default",
+          "NA",
+          "2",
+          "\"%5.2f\"",
+          "Pretty",
+          "Sign"
+        ),
+        a = rep(1000, 6),
+        b = rep(1000.005, 6),
+        c = rep(0.0001, 6),
+        d = rep(-1, 6),
+        e = rep("3.2 (s.e. 1.4)", 6)
+      )
+
+number_format(ht)[3, -1] &lt;- NA
+number_format(ht)[4, -1] &lt;- 2
+number_format(ht)[5, -1] &lt;- "%5.2f"
+
+number_format(ht)[6, -1] &lt;- fmt_pretty()
+
+number_format(ht)[7, -1] &lt;- list(
+        function(x) if (x &gt; 0) "+" else "-"
+      )
+
+right_border(ht) &lt;- 1
+bottom_border(ht)[1, ] &lt;- 1
+
+ht
+
+ht_bands &lt;- huxtable("10000 Maniacs", autoformat = FALSE)
+# probably not what you want:
+ht_bands
+# fixed:
+set_number_format(ht_bands, NA)
+
+</code></pre>
+
+
+</div>

@@ -1,0 +1,153 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>ts_time_event_analysis_tbl</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Event Analysis</h2>
+
+<h3>Description</h3>
+
+<p>Given a tibble/data.frame, you can get information on what happens before, after,
+or in both directions of some given event, where the event is defined by some
+percentage increase/decrease in values from time <code>t</code> to <code>t+1</code>
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">ts_time_event_analysis_tbl(
+  .data,
+  .date_col,
+  .value_col,
+  .percent_change = 0.05,
+  .horizon = 12,
+  .precision = 2,
+  .direction = "forward",
+  .filter_non_event_groups = TRUE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>.data</code></td>
+<td>
+<p>The date.frame/tibble that holds the data.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.date_col</code></td>
+<td>
+<p>The column with the date value.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.value_col</code></td>
+<td>
+<p>The column with the value you are measuring.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.percent_change</code></td>
+<td>
+<p>This defaults to 0.05 which is a 5% increase in the
+<code>.value_col</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.horizon</code></td>
+<td>
+<p>How far do you want to look back or ahead.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.precision</code></td>
+<td>
+<p>The default is 2 which means it rounds the lagged 1 value
+percent change to 2 decimal points. You may want more for more finely tuned
+results, this will result in fewer groupings.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.direction</code></td>
+<td>
+<p>The default is <code>forward</code>. You can supply either <code>forward</code>,
+<code>backwards</code> or <code>both</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>.filter_non_event_groups</code></td>
+<td>
+<p>The default is TRUE, this drops groupings with
+no events on the rare occasion it does occur.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>This takes in a <code>data.frame</code>/<code>tibble</code> of a time series. It requires a date column,
+and a value column. You can convert a <code>ts</code>/<code>xts</code>/<code>zoo</code>/<code>mts</code> object into a tibble by
+using the <code>ts_to_tbl()</code> function.
+</p>
+<p>You will provide the function with a percentage change in the form of -1 to 1
+inclusive. You then provide a time horizon in which you want to see. For example
+you may want to see what happens to <code>AirPassengers</code> after a 0.1 percent increase
+in volume.
+</p>
+<p>The next most important thing to supply is the direction. Do you want to see what
+typically happens after such an event, what leads up to such an event, or both.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A tibble.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Steven P. Sanderson II, MPH
+</p>
+
+
+<h3>See Also</h3>
+
+<p>Other Time_Filtering: 
+<code>ts_compare_data()</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">suppressPackageStartupMessages(library(dplyr))
+suppressPackageStartupMessages(library(ggplot2))
+
+df_tbl &lt;- ts_to_tbl(AirPassengers) %&gt;% select(-index)
+
+tst &lt;- ts_time_event_analysis_tbl(df_tbl, date_col, value, .direction = "both",
+.horizon = 6)
+
+glimpse(tst)
+
+tst %&gt;%
+  ggplot(aes(x = x, y = mean_event_change)) +
+  geom_line() +
+  geom_line(aes(y = event_change_ci_high), color = "blue", linetype = "dashed") +
+  geom_line(aes(y = event_change_ci_low), color = "blue", linetype = "dashed") +
+  geom_vline(xintercept = 7, color = "red", linetype = "dashed") +
+  theme_minimal() +
+  labs(
+    title = "'AirPassengers' Event Analysis at 5% Increase",
+    subtitle = "Vertical Red line is normalized event epoch - Direction: Both",
+    x = "",
+    y = "Mean Event Change"
+  )
+
+</code></pre>
+
+
+</div>

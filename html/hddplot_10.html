@@ -1,0 +1,183 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>pcp</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>convenience version of the singular value decomposition</h2>
+
+<h3>Description</h3>
+
+<p>Packages results from an SVD on what can be either a cases by variables
+(features) or variables by cases layout, for use in principal component
+and related calculations
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">pcp(x = datasets::USArrests, varscores = TRUE, cases = "rows", center = "vars",
+    standardize = FALSE, scale.cases = 1, log = FALSE, sc = 1, reflect = c(1, 1))
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>matrix on which SVD is to be performed</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>varscores</code></td>
+<td>
+<p>logical; should scores be returned?</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cases</code></td>
+<td>
+<p>specify either <code>"rows"</code> or <code>"columns"</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>center</code></td>
+<td>
+<p>logical: if set to <code>"vars"</code>, then values of variables
+will be centered</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>standardize</code></td>
+<td>
+<p>logical: should values of variables be standardized to
+zero mean and unit deviance.  Takes precedence over the setting of
+<code>center</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>scale.cases</code></td>
+<td>
+<p>set to a value in [0,1]. <code>scale.cases=0</code> gives
+a pure rotation of the variables. <code>scale.cases=1</code> weights a/c the
+singular values</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>log</code></td>
+<td>
+<p>logical: should logarithms be taken, prior to the calculation?</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sc</code></td>
+<td>
+<p>the variable scores are divided by <code class="reqn">sqrt{sc-1}</code>. By default,
+<code>sc</code> = number of cases</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>reflect</code></td>
+<td>
+<p>a vector of two elements, by default <code>c(1,1)</code>.
+Use of -1 in one or both positions can be useful in reconciling results
+with output from other software</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>g</code></td>
+<td>
+<p>case scores</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>h</code></td>
+<td>
+<p>variable scores</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>avv</code></td>
+<td>
+<p>variable means</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sdev</code></td>
+<td>
+<p>singular values, divides by the square root of one less than
+the number of cases</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>John Maindonald</p>
+
+
+<h3>See Also</h3>
+
+<p><code>La.svd</code></p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">USArrests.svd &lt;- pcp(x = datasets::USArrests)
+
+## The function is currently defined as
+function(x=datasets::USArrests,
+           varscores=TRUE,
+           cases="rows",
+           center="vars",
+           standardize=FALSE,
+           scale.cases=1,
+           log=FALSE,
+           sc=1,
+           reflect=c(1,1))
+{
+  x &lt;- as.matrix(x)
+  avv &lt;- 0
+  sdv &lt;- 1
+  casedim &lt;- 2-as.logical(cases=="rows")
+  vardim &lt;- 3-casedim
+  ## casedim=1 if rows are cases; otherwise casedim=2
+  ## scale.cases=0 gives a pure rotation of the variables
+  ## scale.cases=1 weights a/c the singular values
+  ncases &lt;- dim(x)[casedim]
+  nvar &lt;- dim(x)[vardim]
+  if(is.null(sc))sc &lt;- dim(x)[casedim]-1
+  if(log)x &lt;- log(x, base=2)
+  if(standardize){
+    avv &lt;- apply(x, vardim, mean)
+    sdv &lt;- apply(x, vardim, sd)
+    x &lt;- sweep(x, vardim, avv,"-")
+    x &lt;- sweep(x, vardim, sdv,"/")
+  }
+  else if(as.logical(match("vars", center, nomatch=0))){
+    avv &lt;- apply(x,vardim, mean)
+    x &lt;- sweep(x, vardim, avv,"-")}
+
+  svdx &lt;- La.svd(x, method = c("dgesdd"))
+  h &lt;- NULL
+  if(cases=="rows"){
+    g &lt;- sweep(svdx$u, 2, svdx$d^scale.cases, "*")*sqrt(sc)
+    if(varscores)
+      h &lt;- t((svdx$d^(1-scale.cases)* svdx$vt ))/sqrt(sc)
+  }
+  else if(cases=="columns"){
+    g &lt;- sweep(t(svdx$vt), 2, svdx$d^scale.cases, "*")*sqrt(sc)
+    if(varscores)
+      h &lt;- sweep(svdx$u, 2, svdx$d^(1-scale.cases),"*")/sqrt(sc)
+  }
+  invisible(list(g=g, rotation=h, av=avv, sdev=svdx$d/sqrt(ncases-1)))
+  }
+</code></pre>
+
+
+</div>

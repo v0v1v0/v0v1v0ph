@@ -1,0 +1,79 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>params_mlogit_list</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Parameters of a list of multinomial logit models</h2>
+
+<h3>Description</h3>
+
+<p>Create a list containing the parameters of multiple fitted multinomial logit models.
+Can be used to parameterize state transitions in a discrete time transition model
+by passing to the <code>params</code> field of a <code>CohortDtstmTrans</code> object.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">params_mlogit_list(...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table><tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Objects of class <code>params_mlogit</code>, which can be named.</p>
+</td>
+</tr></table>
+<h3>Value</h3>
+
+<p>An object of class <code>params_mlogit_list</code>, which is a list containing
+<code>params_mlogit</code> objects.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>summary.params_mlogit_list()</code>, <code>params_mlogit()</code>, <code>CohortDtstmTrans</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Consider a sick-sicker model
+
+params &lt;- params_mlogit_list(
+  ## Transitions from sick state (sick -&gt; sicker, sick -&gt; death)
+  sick = params_mlogit(
+    coefs = list(
+      sicker = data.frame(
+        intercept = c(-0.33, -.2),
+        treat = c(log(.75), log(.8))
+      ),
+      death = data.frame(
+        intercept = c(-1, -1.2),
+        treat = c(log(.6), log(.65))
+      )
+    )
+  ),
+  
+  ## Transitions from sicker state (sicker -&gt; death)
+  sicker = params_mlogit(
+    coefs = list(
+      death = data.frame(
+        intercept = c(-1.5, -1.4),
+        treat = c(log(.5), log(.55))
+      )
+    )
+  )
+)
+summary(params)
+params
+
+</code></pre>
+
+
+</div>

@@ -1,0 +1,154 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>ESAC_test</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>ESAC single change-point test</h2>
+
+<h3>Description</h3>
+
+<p>R wrapper for C function testing for a single change-point using ESAC (see Moen et al. 2023).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">ESAC_test(
+  X,
+  threshold_d = 1.5,
+  threshold_s = 1,
+  debug = FALSE,
+  empirical = FALSE,
+  thresholds = NULL,
+  fast = FALSE,
+  tol = 0.001,
+  N = 1000,
+  rescale_variance = TRUE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>X</code></td>
+<td>
+<p>Matrix of observations, where each row contains a time series</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>threshold_d</code></td>
+<td>
+<p>Leading constant for <code class="reqn">\gamma(t) \propto r(t)</code> for <code class="reqn">t=p</code>.  Only relevant when <code>empirical=FALSE</code> and <code>thresholds=NULL</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>threshold_s</code></td>
+<td>
+<p>Leading constant for <code class="reqn">\gamma(t) \propto r(t)</code> for <code class="reqn">t\leq \sqrt{p\log n}</code>. Only relevant when <code>empirical=FALSE</code> and <code>thresholds=NULL</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>debug</code></td>
+<td>
+<p>If <code>TRUE</code>, diagnostic prints are provided during execution</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>empirical</code></td>
+<td>
+<p>If <code>TRUE</code>, detection thresholds are based on Monte Carlo simulation using <code>ESAC_test_calibrate</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>thresholds</code></td>
+<td>
+<p>Vector of manually chosen values of <code class="reqn">\gamma(t)</code> for <code class="reqn">t \in \mathcal{T}</code>, decreasing in <code class="reqn">t</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fast</code></td>
+<td>
+<p>If <code>TRUE</code>, ESAC only tests for a change-point at the midpoint of each seeded interval</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tol</code></td>
+<td>
+<p>If <code>empirical=TRUE</code>, <code>tol</code> is the false error probability tolerance</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>N</code></td>
+<td>
+<p>If <code>empirical=TRUE</code>, <code>N</code> is the number of Monte Carlo samples used</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rescale_variance</code></td>
+<td>
+<p>If <code>TRUE</code>, each row of the data is re-scaled by a MAD estimate using <code>rescale_variance</code></p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>1 if a change-point is detected, 0 otherwise
+</p>
+
+
+<h3>References</h3>
+
+<p>Moen PAJ, Glad IK, Tveten M (2023).
+“Efficient sparsity adaptive changepoint estimation.”
+Arxiv preprint, 2306.04702, <a href="https://doi.org/10.48550/arXiv.2306.04702">https://doi.org/10.48550/arXiv.2306.04702</a>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">library(HDCD)
+n = 50
+p = 50
+
+# Generating data
+X = matrix(rnorm(n*p), ncol = n, nrow=p)
+Y = matrix(rnorm(n*p), ncol = n, nrow=p)
+
+# Adding a single sparse change-point to X (and not Y):
+X[1:5, 26:n] = X[1:5, 26:n] +1
+
+# Vanilla ESAC:
+resX = ESAC_test(X)
+resX
+resY = ESAC_test(Y)
+resY
+
+# Manually setting leading constants for \lambda(t) and \gamma(t)
+resX = ESAC_test(X, 
+                 threshold_d = 2, threshold_s = 2, #leading constants for \gamma(t)
+)
+resX 
+resY = ESAC_test(Y, 
+                 threshold_d = 2, threshold_s = 2, #leading constants for \gamma(t)
+)
+resY
+
+# Empirical choice of thresholds:
+resX = ESAC_test(X, empirical = TRUE, N = 100, tol = 1/100)
+resX
+resY = ESAC_test(Y, empirical = TRUE, N = 100, tol = 1/100)
+resY
+
+# Manual empirical choice of thresholds (equivalent to the above)
+thresholds_test_emp = ESAC_test_calibrate(n,p, N=100, tol=1/100,bonferroni=TRUE)
+resX = ESAC_test(X, thresholds = thresholds_test_emp[[1]])
+resX
+resY = ESAC_test(Y, thresholds = thresholds_test_emp[[1]])
+resY
+</code></pre>
+
+
+</div>

@@ -1,0 +1,131 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>diagnostic_pass</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Automated Diagnostics and Modifications</h2>
+
+<h3>Description</h3>
+
+<p>Perform a set of diagnostics on emulators, changing them if needed.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">diagnostic_pass(
+  ems,
+  targets,
+  validation,
+  check_output = FALSE,
+  verbose = interactive(),
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>ems</code></td>
+<td>
+<p>The emulators to consider</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>targets</code></td>
+<td>
+<p>The output targets to compare implausibility against</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>validation</code></td>
+<td>
+<p>The set of validation points (either a single data.frame or one per emulator)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>check_output</code></td>
+<td>
+<p>Whether to check for suitability of outputs re. targets</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p>Whether messages should be printed while running</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Other arguments to pass to helper functions</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>NOTE: Automated diagnostics are currently only supported for deterministic
+emulators.
+</p>
+<p>There are a number of different characteristics that emulators might possess
+that give rise to diagnostic flags. This function collects together some of those
+whose resulting modifications can be automated. The tests, and consequences, are
+as follows.
+</p>
+
+<dl>
+<dt>Structured Input Space</dt>
+<dd>
+<p>Looks for errors with dependence on input parameters. If
+found, the emulator's correlation length is reduced (to a minimum of 1/3);</p>
+</dd>
+<dt>Structured Output Space</dt>
+<dd>
+<p>Looks for errors with dependence on output value. If
+found, the training and validation data is resampled and emulators are retrained,
+to try to incorporate/remove high leverage points;</p>
+</dd>
+<dt>Misclassification</dt>
+<dd>
+<p>Checks agreement between emulator and simulator implausibility
+classification. If they do not match, emulator uncertainty is inflated;</p>
+</dd>
+<dt>Comparison</dt>
+<dd>
+<p>Checks that the emulator predictions agree with the simulator
+predictions at the validation points, allowing for expected margin of error.</p>
+</dd>
+</dl>
+<p>If the automated modifications are not sufficient to remove problems, then
+offending emulators are removed from the set under consideration. Emulators in
+this category should be carefully considered and their outputs analyzed: they may
+require manual determination of the regression surface or additional training
+points in the neightbourhood of the problematic inputs.
+</p>
+<p>The validation set can also be checked for suitability independent of emulator
+structure: if <code>check_output = TRUE</code> then the outputs of the validation set
+will be compared against targets, as well as checking the implausibility of the
+points with respect to the emulators. If any outputs are consistent under- or
+over-estimates, or if all points are to be ruled out as implausible, the emulators
+corresponding to these outputs are removed. This option should be used with care:
+such a situation could be informative for considering the model structure and
+whether one should expect a match to observational data.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A collection of modified emulators, potentially a subset of the original collection
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"> new_ems &lt;- diagnostic_pass(SIREmulators$ems, SIREmulators$targets, SIRSample$validation)
+</code></pre>
+
+
+</div>

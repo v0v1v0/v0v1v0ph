@@ -1,0 +1,138 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>glht_zz2022</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Test proposed by Zhu and Zhang (2022)</h2>
+
+<h3>Description</h3>
+
+<p>Zhu and Zhang (2022)'s test for general linear hypothesis testing (GLHT) problem for high-dimensional data with assuming that underlying covariance matrices are the same.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">glht_zz2022(Y,G,n,p)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>Y</code></td>
+<td>
+<p>A list of <code class="reqn">k</code> data matrices.  The <code class="reqn">i</code>th element represents the data matrix (<code class="reqn">p\times n_i</code>) from the <code class="reqn">i</code>th population with each column representing a <code class="reqn">p</code>-dimensional observation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>G</code></td>
+<td>
+<p>A known full-rank coefficient matrix (<code class="reqn">q\times k</code>) with <code class="reqn">\operatorname{rank}(\boldsymbol{G})&lt;k</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n</code></td>
+<td>
+<p>A vector of <code class="reqn">k</code> sample sizes. The <code class="reqn">i</code>th element represents the sample size of group <code class="reqn">i</code>, <code class="reqn">n_i</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>p</code></td>
+<td>
+<p>The dimension of data.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Suppose we have the following <code class="reqn">k</code> independent high-dimensional samples:
+</p>
+<p style="text-align: center;"><code class="reqn">
+\boldsymbol{y}_{i1},\ldots,\boldsymbol{y}_{in_i}, \;\operatorname{are \; i.i.d. \; with}\; \operatorname{E}(\boldsymbol{y}_{i1})=\boldsymbol{\mu}_i,\; \operatorname{Cov}(\boldsymbol{y}_{i1})=\boldsymbol{\Sigma},\; i=1,\ldots,k.
+</code>
+</p>
+
+<p>It is of interest to test the following GLHT problem:
+</p>
+<p style="text-align: center;"><code class="reqn">H_0: \boldsymbol{G M}=\boldsymbol{0}, \quad \text { vs. } \quad H_1: \boldsymbol{G M} \neq \boldsymbol{0},</code>
+</p>
+
+<p>where
+<code class="reqn">\boldsymbol{M}=(\boldsymbol{\mu}_1,\ldots,\boldsymbol{\mu}_k)^\top</code> is a <code class="reqn">k\times p</code> matrix collecting <code class="reqn">k</code> mean vectors and <code class="reqn">\boldsymbol{G}:q\times k</code> is a known full-rank coefficient matrix with <code class="reqn">\operatorname{rank}(\boldsymbol{G})&lt;k</code>.
+</p>
+<p>Zhu and Zhang (2022) proposed the following test statistic:
+</p>
+<p style="text-align: center;"><code class="reqn">
+T_{ZZ}=\|\boldsymbol{C} \hat{\boldsymbol{\mu}}\|^2-q \operatorname{tr}(\hat{\boldsymbol{\Sigma}}),
+</code>
+</p>
+
+<p>where <code class="reqn">\boldsymbol{C}=[(\boldsymbol{G D G}^\top)^{-1/2}\boldsymbol{G}]\otimes\boldsymbol{I}_p</code>, and <code class="reqn">\hat{\boldsymbol{\mu}}=(\bar{\boldsymbol{y}}_1^\top,\ldots,\bar{\boldsymbol{y}}_k^\top)^\top</code>, with <code class="reqn">\bar{\boldsymbol{y}}_{i},i=1,\ldots,k</code> being the sample mean vectors and <code class="reqn">\hat{\boldsymbol{\Sigma}}</code> being the usual pooled sample covariance matrix of the <code class="reqn">k</code> samples.
+</p>
+<p>They showed that under the null hypothesis, <code class="reqn">T_{ZZ}</code> and a chi-squared-type mixture have the same normal or non-normal limiting distribution.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A  (list) object of  <code>S3</code> class <code>htest</code>  containing the following elements:
+</p>
+
+<dl>
+<dt>p.value</dt>
+<dd>
+<p>the <code class="reqn">p</code>-value of the test proposed by  Zhu and Zhang (2022).</p>
+</dd>
+<dt>statistic</dt>
+<dd>
+<p>the test statistic proposed by  Zhu and Zhang (2022).</p>
+</dd>
+<dt>beta0</dt>
+<dd>
+<p>the parameter used in  Zhu and Zhang (2022)'s test.</p>
+</dd>
+<dt>beta1</dt>
+<dd>
+<p>the parameter used in  Zhu and Zhang (2022)'s test.</p>
+</dd>
+<dt>df</dt>
+<dd>
+<p>estimated approximate degrees of freedom of  Zhu and Zhang (2022)'s test.</p>
+</dd>
+</dl>
+<h3>References</h3>
+
+<p>Zhu T, Zhang J (2022).
+“Linear hypothesis testing in high-dimensional one-way MANOVA: a new normal reference approach.”
+<em>Computational Statistics</em>, <b>37</b>(1), 1–27.
+<a href="https://doi.org/10.1007/s00180-021-01110-6">doi:10.1007/s00180-021-01110-6</a>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">set.seed(1234)
+k &lt;- 3
+p &lt;- 50
+n &lt;- c(25, 30, 40)
+rho &lt;- 0.1
+M &lt;- matrix(rep(0, k * p), nrow = k, ncol = p)
+y &lt;- (-2 * sqrt(1 - rho) + sqrt(4 * (1 - rho) + 4 * p * rho)) / (2 * p)
+x &lt;- y + sqrt((1 - rho))
+Gamma &lt;- matrix(rep(y, p * p), nrow = p)
+diag(Gamma) &lt;- rep(x, p)
+Y &lt;- list()
+for (g in 1:k) {
+  Z &lt;- matrix(rnorm(n[g] * p, mean = 0, sd = 1), p, n[g])
+  Y[[g]] &lt;- Gamma %*% Z + t(t(M[g, ])) %*% (rep(1, n[g]))
+}
+G &lt;- cbind(diag(k - 1), rep(-1, k - 1))
+glht_zz2022(Y, G, n, p)
+
+</code></pre>
+
+
+</div>

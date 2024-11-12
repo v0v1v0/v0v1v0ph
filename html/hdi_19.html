@@ -1,0 +1,150 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>stability</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Function to perform stability selection</h2>
+
+<h3>Description</h3>
+
+<p>Function to perform stability selection</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">stability(x, y, EV, threshold = 0.75, B = 100, fraction = 0.5,
+          model.selector = lasso.firstq, args.model.selector = NULL,
+          parallel = FALSE, ncores = getOption("mc.cores", 2L),
+          verbose = FALSE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>Design matrix (without intercept).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+<p>Response vector.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>EV</code></td>
+<td>
+<p>Bound for expected number of false positives.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>threshold</code></td>
+<td>
+<p>Threshold for selection frequency. Must be in (0.5, 1).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>B</code></td>
+<td>
+<p>Number of sub-sample iterations.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fraction</code></td>
+<td>
+<p>Fraction of data used at each of the B sub-samples.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>model.selector</code></td>
+<td>
+<p>Function to perform model selection. Default is
+<code>lasso.firstq</code>. User supplied function must have at
+least three arguments: x (the design matrix), y (the response
+vector) and q (the maximal model size). Return value is the index
+vector of selected columns. See <code>lasso.firstq</code> for an
+example. Additional arguments can be passed through
+<code>args.model.selector</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>args.model.selector</code></td>
+<td>
+<p>Named list of further arguments for
+function <code>model.selector</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>parallel</code></td>
+<td>
+<p>Should parallelization be used? (logical)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ncores</code></td>
+<td>
+<p>Number of cores used for parallelization.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p>Should information be printed out while computing (logical).</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>selected</code></td>
+<td>
+<p>Vector of selected predictors.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>freq</code></td>
+<td>
+<p>Vector of selection frequencies.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>q</code></td>
+<td>
+<p>Size of fitted models in order to control error rate at
+desired level.</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>Lukas Meier</p>
+
+
+<h3>References</h3>
+
+<p>Meinshausen, N. and Bühlmann, P. (2010)
+Stability selection (with discussion).
+<em>Journal of the Royal Statistical Society: Series B</em> <b>72</b>, 417–473.
+</p>
+<p>Bühlmann, P., Kalisch, M. and Meier,
+L. (2014) <em>High-dimensional statistics with a view towards
+applications in biology</em>. Annual Review of Statistics and
+its Applications <b>1</b>, 255–278</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">x &lt;- matrix(rnorm(100 * 1000), nrow = 100, ncol = 1000)
+y &lt;- x[,1] * 2 + x[,2] * 2.5 + rnorm(100)
+fit.stab &lt;- stability(x, y, EV = 1)
+fit.stab
+fit.stab$freq[1:10] ## selection frequency of the first 10 predictors
+</code></pre>
+
+
+</div>

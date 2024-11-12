@@ -1,0 +1,125 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>mutate_ntile</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Add a column of ntiles to a data table</h2>
+
+<h3>Description</h3>
+
+<p>Add a column of ntiles to a data table
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">mutate_ntile(
+  DT,
+  col,
+  n,
+  weights = NULL,
+  by = NULL,
+  keyby = NULL,
+  new.col = NULL,
+  character.only = FALSE,
+  overwrite = TRUE,
+  check.na = FALSE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>DT</code></td>
+<td>
+<p>A <code>data.table</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>col</code></td>
+<td>
+<p>The column name (quoted or unquoted) for which quantiles are desired.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n</code></td>
+<td>
+<p>A positive integer, the number of groups to split <code>col</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>weights</code></td>
+<td>
+<p>If <code>NULL</code>, the default, use unweighted quantiles.
+Otherwise, a string designating the column that is passed to 
+<code>weighted_ntile</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>by, keyby</code></td>
+<td>
+<p>Produce a grouped quantile column, as in <code>data.table</code>.
+<code>keyby</code> will set a key on the result (<em>i.e.</em> order by <code>keyby</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>new.col</code></td>
+<td>
+<p>If not <code>NULL</code>, the name of the column to be added. 
+If <code>NULL</code> (the default) a name will be inferred from <code>n</code>. 
+(For example, <code>n = 100</code> will be <code>&lt;col&gt;Percentile</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>character.only</code></td>
+<td>
+<p>(logical, default: <code>FALSE</code>) Do not contemplate 
+<code>col</code> to be an unquoted column name.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>overwrite</code></td>
+<td>
+<p>(logical, default: <code>TRUE</code>) If <code>TRUE</code> and
+<code>new.col</code> already exists in <code>DT</code>, the column will be overwritten.
+If <code>FALSE</code>, attempting to overwrite an existing column is an error.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>check.na</code></td>
+<td>
+<p>(logical, default: <code>FALSE</code>) If <code>TRUE</code>, <code>NA</code>s
+in <code>DT[[col]]</code> will throw an error. If <code>NA</code>'s are present, the 
+corresponding n-tile may take any value.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p><code>DT</code> with a new integer column <code>new.col</code> containing the
+quantiles. If <code>DT</code> is not a <code>data.table</code> its class may be preserved
+unless <code>keyby</code> is used, where it will always be a <code>data.table</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">library(data.table)
+DT &lt;- data.table(x = 1:20, y = 2:1)
+mutate_ntile(DT, "x", n = 10)
+mutate_ntile(DT, "x", n = 5)
+mutate_ntile(DT, "x", n = 10, by = "y")
+mutate_ntile(DT, "x", n = 10, keyby = "y")
+
+y &lt;- "x"
+DT &lt;- data.table(x = 1:20, y = 2:1)
+mutate_ntile(DT, y, n = 5)                        # Use DT$y
+mutate_ntile(DT, y, n = 5, character.only = TRUE) # Use DT$x
+
+</code></pre>
+
+
+</div>

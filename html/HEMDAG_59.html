@@ -1,0 +1,107 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>multilabel.F.measure</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>multilabel F-measure</h2>
+
+<h3>Description</h3>
+
+<p>Method for computing Precision, Recall, Specificity, Accuracy and F-measure for multiclass and multilabel classification.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">F.measure.multilabel(target, predicted, b.per.example = FALSE)
+
+## S4 method for signature 'matrix,matrix'
+F.measure.multilabel(target, predicted, b.per.example = FALSE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>target</code></td>
+<td>
+<p>matrix with the target multilabel: rows correspond to examples and columns to classes.
+<code class="reqn">target[i,j]=1</code> if example <code class="reqn">i</code> belongs to class <code class="reqn">j</code>, <code class="reqn">target[i,j]=0</code> otherwise.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>predicted</code></td>
+<td>
+<p>a numeric matrix with discrete predicted values: rows correspond to examples and columns to classes.
+<code class="reqn">predicted[i,j]=1</code> if example <code class="reqn">i</code> is predicted belonging to class <code class="reqn">j</code>, <code class="reqn">target[i,j]=0</code> otherwise.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>b.per.example</code></td>
+<td>
+<p>a boolean value.
+</p>
+
+<ul>
+<li> <p><code>TRUE</code>: results are returned for each example;
+</p>
+</li>
+<li> <p><code>FALSE</code>: only the average results are returned;
+</p>
+</li>
+</ul>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Names of rows and columns of <code>target</code> and <code>predicted</code> matrix must be provided in the same order, otherwise a stop message is returned.
+</p>
+
+
+<h3>Value</h3>
+
+<p>Two different outputs respect to the input parameter <code>b.per.example</code>:
+</p>
+
+<ul>
+<li> <p><code>b.per.example==FALSE</code>: a list with a single element average. A named vector with average precision (P), recall (R),
+specificity (S), F-measure (F), average F-measure (avF) and Accuracy (A) across examples. F is the F-measure computed as the
+harmonic mean between the average precision and recall; av.F is the F-measure computed as average across examples;
+</p>
+</li>
+<li> <p><code>b.per.example==FALSE</code>: a list with two elements:
+</p>
+
+<ol>
+<li>
+<p> average: a named vector with average precision (P), recall (R), specificity (S), F-measure (F), average F-measure (avF)
+and Accuracy (A) across examples;
+</p>
+</li>
+<li>
+<p> per.example: a named matrix with the Precision (P), Recall (R), Specificity (S), Accuracy (A), F-measure (F) and
+av.F-measure (av.F) for each example. Row names correspond to examples, column names correspond respectively to Precision (P), Recall (R),
+Specificity (S), Accuracy (A), F-measure (F) and av.F-measure (av.F);
+</p>
+</li>
+</ol>
+</li>
+</ul>
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(labels);
+data(scores);
+data(graph);
+root &lt;- root.node(g);
+L &lt;- L[,-which(colnames(L)==root)];
+S &lt;- S[,-which(colnames(S)==root)];
+S[S&gt;0.7] &lt;- 1;
+S[S&lt;0.7] &lt;- 0;
+fscore &lt;- F.measure.multilabel(L,S);
+</code></pre>
+
+
+</div>

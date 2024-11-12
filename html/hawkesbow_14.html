@@ -1,0 +1,98 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>intensity</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Intensity of a Hawkes process</h2>
+
+<h3>Description</h3>
+
+<p>Outputs the intensity of a Hawkes process <code>x</code>, given the specified set of parameters.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">intensity(x, t, fun = NULL, repr = NULL, family = NULL, M = NULL, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>A non-negative numeric vector, sorted in ascending order; or an object of class "hawkes" output by function <code>hawkes</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>t</code></td>
+<td>
+<p>A non-negative numeric value or vector, at which the intensity should be computed.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fun</code></td>
+<td>
+<p>(default = TRUE) A non-negative numeric function or value - intensity (function) of the immigrant process.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>repr</code></td>
+<td>
+<p>(default = NULL) A non-negative numeric value - mean number of offsprings.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>family</code></td>
+<td>
+<p>(default = NULL) A character string "name" naming a distribution with corresponding distribution function <code>dname</code>, or directly the distribution function.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>M</code></td>
+<td>
+<p>(default = NULL) A non-negative numeric value - upper bound on <code>fun</code>(ignored if <code>fun</code> is a numeric value).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Additional arguments passed on to the random generation function <code>dname</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>If the input <code>x</code> has been simulated using the function <code>hawkes</code>, the parameters of the simulation will be used by default to compute the intensity.
+If any parameter is specified in this function call, the function will use this instead.
+</p>
+
+
+<h3>Value</h3>
+
+<p>The intensity at time t.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Simulate an exponential Hawkes process with baseline intensity 1,
+# reproduction mean 0.5 and exponential fertility distribution with rate 2.
+x &lt;- hawkes(10, fun=1, repr=0.5, family="exp", rate=2)
+intensity(x, 0:10)
+# Intensity with a different set of parameters
+intensity(x, 0:10, repr=0.8, rate=3)
+# Intensity with a different distribution function
+intensity(x, 0:10, family="chisq", df=2)
+# Simulate a Hawkes process with baseline intensity function 1 + sin(x),
+# reproduction mean 0.5 and custom [0,1]-triangular fertility function.
+x &lt;- hawkes(10, fun=function(y) {1+sin(y)}, M=2, repr=0.5,
+            family=function(n) {1 - sqrt(1 - runif(n))})
+intensity(x, 0:10, family=function(y) ifelse(y&gt;0 &amp; y&lt;1, 2-2*y, 0))
+</code></pre>
+
+
+</div>

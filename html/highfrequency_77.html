@@ -1,0 +1,118 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>rmOutliersQuotes</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Remove outliers in quotes</h2>
+
+<h3>Description</h3>
+
+<p>Delete entries for which the mid-quote is outlying with respect to surrounding entries.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">rmOutliersQuotes(qData, maxi = 10, window = 50, type = "advanced", tz = NULL)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>qData</code></td>
+<td>
+<p>a <code>data.table</code> or <code>xts</code> object at least containing the columns <code>"BID"</code> and <code>"OFR"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>maxi</code></td>
+<td>
+<p>an integer, indicating the maximum number of median absolute deviations allowed.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>window</code></td>
+<td>
+<p>an integer, indicating the time window for which the "outlyingness" is considered.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>type</code></td>
+<td>
+<p>should be <code>"standard"</code> or <code>"advanced"</code> (see details).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tz</code></td>
+<td>
+<p>fallback time zone used in case we we are unable to identify the timezone of the data, by default: <code>tz = NULL</code>. 
+With the non-disk functionality, we attempt to extract the timezone from the <code>DT</code> column (or index) of the data, which may fail. 
+In case of failure we use <code>tz</code> if specified, and if it is not specified, we use <code>"UTC"</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+
+<ul>
+<li>
+<p> If <code>type = "standard"</code>: Function deletes entries for which the mid-quote deviated by more than "maxi"
+median absolute deviations from a rolling centered median (excluding
+the observation under consideration) of window observations.
+</p>
+</li>
+<li>
+<p> If <code>type = "advanced"</code>:  Function deletes entries for which the mid-quote deviates by more than "maxi"
+median absolute deviations from the value closest to the mid-quote of
+these three options:
+</p>
+
+<ol>
+<li>
+<p> Rolling centered median (excluding the observation under consideration)
+</p>
+</li>
+<li>
+<p> Rolling median of the following window of observations
+</p>
+</li>
+<li>
+<p> Rolling median of the previous window of observations
+</p>
+</li>
+</ol>
+<p>The advantage of this procedure compared to the "standard" proposed
+by Barndorff-Nielsen et al. (2010) is that it will not incorrectly remove
+large price jumps. Therefore this procedure has been set as the default
+for removing outliers. 
+</p>
+<p>Note that the median absolute deviation is taken over the entire
+day. In case it is zero (which can happen if mid-quotes don't change much), 
+the median absolute deviation is taken over a subsample without constant mid-quotes.
+</p>
+</li>
+</ul>
+<h3>Value</h3>
+
+<p><code>xts</code> object or <code>data.table</code> depending on type of input.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Jonathan Cornelissen and Kris Boudt.
+</p>
+
+
+<h3>References</h3>
+
+<p>Barndorff-Nielsen, O. E., P. R. Hansen, A. Lunde, and N. Shephard (2009). Realized kernels in practice: Trades and quotes. <em>Econometrics Journal</em>, 12, C1-C32.
+</p>
+<p>Brownlees, C.T., and Gallo, G.M. (2006). Financial econometric analysis at ultra-high frequency: Data handling concerns. <em>Computational Statistics &amp; Data Analysis</em>, 51, 2232-2245.
+</p>
+
+
+</div>

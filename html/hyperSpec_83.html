@@ -1,0 +1,73 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>chondro</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Raman spectra of 2 Chondrocytes in Cartilage
+A Raman-map (laterally resolved Raman spectra) of chondrocytes in
+cartilage.</h2>
+
+<h3>Description</h3>
+
+<p>See the vignette <code>vignette ("chondro", package = "hyperSpec")</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">chondro
+</code></pre>
+
+
+<h3>Format</h3>
+
+<p>The data set has 875 Raman spectra measured on a 25 <code class="reqn">\times</code>
+35 grid with 1 micron step size. Spatial information is in
+<code>chondro$x</code> and <code>chondro$y</code>. Each spectrum has 300 data points
+in the range of ca. 600 - 1800 cm<code class="reqn">^{-1}</code>.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>A. Bonifacio and C. Beleites
+</p>
+
+
+<h3>References</h3>
+
+<p>The raw data is available at <a href="http://hyperspec.r-forge.r-project.org/blob/chondro.zip">http://hyperspec.r-forge.r-project.org/blob/chondro.zip</a>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+
+chondro
+
+## do baseline correction
+baselines &lt;- spc.fit.poly.below (chondro)
+chondro &lt;- chondro - baselines
+
+## area normalization
+chondro &lt;- chondro / colMeans (chondro)
+
+## substact common composition
+chondro &lt;- chondro - quantile (chondro, 0.05)
+
+cols &lt;- c ("dark blue", "orange", "#C02020")
+plotmap (chondro, clusters ~ x * y, col.regions = cols)
+
+cluster.means &lt;- aggregate (chondro, chondro$clusters, mean_pm_sd)
+plot (cluster.means, stacked = ".aggregate", fill = ".aggregate", col = cols)
+
+## plot nucleic acid bands
+plotmap (chondro[, , c( 728, 782, 1098, 1240, 1482, 1577)],
+       col.regions = colorRampPalette (c ("white", "gold", "dark green"), space = "Lab") (20))
+
+</code></pre>
+
+
+</div>

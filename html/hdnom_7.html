@@ -1,0 +1,141 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>compare_by_calibrate</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Compare high-dimensional Cox models by model calibration</h2>
+
+<h3>Description</h3>
+
+<p>Compare high-dimensional Cox models by model calibration
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">compare_by_calibrate(
+  x,
+  time,
+  event,
+  model.type = c("lasso", "alasso", "flasso", "enet", "aenet", "mcp", "mnet", "scad",
+    "snet"),
+  method = c("fitting", "bootstrap", "cv", "repeated.cv"),
+  boot.times = NULL,
+  nfolds = NULL,
+  rep.times = NULL,
+  pred.at,
+  ngroup = 5,
+  seed = 1001,
+  trace = TRUE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>Matrix of training data used for fitting the model;
+on which to run the calibration.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>time</code></td>
+<td>
+<p>Survival time.
+Must be of the same length with the number of rows as <code>x</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>event</code></td>
+<td>
+<p>Status indicator, normally 0 = alive, 1 = dead.
+Must be of the same length with the number of rows as <code>x</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>model.type</code></td>
+<td>
+<p>Model types to compare. Could be at least two of
+<code>"lasso"</code>, <code>"alasso"</code>, <code>"flasso"</code>, <code>"enet"</code>,
+<code>"aenet"</code>, <code>"mcp"</code>, <code>"mnet"</code>, <code>"scad"</code>,
+or <code>"snet"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+<p>Calibration method.
+Could be <code>"bootstrap"</code>, <code>"cv"</code>, or <code>"repeated.cv"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>boot.times</code></td>
+<td>
+<p>Number of repetitions for bootstrap.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nfolds</code></td>
+<td>
+<p>Number of folds for cross-validation and
+repeated cross-validation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rep.times</code></td>
+<td>
+<p>Number of repeated times for repeated cross-validation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pred.at</code></td>
+<td>
+<p>Time point at which calibration should take place.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ngroup</code></td>
+<td>
+<p>Number of groups to be formed for calibration.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>seed</code></td>
+<td>
+<p>A random seed for cross-validation fold division.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>trace</code></td>
+<td>
+<p>Logical. Output the calibration progress or not.
+Default is <code>TRUE</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(smart)
+x &lt;- as.matrix(smart[, -c(1, 2)])
+time &lt;- smart$TEVENT
+event &lt;- smart$EVENT
+
+# Compare lasso and adaptive lasso by 5-fold cross-validation
+cmp.cal.cv &lt;- compare_by_calibrate(
+  x, time, event,
+  model.type = c("lasso", "alasso"),
+  method = "fitting",
+  pred.at = 365 * 9, ngroup = 5, seed = 1001
+)
+
+print(cmp.cal.cv)
+summary(cmp.cal.cv)
+plot(cmp.cal.cv)
+</code></pre>
+
+
+</div>

@@ -1,0 +1,221 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hwwn.test</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Perform a test for white noise on a time series.
+</h2>
+
+<h3>Description</h3>
+
+<p>Often one wishes to know whether a time series is consistent
+with a white noise model. This function tests whether the underlying
+spectrum of the time series is flat, which is identical to saying
+that all the autocorrelations of the series are zero (apart from
+the lag zero autocorrelation which is always one). This test
+is exact for Gaussian data but will also work well with heavy-tailed
+distributions whose periodogram tends to the exponential distribution
+asymptotically (see accompanying paper for details). 
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hwwn.test(x, lowlev = 0, plot.it = FALSE, stopeveryscale = FALSE,
+	n.cdf.grid = 1000, mc.method = p.adjust.methods, mac.spread=10)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>The data set you wish to test. For now, the length of this
+series has to be a power of two. In theory, it could be any length.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lowlev</code></td>
+<td>
+<p>Specifies the coarsest resolution level of wavelet coefficients
+computed on the spectrum. Typically, this should be left at one,
+which is the coarsest that can be achieved an still approximate
+the CDF
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>plot.it</code></td>
+<td>
+<p>If <code>TRUE</code> then plots of the wavelet coefficients
+and their modelled underlying distribution are plotted,
+and their cumulative distributions and the resultant p-values
+as a histogram for each scale. Theoretical values are in red
+and data estimated values in black.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>stopeveryscale</code></td>
+<td>
+<p>If <code>TRUE</code> the code stops after every plot
+if <code>plot.it==TRUE</code>. This is a way of ensuring that the
+human can see every plot to stop it whizzing off the screen.
+Simply press ENTER to continue.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n.cdf.grid</code></td>
+<td>
+<p>The CDF of the Macdonald distribution is evaluated
+numerically. This argument controls the resolution of that
+grid: it controls the number of grid points there are between
+<code>-mac.spread</code> and <code>mac.spread</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mc.method</code></td>
+<td>
+<p>The method of multiple hypothesis comparison.
+See <code>p.adjust</code> for details.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mac.spread</code></td>
+<td>
+<p>The range (from <code>-mac.spread</code> to <code>mac.spread</code>)
+that the CDF of the Macdonald distribution is computed on.
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The null hypothesis of the test contained in this function
+is H_0: series is white noise (or constant spectrum) versus
+H_A: it is not white noise.
+This test works by assessing whether the spectrum of the
+underlying series is constant or not. It does this by
+first computing the periodogram of the sample series. This
+is a well-studied estimate of the spectrum. Then it evaluates
+the constancy of the spectrum by examining the Haar wavelet
+coefficients of the periodogram. Under normality much is known
+about the asymptotic distribution of the periodogram and this
+can be transferred, through some moderately complex distribution
+theory to the distribution of the Haar wavelet coefficients
+of the periodogram. Hence, in this situation, we have a good handle
+on whether a particular wavelet coefficients is too large or
+to small as we have near theoretical knowledge of their
+CDF. Since we are testing many wavelet coefficients simultaneously
+we have to use multiple hypothesis p-value adjustment techniques,
+such as Bonferroni to obtain a final p-value.
+</p>
+
+
+<h3>Value</h3>
+
+<p>An object of class <code>htest</code> containing the results of
+the hypothesis test. Actually a list containing the following
+components:
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>p.val.collector</code></td>
+<td>
+<p>All the p-values for all Haar wavelet coefficients
+of the periodogram. These are the values before p-value adjustment
+for multiple tests.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>p.val.adjust</code></td>
+<td>
+<p>The p-values after adjustment for multiple tests via
+<code>p.adjust</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>p.value</code></td>
+<td>
+<p>The p-value of the test</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+<p>Character string describing the test.</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>Delyan Savchev and Guy Nason
+</p>
+
+
+<h3>References</h3>
+
+<p>Nason, G.P. and Savchev, D. (2014) White noise testing using
+wavelets. <em>Stat</em>, <b>3</b>, 351-362.
+<a href="https://doi.org/10.1002/sta4.69">doi:10.1002/sta4.69</a>
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>compute.rejection</code>, <code>Macdonald</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">#
+# Invent test data set which IS white noise
+#
+x &lt;- rnorm(128)
+#
+# Do the test
+#
+x.wntest &lt;- hwwn.test(x)
+#
+# Print the results
+#
+#x.wntest
+#
+#	Wavelet Test of White Noise
+#
+#data:  
+#p-value = 0.9606
+#
+# So p-value indicates that there is no evidence for rejection of
+# H_0: white noise.
+#
+# Let's do an example using data that is not white noise. E.g. AR(1)
+#
+x.ar &lt;- arima.sim(n=128, model=list(ar=0.8))
+#
+# Do the test
+#
+x.ar.wntest &lt;- hwwn.test(x.ar)
+#
+# Print the results
+#
+print(x.ar.wntest)
+#
+#	Wavelet Test of White Noise
+#
+#data:  
+#p-value &lt; 2.2e-16
+#
+# p-value is very small. Extremely strong evidence to reject H_0: white noise
+</code></pre>
+
+
+</div>

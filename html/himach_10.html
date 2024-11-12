@@ -1,0 +1,99 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>find_routes</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Find best routes between airport-pair &amp; aircraft combinations</h2>
+
+<h3>Description</h3>
+
+<p><code>find_routes</code> combines an aircraft and airport-pair list and finds the
+best routes between them, refuelling if necessary
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">find_routes(ac_ids, ap2_ids, aircraft, airports, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>ac_ids</code></td>
+<td>
+<p>A vector of aircraft IDs, as in column 'id' from
+<code>make_aircraft</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ap2_ids</code></td>
+<td>
+<p>A 2-column matrix or dataframe of airport pair text IDs</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>aircraft</code></td>
+<td>
+<p>Specification of the aircraft, see
+<code>make_aircraft</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>airports</code></td>
+<td>
+<p>Airport locations as from <code>make_airports</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Other parameters, passed to <code>find_route</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>This function finds is a wrapper for the single-case function
+<code>find_route</code>. It takes (text) lists of aircraft and airport codes,
+combines them, then finds routes for all of these. A 'route' is made up
+of one or two 'legs' (airport to airport without intermediate stop).
+</p>
+<p>For more details see <code>find_route</code>
+</p>
+
+
+<h3>Value</h3>
+
+<p>Dataframe with details of the routes
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># need to load some of the built-in data
+aircraft &lt;- make_aircraft(warn = FALSE)
+airports &lt;- make_airports(crs = crs_Pacific)
+# get test datasets
+NZ_buffer30 &lt;- hm_get_test("buffer")
+NZ_grid &lt;- hm_get_test("grid")
+
+options("quiet" = 4) #for heavy reporting
+# from Auckland to Christchurch
+ap2 &lt;- make_AP2("NZAA","NZCH",airports)
+## Not run: 
+routes &lt;- find_route(aircraft[4,],
+                    ap2,
+                    fat_map = NZ_buffer30,
+                    route_grid = NZ_grid,
+                    ap_loc = airports)
+
+## End(Not run)
+
+</code></pre>
+
+
+</div>

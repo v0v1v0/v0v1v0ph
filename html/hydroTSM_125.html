@@ -1,0 +1,112 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>sfreq</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Sampling Frequency 
+</h2>
+
+<h3>Description</h3>
+
+<p>This function identifies the sampling frequency of a zoo object. It is wrapper to the <code>periodicity</code> function of the <span class="pkg">xts</span> package.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">sfreq(x, min.year = 1800)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+
+<p>variable of type zoo, xts or ts, with AT LEAST 2 elements, AND with a (sub)hourly, hourly, daily, weekly, monthly, quarterly, or annual (yearly) sampling frequency.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>min.year</code></td>
+<td>
+
+<p>integer used for a correct identification of the sampling frequency when <code>x</code> is an annual (yearly) time series.
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>See further details in the <code>periodicity</code> function of the <span class="pkg">xts</span> package.
+</p>
+
+
+<h3>Value</h3>
+
+<p>Character. Possible values are: <br>
+-) <kbd>minute</kbd>    : indicating that the sampling frequency in <code>x</code> is sub-hourly <br>
+-) <kbd>hourly</kbd>    : indicating that the sampling frequency in <code>x</code> is hourly     <br>
+-) <kbd>daily</kbd>     : indicating that the sampling frequency in <code>x</code> is daily      <br>
+-) <kbd>weekly</kbd>    : indicating that the sampling frequency in <code>x</code> is weekly     <br>
+-) <kbd>monthly</kbd>   : indicating that the sampling frequency in <code>x</code> is monthly    <br>
+-) <kbd>quarterly</kbd> : indicating that the sampling frequency in <code>x</code> is quarterly  <br>
+-) <kbd>annual</kbd>    : indicating that the sampling frequency in <code>x</code> is annual 
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Mauricio Zambrano-Bigiarini, <a href="mailto:mzb.devel@gmail">mzb.devel@gmail</a>
+</p>
+
+
+<h3>See Also</h3>
+
+
+<p><code>frequency</code>, periodicity
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Ex1: sub-hourly data
+## Creating a dummy 15-min zoo object, with 1 as the only value in each time period
+dt  &lt;- seq( from=as.POSIXct("2021-06-30 00:15"), to=as.POSIXct("2021-06-30 23:45"), by="15 min" )
+ndt &lt;- length(dt)
+shr &lt;- zoo( rep(1, ndt), dt)
+sfreq(shr)
+
+
+## Ex2: hourly data 
+## Loading the time series of HOURLY streamflows for the station Karamea at Gorge
+data(KarameaAtGorgeQts)
+hr &lt;- KarameaAtGorgeQts
+sfreq(hr)
+
+
+## Ex3: Daily data
+## Loading daily streamflows at the station Oca en Ona (Ebro River basin, Spain)
+data(OcaEnOnaQts)
+d &lt;- OcaEnOnaQts
+sfreq(d)
+
+
+## Ex4: Monthly data
+m &lt;- daily2monthly(d, FUN=mean, na.rm=TRUE)
+sfreq(m)
+
+
+## Ex5: Annual data
+a &lt;- daily2annual(d, FUN=mean, na.rm=TRUE)
+sfreq(a)
+
+
+</code></pre>
+
+
+</div>

@@ -1,0 +1,170 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>WaterLevelDataFrame</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Initialize a WaterLevelDataFrame</h2>
+
+<h3>Description</h3>
+
+<p>To initialize an object of class WaterLevelDataFrame
+this function should be used. It checks all the required input data and
+validates the final object.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">WaterLevelDataFrame(
+  river = c("Elbe", "Rhine"),
+  time,
+  gauging_stations = NULL,
+  gauging_stations_missing = NULL,
+  comment = NULL,
+  id = NULL,
+  station = NULL,
+  station_int = NULL,
+  w = NULL
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>river</code></td>
+<td>
+<p>a required argument to fill the WaterLevelDataFrame-slot
+<code>river</code>. It has to be type <code>character</code>, has to have a length of
+one and can be either <strong>Elbe</strong> or <strong>Rhine</strong>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>time</code></td>
+<td>
+<p>a required argument to fill the WaterLevelDataFrame-slot
+<code>time</code>. It has to be type <code>c("POSIXct",
+"POSIXt")</code>, has to have a length of one and must be in the temporal range
+between <code>1960-01-01 00:00:00 CET</code> and now (<code>Sys.time()</code>) or be
+<code>NA</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>gauging_stations</code></td>
+<td>
+<p>a slot of class <code>data.frame</code>.
+<code>gauging_stations</code> has to be a <code>data.frame</code> with the
+following columns and column types: id (<code>integer</code>), gauging_station
+(<code>character</code>), uuid (<code>character</code>), km (<code>numeric</code>),
+km_qps (<code>numeric</code>), river (<code>character</code>),
+longitude (<code>numeric</code>), latitude (<code>numeric</code>), mw
+(<code>numeric</code>), pnp (<code>numeric</code>), w (<code>numeric</code>), wl
+(<code>numeric</code>), n_wls_below_w_do (<code>integer</code>),
+n_wls_above_w_do (<code>integer</code>), n_wls_below_w_up
+(<code>integer</code>), n_wls_above_w_up (<code>integer</code>),
+name_wl_below_w_do (<code>character</code>), name_wl_above_w_do
+(<code>character</code>), name_wl_below_w_up (<code>character</code>),
+name_wl_above_w_up (<code>character</code>), w_wl_below_w_do
+(<code>numeric</code>), w_wl_above_w_do (<code>numeric</code>), w_wl_below_w_up
+(<code>numeric</code>), w_wl_above_w_up (<code>numeric</code>), weight_up
+(<code>numeric</code>), weight_do (<code>numeric</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>gauging_stations_missing</code></td>
+<td>
+<p>an optional argument to fill the
+WaterLevelDataFrame-slot <code>gauging_stations_missing</code>. It
+has to be type <code>character</code> and usually contains a vector with names of
+gauging stations for which no water level information was available for the
+specified <code>time</code>. This argument is used by the functions
+<code>waterLevel</code>, <code>waterLevelPegelonline</code>,
+<code>waterLevelFlys3</code> and <code>waterLevelFlys3Seq</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>comment</code></td>
+<td>
+<p>an optional argument to fill the
+WaterLevelDataFrame-slot <code>comment</code>. It has to be type
+<code>character</code> and is used by the functions
+<code>WaterLevelDataFrame</code>, <code>waterLevel</code>,
+<code>waterLevelPegelonline</code>, <code>waterLevelFlys3</code> and <code>waterLevelFlys3Seq</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>id</code></td>
+<td>
+<p>an optional argument to hand over the <code>row.names(wldf)</code>.
+<code>id</code> has to be type <code>integer</code> and has to have the same length
+as other optional arguments (<code>station</code>, <code>station_int</code> and
+<code>w</code>) forming the <code>data.frame</code>-component of a
+WaterLevelDataFrame.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>station</code></td>
+<td>
+<p>an optional argument to hand over the stationing along the
+specified <code>river</code>. If specified, it has to be type <code>numeric</code>
+and has to have the same length as other optional arguments (<code>id</code>,
+<code>station_int</code> and <code>w</code>) forming the <code>data.frame</code>-component
+of a WaterLevelDataFrame. If both stationing arguments
+(<code>station</code> and <code>station_int</code>) are specified, all elements of
+<code>station</code> have to be equal to <code>as.numeric(station_int / 1000)</code>.
+Minimum and maximum allowed values of <code>station</code> are
+<code>river</code>-specific: Elbe (km 0 - 585.7), Rhine (km 336.2 - 865.7).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>station_int</code></td>
+<td>
+<p>an optional argument to hand over the stationing along the
+specified <code>river</code>. If specified, it has to be type <code>integer</code>
+and has to have the same length as other optional arguments (<code>id</code>,
+<code>station</code> and <code>w</code>) forming the <code>data.frame</code>-component
+of a WaterLevelDataFrame. If both stationing arguments
+(<code>station</code> and <code>station_int</code>) are specified, all elements of
+<code>station_int</code> have to be equal to <code>as.integer(station * 1000)</code>.
+Minimum and maximum allowed values of <code>station_int</code> are <code>river</code>-specific:
+Elbe (m 0 - 585700), Rhine (m 336200 - 865700).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>w</code></td>
+<td>
+<p>an optional argument to hand over the water level information along
+the stationing of the specified <code>river</code> for a given <code>time</code>. If
+specified, it has to be type <code>numeric</code> and has to have the same
+length as other optional arguments (<code>id</code>, <code>station</code> and
+<code>station_int</code>) forming the <code>data.frame</code>-component of
+a WaterLevelDataFrame. If not specified, the respective
+WaterLevelDataFrame-column <code>w</code> can be computed by the
+functions <code>waterLevel</code>, <code>waterLevelPegelonline</code>,
+<code>waterLevelFlys3</code> and <code>waterLevelFlys3Seq</code>. Minimum
+and maximum allowed values of <code>w</code> are river-specific: Elbe (m a.s.l. 0
+- 130), Rhine (m a.s.l. 5 - 120).</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>The function produces an object of class
+WaterLevelDataFrame which might contain 1d water level data
+and information to recompute it.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">wldf &lt;- WaterLevelDataFrame(river   = "Elbe",
+                            time    = as.POSIXct("2016-12-21"),
+                            station = seq(257, 262, 0.1))
+wldf &lt;- waterLevel(wldf)
+
+</code></pre>
+
+
+</div>

@@ -1,0 +1,138 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>analyze_diagnostic</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Diagnostic Analysis for Emulators</h2>
+
+<h3>Description</h3>
+
+<p>Produces summary and plots for diagnostics
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">analyze_diagnostic(
+  in_data,
+  output_name,
+  targets = NULL,
+  plt = interactive(),
+  cutoff = 3,
+  target_viz = NULL,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>in_data</code></td>
+<td>
+<p>The data to perform the analysis on</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>output_name</code></td>
+<td>
+<p>The name of the output emulated</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>targets</code></td>
+<td>
+<p>If required or desired, the targets for the system outputs</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>plt</code></td>
+<td>
+<p>Whether or not to plot the analysis</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cutoff</code></td>
+<td>
+<p>The implausibility cutoff for diagnostic ‘ce’</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>target_viz</code></td>
+<td>
+<p>How to show the targets on the diagnostic plots</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Any other parameters to pass to subfunctions</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Given diagnostic information (almost certainly provided from <code>get_diagnostic</code>),
+we can plot the results and highlight the points that are worthy of concern or further
+consideration. Each diagnostic available has a plot associated with it which can be produced
+here:
+</p>
+<p>Standardized Error: A histogram of standardized errors. Outliers should be considered, as well
+as whether very many points have either large or small errors.
+</p>
+<p>Comparison Diagnostics: Error bars around points, corresponding to emulator prediction plus or
+minus emulator uncertainty. A green line indicates where the emulator and simulator prediction
+would be in complete agreement: error bars that do not overlap with this line (coloured red) are
+to be considered. Where targets are provided, the colouration is limited only to points where
+the simulator prediction would be close to the targets.
+</p>
+<p>Classification Error: A point plot comparing emulator implausibility to simulator
+implausibility, sectioned into regions horizontally and vertically by <code>cutoff</code>. Points
+that lie in the lower right quadrant (i.e. emulator would reject; simulator would not) should
+be considered.
+</p>
+<p>This function takes a data.frame that contains the input points, simulator values and, depending
+on the diagnostic, a set of summary measures. It returns a data.frame of any points that failed
+the diagnostic.
+</p>
+<p>We may also superimpose the target bounds on the comparison diagnostics, to get a sense of
+where it is most important that the emulator and simulator agree. The <code>target_viz</code>
+argument controls this, and has three options: 'interval' (a horizontal interval); 'solid'
+(a solid grey box whose dimensions match the target region in both vertical and horizontal
+extent); and 'hatched' (similar to solid, but a semi-transparent box with hatching inside).
+Any such vizualisation has extent equal to the target plus/minus 4.5 times the target
+uncertainty. By default, <code>target_viz = NULL</code>, indicating that no superposition is shown.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A data.frame of failed points
+</p>
+
+
+<h3>References</h3>
+
+<p>Jackson (2018) &lt;http://etheses.dur.ac.uk/12826&gt;
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>get_diagnostic</code>
+</p>
+<p>Other diagnostic functions: 
+<code>classification_diag()</code>,
+<code>comparison_diag()</code>,
+<code>get_diagnostic()</code>,
+<code>individual_errors()</code>,
+<code>residual_diag()</code>,
+<code>standard_errors()</code>,
+<code>summary_diag()</code>,
+<code>validation_diagnostics()</code>
+</p>
+
+
+</div>

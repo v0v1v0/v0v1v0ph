@@ -1,0 +1,374 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>sKGE</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Split Kling-Gupta Efficiency
+</h2>
+
+<h3>Description</h3>
+
+<p>Split Kling-Gupta efficiency between <code>sim</code> and <code>obs</code>.
+</p>
+<p>This goodness-of-fit measure was developed by Fowler et al. (2018), as a modification to the original Kling-Gupta efficiency (KGE) proposed by Gupta et al. (2009). See Details.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">sKGE(sim, obs, ...)
+
+## Default S3 method:
+sKGE(sim, obs, s=c(1,1,1), na.rm=TRUE, method=c("2009", "2012", "2021"),
+              start.month=1, out.PerYear=FALSE, fun=NULL, ...,
+              epsilon.type=c("none", "Pushpalatha2012", "otherFactor", "otherValue"), 
+              epsilon.value=NA)
+
+## S3 method for class 'data.frame'
+sKGE(sim, obs, s=c(1,1,1), na.rm=TRUE, method=c("2009", "2012", "2021"),
+              start.month=1, out.PerYear=FALSE, fun=NULL, ...,
+              epsilon.type=c("none", "Pushpalatha2012", "otherFactor", "otherValue"), 
+              epsilon.value=NA)
+
+## S3 method for class 'matrix'
+sKGE(sim, obs, s=c(1,1,1), na.rm=TRUE, method=c("2009", "2012", "2021"),
+              start.month=1, out.PerYear=FALSE, fun=NULL, ...,
+              epsilon.type=c("none", "Pushpalatha2012", "otherFactor", "otherValue"), 
+              epsilon.value=NA)
+             
+## S3 method for class 'zoo'
+sKGE(sim, obs, s=c(1,1,1), na.rm=TRUE, method=c("2009", "2012", "2021"),
+              start.month=1, out.PerYear=FALSE, fun=NULL, ...,
+              epsilon.type=c("none", "Pushpalatha2012", "otherFactor", "otherValue"), 
+              epsilon.value=NA)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>sim</code></td>
+<td>
+
+<p>numeric, zoo, matrix or data.frame with simulated values
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>obs</code></td>
+<td>
+
+<p>numeric, zoo, matrix or data.frame with observed values
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>s</code></td>
+<td>
+
+<p>numeric of length 3, representing the scaling factors to be used for re-scaling the criteria space before computing the Euclidean distance from the ideal point c(1,1,1), i.e., <code>s</code> elements are used for adjusting the emphasis on different components.
+The first elements is used for rescaling the Pearson product-moment correlation coefficient (<code>r</code>), the second element is used for rescaling <code>Alpha</code> and the third element is used for re-scaling <code>Beta</code>
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>na.rm</code></td>
+<td>
+
+<p>a logical value indicating whether 'NA' should be stripped before the computation proceeds. <br>
+When an 'NA' value is found at the i-th position in <code>obs</code> <b>OR</b> <code>sim</code>, the i-th value of <code>obs</code> <b>AND</b> <code>sim</code> are removed before the computation.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+
+<p>character, indicating the formula used to compute the variability ratio in the Kling-Gupta efficiency. Valid values are:
+</p>
+<p>-) <kbd>2009</kbd>: the variability is defined as ‘Alpha’, the ratio of the standard deviation of <code>sim</code> values to the standard deviation of <code>obs</code>. This is the default option. See Gupta et al. (2009).
+</p>
+<p>-) <kbd>2012</kbd>: the variability is defined as ‘Gamma’, the ratio of the coefficient of variation of <code>sim</code> values to the coefficient of variation of <code>obs</code>. See Kling et al. (2012). 
+</p>
+<p>-) <kbd>2021</kbd>: the bias is defined as ‘Beta’, the ratio of <code>mean(sim)</code> minus <code>mean(obs)</code> to the standard deviation of <code>obs</code>. The variability is defined as ‘Alpha’, the ratio of the standard deviation of <code>sim</code> values to the standard deviation of <code>obs</code>. See Tang et al. (2021). 
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>start.month</code></td>
+<td>
+
+<p>[OPTIONAL]. Only used when the (hydrological) year of interest is different from the calendar year.
+</p>
+<p>numeric in [1:12] indicating the starting month of the (hydrological) year. Numeric values in [1, 12] represent months in [January, December]. By default <code>start.month=1</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>out.PerYear</code></td>
+<td>
+
+<p>logical, indicating whether the output of this function has to include the Kling-Gupta efficiencies obtained for the individual years in <code>sim</code> and <code>obs</code> or not.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fun</code></td>
+<td>
+
+<p>function to be applied to <code>sim</code> and <code>obs</code> in order to obtain transformed values thereof before computing this goodness-of-fit index.
+</p>
+<p>The first argument MUST BE a numeric vector with any name (e.g., <code>x</code>), and additional arguments are passed using <code>...</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+
+<p>arguments passed to <code>fun</code>, in addition to the mandatory first numeric vector.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>epsilon.type</code></td>
+<td>
+
+<p>argument used to define a numeric value to be added to both <code>sim</code> and <code>obs</code> before applying <code>fun</code>. 
+</p>
+<p>It is was  designed to allow the use of logarithm and other similar functions that do not work with zero values.
+</p>
+<p>Valid values of <code>epsilon.type</code> are:
+</p>
+<p>1) <kbd>"none"</kbd>: <code>sim</code> and <code>obs</code> are used by <code>fun</code> without the addition of any numeric value. This is the default option.
+</p>
+<p>2) <kbd>"Pushpalatha2012"</kbd>: one hundredth (1/100) of the mean observed values is added to both <code>sim</code> and <code>obs</code> before applying <code>fun</code>, as described in Pushpalatha et al. (2012). 
+</p>
+<p>3) <kbd>"otherFactor"</kbd>: the numeric value defined in the <code>epsilon.value</code> argument is used to multiply the the mean observed values, instead of the one hundredth (1/100) described in Pushpalatha et al. (2012). The resulting value is then added to both <code>sim</code> and <code>obs</code>, before applying <code>fun</code>.
+</p>
+<p>4) <kbd>"otherValue"</kbd>: the numeric value defined in the <code>epsilon.value</code> argument is directly added to both <code>sim</code> and <code>obs</code>, before applying <code>fun</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>epsilon.value</code></td>
+<td>
+
+<p>-) when <code>epsilon.type="otherValue"</code> it represents the numeric value to be added to both <code>sim</code> and <code>obs</code> before applying <code>fun</code>. <br>
+-) when <code>epsilon.type="otherFactor"</code> it represents the numeric factor used to multiply the mean of the observed values, instead of the one hundredth (1/100) described in Pushpalatha et al. (2012). The resulting value is then added to both <code>sim</code> and <code>obs</code> before applying <code>fun</code>.
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Garcia et al. (2017) tested different objective functions and found that the mean value of the KGE applied to the streamflows (i.e., KGE(Q)) and the KGE applied to the inverse of the streamflows (i.e., KGE(1/Q) is able to provide a an aceptable representation of low-flow indices important for water management. They also found that KGE applied to a transformation of streamflow values (e.g., log)  is inadequate to capture low-flow indices important for water management. 
+</p>
+<p>The robustness of their findings depends more on the climate variability rather than the objective function, and they are insensitive to the hydrological model used in the evaluation.
+</p>
+<p>Traditional Kling-Gupta efficiencies (Gupta et al., 2009; Kling et al., 2012) range from -Inf to 1 and, therefore, sKGE should also range from -Inf to 1. Essentially, the closer to 1, the more similar <code>sim</code> and <code>obs</code> are.
+</p>
+<p>Knoben et al. (2019) showed that traditional Kling-Gupta (Gupta et al., 2009; Kling et al., 2012) values greater than -0.41 indicate that a model improves upon the mean flow benchmark, even if the model's KGE value is negative.
+</p>
+
+
+<h3>Value</h3>
+
+<p>If <code>out.PerYear=FALSE</code>: numeric with the Split Kling-Gupta efficiency between <code>sim</code> and <code>obs</code>. If <code>sim</code> and <code>obs</code> are matrices, the output value is a vector, with the Split Kling-Gupta efficiency between each column of <code>sim</code> and <code>obs</code>
+</p>
+<p>If <code>out.PerYear=TRUE</code>: a list of two elements:
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>sKGE.value</code></td>
+<td>
+
+<p>numeric with the Split Kling-Gupta efficiency. If <code>sim</code> and <code>obs</code> are matrices, the output value is a vector, with the Split Kling-Gupta efficiency between each column of <code>sim</code> and <code>obs</code>
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>KGE.PerYear</code></td>
+<td>
+
+<p>numeric with the Kling-Gupta efficincies obtained for the individual years in <code>sim</code> and <code>obs</code>.
+</p>
+</td>
+</tr>
+</table>
+<h3>Note</h3>
+
+<p><code>obs</code> and <code>sim</code> has to have the same length/dimension <br></p>
+<p>The missing values in <code>obs</code> and <code>sim</code> are removed before the computation proceeds, and only those positions with non-missing values in <code>obs</code> and <code>sim</code> are considered in the computation
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Mauricio Zambrano-Bigiarini &lt;mzb.devel@gmail.com&gt;
+</p>
+
+
+<h3>References</h3>
+
+<p><cite>Fowler, K.; Coxon, G.; Freer, J.; Peel, M.; Wagener, T.; Western, A.; Woods, R.; Zhang, L. (2018). Simulating runoff under changing climatic conditions: A framework for model improvement. Water Resources Research, 54(12), 812-9832. doi:10.1029/2018WR023989.</cite>
+</p>
+<p><cite>Gupta, H. V.; Kling, H.; Yilmaz, K. K.; Martinez, G. F. (2009). Decomposition of the mean squared error and NSE performance criteria: Implications for improving hydrological modelling. Journal of hydrology, 377(1-2), 80-91. doi:10.1016/j.jhydrol.2009.08.003.</cite>
+</p>
+<p><cite>Kling, H.; Fuchs, M.; Paulin, M. (2012). Runoff conditions in the upper Danube basin under an ensemble of climate change scenarios. Journal of Hydrology, 424, 264-277, doi:10.1016/j.jhydrol.2012.01.011.</cite>
+</p>
+<p><cite>Pushpalatha, R., Perrin, C., Le Moine, N. and Andreassian, V. (2012). A review of efficiency criteria suitable for evaluating low-flow simulations. Journal of Hydrology, 420, 171-182. doi:10.1016/j.jhydrol.2011.11.055.</cite>
+</p>
+<p><cite>Pfannerstill, M.; Guse, B.; Fohrer, N. (2014). Smart low flow signature metrics for an improved overall performance evaluation of hydrological models. Journal of Hydrology, 510, 447-458. doi:10.1016/j.jhydrol.2013.12.044.</cite> 
+</p>
+<p><cite>Santos, L.; Thirel, G.; Perrin, C. (2018). Pitfalls in using log-transformed flows within the sKGE criterion. doi:10.5194/hess-22-4583-2018</cite>
+</p>
+<p><cite>Knoben, W.J.; Freer, J.E.; Woods, R.A. (2019). Inherent benchmark or not? Comparing Nash-Sutcliffe and Kling-Gupta efficiency scores. Hydrology and Earth System Sciences, 23(10), 4323-4331. doi:10.5194/hess-23-4323-2019.</cite>
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>KGE</code>, <code>KGElf</code>, <code>KGEnp</code>, <code>gof</code>, <code>ggof</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">##################
+# Example 1: Looking at the difference between 'method=2009' and 'method=2012'
+# Loading daily streamflows of the Ega River (Spain), from 1961 to 1970
+data(EgaEnEstellaQts)
+obs &lt;- EgaEnEstellaQts
+
+# Simulated daily time series, initially equal to twice the observed values
+sim &lt;- 2*obs 
+
+# KGE 2009
+KGE(sim=sim, obs=obs, method="2009", out.type="full")
+
+# KGE 2012
+KGE(sim=sim, obs=obs, method="2012", out.type="full")
+
+# sKGE (Fowler et al., 2018):
+sKGE(sim=sim, obs=obs, method="2012")
+
+##################
+# Example 2: 
+# Loading daily streamflows of the Ega River (Spain), from 1961 to 1970
+data(EgaEnEstellaQts)
+obs &lt;- EgaEnEstellaQts
+
+# Generating a simulated daily time series, initially equal to the observed series
+sim &lt;- obs 
+
+# Computing the 'sKGE' for the "best" (unattainable) case
+sKGE(sim=sim, obs=obs)
+
+##################
+# Example 3: sKGE for simulated values equal to observations plus random noise 
+#            on the first half of the observed values. 
+#            This random noise has more relative importance for ow flows than 
+#            for medium and high flows.
+  
+# Randomly changing the first 1826 elements of 'sim', by using a normal distribution 
+# with mean 10 and standard deviation equal to 1 (default of 'rnorm').
+sim[1:1826] &lt;- obs[1:1826] + rnorm(1826, mean=10)
+ggof(sim, obs)
+
+sKGE(sim=sim, obs=obs)
+
+##################
+# Example 4: sKGE for simulated values equal to observations plus random noise 
+#            on the first half of the observed values and applying (natural) 
+#            logarithm to 'sim' and 'obs' during computations.
+
+sKGE(sim=sim, obs=obs, fun=log)
+
+# Verifying the previous value:
+lsim &lt;- log(sim)
+lobs &lt;- log(obs)
+sKGE(sim=lsim, obs=lobs)
+
+##################
+# Example 5: sKGE for simulated values equal to observations plus random noise 
+#            on the first half of the observed values and applying (natural) 
+#            logarithm to 'sim' and 'obs' and adding the Pushpalatha2012 constant
+#            during computations
+
+sKGE(sim=sim, obs=obs, fun=log, epsilon.type="Pushpalatha2012")
+
+# Verifying the previous value, with the epsilon value following Pushpalatha2012
+eps  &lt;- mean(obs, na.rm=TRUE)/100
+lsim &lt;- log(sim+eps)
+lobs &lt;- log(obs+eps)
+sKGE(sim=lsim, obs=lobs)
+
+##################
+# Example 6: sKGE for simulated values equal to observations plus random noise 
+#            on the first half of the observed values and applying (natural) 
+#            logarithm to 'sim' and 'obs' and adding a user-defined constant
+#            during computations
+
+eps &lt;- 0.01
+sKGE(sim=sim, obs=obs, fun=log, epsilon.type="otherValue", epsilon.value=eps)
+
+# Verifying the previous value:
+lsim &lt;- log(sim+eps)
+lobs &lt;- log(obs+eps)
+sKGE(sim=lsim, obs=lobs)
+
+##################
+# Example 7: sKGE for simulated values equal to observations plus random noise 
+#            on the first half of the observed values and applying (natural) 
+#            logarithm to 'sim' and 'obs' and using a user-defined factor
+#            to multiply the mean of the observed values to obtain the constant
+#            to be added to 'sim' and 'obs' during computations
+
+fact &lt;- 1/50
+sKGE(sim=sim, obs=obs, fun=log, epsilon.type="otherFactor", epsilon.value=fact)
+
+# Verifying the previous value:
+eps  &lt;- fact*mean(obs, na.rm=TRUE)
+lsim &lt;- log(sim+eps)
+lobs &lt;- log(obs+eps)
+sKGE(sim=lsim, obs=lobs)
+
+##################
+# Example 8: sKGE for simulated values equal to observations plus random noise 
+#            on the first half of the observed values and applying a 
+#            user-defined function to 'sim' and 'obs' during computations
+
+fun1 &lt;- function(x) {sqrt(x+1)}
+
+sKGE(sim=sim, obs=obs, fun=fun1)
+
+# Verifying the previous value, with the epsilon value following Pushpalatha2012
+sim1 &lt;- sqrt(sim+1)
+obs1 &lt;- sqrt(obs+1)
+sKGE(sim=sim1, obs=obs1)
+
+##################
+# Example 9: sKGE for a two-column data frame where simulated values are equal to 
+#            observations plus random noise on the first half of the observed values 
+
+SIM &lt;- cbind(sim, sim)
+OBS &lt;- cbind(obs, obs)
+
+sKGE(sim=SIM, obs=OBS)
+
+##################
+# Example 10: sKGE for each year, where simulated values are given in a two-column data 
+#             frame equal to the observations plus random noise on the first half of the 
+#             observed values 
+SIM &lt;- cbind(sim, sim)
+OBS &lt;- cbind(obs, obs)
+sKGE(sim=SIM, obs=OBS, out.PerYear=TRUE)
+
+</code></pre>
+
+
+</div>

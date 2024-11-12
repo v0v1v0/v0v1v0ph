@@ -1,0 +1,102 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>computeR2</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Compute variance explained by models</h2>
+
+<h3>Description</h3>
+
+<p>Compute the variance explained by a linear or
+generalized linear model.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">mypredict(model, newdata)
+
+computeR2(pred, outcome, usebinary = 1)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>model</code></td>
+<td>
+<p>a fitted model, which is the output of <code>themodel</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>newdata</code></td>
+<td>
+<p>a data frame which contains all the variables included in the model.
+This data frame is used to make prediction on.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pred</code></td>
+<td>
+<p>a vector of the predicted outcome.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>outcome</code></td>
+<td>
+<p>a vector of the actual outcome.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>usebinary</code></td>
+<td>
+<p>a non-negative number representing different models.
+Use linear model if <code>usebinary=0</code>,
+use logistic regression model via <code>fastglm</code> if <code>usebinary=1</code> (by default),
+and use logistic regression model via <code>glm</code> if <code>usebinary&gt;1</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The variance explained by a linear model is based on the conventional R<sup>2</sup>.
+As for logistic regression, we use McFadden's R<sup>2</sup>.
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>mypredict</code> returns a vector of the predicted outcome.
+</p>
+<p><code>computeR2</code> returns a positive number of the variance explained by the
+linear model (conventional R<sup>2</sup>) or
+the generalized linear model (McFadden's R<sup>2</sup>).
+</p>
+
+
+<h3>References</h3>
+
+<p>McFadden, Daniel. "Conditional logit analysis of qualitative choice behavior." (1973).
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## create datasets
+x=matrix(runif(100,-2,2),ncol=5)
+outcome=(0.5*x[,2] - 0.8*x[,4] + 0.3*x[,5])&gt;runif(100,-2,2)
+
+## create binary outcome
+outcome[outcome]=1
+data=data.frame(outcome,x)
+
+## compute the variance explained by features
+model=themodel(outcome~.,data[1:80,],usebinary=1)
+outcome_predict=mypredict(model,data[81:100,])
+computeR2(outcome_predict,data[81:100,'outcome'],usebinary=1)
+</code></pre>
+
+
+</div>

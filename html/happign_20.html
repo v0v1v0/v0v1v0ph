@@ -1,0 +1,137 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>get_wmts</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Download WMTS raster tiles</h2>
+
+<h3>Description</h3>
+
+<p>Download an RGB raster layer from IGN Web Map Tile Services (WMTS).
+WMTS focuses on performance and can only query pre-calculated
+tiles.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">get_wmts(x,
+         layer = "ORTHOIMAGERY.ORTHOPHOTOS",
+         zoom = 10L,
+         crs = 2154,
+         filename = tempfile(fileext = ".tif"),
+         verbose = FALSE,
+         overwrite = FALSE,
+         interactive = FALSE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>Object of class <code>sf</code> or <code>sfc</code>. Needs to be located in
+France.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>layer</code></td>
+<td>
+<p><code>character</code>; layer name from
+<code>get_layers_metadata(apikey, "wms")</code> or directly from
+<a href="https://geoservices.ign.fr/services-web-experts">IGN website</a>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>zoom</code></td>
+<td>
+<p><code>integer</code> between 0 and 21; at low zoom levels, a small set of
+map tiles covers a large geographical area. In other words, the smaller
+the zoom level, the less precise the resolution. For conversion between zoom
+level and resolution see
+<a href="https://geoservices.ign.fr/documentation/services/services-geoplateforme/diffusion#70062">WMTS IGN Documentation</a></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>crs</code></td>
+<td>
+<p><code>numeric</code>, <code>character</code>, or object of class <code>sf</code> or <code>sfc</code>.
+It is set to EPSG:2154 by default. See <code>sf::st_crs()</code> for more detail.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>filename</code></td>
+<td>
+<p><code>character</code> or <code>NULL</code>; filename or a open connection for
+writing. (ex : "test.tif" or "~/test.tif"). If <code>NULL</code>, <code>layer</code> is used as
+filename. Default drivers is ".tif" but all gdal drivers are supported,
+see details for more info.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p><code>boolean</code>; if TRUE, message are added.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>overwrite</code></td>
+<td>
+<p>If TRUE, output raster is overwrite.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>interactive</code></td>
+<td>
+<p><code>logical</code>; If TRUE, interactive menu ask for
+<code>apikey</code> and <code>layer</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p><code>SpatRaster</code> object from <code>terra</code> package.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>get_apikeys()</code>, <code>get_layers_metadata()</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+library(sf)
+library(tmap)
+
+penmarch &lt;- read_sf(system.file("extdata/penmarch.shp", package = "happign"))
+
+# Get orthophoto
+layers &lt;- get_layers_metadata("wmts", "ortho")$Identifier
+ortho &lt;- get_wmts(penmarch, layer = layers[1], zoom = 21)
+plotRGB(ortho)
+
+# Get all available irc images
+layers &lt;- get_layers_metadata("wmts", "orthohisto")$Identifier
+irc_names &lt;- grep("irc", layers, value = TRUE, ignore.case = TRUE)
+
+irc &lt;- lapply(irc_names, function(x) get_wmts(penmarch, layer = x, zoom = 18)) |&gt;
+   setNames(irc_names)
+
+# remove empty layer (e.g. only NA)
+irc &lt;- Filter(function(x) !all(is.na(values(x))), irc)
+
+# plot
+all_plots &lt;- lapply(irc, plotRGB)
+
+
+## End(Not run)
+</code></pre>
+
+
+</div>

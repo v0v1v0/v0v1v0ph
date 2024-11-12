@@ -1,0 +1,104 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>rHeckman</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Data generation from the Heckman Selection model (Normal, Student-t or CN)</h2>
+
+<h3>Description</h3>
+
+<p>'rHeckman()' generates a random sample from the Heckman selection model (Normal, Student-t or CN).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">rHeckman(x, w, beta, gamma, sigma2, rho, nu = 4, family = "T")
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>A covariate matrix for the response y.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>w</code></td>
+<td>
+<p>A covariate matrix for the missing indicator cc.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>beta</code></td>
+<td>
+<p>Values for the beta vector.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>gamma</code></td>
+<td>
+<p>Values for the gamma vector.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sigma2</code></td>
+<td>
+<p>Value for the variance.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rho</code></td>
+<td>
+<p>Value for the dependence between the response and missing value.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nu</code></td>
+<td>
+<p>When using the t- distribution, the initial value for the degrees of freedom.
+When using the CN distribution, the initial values for the proportion of bad observations and the degree of contamination.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>family</code></td>
+<td>
+<p>The family to be used (Normal, T, or CN).</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>Return an object with the response (y) and missing values (cc).
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+n &lt;- 100
+rho &lt;- .6
+cens &lt;- 0.25
+nu &lt;- 4
+set.seed(20200527)
+w &lt;- cbind(1,runif(n,-1,1),rnorm(n))
+x &lt;- cbind(w[,1:2])
+
+family &lt;- "T"
+c &lt;- qt(cens, df=nu)
+
+sigma2 &lt;- 1
+beta &lt;- c(1,0.5)
+gamma&lt;- c(1,0.3,-.5)
+gamma[1] &lt;- -c*sqrt(sigma2)
+
+data &lt;- rHeckman(x,w,beta,gamma,sigma2,rho,nu,family=family)
+
+</code></pre>
+
+
+</div>

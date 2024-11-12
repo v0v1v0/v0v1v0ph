@@ -1,0 +1,192 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>new_MV_portfolio_weights_BDOPS21</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Constructor of MV portfolio object</h2>
+
+<h3>Description</h3>
+
+<p>Constructor of mean-variance shrinkage portfolios.
+new_MV_portfolio_weights_BDOPS21 is for the case p&lt;n, while
+new_MV_portfolio_weights_BDOPS21_pgn is for p&gt;n, where p is the number of
+assets and n is the number of observations.
+For more details of the method, see <code>MVShrinkPortfolio</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">new_MV_portfolio_weights_BDOPS21(x, gamma, b, beta)
+
+new_MV_portfolio_weights_BDOPS21_pgn(x, gamma, b, beta)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>a p by n matrix or a data frame of asset returns. Rows represent
+different assets, columns – observations.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>gamma</code></td>
+<td>
+<p>a numeric variable. Coefficient of risk aversion.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>b</code></td>
+<td>
+<p>a numeric variable. 1-beta is the confidence level of the symmetric
+confidence interval, constructed for each weight.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>beta</code></td>
+<td>
+<p>a numeric variable. The confidence level for weight intervals.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>an object of class MeanVar_portfolio with subclass
+MV_portfolio_weights_BDOPS21.</p>
+
+<table>
+<tr>
+<td style="text-align: left;">
+   Element </td>
+<td style="text-align: left;"> Description </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+   call </td>
+<td style="text-align: left;"> the function call with which it was created </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+   cov_mtrx </td>
+<td style="text-align: left;"> the sample covariance matrix of the asset returns </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+   inv_cov_mtrx </td>
+<td style="text-align: left;"> the inverse of the sample covariance matrix </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+   means </td>
+<td style="text-align: left;"> sample mean vector of the asset returns </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+   W_mv_hat </td>
+<td style="text-align: left;"> sample estimator of the portfolio weights </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+   weights </td>
+<td style="text-align: left;"> shrinkage estimator of the portfolio weights </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+   alpha </td>
+<td style="text-align: left;"> shrinkage intensity for the weights </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+   Port_Var </td>
+<td style="text-align: left;"> portfolio variance </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+   Port_mean_return </td>
+<td style="text-align: left;"> expected portfolio return </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+   Sharpe </td>
+<td style="text-align: left;"> portfolio Sharpe ratio </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+   weight_intervals </td>
+<td style="text-align: left;"> A data frame, see details </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+</td>
+</tr>
+</table>
+<p>weight_intervals contains a shrinkage estimator of portfolio weights,
+asymptotic confidence intervals for the true portfolio weights, value of
+the test statistic and the p-value of the test on the equality of
+the weight of each individual asset to zero
+(see Section 4.3 of Bodnar et al. 2023)
+weight_intervals is only computed when p&lt;n.
+</p>
+
+
+<h3>References</h3>
+
+<p>Bodnar T, Dmytriv S, Okhrin Y, Parolya N, Schmid W (2021).
+“Statistical Inference for the Expected Utility Portfolio in High Dimensions.”
+<em>IEEE Transactions on Signal Processing</em>, <b>69</b>, 1-14.
+</p>
+<p>Bodnar T, Dette H, Parolya N, Thorsén E (2023).
+“Corrigendum to "Sampling Distributions of Optimal Portfolio Weights and Characteristics in Low and Large Dimensions.".”
+<em>Random Matrices: Theory and Applications</em>, <b>12</b>, 2392001.
+<a href="https://doi.org/10.1142/S2010326323920016">doi:10.1142/S2010326323920016</a>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+# c&lt;1
+
+# Assets with a diagonal covariance matrix
+
+n &lt;- 3e2 # number of realizations
+p &lt;- .5*n # number of assets
+b &lt;- rep(1/p,p)
+gamma &lt;- 1
+
+x &lt;- matrix(data = rnorm(n*p), nrow = p, ncol = n)
+
+test &lt;- new_MV_portfolio_weights_BDOPS21(x=x, gamma=gamma, b=b, beta=0.05)
+summary(test)
+
+# Assets with a non-diagonal covariance matrix
+
+Mtrx &lt;- RandCovMtrx(p=p)
+x &lt;- t(MASS::mvrnorm(n=n , mu=rep(0,p), Sigma=Mtrx))
+
+test &lt;- new_MV_portfolio_weights_BDOPS21(x=x, gamma=gamma, b=b, beta=0.05)
+str(test)
+
+
+# c&gt;1
+
+n &lt;-2e2 # number of realizations
+p &lt;-1.2*n # number of assets
+b &lt;-rep(1/p,p)
+x &lt;- matrix(data = rnorm(n*p), nrow = p, ncol = n)
+
+test &lt;- new_MV_portfolio_weights_BDOPS21_pgn(x=x, gamma=gamma,
+                                             b=b, beta=0.05)
+summary(test)
+
+# Assets with a non-diagonal covariance matrix
+
+</code></pre>
+
+
+</div>

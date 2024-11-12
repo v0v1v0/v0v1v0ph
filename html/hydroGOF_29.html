@@ -1,0 +1,696 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>ggof</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Graphical Goodness of Fit
+</h2>
+
+<h3>Description</h3>
+
+<p>Graphical comparison between two vectors (numeric, ts or zoo), with several numerical goodness of fit printed as a legend. <br>
+Missing values in observed and/or simulated values can removed before the computations. <br></p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">ggof(sim, obs, na.rm = TRUE, dates, date.fmt = "%Y-%m-%d", 
+     pt.style = "ts", ftype = "o",  FUN, 
+     stype="default", season.names=c("Winter", "Spring", "Summer", "Autumn"),
+     gof.leg = TRUE,  digits=2, 
+     gofs=c("ME", "MAE", "RMSE", "NRMSE", "PBIAS", "RSR", "rSD", "NSE", "mNSE", 
+             "rNSE", "d", "md", "rd", "r", "R2", "bR2", "KGE", "VE"),
+     legend, leg.cex=1,
+     tick.tstep = "auto", lab.tstep = "auto", lab.fmt=NULL,
+     cal.ini=NA, val.ini=NA,
+     main, xlab = "Time", ylab=c("Q, [m3/s]"),  
+     col = c("blue", "black"), 
+     cex = c(0.5, 0.5), cex.axis=1.2, cex.lab=1.2,
+     lwd = c(1, 1), lty = c(1, 3), pch = c(1, 9), ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>sim</code></td>
+<td>
+
+<p>numeric or zoo object with with simulated values
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>obs</code></td>
+<td>
+
+<p>numeric or zoo object with observed values
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>na.rm</code></td>
+<td>
+
+<p>a logical value indicating whether 'NA' should be stripped before the computation proceeds. <br>
+When an 'NA' value is found at the i-th position in <code>obs</code> <b>OR</b> <code>sim</code>, the i-th value of <code>obs</code> <b>AND</b> <code>sim</code> are removed before the computation.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dates</code></td>
+<td>
+
+<p>character, factor, Date or POSIXct object indicating how to obtain the dates for the corresponding values in the <code>sim</code> and <code>obs</code> time series <br>
+If <code>dates</code> is a character or factor, it is converted into Date/POSIXct class, using the date format specified by <code>date.fmt</code>
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>date.fmt</code></td>
+<td>
+
+<p>OPTIONAL. character indicating the format in which the dates are stored in <code>dates</code>, <code>cal.ini</code> and <code>val.ini</code>. See <code>format</code> in <code>as.Date</code>. Default value is <kbd>%Y-%m-%d</kbd> <br>
+ONLY required when <code>class(dates)=="character"</code> or <code>class(dates)=="factor"</code> or when <code>cal.ini</code> and/or <code>val.ini</code> is provided.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pt.style</code></td>
+<td>
+
+<p>Character indicating if the 2 ts have to be plotted as lines or bars. When <code>ftype</code> is NOT <kbd>o</kbd>, it only applies to the annual values. Valid values are: <br>
+-) <kbd>ts</kbd> : (default) each ts is plotted as a lines along the 'x' axis <br>
+-) <kbd>bar</kbd>: both series are plotted as barplots. 
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ftype</code></td>
+<td>
+
+<p>Character indicating how many plots are desired by the user. Valid values are: <br>
+-) <kbd>o</kbd>       : only the original <code>sim</code> and <code>obs</code> time series are plotted <br>
+-) <kbd>dm</kbd>      : it assumes that <code>sim</code> and <code>obs</code> are daily time series and Daily and Monthly values are plotted  <br>
+-) <kbd>ma</kbd>      : it assumes that <code>sim</code> and <code>obs</code> are daily or monthly time series and Monthly and Annual values are plotted <br>
+-) <kbd>dma</kbd>     : it assumes that <code>sim</code> and <code>obs</code> are daily time series and Daily, Monthly and Annual values are plotted <br>
+-) <kbd>seasonal</kbd>: seasonal values are plotted. See <code>stype</code> and <code>season.names</code>
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>FUN</code></td>
+<td>
+
+<p>OPTIONAL, ONLY required when <code>ftype</code> is in <code>c('dm', 'ma', 'dma', 'seasonal')</code>. Function that have to be applied for transforming teh original ts into monthly, annual or seasonal time step (e.g., for precipitation FUN MUST be <code>sum</code>, for temperature and flow time series, FUN MUST be <code>mean</code>)
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>stype</code></td>
+<td>
+
+<p>OPTIONAL, only used when <code>ftype=seasonal</code>. <br>
+character, indicating whath weather seasons will be used for computing the output. Possible values are: <br>
+-) <kbd>default</kbd>          =&gt;  "winter"= DJF  = Dec, Jan, Feb;      "spring"= MAM = Mar, Apr, May;  "summer"= JJA  = Jun, Jul, Aug;       "autumn"= SON = Sep, Oct, Nov  <br>
+-) <kbd>FrenchPolynesia</kbd>  =&gt;  "winter"= DJFM = Dec, Jan, Feb, Mar; "spring"= AM  = Apr, May;       "summer"= JJAS = Jun, Jul, Aug, Sep;  "autumn"= ON  = Oct, Nov 
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>season.names</code></td>
+<td>
+
+<p>OPTIONAL, only used when <code>ftype=seasonal</code>. <br>
+character of length 4 indicating the names of each one of the weather seasons defined by <code>stype</code>.These names are only used for plotting purposes
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>gof.leg</code></td>
+<td>
+
+<p>logical, indicating if several numerical goodness of fit have to be computed between <code>sim</code> and <code>obs</code>, and plotted as a legend on the graph. If <code>leg.gof=TRUE</code>, then <code>x</code> is considered as observed and <code>y</code> as simulated values (for some gof functions this is important).
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>digits</code></td>
+<td>
+
+<p>OPTIONAL, only used when <code>leg.gof=TRUE</code>. Numeric, representing the decimal places used for rounding the goodness-of-fit indexes.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>gofs</code></td>
+<td>
+
+<p>character, with one or more strings indicating the goodness-of-fit measures to be shown in the legend of the plot when  <code>gof.leg=TRUE</code>. <br>
+Possible values when <code>ftype!='seasonal'</code> are in <code>c("ME", "MAE", "MSE", "RMSE", "NRMSE", "PBIAS", "RSR", "rSD", "NSE", "mNSE", "rNSE", "d", "md", "rd", "cp", "r", "R2", "bR2", "KGE", "VE")</code> <br>
+Possible values when <code>ftype='seasonal'</code> are in c("ME", "RMSE", "PBIAS", "RSR", "NSE", "d", "R2", "KGE", "VE")
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>legend</code></td>
+<td>
+
+<p>character of length 2 to appear in the legend.  
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>leg.cex</code></td>
+<td>
+
+<p>OPTIONAL. ONLY used when <code>leg.gof=TRUE</code>. Character expansion factor for drawing the legend, *relative*  to current 'par("cex")'. Used for text, and provides the default for 'pt.cex' and 'title.cex'. Default value = 1
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tick.tstep</code></td>
+<td>
+
+<p>character, indicating the time step that have to be used for putting the ticks on the time axis. Valid values are: <kbd>auto</kbd>, <kbd>years</kbd>, <kbd>months</kbd>,<kbd>weeks</kbd>, <kbd>days</kbd>, <kbd>hours</kbd>, <kbd>minutes</kbd>, <kbd>seconds</kbd>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lab.tstep</code></td>
+<td>
+
+<p>character, indicating the time step that have to be used for putting the labels on the time axis. Valid values are: <kbd>auto</kbd>, <kbd>years</kbd>, <kbd>months</kbd>,<kbd>weeks</kbd>, <kbd>days</kbd>, <kbd>hours</kbd>, <kbd>minutes</kbd>, <kbd>seconds</kbd>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lab.fmt</code></td>
+<td>
+
+<p>Character indicating the format to be used for the label of the axis. See <code>lab.fmt</code> in <code>drawTimeAxis</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cal.ini</code></td>
+<td>
+
+<p>OPTIONAL. Character, indicating the date in which the calibration period started. <br>
+When <code>cal.ini</code> is provided, all the values in <code>obs</code> and <code>sim</code> with dates previous to <code>cal.ini</code> are SKIPPED from the computation of the goodness-of-fit measures (when <code>gof.leg=TRUE</code>), but their values are still plotted, in order to examine if the warming up period was too short, acceptable or too long for the chosen calibration period.
+In addition, a vertical red line in drawn at this date. 
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>val.ini</code></td>
+<td>
+
+<p>OPTIONAL. Character, the date in which the validation period started. <br>
+ONLY used for drawing a vertical red line at this date. 
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>main</code></td>
+<td>
+
+<p>character representing the main title of the plot.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>xlab</code></td>
+<td>
+
+<p>label for the 'x' axis.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ylab</code></td>
+<td>
+
+<p>label for the 'y' axis.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>col</code></td>
+<td>
+
+<p>character, representing the colors of <code>sim</code> and <code>obs</code>
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cex</code></td>
+<td>
+
+<p>numeric, representing the values controlling the size of text and symbols of 'x' and 'y' with respect to the default
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cex.axis</code></td>
+<td>
+
+<p>numeric, representing the magnification to be used for the axis annotation relative to 'cex'. See <code>par</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cex.lab</code></td>
+<td>
+
+<p>numeric, representing the magnification to be used for x and y labels relative to the current setting of 'cex'. See <code>par</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lwd</code></td>
+<td>
+
+<p>vector with the line width of <code>sim</code> and <code>obs</code>
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lty</code></td>
+<td>
+
+<p>numeric with the line type of <code>sim</code> and <code>obs</code>
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pch</code></td>
+<td>
+
+<p>numeric with the type of symbol for <code>x</code> and <code>y</code>. (e.g., 1: white circle; 9: white rhombus with a cross inside)
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+
+<p>further arguments passed to or from other methods.
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Plots observed and simulated values in the same graph.
+</p>
+<p>If <code>gof.leg=TRUE</code>, it computes the numerical values of: <br>
+'me', 'mae', 'rmse', 'nrmse', 'PBIAS',  'RSR, 'rSD', 'NSE', 'mNSE', 'rNSE', 'd', 'md, 'rd', 'cp', 'r', 'r.Spearman', 'R2', 'bR2', 'KGE', 'VE'
+</p>
+
+
+<h3>Value</h3>
+
+<p>The output of the <code>gof</code> function is a matrix with one column only, and the following rows: 
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>ME</code></td>
+<td>
+<p>Mean Error</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>MAE</code></td>
+<td>
+<p>Mean Absolute Error</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>MSE</code></td>
+<td>
+<p>Mean Squared Error</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>RMSE</code></td>
+<td>
+<p>Root Mean Square Error</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ubRMSE</code></td>
+<td>
+<p>Unbiased Root Mean Square Error</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>NRMSE</code></td>
+<td>
+<p>Normalized Root Mean Square Error  ( -100% &lt;= NRMSE &lt;= 100% )</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>PBIAS</code></td>
+<td>
+<p>Percent Bias ( -Inf &lt;= PBIAS &lt;= Inf [%] )</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>RSR</code></td>
+<td>
+<p>Ratio of RMSE to the Standard Deviation of the Observations, RSR = rms / sd(obs). ( 0 &lt;= RSR &lt;= +Inf )</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rSD</code></td>
+<td>
+<p>Ratio of Standard Deviations, rSD = sd(sim) / sd(obs)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>NSE</code></td>
+<td>
+<p>Nash-Sutcliffe Efficiency ( -Inf &lt;= NSE &lt;= 1 )</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mNSE</code></td>
+<td>
+<p>Modified Nash-Sutcliffe Efficiency ( -Inf &lt;= mNSE &lt;= 1 )</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rNSE</code></td>
+<td>
+<p>Relative Nash-Sutcliffe Efficiency ( -Inf &lt;= rNSE &lt;= 1 )</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>wNSE</code></td>
+<td>
+<p>Weighted Nash-Sutcliffe Efficiency ( -Inf &lt;= wNSE &lt;= 1 )</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>wsNSE</code></td>
+<td>
+<p>Weighted Seasonal Nash-Sutcliffe Efficiency ( -Inf &lt;= wsNSE &lt;= 1 )</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>d</code></td>
+<td>
+<p>Index of Agreement ( 0 &lt;= d &lt;= 1 )</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dr</code></td>
+<td>
+<p>Refined Index of Agreement ( -1 &lt;= dr &lt;= 1 )</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>md</code></td>
+<td>
+<p>Modified Index of Agreement ( 0 &lt;= md &lt;= 1 )</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rd</code></td>
+<td>
+<p>Relative Index of Agreement ( 0 &lt;= rd &lt;= 1 )</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cp</code></td>
+<td>
+<p>Persistence Index ( 0 &lt;= cp &lt;= 1 ) </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>r</code></td>
+<td>
+<p>Pearson Correlation coefficient ( -1 &lt;= r &lt;= 1 )</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>R2</code></td>
+<td>
+<p>Coefficient of Determination ( 0 &lt;= R2 &lt;= 1 )</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>bR2</code></td>
+<td>
+<p>R2 multiplied by the coefficient of the regression line between <code>sim</code> and <code>obs</code> <br> ( 0 &lt;= bR2 &lt;= 1 )</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>VE</code></td>
+<td>
+<p>Volumetric efficiency between <code>sim</code> and <code>obs</code> <br> ( -Inf &lt;= VE &lt;= 1)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>KGE</code></td>
+<td>
+<p>Kling-Gupta efficiency between <code>sim</code> and <code>obs</code> <br> ( -Inf &lt;= KGE &lt;= 1 )</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>KGElf</code></td>
+<td>
+<p>Kling-Gupta Efficiency for low values between <code>sim</code> and <code>obs</code> <br> ( -Inf &lt;= KGElf &lt;= 1 )</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>KGEnp</code></td>
+<td>
+<p>Non-parametric version of the Kling-Gupta Efficiency between <code>sim</code> and <code>obs</code> <br> ( -Inf &lt;= KGEnp &lt;= 1 )</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>KGEkm</code></td>
+<td>
+<p>Knowable Moments Kling-Gupta Efficiency between <code>sim</code> and <code>obs</code> <br> ( -Inf &lt;= KGEnp &lt;= 1 )</p>
+</td>
+</tr>
+</table>
+<p>The following outputs are only produced when both <code>sim</code> and <code>obs</code> are zoo objects: 
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>sKGE</code></td>
+<td>
+<p>Split Kling-Gupta Efficiency between <code>sim</code> and <code>obs</code> <br> ( -Inf &lt;= sKGE &lt;= 1 ). Only computed when both <code>sim</code> and <code>obs</code> are zoo objects</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>APFB</code></td>
+<td>
+<p>Annual Peak Flow Bias ( 0 &lt;= APFB &lt;= Inf )</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>HBF</code></td>
+<td>
+<p>High Flow Bias ( 0 &lt;= HFB &lt;= Inf )</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>r.Spearman</code></td>
+<td>
+<p>Spearman Correlation coefficient ( -1 &lt;= r.Spearman &lt;= 1 ). Only computed when <code>do.spearman=TRUE</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pbiasfdc</code></td>
+<td>
+<p>PBIAS in the slope of the midsegment of the Flow Duration Curve</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>Mauricio Zambrano Bigiarini &lt;mzb.devel@gmail.com&gt;
+</p>
+
+
+<h3>References</h3>
+
+<p><cite>Abbaspour, K.C.; Faramarzi, M.; Ghasemi, S.S.; Yang, H. (2009), Assessing the impact of climate change on water resources in Iran, Water Resources Research, 45(10), W10,434, doi:10.1029/2008WR007615.</cite>
+</p>
+<p><cite>Abbaspour, K.C., Yang, J. ; Maximov, I.; Siber, R.; Bogner, K.; Mieleitner, J. ; Zobrist, J.; Srinivasan, R. (2007), Modelling hydrology and water quality in the pre-alpine/alpine Thur watershed using SWAT, Journal of Hydrology, 333(2-4), 413-430, doi:10.1016/j.jhydrol.2006.09.014.</cite>
+</p>
+<p><cite>Box, G.E. (1966). Use and abuse of regression. Technometrics, 8(4), 625-629. doi:10.1080/00401706.1966.10490407.</cite>
+</p>
+<p><cite>Barrett, J.P. (1974). The coefficient of determination-some limitations. The American Statistician, 28(1), 19-20. doi:10.1080/00031305.1974.10479056.</cite>
+</p>
+<p><cite>Chai, T.; Draxler, R.R. (2014). Root mean square error (RMSE) or mean absolute error (MAE)? - Arguments against avoiding RMSE in the literature, Geoscientific Model Development, 7, 1247-1250. doi:10.5194/gmd-7-1247-2014.</cite>
+</p>
+<p><cite>Cinkus, G.; Mazzilli, N.; Jourde, H.; Wunsch, A.; Liesch, T.; Ravbar, N.; Chen, Z.; and Goldscheider, N. (2023). When best is the enemy of good - critical evaluation of performance criteria in hydrological models. Hydrology and Earth System Sciences 27, 2397-2411, doi:10.5194/hess-27-2397-2023.</cite>
+</p>
+<p><cite>Criss, R. E.; Winston, W. E. (2008), Do Nash values have value? Discussion and alternate proposals. Hydrological Processes, 22: 2723-2725. doi:10.1002/hyp.7072.</cite>
+</p>
+<p><cite>Entekhabi, D.; Reichle, R.H.; Koster, R.D.; Crow, W.T. (2010). Performance metrics for soil moisture retrievals and application requirements. Journal of Hydrometeorology, 11(3), 832-840. doi: 10.1175/2010JHM1223.1.</cite>
+</p>
+<p><cite>Fowler, K.; Coxon, G.; Freer, J.; Peel, M.; Wagener, T.; Western, A.; Woods, R.; Zhang, L. (2018). Simulating runoff under changing climatic conditions: A framework for model improvement. Water Resources Research, 54(12), 812-9832. doi:10.1029/2018WR023989.</cite>
+</p>
+<p><cite>Garcia, F.; Folton, N.; Oudin, L. (2017). Which objective function to calibrate rainfall-runoff models for low-flow index simulations?. Hydrological sciences journal, 62(7), 1149-1166. doi:10.1080/02626667.2017.1308511.</cite>
+</p>
+<p><cite>Garrick, M.; Cunnane, C.; Nash, J.E. (1978). A criterion of efficiency for rainfall-runoff models. Journal of Hydrology 36, 375-381. doi:10.1016/0022-1694(78)90155-5.</cite>
+</p>
+<p><cite>Gupta, H.V.; Kling, H.; Yilmaz, K.K.; Martinez, G.F. (2009). Decomposition of the mean squared error and NSE performance criteria: Implications for improving hydrological modelling. Journal of hydrology, 377(1-2), 80-91. doi:10.1016/j.jhydrol.2009.08.003. ISSN 0022-1694.</cite>
+</p>
+<p><cite>Gupta, H.V.; Kling, H. (2011). On typical range, sensitivity, and normalization of Mean Squared Error and Nash-Sutcliffe Efficiency type metrics. Water Resources Research, 47(10). doi:10.1029/2011WR010962.</cite>
+</p>
+<p><cite>Hahn, G.J. (1973). The coefficient of determination exposed. Chemtech, 3(10), 609-612. Aailable online at: <a href="https://www2.hawaii.edu/~cbaajwe/Ph.D.Seminar/Hahn1973.pdf">https://www2.hawaii.edu/~cbaajwe/Ph.D.Seminar/Hahn1973.pdf</a>.</cite>
+</p>
+<p><cite>Hodson, T.O. (2022). Root-mean-square error (RMSE) or mean absolute error (MAE): when to use them or not, Geoscientific Model Development, 15, 5481-5487, doi:10.5194/gmd-15-5481-2022.</cite>
+</p>
+<p><cite>Hundecha, Y., Bardossy, A. (2004). Modeling of the effect of land use changes on the runoff generation of a river basin through parameter regionalization of a watershed model. Journal of hydrology, 292(1-4), 281-295. doi:10.1016/j.jhydrol.2004.01.002.</cite>
+</p>
+<p><cite>Kitanidis, P.K.; Bras, R.L. (1980). Real-time forecasting with a conceptual hydrologic model. 2. Applications and results. Water Resources Research, Vol. 16, No. 6, pp. 1034:1044. doi:10.1029/WR016i006p01034.</cite> <br></p>
+<p><cite>Kling, H.; Fuchs, M.; Paulin, M. (2012). Runoff conditions in the upper Danube basin under an ensemble of climate change scenarios. Journal of Hydrology, 424, 264-277, doi:10.1016/j.jhydrol.2012.01.011.</cite>
+</p>
+<p><cite>Knoben, W.J.; Freer, J.E.; Woods, R.A. (2019). Inherent benchmark or not? Comparing Nash-Sutcliffe and Kling-Gupta efficiency scores. Hydrology and Earth System Sciences, 23(10), 4323-4331. doi:10.5194/hess-23-4323-2019.</cite>
+</p>
+<p><cite>Krause, P.; Boyle, D.P.; Base, F. (2005). Comparison of different efficiency criteria for hydrological model assessment, Advances in Geosciences, 5, 89-97. doi:10.5194/adgeo-5-89-2005.</cite> <br></p>
+<p><cite>Krstic, G.; Krstic, N.S.; Zambrano-Bigiarini, M. (2016). The br2-weighting Method for Estimating the Effects of Air Pollution on Population Health. Journal of Modern Applied Statistical Methods, 15(2), 42. doi:10.22237/jmasm/1478004000</cite>
+</p>
+<p><cite>Legates, D.R.; McCabe, G. J. Jr. (1999), Evaluating the Use of "Goodness-of-Fit" Measures in Hydrologic and Hydroclimatic Model Validation, Water Resour. Res., 35(1), 233-241. doi:10.1029/1998WR900018.</cite> 
+</p>
+<p><cite>Ling, X.; Huang, Y.; Guo, W.; Wang, Y.; Chen, C.; Qiu, B.; Ge, J.; Qin, K.; Xue, Y.; Peng, J. (2021). Comprehensive evaluation of satellite-based and reanalysis soil moisture products using in situ observations over China. Hydrology and Earth System Sciences, 25(7), 4209-4229. doi:10.5194/hess-25-4209-2021.</cite>
+</p>
+<p><cite>Mizukami, N.; Rakovec, O.; Newman, A.J.; Clark, M.P.; Wood, A.W.; Gupta, H.V.; Kumar, R.: (2019). On the choice of calibration metrics for "high-flow" estimation using hydrologic models, Hydrology Earth System Sciences 23, 2601-2614, doi:10.5194/hess-23-2601-2019.</cite>
+</p>
+<p><cite>Moriasi, D.N.; Arnold, J.G.; van Liew, M.W.; Bingner, R.L.; Harmel, R.D.; Veith, T.L. (2007). Model evaluation guidelines for systematic quantification of accuracy in watershed simulations. Transactions of the ASABE. 50(3):885-900</cite>
+</p>
+<p><cite>Nash, J.E. and Sutcliffe, J.V. (1970). River flow forecasting through conceptual models. Part 1: a discussion of principles, Journal of Hydrology 10, pp. 282-290. doi:10.1016/0022-1694(70)90255-6.</cite>
+</p>
+<p><cite>Pearson, K. (1920). Notes on the history of correlation. Biometrika, 13(1), 25-45. doi:10.2307/2331722.</cite>
+</p>
+<p><cite>Pfannerstill, M.; Guse, B.; Fohrer, N. (2014). Smart low flow signature metrics for an improved overall performance evaluation of hydrological models. Journal of Hydrology, 510, 447-458. doi:10.1016/j.jhydrol.2013.12.044.</cite> 
+</p>
+<p><cite>Pizarro, A.; Jorquera, J. (2024). Advancing objective functions in hydrological modelling: Integrating knowable moments for improved simulation accuracy. Journal of Hydrology, 634, 131071. doi:10.1016/j.jhydrol.2024.131071.</cite>
+</p>
+<p><cite>Pool, S.; Vis, M.; Seibert, J. (2018). Evaluating model performance: towards a non-parametric variant of the Kling-Gupta efficiency. Hydrological Sciences Journal, 63(13-14), pp.1941-1953. doi:/10.1080/02626667.2018.1552002.</cite>
+</p>
+<p><cite>Pushpalatha, R.; Perrin, C.; Le Moine, N.; Andreassian, V. (2012). A review of efficiency criteria suitable for evaluating low-flow simulations. Journal of Hydrology, 420, 171-182. doi:10.1016/j.jhydrol.2011.11.055.</cite>  
+</p>
+<p><cite>Santos, L.; Thirel, G.; Perrin, C. (2018). Pitfalls in using log-transformed flows within the KGE criterion. doi:10.5194/hess-22-4583-2018.</cite>
+</p>
+<p><cite>Schaefli, B., Gupta, H. (2007). Do Nash values have value?. Hydrological Processes 21, 2075-2080. doi:10.1002/hyp.6825.</cite>
+</p>
+<p><cite>Schober, P.; Boer, C.; Schwarte, L.A. (2018). Correlation coefficients: appropriate use and interpretation. Anesthesia and Analgesia, 126(5), 1763-1768. doi:10.1213/ANE.0000000000002864.</cite>
+</p>
+<p><cite>Schuol, J.; Abbaspour, K.C.; Srinivasan, R.; Yang, H. (2008b), Estimation of freshwater availability in the West African sub-continent using the SWAT hydrologic model, Journal of Hydrology, 352(1-2), 30, doi:10.1016/j.jhydrol.2007.12.025</cite>
+</p>
+<p><cite>Sorooshian, S., Q. Duan, and V. K. Gupta. (1993). Calibration of rainfall-runoff models: Application of global optimization to the Sacramento Soil Moisture Accounting Model, Water Resources Research, 29 (4), 1185-1194, doi:10.1029/92WR02617</cite>.
+</p>
+<p><cite>Spearman, C. (1961). The Proof and Measurement of Association Between Two Things. In J. J. Jenkins and D. G. Paterson (Eds.), Studies in individual differences: The search for intelligence (pp. 45-58). Appleton-Century-Crofts. doi:10.1037/11491-005</cite>
+</p>
+<p><cite>Tang, G.; Clark, M.P.; Papalexiou, S.M. (2021). SC-earth: a station-based serially complete earth dataset from 1950 to 2019. Journal of Climate, 34(16), 6493-6511. doi:10.1175/JCLI-D-21-0067.1.</cite>
+</p>
+<p><cite>Yapo P.O.; Gupta H.V.; Sorooshian S. (1996). Automatic calibration of conceptual rainfall-runoff models: sensitivity to calibration data. Journal of Hydrology. v181 i1-4. 23-48. doi:10.1016/0022-1694(95)02918-4</cite>
+</p>
+<p><cite>Yilmaz, K.K., Gupta, H.V. ; Wagener, T. (2008), A process-based diagnostic approach to model evaluation: Application to the NWS distributed hydrologic model, Water Resources Research, 44, W09417, doi:10.1029/2007WR006716.</cite>
+</p>
+<p><cite>Willmott, C.J. (1981). On the validation of models. Physical Geography, 2, 184–194. doi:10.1080/02723646.1981.10642213.</cite>
+</p>
+<p><cite>Willmott, C.J. (1984). On the evaluation of model performance in physical geography. Spatial Statistics and Models, G. L. Gaile and C. J. Willmott, eds., 443-460. doi:10.1007/978-94-017-3048-8_23.</cite>
+</p>
+<p><cite>Willmott, C.J.; Ackleson, S.G. Davis, R.E.; Feddema, J.J.; Klink, K.M.; Legates, D.R.; O'Donnell, J.; Rowe, C.M. (1985), Statistics for the Evaluation and Comparison of Models, J. Geophys. Res., 90(C5), 8995-9005. doi:10.1029/JC090iC05p08995.</cite>
+</p>
+<p><cite>Willmott, C.J.; Matsuura, K. (2005). Advantages of the mean absolute error (MAE) over the root mean square error (RMSE) in assessing average model performance, Climate Research, 30, 79-82, doi:10.3354/cr030079.</cite>
+</p>
+<p><cite>Willmott, C.J.; Matsuura, K.; Robeson, S.M. (2009). Ambiguities inherent in sums-of-squares-based error statistics, Atmospheric Environment, 43, 749-752, doi:10.1016/j.atmosenv.2008.10.005.</cite>
+</p>
+<p><cite>Willmott, C.J.; Robeson, S.M.; Matsuura, K. (2012). A refined index of model performance. International Journal of climatology, 32(13), pp.2088-2094. doi:10.1002/joc.2419.</cite>
+</p>
+<p><cite>Willmott, C.J.; Robeson, S.M.; Matsuura, K.; Ficklin, D.L. (2015). Assessment of three dimensionless measures of model performance. Environmental Modelling &amp; Software, 73, pp.167-174. doi:10.1016/j.envsoft.2015.08.012</cite>
+</p>
+<p><cite>Zambrano-Bigiarini, M.; Bellin, A. (2012). Comparing goodness-of-fit measures for calibration of models focused on extreme events. EGU General Assembly 2012, Vienna, Austria, 22-27 Apr 2012, EGU2012-11549-1.</cite>
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>gof</code>, <code>plot2</code>, 
+<code>ggof</code>, <code>me</code>, <code>mae</code>, <code>mse</code>, <code>rmse</code>, <code>ubRMSE</code>, 
+<code>nrmse</code>, <code>pbias</code>, <code>rsr</code>, <code>rSD</code>, <code>NSE</code>, <code>mNSE</code>, 
+<code>rNSE</code>, <code>wNSE</code>, <code>d</code>, <code>dr</code>, <code>md</code>, <code>rd</code>, 
+<code>cp</code>, <code>rPearson</code>, <code>R2</code>, <code>br2</code>, <code>KGE</code>, <code>KGElf</code>,
+<code>KGEnp</code>, <code>sKGE</code>, <code>VE</code>, <code>rSpearman</code>, <code>pbiasfdc</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">obs &lt;- 1:10
+sim &lt;- 2:11
+
+## Not run: 
+ggof(sim, obs)
+
+## End(Not run)
+
+##################
+# Loading daily streamflows of the Ega River (Spain), from 1961 to 1970
+data(EgaEnEstellaQts)
+obs &lt;- EgaEnEstellaQts
+
+# Generating a simulated daily time series, initially equal to the observed series
+sim &lt;- obs 
+
+# Getting the numeric goodness of fit for the "best" (unattainable) case
+gof(sim=sim, obs=obs)
+
+# Randomly changing the first 2000 elements of 'sim', by using a normal distribution 
+# with mean 10 and standard deviation equal to 1 (default of 'rnorm').
+sim[1:2000] &lt;- obs[1:2000] + rnorm(2000, mean=10)
+
+# Getting the new numeric goodness-of-fit measures
+gof(sim=sim, obs=obs)
+
+# Getting the graphical representation of 'obs' and 'sim' along with the numeric 
+# goodness-of-fit measures for the daily and monthly time series 
+## Not run: 
+ggof(sim=sim, obs=obs, ftype="dm", FUN=mean)
+
+## End(Not run)
+
+# Getting the graphical representation of 'obs' and 'sim' along with some numeric 
+# goodness-of-fit measures for the seasonal time series 
+## Not run: 
+ggof(sim=sim, obs=obs, ftype="seasonal", FUN=mean)
+
+## End(Not run)
+
+# Computing the daily residuals 
+# even if this is a dummy example, it is enough for illustrating the capability
+r &lt;- sim-obs
+
+# Summarizing and plotting the residuals
+## Not run: 
+library(hydroTSM)
+
+# summary
+smry(r) 
+
+# daily, monthly and annual plots, boxplots and histograms
+hydroplot(r, FUN=mean)
+
+# seasonal plots and boxplots
+hydroplot(r, FUN=mean, pfreq="seasonal")
+
+## End(Not run)
+
+</code></pre>
+
+
+</div>

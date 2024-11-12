@@ -1,0 +1,192 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>county_wind</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Hurricane exposure by wind for counties</h2>
+
+<h3>Description</h3>
+
+<p>This function takes a list of US counties, based on their 5-digit Federal
+Information Processing Standard (FIPS) codes, boundaries on
+the range of years to be considered, and thresholds for wind speed (in meters
+per second) (or, alternatively, duration of winds at or above 20 m / s in minutes)
+for each  county to be considered "exposed" to the
+storm. Based on these inputs, the function returns a dataframe with the
+subset of Atlantic basin storms meeting those criteria for each of the listed
+counties.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">county_wind(
+  counties,
+  start_year,
+  end_year,
+  wind_limit,
+  wind_var = "vmax_sust",
+  wind_source = "modeled"
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>counties</code></td>
+<td>
+<p>Character vector of the five-digit Federal Information
+Processing Standard (FIPS) codes for counties for which the user wants to
+determine storm exposure.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>start_year</code></td>
+<td>
+<p>Four-digit integer with first year to consider.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>end_year</code></td>
+<td>
+<p>Four-digit integer with last year to consider.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>wind_limit</code></td>
+<td>
+<p>A numeric vector of length one giving the minimum
+wind speed (in meters per second) or duration of winds of 20 m / s or more
+(in minutes) to use in the filter. The units of this variable will depend on
+the user's choice for the <code>wind_var</code> parameter. If the Extended Best
+Tracks wind radii are used as the source of the wind data, the sustained
+winds will only be available for cutpoints of 34 knots, 50 knots, and 64
+knots, so these values should be used (e.g., to get all counties with winds of
+34 knots or higher, you could use <code>wind_limit = 17.4</code>, with the limit
+given as a value just below 34 knots in the units meters per second).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>wind_var</code></td>
+<td>
+<p>A character string giving the wind variable to use. Choices
+are <code>"vmax_sust"</code> (maximum sustained winds; default), <code>"vmax_gust"</code>
+(maximum gust winds), <code>"sust_dur"</code> (minutes of sustained winds of 20 m / s
+or higher) and <code>"gust_dur"</code> (minutes of gust winds of 20 m / s or higher).
+If the Extended Best Tracks wind radii are used as the source of wind data,
+the <code>"gust_dur"</code> option cannot be selected.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>wind_source</code></td>
+<td>
+<p>A character string specifying the source to use for the winds. Options
+are <code>"modeled"</code>, for estimates based on running a wind model from Best
+Tracks data inputs, and <code>"ext_tracks"</code>, for estimates based on
+the wind radii in the Extended Best Tracks data. See the help files for the
+datasets <code>storm_winds</code> and <code>ext_tracks_wind</code> in the
+<code>hurricaneexposuredata</code> package for more details on each of these sources
+for wind estimates. For the gust wind estimates, these are based on applying
+a gust factor of 1.49 to the sustained wind estimates in both wind data sources.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>For more information on how wind speeds are modeled in this data,
+see the documentation for the <code>stormwindmodel</code> R package.
+</p>
+
+
+<h3>Value</h3>
+
+<p>Returns a dataframe with a row for each county-storm
+pair and with columns for:
+</p>
+
+<ul>
+<li>
+<p><code>storm_id</code>: Unique storm identifier with the storm name and year,
+separated by a hyphen(e.g., "Alberto-1988",
+"Katrina-2005")
+</p>
+</li>
+<li>
+<p><code>fips</code>: County's 5-digit Federal Information Processing Standard
+(FIPS) code
+</p>
+</li>
+<li>
+<p><code>max_sust</code>: Maximum sustained wind speed (in m / s)
+</p>
+</li>
+<li>
+<p><code>max_gust</code>: Maximum gust wind speed (in m / s)
+</p>
+</li>
+<li>
+<p><code>sust_dur</code>: Minutes sustained wind speed was 20 m / s or higher
+</p>
+</li>
+<li>
+<p><code>gust_dur</code>: Minutes gust wind speed was 20 m / s or higher (only
+returned if the modeled winds are requested using <code>wind_source</code>)
+</p>
+</li>
+<li>
+<p><code>usa_atcf_id</code>: United States Automated Tropical Cyclone Forecasting
+storm identifier
+</p>
+</li>
+<li>
+<p><code>closest_time_utc</code>: Time, in UTC, of the closest approach of the
+storm to the county's population mean center,
+based on storm tracks linearly interpolated to
+15-minute increments.
+</p>
+</li>
+<li>
+<p><code>storm_dist</code>: Minimum distance (in kilometers) between the storm's
+track and the county's population mean center.
+</p>
+</li>
+<li>
+<p><code>local_time</code>: Local time of the closest approach of the storm to the
+county's population mean center, based on storm tracks
+linearly interpolated to 15-minute increments.
+</p>
+</li>
+<li>
+<p><code>closest_date</code>: Date (based on local time) of the closest
+approach of the storm to the county's population
+mean center.
+</p>
+</li>
+</ul>
+<h3>Note</h3>
+
+<p>Only counties in states in the eastern half of the United States can
+be processed by this function. Winds are modeled at 15-minute increments, so
+all duration estimates (<code>sust_dur</code> and <code>gust_dur</code> in the output)
+will be divisible by 15.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Ensure that data package is available before running the example.
+#  If it is not, see the `hurricaneexposure` package vignette for details
+# on installing the required data package.
+if (requireNamespace("hurricaneexposuredata", quietly = TRUE)) {
+
+county_wind(counties = c("22071", "51700"),
+            start_year = 1988, end_year = 2005,
+            wind_limit = 20, wind_var = "vmax_sust")
+}
+</code></pre>
+
+
+</div>

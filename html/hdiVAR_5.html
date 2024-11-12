@@ -1,0 +1,129 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>Mstep</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>maximization step of sparse expectation-maximization algorithm for updating error standard deviations</h2>
+
+<h3>Description</h3>
+
+<p>Update <code class="reqn">\sigma_\eta,\sigma_\epsilon</code> based on estimate of A and
+conditional expecation and covariance from expectation step.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">Mstep(Y,A,EXtT,EXtt,EXtt1,is_MLE=FALSE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>Y</code></td>
+<td>
+<p>observations of time series, a p by T matrix.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>A</code></td>
+<td>
+<p>current estimate of transition matrix <code class="reqn">A</code>. If <code>is_MLE=TRUE</code>, use naive MLE of transition matrix, by conditional expecation and covariance from expecation step, to update error standard deviations.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>EXtT</code></td>
+<td>
+<p>a p by T matrix of column <code class="reqn">E[x_t | y_1,\ldots,y_T, \hat{A},\hat{\sigma}_\eta,\hat{\sigma}_\epsilon]</code> from expectation step.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>EXtt</code></td>
+<td>
+<p>a p by p by T tensor of first-two-mode slice <code class="reqn">E[x_t x_t^\top | y_1,\ldots,y_T, \hat{A},\hat{\sigma}_\eta,\hat{\sigma}_\epsilon]</code> from expectation step.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>EXtt1</code></td>
+<td>
+<p>a p by p by T-1 matrix of first-two-mode slice <code class="reqn">E[x_t x_{t+1}^\top | y_1,\ldots,y_T, \hat{A},\hat{\sigma}_\eta,\hat{\sigma}_\epsilon]</code> from expectation step.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>is_MLE</code></td>
+<td>
+<p>logic; if true, use naive MLE of transition matrix, by conditional expecation and covariance from expecation step, to update error variances. Otherwise, use input argument <code>A</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>a list of estimates of error standard deviations.
+</p>
+
+<table>
+<tr>
+<td style="text-align: left;">
+<code>sig_eta</code>  </td>
+<td style="text-align: left;">  estimate of <code class="reqn">\sigma_\eta</code>. </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+<code>sig_epsilon</code>  </td>
+<td style="text-align: left;">   estimate of <code class="reqn">\sigma_\epsilon</code>. </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+<code>A</code>  </td>
+<td style="text-align: left;">  naive MLE of transition matrix <code class="reqn">A</code> by conditional expecation and covariance from expecation step. Exist if <code>is_MLE=TRUE</code>. </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>Xiang Lyu, Jian Kang, Lexin Li
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">p= 2; Ti=10  # dimension and time
+A=diag(1,p) # transition matrix
+sig_eta=sig_epsilon=0.2 # error std
+Y=array(0,dim=c(p,Ti)) #observation t=1, ...., Ti
+X=array(0,dim=c(p,Ti)) #latent t=1, ...., T
+Ti_burnin=100 # time for burn-in to stationarity
+for (t in 1:(Ti+Ti_burnin)) {
+  if (t==1){
+    x1=rnorm(p)
+  } else if (t&lt;=Ti_burnin) { # burn in
+    x1=A%*%x1+rnorm(p,mean=0,sd=sig_eta)
+  } else if (t==(Ti_burnin+1)){ # time series used for learning
+    X[,t-Ti_burnin]=x1
+    Y[,t-Ti_burnin]=X[,t-Ti_burnin]+rnorm(p,mean=0,sd=sig_epsilon)
+  } else {
+    X[,t- Ti_burnin]=A%*%X[,t-1- Ti_burnin]+rnorm(p,mean=0,sd=sig_eta)
+    Y[,t- Ti_burnin]=X[,t- Ti_burnin]+rnorm(p,mean=0,sd=sig_epsilon)
+  }
+}
+
+# expectation step
+Efit=Estep(Y,A,sig_eta,sig_epsilon,x1,diag(1,p))
+EXtT=Efit[["EXtT"]]
+EXtt=Efit[["EXtt"]]
+EXtt1=Efit[["EXtt1"]]
+# maximization step for error standard deviations
+Mfit=Mstep(Y,A,EXtT,EXtt,EXtt1)
+
+
+
+</code></pre>
+
+
+</div>

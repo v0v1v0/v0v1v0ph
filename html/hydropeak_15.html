@@ -1,0 +1,105 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>flow</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>'flow' S3 Class for Flow Rate Time Series</h2>
+
+<h3>Description</h3>
+
+<p>The function <code>flow()</code> creates a flow rate time series object
+which is formatted to be compatible with the functions in the <span class="pkg">hydropeak</span>
+package.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">flow(
+  x,
+  format = "%d.%m.%Y %H:%M",
+  tz = "Etc/GMT-1",
+  cols = c(1, 2, 3),
+  steplength = 15,
+  full = TRUE
+)
+
+validate_flow(x)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>Data frame which contains at least a column with an ID of the gauging
+station, a column with date-time values in character representation and a
+column with flow rates</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>format</code></td>
+<td>
+<p>Character string giving the date-time format of the date-time
+column in the input data frame  (default: <code>dd.mm.YYYY HH:MM</code>)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tz</code></td>
+<td>
+<p>Character string specifying the time zone to be used for the conversion
+(default: <code>Etc/GMT-1</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cols</code></td>
+<td>
+<p>Integer vector specifying column indices in the input data frame
+which contain gauging station ID, date-time and flow rate to be renamed.
+The default indices are 1 (ID), 2 (date-time) and 3 (flow rate, Q).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>steplength</code></td>
+<td>
+<p>Numeric value which specifies the distance between (equispaced)
+time steps in minutes. (default: <code>15</code>, which refers to 15 minutes).
+Non-equispaced time steps are not supported and missing time steps are
+imputed if argument <code>full</code> is set to <code>TRUE</code> (default), Q values
+are assumed to be <code>NA</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>full</code></td>
+<td>
+<p>A logical. If <code>TRUE</code> (default) imputes missing time step values
+so the time series is complete. Imputed Q values are set to NA. It should
+only be set to <code>FALSE</code>, if it is known, that the time series is complete.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>Returns a <code>flow</code> object which inherits from data frame (time series).
+It contains at least a gauging station ID column (<code>ID</code>) converted to
+character values, a date-time column (<code>Time</code>) converted to class "POSIXlt"
+(see <code>base::strptime()</code>) and a flow rate column
+(<code>Q</code>), which is converted to numeric values. The <code>flow()</code> object
+ensures that input flow fluctuation time series data can be processed with
+the functions in the <span class="pkg">hydropeak</span> package. Therefore, it is mandatory
+to provide the correct indices (see argument <code>cols</code>) and the correct
+date-time format (see argument <code>format</code>) of the input data frame.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(Q)
+Q &lt;- flow(Q)
+</code></pre>
+
+
+</div>

@@ -1,0 +1,127 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hyper2</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Basic functions in the hyper2 package
+</h2>
+
+<h3>Description</h3>
+
+<p>Basic functions in the hyper2 package
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hyper2(L=list(), d=0, pnames)
+## S3 method for class 'hyper2'
+brackets(H)
+## S3 method for class 'hyper2'
+powers(H)
+## S3 method for class 'hyper2'
+pnames(H)
+## S3 method for class 'suplist'
+pnames(H)
+size(H)
+as.hyper2(L,d,pnames)
+is.hyper2(H)
+is_valid_hyper2(L,d,pnames)
+is_constant(H)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>H</code></td>
+<td>
+<p>A hyper2 object</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>L</code></td>
+<td>
+<p>A list of character vectors whose elements specify
+the brackets of a hyper2 object</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>d</code></td>
+<td>
+<p>A vector of powers; <code>hyper2()</code> recycles <em>only if</em>
+<code>d</code> is of length 1</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pnames</code></td>
+<td>
+
+<p>A character vector specifying the names of <code class="reqn">p_1</code> through <code class="reqn">p_n</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>These are the basic functions of the hyper2 package.  Function
+<code>hyper()</code> is the low-level creator function; <code>as.hyper2()</code> is
+a bit more user-friendly and attempts to coerce its arguments into a
+suitable form; for example, a matrix is interpreted as rows of brackets.
+</p>
+<p>Functions <code>pnames()</code> and <code>pnames&lt;-()</code> are the accessor and
+setter methods for the player names.  Length-zero character strings are
+acceptable player names.  The setter method <code>pnames&lt;-()</code> can be
+confusing.  Idiom such as <code>pnames(H) &lt;- value</code> does not change the
+likelihood function of <code>H</code> (except possibly its domain).  When
+called, it changes the <code>pnames</code> internal vector, and will throw an
+error if any element of <code>c(brackets(H))</code> is not present in
+<code>value</code>.  It has two uses: firstly, to add players who do not
+appear in the brackets; and secondly to rearrange the <code>pnames</code>
+vector (the canonical use-case is <code>pnames(H) &lt;- rev(pnames(H))</code>).
+If you want to change the player names, use <code>psubs()</code> to substitute
+players for other players.
+</p>
+<p>Function <code>is_valid_hyper2()</code> tests for valid input, returning a
+Boolean.  This function returns an error if a bracket contains a
+repeated element, as in <code>hyper2(list(c("a","a")),1)</code>.
+</p>
+<p>Note that it is perfectly acceptable to have an element of
+<code>pnames</code> that is not present in the likelihood function (this would
+correspond to having no information about that particular player).
+</p>
+<p>Function <code>size()</code> returns the (nominal) length <code class="reqn">n</code> of
+nonnegative vector <code class="reqn">p=\left(p_1,\ldots,p_n\right)</code>
+where <code class="reqn">p_1+\cdots+p_n=1</code>.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Robin K. S. Hankin</p>
+
+
+<h3>See Also</h3>
+
+<p><code>Ops.hyper2</code>,
+<code>Extract.hyper2</code>,
+<code>loglik</code>,
+<code>hyper2-package</code>
+<code>psubs</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">o &lt;- hyper2(list("a","b","c",c("a","b"),letters[1:3]),1:5) 
+
+# Verify that the MLE is invariant under reordering
+pnames(icons) &lt;- rev(pnames(icons))
+maxp(icons) - icons_maxp # should be small
+
+</code></pre>
+
+
+</div>

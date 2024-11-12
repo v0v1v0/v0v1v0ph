@@ -1,0 +1,259 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>haplo.scan</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Search for a trait-locus by sliding a fixed-width window over each marker locus
+and scanning all possible haplotype lengths within the window
+</h2>
+
+<h3>Description</h3>
+
+<p>Search for haplotypes that have the strongest association with a
+binary trait (typically case/control status) by sliding a fixed-width
+window over each marker locus and scanning all possible haplotype
+lengths within the window. For each haplotype length, a score
+statistic is computed to compare the set of haplotypes with a given
+length between cases versus controls. The locus-specific score statistic 
+is the maximum score statistic calculated on loci containing
+that locus.  The maximum score statistic over all haplotype lengths
+within all possible windows is used for a global test for association.
+Permutations of the trait are used to compute p-values.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">haplo.scan(y, geno, width=4, miss.val=c(0, NA),
+          em.control=haplo.em.control(),
+          sim.control=score.sim.control())
+
+haplo.scan.obs(y, em.obj, width)
+
+haplo.scan.sim(y.reord, save.lst, nloci)
+
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+
+<p>Vector of binary trait values, must be 1 for cases and 0 for controls.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>y.reord</code></td>
+<td>
+
+<p>Same as y, except the order is permuted
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>geno</code></td>
+<td>
+
+<p>Matrix of alleles, such that each locus has a pair of adjacent
+columns of alleles, and the order of columns corresponds to the
+order of loci on a chromosome. If there are K loci, then 
+ncol(geno) = 2*K. Rows represent alleles for each subject.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>width</code></td>
+<td>
+
+<p>Width of sliding the window
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>miss.val </code></td>
+<td>
+
+<p>Vector of codes for missing values of alleles
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>em.control </code></td>
+<td>
+
+<p>A list of control parameters to determine how to perform the EM
+algorithm for estimating haplotype frequencies when phase is  
+unknown. The list is created by the function haplo.em.control -
+see this function for more details.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sim.control </code></td>
+<td>
+
+<p>A list of control parameters to determine how simulations are
+performed for simulated p-values. The list is created by the
+function score.sim.control and the default values of this
+function can be changed as desired. See score.sim.control for
+details.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>em.obj</code></td>
+<td>
+
+<p>Object returned from haplo.em, performed on geno
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>save.lst</code></td>
+<td>
+
+<p>Information on haplotypes needed for haplo.scan.sim, already
+calculated in haplo.scan
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nloci</code></td>
+<td>
+
+<p>number of markers
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Search for a region for which the haplotypes have the strongest
+association with a binary trait by sliding a window of fixed width
+over each marker locus, and considering all haplotype lengths within
+each window. To acount for unknown linkage phase, the function haplo.em is
+called prior to scanning, to create a list of haplotype pairs and 
+posterior probabilities. To illustrate the scanning, consider a 10-locus
+dataset. When placing a window of width 3 over locus 5, the possible 
+haplotype lengths that contain locus 5 are three (loci 3-4-5,
+4-5-6, and 5-6-7), two (loci 4-5, and 5-6) and one (locus 5).  
+For each of these loci subsets a score statistic is computed, which is
+based on the difference between the mean vector of haplotype counts
+for cases and that for controls. The maximum of these score
+statistics, over all possible haplotype lengths within a window, is 
+the locus-specific test statistic. The global test statistic is the 
+maximum over all computed score statistics. To compute p-values, 
+the case/control status is randomly permuted.  Simulations are
+performed until precision criteria are met for all p-values; the
+criteria are controlled by score.sim.control. See the note for long run
+times.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A list that has class haplo.scan, which contains the following items:
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>call</code></td>
+<td>
+
+<p>The call to haplo.scan
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>scan.df</code></td>
+<td>
+
+<p>A data frame containing the maximum test statistic for each window
+around each locus, and its simulated p-value.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>max.loc</code></td>
+<td>
+
+<p>The loci (locus) which contain(s) the maximum observed test statistic
+over all haplotype lengths and all windows.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>globalp</code></td>
+<td>
+
+<p>A p-value for the significance of the global maximum statistic.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nsim</code></td>
+<td>
+
+<p>Number of simulations performed
+</p>
+</td>
+</tr>
+</table>
+<h3>Note</h3>
+
+<p>For datasets with many estimated haplotypes, the run-time can be very long.
+</p>
+
+
+<h3>References</h3>
+
+
+<dl>
+<dt>Cheng et al-1</dt>
+<dd>
+<p>Cheng R, Ma JZ, Wright FA, Lin S, Gau X, Wang
+D, Elston RC, Li MD. "Nonparametric disequilibrium mapping of
+functional sites using haplotypes of multiple tightly linked
+single-nucleotide polymorphism markers". Genetics 164
+(2003):1175-1187.</p>
+</dd> 
+<dt>Cheng et al-2</dt>
+<dd>
+<p>Cheng R, Ma JZ, Elston RC, Li MD.  "Fine Mapping Functional Sites or
+Regions from Case-Control Data Using Haplotypes of Multiple
+Linked SNPs."  Annals of Human Genetics 69 (2005): 102-112. 
+</p>
+</dd>
+</dl>
+<h3>See Also</h3>
+
+<p><code>haplo.em</code>,
+<code>haplo.em.control</code>,
+<code>score.sim.control</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">  # create a random genotype matrix with 10 loci, 50 cases, 50 controls
+  set.seed(1)
+  tmp &lt;- ifelse(runif(2000)&gt;.3, 1, 2)
+  geno &lt;- matrix(tmp, ncol=20)
+  y &lt;- rep(c(0,1),c(50,50))
+
+  # search 10-locus region, typically don't limit the number of
+  # simulations, but run time can get long with many simulations
+
+  scan.obj &lt;- haplo.scan(y, geno, width=3,
+                sim.control = score.sim.control(min.sim=10, max.sim=20))
+
+  print(scan.obj)
+</code></pre>
+
+
+</div>

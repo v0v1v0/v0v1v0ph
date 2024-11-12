@@ -1,0 +1,164 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>make_N, make_Ni, make_Y, make_Yi</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Occurance and Exposure on grids</h2>
+
+<h3>Description</h3>
+
+<p>Auxiliary functions that help automate the process of calculating integrals with occurances or exposure processes.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">make_N(data, data.id, breaks_X, breaks_s, ss, XX, delta)
+make_Ni(breaks_s, size_s_grid, ss, delta, n)
+make_Y(data, data.id, X_lin, breaks_X, breaks_s,
+        size_s_grid, size_X_grid, int_s, int_X, event_time = 'years', n)
+make_Yi(data, data.id, X_lin, breaks_X, breaks_s,
+        size_s_grid, size_X_grid, int_s,int_X, event_time = 'years', n)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>A data frame of time dependent data points.  Missing values are allowed.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>data.id</code></td>
+<td>
+<p>An id data frame obtained from <code>to_id</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>breaks_X</code></td>
+<td>
+<p>Marker value grid points where the function will be evaluated.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>breaks_s</code></td>
+<td>
+<p>Time value grid points where the function will be evaluated.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ss</code></td>
+<td>
+<p>Vector with event times.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>XX</code></td>
+<td>
+<p>Vector of last observed marker values.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>delta</code></td>
+<td>
+<p>0-1 vector of whether events happened.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>size_s_grid</code></td>
+<td>
+<p>Size of the time grid.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>size_X_grid</code></td>
+<td>
+<p>Size of the marker grid.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n</code></td>
+<td>
+<p>Number of individuals.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>X_lin</code></td>
+<td>
+<p>Linear interpolation of observed marker values evaluated on the marker grid.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>int_s</code></td>
+<td>
+<p>Position of the observed time values on the time grid.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>int_X</code></td>
+<td>
+<p>Position of the linear interpolated marker values on the marker grid.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>event_time</code></td>
+<td>
+<p>String of the column name with the event times.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Implements matrices for the computation of integrals with occurences and exposures of the form
+</p>
+<p style="text-align: center;"><code class="reqn">\int f(s)Z(s)Z(s+t)ds, \int f(s) Z(s)ds, \int f(s) dN(s).</code>
+</p>
+
+<p>where <code class="reqn">N</code> is a 0-1 counting process, <code class="reqn">Z</code> the exposure and <code class="reqn">f</code> an arbitrary function.
+</p>
+
+
+<h3>Value</h3>
+
+<p>The functions <code>make_N</code> and <code>make_Y</code> return a matrix on the time grid and marker grid for occurence and exposure, respectively, while <code>make_Ni</code> and <code>make_Yi</code> return a matrix on the time grid for evey individual again for occurence and exposure, respectively.
+</p>
+
+
+<h3>See Also</h3>
+
+ <p><code>h_xt, g_xt, get_alpha </code></p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">pbc2_id = to_id(pbc2)
+size_s_grid &lt;- size_X_grid &lt;- 100
+n = max(as.numeric(pbc2$id))
+s = pbc2$year
+X = pbc2$serBilir
+XX = pbc2_id$serBilir
+ss &lt;- pbc2_id$years
+delta &lt;- pbc2_id$status2
+br_s = seq(0, max(s), max(s)/( size_s_grid-1))
+br_X = seq(min(X), max(X), (max(X)-min(X))/( size_X_grid-1))
+
+X_lin = lin_interpolate(br_s, pbc2_id$id, pbc2$id, X, s)
+
+int_X &lt;- findInterval(X_lin, br_X)
+int_s = rep(1:length(br_s), n)
+
+N &lt;- make_N(pbc2, pbc2_id, br_X, br_s, ss, XX, delta)
+Y &lt;- make_Y(pbc2, pbc2_id, X_lin, br_X, br_s,
+            size_s_grid, size_X_grid, int_s, int_X, event_time = 'years', n)
+Yi &lt;- make_Yi(pbc2, pbc2_id, X_lin, br_X, br_s,
+              size_s_grid, size_X_grid, int_s, int_X, event_time = 'years', n)
+Ni  &lt;- make_Ni(br_s, size_s_grid, ss, delta, n)
+
+</code></pre>
+
+
+</div>

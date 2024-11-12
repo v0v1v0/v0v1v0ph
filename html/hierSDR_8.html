@@ -1,0 +1,135 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>simulate_data</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Simulate data with hierarchical subspaces</h2>
+
+<h3>Description</h3>
+
+<p>Simulates data with hierarchical subspaces. Data are generated with two factors that induce heterogeneity
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">simulate_data(
+  nobs,
+  nvars,
+  x.type = c("continuous", "some_categorical"),
+  sd.y = 1,
+  rho = 0.5,
+  model = c("1", "2", "3")
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>nobs</code></td>
+<td>
+<p>positive integer for the sample size per subpopulation</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nvars</code></td>
+<td>
+<p>positive integer for the dimension</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x.type</code></td>
+<td>
+<p>variable type for covariates, either <code>"continuous"</code> (where the covariates are multivariate normal with a variance-matrix
+with AR-1 form with parameter <code>rho</code>) or <code>"some_categorical"</code> (where half covariates are continuous and
+the other half are binary with dependencies on the continuous covariates)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sd.y</code></td>
+<td>
+<p>standard deviation of responsee</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rho</code></td>
+<td>
+<p>correlation parameter for AR-1 covariance structure for continuous covariates</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>model</code></td>
+<td>
+<p>model number used, either "1", "2", or "3", each corresponds to a different outcome model setting</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A list with the following elements
+</p>
+
+<ul>
+<li>
+<p> x a matrix of covariates with number of rows equal to the total sample size and columns equal to the number of variables
+</p>
+</li>
+<li>
+<p> z a matrix with number of rows equal to the total sample size and columns as dummy variables indicating presence of a stratifying factor
+</p>
+</li>
+<li>
+<p> y a vector of all responses
+</p>
+</li>
+<li>
+<p> beta a list of the true sufficient dimension reduction matrices, one for each subpopulation
+</p>
+</li>
+<li>
+<p> z.combinations all possible combinations of the stratifying factors <code>z</code>
+</p>
+</li>
+<li>
+<p> snr scalar the observed signal-to-noise ratio for the response
+</p>
+</li>
+<li>
+<p> d.correct the true dimensions of the dimension reduction spaces
+</p>
+</li>
+</ul>
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+library(hierSDR)
+
+set.seed(123)
+dat &lt;- simulate_data(nobs = 100, nvars = 6,
+                     x.type = "some_categorical",
+                     sd.y = 1, model = 2)
+
+x &lt;- dat$x ## covariates
+z &lt;- dat$z ## factor indicators
+y &lt;- dat$y ## response
+
+dat$beta ## true coefficients that generate the subspaces
+
+dat$snr ## signal-to-noise ratio
+
+str(x)
+str(z)
+
+dat$z.combinations ## what combinations of z represent different subpops
+
+## correct structural dimensions:
+dat$d.correct
+
+
+</code></pre>
+
+
+</div>

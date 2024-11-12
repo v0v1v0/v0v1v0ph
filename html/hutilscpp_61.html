@@ -1,0 +1,179 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>which_first</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Where does a logical expression first return <code>TRUE</code>?</h2>
+
+<h3>Description</h3>
+
+<p>A faster and safer version of <code>which.max</code> applied
+to simple-to-parse logical expressions.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">which_first(
+  expr,
+  verbose = FALSE,
+  reverse = FALSE,
+  sexpr,
+  eval_parent_n = 1L,
+  suppressWarning = getOption("hutilscpp_suppressWarning", FALSE),
+  use.which.max = FALSE
+)
+
+which_last(
+  expr,
+  verbose = FALSE,
+  reverse = FALSE,
+  suppressWarning = getOption("hutilscpp_suppressWarning", FALSE)
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>expr</code></td>
+<td>
+<p>An expression, such as <code>x == 2</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+
+<dl>
+<dt>
+<code>logical(1)</code>, default: <code>FALSE</code>
+</dt>
+<dd>
+<p>If <code>TRUE</code> a message is emitted
+if <code>expr</code> could not be handled in the advertised way.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>reverse</code></td>
+<td>
+
+<dl>
+<dt>
+<code>logical(1)</code>, default: <code>FALSE</code>
+</dt>
+<dd>
+<p>Scan <code>expr</code> in reverse.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sexpr</code></td>
+<td>
+<p>Equivalent to <code>substitute(expr)</code>. For internal use.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>eval_parent_n</code></td>
+<td>
+<p>Passed to <code>eval.parent</code>, the environment in which
+<code>expr</code> is evaluated.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>suppressWarning</code></td>
+<td>
+<p>Either a <code>FALSE</code> or <code>TRUE</code>, whether or not
+warnings should be suppressed. Also supports a string input which suppresses a
+warning if it matches as a regular expression.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>use.which.max</code></td>
+<td>
+<p>If <code>TRUE</code>, <code>which.max</code> is dispatched immediately,
+even if <code>expr</code> would be amenable to separation. Useful when evaluating
+many small <code>expr</code>'s when these are known in advance.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>If the <code>expr</code> is of the form <code>LHS &lt;operator&gt; RHS</code>
+and <code>LHS</code> is a single symbol, <code>operator</code> is one of
+<code>==</code>,  <code>!=</code>, <code>&gt;</code>, <code>&gt;=</code>, <code>&lt;</code>, <code>&lt;=</code>,
+<code>%in%</code>,
+or
+<code>%between%</code>,
+and <code>RHS</code> is numeric, then <code>expr</code> is not
+evaluated directly; instead, each element of <code>LHS</code> is compared
+individually.
+</p>
+<p>If <code>expr</code> is not of the above form, then <code>expr</code> is evaluated
+and passed to <code>which.max</code>.
+</p>
+<p>Using this function can be significantly faster than the alternatives
+when the computation
+of <code>expr</code> would be expensive, though the difference is only likely to
+be clear when <code>length(x)</code> is much larger than 10 million.
+But even for smaller vectors, it has the benefit of returning
+<code>0L</code> if none of the values in <code>expr</code> are <code>TRUE</code>, unlike
+<code>which.max</code>.
+</p>
+<p>Compared to <code>Position</code> for an appropriate
+choice of <code>f</code> the speed of <code>which_first</code> is not much faster
+when the expression is <code>TRUE</code> for some position. However, <code>which_first</code>
+is faster when all elements of <code>expr</code> are <code>FALSE</code>.
+Thus <code>which_first</code> has a smaller worst-case time than the
+alternatives for most <code>x</code>.
+</p>
+<p>Missing values on the RHS are handled specially.
+<code>which_first(x %between% c(NA, 1))</code> for example is equivalent to
+<code>which_first(x &lt;= 1)</code>, as in <code>data.table::between</code>.
+</p>
+
+
+<h3>Value</h3>
+
+<p>The same as <code>which.max(expr)</code> or <code>which(expr)[1]</code> but returns <code>0L</code>
+when <code>expr</code> has no <code>TRUE</code> values.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+N &lt;- 1e5
+# N &lt;- 1e8  ## too slow for CRAN
+
+# Two examples, from slowest to fastest,
+# run with N = 1e8 elements
+
+                                       # seconds
+x &lt;- rep_len(runif(1e4, 0, 6), N)
+bench_system_time(x &gt; 5)
+bench_system_time(which(x &gt; 5))        # 0.8
+bench_system_time(which.max(x &gt; 5))    # 0.3
+bench_system_time(which_first(x &gt; 5))  # 0.000
+
+## Worst case: have to check all N elements
+x &lt;- double(N)
+bench_system_time(x &gt; 0)
+bench_system_time(which(x &gt; 0))        # 1.0
+bench_system_time(which.max(x &gt; 0))    # 0.4  but returns 1, not 0
+bench_system_time(which_first(x &gt; 0))  # 0.1
+
+x &lt;- as.character(x)
+# bench_system_time(which(x == 5))     # 2.2
+bench_system_time(which.max(x == 5))   # 1.6
+bench_system_time(which_first(x == 5)) # 1.3
+
+</code></pre>
+
+
+</div>

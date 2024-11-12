@@ -1,0 +1,77 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>data_to_hierarchical</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Helper to transform data frame for treemap/sunburst highcharts format</h2>
+
+<h3>Description</h3>
+
+<p>Helper to transform data frame for treemap/sunburst highcharts format
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">data_to_hierarchical(
+  data,
+  group_vars,
+  size_var,
+  colors = getOption("highcharter.color_palette")
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>data frame containing variables to organize each level of
+the treemap.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>group_vars</code></td>
+<td>
+<p>Variables to generate treemap levels.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>size_var</code></td>
+<td>
+<p>Variable to aggregate.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>colors</code></td>
+<td>
+<p>Color to chart every item in the first level.</p>
+</td>
+</tr>
+</table>
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+
+library(dplyr)
+data(gapminder, package = "gapminder")
+
+gapminder_2007 &lt;- gapminder::gapminder %&gt;%
+  filter(year == max(year)) %&gt;%
+  mutate(pop_mm = round(pop / 1e6))
+
+dout &lt;- data_to_hierarchical(gapminder_2007, c(continent, country), pop_mm)
+
+hchart(dout, type = "sunburst")
+
+hchart(dout, type = "treemap")
+
+## End(Not run)
+
+</code></pre>
+
+
+</div>

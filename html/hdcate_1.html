@@ -1,0 +1,94 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>HDCATE</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>High-Dimensional Conditional Average Treatment Effects (HDCATE) Estimator</h2>
+
+<h3>Description</h3>
+
+<p>Use a two-step procedure to estimate the conditional average treatment effects (CATE) with potentially high-dimensional covariate(s).
+Run <code>browseVignettes('hdcate')</code> to browse the user manual of this package.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">HDCATE(data, y_name, d_name, x_formula)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>data frame of the observed data</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>y_name</code></td>
+<td>
+<p>variable name of the observed outcomes</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>d_name</code></td>
+<td>
+<p>variable name of the treatment indicators</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x_formula</code></td>
+<td>
+<p>formula of the covariates</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>An initialized <code>HDCATE</code> model (object), ready for estimation.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># get simulation data
+n_obs &lt;- 500  # Num of observations
+n_var &lt;- 100  # Num of observed variables
+n_rel_var &lt;- 4  # Num of relevant variables
+data &lt;- HDCATE.get_sim_data(n_obs, n_var, n_rel_var)
+# conditional expectation model is misspecified
+x_formula &lt;- paste(paste0('X', c(2:n_var)), collapse ='+')
+# for example, and alternatively, the propensity score model is misspecified
+# x_formula &lt;- paste(paste0('X', c(1:(n_var-1))), collapse ='+')
+
+# Example 1: full-sample estimator
+# create a new HDCATE model
+model &lt;- HDCATE(data=data, y_name='Y', d_name='D', x_formula=x_formula)
+
+# estimate HDCATE function, inference, and plot
+HDCATE.set_condition_var(model, 'X2', min=-1, max=1, step=0.01)
+
+HDCATE.fit(model)
+HDCATE.inference(model)
+HDCATE.plot(model)
+
+
+# Example 2: cross-fitting estimator
+# change above estimator to cross-fitting mode, 5 folds, for example.
+HDCATE.use_cross_fitting(model, k_fold=5)
+
+# estimate HDCATE function, inference, and plot
+HDCATE.set_condition_var(model, 'X2', min=-1, max=1, step=0.01)
+
+HDCATE.fit(model)
+HDCATE.inference(model)
+HDCATE.plot(model)
+
+</code></pre>
+
+
+</div>

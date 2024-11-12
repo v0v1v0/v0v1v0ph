@@ -1,0 +1,121 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>occupancy_to_intersection</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Get the intersection of an occupancy object
+</h2>
+
+<h3>Description</h3>
+
+<p>The <code>occupancy_to_intersection()</code> function is used to get the intersection of hypervolumes of an object generated with the occupancy routine.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">occupancy_to_intersection(hv_list, method = "all", m = 2, tol = 1e-10)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>hv_list</code></td>
+<td>
+
+<p>A <code>HypervolumeList</code> generated with <code>hypervolume_n_occupancy()</code>,  <code>hypervolume_n_occupancy_test()</code>, <code>occupancy_to_union()</code>, <code>occupancy_to_unshared()</code> or <code>occupancy_filter()</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+
+<p>If <code>all</code> compute the intersection among all the hypervolumes in <code>hv_list</code>. If <code>n_wise</code> compute the intersection for each n_wise combination of hypervolumes in <code>hv_list</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>m</code></td>
+<td>
+
+<p>Number of elements to choose. Default to 2 (pairwise comparisons). This argument is ignored when <code>method</code> is set to <code>all</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tol</code></td>
+<td>
+
+<p>Set the tolerance for reconstructing whole volume. See details.
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The <code>occupancy_to_intersection()</code> function takes as input a <code>HypervolumeList</code> generated with an occupancy function (check <code>See Also</code>) and returns a <code>Hypervolume</code> or <code>HypervolumeList</code> depending on <code>method</code>. When <code>method = "all"</code> the <code>occupancy_to_intersection()</code> function returns a <code>Hypervolume</code> representing the intersection of all the hypervolumes in <code>hv_list</code>. When <code>method = "n_wise"</code> a <code>HypervolumeList</code> in which each hypervolume represent the intersection of a combination of the hypervolumes in <code>hv_list</code> is returned. The number of hypervolumes for each combination is set with the argument <code>m</code>. Argument <code>m</code> can not be higher than the number of hypervolumes in <code>hv_list</code> and lower than 2. <br>
+The <code>occupancy_to_intersection()</code> function attempts to reconstruct the volume of the intersection from the <code>hv_list</code> provided by the user. At first, the volume of the union of hypervolumes is calculated for each hypervolume in <code>hv_list</code> as the the ratio between the total number of random points and the number of random points of the ith hypervolume of <code>hv_list</code>, multiplied by the volume of the ith hypervolume of <code>hv_list</code>. This step results in a number of reconstructed volumes equal to the number of hypervolumes in the jth bootstrapped occupancy_object. Reconstructed volumes are then compared among each other to ensure the consistency of the reconstruction. To do this, the distance among reconstructed volumes is calculated with the <code>dist()</code> function of the <code>stats</code> package. If at least one of the distances is greater than <code>tol</code> the computation is stopped and some suggestions are returned. The volume of the intersection is then calculated as the ratio between the number of random points of the intersection and the total number of random points, multiplied by the volume of the union of hypervolumes.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A <code>Hypervolume-class</code> or <code>HypervolumeList-class</code> object.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>hypervolume_n_occupancy</code>, <code>hypervolume_n_occupancy_test</code>, <code>occupancy_to_union</code>,
+<code>occupancy_to_unshared</code>, <code>occupancy_filter</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+data(penguins,package='palmerpenguins')
+penguins_no_na = as.data.frame(na.omit(penguins))
+
+# split the dataset on species and sex
+penguins_no_na_split = split(penguins_no_na, 
+                  paste(penguins_no_na$species, penguins_no_na$sex, sep = "_"))
+
+# calculate the hypervolume for each element of the splitted dataset
+hv_list = mapply(function(x, y) 
+  hypervolume_gaussian(x[, c("bill_length_mm", "flipper_length_mm")],
+                       samples.per.point=100, name = y), 
+  x = penguins_no_na_split, 
+  y = names(penguins_no_na_split))
+
+
+# transform the list into an HypervolumeList
+hv_list = hypervolume_join(hv_list)
+
+# calculate occupancy based on sex
+hv_occupancy_list_sex = hypervolume_n_occupancy(hv_list, 
+                    classification = rep(c("Adelie", "Chinstrap", "Gentoo"), 2))
+
+# get the hypervolume of intersection
+hv_occupancy_sex_intersection &lt;- occupancy_to_intersection(hv_occupancy_list_sex)
+plot(hv_occupancy_sex_intersection)
+
+# get hypervolumes with the intersection among 3 or 2 combinations of hypervolumes
+hv_occ_sex_intersection_3 &lt;- occupancy_to_intersection(hv_occupancy_list_sex,
+                                                       method = "n_wise",
+                                                       m = 3)
+hv_occ_intersection_2 &lt;- occupancy_to_intersection(hv_occupancy_list_sex,
+                                                   method = "n_wise",
+                                                   m = 2)
+
+
+## End(Not run)
+</code></pre>
+
+
+</div>

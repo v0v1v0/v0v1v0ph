@@ -1,0 +1,109 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hdd</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Hard drive data set</h2>
+
+<h3>Description</h3>
+
+<p>This function connects to a hard drive data set (HDD). You can access the hard
+drive data in a similar way to a <code>data.table</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hdd(dir)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table><tr style="vertical-align: top;">
+<td><code>dir</code></td>
+<td>
+<p>The directory where the hard drive data set is.</p>
+</td>
+</tr></table>
+<h3>Details</h3>
+
+<p>HDD has been created to deal with out of memory data sets. The data set exists
+in the hard drive, split in multiple files – each file being workable in memory.
+</p>
+<p>You can perform extraction and manipulation operations as with a regular data
+set with <code>sub-.hdd</code>. Each operation is performed chunk-by-chunk
+behind the scene.
+</p>
+<p>In terms of performance, working with complete data sets in memory will always
+be faster. This is because read/write operations on disk are order of magnitude
+slower than read/write in memory. However, this might be the only way to deal
+with out of memory data.
+</p>
+
+
+<h3>Value</h3>
+
+<p>This function returns an object of class <code>hdd</code> which is linked to
+a folder on disk containing the data. The data is not loaded in R.
+</p>
+<p>This object is not intended to be interacted with directly as a regular list. Please use the methods
+<code>sub-.hdd</code> and <code>cash-.hdd</code> to extract the data.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Laurent Berge
+</p>
+
+
+<h3>See Also</h3>
+
+<p>See <code>hdd</code>, <code>sub-.hdd</code> and <code>cash-.hdd</code>
+for the extraction and manipulation of out of memory data. For importation of
+HDD data sets from text files: see <code>txt2hdd</code>.
+</p>
+<p>See <code>hdd_slice</code> to apply functions to chunks of data (and create
+HDD objects) and <code>hdd_merge</code> to merge large files.
+</p>
+<p>To create/reshape HDD objects from memory or from other HDD objects, see
+<code>write_hdd</code>.
+</p>
+<p>To display general information from HDD objects: <code>origin</code>,
+<code>summary.hdd</code>, <code>print.hdd</code>,
+<code>dim.hdd</code> and <code>names.hdd</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+# Toy example with iris data
+iris_path = tempfile()
+fwrite(iris, iris_path)
+
+# destination path
+hdd_path = tempfile()
+
+# reading the text file with 50 rows chunks:
+txt2hdd(iris_path, dirDest = hdd_path, rowsPerChunk = 50)
+
+# creating a HDD object
+base_hdd = hdd(hdd_path)
+
+# Summary information on the whole data set
+summary(base_hdd)
+
+# Looking at it like a regular data.frame
+print(base_hdd)
+dim(base_hdd)
+names(base_hdd)
+
+
+
+</code></pre>
+
+
+</div>

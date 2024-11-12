@@ -1,0 +1,130 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>connection</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>HERE Public Transit API: Transit Route</h2>
+
+<h3>Description</h3>
+
+<p>Route public transport connections with geometries (<code>LINESTRING</code>) between pairs of points using the HERE 'Public Transit' API.
+Two modes are provided:
+</p>
+
+<ul>
+<li>
+<p><code>summary = FALSE</code>: The public transport connections are returned as mulitple sections with the same vehicle and transport mode. Each section has a detailed route geometry.
+</p>
+</li>
+<li>
+<p><code>summary = TRUE</code>: A summary of the connections is retrieved, where each connection is represented as one row with a unified and simplified geometry.
+</p>
+</li>
+</ul>
+<h3>Usage</h3>
+
+<pre><code class="language-R">connection(
+  origin,
+  destination,
+  datetime = Sys.time(),
+  arrival = FALSE,
+  results = 3,
+  transfers = -1,
+  transport_mode = NULL,
+  summary = FALSE,
+  url_only = FALSE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>origin</code></td>
+<td>
+<p><code>sf</code> object, the origin locations of geometry type <code>POINT</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>destination</code></td>
+<td>
+<p><code>sf</code> object, the destination locations of geometry type <code>POINT</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>datetime</code></td>
+<td>
+<p><code>POSIXct</code> object, datetime for the departure (or arrival if <code>arrival = TRUE</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>arrival</code></td>
+<td>
+<p>boolean, calculate connections for arrival at the defined time (<code>default = FALSE</code>)?</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>results</code></td>
+<td>
+<p>numeric, maximum number of suggested public transport routes (Valid range: 1 and 6).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>transfers</code></td>
+<td>
+<p>numeric, maximum number of transfers allowed per route (Valid range: -1 and 6, whereby the <code>default = -1</code> allows for unlimited transfers).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>transport_mode</code></td>
+<td>
+<p>character, enable or disable (<code>"-"</code> prefix) transport modes. Note: Do not enable and disable modes at the same time (<code>default = NULL</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>summary</code></td>
+<td>
+<p>boolean, return a summary of the public transport connections instead of the sections of the routes (<code>default = FALSE</code>)?</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>url_only</code></td>
+<td>
+<p>boolean, only return the generated URLs (<code>default = FALSE</code>)?</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>An <code>sf</code> object containing the requested routes.
+</p>
+
+
+<h3>References</h3>
+
+<p><a href="https://developer.here.com/documentation/public-transit/dev_guide/routing/index.html">HERE Public Transit API: Transit Route</a>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Provide an API Key for a HERE project
+set_key("&lt;YOUR API KEY&gt;")
+
+# Connection sections
+sections &lt;- connection(
+  origin = poi[3:4, ], destination = poi[5:6, ],
+  summary = FALSE, url_only = TRUE
+)
+
+# Connection summary
+summary &lt;- connection(
+  origin = poi[3:4, ], destination = poi[5:6, ],
+  summary = TRUE, url_only = TRUE
+)
+</code></pre>
+
+
+</div>

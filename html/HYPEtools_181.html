@@ -1,0 +1,132 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>WriteXobs</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Write an 'Xobs.txt' File</h2>
+
+<h3>Description</h3>
+
+<p><code>WriteXobs</code> writes or appends an observation data set to an Xobs file.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">WriteXobs(
+  x,
+  filename,
+  append = FALSE,
+  comment = NULL,
+  variable = NULL,
+  subid = NULL,
+  last.date = NULL,
+  timestep = "d"
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>A data frame, e.g. an object originally imported with <code>ReadXobs</code>. Date-time information in the first
+column and measured values in the remaining columns. Column names are ignored on export, but if attributes <code>comment</code>,
+<code>variable</code>, and <code>subid</code> are available, these can be exported as Xobs headers (see also arguments of the same names
+below).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>filename</code></td>
+<td>
+<p>A character string naming a file to write to. Windows users: Note that
+Paths are separated by '/', not '\'.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>append</code></td>
+<td>
+<p>Logical. If <code>TRUE</code>, <code>x</code> will be appended to file <code>filename</code>. File must exist and
+have an identical column structure as <code>x</code>. If <code>FALSE</code>, existing file in <code>filename</code> will be overwritten!</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>comment</code></td>
+<td>
+<p>A character string to be exported as first row comment in the Xobs file. If provided, it takes precedence over
+a <code>comment</code> attribute of <code>x</code>. Comments are only exported if <code>append</code> is <code>FALSE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>variable</code></td>
+<td>
+<p>A character vector to be exported as second row in the Xobs file. Must contain the same number of
+variables as <code>x</code>. If omitted or <code>NULL</code>, an attribute <code>variable</code> in <code>x</code> is mandatory.
+Will take precedence over a <code>variable</code> attribute of <code>x</code>. If <code>append</code> is <code>TRUE</code> the values are
+used to test for consistency between export object and the existing file.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>subid</code></td>
+<td>
+<p>Third row in Xobs, containing SUBIDs (integer). Behavior otherwise as argument <code>variable</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>last.date</code></td>
+<td>
+<p>Optional date-time of last observation in existing Xobs file as text string. Only relevant with <code>append = TRUE</code>.
+Formatting depending on time step, e.g. <code>'2000-01-01'</code> (day) or <code>'2000-01-01 00:00'</code> (hour). Will be automatically read
+from file per default, but can be provided to reduce execution time when appending to large files.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>timestep</code></td>
+<td>
+<p>Character string, either "day" or "hour", giving the time step between observations. Can be
+abbreviated.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p><code>WriteXobs</code> writes a 'Xobs.txt' file, typically originating from an imported and modified 'Xobs.txt'.
+HYPE Xobs files contain a three-row header, with a comment line first, next a line of variables, and then a line of SUBIDs.
+Objects imported with <code>ReadXobs</code> include attributes holding this information, and <code>WriteXobs</code> will use this
+information. Otherwise, these attributes can be added to objects prior to calling <code>WriteXobs</code>, or passed as function
+arguments.
+</p>
+<p>If argument <code>append</code> is <code>TRUE</code>, the function requires daily or hourly time steps as input.
+The date-time column must be of class <code>POSIXct</code>, see <code>as.POSIXct</code>. Objects returned from
+<code>ReadXobs</code> per default have the correct class for the date-time column. When appending to existing file, the
+function adds new rows with '-9999' values in all data columns to fill any time gaps between existing and new data. If time
+periods overlap, the export will stop with an error message. Argument <code>last.date</code> can be provided to speed up appending exports,
+but per default, <code>WriteXobs</code> extracts the last observation in the existing file automatically.
+</p>
+
+
+<h3>Value</h3>
+
+<p>No return value, called for export to text files.
+</p>
+
+
+<h3>Note</h3>
+
+<p>Both <code>variable</code> and <code>subid</code> do not include elements for the first column in the Xobs file/object, in accordance
+with <code>ReadXobs</code>. These elements will be added by the function.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">te &lt;- ReadXobs(filename = system.file("demo_model", "Xobs.txt", package = "HYPEtools"))
+WriteXobs(x = te, filename = tempfile())
+
+</code></pre>
+
+
+</div>

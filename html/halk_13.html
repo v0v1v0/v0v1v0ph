@@ -1,0 +1,114 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>calc_stat_scores</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Compute test statistics for comparing actual and estimated ages</h2>
+
+<h3>Description</h3>
+
+<p>Using these functions you can compute either a Kolmogorov-Smirnov (KS)
+statistic or a Chi-squared test statistic to compare estimated ages to actual
+ages. See details for how each test works and what is reported.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">calc_ks_score(
+  data,
+  summary_fun = mean,
+  age_col = "age",
+  suppress_warnings = TRUE,
+  return_val = "statistic",
+  ...
+)
+
+calc_chi_score(
+  data,
+  age_col = "age",
+  suppress_warnings = TRUE,
+  return_val = "statistic",
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>A data.frame containing estimated ages as returned by
+<code>assign_ages</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>summary_fun</code></td>
+<td>
+<p>Function used to compute summary statistics for
+<code>calc_ks_score</code> for each age group (default is <code>mean</code>)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>age_col</code></td>
+<td>
+<p>Character string specifying the name of the age column</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>suppress_warnings</code></td>
+<td>
+<p>Logical. Should any warnings from the function
+call to <code>ks.test</code> or <code>chisq.test</code> be suppressed (TRUE, the default)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>return_val</code></td>
+<td>
+<p>Character. The name of the object to return from the given
+test</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Additional arguments to pass to <code>summary_fun</code>
+(<code>calc_ks_score</code>) or <code>chisq.test</code> (<code>calc_chi_score</code>)</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The KS test compares length distributions for each age class from known ages
+against that of estimated ages computed by the <code>assign_ages</code>
+function. The output is a summary value of the test statistics as specified
+by <code>summary_fun</code>.
+</p>
+<p>The <code>calc_chi_score</code> function performs a Chi-square test (using the
+<code>chisq.test</code> function) on the number of estimated and
+actual ages for each age group.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A numeric value for each level that was used in the model to assign
+ages
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">halk &lt;- make_halk(spp_data, levels = c("spp"))
+newdat &lt;- laa_data
+newdat$spp &lt;- "bluegill"
+pred_ages &lt;- assign_ages(newdat, halk)
+calc_ks_score(pred_ages)
+calc_chi_score(pred_ages)
+</code></pre>
+
+
+</div>

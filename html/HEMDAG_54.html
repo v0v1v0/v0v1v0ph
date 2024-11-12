@@ -1,0 +1,80 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>htd</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>HTD-DAG</h2>
+
+<h3>Description</h3>
+
+<p>Implementation of the top-down procedure to correct the scores of the hierarchy according to the constraints that the score of a
+node cannot be greater than a score of its parents.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">htd(S, g, root = "00")
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>S</code></td>
+<td>
+<p>a named flat scores matrix with examples on rows and classes on columns.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>g</code></td>
+<td>
+<p>a graph of class <code>graphNEL</code>. It represents the hierarchy of the classes.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>root</code></td>
+<td>
+<p>name of the class that it is the top-level of the hierarchy (<code>def:00</code>).</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The <code>HTD-DAG</code> algorithm modifies the flat scores according to the hierarchy of a DAG <code class="reqn">G</code> through a unique run across
+the nodes of the graph. For a given example <code class="reqn">x</code>, the flat predictions <code class="reqn">f(x) = \hat{y}</code> are hierarchically corrected to
+<code class="reqn">\bar{y}</code>, by per-level visiting the nodes of the DAG from top to bottom according to the following simple rule:
+</p>
+<p style="text-align: center;"><code class="reqn">
+ \bar{y}_i := \left\{
+  \begin{array}{lll}
+   \hat{y}_i  &amp; {\rm if} \quad i \in root(G) \\
+   \min_{j \in par(i)} \bar{y}_j &amp; {\rm if} \quad \min_{j \in par(i)} \bar{y}_j &lt; \hat{y}_i \\
+   \hat{y}_i &amp; {\rm otherwise}
+  \end{array}
+ \right.
+</code>
+</p>
+
+<p>The node levels correspond to their maximum path length from the root.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A matrix with the scores of the classes corrected according to the <code>HTD-DAG</code> algorithm.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(graph);
+data(scores);
+root &lt;- root.node(g);
+S.htd &lt;- htd(S,g,root);
+</code></pre>
+
+
+</div>

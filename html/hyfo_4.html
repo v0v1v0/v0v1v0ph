@@ -1,0 +1,319 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>biasCorrect</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Biascorrect the input timeseries or hyfo dataset</h2>
+
+<h3>Description</h3>
+
+<p>Biascorrect the input time series or dataset, the input time series or dataset should consist of observation, hindcast, and forecast.
+observation and hindcast should belong to the same period, in order to calibrate. Then the modified forecast
+will be returned. If the input is a time series, first column should be date column and rest columns should be 
+the value column. If the input is a hyfo dataset, the dataset should be the result of <code>loadNcdf</code>, or a list
+file with the same format.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">biasCorrect(
+  frc,
+  hindcast,
+  obs,
+  method = "scaling",
+  scaleType = "multi",
+  preci = FALSE,
+  prThreshold = 0,
+  extrapolate = "no"
+)
+
+## S4 method for signature 'data.frame,data.frame,data.frame'
+biasCorrect(
+  frc,
+  hindcast,
+  obs,
+  method = "scaling",
+  scaleType = "multi",
+  preci = FALSE,
+  prThreshold = 0,
+  extrapolate = "no"
+)
+
+## S4 method for signature 'list,list,list'
+biasCorrect(
+  frc,
+  hindcast,
+  obs,
+  method = "scaling",
+  scaleType = "multi",
+  preci = FALSE,
+  prThreshold = 0,
+  extrapolate = "no"
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>frc</code></td>
+<td>
+<p>a hyfo grid data output or a dataframe (time series) consists of Date column and one or more value columns, 
+representing the forecast to be calibrated.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>hindcast</code></td>
+<td>
+<p>a hyfo grid data output or a dataframe(time series) consists of Date column and one or more value columns, 
+representing the hindcast data. This data will be used in the calibration of the forecast, so it's better to have the same date period as
+observation data. Check details for more information.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>obs</code></td>
+<td>
+<p>a hyfo grid data output or a dataframe (time series) consists of Date column and one or more value columns, 
+representing the observation data.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+<p>bias correct method, including 'delta', 'scaling'..., default is 'scaling'</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>scaleType</code></td>
+<td>
+<p>only when the method "scaling" is chosen, scaleType will be available. Two different types
+of scaling method, 'add' and 'multi', which means additive and multiplicative scaling method. More info check 
+details. Default scaleType is 'multi'.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>preci</code></td>
+<td>
+<p>If the precipitation is biascorrected, then you have to assign <code>preci = TRUE</code>. Since for
+precipitation, some biascorrect methods may not apply to, or some methods are specially for precipitation. 
+Default is FALSE, refer to details.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>prThreshold</code></td>
+<td>
+<p>The minimum value that is considered as a non-zero precipitation. Default to 0 (assuming mm). If you want 
+to use precipitation biascorrect, you should consider carefully how to set this threshold, usually is 1. But you 
+can try with different numbers to see the results.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>extrapolate</code></td>
+<td>
+<p>When use 'eqm' method, and 'no' is set, modified frc is bounded by the range of obs.
+If 'constant' is set, modified frc is not bounded by the range of obs. Default is 'no'.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Since climate forecast is based on global condition, when downscaling to different regions, it may include
+some bias, biascorrection is used then to fix the bias.
+</p>
+<p><strong>Hindcast</strong>
+</p>
+<p>In order to bias correct, we need to pick up some data from the forecast to train with
+the observation, which is called hindcast in this function. Using hindcast and observation, 
+the program can analyze the bias and correct the bias in the forecast. 
+</p>
+<p>Hindcast should have <strong>EVERY</strong> attributes that forecast has.
+</p>
+<p>Hindcast is also called re-forecast, is the forecast of the past. E.g. you have a forecast from year 2000-2010, assuming now you are in 2005. So from 2000-2005, this period
+is the hindcast period, and 2005-2010, this period is the forecast period.
+</p>
+<p>Hindcast can be the same as forecast, i.e., you can use forecast itself as hindcast to train the bias correction.
+</p>
+<p><strong>How it works</strong>
+</p>
+<p>Forecast product has to be calibrated, usually the system is doing forecast in real time. So, e.g., if the 
+forecast starts from year 2000, assuming you are in year 2003, then you will have 3 years' hindcast 
+data (year 2000-2003), which can be used to calibrate. And your forecast period is (2003-2004)
+</p>
+<p>E.g. you have observation from 2001-2002, this is your input obs. Then you can take the same 
+period (2001-2002) from the forecast, which is the hindcast period. For forecast, you can take any period.
+The program will evaluate the obs and hindcast, to get the modification of the forecast, and then add the 
+modification to the forecast data.
+</p>
+<p>The more categorized input, the more accurate result you will get. E.g., if you want to 
+bias correct a forecast for winter season. So you'd better to extract all the winter period
+in the hindcast and observation to train. <code>extractPeriod</code> can be used for this purpose.
+</p>
+<p><strong>method</strong>
+</p>
+<p>Different methods used in the bias correction. Among which, delta, scaling can be applied
+to different kinds of parameters, with no need to set <code>preci</code>; eqm has two conditions for rainfall data and other data,
+it needs user to input <code>preci = TRUE/FALSE</code> to point to different conditions; gqm is
+designed for rainfall data, so <code>preci = TRUE</code> needs to be set.
+</p>
+<p><strong>delta</strong>
+</p>
+<p>This method consists on adding to the observations the mean change signal (delta method). 
+This method is applicable to any kind of variable but it is preferable to avoid it for bounded variables
+(e.g. precipitation, wind speed, etc.) because values out of the variable range could be obtained 
+(e.g. negative wind speeds...)
+</p>
+<p><strong>scaling</strong>
+</p>
+<p>This method consists on scaling the simulation  with the difference (additive) or quotient (multiplicative) 
+between the observed and simulated means in the train period. The <code>additive</code> or <code>multiplicative</code>
+correction is defined by parameter <code>scaling.type</code> (default is <code>additive</code>).
+The additive version is preferably applicable to unbounded variables (e.g. temperature) 
+and the multiplicative to variables with a lower bound (e.g. precipitation, because it also preserves the frequency). 
+</p>
+<p><strong>eqm</strong>
+</p>
+<p>Empirical Quantile Mapping. This is a very extended bias correction method which consists on calibrating the simulated Cumulative Distribution Function (CDF) 
+by adding to the observed quantiles both the mean delta change and the individual delta changes in the corresponding quantiles. 
+This method is applicable to any kind of variable.
+</p>
+<p>It can keep the extreme value, if you choose constant extrapolation method. But then you will face the risk
+that the extreme value is an error.
+</p>
+<p><strong>gqm</strong>
+</p>
+<p>Gamma Quantile Mapping. This method is described in Piani et al. 2010 and is applicable only to precipitation. It is based on the initial assumption that both observed
+and simulated intensity distributions are well approximated by the gamma distribution, therefore is a parametric q-q map 
+that uses the theorical instead of the empirical distribution. 
+</p>
+<p>It can somehow filter some extreme values caused by errors, while keep the extreme value. Seems more reasonable.
+Better have a long period of training, and the if the forecast system is relatively stable.
+</p>
+<p>It is a generic function, if in your case you need to debug, please see <code>?debug()</code> 
+for how to debug S4 method.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Yuanchao Xu <a href="mailto:xuyuanchao37@gmail.com">xuyuanchao37@gmail.com</a>
+</p>
+
+
+<h3>References</h3>
+
+<p>Bias correction methods come from <code>biasCorrection</code> from <code>dowscaleR</code>
+</p>
+
+<ul>
+<li>
+<p> Santander Meteorology Group (2015). downscaleR: Climate data manipulation and statistical downscaling. R
+package version 0.6-0. https://github.com/SantanderMetGroup/downscaleR/wiki
+</p>
+</li>
+<li>
+<p> R.A.I. Wilcke, T. Mendlik and A. Gobiet (2013) Multi-variable error correction of regional climate models. Climatic Change, 120, 871-887
+</p>
+</li>
+<li>
+<p> A. Amengual, V. Homar, R. Romero, S. Alonso, and C. Ramis (2012) A Statistical Adjustment of Regional Climate Model Outputs to Local Scales: Application to Platja de Palma, Spain. J. Clim., 25, 939-957
+</p>
+</li>
+<li>
+<p> C. Piani, J. O. Haerter and E. Coppola (2009) Statistical bias correction for daily precipitation in regional climate models over Europe, Theoretical and Applied Climatology, 99, 187-192
+</p>
+</li>
+<li>
+<p> O. Gutjahr and G. Heinemann (2013) Comparing precipitation bias correction methods for high-resolution regional climate simulations using COSMO-CLM, Theoretical and Applied Climatology, 114, 511-529
+</p>
+</li>
+</ul>
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+######## hyfo grid file biascorrection
+########
+
+# If your input is obtained by \code{loadNcdf}, you can also directly biascorrect
+# the file.
+
+# First load ncdf file.
+filePath &lt;- system.file("extdata", "tnc.nc", package = "hyfo")
+varname &lt;- getNcdfVar(filePath)    
+nc &lt;- loadNcdf(filePath, varname)
+
+data(tgridData)
+# Since the example data, has some NA values, the process will include some warning #message, 
+# which can be ignored in this case.
+
+
+
+
+# Then we will use nc data as forecasting data, and use itself as hindcast data,
+# use tgridData as observation.
+newFrc &lt;- biasCorrect(nc, nc, tgridData)  
+newFrc &lt;- biasCorrect(nc, nc, tgridData, scaleType = 'add')   
+newFrc &lt;- biasCorrect(nc, nc, tgridData, method = 'eqm', extrapolate = 'constant', 
+preci = TRUE) 
+newFrc &lt;- biasCorrect(nc, nc, tgridData, method = 'gqm', preci = TRUE) 
+
+
+######## Time series biascorrection
+########
+
+# Use the time series from testdl as an example, we take frc, hindcast and obs from testdl.
+data(testdl)
+
+# common period has to be extracted in order to better train the forecast.
+
+datalist &lt;- extractPeriod(testdl, startDate = '1994-1-1', endDate = '1995-10-1')
+
+frc &lt;- datalist[[1]]
+hindcast &lt;- datalist[[2]]
+obs &lt;- datalist[[3]]
+
+
+# The data used here is just for example, so there could be negative data.
+
+# default method is scaling, with 'multi' scaleType
+frc_new &lt;- biasCorrect(frc, hindcast, obs)
+
+# for precipitation data, extra process needs to be executed, so you have to tell
+# the program that it is a precipitation data.
+
+frc_new1 &lt;- biasCorrect(frc, hindcast, obs, preci = TRUE)
+
+# You can use other scaling methods to biascorrect.
+frc_new2 &lt;- biasCorrect(frc, hindcast, obs, scaleType = 'add')
+
+# 
+frc_new3 &lt;- biasCorrect(frc, hindcast, obs, method = 'eqm', preci = TRUE)
+frc_new4 &lt;- biasCorrect(frc, hindcast, obs, method = 'gqm', preci = TRUE)
+
+plotTS(obs, frc, frc_new, frc_new1, frc_new2, frc_new3, frc_new4, plot = 'cum')
+
+# You can also give name to this input list.
+TSlist &lt;- list(obs, frc, frc_new, frc_new1, frc_new2, frc_new3, frc_new4)
+names(TSlist) &lt;- c('obs', 'frc', 'delta', 'delta_preci', 'scale', 'eqm', 'gqm')
+plotTS(list = TSlist, plot = 'cum')
+
+
+# If the forecasts you extracted only has incontinuous data for certain months and years, e.g.,
+# for seasonal forecasting, forecasts only provide 3-6 months data, so the case can be 
+# for example Dec, Jan and Feb of every year from year 1999-2005.
+# In such case, you need to extract certain months and years from observed time series.
+# extractPeriod() can be then used.
+  
+  
+
+
+
+# More examples can be found in the user manual on https://yuanchao-xu.github.io/hyfo/
+
+
+</code></pre>
+
+
+</div>

@@ -1,0 +1,163 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>tradesCleanupUsingQuotes</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Perform a final cleaning procedure on trade data</h2>
+
+<h3>Description</h3>
+
+<p>Function performs cleaning procedure <code>rmTradeOutliersUsingQuotes</code> 
+for the trades of all stocks data in "dataDestination". 
+Note that preferably the input data for this function 
+is trade and quote data cleaned by respectively e.g. <code>tradesCleanup</code>
+and <code>quotesCleanup</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">tradesCleanupUsingQuotes(
+  tradeDataSource = NULL,
+  quoteDataSource = NULL,
+  dataDestination = NULL,
+  tData = NULL,
+  qData = NULL,
+  lagQuotes = 0,
+  nSpreads = 1,
+  BFM = FALSE,
+  backwardsWindow = 3600,
+  forwardsWindow = 0.5,
+  plot = FALSE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>tradeDataSource</code></td>
+<td>
+<p>character indicating the folder in which the original trade data is stored.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>quoteDataSource</code></td>
+<td>
+<p>character indicating the folder in which the original quote data is stored.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dataDestination</code></td>
+<td>
+<p>character indicating the folder in which the cleaned data is stored, folder of <code>dataSource</code> by default.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tData</code></td>
+<td>
+<p><code>data.table</code> or <code>xts</code> object containing trade data cleaned by <code>tradesCleanup</code>. This argument is <code>NULL</code> by default. Enabling it, means the arguments
+<code>from</code>, <code>to</code>, <code>dataSource</code> and <code>dataDestination</code> will be ignored (only advisable for small chunks of data).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>qData</code></td>
+<td>
+<p><code>data.table</code> or <code>xts</code> object containing cleaned quote data. This argument is NULL by default. Enabling it means the arguments
+<code>from</code>, <code>to</code>, <code>dataSource</code>, <code>dataDestination</code> will be ignored (only advisable for small chunks of data).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lagQuotes</code></td>
+<td>
+<p>numeric, number of seconds the quotes are registered faster than
+the trades (should be round and positive). Default is 0. For older datasets, i.e. before 2010, it may be a good idea to set this to, e.g., 2 (see, Vergote, 2005).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nSpreads</code></td>
+<td>
+<p>numeric of length 1 denotes how far above the offer and below bid we allow outliers to be. Trades are filtered out if they are MORE THAN nSpread * spread above (below) the offer (bid)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>BFM</code></td>
+<td>
+<p>a logical determining whether to conduct "Backwards - Forwards matching" of trades and quotes.
+The algorithm tries to match trades that fall outside the bid - ask and first tries to match a small window forwards and if this fails, it tries to match backwards in a bigger window.
+The small window is a tolerance for inaccuracies in the timestamps of bids and asks. The backwards window allow for matching of late reported trades, i.e. block trades.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>backwardsWindow</code></td>
+<td>
+<p>a numeric denoting the length of the backwards window used when <code>BFM = TRUE</code>. Default is 3600, corresponding to one hour.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>forwardsWindow</code></td>
+<td>
+<p>a numeric denoting the length of the forwards window used when <code>BFM = TRUE</code>. Default is 0.5, corresponding to one half second.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>plot</code></td>
+<td>
+<p>a logical denoting whether to visualize the forwards, backwards, and unmatched trades in a plot. Passed on to <code>rmTradeOutliersUsingQuotes</code></p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>In case you supply the arguments <code>tData</code> and <code>qData</code>, the on-disk functionality is ignored
+and the function returns cleaned trades as a <code>data.table</code> or <code>xts</code> object (see examples).
+</p>
+<p>When using the on-disk functionality and tradeDataSource and quoteDataSource are the same, the quote files are all files in the folder that contains 'quote', and the rest are treated as containing trade data.
+</p>
+
+
+<h3>Value</h3>
+
+<p>For each day an <code>xts</code> object is saved into the folder of that date, containing the cleaned data.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup.
+</p>
+
+
+<h3>References</h3>
+
+<p>Barndorff-Nielsen, O. E., Hansen, P. R., Lunde, A., and Shephard, N. (2009). Realized kernels in practice: Trades and quotes. <em>Econometrics Journal</em>, 12, C1-C32.
+</p>
+<p>Brownlees, C.T., and Gallo, G.M. (2006). Financial econometric analysis at ultra-high frequency: Data handling concerns. <em>Computational Statistics &amp; Data Analysis</em>, 51, 2232-2245.
+</p>
+<p>Christensen, K., Oomen, R. C. A., Podolskij, M. (2014): Fact or Friction: Jumps at ultra high frequency. <em>Journal of Financial Economics</em>, 144, 576-599
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Consider you have raw trade data for 1 stock for 2 days 
+## Not run: 
+tDataAfterFirstCleaning &lt;- tradesCleanup(tDataRaw = sampleTDataRaw, 
+                                          exchanges = "N", report = FALSE)
+qData &lt;- quotesCleanup(qDataRaw = sampleQDataRaw, 
+                       exchanges = "N", report = FALSE)
+dim(tDataAfterFirstCleaning)
+tDataAfterFinalCleaning &lt;- 
+  tradesCleanupUsingQuotes(qData = qData[as.Date(DT) == "2018-01-02"],
+                           tData = tDataAfterFirstCleaning[as.Date(DT) == "2018-01-02"])
+dim(tDataAfterFinalCleaning)
+
+## End(Not run)
+# In case you have more data it is advised to use the on-disk functionality
+# via the "tradeDataSource", "quoteDataSource", and "dataDestination" arguments
+</code></pre>
+
+
+</div>

@@ -1,0 +1,92 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>RectangleRegression</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Return parameters of rectangle regression</h2>
+
+<h3>Description</h3>
+
+<p>Fit a line using least rectangle method.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">RectangleRegression(
+  x1,
+  x2,
+  replicate = 1000,
+  x1new = seq(from = min(x1), to = max(x1), length.out = 100)
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x1</code></td>
+<td>
+<p>The first series of data</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x2</code></td>
+<td>
+<p>The second series of data</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>replicate</code></td>
+<td>
+<p>Number of replicates for bootstrap</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x1new</code></td>
+<td>
+<p>Values for x1 to generate x2</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>RectangleRegression performs rectangle regression
+</p>
+
+
+<h3>Value</h3>
+
+<p>A list with parameters of rectangle regression
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Marc Girondot <a href="mailto:marc.girondot@gmail.com">marc.girondot@gmail.com</a>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">x1 &lt;- runif(100, min=10, max=20)
+x2 &lt;- runif(100, min=10, max=20)+x1
+
+rectreg &lt;- RectangleRegression(x1, x2)
+
+plot(x=x1, y=x2, bty="n", las=1, xlim=c(10, 20), ylim=c(20, 40))
+abline(a=rectreg$par["Intercept"], b=rectreg$par["Slope"], lwd=2)
+par(xpd=FALSE)
+lines(rectreg$x2new["x1new", ], rectreg$x2new["50%", ])
+lines(rectreg$x2new["x1new", ], rectreg$x2new["2.5%", ], lty=2)
+lines(rectreg$x2new["x1new", ], rectreg$x2new["97.5%", ], lty=2)
+
+abline(a=rectreg$Intercept[1], b=rectreg$Slope[3], col="red")
+abline(a=rectreg$Intercept[3], b=rectreg$Slope[1], col="red")
+
+</code></pre>
+
+
+</div>

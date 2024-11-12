@@ -1,0 +1,425 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>interaction2wt</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Plot all main effects and twoway interactions in a multifactor design</h2>
+
+<h3>Description</h3>
+
+<p>The main diagonal
+displays boxplots for the main effects of each factor.  The
+off-diagonals show the interaction plots for each pair of factors.
+The <code>i,j</code> panel shows the same factors as the <code>j,i</code> but with
+the trace- and x-factor roles interchanged.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">interaction2wt(x, ...)
+
+## S3 method for class 'formula'
+interaction2wt(x, data=NULL, responselab, ...)
+
+## Default S3 method:
+interaction2wt(x,
+               response.var,
+               responselab = deparse(substitute(response.var)),
+               responselab.expression = responselab,
+               relation = list(x = "same", y = "same"),
+               x.relation = relation$x,
+               y.relation = relation$y,
+               digits = 3,
+               x.between=1,
+               y.between=1,
+               between,
+               cex = 0.75,
+               rot=c(0,0),
+               panel.input = panel.interaction2wt,
+               strip.input =
+                if (label.as.interaction.formula) strip.default
+                else strip.interaction2wt,
+               par.strip.text.input = trellis.par.get()$add.text,
+               scales.additional,
+               main.in =
+                 paste(responselab,
+                       ": ", c("main", "simple")[1+simple],
+                       " effects and 2-way interactions",
+                       sep=""),
+               xlab = "",
+               ylab = "",
+               simple=FALSE,
+               box.ratio=if (simple) .32 else 1,
+               label.as.interaction.formula=TRUE,
+               ...,
+               main.cex,
+               key.cex.title=.8,
+               key.cex.text=.7,
+               factor.expressions=names.x,
+               simple.pch=NULL,
+               col.by.row=TRUE,
+               col  =trellis.par.get("superpose.line")$col,
+               lty  =trellis.par.get("superpose.line")$lty,
+               lwd  =trellis.par.get("superpose.line")$lwd,
+               alpha=trellis.par.get("superpose.line")$alpha
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<p>Arguments when <code>x</code> is a formula.
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+
+<p>The object on which method dispatch is carried out.
+</p>
+<p>For the <code>"formula"</code> method, a formula describing the response
+variable and factors.
+The formula is generally of the form <code>y ~ g1 + g2 + ...</code>.
+There may be one or more factors in the formula.
+</p>
+<p>For the <code>"default"</code> method, <code>data.frame</code> of factors.  This
+is usually constructed by <code>formula</code> method from the input
+data and the input formula.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+
+<p>For the <code>formula</code> method, a data frame containing values for
+any variables in the formula.  In the R version,
+if not found in <code>data</code>, or if
+<code>data</code> is unspecified, the variables are looked for in the
+environment of the formula.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>responselab</code></td>
+<td>
+<p>Character name of response variable, defaults to
+the name of the response variable in the <code>formula</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>responselab.expression</code></td>
+<td>
+<p><code>plotmath</code> or character name
+of response variable, defaults to <code>responselab</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>additional arguments, primarily trellis arguments.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>response.var</code></td>
+<td>
+<p>For the <code>"default"</code> method, the
+response variable.  This is usually constructed by
+<code>formula</code> method from the input data and the input formula.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>simple</code></td>
+<td>
+<p>logical.  <code>TRUE</code> if simple effects are to be
+displayed.  Arguments <code>simple.offset</code>, <code>simple.scale</code>, and
+<code>col.by.row</code> may also be needed.  See
+<code>panel.interaction2wt</code> for details.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>box.ratio</code></td>
+<td>
+
+
+<p><code>xyplot</code>.
+</p>
+</td>
+</tr>
+</table>
+<p>Trellis/Lattice arguments.  Default values are set by the
+the <code>formula</code> method.  The user may override the defaults.
+See also
+
+<code>xyplot</code>.
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>relation</code></td>
+<td>
+<p><code>trellis</code> argument.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x.relation</code></td>
+<td>
+<p><code>x</code> value of <code>relation</code> argument.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>y.relation</code></td>
+<td>
+<p><code>y</code> value of <code>relation</code> argument.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>digits</code></td>
+<td>
+<p>doesn't do anything at the moment</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x.between</code></td>
+<td>
+<p><code>x</code> value of <code>between</code> argument.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>y.between</code></td>
+<td>
+<p><code>y</code> value of <code>between</code> argument.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>between</code></td>
+<td>
+<p>trellis/lattice <code>between</code> argument.
+If used, <code>between</code> has precedence over both the
+<code>x.between</code> and <code>y.between</code> arguments.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cex</code></td>
+<td>
+<p>S-Plus: changes the size of the median dot in the
+boxplots.  R: doesn't do anything.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>panel.input</code></td>
+<td>
+<p>panel function.  Default is <code>panel.interaction2wt</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>label.as.interaction.formula</code></td>
+<td>
+<p>logical.  If <code>TRUE</code>, each
+panel has a single strip label of the form <code>y ~ a | b</code>.  If
+<code>FALSE</code>, each panel has a pair of strip labels, one for the
+<code>trace</code> factor and one for the <code>x</code> factor.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>strip.input</code></td>
+<td>
+<p>strip function.  Default depends on the value of
+<code>label.as.interaction.formula</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>par.strip.text.input</code></td>
+<td>
+<p><code>par.strip.text</code> argument.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>scales.additional</code></td>
+<td>
+<p>additional arguments to <code>scales</code>
+argument of <code>interaction.positioned</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>main.in</code></td>
+<td>
+<p>Text of main title.</p>
+</td>
+</tr>
+</table>
+<table>
+<tr style="vertical-align: top;">
+<td><code>xlab</code></td>
+<td>
+<p>No effect.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ylab</code></td>
+<td>
+<p>No effect.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>main.cex</code></td>
+<td>
+<p><code>cex</code> for main title.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>key.cex.title</code></td>
+<td>
+<p><code>cex</code> key title.  Defaults to <code>cex</code> for
+<code>xlab</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>key.cex.text</code></td>
+<td>
+<p><code>cex</code> group names in key.  Defaults to <code>cex</code> for
+<code>axis.text</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>factor.expressions</code></td>
+<td>
+<p>Expressions for titles of keys and
+<code>xlab</code> for each column.  Defaults to the names of the factors in
+the input formula.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rot</code></td>
+<td>
+<p>Rotation of x tick labels and y tick labels.  Only 0 and 90
+will look good.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>simple.pch</code></td>
+<td>
+<p>Named list containing plotting characters for each
+level of one or more of the factors.  <code>simple.pch</code> is used only when
+<code>simple==TRUE</code>.  If the argument <code>simple.pch</code> is missing,
+then the integers for the levels of the factors are used.  The
+characters are used for the median of the box plots in the diagonal
+panels.  They match the trace factor of the interaction panel in the
+same column of the display.  </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>col.by.row</code></td>
+<td>
+<p>logical.  If <code>TRUE</code> (the default), simple
+effects plots color the simple effects on the main diagonals in the same
+color as the trace levels in their row.  If <code>FALSE</code>, then simple
+effects are colored to match the x levels in their column.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>col, lty, lwd, alpha</code></td>
+<td>
+<p>Arguments to
+<code>trellis.par.set(superpose.line=list())</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p><code>"trellis"</code> object containing the plot.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p> Richard M. Heiberger &lt;rmh@temple.edu&gt; </p>
+
+
+<h3>References</h3>
+
+<p>Heiberger, Richard M. and Holland, Burt (2015).
+<em>Statistical Analysis and Data Display: An Intermediate Course with Examples in R</em>.
+Second Edition.
+Springer-Verlag, New York.
+<a href="https://link.springer.com/book/10.1007/978-1-4939-2122-5">https://link.springer.com/book/10.1007/978-1-4939-2122-5</a>
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>panel.interaction2wt</code></p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(vulcan)
+
+interaction2wt(wear ~ filler + pretreat + raw, data=vulcan,
+               par.strip.text=list(cex=.7))
+
+interaction2wt(wear ~ filler + pretreat + raw, data=vulcan,
+               par.strip.text=list(cex=.7),
+               label.as.interaction.formula=FALSE)
+
+interaction2wt(wear ~ filler + raw, data=vulcan,
+               simple=TRUE)
+
+interaction2wt(wear ~ filler + raw, data=vulcan,
+               simple=TRUE, col.by.row=FALSE)
+
+interaction2wt(wear ~ filler + raw, data=vulcan,
+               simple=TRUE, simple.scale=c(filler=.15, raw=.2),
+               xlim=c(.3, 5.6))
+
+interaction2wt(wear ~ filler + raw, data=vulcan,
+               col=1:5, lwd=1:5, lty=1:5)
+
+interaction2wt(wear ~ filler + raw, data=vulcan,
+               simple=TRUE, col=1:5, lwd=1:5, lty=1:5)
+
+interaction2wt(wear ~ filler + raw, data=vulcan,
+               simple=TRUE, col=1:5, lwd=1:5, lty=1:5, col.by.row=FALSE,
+               simple.pch=list(filler=LETTERS[1:5], raw=letters[6:9]), cex=2)
+
+
+
+ToothGrowth$dose &lt;- positioned(ToothGrowth$dose) ## modify local copy
+anova(aov(len ~ supp*dose, data=ToothGrowth))
+interaction2wt(len ~ supp + dose, data=ToothGrowth)
+
+
+esoph$ntotal &lt;- with(esoph, ncases + ncontrols) ## modify local copy
+esoph$rate   &lt;- with(esoph, ncases/ntotal)      ## modify local copy
+
+position(esoph$alcgp) &lt;- 2:5
+position(esoph$tobgp) &lt;- 2:5
+
+interaction2wt(rate ~ agegp + alcgp + tobgp, esoph, rot=c(90,0),
+               par.strip.text=list(cex=.8))
+
+interaction2wt(rate ~ agegp + alcgp + tobgp, esoph, rot=c(90,0),
+               par.strip.text=list(cex=.8),
+               factor.expressions=c(
+                 agegp=expression(Age~~(years)),
+                 alcgp=expression(Alcohol~
+                   bgroup("(",scriptstyle(frac(gm, day)),")")),
+                 tobgp=expression(Tobacco~
+                   bgroup("(",scriptstyle(frac(gm, day)),")"))),
+               par.settings=list(
+                 par.xlab.text=list(cex=.8),
+                 par.ylab.text=list(cex=.8)),
+               responselab.expression="Cancer\nRate",
+               main=list(
+"Esophogeal Cancer Rate ~ Alcohol Consumption + Tobacco Consumption",
+                 cex=1.2))
+
+esoph.aov &lt;- aov(rate ~ agegp + alcgp + tobgp, data=esoph)
+anova(esoph.aov)
+
+</code></pre>
+
+
+</div>

@@ -1,0 +1,86 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>copy_param_hypervolume</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Generate hypervolumes using pre-existing parameters
+</h2>
+
+<h3>Description</h3>
+
+<p><code>copy_param_hypervolume</code> takes in a hypervolume and data. After detecting the method used to generate the input hypervolume, the function returns a new hypervolume generated from the data using the same method and parameters as the input hypervolume. 
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">copy_param_hypervolume(hv, data, name = NULL)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>hv</code></td>
+<td>
+
+<p>hypervolume object
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+
+<p>A m x n matrix or data frame, where m is the number of observations and n is the dimensionality.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>name</code></td>
+<td>
+
+<p>String name of hypervolume
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p><code>copy_param_hypervolume</code> only works if the input hypervolume was generated using <code>method = "box"</code>, <code>method = "gaussian"</code>, or <code>method = "svm"</code>. Calling this function on hypervolumes generated from <code>hypervolume_set</code> will result in an error. 
+Note that <code>kde.bandwidth</code> is affected by size of the data and will be re-estimated using whichever method was used to generate the original bandwidth if <code>method = "gaussian"</code> or <code>method = "box"</code>.
+Use <code>hv@Parameters</code> to see what parameters are copied from the input hypervolume.
+</p>
+
+
+<h3>Value</h3>
+
+<p>hypervolume object
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+library(palmerpenguins)
+data("penguins")
+bill_data = na.omit(penguins[,3:4])
+hv = hypervolume(data = bill_data, 
+                  method = "gaussian", 
+                  quantile.requested = .9, 
+                  quantile.requested.type = "volume")
+
+# Generates a new hypervolume using the same hypervolume and data
+hv_copy = copy_param_hypervolume(hv, hv@Data)
+# Check to see that the information of the two hypervolumes is the same
+print(hv)
+print(hv_copy)
+
+## End(Not run)
+</code></pre>
+
+
+</div>

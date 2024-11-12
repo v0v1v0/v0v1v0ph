@@ -1,0 +1,124 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hkevp.rand</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Simulation of the HKEVP</h2>
+
+<h3>Description</h3>
+
+<p>Simulation procedure of the HKEVP with given sites and knots positions and marginal and spatial dependence parameters.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hkevp.rand(nrep, sites, knots, loc, scale, shape, alpha, tau)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>nrep</code></td>
+<td>
+<p>A positive integer.
+Number of realisations of the block mashapema process.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sites</code></td>
+<td>
+<p>The coordinates of the sites where the data are observed. Each row corresponds to a site position.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>knots</code></td>
+<td>
+<p>The coordinates of the knots in the HKEVP. By default, the positions of the knots coincide with the positions of the sites.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>loc</code></td>
+<td>
+<p>A numerical value or a vector of real values for the GEV location parameter. If a vector, its length must coincide with the number of sites. The value by default is 1.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>scale</code></td>
+<td>
+<p>A numerical value or a vector of real values for the GEV scale parameter. If a vector, its length must coincide with the number of sites. The value by default is 1.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>shape</code></td>
+<td>
+<p>A numerical value or a vector of real values for the GEV shape parameter. If a vector, its length must coincide with the number of sites. The value by default is 1.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alpha</code></td>
+<td>
+<p>The dependence parameter <code class="reqn">\alpha</code> of the HKEVP: a single value in (0,1].</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tau</code></td>
+<td>
+<p>The bandwidth parameter <code class="reqn">\tau</code> of the kernel functions in the HKEVP: a positive value.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Simulating one realisation of the block mashapema process <code class="reqn">Y(\cdot)</code> from the HKEVP involves three steps:
+</p>
+
+<ol>
+<li>
+<p> The <em>nugget process</em> <code class="reqn">U(\cdot)</code> is generated independently at each position, by simulating a random variable with <code class="reqn">GEV(1,\alpha,\alpha)</code> distribution.
+</p>
+</li>
+<li>
+<p> The <em>residual dependence process</em> <code class="reqn">\theta(\cdot)</code> is computed by using the kernel functions centered at the set of knots, the bandwidth parameter <code class="reqn">\tau</code> and the simulations of the positive stable <code class="reqn">PS(\alpha)</code> random effect <code class="reqn">A</code>.
+</p>
+</li>
+<li>
+<p> The process <code class="reqn">Z = U\theta</code> is computed and its margins are transformed to the general GEV distribution with <code class="reqn">\mu(s),\sigma(s)</code> and <code class="reqn">\xi(s)</code> parameters.
+</p>
+</li>
+</ol>
+<h3>Value</h3>
+
+<p>A numerical matrix of real values.
+Each column corresponds to a position and each row to a realisation of the process.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Quentin Sebille
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Simulation of HKEVP:
+sites &lt;- as.matrix(expand.grid(1:3,1:3))
+loc &lt;- sites[,1]*10
+scale &lt;- 3
+shape &lt;- 0
+alpha &lt;- .4
+tau &lt;- 1
+ysim &lt;- hkevp.rand(10, sites, sites, loc, scale, shape, alpha, tau)
+
+
+
+
+
+</code></pre>
+
+
+</div>

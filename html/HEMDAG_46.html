@@ -1,0 +1,95 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>gpav</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Generalized Pool-Adjacent Violators (GPAV)</h2>
+
+<h3>Description</h3>
+
+<p>Implementation of <code>GPAV</code> (Generalized Pool-Adjacent Violators) algorithm.
+(<cite>Burdakov et al., In: Di Pillo G, Roma M, editors. An O(n2) Algorithm for Isotonic Regression. Boston, MA: Springer US; 2006.
+p. 25–33. Available from: doi: <a href="https://doi.org/10.1007/0-387-30065-1_3">10.1007/0-387-30065-1_3</a></cite>
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">gpav(Y, W = NULL, adj)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>Y</code></td>
+<td>
+<p>vector of scores relative to a single example. <code>Y</code> must be a numeric named vector, where names
+correspond to classes' names, i.e. nodes of the graph <code>g</code> (root node included).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>W</code></td>
+<td>
+<p>vector of weight relative to a single example. If <code>W=NULL</code> (def.) it is assumed that
+<code>W</code> is a unitary vector of the same length of the columns' number of the matrix <code>S</code> (root node included).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>adj</code></td>
+<td>
+<p>adjacency matrix of the graph which must be sparse, logical and upper triangular. Number of columns of <code>adj</code> must be
+equal to the length of <code>Y</code> and <code>W</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Given the constraints adjacency matrix of the graph, a vector of scores <code class="reqn">\hat{y} \in R^n</code> and a vector of strictly positive
+weights <code class="reqn">w \in R^n</code>, the <code>GPAV</code> algorithm returns a vector <code class="reqn">\bar{y}</code> which is as close as possible, in the least-squares sense,
+to the response vector <code class="reqn">\hat{y}</code> and whose components are partially ordered in accordance with the constraints matrix <code>adj</code>.
+In other words, <code>GPAV</code> solves the following problem:
+</p>
+<p style="text-align: center;"><code class="reqn">
+ \bar{y} = \left\{
+  \begin{array}{l}
+   \min \sum_{i \in V} (\hat{y}_i - \bar{y}_i )^2\\\\
+   \forall i, \quad  j \in par(i) \Rightarrow  \bar{y}_j  \geq \bar{y}_i
+  \end{array}
+\right.
+</code>
+</p>
+
+<p>where <code class="reqn">V</code> are the number of vertexes of the graph.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A list of 3 elements:
+</p>
+
+<ul>
+<li> <p><code>YFit</code>: a named vector with the scores of the classes corrected according to the <code>GPAV</code> algorithm.
+</p>
+</li>
+<li> <p><code>blocks</code>: list of vectors, containing the partitioning of nodes (represented with an integer number) into blocks;
+</p>
+</li>
+<li> <p><code>W</code>: vector of weights.
+</p>
+</li>
+</ul>
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(graph);
+data(scores);
+Y &lt;- S[3,];
+adj &lt;- adj.upper.tri(g);
+Y.gpav &lt;- gpav(Y,W=NULL,adj);
+</code></pre>
+
+
+</div>

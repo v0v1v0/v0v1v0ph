@@ -1,0 +1,220 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>driftBursts</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Inference on drift burst hypothesis</h2>
+
+<h3>Description</h3>
+
+<p>Calculates the test-statistic for the drift burst hypothesis
+</p>
+<p>Let the efficient log-price be defined as:
+</p>
+<p style="text-align: center;"><code class="reqn">
+    dX_{t} = \mu_{t}dt + \sigma_{t}dW_{t} + dJ_{t},
+</code>
+</p>
+
+<p>where <code class="reqn">\mu_{t}</code>, <code class="reqn">\sigma_{t}</code>, and <code class="reqn">J_{t}</code> are the spot drift, the spot volatility, and a jump process respectively.
+However, due to microstructure noise, the observed log-price is 
+</p>
+<p style="text-align: center;"><code class="reqn">
+    Y_{t} = X_{t} + \varepsilon_{t}
+</code>
+</p>
+
+<p>In order robustify the results to the presence of market microstructure noise, the pre-averaged returns are used:
+</p>
+<p style="text-align: center;"><code class="reqn">
+    \Delta_{i}^{n}\overline{Y} = \sum_{j=1}^{k_{n}-1}g_{j}^{n}\Delta_{i+j}^{n}Y,
+</code>
+</p>
+
+<p>where <code class="reqn">g(\cdot)</code> is a weighting function, <code class="reqn">min(x, 1-x)</code>, and <code class="reqn">k_{n}</code> is the pre-averaging horizon.
+</p>
+<p>The test statistic for the Drift Burst Hypothesis can then be calculated as
+</p>
+<p style="text-align: center;"><code class="reqn">
+    \bar{T}_{t}^{n} = \sqrt{\frac{h_{n}}{K_{2}}}\frac{\hat{\bar{\mu}}_{t}^{n}}{\sqrt{\hat{\bar{\sigma}}_{t}^{n}}},
+</code>
+</p>
+
+<p>where
+</p>
+<p style="text-align: center;"><code class="reqn">
+    \hat{\bar{\mu}}_{t}^{n} = \frac{1}{h_{n}}\sum_{i=1}^{n-k_{n}+2}K\left(\frac{t_{i-1}-t}{h_{n}}\right)\Delta_{i-1}^{n}\overline{Y},
+</code>
+</p>
+
+<p>and
+</p>
+<p><code class="reqn">
+    \hat{\bar{\sigma}}_{t}^{n} = \frac{1}{h_{n}'}\bigg[\sum_{i=1}^{n-k_{n}+2}\left(K\left(\frac{t_{i-1}-t}{h'_{n}}\right)\Delta_{i-1}^{n}\overline{Y}\right)^{2} \\
+    + 2\sum_{L=1}^{L_{n}}\omega\left(\frac{L}{L_{n}}\right)\sum_{i=1}^{n-k_{n}-L+2}K\left(\frac{t_{i-1}-t}{h_{n}'}\right)K\left(\frac{t_{i+L-1}-t}{h_{n}'}\right)\Delta_{i-1}^{n}\overline{Y}\Delta_{i-1+L}^{n}\overline{Y}\bigg],
+</code>
+</p>
+<p>where <code class="reqn">\omega(\cdot)</code> is a smooth kernel function, in this case the Parzen kernel. <code class="reqn">L_{n}</code> is the lag length for adjusting for auto-correlation and <code class="reqn">K(\cdot)</code>
+is a kernel weighting function, which in this case is the left-sided exponential kernel.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">driftBursts(
+  pData,
+  testTimes = seq(34260, 57600, 60),
+  preAverage = 5,
+  ACLag = -1L,
+  meanBandwidth = 300L,
+  varianceBandwidth = 900L,
+  parallelize = FALSE,
+  nCores = NA,
+  warnings = TRUE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>pData</code></td>
+<td>
+<p>Either a <code>data.table</code> or an <code>xts</code> object. If pData is a data.table, columns DT and PRICE must be present, containing timestamps of the trades and the price of the 
+trades (in levels) respectively. If pData is an <code>xts</code> object and the number of columns is greater than one, PRICE must be present.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>testTimes</code></td>
+<td>
+<p>A <code>numeric</code> containing the times at which to calculate the tests. The standard of <code>seq(34260, 57600, 60)</code> 
+denotes calculating the test-statistic once per minute, i.e. 390 times for a typical 6.5 hour trading day from 9:31:00 to 16:00:00. See details.
+Additionally, <code>testTimes</code> can be set to 'all' where the test statistic will be calculated on each tick more than 5 seconds after opening</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>preAverage</code></td>
+<td>
+<p>A positive <code>integer</code> denoting the length of pre-averaging window for the log-prices. Default is <code>5</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ACLag</code></td>
+<td>
+<p>A positive <code>integer</code> greater than 1 denoting how many lags are to be used for the HAC estimator of the variance - the default
+of <code>-1</code> denotes using an automatic lag selection algorithm for each iteration. Default is <code>-1L</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>meanBandwidth</code></td>
+<td>
+<p>An <code>integer</code> denoting the bandwidth for the left-sided exponential kernel for the mean. Default is <code>300L</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>varianceBandwidth</code></td>
+<td>
+<p>An <code>integer</code> denoting the bandwidth for the left-sided exponential kernel for the variance. Default is <code>900L</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>parallelize</code></td>
+<td>
+<p>A <code>logical</code> to determine whether to parallelize the underlying C++ code (Using OpenMP). Default is <code>FALSE</code>. 
+Note that the parallelized code is not interruptable, while the non-parallel code is interruptable and it's checked every 100 iterations.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nCores</code></td>
+<td>
+<p>An <code>integer</code> denoting the number of cores to use for calculating the code when parallelized. 
+If this argument is not provided, sequential evaluation will be used even though <code>parallelize</code> is TRUE. Default is <code>NA</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>warnings</code></td>
+<td>
+<p>A <code>logical</code> denoting whether warnings should be shown. Default is <code>TRUE</code></p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>If the <code>testTimes</code> vector contains instructions to test before the first trade, or more than 15 minutes after the last trade, these entries will be deleted, as not doing so may cause crashes.
+The test statistic is unstable before <code>max(meanBandwidth , varianceBandwidth)</code> seconds has passed.
+The lags from the Newey-West algorithm is increased by <code>2 * (preAveage-1)</code> due to the pre-averaging we know at least this many lags should be corrected for.
+The maximum of 20 lags is also increased by this factor for the same reason.
+</p>
+
+
+<h3>Value</h3>
+
+<p>An object of class <code>DBH</code> and <code>list</code> containing the series of the drift burst hypothesis test-statistic as well as the estimated spot drift and variance series. 
+The list also contains some information such as the variance and mean bandwidths along with the pre-averaging setting and the amount of observations. 
+Additionally, the list will contain information on whether testing happened for all <code>testTimes</code> entries.
+Objects of class <code>DBH</code> has the methods <code>print.DBH</code>, <code>plot.DBH</code>, and <code>getCriticalValues.DBH</code> which prints, plots, and
+retrieves critical values for the test described in appendix B of Christensen, Oomen, and Reno (2020).
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Emil Sjoerup
+</p>
+
+
+<h3>References</h3>
+
+<p>Christensen, K., Oomen, R., and Reno, R. (2020) The drift burst hypothesis. Journal of Econometrics. Forthcoming.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+
+# Usage with data.table object
+dat &lt;- sampleTData[as.Date(DT) == "2018-01-02"]
+# Testing every 60 seconds after 09:45:00
+DBH1 &lt;- driftBursts(dat, testTimes = seq(35100, 57600, 60), preAverage = 2, ACLag = -1L,
+                    meanBandwidth = 300L, varianceBandwidth = 900L)
+print(DBH1)
+
+plot(DBH1, pData = dat)
+# Usage with xts object (1 column)
+library("xts")
+dat &lt;- xts(sampleTData[as.Date(DT) == "2018-01-03"]$PRICE, 
+           order.by = sampleTData[as.Date(DT) == "2018-01-03"]$DT)
+# Testing every 60 seconds after 09:45:00
+DBH2 &lt;- driftBursts(dat, testTimes = seq(35100, 57600, 60), preAverage = 2, ACLag = -1L,
+                    meanBandwidth = 300L, varianceBandwidth = 900L)
+plot(DBH2, pData = dat)
+
+## Not run:  
+# This block takes some time
+dat &lt;- xts(sampleTDataEurope$PRICE, 
+           order.by = sampleTDataEurope$DT)
+# Testing every 60 seconds after 09:00:00
+system.time({DBH4 &lt;- driftBursts(dat, testTimes = seq(32400 + 900, 63000, 60), preAverage = 2, 
+             ACLag = -1L, meanBandwidth = 300L, varianceBandwidth = 900L)})
+
+system.time({DBH4 &lt;- driftBursts(dat, testTimes = seq(32400 + 900, 63000, 60), preAverage = 2, 
+                                 ACLag = -1L, meanBandwidth = 300L, varianceBandwidth = 900L,
+                                 parallelize = TRUE, nCores = 8)})
+plot(DBH4, pData = dat)
+
+# The print method for DBH objects takes an argument alpha that determines the confidence level
+# of the test performed
+print(DBH4, alpha = 0.99)
+# Additionally, criticalValue can be passed directly
+print(DBH4, criticalValue = 3)
+max(abs(DBH4$tStat)) &gt; getCriticalValues(DBH4, 0.99)$quantile
+
+## End(Not run)
+
+</code></pre>
+
+
+</div>

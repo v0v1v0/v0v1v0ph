@@ -1,0 +1,112 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>mutate_other</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Group infrequent entries into 'Other category'</h2>
+
+<h3>Description</h3>
+
+<p>Useful when you want to constrain the number of unique values in a column by keeping only the most common values.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">mutate_other(
+  .data,
+  var,
+  n = 5,
+  count,
+  by = NULL,
+  var.weight = NULL,
+  mass = NULL,
+  copy = TRUE,
+  other.category = "Other"
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>.data</code></td>
+<td>
+<p>Data containing variable.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>var</code></td>
+<td>
+<p>Variable containing infrequent entries, to be collapsed into "Other".</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n</code></td>
+<td>
+<p>Threshold for total number of categories above "Other".</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>count</code></td>
+<td>
+<p>Threshold for total count of observations before "Other".</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>by</code></td>
+<td>
+<p>Extra variables to group by when calculating <code>n</code> or <code>count</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>var.weight</code></td>
+<td>
+<p>Variable to act as a weight: <code>var</code>'s where the sum of this variable exceeds 
+<code>mass</code> will be kept, others set to <code>other.category</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mass</code></td>
+<td>
+<p>Threshold for sum of <code>var.weight</code>: any <code>var</code> where the aggregated sum of <code>var.weight</code> exceeds <code>mass</code> will be kept and other <code>var</code> will be set to <code>other.category</code>. By default (<code>mass = NULL</code>), 
+the value of <code>mass</code> is <code class="reqn">-\infty</code>, with a warning. You may set it explicitly to <code>-Inf</code> if you really want to avoid a warning that this function will have no effect.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>copy</code></td>
+<td>
+<p>Should <code>.data</code> be copied? Currently only <code>TRUE</code> is supported.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>other.category</code></td>
+<td>
+<p>Value that infrequent entries are to be collapsed into. Defaults to <code>"Other"</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p><code>.data</code> but with <code>var</code> changed so that infrequent values have the same value (<code>other.category</code>).
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">library(data.table)
+library(magrittr)
+
+DT &lt;- data.table(City = c("A", "A", "B", "B", "C", "D"),
+                 value = c(1, 9, 4, 4, 5, 11))
+
+DT %&gt;%
+  mutate_other("City", var.weight = "value", mass = 10) %&gt;%
+  .[]
+  
+</code></pre>
+
+
+</div>

@@ -1,0 +1,103 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>PCA</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Principal Component Analysis for Large-Dimensional Factor Models
+</h2>
+
+<h3>Description</h3>
+
+<p>This function is to fit the factor models via Principal Component Analysis (PCA) methods.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">PCA(X, r, constraint = "L")
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>X</code></td>
+<td>
+
+<p>Input matrix, of dimension <code class="reqn">T\times N</code>. Each row is an observation with <code class="reqn">N</code> features at time point <code class="reqn">t</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>r</code></td>
+<td>
+
+<p>A positive integer indicating the factor numbers.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>constraint</code></td>
+<td>
+
+<p>The type of identification condition. If <code>constraint="L"</code>, the columns of the estimated loading matrix are orthogonal and <code>constraint="F"</code> indicates the columns of the estimated factor matrix are orthogonal.
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>See Bai (2003) for details.
+</p>
+
+
+<h3>Value</h3>
+
+<p>The return value is a list. In this list, it contains the following:
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>Fhat</code></td>
+<td>
+<p>The estimated factor matrix of dimension <code class="reqn">T\times r</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Lhat</code></td>
+<td>
+<p>The estimated loading matrix of dimension <code class="reqn">N\times r</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>Yong He, Lingxiao Li, Dong Liu, Wenxin Zhou.
+</p>
+
+
+<h3>References</h3>
+
+<p>Bai, J., 2003. Inferential theory for factor models of large dimensions. Econometrica 71, 135–171.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">set.seed(1)
+T=50;N=50;r=3
+L=matrix(rnorm(N*r,0,1),N,r);F=matrix(rnorm(T*r,0,1),T,r)
+E=matrix(rnorm(T*N,0,1),T,N)
+X=F%*%t(L)+E
+
+fit=PCA(X,3,"L")
+t(fit$Lhat)%*%fit$Lhat/N
+
+fit=PCA(X,3,"F")
+t(fit$Fhat)%*%fit$Fhat/T
+</code></pre>
+
+
+</div>

@@ -1,0 +1,79 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>SimToPhylo</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Convert simulated result to a tree</h2>
+
+<h3>Description</h3>
+
+<p>Converts the $results element of the return to a phylo object</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">SimToPhylo(results, include.extinct=FALSE, drop.stem=TRUE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>results</code></td>
+<td>
+<p>dataframe of results from SimulateHisse.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>include.extinct</code></td>
+<td>
+<p>include (TRUE) or delete (FALSE) extinct terminal taxa.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>drop.stem</code></td>
+<td>
+<p>include the lineage leading to the first saved speciation even (FALSE) or cull it (TRUE).</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>This takes the <code>$results</code> object from a <code>SimulateHisse</code> run and converts it to an ape <code>phylo</code> object. If there are no taxa on the final tree, it returns NA; if there is one taxon, it returns a one taxon tree. This is behavior different from diversitree's tree simulators, which returns NULL in both the zero and one taxon case. Extinct taxa can be pruned or not. For simulations starting with one taxon, and/or for simulations with some extinction, the final tree can have a time when there is a single lineage before it radiates into the crown group. This stem can be included or not. The tip states are stored in <code>$tip.state</code> in the returned tree.
+</p>
+
+
+<h3>Value</h3>
+
+<table><tr style="vertical-align: top;">
+<td><code>phylo</code></td>
+<td>
+<p>a phylo object in cladewise order.</p>
+</td>
+</tr></table>
+<h3>Author(s)</h3>
+
+<p>Brian O'Meara</p>
+
+
+<h3>References</h3>
+
+<p>Beaulieu, J.M, and B.C. O'Meara. 2016. Detecting hidden diversification shifts in models of trait-dependent speciation and extinction. Syst. Biol. 65:583-601. 
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+simulated.result &lt;- SimulateHisse(c(.3, .1), c(.1, 0), 
+matrix(c(NA, 0.2, .3, NA), nrow=2), max.taxa=35, x0=1)	
+par(mfcol=c(1,2))
+plot(SimToPhylo(simulated.result$results, include.extinct=TRUE))
+plot(SimToPhylo(simulated.result$results, include.extinct=FALSE))
+ 	
+</code></pre>
+
+
+</div>

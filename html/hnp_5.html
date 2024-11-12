@@ -1,0 +1,115 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>corn</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Corn damage data</h2>
+
+<h3>Description</h3>
+
+<p>Corn grain damage by the maize weevil, a major pest of stored maize worldwide.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">data(corn)</code></pre>
+
+
+<h3>Format</h3>
+
+<p>A data frame with 40 observations on the following 3 variables.
+</p>
+
+<table>
+<tr>
+<td style="text-align: left;">
+<code>extract</code>
+</td>
+<td style="text-align: left;"> factor</td>
+<td style="text-align: left;"> with levels <code>leaf</code>, <code>branch</code>, <code>seed</code> and <code>control</code>
+</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+<code>m</code>
+</td>
+<td style="text-align: left;"> numeric</td>
+<td style="text-align: left;"> total number of corn grains</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+<code>y</code>
+</td>
+<td style="text-align: left;"> numeric</td>
+<td style="text-align: left;"> number of damaged corn grains
+  </td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>A major pest of stored  maize in Brazil is <em>Sitophilus zeamais</em>.
+In an experiment to assess the insecticide action of organic
+extracts of <em>Annona mucosa</em> (<em>Annonaceae</em>), Petri dishes containing 10g of corn were treated with
+extracts prepared with different parts of the plant
+(seeds, leaves and branches) at a concentration of 1500mg/kg
+or just water (control), using a completely randomized design with 10 replicates.
+Then 20 Sitophilus zeamais adults were placed in each Petri dish
+and, after 60 days, the numbers of damaged and undamaged corn grains were counted, see Ribeiro et al (2013).
+</p>
+
+
+<h3>Source</h3>
+
+<p>Demétrio, C. G. B., Hinde, J. and Moral, R. A. (2014) Models for overdispersed data in entomology. In Godoy, W. A. C. and Ferreira, C. P. (Eds.) Ecological modelling applied to entomology. Springer.
+</p>
+
+
+<h3>References</h3>
+
+<p>Moral, R. A., Hinde, J. and Demétrio, C. G. B. (2017) Half-normal plots and overdispersed models in R: the hnp package. Journal of Statistical Software 81(10):1-23.
+</p>
+<p>Ribeiro, L. P., Vendramin, J. D., Bicalho, K. U., Andrade, M. S., Fernandes, J. B., Moral, R. A., Demétrio, C. G. B. (2013) <em>Annona mucosa Jacq.</em> (<em>Annonaceae</em>): A promising source of bioactive compounds against <em>Sitophilus zeamais Mots.</em> (<em>Coleoptera: Curculionidae</em>). J Stored Prod Res 55:6-14
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(corn)
+
+# Binomial fit
+model1 &lt;- glm(cbind(y, m-y) ~ extract, family=binomial,
+              data=corn)
+anova(model1, test="Chisq")
+hnp(model1, pch=4, main="Binomial: Logit",
+    xlab="Half-normal scores", ylab="Deviance residuals")
+
+# Quasi-binomial fit
+model2 &lt;- glm(cbind(y, m-y) ~ extract, family=quasibinomial,
+              data=corn)
+anova(model2, test="F")
+summary(model2)$dispersion # estimated phi
+
+# half-normal plots
+par(mfrow=c(1,2),cex=1.4, cex.main=0.9, pty='s')
+hnp(model1, pch=4, main="(a) Binomial; Logit",
+    xlab="Half-normal scores", ylab="Deviance residuals")
+hnp(model2, pch=4, main="(b) Quasibinomial; Logit",
+    xlab="Half-normal scores", ylab="Deviance residuals")
+
+anova(model1, test="Chisq") # binomial model
+anova(model2, test="F") # quasi-binomial model
+summary(model1) # binomial model
+summary(model2) # quasi-binomial model
+
+# now with factor level parameterisation
+summary(update(model1,.~.-1))
+summary(update(model2,.~.-1))
+
+## for discussion on the analysis of this data set,
+## see Demetrio et al. (2014)
+</code></pre>
+
+
+</div>

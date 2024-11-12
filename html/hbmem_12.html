@@ -1,0 +1,252 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>sampleGamma</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Function sampleGamma</h2>
+
+<h3>Description</h3>
+
+<p>Samples posterior of mean parameters of the hierarchical
+linear model on the log scale parameter of a gamma distributuion. Usually 
+used within an MCMC loop.</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">sampleGamma(sample, y, cond,subj, item,
+lag,N,I,J,R,ncond,nsub,nitem,s2mu, s2a, s2b, met, shape,
+sampLag,pos=FALSE)</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>sample</code></td>
+<td>
+<p>Block of linear model parameters from previous iteration.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+<p>Vector of data</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cond</code></td>
+<td>
+<p>Vector fo condition index,starting at zero.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>subj</code></td>
+<td>
+<p>Vector of subject index, starting at zero.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>item</code></td>
+<td>
+<p>Vector of item index, starting at zero.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lag</code></td>
+<td>
+<p>Vector of lag index, zero-centered.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>N</code></td>
+<td>
+<p>Numer of conditions.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>I</code></td>
+<td>
+<p>Number of subjects.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>J</code></td>
+<td>
+<p>Number of items.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>R</code></td>
+<td>
+<p>Total number of trials.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ncond</code></td>
+<td>
+<p>Vector of length (N) containing number of trials per 
+condition.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nsub</code></td>
+<td>
+<p>Vector of length (I) containing number of trials per each
+subject.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nitem</code></td>
+<td>
+<p>Vector of length (J) containing number of trials per each
+item.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>s2mu</code></td>
+<td>
+<p>Prior variance on the grand mean mu; usually set to some
+large number.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>s2a</code></td>
+<td>
+<p>Shape parameter of inverse gamma prior placed on effect 
+variances.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>s2b</code></td>
+<td>
+<p>Rate parameter of inverse gamma prior
+placed on effect variances.  Setting both s2a AND s2b to be small
+(e.g., .01, .01) makes this an uninformative prior.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>met</code></td>
+<td>
+<p>Vector of tuning parameter for metropolis-hastings 
+steps.  Here, all sampling (except variances of alpha and beta) and 
+decorrelating steps utilize the M-H sampling algorithm.  This hould 
+be adjusted so that .2 &lt; b0 &lt; .6.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>shape</code></td>
+<td>
+<p>Single shape of Gamma distribution.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sampLag</code></td>
+<td>
+<p>Logical.  Whether or not to sample the lag effect.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pos</code></td>
+<td>
+<p>Logical.  If true, the model on scale is 1+exp(mu + alpha + beta).  That is, the scale is always greater than one. </p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>The function returns a list.  The first element of the list is the
+newly sampled block of parameters.  The second element contains a
+vector of 0s and 1s indicating which of the decorrelating steps were accepted.</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Michael S. Pratte</p>
+
+
+<h3>See Also</h3>
+
+<p>hbmem</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">library(hbmem)
+N=2
+shape=2
+I=30
+J=50
+R=I*J
+#make some data
+mu=log(c(1,2))
+alpha=rnorm(I,0,.2)
+beta=rnorm(J,0,.2)
+theta=-.001
+cond=sample(0:(N-1),R,replace=TRUE)
+subj=rep(0:(I-1),each=J)
+item=NULL
+for(i in 1:I)
+item=c(item,sample(0:(J-1),J,replace=FALSE))
+lag=rnorm(R,0,100)
+lag=lag-mean(lag)
+resp=1:R
+for(r in 1:R)
+{
+  scale=1+exp(mu[cond[r]+1]+alpha[subj[r]+1]+beta[item[r]+1]+theta*lag[r])
+  resp[r]=rgamma(1,shape=shape,scale=scale)
+}
+
+ncond=table(cond)
+nsub=table(subj)
+nitem=table(item)
+
+M=10
+keep=2:M
+B=N+I+J+3
+s.block=matrix(0,nrow=M,ncol=B)
+met=rep(.08,B)
+b0=rep(0,B)
+jump=.0005
+for(m in 2:M)
+{
+tmp=sampleGamma(s.block[m-1,],resp,cond,subj,item,lag,
+N,I,J,R,ncond,nsub,nitem,5,.01,.01,met,2,1,pos=TRUE)
+s.block[m,]=tmp[[1]]
+b0=b0 + tmp[[2]]
+#Auto-tuning of metropolis decorrelating steps 
+if(m&gt;20 &amp; m&lt;min(keep))
+  {
+    met=met+(b0/m&lt;.4)*rep(-jump,B) +(b0/m&gt;.6)*rep(jump,B)
+    met[met&lt;jump]=jump 
+  }
+if(m==min(keep)) b0=rep(0,B)
+}
+
+b0/length(keep) #check acceptance rate
+
+hbest=colMeans(s.block[keep,])
+
+par(mfrow=c(2,2),pch=19,pty='s')
+matplot(s.block[keep,1:N],t='l')
+abline(h=mu,col="green")
+acf(s.block[keep,1])
+plot(hbest[(N+1):(I+N)]~alpha)
+abline(0,1,col="green")
+plot(hbest[(I+N+1):(I+J+N)]~beta)
+abline(0,1,col="green")
+
+
+
+#variance of participant effect
+mean(s.block[keep,(N+I+J+1)])
+#variance of item effect
+mean(s.block[keep,(N+I+J+2)])
+#estimate of lag effect
+mean(s.block[keep,(N+I+J+3)])
+
+</code></pre>
+
+
+</div>

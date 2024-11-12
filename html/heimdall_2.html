@@ -1,0 +1,67 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>dfr_cusum</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Cumulative Sum for Concept Drift Detection (CUMSUM) method</h2>
+
+<h3>Description</h3>
+
+<p>The cumulative sum (CUSUM) is a sequential analysis technique used for change detection.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">dfr_cusum(lambda = 100)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table><tr style="vertical-align: top;">
+<td><code>lambda</code></td>
+<td>
+<p>Necessary level for warning zone (2 standard deviation)</p>
+</td>
+</tr></table>
+<h3>Value</h3>
+
+<p><code>dfr_cusum</code> object
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">library(daltoolbox)
+library(heimdall)
+
+# This example uses an error-based drift detector with a synthetic a 
+# model residual where 1 is an error and 0 is a correct prediction.
+
+data(st_drift_examples)
+data &lt;- st_drift_examples$univariate
+data$event &lt;- NULL
+data$prediction &lt;- st_drift_examples$univariate$serie &gt; 4
+
+model &lt;- dfr_cusum()
+
+detection &lt;- NULL
+output &lt;- list(obj=model, drift=FALSE)
+for (i in 1:length(data$prediction)){
+ output &lt;- update_state(output$obj, data$prediction[i])
+ if (output$drift){
+   type &lt;- 'drift'
+   output$obj &lt;- reset_state(output$obj)
+ }else{
+   type &lt;- ''
+ }
+ detection &lt;- rbind(detection, data.frame(idx=i, event=output$drift, type=type))
+}
+
+detection[detection$type == 'drift',]
+</code></pre>
+
+
+</div>

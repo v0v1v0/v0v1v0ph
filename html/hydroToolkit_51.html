@@ -1,0 +1,93 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>precip_hydroMet</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Make homogeneity test or fill gaps in a series</h2>
+
+<h3>Description</h3>
+
+<p>This method can do both: test homogeneity in precipitation series or fill data gaps using regional analysis.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">precip_hydroMet(
+  obj,
+  col_target = 2,
+  fill = FALSE,
+  method = "spearman",
+  min_value = 0.2
+)
+
+## S4 method for signature 'hydroMet_compact'
+precip_hydroMet(
+  obj,
+  col_target = 2,
+  fill = FALSE,
+  method = "spearman",
+  min_value = 0.2
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>obj</code></td>
+<td>
+<p>an <code>hydroMet_compact</code> class object.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>col_target</code></td>
+<td>
+<p>numeric. The column number of the target series (either to test homogeneity or to fill gaps) in <code>compact</code> slot.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fill</code></td>
+<td>
+<p>logical. By default value (<code>FALSE</code>) you will make an homogeneity test to your target series.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+<p>string (default is <code>spearman</code> - possible values are: <code>spearman</code>, <code>pearson</code> or <code>kendall</code>). When creating the regional (or master series) the method uses a weighted mean. The weighted values are the correlations coefficients.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>min_value</code></td>
+<td>
+<p>numeric. Series with a correlation value less than <code>min_value</code> are thrown away.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>If <code>fill = FALSE</code> the method will return a list with three elements: a data frame with all necessary values to correct your target serie, a plot with <code>p-values</code> and the correlation matrix. When <code>fill = TRUE</code> the list will contain: the data frame with the target series gaps filled and the correlation matrix.
+</p>
+
+
+<h3>Functions</h3>
+
+
+<ul><li> <p><code>precip_hydroMet,hydroMet_compact-method</code>: homogeneity test applied to precipitation data stored in <code>compact</code> class.
+</p>
+</li></ul>
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Load daily precipitation data-set from BDHI
+load( paste0(system.file('extdata', package = "hydroToolkit"), '/bdhi_p.rda') )
+
+# Fill gaps in Tupungato station
+relleno &lt;- precip_hydroMet(obj = bdhi_p, col_target = 5, fill = TRUE)
+
+</code></pre>
+
+
+</div>

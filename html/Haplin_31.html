@@ -1,0 +1,154 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>lineByLine</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Line-by-line modification of files</h2>
+
+<h3>Description</h3>
+
+<p>Modifies a data file line by line, i.e. reads a file line by line, converts each line, then writes to the modified file. This method is especially useful when modifying large datasets, where the reading of entire files may be time consuming and require a large amount of memory.</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">lineByLine(infile, outfile, linefunc = identity, choose.lines = NULL,
+choose.columns = NULL, col.sep = " ", ask = TRUE, 
+blank.lines.skip = TRUE, verbose = TRUE, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>infile</code></td>
+<td>
+<p>A character string giving the name and path of the file to be modified. </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>outfile</code></td>
+<td>
+<p>A character string giving the name of the modified file. The name of the file is relative to the current working directory, unless the file name contains a definite path.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>linefunc</code></td>
+<td>
+<p><code>lineByLine</code> modifies each line using <code>linefunc</code>. Default is the identity function. The user may define his or her own line-modifying functions, see Details for a thorough description.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>choose.lines</code></td>
+<td>
+<p>A numeric vector of lines to be selected or dropped from <code>infile</code>. Positive values refer to lines to be chosen, whereas negative values refer to lines to be skipped. The vector cannot include both positive and negative values at the same time. If "NULL" (default), all lines are selected.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>choose.columns</code></td>
+<td>
+<p>A numeric vector of columns to be selected (positive values) or skipped (negative values) from <code>infile</code>. The vector cannot include both positive and negative values at the same time. By default, all columns are selected without reordering among the columns. Duplication and reordering among the selected columns will occur in the modified file corresponding to the order in which the columns are listed.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>col.sep</code></td>
+<td>
+<p>Specifies the separator that splits the columns in <code>infile</code>. By default, <code>col.sep = " "</code> (space). To split at all types of spaces or blank characters, set <code>col.sep = "[[:space:]]"</code> or <code>col.sep = "[[:blank:]]"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ask</code></td>
+<td>
+<p>Logical. Default is "TRUE". If set to "FALSE", an already existing outfile will be overwritten without asking.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>blank.lines.skip</code></td>
+<td>
+<p>Logical. If "TRUE" (default), <code>lineByLine</code> ignores blank lines in the input.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p>Logical. Default is "TRUE", which means that the line number is displayed for each iteration, in addition to output from <code>linefunc</code>. If <code>choose.columns</code> contains invalid column numbers, this will also be displayed.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Further arguments to be passed to <code>linefunc</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>When reading large datafiles, functions such as <code>read.table</code> can use a large amount of memory and be extremely time consuming.
+Instead of reading the entire file at once, <code>lineByLine</code> reads one line at a time, modifies the line using <code>linefunc</code>, and then writes the line to <code>outfile</code>. <br>
+The user may specify his or her own line-converting function. This function must take the argument <code>x</code>, a character vector representing a single line of the file, split at spaces. However, additional arguments may be included.
+If <code>verbose</code> equals "TRUE", output should be displayed.
+The modified vector is returned. <br>	
+The framework of the line-modifying function may look something like this:
+</p>
+<pre>
+lineModify &lt;- function(x){
+.xnew &lt;- x
+
+## Define any modifications, for instance recoding missing values in a dataset from NA to 0:
+.xnew[is.na(.xnew)] &lt;- 0
+
+## Just to monitor progress, display, for instance, 10 first elements, without newline:
+cat(paste(.xnew[1:min(10, length(.xnew))], collapse = " "))
+
+## Return converted vector
+return(.xnew)
+}
+</pre>
+<p>See <code>Haplin:::lineConvert</code> for an additional example of a line-modifying function.
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>lineByLine</code> returns the number of lines read, although invisible. The main objective is the modified file.</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Miriam Gjerdevik,<br>
+with Hakon K. Gjessing<br>
+Professor of Biostatistics<br>
+Division of Epidemiology<br>
+Norwegian Institute of Public Health<br></p>
+<p><a href="mailto:hakon.gjessing@uib.no">hakon.gjessing@uib.no</a></p>
+
+
+<h3>References</h3>
+
+<p>Web Site: <a href="https://haplin.bitbucket.io">https://haplin.bitbucket.io</a>
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>convertPed</code></p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+
+## Extract the first ten columns from "myfile.txt", 
+## without reordering
+lineByLine(infile = "myfile.txt", outfile = "myfile_modified.txt", 
+choose.columns = c(1:10))
+
+
+## End(Not run)
+
+</code></pre>
+
+
+</div>

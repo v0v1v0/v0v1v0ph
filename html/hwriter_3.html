@@ -1,0 +1,207 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hwrite</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>HTML writer</h2>
+
+<h3>Description</h3>
+
+<p>Outputs an R object in HTML format.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">  hwrite(x, page=NULL, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>an R object to output in HTML format. Objects of type <code>character</code>, <code>vector</code>, <code>matrix</code>
+and <code>data.frame</code> are currently supported. </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>page</code></td>
+<td>
+<p>an optional connection, a character string naming the file to write
+to or a page object returned by <code>openPage</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>optional arguments. See Details.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>If <code>x</code> is a vector of only one element, it will be written by default
+as an HTML text element unless <code>table</code> is <code>TRUE</code>: in that case,
+it will be written as an HTML table containing an unique element.
+</p>
+<p>If <code>x</code> is a vector of more than one element, a matrix or a data.frame, it will be
+written by default as an HTML table unless <code>table</code> is <code>FALSE</code>: in that case,
+it will be written as a vector or a matrix of HTML text elements.
+</p>
+<p>Many optional arguments can be used to render an HTML object. See below for
+additional information. Many comprehensive examples can be found in the
+Examples section by typing <code>example(hwrite)</code>.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A character vector containing the output HTML code.
+</p>
+
+
+<h3>General arguments</h3>
+
+<p>The following optional arguments can always be used:
+</p>
+
+<dl>
+<dt>br</dt>
+<dd>
+<p>a logical specifying if a breakline (carriage return) should
+be appended at the end of <code>x</code>. Default is <code>FALSE</code>.</p>
+</dd>
+<dt>table</dt>
+<dd>
+<p>a logical controlling if the object <code>x</code> should be written as an HTML table. Default is <code>TRUE</code> for matrices and vectors containing more than one element, and <code>FALSE</code> otherwise. If set to <code>FALSE</code>, the object is written as a vector (or a matrix) of HTML text elements.</p>
+</dd>
+<dt>link</dt>
+<dd>
+<p>a character vector containing the URLs the HTML element
+will point to. This argument is the equivalent of the attribute <code>href</code> of the HTML tag &lt;a&gt;.</p>
+</dd>
+<dt>name</dt>
+<dd>
+<p>a character string naming the HTML element for further reference. This is the equivalent of the attribute <code>name</code> of the HTML tag &lt;a&gt;.</p>
+</dd>
+<dt>div</dt>
+<dd>
+<p>a logical. If <code>TRUE</code>, places the HTML element into a HTML section, using the &lt;div&gt; HTML tag. This is helpful for styling a section. Default is <code>FALSE</code>.</p>
+</dd>
+<dt>center</dt>
+<dd>
+<p>a logical indicating if <code>x</code> should be centered. Default is <code>FALSE</code>. This element may interfere with the current CSS style. Please consider the use the CSS style attribute "text-align" instead.</p>
+</dd>
+<dt>...</dt>
+<dd>
+<p>Additional arguments are added to the HTML element as HTML attributes. For HTML tables, attributes are distributed on table cells using R recycling rules. For text elements, a &lt;span&gt; HTML tag (or &lt;div&gt; if <code>div</code> is <code>TRUE</code>) is used to accommodate the attributes.</p>
+</dd> 
+</dl>
+<h3>Additional arguments for text elements</h3>
+
+<p>If <code>x</code> is rendered as an HTML text element, the following optional arguments can be used:
+</p>
+ 
+<dl>
+<dt>heading</dt>
+<dd>
+<p>a numeric containing the heading level style. Valid values spans from 1 to 5. See Examples.</p>
+</dd>
+</dl>
+<h3>Additional arguments for vectors</h3>
+
+<p>If <code>x</code> is a vector with more than one element, the following optional
+arguments can be used:
+</p>
+ 
+<dl>
+<dt>dim</dt>
+<dd>
+<p>a couple of optional numeric values indicating the desired number of rows
+and columns in the table. This is useful to orient a vector.</p>
+</dd>
+<dt>byrow</dt>
+<dd>
+<p>logical. If <code>TRUE</code>, the table is filled by
+rows first, otherwise the table is filled by columns first. Default is <code>FALSE</code>.</p>
+</dd>
+<dt>names</dt>
+<dd>
+<p>a logical indicating if the names of the elements should
+be written if the vector is named. Default is <code>TRUE</code>.</p>
+</dd>
+</dl>
+<h3>Additional arguments for tables</h3>
+
+<p>If <code>x</code> is rendered as an HTML table element, the following optional arguments can be used:
+</p>
+ 
+<dl>
+<dt>border</dt>
+<dd>
+<p>a numeric. Specifies the table border width. A value of 0 implies that no borders will be drawn.
+This argument may interfere with the "border" CSS style attribute.</p>
+</dd>
+<dt>row.names, col.names</dt>
+<dd>
+<p>a logical value indicating whether the row (resp. column) names of
+<code>x</code> are to be written. Default is <code>TRUE</code>.</p>
+</dd>
+<dt>cellspacing, cellpadding</dt>
+<dd>
+<p>a numeric. Defines the spacing and padding space in pixels between cells. These arguments may interfere with the "border" and "padding" CSS style attributes.</p>
+</dd>
+<dt>width</dt>
+<dd>
+<p>a character string. Specifies the global table width in HTML units (pixels or %).</p>
+</dd>
+<dt>col.width</dt>
+<dd>
+<p>a named character vector. Specifies the columns width
+in HTML units (pixels or %) where names of <code>col.width</code> are used to
+point column names of <code>x</code>. NAs may be used to let several column
+widths unspecified.</p>
+</dd>
+<dt>row.*, col.*</dt>
+<dd>
+<p>a list of character vectors or a character vector. Distributes the attribute '*' on the HTML table cells, according to rows (resp. columns).
+Named lists (or vectors) point the corresponding rows/columns, according to their names. Unnamed lists (or vectors) point the rows/columns in the numeric order and NAs can be used to omit rows/columns. If pointed rows/columns sizes don't match, vector values are recycled using R rules.</p>
+</dd>
+<dt>table.*</dt>
+<dd>
+<p>a character string. Uses the global table attribute '*' to render the HTML table. The attribute is added to the main &lt;table&gt; tag. Some uses include
+setting of the "border" and "margin" CSS attributes that cannot be distributed on cells.</p>
+</dd>
+<dt>*</dt>
+<dd>
+<p>a character string, vector or matrix. Distributes the attribute '*' on the HTML table cells, using R recycling rules.
+Any valid HTML attributes can be used. The value may contain NAs to omit cells. Matrices may contain one extra row and/or column to target heading cells.</p>
+</dd>
+</dl>
+<p>See Examples for many illustrated examples of all arguments.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Gregoire Pau, <a href="mailto:gpau@ebi.ac.uk">gpau@ebi.ac.uk</a>, 2008
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>openPage</code>, <code>closePage</code>, <code>hwriteImage</code>, <code>hmakeTag</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"> hwriter:::showExample()
+</code></pre>
+
+
+</div>

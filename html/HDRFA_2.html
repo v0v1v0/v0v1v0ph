@@ -1,0 +1,158 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>HPCA_FN</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Estimating Factor Numbers via Rank Minimization Corresponding to Huber PCA
+</h2>
+
+<h3>Description</h3>
+
+<p>This function is to estimate factor numbers via rank minimization corresponding to Huber Principal Component Analysis (HPCA).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">HPCA_FN(X, rmax, Method = "E", tau = NULL, scale_est="MAD", threshold = NULL,
+        L_init = NULL, F_init = NULL, maxiter_HPCA = 100, maxiter_HLM = 100, 
+        eps = 0.001)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>X</code></td>
+<td>
+
+<p>Input matrix, of dimension <code class="reqn">T\times N</code>. Each row is an observation with <code class="reqn">N</code> features at time point <code class="reqn">t</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rmax</code></td>
+<td>
+
+<p>The user-supplied maximum factor numbers. 
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Method</code></td>
+<td>
+
+<p><code>Method="P"</code> indicates minimizing the Huber loss of the idiosyncratic error's <code class="reqn">\ell_2</code> norm while <code>Method="E"</code> indicates minimizing the elementwise Huber loss. The default is the elementwise Huber loss.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tau</code></td>
+<td>
+
+<p>Optional user-supplied parameter for Huber loss; default is NULL, and <code class="reqn">\tau</code> is provided by default.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>scale_est</code></td>
+<td>
+
+<p>A parameter for the elementwise Huber loss. <code>scale_est="MAD"</code> indicates robust variance estimation in each iteration, while <code>scale_est="const"</code> indicates fixing user-supplied <code class="reqn">\tau</code>. The default is <code>scale_est="MAD"</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>threshold</code></td>
+<td>
+
+<p>The threshold of rank minimization; default is NULL.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>L_init</code></td>
+<td>
+
+<p>User-supplied inital value of loadings in the HPCA; default is the PCA estimator.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>F_init</code></td>
+<td>
+
+<p>User-supplied inital value of factors in the HPCA; default is the PCA estimator.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>maxiter_HPCA</code></td>
+<td>
+
+<p>The maximum number of iterations in the HPCA. The default is <code class="reqn">100</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>maxiter_HLM</code></td>
+<td>
+
+<p>The maximum number of iterations in the iterative Huber regression algorithm. The default is <code class="reqn">100</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>eps</code></td>
+<td>
+
+<p>The stopping critetion parameter in the HPCA. The default is 1e-3.
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>See He et al. (2023) for details.
+</p>
+
+
+<h3>Value</h3>
+
+<table><tr style="vertical-align: top;">
+<td><code>rhat</code></td>
+<td>
+<p>The estimated factor number.</p>
+</td>
+</tr></table>
+<h3>Author(s)</h3>
+
+<p>Yong He, Lingxiao Li, Dong Liu, Wenxin Zhou.
+</p>
+
+
+<h3>References</h3>
+
+<p>He Y, Li L, Liu D, Zhou W., 2023 Huber Principal Component Analysis for Large-dimensional Factor Models. 
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">set.seed(1)
+T=50;N=50;r=3
+L=matrix(rnorm(N*r,0,1),N,r);F=matrix(rnorm(T*r,0,1),T,r)
+E=matrix(rnorm(T*N,0,1),T,N)
+X=F%*%t(L)+E
+
+
+HPCA_FN(X,8,Method="E")
+
+HPCA_FN(X,8,Method="P")
+</code></pre>
+
+
+</div>

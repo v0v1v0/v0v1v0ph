@@ -1,0 +1,115 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>create.prepared_list</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Manually create a <code>prepared_list</code>
+</h2>
+
+<h3>Description</h3>
+
+<p><code>create.prepared_list</code> creates a
+<code>prepared_list</code> manually.  Typically, one would
+simply use the <code>prepare.list</code>, but there are
+situations where the <code>data</code> argument would be too
+large to read into memory. <br> This function assumes that
+the user has used the <code>assemble</code> function to
+construct a list of the relevant <code>assembled_splines</code>
+and manually computed <code>Ytilde</code> for a number of
+relevant <code>data</code> observations and stored them in a
+list. The user should also manually compute the sum of
+the squared <code>data</code> for each <code>data</code> observation.
+The user must also specify the dimensions of each data
+set (which are assumed to be the same) as a vector and
+provide the relevant set of values at which each
+<code>data</code> object is observed.  See Examples.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">create.prepared_list(assembled, x, Ytilde, sum_ysq, n)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>assembled</code></td>
+<td>
+<p>A list of <code>assembled_splines</code>.  See
+Examples.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>The list of arguments at which to evaluate each
+of the splines used to construct <code>assembled</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Ytilde</code></td>
+<td>
+<p>A list of <code>prepared_*</code> objects.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sum_ysq</code></td>
+<td>
+<p>A vector with the sum of squared <code>data</code>
+objects used to construct <code>Ytilde</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n</code></td>
+<td>
+<p>The dimensions of the <code>data</code> objects used
+to construct <code>Ytilde</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A prepared list.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># generate and prepare 3d data
+set.seed(9)
+dat = generate.data3d()
+
+# list giving the locations to evaluate the basis functions
+x = dat$x
+# construct a set of basic B-splines for each dimension
+splines = default.splines(x)
+
+# construct assembled splines from splines list
+a = assemble(splines, x)
+
+# imagine there are 4 data obsevations we want to smooth
+# but that they can't be loaded into memory
+Ytilde = vector("list", 4)
+sum_ysq = numeric(4)
+
+# prepare each data set manually
+# notice the use of the assembled arguments so that
+# the splines are not "assembled" again for each data set
+for(i in seq_along(Ytilde)) {
+    data = generate.data3d()$data3d
+    Ytilde[[i]] = prepare(data, x = x, splines = splines,
+                          assembled = a)
+    sum_ysq[i] = sum(data^2)
+}
+n = dim(data)
+p = create.prepared_list(assembled = a, x = x,
+                         Ytilde = Ytilde, sum_ysq = sum_ysq,
+                         n = n)
+</code></pre>
+
+
+</div>

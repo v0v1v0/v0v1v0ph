@@ -1,0 +1,138 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>Gen.Alg.Consensus</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Find Taxa Separating Two Groups using Multiple Genetic Algorithm's (GA) Consensus</h2>
+
+<h3>Description</h3>
+
+<p>GA-Mantel is a fully multivariate method that uses a genetic algorithm to search over 
+possible taxa subsets using the Mantel correlation as the scoring measure for assessing 
+the quality of any given taxa subset.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">	Gen.Alg.Consensus(data, covars, consensus = .5, numRuns = 10, 
+		parallel = FALSE, cores = 3, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>A  matrix of taxonomic counts(columns) for each sample(rows).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>covars</code></td>
+<td>
+<p>A  matrix of covariates(columns) for each sample(rows).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>consensus</code></td>
+<td>
+<p>The required fraction (0, 1] of solutions containing an edge in order to keep it.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>numRuns</code></td>
+<td>
+
+<p>Number of runs to do.  In practice the number of runs needed varies based on data set size
+and the GA parameters set.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>parallel</code></td>
+<td>
+<p>When this is 'TRUE' it allows for parallel calculation of the bootstraps. Requires the package <code>doParallel</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cores</code></td>
+<td>
+<p>The number of parallel processes to run if parallel is 'TRUE'.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Other arguments for the GA function see Gen.Alg</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Use a GA consensus approach to find taxa that separate subjects based on group membership 
+or set of covariates if you cannot run the GA long enough to get a final solution.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A list containing
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>solutions</code></td>
+<td>
+<p>The best solution from each run.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>consSol</code></td>
+<td>
+<p>The consensus solution.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>selectedIndex</code></td>
+<td>
+<p>The selected taxa by column number.</p>
+</td>
+</tr>
+</table>
+<h3>Examples</h3>
+
+<pre><code class="language-R">	## Not run: 
+		data(saliva)
+		data(throat)
+		
+		### Combine the data into a single data frame
+		group.data &lt;- list(saliva, throat)
+		group.data &lt;- formatDataSets(group.data)
+		data &lt;- do.call("rbind", group.data)
+		
+		### Normalize the data by subject
+		dataNorm &lt;- t(apply(data, 1, function(x){x/sum(x)}))
+		
+		### Set covars to just be group membership
+		memb &lt;- c(rep(0, nrow(saliva)), rep(1, nrow(throat)))
+		covars &lt;- matrix(memb, length(memb), 1)
+		
+		### We use low numbers for speed. The exact numbers to use depend
+		### on the data being used, but generally the higher iters and popSize 
+		### the longer it will take to run.  earlyStop is then used to stop the
+		### run early if the results aren't improving.
+		iters &lt;- 500
+		popSize &lt;- 200
+		earlyStop &lt;- 250
+		numRuns &lt;- 3
+		
+		gaRes &lt;- Gen.Alg.Consensus(dataNorm, covars, .5, numRuns, FALSE, 3, 
+				iters, popSize, earlyStop)
+	
+## End(Not run)
+</code></pre>
+
+
+</div>

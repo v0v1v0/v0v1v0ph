@@ -1,0 +1,203 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>calc_fup_correction</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Calculate the correction for lipid binding in plasma binding assay</h2>
+
+<h3>Description</h3>
+
+<p>Poulin and Haddad (2012) observed "...that for
+a highly lipophilic compound, the calculated 
+f<sub>up</sub> is by
+far [less than] the experimental values observed under
+in vitro conditions." Pearce et al. (2017) hypothesized that there was additional lipid
+binding in vivo that acted as a sink for lipophilic compounds, reducing the
+effective f<sub>up</sub> in vivo. It is 
+possible that this is due to the binding of lipophilic compounds on the non
+plasma-side of the rapid equilibrium dialysis plates (Waters et al., 2008).
+Pearce et al. (2017) compared predicted and observed 
+tissue partition coefficients
+for a range of compounds. They showed that predictions were improved by 
+adding additional binding proportional to the distribution coefficient 
+D<sub>ow</sub> 
+(<code>calc_dow</code>)
+and the fractional volume of lipid in
+plasma (F<sub>lipid</sub>). 
+We calculate
+F<sub>lipid</sub> as the     
+sum of the physiological plasma neutral lipid fractional volume and 30 percent of 
+the plasma neutral phospholipid fractional volume. We use values
+from Peyret et al. (2010) for rats and Poulin and Haddad (2012)
+for humans. The estimate of 30 percent of the
+neutral phospholipid volume as neutral lipid was used for simplictity's sake in
+place of our membrane affinity predictor. To account for additional binding to lipid, 
+plasma to water partitioning
+(K<sub>plasma:water</sub> = 1/f<sub>up</sub>)
+is increased as such:
+K<sup>corrected</sup><sub>plasma:water</sub> = 1/f<sup>corrected</sup><sub>up</sub> = 1/f<sup>in vitro</sup><sub>up</sub> + D<sub>ow</sub>*F<sub>lipid</sub></p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">calc_fup_correction(
+  fup = NULL,
+  chem.cas = NULL,
+  chem.name = NULL,
+  dtxsid = NULL,
+  parameters = NULL,
+  Flipid = NULL,
+  plasma.pH = 7.4,
+  dow74 = NULL,
+  species = "Human",
+  default.to.human = FALSE,
+  force.human.fup = FALSE,
+  suppress.messages = FALSE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>fup</code></td>
+<td>
+<p>Fraction unbound in plasma, if provided this argument overides
+values from argument parameters and <code>chem.physical_and_invitro.data</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>chem.cas</code></td>
+<td>
+<p>Chemical Abstract Services Registry Number (CAS-RN) – if
+parameters is not specified then the chemical must be identified by either
+CAS, name, or DTXISD</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>chem.name</code></td>
+<td>
+<p>Chemical name (spaces and capitalization ignored) –  if
+parameters is not specified then the chemical must be identified by either
+CAS, name, or DTXISD</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dtxsid</code></td>
+<td>
+<p>EPA's 'DSSTox Structure ID (<a href="https://comptox.epa.gov/dashboard">https://comptox.epa.gov/dashboard</a>)
+– if parameters is not specified then the chemical must be identified by 
+either CAS, name, or DTXSIDs</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>parameters</code></td>
+<td>
+<p>Parameters from the appropriate parameterization function
+for the model indicated by argument model</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Flipid</code></td>
+<td>
+<p>The fractional volume of lipid in plasma (from <code>physiology.data</code>)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>plasma.pH</code></td>
+<td>
+<p>pH of plasma (default 7.4)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dow74</code></td>
+<td>
+<p>The octanol-water distribution ratio (DOW).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>species</code></td>
+<td>
+<p>Species desired (either "Rat", "Rabbit", "Dog", "Mouse", or
+default "Human").</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>default.to.human</code></td>
+<td>
+<p>Substitutes missing fraction of unbound plasma with
+human values if true.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>force.human.fup</code></td>
+<td>
+<p>Returns human fraction of unbound plasma in
+calculation for rats if true.
+When species is specified as rabbit, dog, or mouse, the human unbound
+fraction is substituted.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>suppress.messages</code></td>
+<td>
+<p>Whether or not the output message is suppressed.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Note that octanal:water partitioning above 1:1,000,000 
+(LogD<sub>ow</sub> &gt; 6)
+are truncated at 1:1,000,000 because greater partitioning would
+likely take longer than protein binding assay itself.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A numeric fraction unpbound in plasma between zero and one
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>John Wambaugh
+</p>
+
+
+<h3>References</h3>
+
+<p>Pearce RG, Setzer RW, Davis JL, Wambaugh JF (2017).
+“Evaluation and calibration of high-throughput predictions of chemical distribution to tissues.”
+<em>Journal of pharmacokinetics and pharmacodynamics</em>, <b>44</b>, 549–565.
+</p>
+<p>Peyret T, Poulin P, Krishnan K (2010).
+“A unified algorithm for predicting partition coefficients for PBPK modeling of drugs and environmental chemicals.”
+<em>Toxicology and applied pharmacology</em>, <b>249</b>(3), 197–207.
+</p>
+<p>Poulin P, Haddad S (2012).
+“Advancing prediction of tissue distribution and volume of distribution of highly lipophilic compounds from a simplified tissue-composition-based model as a mechanistic animal alternative method.”
+<em>Journal of pharmaceutical sciences</em>, <b>101</b>(6), 2250–2261.
+</p>
+<p>Schmitt W (2008).
+“General approach for the calculation of tissue to plasma partition coefficients.”
+<em>Toxicology in vitro</em>, <b>22</b>(2), 457–467.
+</p>
+<p>Waters, Nigel J., et al. "Validation of a rapid equilibrium dialysis 
+approach for the measurement of plasma protein binding." Journal of 
+pharmaceutical sciences 97.10 (2008): 4586-4595.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>apply_fup_adjustment</code>
+</p>
+<p><code>calc_dow</code>
+</p>
+
+
+</div>

@@ -1,0 +1,197 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hurdle</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Hurdle Model Count Data Regression</h2>
+
+<h3>Description</h3>
+
+<p><code>hurdle</code> is used to fit single or 
+double-hurdle regression models to count data via Bayesian inference.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hurdle(y, x = NULL, hurd = Inf, dist = c("poisson", "nb", "lognormal"),
+  dist.2 = c("gpd", "poisson", "lognormal", "nb"),
+  control = hurdle_control(), iters = 1000, burn = 500, nthin = 1,
+  plots = FALSE, progress.bar = TRUE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+<p>numeric response vector.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>numeric predictor matrix.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>hurd</code></td>
+<td>
+<p>numeric threshold for 'extreme' observations of two-hurdle models. 
+<code>Inf</code> for one-hurdle models.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dist</code></td>
+<td>
+<p>character specification of response distribution.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dist.2</code></td>
+<td>
+<p>character specification of response distribution for 
+'extreme' observations of two-hurdle models.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>control</code></td>
+<td>
+<p>list of parameters for controlling the fitting process, 
+specified by <code>hurdle_control</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>iters</code></td>
+<td>
+<p>number of iterations for the Markov chain to run.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>burn</code></td>
+<td>
+<p>numeric burn-in length.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nthin</code></td>
+<td>
+<p>numeric thinning rate.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>plots</code></td>
+<td>
+<p>logical operator. <code>TRUE</code> to output plots.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>progress.bar</code></td>
+<td>
+<p>logical operator. <code>TRUE</code> to print progress bar.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Setting <code>dist</code> and <code>dist.2</code> to be the same distribution creates a 
+single <code>dist</code>-hurdle model, not a double-hurdle model. However, this 
+is being considered in future package updates.
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>hurdle</code> returns a list which includes the items
+</p>
+
+<dl>
+<dt>pD</dt>
+<dd>
+<p>measure of model dimensionality <code class="reqn">p_D</code> where 
+<code class="reqn">p_D = \bar{D} - D(\bar{\theta}</code>) is the <code class="reqn">"mean posterior deviance - 
+   deviance of posterior means"</code></p>
+</dd>
+<dt>DIC</dt>
+<dd>
+<p>Deviance Information Criterion where <code class="reqn">DIC = \bar{D} - p_D</code></p>
+</dd>
+<dt>PPO</dt>
+<dd>
+<p>Posterior Predictive Ordinate (PPO) measure of fit</p>
+</dd>
+<dt>CPO</dt>
+<dd>
+<p>Conditional Predictive Ordinate (CPO) measure of fit</p>
+</dd>
+<dt>pars.means</dt>
+<dd>
+<p>posterior mean(s) of third-component parameter(s) if 
+<code>hurd != Inf</code></p>
+</dd>  
+<dt>ll.means</dt>
+<dd>
+<p>posterior means of the log-likelihood distributions of 
+all model components</p>
+</dd>
+<dt>beta.means</dt>
+<dd>
+<p>posterior means regression coefficients</p>
+</dd>
+<dt>dev</dt>
+<dd>
+<p>posterior deviation where <code class="reqn">D = -2LogL</code></p>
+</dd>
+<dt>beta</dt>
+<dd>
+<p>posterior distributions of regression coefficients</p>
+</dd>
+<dt>pars</dt>
+<dd>
+<p>posterior distribution(s) of third-component parameter(s) if 
+<code>hurd != Inf</code></p>
+</dd>  
+</dl>
+<h3>Author(s)</h3>
+
+<p>Taylor Trippe &lt;<a href="mailto:ttrippe@luc.edu">ttrippe@luc.edu</a>&gt; <br>
+Earvin Balderama &lt;<a href="mailto:ebalderama@luc.edu">ebalderama@luc.edu</a>&gt;
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">#Generate some data:
+p=0.5; q=0.25; lam=3;
+mu=10; sigma=7; xi=0.75;
+n=200
+
+set.seed(2016)
+y &lt;- rbinom(n,1,p)
+nz &lt;- sum(1-y)
+extremes &lt;- rbinom(sum(y),1,q)
+ne &lt;- sum(extremes)
+nt &lt;- n-nz-ne
+yt &lt;- sample(mu-1,nt,replace=TRUE,prob=dpois(1:(mu-1),3)/(ppois(mu-1,lam)-ppois(0,lam)))
+yz &lt;- round(rgpd(nz,mu,sigma,xi))
+y[y==1] &lt;- c(yt,yz)
+g &lt;- hurdle(y)
+
+
+
+
+
+
+
+
+
+
+
+
+</code></pre>
+
+
+</div>

@@ -1,0 +1,247 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>likertWeighted</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Special case wrapper for likert() when multiple columns are to have the
+same bar thicknesses.  Uses formula with one or two conditioning variables.
+</h2>
+
+<h3>Description</h3>
+
+<p>Special case wrapper for likert() when multiple columns are to have the
+same bar thicknesses.  Uses formula with one or two conditioning variables.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">likertWeighted(x, ...) ## generic
+
+## S3 method for class 'array'
+likertWeighted(x, ..., C = 1, Q = 3, R = 2) ## array
+
+## Default S3 method:
+likertWeighted(x, ...) ## matrix, table, data.frame
+
+## S3 method for class 'formula'
+likertWeighted(x, data,
+               xlim=c(-100, 100),
+               scales=list(y=list(relation="free", cex=1.3),
+                           x=list(at=seq(-100, 100, 50),
+                           labels=abs(seq(-100, 100, 50)), cex=.5)),
+               box.ratio=1000,
+               as.percent=TRUE, rightAxis=FALSE,
+               between=list(x=1, y=0),
+               strip=FALSE, strip.left=FALSE,
+               par.settings=list(clip=list(panel="off")),
+               h.resizePanels=1,
+               auto.key.title=NULL,
+               auto.key.columns=dim(data)[[2]] -
+               NumberOfConditioningVariables(formula), ## excludes conditioning variables
+               auto.key.cex=1.2,
+               auto.key.cex.title=1.2,
+               auto.key.lines.title=3,
+               ylab=NULL,
+               axis.top=dimnames(result)[[1]], ## Questions
+               axis.top.row=1,
+               ...)
+               </code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+
+<p>For the default method, a matrix or data.frame or two-dimensional
+table.  For the array method, a two- or-three-dimensional array.
+For the formula method, a formula.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>formula</code></td>
+<td>
+
+<p>Standard trellis formula, usually <code> ~ . | row + column</code> or
+<code> ~ . | row</code>
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+
+<p>A <code>data.frame</code> that has been constructed from a 2D object (<code>matrix</code>
+or <code>table</code> or <code>data.frame</code>) to include an additional column <code>row</code>, or
+constructed from a 3D <code>array</code> by <code>toCQxR</code> to include
+two additional columns <code>group</code> and <code>row</code>.  The <code>default</code>
+and <code>array</code> methods do that construction.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>C, R, Q</code></td>
+<td>
+
+<p>Integers, one each of 1,2,3; positions of the three dimensions.  Used in
+<code>array</code> method.  See <code>toCQxR</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>xlim, between, strip, strip.left, par.settings, ylab</code></td>
+<td>
+
+<p>See <code>xyplot</code>
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>scales</code></td>
+<td>
+
+<p>See <code>xyplot</code>.  For <code>likertWeighted</code>, when scales for x is
+changed, scales for y must be stated also.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>box.ratio</code></td>
+<td>
+
+<p>See <code>panel.bwplot</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>as.percent, rightAxis, ..., h.resizePanels</code></td>
+<td>
+
+<p>First see the formula method for <code>likertWeighted</code>, and then <code>likert</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>auto.key.title, auto.key.columns, auto.key.cex,
+auto.key.cex.title, auto.key.lines.title</code></td>
+<td>
+
+<p>Values which will be used in <code>trellis</code> argument
+<code>auto.key=list(title=auto.key.title, columns=auto.key.columns,
+    cex=auto.key.cex, cex.title=auto.key.cex.title,
+    lines.title=auto.key.lines.title)</code>
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>axis.top</code></td>
+<td>
+
+<p>Label to be placed at <code>x=0</code> for top (and other specified) panel of each column.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>axis.top.row</code></td>
+<td>
+
+<p>Which rows will have <code>axis.top</code> displayed.
+</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A <code>likert</code> plot as a <code>"trellis"</code> object.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p> Richard M. Heiberger &lt;rmh@temple.edu&gt; </p>
+
+
+<h3>See Also</h3>
+
+<p><code>likert</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+## simplest 2D example
+tmp &lt;- matrix(1:12, 3, 4,
+              dimnames=list(c("A","B","C"),
+                            c(letters[4:7]))) * c(1,2,3)
+tmp
+rowSums(tmp)
+
+likertWeighted(tmp,
+               h.resizePanels=rowSums(tmp),
+               main="likertWeighted, simplest example,
+                     defaults to Percent,
+                     specified row thicknesses")
+
+## Same example with explicit use of the formula method
+## (default method does this for you).
+tmpdd &lt;- data.frame(tmp, row=row.names(tmp))
+tmpdd
+likertWeighted(~ . | row, tmpdd,            ## tmpdd
+               h.resizePanels=rowSums(tmp), ## tmp
+main="likertWeighted,
+same example but with explicit formula method")
+
+## show subgroups
+likertWeighted(tmp,
+               h.resizePanels=rowSums(tmp),
+               between=list(y=c(0, 1)),
+               ylab=c("C in its own group","A and B together"),
+               main="between=list(y=c(0,1) ## standard lattice between argument
+Adjacent A and B with y.between = 0 are in the same bordered group.
+Adjacent B and C with y.between != 0 are in different bordered groups.")
+
+
+## simplest 3D example
+## This is natural when multiple questions are asked of the
+## same set of respondents in a survey.
+## This example simulates that situation.
+##
+tmp3D &lt;- abind::abind(h=tmp, i=tmp, j=tmp, along=3)
+tmp3D[1,,"i"] &lt;- tmp3D[1,c(4,2,1,3),"h"]
+tmp3D[2,,"i"] &lt;- tmp3D[2,c(2,4,3,1),"h"]
+tmp3D[3,,"i"] &lt;- tmp3D[3,c(4,1,2,3),"h"]
+tmp3D[1,,"j"] &lt;- tmp3D[1,c(4,3,2,1),"h"]
+tmp3D[2,,"j"] &lt;- tmp3D[2,c(1,4,3,2),"h"]
+tmp3D[3,,"j"] &lt;- tmp3D[3,c(2,4,3,1),"h"]
+## now
+rowSums(tmp3D[,,1]) == rowSums(tmp3D[,,2])
+rowSums(tmp3D[,,1]) == rowSums(tmp3D[,,3])
+
+
+likertWeighted(tmp3D, h.resizePanels=rowSums(tmp3D[,,1]),
+               main="simplest 3D example, array method")
+
+likertWeighted(tmp3D, h.resizePanels=rowSums(tmp3D[,,1]),
+               between=list(x=1, y=c(0, 1)),
+               main="simplest 3D example, array method, with subgroups")
+
+## Same example with explicit use of the formula method
+## (array method does this for you).
+tmp3Ddf &lt;- toCQxR(tmp3D)
+dimnames(tmp3Ddf)
+tmp3Ddf
+likertWeighted(~ . | group + row, tmp3Ddf, h.resizePanels=rowSums(tmp3D[,,1]),
+               main="simplest 3D example, formula method")
+
+
+</code></pre>
+
+
+</div>

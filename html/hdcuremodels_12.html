@@ -1,0 +1,106 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>nonzerocure_test</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Non-parametric pest for a non-zero cured fraction</h2>
+
+<h3>Description</h3>
+
+<p>Tests the null hypothesis that the proportion of observations susceptible to the event = 1 against the alternative that the proportion of observations susceptible to the event is &lt; 1. If the null hypothesis is rejected, there is a significant cured fraction.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">nonzerocure_test(object, Reps = 1000, seed = NULL, plot = FALSE, B = NULL)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>object</code></td>
+<td>
+<p>a <code>survfit</code> object.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Reps</code></td>
+<td>
+<p>number of simulations on which to base the p-value (default = 1000).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>seed</code></td>
+<td>
+<p>optional random seed.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>plot</code></td>
+<td>
+<p>logical. If TRUE a histogram of the estimated susceptible proportions over all simulations is produced.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>B</code></td>
+<td>
+<p>optional. If specified the maximum observed time for the uniform distribution for generating the censoring times. If not specified, an exponential model is used for generating the censoring times (default).</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>proportion_susceptible</code></td>
+<td>
+<p>estimated proportion of susceptibles</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>proportion_cured</code></td>
+<td>
+<p>estimated proportion of those cured</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>p.value</code></td>
+<td>
+<p>p-value testing the null hypothesis that the proportion of susceptibles = 1 (cured fraction = 0) against the alternative that the proportion of susceptibles &lt; 1 (non-zero cured fraction)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>time_95_percent_of_events</code></td>
+<td>
+<p>estimated time at which 95% of events should have occurred</p>
+</td>
+</tr>
+</table>
+<h3>References</h3>
+
+<p>Maller, R. A. and Zhou, X. (1996) <em>Survival Analysis with Long-Term Survivors</em>. John Wiley &amp; Sons.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>survfit</code>, <code>cure_estimate</code>, <code>sufficient_fu_test</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">library(survival)
+set.seed(1234)
+temp &lt;- generate_cure_data(N = 100, J = 10, nTrue = 10, A = 1.8)
+training &lt;- temp$Training
+km.fit &lt;- survfit(Surv(Time, Censor) ~ 1, data = training)
+nonzerocure_test(km.fit)
+</code></pre>
+
+
+</div>

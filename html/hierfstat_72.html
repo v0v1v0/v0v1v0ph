@@ -1,0 +1,162 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>sim.genot.metapop.t</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Simulate genetic data from a metapopulation model</h2>
+
+<h3>Description</h3>
+
+<p>This function allows to simulate genetic data from a metapopulation
+model, where each population can have a different size and a different inbreeding 
+coefficient, and migration between each population is given in a migration matrix. 
+</p>
+<p>This function simulates genetic data under a migration matrix model.
+Each population <code class="reqn">i</code> sends a proportion of migrant alleles <code class="reqn">m_{ij}</code> to population <code class="reqn">j</code> 
+and receives a proportion of migrant alleles <code class="reqn">m_{ji}</code> from population <code class="reqn">j</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">sim.genot.metapop.t(size=50,nbal=4,nbloc=5,nbpop=3,N=1000,
+mig=diag(3),mut=0.0001,f=0,t=100)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>size</code></td>
+<td>
+<p>the number of sampled individuals per population</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nbal</code></td>
+<td>
+<p>the number of alleles per locus (maximum of 99)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nbloc</code></td>
+<td>
+<p>the number of loci to simulate</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nbpop</code></td>
+<td>
+<p>the number of populations to simulate</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>N</code></td>
+<td>
+<p>the effective population sizes of each population. If only one number, all
+populations are assumed to be of the same size</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mig</code></td>
+<td>
+<p>a matrix with nbpop rows and columns giving the migration rate 
+from population i (in row) to population j (in column). Each row must sum to 1.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mut</code></td>
+<td>
+<p>the mutation rate of the loci</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>f</code></td>
+<td>
+<p>the inbreeding coefficient for each population</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>t</code></td>
+<td>
+<p>the number of generation since the islands were created</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>In this model, <code class="reqn">\theta_t</code> can be written as a function of population size 
+<code class="reqn">N_i</code>, migration rate <code class="reqn">m_{ij}</code>, mutation rate <code class="reqn">\mu</code> and <code class="reqn">\theta_{(t-1)}</code>.  
+</p>
+<p>The rational is as follows:
+</p>
+<p>With probability <code class="reqn">\frac{1}{N_i}</code>, 2 alleles from 2 different individuals in 
+the current generation are sampled from the same individual of the previous 
+generation:     
+</p>
+<p>-Half the time, the same allele is drawn from the parent;
+</p>
+<p>-The other half, two different alleles are drawn, but they are identical in 
+proportion <code class="reqn">\theta_{(t-1)}</code>.
+</p>
+<p>-With  probability <code class="reqn">1-\frac{1}{N_i}</code>, the 2 alleles are drawn from different 
+individuals in the previous generation, in which case they are identical in 
+proportion <code class="reqn">\theta_{(t-1)}</code>.
+</p>
+<p>This holds providing that neither alleles have mutated or migrated.  This is 
+the case with probability <code class="reqn">m_{ii}^2 \times (1-\mu)^2</code>.
+If an allele is a mutant, then its coancestry with another allele 
+is 0.
+</p>
+<p>Note also that the mutation scheme assumed is the infinite allele (or site) 
+model.  If the number of alleles is finite (as will be the case in what follows),
+the corresponding mutation model is the K-allele model and the mutation rate 
+has to be adjusted to <code class="reqn">\mu'=\frac{K-1}{K}\mu</code>.
+</p>
+<p>Continue derivation
+</p>
+
+
+<h3>Value</h3>
+
+<p>A data frame with size*nbpop rows and nbloc+1 columns. Each row is an
+individual, the first column contains the identifier of the population to which the individual belongs, 
+the following nbloc columns contain the genotype for each locus.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Jerome Goudet <a href="mailto:jerome.goudet@unil.ch">jerome.goudet@unil.ch</a>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+#2 populations
+psize&lt;-c(10,1000)
+mig.mat&lt;-matrix(c(0.99,0.01,0.1,0.9),nrow=2,byrow=TRUE)
+dat&lt;-sim.genot.metapop.t(nbal=10,nbloc=100,nbpop=2,N=psize,mig=mig.mat,mut=0.00001,t=100)
+betas(dat)$betaiovl # Population specific estimator of FST
+
+#1D stepping stone
+## Not run: 
+np&lt;-10
+m&lt;-0.2
+mig.mat&lt;-diag(np)*(1-m)
+diag(mig.mat[-1,-np])&lt;-m/2
+diag(mig.mat[-np,-1])&lt;-m/2
+mig.mat[1,1:2]&lt;-c(1-m/2,m/2)
+mig.mat[np,(np-1):np]&lt;-c(m/2,1-m/2)
+dat&lt;-sim.genot.metapop.t(nbal=10,nbloc=50,nbpop=np,mig=mig.mat,t=400)
+pcoa(as.matrix(genet.dist(dat))) # principal coordinates plot
+
+## End(Not run)
+
+</code></pre>
+
+
+</div>

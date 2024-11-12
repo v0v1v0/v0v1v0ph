@@ -1,0 +1,196 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>predict.Hmsc</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>predict</h2>
+
+<h3>Description</h3>
+
+<p>Calculates predicted values from a fitted <code>Hmsc</code> model.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">## S3 method for class 'Hmsc'
+predict(
+  object,
+  post = poolMcmcChains(object$postList),
+  XData = NULL,
+  X = NULL,
+  XRRRData = NULL,
+  XRRR = NULL,
+  studyDesign = object$studyDesign,
+  ranLevels = object$ranLevels,
+  Gradient = NULL,
+  Yc = NULL,
+  mcmcStep = 1,
+  expected = FALSE,
+  predictEtaMean = FALSE,
+  predictEtaMeanField = FALSE,
+  nParallel = 1,
+  useSocket = TRUE,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>object</code></td>
+<td>
+<p>a fitted <code>Hmsc</code> model object</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>post</code></td>
+<td>
+<p>a list of posterior samples of the HMSC model. By default uses all samples from the pooled
+posterior of the hM object.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>XData</code></td>
+<td>
+<p>a dataframe specifying the unpreprocessed covariates for the predictions to be made.
+Works only if the <code>XFormula</code> argument was specified in the <code>Hmsc()</code> model constructor call.
+Requirements are similar to those in the <code>Hmsc</code> model constructor.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>X</code></td>
+<td>
+<p>a matrix specifying the covariates for the predictions to be made.
+Only one of XData and X arguments may be provided.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>XRRRData</code></td>
+<td>
+<p>a dataframe of covariates for reduced-rank regression</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>XRRR</code></td>
+<td>
+<p>a matrix of covariates for reduced-rank regression</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>studyDesign</code></td>
+<td>
+<p>a matrix, specifying the structure of the study design for the prediction.
+Requirements are similar to those of the <code>Hmsc</code> constructor. By default this argument is
+assigned the study design of the training data in the fitted Hmsc model.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ranLevels</code></td>
+<td>
+<p>a list of <code>HmscRandomLevel</code> objects, futher specifying the structure of
+random levels. Requirements are similar to those of the <code>Hmsc</code> constructor.
+Each level must cover all units, specified in the correspondingly named column of <code>studyDesign</code>
+argument. By default this argument is assigned the list of <code>HmscRandomLevel</code> objects
+specified for fitting Hmsc model.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Gradient</code></td>
+<td>
+<p>an object returned by
+<code>constructGradient</code>. Providing <code>Gradient</code> is
+an alternative for providing <code>XData</code>, <code>studyDesign</code>
+and <code>ranLevels</code>. Cannot be used together with <code>Yc</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Yc</code></td>
+<td>
+<p>a matrix of the outcomes that are assumed to be known for
+conditional predictions. Cannot be used together with
+<code>Gradient</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mcmcStep</code></td>
+<td>
+<p>the number of extra mcmc steps used for updating the random effects</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>expected</code></td>
+<td>
+<p>boolean flag indicating whether to return the location parameter of the observation
+models or sample the values from those.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>predictEtaMean</code></td>
+<td>
+<p>boolean flag indicating whether to use the estimated mean values of posterior
+predictive distribution for random effets corresponding for the new units.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>predictEtaMeanField</code></td>
+<td>
+<p>boolean flag indicating whether to use draws from the mean-field of the
+posterior predictive distribution for random effets corresponding for the new units.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nParallel</code></td>
+<td>
+<p>Number of parallel processes. Parallel processing
+is only useful with new <code>Yc</code> data and extra
+<code>mcmcStep</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>useSocket</code></td>
+<td>
+<p>(logical) Use socket clusters in parallel
+proecessing; these are the only alternative in Windows, but in
+other systems this should be usually set <code>FALSE</code> for
+forking.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>other arguments passed to functions.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>In <code>mcmcStep,the number of extra mcmc steps used for updating the random effects
+for the Eta parameters, starting from the samples of the fitted Hmsc model in order to
+account for the conditional infromation provided in the Yc argument. The higher this number is,
+the more the obtained updated samples are unaffected by the posterior estimates of latent factors
+in the model fitted to the training data and more resembles the true conditional posterior. However,
+the elapsed time for conditional prediction grows approximately linearly as this parameter increases.
+The exact number for sufficient is problem-dependent and should be assessed by e.g. gradually
+increasing this parameter till the stationarity of the produced predictions.</code>
+</p>
+
+
+<h3>Value</h3>
+
+<p>A list of length <code>length(post)</code>, each element of which contains a sample from the posterior
+predictive distribution (given the sample of the Hmsc model parameters in the corresponding element of
+the <code>post</code> argument)
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>predictLatentFactor</code>
+</p>
+
+
+</div>

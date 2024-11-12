@@ -1,0 +1,197 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>add_chemtable</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Add a table of chemical information for use in making httk predictions.</h2>
+
+<h3>Description</h3>
+
+<p>This function adds chemical-specific information to the table
+chem.physical_and_invitro.data. This table is queried by the model
+parameterization functions when attempting to parameterize a model, so
+adding sufficient data to this table allows additional chemicals to be
+modeled.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">add_chemtable(
+  new.table,
+  data.list,
+  current.table = NULL,
+  reference = NULL,
+  species = NULL,
+  overwrite = FALSE,
+  sig.fig = 4,
+  clint.pvalue.overwrite = TRUE,
+  allow.na = FALSE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>new.table</code></td>
+<td>
+<p>Object of class data.frame containing one row per chemical,
+with each chemical minimally described by a CAS number.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>data.list</code></td>
+<td>
+<p>This list identifies which properties are to be read from
+the table. Each item in the list should point to a column in the table
+new.table. Valid names in the list are: 'Compound', 'CAS', 'DSSTox.GSID'
+'SMILES.desalt', 'Reference', 'Species', 'MW', 'logP', 'pKa_Donor',
+'pKa_Accept', 'logMA', 'Clint', 'Clint.pValue', 'Funbound.plasma',
+'Fabs', 'Fgut', 'Rblood2plasma'.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>current.table</code></td>
+<td>
+<p>This is the table to which data are being added.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>reference</code></td>
+<td>
+<p>This is the reference for the data in the new table. This
+may be omitted if a column in data.list gives the reference value for each
+chemical.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>species</code></td>
+<td>
+<p>This is the species for the data in the new table. This may
+be omitted if a column in data.list gives the species value for each
+chemical or if the data are not species-specific (e.g., MW).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>overwrite</code></td>
+<td>
+<p>If overwrite=TRUE then data in current.table will be
+replaced by any data in new.table that is for the same chemical and
+property. If overwrite=FALSE (DEFAULT) then new data for the same chemical
+and property are ignored.  Funbound.plasma values of 0 (below limit of
+detection) are overwritten either way.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sig.fig</code></td>
+<td>
+<p>Sets the number of significant figures stored (defaults to 4)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>clint.pvalue.overwrite</code></td>
+<td>
+<p>If TRUE then the Cl_int p-value is set to NA 
+when the Cl_int value is changed unless a new p-value is provided. (defaults
+to TRUE)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>allow.na</code></td>
+<td>
+<p>If TRUE (default is FALSE) then NA values are written to the
+table, otherwise they are ignored.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<table><tr style="vertical-align: top;">
+<td><code>data.frame</code></td>
+<td>
+<p>A new data.frame containing the data in
+current.table augmented by new.table</p>
+</td>
+</tr></table>
+<h3>Author(s)</h3>
+
+<p>John Wambaugh
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+library(httk)
+
+my.new.data &lt;- as.data.frame(c("A","B","C"),stringsAsFactors=FALSE)
+my.new.data &lt;- cbind(my.new.data,as.data.frame(c(
+                     "111-11-2","222-22-0","333-33-5"),
+                     stringsAsFactors=FALSE))
+my.new.data &lt;- cbind(my.new.data,as.data.frame(c("DTX1","DTX2","DTX3"),
+                    stringsAsFactors=FALSE))
+my.new.data &lt;- cbind(my.new.data,as.data.frame(c(200,200,200)))
+my.new.data &lt;- cbind(my.new.data,as.data.frame(c(2,3,4)))
+my.new.data &lt;- cbind(my.new.data,as.data.frame(c(0.01,0.02,0.3)))
+my.new.data &lt;- cbind(my.new.data,as.data.frame(c(0,10,100)))
+colnames(my.new.data) &lt;- c("Name","CASRN","DTXSID","MW","LogP","Fup","CLint")
+
+chem.physical_and_invitro.data &lt;- add_chemtable(my.new.data,
+                                  current.table=
+                                    chem.physical_and_invitro.data,
+                                  data.list=list(
+                                  Compound="Name",
+                                  CAS="CASRN",
+                                  DTXSID="DTXSID",
+                                  MW="MW",
+                                  logP="LogP",
+                                  Funbound.plasma="Fup",
+                                  Clint="CLint"),
+                                  species="Human",
+                                  reference="MyPaper 2015")
+parameterize_steadystate(chem.name="C")  
+calc_css(chem.name="B")                                
+
+# Initialize a column describing proton donors ("acids")
+my.new.data$pka.a &lt;- NA 
+# set chemical C to an acid (pKa_donor = 5):
+my.new.data[my.new.data$Name=="C","pka.a"] &lt;- "5"
+chem.physical_and_invitro.data &lt;- add_chemtable(my.new.data,
+                                  current.table=
+                                    chem.physical_and_invitro.data,
+                                 data.list=list(
+                                 Compound="Name",
+                                 CAS="CASRN",
+                                 DTXSID="DTXSID",
+                                 pKa_Donor="pka.a"),
+                                 species="Human",
+                                 reference="MyPaper 2015") 
+
+# Note Rblood2plasma and hepatic bioavailability change (relative to above):
+parameterize_steadystate(chem.name="C")  
+
+# Initialize a column describing proton acceptors ("bases")
+my.new.data$pka.b &lt;- NA 
+# set chemical B to a base with multiple pka's (pKa_accept = 7 and 8):
+my.new.data[my.new.data$Name=="B","pka.b"] &lt;- "7;8"
+chem.physical_and_invitro.data &lt;- add_chemtable(my.new.data,
+                                  current.table=
+                                    chem.physical_and_invitro.data,
+                                 data.list=list(
+                                 Compound="Name",
+                                 CAS="CASRN",
+                                 DTXSID="DTXSID",
+                                 pKa_Accept="pka.b"),
+                                 species="Human",
+                                 reference="MyPaper 2015") 
+# Note that average and max change (relative to above):
+calc_css(chem.name="B")     
+
+
+</code></pre>
+
+
+</div>

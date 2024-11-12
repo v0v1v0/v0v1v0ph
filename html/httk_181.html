@@ -1,0 +1,519 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>solve_gas_pbtk</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>solve_gas_pbtk</h2>
+
+<h3>Description</h3>
+
+<p>This function solves for the amounts or concentrations of a chemical
+in different tissues as functions of time as a result of inhalation 
+exposure to an ideal gas.
+In this PBTK formulation. <code class="reqn">C_{tissue}</code> is the concentration in tissue at 
+time t. Since the perfusion limited partition coefficients describe 
+instantaneous equilibrium between the tissue and the free fraction in 
+plasma, the whole plasma concentration is 
+<code class="reqn">C_{tissue,plasma} = \frac{1}{f_{up}*K_{tissue2fup}}*C_{tissue}</code>. 
+Note that we use a single, 
+constant value of <code class="reqn">f_{up}</code> across all tissues. Corespondingly the free 
+plasma 
+concentration is modeled as 
+<code class="reqn">C_{tissue,free plasma} = \frac{1}{K_{tissue2fup}}*C_tissue</code>. 
+The amount of blood flowing from tissue x is <code class="reqn">Q_{tissue}</code> (L/h) at a 
+concentration 
+<code class="reqn">C_{x,blood} = \frac{R_{b2p}}{f_{up}*K_{tissue2fup}}*C_{tissue}</code>, where 
+we use a 
+single <code class="reqn">R_{b2p}</code> value throughout the body.
+Metabolic clearance is modelled as being from the total plasma 
+concentration here, though it is restricted to the free fraction in 
+<code>calc_hep_clearance</code> by default. Renal clearance via 
+glomerulsr filtration is from the free plasma concentration.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">solve_gas_pbtk(
+  chem.name = NULL,
+  chem.cas = NULL,
+  dtxsid = NULL,
+  parameters = NULL,
+  times = NULL,
+  days = 10,
+  tsteps = 4,
+  daily.dose = NULL,
+  doses.per.day = NULL,
+  dose = NULL,
+  dosing.matrix = NULL,
+  forcings = NULL,
+  exp.start.time = 0,
+  exp.conc = 1,
+  period = 24,
+  exp.duration = 12,
+  initial.values = NULL,
+  plots = FALSE,
+  suppress.messages = FALSE,
+  species = "Human",
+  iv.dose = FALSE,
+  input.units = "ppmv",
+  output.units = NULL,
+  default.to.human = FALSE,
+  class.exclude = TRUE,
+  recalc.blood2plasma = FALSE,
+  recalc.clearance = FALSE,
+  adjusted.Funbound.plasma = TRUE,
+  regression = TRUE,
+  restrictive.clearance = TRUE,
+  minimum.Funbound.plasma = 1e-04,
+  monitor.vars = NULL,
+  vmax = 0,
+  km = 1,
+  exercise = FALSE,
+  fR = 12,
+  VT = 0.75,
+  VD = 0.15,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>chem.name</code></td>
+<td>
+<p>Either the chemical name, CAS number, or the parameters
+must be specified.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>chem.cas</code></td>
+<td>
+<p>Either the chemical name, CAS number, or the parameters must
+be specified.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dtxsid</code></td>
+<td>
+<p>EPA's DSSTox Structure ID (<a href="https://comptox.epa.gov/dashboard">https://comptox.epa.gov/dashboard</a>)
+the chemical must be identified by either CAS, name, or DTXSIDs</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>parameters</code></td>
+<td>
+<p>Chemical parameters from parameterize_gas_pbtk (or other
+bespoke) function, overrides chem.name and chem.cas.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>times</code></td>
+<td>
+<p>Optional time sequence for specified number of days.  Dosing
+sequence begins at the beginning of times.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>days</code></td>
+<td>
+<p>Length of the simulation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tsteps</code></td>
+<td>
+<p>The number of time steps per hour.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>daily.dose</code></td>
+<td>
+<p>Total daily dose</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>doses.per.day</code></td>
+<td>
+<p>Number of doses per day.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dose</code></td>
+<td>
+<p>Amount of a single dose</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dosing.matrix</code></td>
+<td>
+<p>Vector of dosing times or a matrix consisting of two
+columns or rows named "dose" and "time" containing the time and amount of 
+each dose.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>forcings</code></td>
+<td>
+<p>Manual input of 'forcings' data series argument for ode
+integrator. If left unspecified, 'forcings' defaults to NULL, and then other 
+input parameters (see exp.start.time, exp.conc, exp.duration, and period)
+provide the necessary information to assemble a forcings data series.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>exp.start.time</code></td>
+<td>
+<p>Start time in specifying forcing exposure series,
+default 0.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>exp.conc</code></td>
+<td>
+<p>Specified inhalation exposure concentration for use in 
+assembling "forcings" data series argument for integrator. Defaults to
+units of ppmv.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>period</code></td>
+<td>
+<p>For use in assembling forcing function data series 'forcings'
+argument, specified in hours</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>exp.duration</code></td>
+<td>
+<p>For use in assembling forcing function data 
+series 'forcings' argument, specified in hours</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>initial.values</code></td>
+<td>
+<p>Vector containing the initial concentrations or
+amounts of the chemical in specified tissues with units corresponding to
+those specified for the model outputs. Default values are zero.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>plots</code></td>
+<td>
+<p>Plots all outputs if true.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>suppress.messages</code></td>
+<td>
+<p>Whether or not the output message is suppressed.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>species</code></td>
+<td>
+<p>Species desired (either "Rat", "Rabbit", "Dog", "Mouse", or
+default "Human").</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>iv.dose</code></td>
+<td>
+<p>Simulates a single i.v. dose if true.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>input.units</code></td>
+<td>
+<p>Input units of interest assigned to dosing, including 
+forcings. Defaults to "ppmv" as applied to the default forcings scheme.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>output.units</code></td>
+<td>
+<p>A named vector of output units expected for the model
+results. Default, NULL, returns model results in units specified in the
+'modelinfo' file. See table below for details.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>default.to.human</code></td>
+<td>
+<p>Substitutes missing animal values with human values
+if true (hepatic intrinsic clearance or fraction of unbound plasma).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>class.exclude</code></td>
+<td>
+<p>Exclude chemical classes identified as outside of 
+domain of applicability by relevant modelinfo_[MODEL] file (default TRUE).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>recalc.blood2plasma</code></td>
+<td>
+<p>Recalculates the ratio of the amount of chemical
+in the blood to plasma using the input parameters, calculated with
+hematocrit, Funbound.plasma, and Krbc2pu.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>recalc.clearance</code></td>
+<td>
+<p>Recalculates the hepatic clearance
+(Clmetabolism) with new million.cells.per.gliver parameter.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>adjusted.Funbound.plasma</code></td>
+<td>
+<p>Uses adjusted Funbound.plasma when set to
+TRUE along with partition coefficients calculated with this value.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>regression</code></td>
+<td>
+<p>Whether or not to use the regressions in calculating
+partition coefficients.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>restrictive.clearance</code></td>
+<td>
+<p>Protein binding not taken into account (set to
+1) in liver clearance if FALSE.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>minimum.Funbound.plasma</code></td>
+<td>
+<p>Monte Carlo draws less than this value are set 
+equal to this value (default is 0.0001 – half the lowest measured Fup in our
+dataset).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>monitor.vars</code></td>
+<td>
+<p>Which variables are returned as a function of time. 
+Defaults value of NULL provides "Cgut", "Cliver", "Cven", "Clung", "Cart",
+"Crest", "Ckidney", "Cplasma", "Calv", "Cendexh", "Cmixexh", "Cmuc", 
+"Atubules", "Ametabolized", "AUC"</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>vmax</code></td>
+<td>
+<p>Michaelis-Menten vmax value in reactions/min</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>km</code></td>
+<td>
+<p>Michaelis-Menten concentration of half-maximal reaction velocity
+in desired output concentration units.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>exercise</code></td>
+<td>
+<p>Logical indicator of whether to simulate an exercise-induced
+heightened respiration rate</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fR</code></td>
+<td>
+<p>Respiratory frequency (breaths/minute), used especially to adjust
+breathing rate in the case of exercise. This parameter, along with VT and VD
+(below) gives another option for calculating Qalv (Alveolar ventilation) 
+in case pulmonary ventilation rate is not known</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>VT</code></td>
+<td>
+<p>Tidal volume (L), to be modulated especially as part of simulating
+the state of exercise</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>VD</code></td>
+<td>
+<p>Anatomical dead space (L), to be modulated especially as part of
+simulating the state of exercise</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Additional arguments passed to the integrator (deSolve).
+(Note: There are precision differences between M1 Mac and other OS systems
+for this function due to how long doubles are handled. To replicate results
+between various OS systems we suggest changing the default method of "lsoda"
+to "lsode" and also adding the argument mf = 10.
+See [deSolve::ode()] for further details.)</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The default dosing scheme involves a specification of the start time
+of exposure (exp.start.time), the concentration of gas inhaled (exp.conc),
+the period of a cycle of exposure and non-exposure (period), the
+duration of the exposure during that period (exp.duration), and the total
+days simulated. Together,these arguments determine the "forcings" passed to
+the ODE integrator. Forcings can also be specified manually, or effectively
+turned off by setting exposure concentration to zero, if the user prefers to 
+simulate dosing by other means. 
+</p>
+<p>The "forcings" object is configured to be passed to the integrator with,
+at the most, a basic unit conversion among ppmv, mg/L, and uM. No scaling by
+BW is set to be performed on the forcings series.
+</p>
+<p>Note that the model parameters have units of hours while the model output is
+in days.
+</p>
+<p>Default NULL value for doses.per.day solves for a single dose.
+</p>
+<p>The compartments used in this model are the gut lumen, gut, liver, kidneys,
+veins, arteries, lungs, and the rest of the body.
+</p>
+<p>The extra compartments include the amounts or concentrations metabolized by
+the liver and excreted by the kidneys through the tubules.
+</p>
+<p>AUC is the area under the curve of the plasma concentration.
+</p>
+<p>Model Figure from (Linakis et al. 2020):
+<img src="../help/figures/gaspbtk.jpg" width="100%" alt="Figure: Gas PBTK  Model Schematic"></p>
+<p>Model parameters are named according to the following convention:</p>
+
+<table>
+<tr>
+<td style="text-align: left;">
+prefix </td>
+<td style="text-align: right;"> suffic </td>
+<td style="text-align: right;"> Meaning </td>
+<td style="text-align: right;"> units </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+K </td>
+<td style="text-align: right;"> </td>
+<td style="text-align: right;"> Partition coefficient for tissue to free plasma \ tab unitless </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+V </td>
+<td style="text-align: right;"> </td>
+<td style="text-align: right;"> Volume </td>
+<td style="text-align: right;"> L </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+Q </td>
+<td style="text-align: right;"> </td>
+<td style="text-align: right;"> Flow </td>
+<td style="text-align: right;"> L/h </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+k </td>
+<td style="text-align: right;"> </td>
+<td style="text-align: right;"> Rate </td>
+<td style="text-align: right;"> 1/h </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+</td>
+<td style="text-align: right;"> c </td>
+<td style="text-align: right;"> Parameter is proportional to body weight </td>
+<td style="text-align: right;"> 1 / kg for volumes
+and 1/kg^(3/4) for flows </td>
+</tr>
+</table>
+<p>When species is specified but chemical-specific in vitro data are not
+available, the function uses the appropriate physiological data (volumes and 
+flows) but default.to.human = TRUE must be used to substitute human
+fraction unbound, partition coefficients, and intrinsic hepatic clearance.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A matrix of class deSolve with a column for time(in days), each
+compartment, the area under the curve, and plasma concentration and a row
+for each time point.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Matt Linakis, John Wambaugh, Mark Sfeir, Miyuki Breen
+</p>
+
+
+<h3>References</h3>
+
+<p>Linakis MW, Sayre RR, Pearce RG, Sfeir MA, Sipes NS, Pangburn HA, Gearhart JM, Wambaugh JF (2020).
+“Development and evaluation of a high-throughput inhalation model for organic chemicals.”
+<em>Journal of exposure science &amp; environmental epidemiology</em>, <b>30</b>(5), 866–877.
+</p>
+<p>Pearce RG, Setzer RW, Strope CL, Wambaugh JF, Sipes NS (2017).
+“Httk: R package for high-throughput toxicokinetics.”
+<em>Journal of Statistical Software</em>, <b>79</b>(4), 1.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>solve_model</code>
+</p>
+<p><code>parameterize_gas_pbtk</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+
+solve_gas_pbtk(chem.name = 'pyrene', exp.conc = 1, period = 24, expduration = 24)
+
+out &lt;- solve_gas_pbtk(chem.name='pyrene',
+                      exp.conc = 0, doses.per.day = 2,
+                      daily.dose = 3, input.units = "umol",
+                      days=2.5, 
+                      plots=TRUE, initial.values=c(Aven=20))
+
+out &lt;- solve_gas_pbtk(chem.name = 'pyrene', exp.conc = 3, 
+                      period = 24, days=2.5,
+                      exp.duration = 6, exercise = TRUE)
+                  
+params &lt;- parameterize_gas_pbtk(chem.cas="80-05-7")
+solve_gas_pbtk(parameters=params, days=2.5)
+
+# Oral dose with exhalation as a route of elimination:
+out &lt;- solve_gas_pbtk(chem.name = 'bisphenol a', exp.conc = 0, dose=100,
+                      days=2.5, input.units="mg/kg")
+
+# Note that different model compartments for this model have different units 
+# and that the final units can be controlled with the output.units argument:
+head(solve_gas_pbtk(chem.name="lindane", days=2.5))
+# Convert all compartment units to mg/L:
+head(solve_gas_pbtk(chem.name="lindane", days=2.5, output.units="mg/L"))
+# Convert just the plasma to mg/L:
+head(solve_gas_pbtk(chem.name="lindane", days=2.5, 
+                    output.units=list(Cplasma="mg/L")))
+
+
+</code></pre>
+
+
+</div>

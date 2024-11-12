@@ -1,0 +1,135 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>rBPCov</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Realized bipower covariance</h2>
+
+<h3>Description</h3>
+
+<p>Calculate the Realized BiPower Covariance (rBPCov),
+defined in Barndorff-Nielsen and Shephard (2004).
+</p>
+<p>Let <code class="reqn">r_{t,i}</code> be an intraday <code class="reqn">N x 1</code> return vector and <code class="reqn">i=1,...,M</code>
+the number of intraday returns.
+</p>
+<p>The rBPCov is defined as the process whose value at time <code class="reqn">t</code>
+is the <code class="reqn">N</code>-dimensional square matrix with <code class="reqn">k,q</code>-th element equal to
+</p>
+<p style="text-align: center;"><code class="reqn">
+   \mbox{rBPCov}[k,q]_t = \frac{\pi}{8} \bigg( \sum_{i=2}^{M}
+                                              \left|
+                                                r_{(k)t,i} + r_{(q)t,i} \right| \ \left| r_{(k)t,i-1} + r_{(q)t,i-1} \right|   \\
+                                              - \left| r_{(k)t,i}  - r_{(q)t,i} \right| \ \left|
+                                                r_{(k)t,i-1} - r_{(q)t,i-1} \right|  \bigg),
+ </code>
+</p>
+
+<p>where <code class="reqn">r_{(k)t,i}</code> is the
+<code class="reqn">k</code>-th component of the return vector <code class="reqn">r_{i,t}</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">rBPCov(
+  rData,
+  cor = FALSE,
+  alignBy = NULL,
+  alignPeriod = NULL,
+  makeReturns = FALSE,
+  makePsd = FALSE,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>rData</code></td>
+<td>
+<p>an <code>xts</code> or <code>data.table</code> object containing returns or prices, possibly for multiple assets over multiple days</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cor</code></td>
+<td>
+<p>boolean, in case it is <code>TRUE</code>, and the input data is multivariate, the correlation is returned instead of the covariance matrix. <code>FALSE</code> by default.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alignBy</code></td>
+<td>
+<p>character, indicating the time scale in which <code>alignPeriod</code> is expressed. 
+Possible values are: <code>"ticks"</code>, <code>"secs"</code>, <code>"seconds"</code>, <code>"mins"</code>, <code>"minutes"</code>, <code>"hours"</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alignPeriod</code></td>
+<td>
+<p>positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate
+based on a 5-minute frequency, set <code>alignPeriod</code> to 5 and <code>alignBy</code> to <code>"minutes"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>makeReturns</code></td>
+<td>
+<p>boolean, should be <code>TRUE</code> when <code>rData</code> contains prices instead of returns. <code>FALSE</code> by default.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>makePsd</code></td>
+<td>
+<p>boolean, in case it is <code>TRUE</code>, the positive definite version of rBPCov is returned. <code>FALSE</code> by default.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>used internally, do not change.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>in case the input is and contains data from one day, an <code class="reqn">N</code> by <code class="reqn">N</code> matrix is returned. If the data is a univariate <code>xts</code> object with multiple days, an <code>xts</code> is returned.
+If the data is multivariate and contains multiple days (<code>xts</code> or <code>data.table</code>), the function returns a list containing <code class="reqn">N</code> by <code class="reqn">N</code> matrices. Each item in the list has a name which corresponds to the date for the matrix.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup.
+</p>
+
+
+<h3>References</h3>
+
+<p>Barndorff-Nielsen, O. E., and Shephard, N. (2004). Measuring the impact of jumps in multivariate price processes using bipower covariation. Discussion paper, Nuffield College, Oxford University.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>ICov</code> for a list of implemented estimators of the integrated covariance.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Realized Bipower Variance/Covariance for a price series aligned
+# at 5 minutes.
+
+# Univariate:
+rbpv &lt;- rBPCov(rData = sampleTData[, list(DT, PRICE)], alignBy ="minutes",
+               alignPeriod = 5, makeReturns = TRUE)
+# Multivariate:
+rbpc &lt;- rBPCov(rData = sampleOneMinuteData, makeReturns = TRUE, makePsd = TRUE)
+rbpc
+</code></pre>
+
+
+</div>

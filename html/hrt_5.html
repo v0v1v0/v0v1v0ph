@@ -1,0 +1,131 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>test.stat</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Computation of the test statistics</h2>
+
+<h3>Description</h3>
+
+<p>This function computes the test statistics <code class="reqn">T_{uc}</code>, <code class="reqn">T_{Het}</code> 
+(with HC0-HC4 weights), <code class="reqn">\tilde{T}_{uc}</code>, or <code class="reqn">\tilde{T}_{Het}</code> 
+(with HC0R-HC4R weights) as defined in 
+Pötscher and Preinerstorfer (2021).</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">test.stat(y, R, r, X, hcmethod, restr.cov, tol = 1e-08, cores = 1)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+<p>Either an observation vector, or a matrix the columns of which are
+observation vectors. The
+number of rows of an observation vector must coincide with the number of rows
+of the design matrix <code>X</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>R</code></td>
+<td>
+<p>The restriction matrix. <code>test.stat</code> computes a test 
+statistic for the hypothesis <code class="reqn">R \beta = r</code>. <code>R</code> needs to be of
+full row rank, and needs to have the same number of columns as <code>X</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>r</code></td>
+<td>
+<p>The restriction vector. <code>test.stat</code> computes a test 
+statistic for the hypothesis <code class="reqn">R \beta = r</code>. <code>r</code> needs to be a
+vector with the same number of coordinates as the number of rows of <code>R</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>X</code></td>
+<td>
+<p>The design matrix <code>X</code> needs to be of full column rank. 
+The number of columns of <code>X</code> must be smaller than the number of rows of 
+<code>X</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>hcmethod</code></td>
+<td>
+<p>Integer in [-1, 4]. Determines the method applied in the construction of the covariance estimator
+used in the test statistic. The value -1 corresponds to unadjusted (i.e., classical) F statistic without df adjustment; the value 0 
+corresponds to the HC0 estimator; ...; the value 4 corresponds to the HC4 estimator. Note that in case <code>restr.cov</code>
+is TRUE the null-restricted versions of the covariance estimators are computed. Cf. Pötscher 
+and Preinerstorfer (2021) and the references there for details.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>restr.cov</code></td>
+<td>
+<p>TRUE or FALSE. Covariance matrix estimator based on null-restricted (TRUE) or unrestricted (FALSE) residuals.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tol</code></td>
+<td>
+<p>(Small) positive real number. Tolerance parameter used in checking invertibility of the covariance matrix in the test statistic. 
+Default is 1e-08.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cores</code></td>
+<td>
+<p>The number of CPU cores used in the (parallelized)
+computations. Default is 1. Parallelized computation is enabled only
+if the compiler used to build <span class="pkg">hrt</span> supports OpenMP.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>For details concerning the test statistics please
+see the relevant sections in Pötscher and Preinerstorfer (2021)
+.
+</p>
+
+
+<h3>Value</h3>
+
+<p>The function returns a list consisting of:
+</p>
+<table><tr style="vertical-align: top;">
+<td><code>test.val</code></td>
+<td>
+<p>Either a vector the entries of which correspond to the values 
+of the
+test statistic evaluated at each column of the input matrix <code>y</code>, or, 
+if <code>y</code> is a vector, the test statistic evaluated at <code>y</code>.</p>
+</td>
+</tr></table>
+<h3>References</h3>
+
+<p>Pötscher, B. M. and Preinerstorfer, D. (2021). Valid Heteroskedasticity Robust Testing. &lt;arXiv:2104.12597&gt;
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">n &lt;- 20
+y &lt;- rnorm(n)
+X &lt;- cbind(rep(1, length = n), rnorm(n))
+R &lt;- matrix(1, nrow = 1, ncol = 2)
+r &lt;- 0
+hcmethod &lt;- 4
+restr.cov &lt;- FALSE
+test.stat(y, R, r, X, hcmethod, restr.cov)
+</code></pre>
+
+
+</div>

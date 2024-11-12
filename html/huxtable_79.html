@@ -1,0 +1,112 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>tidy_override</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Change a model's <code>tidy</code> output</h2>
+
+<h3>Description</h3>
+
+<p>Use <code>tidy_override</code> and <code>tidy_replace</code> to provide your own p values,
+confidence intervals etc. for a model.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">tidy_override(x, ..., glance = list(), extend = FALSE)
+
+tidy_replace(x, tidied, glance = list())
+
+## S3 method for class 'tidy_override'
+tidy(x, ...)
+
+## S3 method for class 'tidy_override'
+glance(x, ...)
+
+## S3 method for class 'tidy_override'
+nobs(object, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>A model with methods defined for <code>generics::tidy()</code> and/or <code>generics::glance()</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>In <code>tidy_override</code>, columns of statistics to replace <code>tidy</code> output. In
+<code>tidy</code> and <code>glance</code> methods, arguments passed on to the underlying model.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>glance</code></td>
+<td>
+<p>A list of summary statistics for <code>glance</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>extend</code></td>
+<td>
+<p>Logical: allow adding new columns to <code>tidy(x)</code> and <code>glance(x)</code>?</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tidied</code></td>
+<td>
+<p>Data frame to replace the result of <code>tidy(x)</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>object</code></td>
+<td>
+<p>A <code>tidy_override</code> object.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p><code>tidy_override</code> allows you to replace some columns of <code>tidy(x)</code> with your own
+data.
+</p>
+<p><code>tidy_replace</code> allows you to replace the result of <code>tidy(x)</code> entirely.
+</p>
+
+
+<h3>Value</h3>
+
+<p>An object that can be passed in to <code>huxreg</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">if (! requireNamespace("broom", quietly = TRUE)) {
+  stop("Please install 'broom' to run this example.")
+}
+
+lm1 &lt;- lm(mpg ~ cyl, mtcars)
+fixed_lm1 &lt;- tidy_override(lm1,
+      p.value = c(.04, .12),
+      glance = list(r.squared = 0.99))
+huxreg(lm1, fixed_lm1)
+
+if (requireNamespace("nnet", quietly = TRUE)) {
+  mnl &lt;- nnet::multinom(gear ~ mpg, mtcars)
+  tidied &lt;- broom::tidy(mnl)
+  mnl4 &lt;- tidy_replace(mnl, tidied[tidied$y.level == 4, ])
+  mnl5 &lt;- tidy_replace(mnl, tidied[tidied$y.level == 5, ])
+  huxreg(mnl4, mnl5, statistics = "nobs")
+}
+
+</code></pre>
+
+
+</div>

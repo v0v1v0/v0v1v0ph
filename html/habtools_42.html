@@ -1,0 +1,117 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>sim_dem</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Simulates a fractal DEM</h2>
+
+<h3>Description</h3>
+
+<p>Simulates z-values based on the Diamond-square algorithm.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">sim_dem(
+  L,
+  smoothness,
+  H,
+  R,
+  plot = FALSE,
+  prop = 0.1,
+  n = 100,
+  method = "area",
+  parallel = FALSE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>L</code></td>
+<td>
+<p>The extent.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>smoothness</code></td>
+<td>
+<p>A value between 0.0 and 1.0 (lower values
+produce rougher DEM).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>H</code></td>
+<td>
+<p>Desired height range (optional).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>R</code></td>
+<td>
+<p>Desired rugosity value (optional).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>plot</code></td>
+<td>
+<p>Logical. Plot the simulated DEM during simulation? Only relevant if R is provided.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>prop</code></td>
+<td>
+<p>Proportion of cells that undergo smoothing at each iteration when R is provided.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n</code></td>
+<td>
+<p>Number of iterations to try and reach desired R. Recommended to adapt R and H instead of increasing n if simulation fails.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+<p>The method to be used for rugosity calculation in case R is given. Can be "hvar" or "area"</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>parallel</code></td>
+<td>
+<p>Logical. Use parallel processing? Defaults to FALSE. Only relevant if method = "hvar".</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Warning: this function gets slow for n &gt; 128.
+If H is provided, the simulated DEM is rescaled based on the value for H.
+If R is provided, a DEM is simulated using the same algorithm based on R, H, and the predicted D based on <code>rdh_theory()</code>, while smoothness is ignored.
+From that first simulated DEM, R is calculated and the DEM undergoes smoothing at each iteration until the rugosity approximates the inputted R.
+Argument prop defined the proportion of random cells of the DEM that are smoothed by averaging the z values of cell and neighboring cells at each iteration.
+Caution: When R is provided, the DEM may become increasingly less fractal as it is modified at each iteration.
+</p>
+
+
+<h3>Value</h3>
+
+<p>Digital elevation model of class RasterLayer.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">library(raster)
+dem &lt;- sim_dem(L = 32, smoothness = 0.5)
+plot(dem)
+dem &lt;- sim_dem(L = 32, smoothness = 0.2, H = 20)
+plot(dem)
+</code></pre>
+
+
+</div>

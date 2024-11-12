@@ -1,0 +1,146 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>[.mosg</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Extract or replace parts of a game's payoff matrix
+</h2>
+
+<h3>Description</h3>
+
+<p>Construct a new game by taking out a specified set of rows, columns and goals from a given game <code class="reqn">G</code>. The new game inherits all descriptions (rows, cols and goals) from the <code class="reqn">G</code>, and has its list of loss distributions organized in the same way (by rows or columns) as <code class="reqn">G</code>.
+</p>
+<p>The extraction or substitution works like as for data frames (see <code>[.data.frame</code>).
+Strategies for both players, as well as goals, can equivalently be addressed by their string-names.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">## S3 method for class 'mosg'
+x[i,j,k=NULL]
+
+## S3 replacement method for class 'mosg'
+x[i,j,k=NULL] &lt;- value
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+
+<p>a game of class mosg
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>i,j,k</code></td>
+<td>
+
+<p>a numeric value or numeric vector of row incides <code>i</code>, colum indices <code>j</code>, or goals <code>k</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>value</code></td>
+<td>
+
+<p>a list of lossDistribution objects, or a game object of class <code>mosg</code>.
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>For <code>[</code> extraction of elements from a payoff matrix, omitting any index dimension selects all elements in the respective dimension. Supplying negative values excludes the respective elements. For example, <code>G[c(1:3),1]</code> returns a game with only the rows 1..3 of <code>G</code>, but all column strategies that <code>G</code> had, and only the first of <code>G</code>'s goals retained.
+</p>
+<p>For <code>[&lt;-</code>, the list of substitute values needs to be of the same length as the number of elements addressed by the triple <code>(i,j,k)</code>, otherwise an error is returned. If the new elements come from another game object, say <code>G2</code>, only the loss distributions get replaced, but not the names of the strategies. The replacement checks if <code>G2</code> has its list of loss distributions organized in the same way as <code>G</code>, i.e., row-by-row or column-by-column. If there is a mismatch, the substitution is nonetheless done, but a warning about this issue is printed.
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>[</code> returns a freshly constructed game object.
+</p>
+
+
+<h3>Warning</h3>
+
+<p>For <code>[&lt;-</code>, be aware that the replacement <em>does not</em> semantically check if the newly incoming loss distributions make sense as elements of the new game (e.g., they can have different supports, or be discrete/continuous while the game was continuous/discrete in its payoffs). Respective errors may only subsequently come up when the modified or extracted game is used.</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Stefan Rass
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>[.data.frame</code> 
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## raw data (PURELY ARTIFICIAL, for demo purposes only)
+obs111&lt;-c(rep(1,40),rep(3,20),rep(5,10),rep(7,20),rep(9,10));
+obs112&lt;-c(rep(1,50),rep(2,10),rep(4,10),rep(6,20),rep(8,10));
+obs121&lt;-c(rep(1,20),rep(4,30),rep(6,20),rep(8,10),rep(10,20));
+obs122&lt;-c(rep(1,40),rep(2.5,20),rep(5,20),rep(7.5,10),rep(9,10));
+obs211&lt;-c(rep(1,30),rep(2,30),rep(5,10),rep(8,10),rep(10,20));
+obs212&lt;-c(rep(1,10),rep(2,10),rep(4,20),rep(7,20),rep(10,40));
+obs221&lt;-c(rep(1,30),rep(3,30),rep(4,10),rep(7,20),rep(9,10));
+obs222&lt;-c(rep(1,10),rep(3,10),rep(5,50),rep(8,20),rep(10,10));
+obs311&lt;-c(rep(1,40),rep(2,30),rep(4,10),rep(7,10),rep(9,10));
+obs312&lt;-c(rep(1,20),rep(3,20),rep(4,20),rep(7,20),rep(10,20));
+obs321&lt;-c(rep(1,10),rep(3,40),rep(4,30),rep(7,10),rep(9,10));
+obs322&lt;-c(rep(1,10),rep(4,30),rep(5,30),rep(7,10),rep(10,20));
+## compute payoff densities
+f111&lt;-lossDistribution(obs111)
+f112&lt;-lossDistribution(obs112)
+f121&lt;-lossDistribution(obs121)
+f122&lt;-lossDistribution(obs122)
+f211&lt;-lossDistribution(obs211)
+f212&lt;-lossDistribution(obs212)
+f221&lt;-lossDistribution(obs221)
+f222&lt;-lossDistribution(obs222)
+f311&lt;-lossDistribution(obs311)
+f312&lt;-lossDistribution(obs312)
+f321&lt;-lossDistribution(obs321)
+f322&lt;-lossDistribution(obs322)
+
+payoffs&lt;-list(f111,f112,f121, f122,f211,f212,f221,f222, f311,f312,f321,f322)
+G &lt;- mosg( n=2,
+            m=3,
+            payoffs,
+            goals=2,
+            goalDescriptions=c("g1", "g2"),
+            defensesDescr = c("d1", "d2"),
+            attacksDescr = c("a1", "a2", "a3"))
+
+# modify the game by subsetting
+G[,c(1,2),] # select only the first two strategies
+G[,-3,] # exclude the third strategy (equivalent to before)
+
+# replace a 2x2 subgame related to the second goal
+# (replacement data is chosen arbitrarily here)
+G2 &lt;- mosg(n=2, m=2, goals=1, losses = list(f111,f112,f121, f122))
+G[,c(1,2),1] &lt;- G2  # replace the subgame
+
+# construct another replacement game that is organized different (by column)
+G2 &lt;- mosg(n=2, m=2, goals=1, losses = list(f111,f112,f121, f122), byrow=FALSE)
+G[,c(1,2),1] &lt;- G2  # this will issue a warning
+
+# plot a submatrix from the game
+plot(G[-2,c(1,2),], goal=2)
+
+</code></pre>
+
+
+</div>

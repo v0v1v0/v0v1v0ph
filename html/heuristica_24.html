@@ -1,0 +1,92 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>percentCorrect</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Percent correct of heuristics' predictPair on test_data.</h2>
+
+<h3>Description</h3>
+
+<p>Returns overall percent correct for all heuristics.
+1. Create predictions using predictPair for all row pairs for all
+fitted heuristics in the list.
+2. Calculate percent correct for each heuristic.
+Assumes the heuristics passed in have already been fitted to training
+data and all have the same criterion column.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">percentCorrect(test_data, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>test_data</code></td>
+<td>
+<p>Data to try to predict.  Must have same criterion column
+and cols_to_fit as the data heuristics were fit to.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>One or more heuristics fitted to
+data, e.g. the output of ttbModel.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>In cases where a heuristic guesses (predictPair outputs 0), percentCorrect
+will use the expected value, so output will be deterministic and repeatable.
+That is, if 10 guesses happen across the data set, percentCorrect will always
+allocate 5 to 1 and 5 to -1.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A one-row data.frame of numbers from 0 to 100, the percent correc
+of each heuristic.  Each column is named with the heuristic's class or
+the fit name.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>percentCorrectList</code> for a version which takes a list of
+heuristics.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">df &lt;- data.frame(y=c(30,20,10,5), name=c("a", "b", "c", "d"),
+                 x1=c(1,1,0,0), x2=c(1,1,0,1))
+ttb &lt;- ttbModel(df, 1, c(3:4))
+sing &lt;- singleCueModel(df, 1, c(3:4))
+percentCorrect(df, ttb, sing)
+#    ttbModel singleCueModel
+#  1     0.75      0.8333333
+# TTB gets 75% correct while single cue model gets 83%.
+
+# Now repeatedly sample 2 rows of the data set and see how outcomes are
+# affected, tracking with the fit_name.
+set.seed(1) # If you want to reproduce the same output as below.
+ttb1 &lt;- ttbModel(df[sample(nrow(df), 2),], 1, c(3:4), fit_name="fit1")
+ttb2 &lt;- ttbModel(df[sample(nrow(df), 2),], 1, c(3:4), fit_name="fit2")
+ttb3 &lt;- ttbModel(df[sample(nrow(df), 2),], 1, c(3:4), fit_name="fit3")
+percentCorrect(df, ttb1, ttb2, ttb3)
+#        fit1 fit2 fit3
+# 1 0.8333333 0.75 0.75
+
+</code></pre>
+
+
+</div>

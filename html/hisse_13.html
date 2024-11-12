@@ -1,0 +1,173 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>makeHiSSELikelihood</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Export likelihood function for the HiSSE model</h2>
+
+<h3>Description</h3>
+
+<p>Exports a likelihood function conditioned on the data and a
+named vector with the parameters for each of the models.</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">makeHiSSELikelihood(phy, data, hidden.states=TRUE, null4=FALSE,
+f=c(1,1), condition.on.survival=TRUE, root.type="madfitz", root.p=NULL, ode.eps=0)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>phy</code></td>
+<td>
+<p>a phylogenetic tree, in <code>ape</code> “phylo” format and with internal nodes labeled denoting the ancestral selective regimes.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>a data matrix containing species information (see Details).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>hidden.states</code></td>
+<td>
+<p>whether the model has hidden states. This is
+ignored if the option “null4” is selected.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>null4</code></td>
+<td>
+<p>used to select the null model for the full HiSSE
+model. This is a special model with 4 hidden states.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>f</code></td>
+<td>
+<p>vector of length 2 with the estimated proportion of extant species in state 0 and 1 that are included in the phylogeny. A value of c(0.25, 0.5) means that 25 percent of species in state 0 and 50 percent of species in state 1 are included in the phylogeny. By default all species are assumed to be sampled.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>condition.on.survival</code></td>
+<td>
+<p>a logical indicating whether the likelihood should be conditioned on the survival of two lineages and the speciation event subtending them (Nee et al. 1994). The default is <code>TRUE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>root.type</code></td>
+<td>
+<p>indicates whether root summarization follow the procedure described by FitzJohn et al. 2009, “madfitz” or Herrera-Alsina et al. 2018, “herr_als”.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>root.p</code></td>
+<td>
+<p>a vector indicating fixed root state probabilities. The default is <code>NULL</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ode.eps</code></td>
+<td>
+<p>sets the tolerance for the integration at the end of a branch. Essentially if the sum of compD is less than this tolerance, then it assumes the results are unstable and discards them. The default is set to zero, but in testing a value of 1e-8 can sometimes produce stable solutions for both easy and very difficult optimization problems.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>This function sets up and returns the likelihood for the HiSSE model
+together with a vector of parameters. The likelihood function is
+conditioned on the observed data and will return a value of
+loglikelihood given a vector of parameter values. The length of the
+parameter vector as well as the order of
+the parameter vector cannot be changed. The parameter values are
+provided in natural form but are log-transformed for the likelihood
+evaluation. Please pay special attention to the length of the parameter
+vector and the names of the parameters provided by the “pars”
+element of the list.
+</p>
+<p>When the option “null4” is set to TRUE, then the likelihood
+returned is for the HiSSE null model with 4 hidden states. The returned
+list will include an additional element named “trans.mat.guide”
+which can be used as a reference for the meaning of the 32 transition
+parameters. Note that the original model in “hisse.null4” usually
+sets all these transitions to a single value. This helps model
+estimation since information is limited to estimate distinct transition
+rates between parameters.
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>makeHiSSELikelihood</code> returns a list with elements:
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>$loglik</code></td>
+<td>
+<p>the likelihood function for the model. This has a single
+parameter 'p'.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>$pars</code></td>
+<td>
+<p>a named vector for the likelihood function pupulated with 0
+values.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>$trans.mat.guide</code></td>
+<td>
+<p>a reference matrix to understand the parameters
+returned by the “$pars” vector. Only present if the
+“null4” option is set to TRUE.</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>Jeremy M. Beaulieu and Daniel S. Caetano</p>
+
+
+<h3>References</h3>
+
+<p>Beaulieu, J.M, and B.C. O'Meara. 2016. Detecting hidden diversification shifts in models of trait-dependent speciation and extinction. Syst. Biol. 65:583-601. 
+</p>
+<p>FitzJohn R.G., Maddison W.P., and Otto S.P. 2009. Estimating trait-dependent speciation and extinction rates from incompletely resolved phylogenies. Syst. Biol. 58:595-611.
+</p>
+<p>Maddison W.P., Midford P.E., and Otto S.P. 2007. Estimating a binary characters effect on speciation and extinction. Syst. Biol. 56:701-710.
+</p>
+<p>Nee S., May R.M., and Harvey P.H. 1994. The reconstructed evolutionary process. Philos. Trans. R. Soc. Lond. B Biol. Sci. 344:305-311.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+library(diversitree)
+library(hisse)
+## Generate data:
+pars &lt;- c(0.1, 0.2, 0.03, 0.03, 0.01, 0.01)
+set.seed(4) 
+phy &lt;- tree.bisse(pars, max.t=30, x0=0)
+sim.dat &lt;- data.frame(names(phy$tip.state), phy$tip.state)
+## Get lik function:
+lik.hisse &lt;- makeHiSSELikelihood(phy = phy, data = sim.dat, hidden.states = FALSE)
+likf &lt;- lik.hisse$log.lik
+pars &lt;- lik.hisse$pars
+## Set the parameter values. Note that we have turnover and eps, not speciation and extinction!
+pars &lt;- setNames(c(0.1+0.03,0.2+0.03,0.03/0.1,0.03/0.2,0.01,0.01), names(pars))
+## Compute the log-likelihood for the model.
+likf(pars)
+
+</code></pre>
+
+
+</div>

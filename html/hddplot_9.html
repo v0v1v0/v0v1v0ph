@@ -1,0 +1,109 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>orderFeatures</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Order features, based on their ability to discriminate</h2>
+
+<h3>Description</h3>
+
+<p> For each row of <code>data</code>, an F or (potentially) other
+statistic is calculated, using the function <code>FUN</code>, that measures
+the extent to which this variable separates the data into groups. This
+statistic is then used to order the rows.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R"> orderFeatures(x, cl, subset = NULL, FUN = aovFbyrow, values =
+FALSE) </code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>Matrix; rows are features, and columns are observations 
+('samples')</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cl</code></td>
+<td>
+<p>Factor that classifies columns into groups</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>subset</code></td>
+<td>
+<p>allows specification of a subset of the columns of <code>data</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>FUN</code></td>
+<td>
+<p>specifies the function used to measure separation between groups</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>values</code></td>
+<td>
+<p>if <code>TRUE</code>, F-values as well as the ordering are returned</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>Either (<code>values=FALSE</code>) a vector that orders the rows,
+or (<code>values=TRUE</code>)
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>ord</code></td>
+<td>
+<p>a vector that orders the rows</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>stat</code></td>
+<td>
+<p>ordered values of the statistic</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>John Maindonald</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">mat &lt;- matrix(rnorm(1000), ncol=20)
+cl &lt;- factor(rep(1:3, c(7,9,4)))
+ord &lt;- orderFeatures(mat, cl)
+
+## The function is currently defined as
+function(x, cl, subset=NULL, FUN=aovFbyrow, values=FALSE){
+    if(dim(x)[2]!=length(cl))stop(paste("Dimension 2 of x is",
+                  dim(x)[2], "differs from the length of cl (=",
+                  length(cl)))
+    ## Ensure that cl is a factor &amp; has no redundant levels
+    if(is.null(subset))
+      cl &lt;- factor(cl)
+    else
+      cl &lt;- factor(cl[subset])
+    if(is.null(subset))
+      stat &lt;- FUN(x, cl)
+    else
+      stat &lt;- FUN(x[, subset], cl)
+    ord &lt;- order(-abs(stat))
+    if(!values)ord else(list(ord=ord, stat=stat[ord]))
+  }
+</code></pre>
+
+
+</div>

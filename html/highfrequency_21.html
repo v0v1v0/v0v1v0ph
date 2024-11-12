@@ -1,0 +1,267 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>HARmodel</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Heterogeneous autoregressive (HAR) model for realized volatility model estimation</h2>
+
+<h3>Description</h3>
+
+<p>Function returns the estimates for the heterogeneous autoregressive model (HAR)
+for realized volatility  discussed in Andersen et al. (2007) and Corsi (2009).
+This model is mainly used to forecast the next day's volatility based on the high-frequency returns of the past.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">HARmodel(
+  data,
+  periods = c(1, 5, 22),
+  periodsJ = c(1, 5, 22),
+  periodsQ = c(1),
+  leverage = NULL,
+  RVest = c("rCov", "rBPCov", "rQuar"),
+  type = "HAR",
+  inputType = "RM",
+  jumpTest = "ABDJumptest",
+  alpha = 0.05,
+  h = 1,
+  transform = NULL,
+  externalRegressor = NULL,
+  periodsExternal = c(1),
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>an <code>xts</code> object containing either: intraday (log-)returns or realized measures already computed from such returns. 
+In case more than one realized measure is needed, the object should have the as many columns as realized measures needed. 
+The first column should always be the realized variance proxy. 
+In case type is either <code>"HARQJ"</code> or <code>"CHARQ"</code> the order should be 
+<code>"RV"</code>, <code>"BPV"</code>, <code>"RQ"</code>, or the relevant proxies.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>periods</code></td>
+<td>
+<p>a vector of integers indicating over how days the realized measures in the model should be aggregated. 
+By default  <code>periods = c(1,5,22)</code>, which corresponds to one day, one week and one month respectively. This default is in line with Andersen et al. (2007).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>periodsJ</code></td>
+<td>
+<p>a vector of integers indicating over what time periods the jump components in the model should be aggregated. 
+By default <code>periodsJ = c(1,5,22)</code>, which corresponds to one day, one week and one month respectively.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>periodsQ</code></td>
+<td>
+<p>a vector of integers indicating over what time periods the realized quarticity in the model should be aggregated. 
+By default <code>periodsQ = c(1,5,22)</code>, which corresponds to one day, one week and one month respectively.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>leverage</code></td>
+<td>
+<p>a vector of integers indicating over what periods the negative returns should be aggregated.
+See Corsi and Reno (2012) for more information. By default <code>leverage = NULL</code> and the model assumes the absence of a  leverage effect. 
+Set <code>leverage = c(1,5,22)</code> to mimic the analysis in Corsi and Reno (2012).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>RVest</code></td>
+<td>
+<p>a character vector with one, two, or three elements. The first element always refers to the name of the function to estimate the daily integrated variance (non-jump-robust).
+The second and third element depends on which type of model is estimated: 
+If <code>type = "HARJ"</code>, <code>type = "HARCJ"</code>, <code>type = "HARQJ"</code> the second element refers to the name of the function to estimate the continuous component of daily volatility (jump robust). 
+If type = "HARQ", the second element refers to the name of the function used to estimate the integrated quarticity.
+If <code>type = "HARQJ"</code> the third element always refers to the name of the function used to estimate integrated quarticity.
+By default <code>RVest = c("rCov","rBPCov","rQuar")</code>, i.e. using the realized volatility, realized bi-power variance, and realized quarticity.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>type</code></td>
+<td>
+<p>a string referring to the type of HAR model you would like to estimate. By default <code>type = "HAR"</code>, the most basic model. 
+Other valid options for type are <code>"HARJ"</code>, <code>"HARCJ"</code>, <code>"HARQ"</code>, <code>"HARQJ"</code>, <code>"CHAR"</code>, or <code>"CHARQ"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>inputType</code></td>
+<td>
+<p>a string denoting if the input data consists of realized measures or high-frequency returns. 
+Default "RM" is the only way to denote realized measures and everything else denotes returns.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>jumpTest</code></td>
+<td>
+<p>the function name of a function used to test whether the test statistic which determines whether the jump variability is significant that day. By default <code>jumpTest = "ABDJumptest"</code>, hence using the test statistic in Equation or Equation (18) of Andersen et al. (2007).
+It is also possible to provide pre-computed test statistics for jump tests by setting <code>jumpTest</code> to <code>"testStat"</code>. These test statistics should still be passed as the third column.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alpha</code></td>
+<td>
+<p>a real indicating the confidence level used in testing for jumps. By default <code>alpha = 0.05</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>h</code></td>
+<td>
+<p>an integer indicating the number over how many days the dependent variable should be aggregated.
+By default, <code>h = 1</code>, i.e. no aggregation takes place, you just model the daily realized volatility.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>transform</code></td>
+<td>
+<p>optionally a string referring to a function that transforms both the dependent and explanatory variables in the model. By default <code>transform = NULL</code>, so no transformation is done. Typical other choices in this context would be "log" or "sqrt".</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>externalRegressor</code></td>
+<td>
+<p>an <code>xts</code> object of same number of rows as <code>data</code>, and one column. This is used as an external regressor. Default is <code>NULL</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>periodsExternal</code></td>
+<td>
+<p>a vector of integers indicating over how days <code>externalRegressor</code> should be aggregated.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>extra arguments for jump test.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The basic specification in Corsi (2009) is as follows. 
+Let <code class="reqn">RV_{t}</code> be the realized variances at day <code class="reqn">t</code> and <code class="reqn">RV_{t-k:t}</code> the average
+realized variance in between <code class="reqn">t-k</code> and <code class="reqn">t</code>, <code class="reqn">k \geq 0</code>. 
+</p>
+<p>The dynamics of the model are given by
+</p>
+<p style="text-align: center;"><code class="reqn">
+RV_{t+1} = \beta_0 + \beta_1 \ RV_{t} + \beta_2 \ RV_{t-4:t} + \beta_3 \ RV_{t-21:t} + \varepsilon_{t+1}
+</code>
+</p>
+
+<p>which is estimated by ordinary least squares under the assumption that at time <code class="reqn">t</code>,
+the conditional mean of  <code class="reqn">\varepsilon_{t+1}</code> is equal to zero.
+</p>
+<p>For other specifications, please refer to the cited papers.
+</p>
+<p>The standard errors reporting in the <code>print</code> and <code>summary</code> methods are Newey-West standard errors calculated with the <span class="pkg">sandwich</span> package.
+</p>
+
+
+<h3>Value</h3>
+
+<p>The function outputs an object of class <code>HARmodel</code> and <code>lm</code> (so <code>HARmodel</code> is  a subclass of <code>lm</code>). Objects
+of class <code>HARmodel</code> has the following methods <code>plot.HARmodel</code>, <code>predict.HARmodel</code>, <code>print.HARmodel</code>, and <code>summary.HARmodel</code>.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup.
+</p>
+
+
+<h3>References</h3>
+
+<p>Andersen, T. G., Bollerslev, T., and Diebold, F. (2007). Roughing it up: Including jump components in the measurement, modelling and forecasting of return volatility. <em>The Review of Economics and Statistics</em>, 89, 701-720.
+</p>
+<p>Corsi, F. (2009). A simple approximate long memory model of realized volatility. <em>Journal of Financial Econometrics</em>, 7, 174-196.
+</p>
+<p>Corsi, F. and Reno R. (2012). Discrete-time volatility forecasting with persistent leverage effect and the link with continuous-time volatility modeling. <em>Journal of Business &amp; Economic Statistics</em>, 30, 368-380.
+</p>
+<p>Bollerslev, T., Patton, A., and Quaedvlieg, R. (2016).  Exploiting the errors: A simple approach for improved volatility forecasting, <em>Journal of Econometrics</em>, 192, 1-18.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+
+# Example 1: HAR
+# Forecasting daily Realized volatility for the S&amp;P 500 using the basic HARmodel: HAR
+library(xts)
+RVSPY &lt;- as.xts(SPYRM$RV5, order.by = SPYRM$DT)
+
+x &lt;- HARmodel(data = RVSPY , periods = c(1,5,22), RVest = c("rCov"),
+              type = "HAR", h = 1, transform = NULL, inputType = "RM")
+class(x)
+x
+summary(x)
+plot(x)
+predict(x)
+
+
+# Example 2: HARQ
+# Get the highfrequency returns
+dat &lt;- as.xts(sampleOneMinuteData[, makeReturns(STOCK), by = list(DATE = as.Date(DT))])
+x &lt;- HARmodel(dat, periods = c(1,5,10), periodsJ = c(1,5,10),
+            periodsQ = c(1), RVest = c("rCov", "rQuar"),
+              type="HARQ", inputType = "returns")
+# Estimate the HAR model of type HARQ
+class(x)
+x
+# plot(x)
+# predict(x)
+
+# Example 3: HARQJ with already computed realized measures
+dat &lt;- SPYRM[, list(DT, RV5, BPV5, RQ5)]
+x &lt;- HARmodel(as.xts(dat), periods = c(1,5,22), periodsJ = c(1),
+              periodsQ = c(1), type = "HARQJ")
+# Estimate the HAR model of type HARQJ
+class(x)
+x
+# plot(x)
+predict(x)
+
+# Example 4: CHAR with already computed realized measures
+dat &lt;- SPYRM[, list(DT, RV5, BPV5)]
+
+x &lt;- HARmodel(as.xts(dat), periods = c(1, 5, 22), type = "CHAR")
+# Estimate the HAR model of type CHAR
+class(x)
+x
+# plot(x)
+predict(x)
+
+# Example 5: CHARQ with already computed realized measures
+dat &lt;- SPYRM[, list(DT, RV5, BPV5, RQ5)]
+
+x &lt;- HARmodel(as.xts(dat), periods = c(1,5,22), periodsQ = c(1), type = "CHARQ")
+# Estimate the HAR model of type CHARQ
+class(x)
+x
+# plot(x)
+predict(x)
+
+# Example 6: HARCJ with pre-computed test-statistics
+## BNSJumptest manually calculated.
+testStats &lt;- sqrt(390) * (SPYRM$RV1 - SPYRM$BPV1)/sqrt((pi^2/4+pi-3 - 2) * SPYRM$medRQ1)
+model &lt;- HARmodel(cbind(as.xts(SPYRM[, list(DT, RV5, BPV5)]), testStats), type = "HARCJ")
+
+
+</code></pre>
+
+
+</div>

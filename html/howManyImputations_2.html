@@ -1,0 +1,121 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>how_many_imputations</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Implements two-stage "how_many_imputations" from von Hippel (2020)</h2>
+
+<h3>Description</h3>
+
+<p>The old advice of 5-10 imputations is sufficient for a point estimate (e.g.
+an estimated coefficient), but not for estimates of standard errors (and
+consequently, hypothesis tests or confidence intervals).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">how_many_imputations(model, cv = 0.05, alpha = 0.05)
+
+howManyImputations(model, cv = 0.05, alpha = 0.05)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>model</code></td>
+<td>
+<p>Either a <code>mira</code> object (created by running a model on a
+data set which was imputed using <code>mice::mice()</code>) or a <code>mipo</code>
+object (creating by running <code>pool()</code> on a <code>mira</code> object), or any
+object which can be converted to <code>mira</code> via <code>as.mira()</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cv</code></td>
+<td>
+<p>Desired precision of standard errors. Default to .05. If the data
+were re-imputed, the estimated standard errors would differ by no more than
+this amount.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alpha</code></td>
+<td>
+<p>Significance level for choice of "conservative" FMI.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>von Hippel (2020) provides a way to calculate the number of imputations
+needed to have consistent estimates of the standard error. To do so requires
+an estimate of the Fraction of Missing Information (FMI) which can only be
+obtained after running some number of imputations. Therefore, von Hippel
+(2020) recommends the following procedure:
+</p>
+
+<ol>
+<li>
+<p> Carry out a limited number of imputations to enable estimation of the
+FMI. von Hippel (2020) recommends 20 imputations.
+</p>
+</li>
+<li>
+<p> Use this function, <code>how_many_imputations()</code>, to calculate how
+many total imputations you will need.
+</p>
+</li>
+<li>
+<p> If the number of total imputations you will need is larger than your
+initial batch of 20, run additional imputations.
+</p>
+</li>
+</ol>
+<h3>Value</h3>
+
+<p>The number of required imputations to obtain the <code>cv</code> level of
+precision.
+</p>
+
+
+<h3>References</h3>
+
+<p>von Hippel, Paul T. "How Many Imputations Do You Need? A Two-stage Calculation Using a Quadratic Rule." Sociological Methods &amp; Research 49.3 (2020): 699-718.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(airquality)
+# Add some missingness
+airquality[4:10, 3] &lt;- rep(NA, 7)
+airquality[1:5, 4] &lt;- NA
+airquality &lt;- airquality[-c(5, 6)]
+impdata1 &lt;- mice::mice(airquality, m = 5, maxit = 10,
+                       method = 'pmm', seed = 500)
+modelFit1 &lt;- with(impdata1, lm(Temp ~ Ozone + Solar.R + Wind))
+how_many_imputations(modelFit1)
+how_many_imputations(modelFit1, cv = .01)
+
+# Using a non-`mice` libraries.
+library(jomo)
+library(mitools) # for the `imputationList` function
+jomodata &lt;- jomo::jomo1(airquality, nburn = 100, nbetween = 100, nimp = 5)
+impdata2 &lt;- mitools::imputationList(split(jomodata, jomodata$Imputation))
+modelfit2 &lt;- with(impdata2, lm(Temp ~ Ozone + Solar.R + Wind))
+how_many_imputations(modelfit2)
+
+library(Amelia)
+data(freetrade)
+a.out &lt;- amelia(freetrade, m = 20, ts = "year", cs = "country")
+modelFit3 &lt;- with(imputationList(a.out$imputations),
+                  lm(tariff ~ polity + pop + gdp.pc + year + country))
+how_many_imputations(modelFit3)
+</code></pre>
+
+
+</div>

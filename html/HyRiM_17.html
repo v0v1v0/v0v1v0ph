@@ -1,0 +1,209 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>mosg.equilibrium</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+embodies all information related to a lexicographic Nash equilibrium computed by the function <code>mgss</code>.
+</h2>
+
+<h3>Description</h3>
+
+<p>The generic functions <code>print</code> and <code>summary</code> provide brief, and detailed information about the lexicographic Nash equilibrium. The generic function <code>plot</code> can be used to visualize the equilibrium.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">## S3 method for class 'mosg.equilibrium'
+summary(object, ...)
+## S3 method for class 'mosg.equilibrium.summary'
+print(x, ...)
+## S3 method for class 'mosg.equilibrium'
+print(x, extended=FALSE, ...)
+## S3 method for class 'mosg.equilibrium'
+plot(x, points=100, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+
+<p>an <code>mgss</code> object as returned by the function <code>mgss</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>object</code></td>
+<td>
+
+<p>an <code>mgss</code> object as returned by the function <code>mgss</code>.
+</p>
+</td>
+</tr>
+</table>
+<p>for <code>print.mosg.equilibrium</code>, the following parameter can be supplied:
+</p>
+<table><tr style="vertical-align: top;">
+<td><code>extended</code></td>
+<td>
+<p>if set to <code>TRUE</code>, then the individual assurances are printed as well.</p>
+</td>
+</tr></table>
+<p>for <code>plot.mosg.equilibrium</code>, the following parameter can be supplied:
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>points</code></td>
+<td>
+<p>the number of points to evaluate the density function over its support for plotting</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>further arguments passed to or from other methods.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>the result returned by the function <code>summary</code> carries the following fields:
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>optimalDefense</code></td>
+<td>
+<p>a discrete probability distribution over the action space for player 1 (the defender).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>optimalAttacks</code></td>
+<td>
+<p>a discrete probability distribution over the action space for player 2 (the attacker).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>assurances</code></td>
+<td>
+<p>an optimal loss distribution valid under the assumption that the defender plays <code>optimalDefense</code> as its mixed strategy. This is a list of <code>mosg.lossdistribution</code> objects, accessible through their assigend names (coming from the underlying game) or by indices.</p>
+</td>
+</tr>
+</table>
+<p>The action spaces for both players are defined in first place by the game for which the equilibrium was computed (via <code>mgss</code> on a game constructed by <code>mosg</code>).
+</p>
+<p><code>print</code> gives a shortened output restricted only to displaying the optimal defense for the defender and attack strategies per goal (as defined by the underlying game).
+</p>
+<p><code>summary</code> returns an object of class <code>summary.mosg.lossdistribution</code>, which has the fields:
+"range"       "mean"        "variance"    "quantiles"   "is.discrete"
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>range</code></td>
+<td>
+<p>the minimal and maximal values of the loss (as anticipated by the observations)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mean</code></td>
+<td>
+<p>the first moment as computed by <code>mean</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>variance</code></td>
+<td>
+<p>the variance as computed by <code>variance</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>quantiles</code></td>
+<td>
+<p>a 2x5-matrix of quantiles at the 10%,25%,50%,75% and 90% level</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>is.discrete</code></td>
+<td>
+<p>a Boolean flag being <code>TRUE</code> if the loss distribution is over categories</p>
+</td>
+</tr>
+</table>
+<p><code>plot</code> displays a grid of plots, starting with the optimal defense behavior plotted as a discrete distribution on top of a (m x 2)-matrix of plots. Each line in this grid shows the discrete optimal attack strategy on the right side (as a bar plot), paired with the loss distribution (extracted from <code>x</code>) caused when the defender plays <code>optimalDefense</code> and the attacker plays the respective optimal attack strategy.
+</p>
+
+
+
+
+
+
+
+<h3>Author(s)</h3>
+
+<p>Stefan Rass
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>print.mosg.equilibrium</code>, <code>mgss</code>, <code>mosg</code>, <code>lossDistribution</code>
+
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## raw data (PURELY ARTIFICIAL, for demo purposes only)
+# N=100 observations in each category
+obs111&lt;-c(rep(1,40),rep(3,20),rep(5,10),rep(7,20),rep(9,10));
+obs112&lt;-c(rep(1,50),rep(2,10),rep(4,10),rep(6,20),rep(8,10));
+obs121&lt;-c(rep(1,20),rep(4,30),rep(6,20),rep(8,10),rep(10,20));
+obs122&lt;-c(rep(1,40),rep(2.5,20),rep(5,20),rep(7.5,10),rep(9,10));
+obs211&lt;-c(rep(1,30),rep(2,30),rep(5,10),rep(8,10),rep(10,20));
+obs212&lt;-c(rep(1,10),rep(2,10),rep(4,20),rep(7,20),rep(10,40));
+obs221&lt;-c(rep(1,30),rep(3,30),rep(4,10),rep(7,20),rep(9,10));
+obs222&lt;-c(rep(1,10),rep(3,10),rep(5,50),rep(8,20),rep(10,10));
+obs311&lt;-c(rep(1,40),rep(2,30),rep(4,10),rep(7,10),rep(9,10));
+obs312&lt;-c(rep(1,20),rep(3,20),rep(4,20),rep(7,20),rep(10,20));
+obs321&lt;-c(rep(1,10),rep(3,40),rep(4,30),rep(7,10),rep(9,10));
+obs322&lt;-c(rep(1,10),rep(4,30),rep(5,30),rep(7,10),rep(10,20));
+
+## compute payoff densities
+f111&lt;-lossDistribution(obs111)
+f112&lt;-lossDistribution(obs112)
+f121&lt;-lossDistribution(obs121)
+f122&lt;-lossDistribution(obs122)
+f211&lt;-lossDistribution(obs211)
+f212&lt;-lossDistribution(obs212)
+f221&lt;-lossDistribution(obs221)
+f222&lt;-lossDistribution(obs222)
+f311&lt;-lossDistribution(obs311)
+f312&lt;-lossDistribution(obs312)
+f321&lt;-lossDistribution(obs321)
+f322&lt;-lossDistribution(obs322)
+
+payoffs&lt;-list(f111,f112,f121, f122,f211,f212,f221,f222, f311,f312,f321,f322)
+G &lt;- mosg( n=2,
+            m=2,
+            payoffs,
+            goals=3,
+            goalDescriptions=c("g1", "g2", "g3"),
+            defensesDescr = c("d1", "d2"),
+            attacksDescr = c("a1", "a2"))
+eq &lt;- mgss(G,weights=c(0.25,0.5,0.25))
+print(eq)
+summary(eq)
+plot(eq)
+
+# access the loss distributions computed in the game
+summary(eq$assurances$g1)
+mean(eq$assurance$g1)    # get the average loss in goal "g1"
+</code></pre>
+
+
+</div>

@@ -1,0 +1,166 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>Pilliat_calibrate</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Generates detection thresholds for the Pilliat algorithm using Monte Carlo simulation</h2>
+
+<h3>Description</h3>
+
+<p>R wrapper for function choosing detection thresholds for the Dense, Partial sum and Berk-Jones statistics in the multiple change-point detection algorithm of Pilliat et al. (2023) using Monte Carlo simulation. When <code>Bonferroni==TRUE</code>, the detection thresholds are chosen by simulating the leading constant in the theoretical detection thresholds given in Pilliat et al. (2023), similarly as described in Appendix B in Moen et al. (2023) for ESAC. When <code>Bonferroni==TRUE</code>, the thresholds for the Berk-Jones statistic are theoretical and not chosen by Monte Carlo simulation.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">Pilliat_calibrate(
+  n,
+  p,
+  N = 100,
+  tol = 0.01,
+  bonferroni = TRUE,
+  threshold_bj_const = 6,
+  K = 2,
+  alpha = 1.5,
+  rescale_variance = TRUE,
+  test_all = FALSE,
+  debug = FALSE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>n</code></td>
+<td>
+<p>Number of observations</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>p</code></td>
+<td>
+<p>Number time series</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>N</code></td>
+<td>
+<p>Number of Monte Carlo samples used</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tol</code></td>
+<td>
+<p>False error probability tolerance</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>bonferroni</code></td>
+<td>
+<p>If <code>TRUE</code>, a Bonferroni correction applied and the detection thresholds for each statistic is chosen by simulating the leading constant in the theoretical detection thresholds</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>threshold_bj_const</code></td>
+<td>
+<p>Leading constant for <code class="reqn">p_0</code> for the Berk-Jones statistic</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>K</code></td>
+<td>
+<p>Parameter for generating seeded intervals</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alpha</code></td>
+<td>
+<p>Parameter for generating seeded intervals</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rescale_variance</code></td>
+<td>
+<p>If <code>TRUE</code>, each row of the data is re-scaled by a MAD estimate (see <code>rescale_variance</code>)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>test_all</code></td>
+<td>
+<p>If <code>TRUE</code>, a change-point test is applied to each candidate change-point position in each interval. If <code>FALSE</code>, only the mid-point of each interval is considered</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>debug</code></td>
+<td>
+<p>If <code>TRUE</code>, diagnostic prints are provided during execution</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A list containing 
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>thresholds_partial</code></td>
+<td>
+<p>vector of thresholds for the Partial Sum statistic (respectively for <code class="reqn">t=1,2,4,\ldots,2^{\lfloor\log_2(p)\rfloor}</code> number of terms in the partial sum)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>threshold_dense</code></td>
+<td>
+<p>threshold for the dense statistic</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>thresholds_bj</code></td>
+<td>
+<p>vector of thresholds for the Berk-Jones static (respectively for <code class="reqn">x=1,2,\ldots,x_0</code>)</p>
+</td>
+</tr>
+</table>
+<h3>References</h3>
+
+<p>Moen PAJ, Glad IK, Tveten M (2023).
+“Efficient sparsity adaptive changepoint estimation.”
+Arxiv preprint, 2306.04702, <a href="https://doi.org/10.48550/arXiv.2306.04702">https://doi.org/10.48550/arXiv.2306.04702</a>.<br><br> Pilliat E, Carpentier A, Verzelen N (2023).
+“Optimal multiple change-point detection for high-dimensional data.”
+<em>Electronic Journal of Statistics</em>, <b>17</b>(1), 1240 – 1315.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">library(HDCD)
+n = 50
+p = 50
+
+set.seed(100)
+thresholds_emp = Pilliat_calibrate(n,p, N=100, tol=1/100)
+thresholds_emp$thresholds_partial # thresholds for partial sum statistic
+thresholds_emp$thresholds_bj # thresholds for Berk-Jones statistic
+thresholds_emp$threshold_dense # thresholds for Berk-Jones statistic
+set.seed(100)
+thresholds_emp_without_bonferroni = Pilliat_calibrate(n,p, N=100, tol=1/100,bonferroni = FALSE)
+thresholds_emp_without_bonferroni$thresholds_partial # thresholds for partial sum statistic
+thresholds_emp_without_bonferroni$thresholds_bj # thresholds for Berk-Jones statistic
+thresholds_emp_without_bonferroni$threshold_dense # thresholds for Berk-Jones statistic
+
+# Generating data
+X = matrix(rnorm(n*p), ncol = n, nrow=p)
+# Adding a single sparse change-point:
+X[1:5, 26:n] = X[1:5, 26:n] +2
+
+res = Pilliat(X, threshold_dense =thresholds_emp$threshold_dense, 
+              thresholds_bj = thresholds_emp$thresholds_bj,
+              thresholds_partial =thresholds_emp$thresholds_partial )
+res$changepoints
+</code></pre>
+
+
+</div>

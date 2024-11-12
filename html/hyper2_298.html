@@ -1,0 +1,195 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>ordertable2supp</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Translate order tables to support functions</h2>
+
+<h3>Description</h3>
+
+<p>Wikipedia gives a nice summary in table form of Formula 1 racing results
+on pages like
+<a href="https://en.wikipedia.org/wiki/2017_Formula_One_World_Championship">https://en.wikipedia.org/wiki/2017_Formula_One_World_Championship</a>
+(at <em>World Drivers' Championship standings</em>) but the data format is
+commonly used for many sports [see <code>ordertable.Rd</code>] and function
+<code>ordertable2supp()</code> translates such tables into a <code>hyper2</code>
+support function and also a order table.
+</p>
+<p>Both functions interpret zero to mean “Did not finish” (wikipedia
+usually signifies DNF as a blank).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">ordertable2supp(x, noscore, incomplete=TRUE)
+ordervec2supp(d)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>Data frame, see details</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>d</code></td>
+<td>
+<p>A named numeric vector giving order; zero entries are
+interpreted as that competitor coming last (due to, e.g., not
+finishing)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>incomplete</code></td>
+<td>
+<p>Boolean, with <code>FALSE</code> meaning to insist that
+each rank <code class="reqn">1,2,...,n</code> is present [zero entries mean “did
+not place” irregardless].  The default <code>TRUE</code> allows for gaps.
+This is useful if we are considering the first few lines of an
+ordertable because there might be missing ranks.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>noscore</code></td>
+<td>
+<p>Character vector giving the abbreviations
+for a non-finishing status such as “did not finish”
+or “disqualified”.  A missing argument is interpreted as 
+<code>c("Ret", "WD", "DNS", "DSQ", "DNP", "NC")</code></p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Function <code>ordertable2supp()</code> is intended for use on order tables
+such as found at <a href="https://en.wikipedia.org/wiki/2019_Moto3_season">https://en.wikipedia.org/wiki/2019_Moto3_season</a>.
+This is a common format, used for Formula 1, motoGP, and other racing
+sports.  Prepared text versions are available in the package in the
+<code>inst/</code> directory, for example <code>inst/motoGP_2019.txt</code>.  Use
+<code>read.table()</code> to create a data frame which can be interpreted by
+<code>ordertable2supp()</code>.
+</p>
+<p>Function <code>ordervec2supp()</code> takes an order vector <code>d</code> and
+returns the corresponding Plackett-Luce loglikelihood function as a
+<code>hyper2</code> object.  It requires a named vector; names of the elements
+are interpreted as names of the players.  Use argument <code>pnames</code> to
+supply the players' names (see the examples).
+</p>
+<pre>
+&gt; x &lt;- c(b=2,c=3,a=1,d=4,e=5) # a: 1st, b: 2nd, c: 3rd etc
+&gt; ordervec2supp(x)
+log( a * (a + b + c + d + e)^-1 * (a + b + d + e)^-1 * b * (b + d +
+e)^-1 * c * (d + e)^-1 * e)
+</pre>
+<p style="text-align: center;"><code class="reqn">
+\frac{a}{a+b+c+d+e}\cdot
+\frac{b}{b+c+d+e}\cdot
+\frac{c}{c+d+e}\cdot
+\frac{d}{d+e}\cdot
+\frac{e}{e}
+</code>
+</p>
+
+<p>Zero entries mean “did not finish”:
+</p>
+<pre>
+&gt; ordervec2supp(c(b=1,a=0,c=2))  # b: 1st, a: DNF, c: second
+log((a + b + c)^-1 * (a + c)^-1 * b * c)
+  </pre>
+<p style="text-align: center;"><code class="reqn">
+\frac{b}{a+b+c}\cdot
+\frac{c}{a+c}
+</code>
+</p>
+
+<p>Note carefully the difference between <code>ordervec2supp()</code> and
+<code>rankvec_likelihood()</code>, which takes a character vector:
+</p>
+<pre>
+&gt;  names(sort(x))
+[1] "a" "b" "c" "d" "e"
+&gt; rankvec_likelihood(names(sort(x)))
+log( a * (a + b + c + d + e)^-1 * b * (b + c + d + e)^-1 * c * (c + d +
+e)^-1 * d * (d + e)^-1)
+&gt; rankvec_likelihood(names(sort(x))) == ordervec2supp(x)
+[1] TRUE
+&gt; 
+</pre>
+<p>Function <code>order_obs()</code> was used in the integer-indexed paradigm but
+is obsolete in the name paradigm.  A short vignette applying
+<code>ordervec2supp()</code> and <code>ordertable2supp()</code> to the salad
+dataset of the <a href="https://CRAN.R-project.org/package=prefmod"><span class="pkg">prefmod</span></a> package [and further analysed in the
+<a href="https://CRAN.R-project.org/package=PlackettLuce"><span class="pkg">PlackettLuce</span></a> package] is presented at <code>inst/salad.Rmd</code>.
+</p>
+
+
+<h3>Value</h3>
+
+<p>Returns a <code>hyper2</code> object</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Robin K. S. Hankin</p>
+
+
+<h3>See Also</h3>
+
+<p><code>ordertable</code>,<code>ordertable2supp3</code></p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">ordertable2supp(soling_table)
+
+# competitors a-f, racing at two venues:
+x &lt;- data.frame(
+    venue1=c(1:5,"Ret"),venue2=c("Ret",4,"Ret",1,3,2),
+    row.names=letters[1:6])
+
+## First consider all competitors; incomplete=FALSE checks that all
+## finishing competitors have ranks 1-n in some order for some n:
+
+ordertable2supp(x,incomplete=FALSE)
+
+
+## Now consider just a-d; must use default incomplete=TRUE as at venue2
+## the second and third ranked competitors are not present in x[1:4,]:
+
+ordertable2supp(x[1:4,])   
+
+
+
+
+
+## Function ordervec2supp() is lower-level, used for order vectors:
+
+a1 &lt;- c(a=2,b=3,c=1,d=5,e=4) # a: 2nd, b: 3rd, c: 1st, d: 5th, e: 4th
+a2 &lt;- c(a=1,b=0,c=0,d=2,e=3) # a: 2nd, b: DNF, c: DNF, d: 2nd, e: 3rd
+a3 &lt;- c(a=1,b=3,c=2)         # a: 1st, b: 3rd, c: 2nd. NB only a,b,c competed
+a4 &lt;- c(a=1,b=3,c=2,d=0,e=0) # a: 1st, b: 3rd, c: 2nd, d,e: DNF
+
+
+## results of ordervec2supp() may be added with "+" [if the observations
+## are independent]:
+
+H1 &lt;- ordervec2supp(a1) + ordervec2supp(a2) + ordervec2supp(a3)
+H2 &lt;- ordervec2supp(a1) + ordervec2supp(a2) + ordervec2supp(a4)
+
+## Thus H1 and H2 are identical except for the third race.  In H1, 'd'
+## and 'e' did not compete, but in H2, 'd' and 'e' did not finish (and
+## notionally came last):
+
+pmax(H1)
+pmax(H2)   # d,e not finishing affects their estimated strength
+
+</code></pre>
+
+
+</div>

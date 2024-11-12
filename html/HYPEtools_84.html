@@ -1,0 +1,425 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>PlotPerformanceByAttribute</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Plot model performance by SUBID attributes</h2>
+
+<h3>Description</h3>
+
+<p>Create scatterplots of model performance by SUBID attributes.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">PlotPerformanceByAttribute(
+  subass,
+  subass.column = 2,
+  groups = NULL,
+  attributes,
+  join.type = c("join", "cbind"),
+  group.join.type = c("join", "cbind"),
+  groups.color.pal = NULL,
+  drop = TRUE,
+  alpha = 0.4,
+  trendline = TRUE,
+  trendline.method = "lm",
+  trendline.formula = NULL,
+  trendline.alpha = 0.5,
+  trendline.darken = 15,
+  density.plot = FALSE,
+  density.plot.type = c("density", "boxplot"),
+  scale.x.log = FALSE,
+  scale.y.log = FALSE,
+  xsigma = 1,
+  ysigma = 1,
+  xlimits = c(NA, NA),
+  ylimits = c(NA, NA),
+  xbreaks = waiver(),
+  ybreaks = waiver(),
+  xlabels = waiver(),
+  ylabels = waiver(),
+  xlab = NULL,
+  ylab = NULL,
+  ncol = NULL,
+  nrow = NULL,
+  align = "hv",
+  common.legend = TRUE,
+  legend.position = "bottom",
+  group.legend.title = "Group",
+  common.y.axis = FALSE,
+  summary.table = FALSE,
+  table.margin = 0.4,
+  filename = NULL,
+  width = NA,
+  height = NA,
+  units = c("in", "cm", "mm", "px"),
+  dpi = 300
+)
+
+PlotJohan(
+  subass,
+  subass.column = 2,
+  groups = NULL,
+  attributes,
+  join.type = c("join", "cbind"),
+  group.join.type = c("join", "cbind"),
+  groups.color.pal = NULL,
+  drop = TRUE,
+  alpha = 0.4,
+  trendline = TRUE,
+  trendline.method = "lm",
+  trendline.formula = NULL,
+  trendline.alpha = 0.5,
+  trendline.darken = 15,
+  density.plot = FALSE,
+  density.plot.type = c("density", "boxplot"),
+  scale.x.log = FALSE,
+  scale.y.log = FALSE,
+  xsigma = 1,
+  ysigma = 1,
+  xlimits = c(NA, NA),
+  ylimits = c(NA, NA),
+  xbreaks = waiver(),
+  ybreaks = waiver(),
+  xlabels = waiver(),
+  ylabels = waiver(),
+  xlab = NULL,
+  ylab = NULL,
+  ncol = NULL,
+  nrow = NULL,
+  align = "hv",
+  common.legend = TRUE,
+  legend.position = "bottom",
+  group.legend.title = "Group",
+  common.y.axis = FALSE,
+  summary.table = FALSE,
+  table.margin = 0.4,
+  filename = NULL,
+  width = NA,
+  height = NA,
+  units = c("in", "cm", "mm", "px"),
+  dpi = 300
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>subass</code></td>
+<td>
+<p>Information to plot, typically model performances from imported HYPE 'subassX.txt' files. Data frame object
+with first column containing SUBIDs and additional columns containing model results to plot. See details.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>subass.column</code></td>
+<td>
+<p>Column index of information in <code>subass</code> to plot on the y-axis of the output plots.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>groups</code></td>
+<td>
+<p>Optional data frame object to specify groups of SUBIDs to plot separately. First column should contain SUBIDs and second column should contain group IDs.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>attributes</code></td>
+<td>
+<p>Data frame object containing the subbasin attribute information to plot on the x-axis of the output plots. Typically a data frame created by <code>SubidAttributeSummary</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>join.type</code></td>
+<td>
+<p>Specify how to join <code>subass</code> to <code>attributes</code>. Default "join" will perform a dplyr::left_join in which the order of the SUBIDs does not need to match. Additional option "cbind"
+will perform a <code>cbind</code> in which the order of the SUBIDs needs to match; this can be helpful if you want to create plots where <code>subass</code> performance data is calculated according to a
+grouping variable (e.g. month).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>group.join.type</code></td>
+<td>
+<p>Specify how to join <code>subass</code> to <code>groups</code>. Default "join" will perform a dplyr::left_join in which the order of the SUBIDs does not need to match. Additional option "cbind"
+will perform a <code>cbind</code> in which the order of the SUBIDs needs to match; this can be helpful if you want to create plots where <code>subass</code> performance data is calculated according to a
+grouping variable (e.g. month).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>groups.color.pal</code></td>
+<td>
+<p>Vector containing colors to use when plotting groups. Only used if groups is not <code>NULL</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>drop</code></td>
+<td>
+<p>Logical, should unused factor levels be omitted from the legend. See ggplot2::scale_color_manual and ggplot2::scale_fill_manual.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alpha</code></td>
+<td>
+<p>Numeric value to set transparency of dots in output plots. Should be in the range 0-1.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>trendline</code></td>
+<td>
+<p>Logical, if <code>TRUE</code>, then trendlines will be added to the output plots. Set to <code>FALSE</code> to hide trendlines. See ggplot2::geom_smooth.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>trendline.method</code></td>
+<td>
+<p>Specify method used to create trendlines. See ggplot2::geom_smooth.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>trendline.formula</code></td>
+<td>
+<p>Specify formula used to create trendlines. See ggplot2::geom_smooth.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>trendline.alpha</code></td>
+<td>
+<p>Numeric value to set transparency of trendlines in output plots. Should be in the range 0-1.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>trendline.darken</code></td>
+<td>
+<p>Numeric value to make the trendlines darker color shades of their corresponding scatterplot points. Should be in the range 1-100.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>density.plot</code></td>
+<td>
+<p>Logical, if <code>TRUE</code>, then density plots will be added to the output plots. Set to <code>FALSE</code> to hide density plots.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>density.plot.type</code></td>
+<td>
+<p>String, type of plot geometry to use for density plots: <code>"density"</code> for ggplot2::geom_density or <code>"boxplot"</code> for ggplot2::geom_boxplot. Outliers are hidden from the boxplots.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>scale.x.log</code></td>
+<td>
+<p>Vector describing if output plots should use a log scale on the x-axis. A pseudo-log scale will be used if any zero or negative values are present. If length of vector == 1, then the value will be used for all output plots. Vector values should be either <code>TRUE</code> or <code>FALSE</code>. See ggplot2::scale_x_log10.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>scale.y.log</code></td>
+<td>
+<p>Vector describing if output plots should use a log scale on the y-axis. A pseudo-log scale will be used if any zero or negative values are present. If length of vector == 1, then the value will be used for all output plots. Vector values should be either <code>TRUE</code> or <code>FALSE</code>. See ggplot2::scale_y_log10.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>xsigma</code></td>
+<td>
+<p>Numeric, scaling factor for the linear part of psuedo-long transformation of x axis. Used if <code>scale.x.log</code> is <code>TRUE</code> and zero or negative values are present. See scales::pseudo_log_trans.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ysigma</code></td>
+<td>
+<p>Numeric, scaling factor for the linear part of psuedo-long transformation of y axis. Used if <code>scale.y.log</code> is <code>TRUE</code> and zero or negative values are present. See scales::pseudo_log_trans.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>xlimits</code></td>
+<td>
+<p>Vector containing minimum and maximum values for the x-axis of the output plots. See ggplot2::scale_x_continuous.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ylimits</code></td>
+<td>
+<p>Vector containing minimum and maximum values for the y-axis of the output plots. See ggplot2::scale_y_continuous.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>xbreaks</code></td>
+<td>
+<p>Vector containing the break values used for the x-axis of the output plots. See ggplot2::scale_x_continuous.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ybreaks</code></td>
+<td>
+<p>Vector containing the break values used for the y-axis of the output plots. See ggplot2::scale_y_continuous.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>xlabels</code></td>
+<td>
+<p>Vector containing the labels for each break value used for the x-axis of the output plots. See ggplot2::scale_x_continuous.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ylabels</code></td>
+<td>
+<p>Vector containing the labels for each break value used for the y-axis of the output plots. See ggplot2::scale_y_continuous.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>xlab</code></td>
+<td>
+<p>String containing the text to use for the x-axis title of the output plots. See ggplot2::xlab.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ylab</code></td>
+<td>
+<p>String containing the text to use for the y-axis title of the output plots. See ggplot2::ylab.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ncol</code></td>
+<td>
+<p>Integer, number of columns to use in the output arranged plot. See ggpubr::ggarrange.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nrow</code></td>
+<td>
+<p>Integer, number of rows to use in the output arranged plot. See ggpubr::ggarrange.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>align</code></td>
+<td>
+<p>Specify how output plots should be arranged. See ggpubr::ggarrange.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>common.legend</code></td>
+<td>
+<p>Specify if arranged plot should use a common legend. See ggpubr::ggarrange.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>legend.position</code></td>
+<td>
+<p>Specify position of common legend for arranged plot. See ggpubr::ggarrange. Use <code>"none"</code> to hide legend.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>group.legend.title</code></td>
+<td>
+<p>String, title for plot legend when generating plots with <code>groups</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>common.y.axis</code></td>
+<td>
+<p>Logical, if <code>TRUE</code>, then only one y-axis label and marginal density plot will be provided. If <code>FALSE</code>, then separate y-axis labels and marginal density plots will be included for each subplot.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>summary.table</code></td>
+<td>
+<p>Logical, if <code>TRUE</code>, then a table providing summary statistics will be included at the bottom of the output plot.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>table.margin</code></td>
+<td>
+<p>Numeric, controls spacing between plots and summary table.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>filename</code></td>
+<td>
+<p>String, filename used to save plot. File extension must be specified. See ggplot2::ggsave.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>width</code></td>
+<td>
+<p>Numeric, specify width of output plot. See ggplot2::ggsave.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>height</code></td>
+<td>
+<p>Numeric, specify height of output plot. See ggplot2::ggsave.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>units</code></td>
+<td>
+<p>Specify units of <code>width</code> and <code>height</code>. See ggplot2::ggsave.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dpi</code></td>
+<td>
+<p>Specify resolution of output plot. See ggplot2::ggsave.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p><code>PlotPerformanceByAttribute</code> can be used to analyze model performance according to subbasin attributes. The function requires two primary inputs; Model performance
+information is contained in the <code>subass</code> input, and subbasin attribute information is contained in the <code>attributes</code> input. The <code>subass.column</code> argument controls
+which column of the <code>subass</code> data frame will be used as the y-coordinate of points. Plots will be generated for each column in the <code>attributes</code> data frame
+(except for the column named "SUBID") using the column values as the x-coordinate of the points.
+</p>
+<p>A subbasin attribute summary table can be generated using <code>SubidAttributeSummary</code>, and additional columns can be joined to the data frame to add additional output plots.
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>PlotPerformanceByAttribute</code> returns a plot to the currently active plot device.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>ReadSubass</code> for HYPE result import; <code>SubidAttributeSummary</code> for subbasin attribute summary
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+subass &lt;- ReadSubass(filename = system.file("demo_model", "results",
+  "subass1.txt",
+  package = "HYPEtools"
+), check.names = TRUE)
+gd &lt;- ReadGeoData(filename = system.file("demo_model",
+  "GeoData.txt",
+  package = "HYPEtools"
+))
+gc &lt;- ReadGeoClass(filename = system.file("demo_model",
+  "GeoClass.txt",
+  package = "HYPEtools"
+))
+
+attributes &lt;- SubidAttributeSummary(subids &lt;- subass$SUBID,
+  gd = gd, gc = gc,
+  mapoutputs = c(system.file("demo_model", "results", "mapCOUT.txt", package = "HYPEtools")),
+  upstream.gd.cols = c("SLOPE_MEAN")
+)
+
+PlotPerformanceByAttribute(
+  subass = subass,
+  attributes = attributes[, c("SUBID", "landuse_1", "landuse_2", "landuse_3")],
+  xlimits = c(0, 1)
+)
+
+
+</code></pre>
+
+
+</div>

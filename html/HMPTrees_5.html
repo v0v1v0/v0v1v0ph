@@ -1,0 +1,120 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>compareTwoDataSets</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Likelihood-Ratio-Test Statistics to Compare the Distribution of 2 Sets of RDP-Based Taxonomic Trees</h2>
+
+<h3>Description</h3>
+
+<p>This functions compares the distribution of two sets of RDP-based taxonomic trees using Likelihood-Ratio-Test statistics and a 
+p-value is computed using permutations.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">	compareTwoDataSets(data1, data2, numPerms = 1000, parallel = FALSE, cores = 3, 
+	maxSteps=50, delta=10^(-6), numBootStraps = NULL, enableMC = NULL)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>data1, data2</code></td>
+<td>
+<p>Data frames in which each column contains the rdp read counts for every taxa given in the row names.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>numPerms</code></td>
+<td>
+<p>The number of permutation tests to run.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>parallel</code></td>
+<td>
+<p>When this is 'TRUE' it allows for parallel calculation of the permutations. Requires the package <code>doParallel</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cores</code></td>
+<td>
+<p>The number of parallel processes to run if enableMC is 'TRUE'.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>maxSteps</code></td>
+<td>
+<p>The maximum number of times to iterate though for the MLE.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>delta</code></td>
+<td>
+<p>The minimum threshold of change in f to stop the search for the MLE.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>numBootStraps</code></td>
+<td>
+<p>Deprecated. Replaced with numPerms.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>enableMC</code></td>
+<td>
+<p>Deprecated. Replaced with parallel.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Note: Both data sets should be standardized to the same number of reads.
+</p>
+<p>We are interested in assessing whether the distributions from two metagenomic populations are the same or different, which is equivalent to evaluating 
+whether their respective parameters are the same or different. The corresponding hypothesis is given as follows:
+</p>
+<p style="text-align: center;"><code class="reqn">H_{\mathrm{o}}: (g_{1}^{*},\tau_{1}) =  (g_{2}^{*},\tau_{2}) = (g_{0}^{*},\tau_{0}) vs H_{\mathrm{A}}: (g_{1}^{*},\tau_{1}) \neq (g_{2}^{*},\tau_{2}) ,</code>
+</p>
+
+<p>where <code class="reqn">(g_{0}^{*},\tau_{0})</code> is the unknown common parameter vector. To evaluate this hypothesis we use the likelihood-ratio test (LRT) which is given by,
+</p>
+<p style="text-align: center;"><code class="reqn">\lambda = -2 \log\left(\frac{L(g_{o}^{*},\tau_{o};{S_{1n},S_{2m}})}{L(g_{1}^{*},\tau_{1};{S_{1n}})+L(g_{2}^{*},\tau_{2};{S_{2m}})} \right),</code>
+</p>
+
+<p>where <code class="reqn">S_{1n}</code> and <code class="reqn">S_{2m}</code> are the sets containing <code class="reqn">n</code> and <code class="reqn">m</code> random samples of trees from each metagenomic population, respectively. 
+We assume that the model parameters are unknown under both the null and alternative hypothesis, therefore, we estimate these using the MLE procedure proposed 
+in La Rosa et al (see reference 2), and compute the corresponding p-value using non-parametric bootstrap.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A p-value for the similarity of the two data sets based on the permutation test.</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Patricio S. La Rosa, Elena Deych, Berkley Shands, William D. Shannon</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">	data(saliva)
+	data(stool)
+	
+	### We use 1 for the number of permutations for computation time
+	### This value should be at least 1000 for an accurate result
+	numPerms &lt;- 1
+	
+	pval &lt;- compareTwoDataSets(saliva, stool, numPerms)
+	pval
+</code></pre>
+
+
+</div>

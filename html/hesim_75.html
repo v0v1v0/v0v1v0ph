@@ -1,0 +1,151 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>create_StateVals</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Create a <code>StateVals</code> object</h2>
+
+<h3>Description</h3>
+
+<p><code>create_StateVals()</code> is a generic function for creating an object of class
+<code>StateVals</code> from a fitted statistical model or a <code>stateval_tbl</code>
+object.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">create_StateVals(object, ...)
+
+## S3 method for class 'lm'
+create_StateVals(
+  object,
+  input_data = NULL,
+  n = 1000,
+  uncertainty = c("normal", "none"),
+  ...
+)
+
+## S3 method for class 'stateval_tbl'
+create_StateVals(object, hesim_data = NULL, n = 1000, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>object</code></td>
+<td>
+<p>A model object of the appropriate class.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Further arguments (<code>time_reset</code> and <code>method</code>) passed to <code>StateVals$new()</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>input_data</code></td>
+<td>
+<p>An object of class <code>expanded_hesim_data</code>.
+Must be expanded by treatment strategies, patients, and health states.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n</code></td>
+<td>
+<p>Number of random observations of the parameters to draw when parameters
+are fit using a statistical model.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>uncertainty</code></td>
+<td>
+<p>Method determining how parameter uncertainty should be handled. See
+documentation in <code>create_params()</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>hesim_data</code></td>
+<td>
+<p>A <code>hesim_data</code> object. Only required when <code>object</code> is of class
+<code>stateval_tbl</code>. See "details".</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>If <code>object</code> is a <code>stateval_tbl</code>, then a <code>hesim_data</code> object is used
+to specify treatment strategies, patients, and/or health states not included as
+columns in the table, or, to match patients in the table to groups. Not required if
+the table includes one row for each treatment strategy, patient, and health state
+combination. Patients are matched to groups by specifying both a <code>patient_id</code>
+and a <code>grp_var</code> column in the <code>patients</code> table.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A <code>StateVals</code> object.
+</p>
+
+
+<h3>See Also</h3>
+
+<p>See <code>StateVals</code> for documentation of the class and additional examples.
+An example use case for <code>create_StateVals.stateval_tbl()</code> is provided in
+the <code>stateval_tbl()</code> documentation.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">set.seed(10)
+
+# EXAMPLE FOR `create_statevals.lm()`
+## Simple example comparing two treatment strategies where
+## medical costs vary by sex and health state
+
+## Setup model
+hesim_dat &lt;- hesim_data(
+  strategies = data.frame(strategy_id = c(1, 2)),
+  patients = data.frame(
+    patient_id = c(1, 2),
+    female = c(1, 0)
+  ),
+  states = data.frame(
+    state_id = c(1, 2, 3),
+    state_name = c("state1", "state2", "state3")
+  )
+)
+
+## Fit model
+medcost_estimation_data &lt;- psm4_exdata$costs$medical
+medcost_estimation_data$time5 &lt;- rbinom(nrow(medcost_estimation_data), 
+                                        1, .5) # Illustrative time dummy
+medcost_fit &lt;- lm(costs ~ female + state_name + time5, 
+                  data = medcost_estimation_data)
+
+## Create medical cost model
+### Allow medical costs to vary across time in addition to by patient and 
+### health state
+medcost_times &lt;- time_intervals(
+  data.frame(time_start = c(0, 3, 5),
+            time5 = c(0, 0, 1)) # Time dummy corresponds to time &gt; 5
+)
+medcost_input_data &lt;- expand(hesim_dat, 
+                             by = c("strategies", "patients", "states"),
+                             times = medcost_times)
+medcost_model &lt;- create_StateVals(medcost_fit, medcost_input_data,
+                                  n = 1)
+
+## Explore predictions from medical cost model
+### We can assess predictions at multiple time points
+medcost_model$sim(t = c(1, 6), type = "predict")
+</code></pre>
+
+
+</div>

@@ -1,0 +1,207 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>MTL_reg</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Robust Multi-Task Feature Learning</h2>
+
+<h3>Description</h3>
+
+<p><code>MTL_reg</code> conducts multi-tasks feature learning to the learning tasks with continous response variables, such as the linear regression, Huber regression, adaptive Huber. The adaptive Huber method is based on Sun, Q., Zhou, W.-X. and Fan, J. (2020) and Wang, L., Zheng, C., Zhou, W. and Zhou, W.-X. (2021). The penalty function applies a mixed <code class="reqn">\ell_{2,1}</code> norm to combine regression coefficients of predictor shared across all tasks.
+The Huber regression and adaptive Huber regression need the robustification parameter <code class="reqn">\tau_k</code> to strike a balance between the unbiasedness and robustness, and the adaptive method can determine this parameter by a tuning-free principle.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">MTL_reg(
+  y,
+  x,
+  lambda,
+  Kn,
+  p,
+  n,
+  beta = 0.1,
+  tau = 1.45,
+  Cont_Model = "adaptive Huber",
+  import_w = 1,
+  tol = 0.05,
+  max_iter = 100,
+  Complete = "True",
+  diagnostics = FALSE,
+  gamma = 1,
+  alpha = 1
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+<p>List. A list of continuous responses vectors for all tasks.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>List. Listing matrices of the predictors for all tasks align with the same order as in y.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lambda</code></td>
+<td>
+<p>Numeric. The penalty parameter used for block-wise regularization (<code class="reqn">\ell_{2,1}</code> norm).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Kn</code></td>
+<td>
+<p>Numeric. The number of tasks with continuous responses.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>p</code></td>
+<td>
+<p>Numeric. The number of features.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n</code></td>
+<td>
+<p>Numeric or vector. If only one numeric value is provided, equal sample size will be assumed for each task. If a vector is provided, then the elements are the sample sizes for all tasks.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>beta</code></td>
+<td>
+<p>(<strong>optional</strong>). Numeric or matrix. An initial value or matrix of values <code class="reqn">p</code> by <code class="reqn">K</code> for the estimation. The default value is 0.1.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tau</code></td>
+<td>
+<p>Numeric or vector. The robustification parameter used for methods "Huber regression" or "Adaptive Huber". The default value is 1.45.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Cont_Model</code></td>
+<td>
+<p>Character("regression", "Huber regression", or "adaptive Huber"). The models used for tasks with continuous responses.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>import_w</code></td>
+<td>
+<p>Numeric or vector. The weights assigned to different tasks. An equal weight is set as the default.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tol</code></td>
+<td>
+<p>(<strong>optional</strong>). Numeric. The tolerance level of optimation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>max_iter</code></td>
+<td>
+<p>(<strong>optional</strong>). Numeric. The maximum number of iteration steps.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Complete</code></td>
+<td>
+<p>Logic input. If the predictors in each task are all measured, set 'Complete == TRUE'; If some predictors in some but not all task are all measured, set'Complete == FALSE', and the missing values are imputed by column mean. The adjustment weights will be assigned based on the completeness of the predictors.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>diagnostics</code></td>
+<td>
+<p>Logic input. If 'diagnostics == TRUE', the function provides Bayesian information criterion, and the selected model performance is evalued by the MSE and MAE for tasks with continuous response and the AUC and deviance for tasks with binary responses.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>gamma</code></td>
+<td>
+<p>(<strong>optional</strong>). Numeric. Step size for each inner iteration. The default is equal to 1.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alpha</code></td>
+<td>
+<p>(<strong>optional</strong>). Numeric. A tuning parameter for BIC penalty. The default is equal to 1.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A list including the following terms will be returned:
+</p>
+
+<dl>
+<dt><code>beta</code></dt>
+<dd>
+<p>A <code class="reqn">p</code> by <code class="reqn">K</code> matrix of estimated sparse parameters.</p>
+</dd>
+<dt><code>Task type</code></dt>
+<dd>
+<p>The models used in each task.</p>
+</dd>
+<dt><code>Task weights</code></dt>
+<dd>
+<p>The weights assigned to each task.</p>
+</dd>
+<dt><code>Selected_List</code></dt>
+<dd>
+<p>The index of non-zero parameters.</p>
+</dd>
+</dl>
+<p>If 'diagnostics = TRUE', the following terms will be returned:
+</p>
+
+<dl>
+<dt><code>Bayesian_Information</code></dt>
+<dd>
+<p>Table of the information criterion: Composite likelihood, Degree of freedom, and (peudo or robust) Bayesian informtion criterion.</p>
+</dd>
+<dt><code>Reg_Error</code></dt>
+<dd>
+<p>Table of the model performance for (Huber) regressions: the mean square error (MSE), and the mean absolute error (MAE).</p>
+</dd>
+<dt><code>Residuals</code></dt>
+<dd>
+<p>The residuals for all tasks.</p>
+</dd>
+</dl>
+<h3>References</h3>
+
+<p>Huber, P. J. (1964). Robust estimation of a location parameter. Ann. Math. Statist., 35, 73–101.
+</p>
+<p>Sun, Q., Zhou, W.-X. and Fan, J. (2020). Adaptive Huber regression. J. Amer. Statist. Assoc., 115, 254-265.
+</p>
+<p>Wang, L., Zheng, C., Zhou, W. and Zhou, W.-X. (2021). A new principle for tuning-free Huber regression. Stat. Sinica, 31, 2153-2177.
+</p>
+<p>Zhong, Y., Xu, W., and Gao X., (2023) Robust Multi-task Feature Learning. Submitted
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">x_reg &lt;- list(mockdata1[[1]],mockdata1[[2]])
+y_reg &lt;- list(mockdata2[[1]],mockdata2[[2]])
+model &lt;- MTL_reg(y_reg,x_reg, lambda = 2.5  , Kn = 2, p=500,
+                n = c(500,250 ),gamma = 2, Complete = FALSE, diagnostics = TRUE, alpha = 2)
+
+# Selected non-zero coefficients
+model$beta[model$Selected_List,]
+# Estimated Pseudo-BIC
+model$Bayesian_Information
+# Regression error
+model$Reg_Error
+</code></pre>
+
+
+</div>

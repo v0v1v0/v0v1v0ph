@@ -1,0 +1,200 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>sEM</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>sparse expectation-maximization algorithm for high-dimensional vector autoregression with measurement error</h2>
+
+<h3>Description</h3>
+
+<p>Alteranting between expectation step (by kalman filter and smoothing) and maximization step (by generalized Dantzig selector for transiton matrix)
+to estimate transtion matrix and error variances.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">sEM(
+  Y,
+  A_init,
+  sig2_eta_init,
+  sig2_epsilon_init,
+  Ti_train = NULL,
+  Ti_gap = NULL,
+  tol_seq = NULL,
+  ht_seq = 0,
+  is_cv = TRUE,
+  thres = 0.001,
+  count_vanish = 1,
+  n_em = NULL,
+  is_echo = FALSE,
+  is_sparse = TRUE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>Y</code></td>
+<td>
+<p>observations of time series, a p by T matrix.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>A_init</code></td>
+<td>
+<p>a p by p matrix as initial value of transition matrix <code class="reqn">A</code> estimate.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sig2_eta_init</code></td>
+<td>
+<p>scalar; initial value of propagation error variance <code class="reqn">\sigma_\eta^2</code> estimate in latent signal process.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sig2_epsilon_init</code></td>
+<td>
+<p>scalar; initial value of measurement error variance <code class="reqn">\sigma_\epsilon^2</code> estimate in observation process.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Ti_train</code></td>
+<td>
+<p>scalar; the number of time points in training data in cross-validation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Ti_gap</code></td>
+<td>
+<p>scalar; the number of time points between test data and train data in cross-validation.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tol_seq</code></td>
+<td>
+<p>vector; grid of tolerance parameter in Dantzig selector for cross-validation. If <code>is_cv=FALSE</code>, use the first element.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ht_seq</code></td>
+<td>
+<p>vector; grid of hard-thresholding levels for transition matrix estimate. If <code>is_cv=FALSE</code>, use the first element.
+To avoid hard thresholding, set <code>ht_seq=0</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>is_cv</code></td>
+<td>
+<p>logical; if true, run cross-validation to tune Dantzig selector tolerance parameter each sparse EM iteration.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>thres</code></td>
+<td>
+<p>scalar; if the difference between updates of two consecutive iterations is less that <code>thres</code>, record one hit.
+The algorithm is terminated due to vanishing updates if hit times accumulate up to <code>count_vanish</code>. If <code>thres=NULL</code>, the algorithm will not be terminated
+due to vanishing updates, but too many iterations instead.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>count_vanish</code></td>
+<td>
+<p>scalar; if the difference between updates of two consecutive
+iterations is less that <code>thres</code> up to <code>count_vanish</code> times, the algorithm is terminated due to vanishing updates.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n_em</code></td>
+<td>
+<p>scalar; the maximal allowed number of EM iterations, otherwise the algorithm is terminated due to too many iterations.
+If <code>n_em=NULL</code>, the algorithm will not be terminated due to too many iterations, but vanishing updates instead.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>is_echo</code></td>
+<td>
+<p>logical; if true, display the information of CV-optimal (tol, ht) each iteration, and of algorithm termination.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>is_sparse</code></td>
+<td>
+<p>logical; if false, use standard EM algorithm, and arguments for cross-validation are not needed.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>a list of parameter estimates.
+</p>
+
+<table>
+<tr>
+<td style="text-align: left;">
+<code>A_est</code>  </td>
+<td style="text-align: left;">  estimate of transition matrix <code class="reqn">A</code>. </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+<code>sig2_eta_hat</code>  </td>
+<td style="text-align: left;">  estimate of propagation error variance <code class="reqn">\sigma_\eta^2</code>. </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+<code>sig2_epsilon_hat</code>  </td>
+<td style="text-align: left;">   estimate of measurement error variance <code class="reqn">\sigma_\epsilon^2</code>. </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+<code>iter_err</code> </td>
+<td style="text-align: left;">   the difference between updates of two consecutive iterations. </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+<code>iter_err_ratio</code> </td>
+<td style="text-align: left;">  the difference ratio (over the previous estimate) between updates of two consecutive iterations. </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>Xiang Lyu, Jian Kang, Lexin Li
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">p= 3; Ti=20  # dimension and time
+A=diag(1,p) # transition matrix
+sig_eta=sig_epsilon=0.2 # error std
+Y=array(0,dim=c(p,Ti)) #observation t=1, ...., Ti
+X=array(0,dim=c(p,Ti)) #latent t=1, ...., T
+Ti_burnin=30 # time for burn-in to stationarity
+for (t in 1:(Ti+Ti_burnin)) {
+  if (t==1){
+    x1=rnorm(p)
+  } else if (t&lt;=Ti_burnin) { # burn in
+    x1=A%*%x1+rnorm(p,mean=0,sd=sig_eta)
+  } else if (t==(Ti_burnin+1)){ # time series used for learning
+    X[,t-Ti_burnin]=x1
+    Y[,t-Ti_burnin]=X[,t-Ti_burnin]+rnorm(p,mean=0,sd=sig_epsilon)
+  } else {
+    X[,t- Ti_burnin]=A%*%X[,t-1- Ti_burnin]+rnorm(p,mean=0,sd=sig_eta)
+    Y[,t- Ti_burnin]=X[,t- Ti_burnin]+rnorm(p,mean=0,sd=sig_epsilon)
+  }
+}
+
+sEM_fit=sEM(Y,diag(0.5,p),0.1,0.1,Ti*0.5,Ti*0.2,c(0.01,0.1))
+
+
+</code></pre>
+
+
+</div>

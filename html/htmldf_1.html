@@ -1,0 +1,195 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>html_df</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Get a tabular summary of webpage content from a vector of urls</h2>
+
+<h3>Description</h3>
+
+<p>From a vector of urls, <code>html_df()</code> will attempt to fetch the html.  From the 
+html, <code>html_df()</code> will attempt to look for a page title, rss feeds, images, embedded social media
+profile handles and other page metadata.  Page language is inferred using the package <code>cld3</code>
+which wraps Google's Compact Language Detector 3.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">html_df(
+  urlx,
+  max_size = 5e+06,
+  wait = 0,
+  retry_times = 0,
+  time_out = 30,
+  show_progress = TRUE,
+  keep_source = TRUE,
+  chrome_bin = NULL,
+  chrome_args = NULL,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>urlx</code></td>
+<td>
+<p>A character vector containing urls.  Local files must be prepended with <code>file://</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>max_size</code></td>
+<td>
+<p>Maximum size in bytes of pages to attempt to parse, defaults to <code>5000000</code>.
+This is to avoid reading very large pages that may cause <code>read_html()</code> to hang.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>wait</code></td>
+<td>
+<p>Time in seconds to wait between successive requests. Defaults to 0.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>retry_times</code></td>
+<td>
+<p>Number of times to retry a URL after failure.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>time_out</code></td>
+<td>
+<p>Time in seconds to wait for <code>httr::GET()</code> to complete before exiting.  Defaults 
+to 30.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>show_progress</code></td>
+<td>
+<p>Logical, defaults to <code>TRUE</code>. Whether to show progress during download.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>keep_source</code></td>
+<td>
+<p>Logical argument - whether or not to retain the contents of the page <code>source</code> 
+column in the output tibble.  Useful to reduce memory usage when scraping many pages.  Defaults to <code>TRUE</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>chrome_bin</code></td>
+<td>
+<p>(Optional) Path to a Chromium install to use Chrome in headless mode for scraping</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>chrome_args</code></td>
+<td>
+<p>(Optional) Vector of additional command-line arguments to pass to chrome</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Additional arguments to 'httr::GET()'.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A tibble with columns 
+</p>
+
+<ul>
+<li> <p><code>url</code> the original vector of urls provided
+</p>
+</li>
+<li> <p><code>title</code> the page title, if found
+</p>
+</li>
+<li> <p><code>lang</code> inferred page language
+</p>
+</li>
+<li> <p><code>url2</code> the fetched url, this may be different to the original, for example if redirected
+</p>
+</li>
+<li> <p><code>links</code> a list of tibbles of hyperlinks found in <code>&lt;a&gt;</code> tags
+</p>
+</li>
+<li> <p><code>rss</code> a list of embedded RSS feeds found on the page
+</p>
+</li>
+<li> <p><code>tables</code> a list of tables found on the page in descending order of size, coerced to
+<code>tibble</code> wherever possible.  
+</p>
+</li>
+<li> <p><code>images</code> list of tibbles containing image links found on the page
+</p>
+</li>
+<li> <p><code>social</code> list of tibbles containing twitter, linkedin and github user info found on page
+</p>
+</li>
+<li> <p><code>code_lang</code> numeric indicating inferred code language.  A negative values near -1 
+indicates high likelihood that the language is python, positive values near 1 indicate R. 
+If not code tags are detected, or the language could not be inferred, value is <code>NA</code>.
+</p>
+</li>
+<li> <p><code>size</code> the size of the downloaded page in bytes
+</p>
+</li>
+<li> <p><code>server</code> the page server
+</p>
+</li>
+<li> <p><code>accessed</code> datetime when the page was accessed
+</p>
+</li>
+<li> <p><code>published</code> page publication or last updated date, if detected 
+</p>
+</li>
+<li> <p><code>generator</code> the page generator, if found
+</p>
+</li>
+<li> <p><code>status</code> HTTP status code 
+</p>
+</li>
+<li> <p><code>source</code> character string of xml documents.  These can each be coerced to <code>xml_document</code>
+for further processing using <code>rvest</code> using <code>xml2:read_html()</code>.
+</p>
+</li>
+</ul>
+<h3>Author(s)</h3>
+
+<p>Alastair Rushworth
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Examples require an internet connection...
+urlx &lt;- c("https://github.com/alastairrushworth/htmldf", 
+          "https://alastairrushworth.github.io/")
+dl   &lt;- html_df(urlx)
+# preview the dataframe
+head(dl)
+# social tags
+dl$social
+# page titles
+dl$title
+# page language
+dl$lang
+# rss feeds
+dl$rss
+# inferred code language
+dl$code_lang
+# print the page source
+dl$source
+
+
+</code></pre>
+
+
+</div>

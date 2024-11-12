@@ -1,0 +1,891 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>armitage_eval</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Evaluate the updated Armitage model</h2>
+
+<h3>Description</h3>
+
+<p>Evaluate the Armitage model for chemical distributon <em>in vitro</em>. Takes input
+as data table or vectors of values. Outputs a data table. Updates over
+the model published in Armitage et al. (2014) include binding to plastic walls
+and lipid and protein compartments in cells.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">armitage_eval(
+  chem.cas = NULL,
+  chem.name = NULL,
+  dtxsid = NULL,
+  casrn.vector = NA_character_,
+  nomconc.vector = 1,
+  this.well_number = 384,
+  this.FBSf = NA_real_,
+  tcdata = NA,
+  this.sarea = NA_real_,
+  this.v_total = NA_real_,
+  this.v_working = NA_real_,
+  this.cell_yield = NA_real_,
+  this.Tsys = 37,
+  this.Tref = 298.15,
+  this.option.kbsa2 = FALSE,
+  this.option.swat2 = FALSE,
+  this.pseudooct = 0.01,
+  this.memblip = 0.04,
+  this.nlom = 0.2,
+  this.P_nlom = 0.035,
+  this.P_dom = 0.05,
+  this.P_cells = 1,
+  this.csalt = 0.15,
+  this.celldensity = 1,
+  this.cellmass = 3,
+  this.f_oc = 1,
+  this.conc_ser_alb = 24,
+  this.conc_ser_lip = 1.9,
+  this.Vdom = 0,
+  this.pH = 7,
+  restrict.ion.partitioning = FALSE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>chem.cas</code></td>
+<td>
+<p>A single or vector of Chemical Abstracts Service Registry 
+Number(s) (CAS-RN) of desired chemical(s).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>chem.name</code></td>
+<td>
+<p>A single or vector of name(s)) of desired chemical(s).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dtxsid</code></td>
+<td>
+<p>A single or vector ofEPA's DSSTox Structure ID(s) 
+(<a href="https://comptox.epa.gov/dashboard">https://comptox.epa.gov/dashboard</a>)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>casrn.vector</code></td>
+<td>
+<p>A deprecated argument specifying a single or vector of 
+Chemical Abstracts Service Registry 
+Number(s) (CAS-RN) of desired chemical(s).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nomconc.vector</code></td>
+<td>
+<p>For vector or single value, micromolar (uM = mol/L) nominal 
+concentration (e.g. AC50 value)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>this.well_number</code></td>
+<td>
+<p>For single value, plate format default is 384, used
+if is.na(tcdata)==TRUE. This value chooses default surface area settings for
+<code>armitage_estimate_sarea</code> based on the number of plates per well.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>this.FBSf</code></td>
+<td>
+<p>Fraction fetal bovine serum, must be entered by user.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tcdata</code></td>
+<td>
+<p>A data.table with casrn, nomconc, MP, gkow, gkaw, gswat, sarea,
+v_total, v_working. Otherwise supply single values to this.params (e.g., this.sarea,
+this.v_total, etc.). Chemical parameters are taken from 
+<code>chem.physical_and_invitro.data</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>this.sarea</code></td>
+<td>
+<p>Surface area per well (m^2)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>this.v_total</code></td>
+<td>
+<p>Total volume per well (uL)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>this.v_working</code></td>
+<td>
+<p>Working volume per well (uL)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>this.cell_yield</code></td>
+<td>
+<p>Number of cells per well</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>this.Tsys</code></td>
+<td>
+<p>System temperature (degrees C)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>this.Tref</code></td>
+<td>
+<p>Reference temperature (degrees K)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>this.option.kbsa2</code></td>
+<td>
+<p>Use alternative bovine-serum-albumin partitioning
+model</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>this.option.swat2</code></td>
+<td>
+<p>Use alternative water solubility correction</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>this.pseudooct</code></td>
+<td>
+<p>Pseudo-octanol cell storage lipid content</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>this.memblip</code></td>
+<td>
+<p>Membrane lipid content of cells</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>this.nlom</code></td>
+<td>
+<p>Structural protein content of cells</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>this.P_nlom</code></td>
+<td>
+<p>Proportionality constant to octanol structural protein</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>this.P_dom</code></td>
+<td>
+<p>Proportionality constant to dissolve organic material</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>this.P_cells</code></td>
+<td>
+<p>Proportionality constant to octanol storage lipid</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>this.csalt</code></td>
+<td>
+<p>Ionic strength of buffer (M = mol/L)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>this.celldensity</code></td>
+<td>
+<p>Cell density kg/L, g/mL</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>this.cellmass</code></td>
+<td>
+<p>Mass per cell, ng/cell</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>this.f_oc</code></td>
+<td>
+<p>Everything assumed to be like proteins</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>this.conc_ser_alb</code></td>
+<td>
+<p>Mass concentration of albumin in serum (g/L)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>this.conc_ser_lip</code></td>
+<td>
+<p>Mass concentration of lipids in serum (g/L)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>this.Vdom</code></td>
+<td>
+<p>0 ml, the volume of dissolved organic matter (DOM)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>this.pH</code></td>
+<td>
+<p>7.0, pH of cell culture</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>restrict.ion.partitioning</code></td>
+<td>
+<p>FALSE, Should we restrict the chemical available to partition to only the neutral fraction?</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+
+<table>
+<tr>
+<td style="text-align: left;">
+<strong>Param</strong> </td>
+<td style="text-align: left;"> <strong>Description</strong> </td>
+<td style="text-align: left;"> <strong>Units</strong> </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+casrn </td>
+<td style="text-align: left;"> Chemical Abstracts Service Registry Number </td>
+<td style="text-align: left;"> character </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+nomconc </td>
+<td style="text-align: left;"> Nominal Concentration </td>
+<td style="text-align: left;"> uM=umol/L </td>
+</tr>
+<tr>
+<td style="text-align: left;">       
+well_number </td>
+<td style="text-align: left;"> Number of wells in plate (used to set default surface area) </td>
+<td style="text-align: left;"> unitless </td>
+</tr>
+<tr>
+<td style="text-align: left;">   
+sarea </td>
+<td style="text-align: left;"> Surface area of well </td>
+<td style="text-align: left;"> m^2 </td>
+</tr>
+<tr>
+<td style="text-align: left;">         
+v_total </td>
+<td style="text-align: left;"> Total volume of well </td>
+<td style="text-align: left;"> uL </td>
+</tr>
+<tr>
+<td style="text-align: left;">       
+v_working </td>
+<td style="text-align: left;"> Filled volume of well </td>
+<td style="text-align: left;"> uL </td>
+</tr>
+<tr>
+<td style="text-align: left;">     
+cell_yield </td>
+<td style="text-align: left;"> Number of cells </td>
+<td style="text-align: left;"> cells </td>
+</tr>
+<tr>
+<td style="text-align: left;">    
+gkow </td>
+<td style="text-align: left;"> The log10 octanol to water (PC) (logP)</td>
+<td style="text-align: left;"> log10 unitless ratio </td>
+</tr>
+<tr>
+<td style="text-align: left;">          
+logHenry </td>
+<td style="text-align: left;"> The log10 Henry's law constant '</td>
+<td style="text-align: left;"> log10 unitless ratio </td>
+</tr>
+<tr>
+<td style="text-align: left;">      
+gswat </td>
+<td style="text-align: left;"> The log10 water solubility (logWSol) </td>
+<td style="text-align: left;"> log10 mg/L </td>
+</tr>
+<tr>
+<td style="text-align: left;">         
+MP </td>
+<td style="text-align: left;"> The chemical compound melting point </td>
+<td style="text-align: left;"> degrees Kelvin </td>
+</tr>
+<tr>
+<td style="text-align: left;">           
+MW </td>
+<td style="text-align: left;"> The chemical compound molecular weight </td>
+<td style="text-align: left;"> g/mol </td>
+</tr>
+<tr>
+<td style="text-align: left;">            
+gkaw </td>
+<td style="text-align: left;"> The air to water PC </td>
+<td style="text-align: left;"> unitless ratio </td>
+</tr>
+<tr>
+<td style="text-align: left;">          
+dsm </td>
+<td style="text-align: left;"> </td>
+<td style="text-align: left;"> </td>
+</tr>
+<tr>
+<td style="text-align: left;">           
+duow </td>
+<td style="text-align: left;"> </td>
+<td style="text-align: left;"> </td>
+</tr>
+<tr>
+<td style="text-align: left;">          
+duaw </td>
+<td style="text-align: left;"> </td>
+<td style="text-align: left;"> </td>
+</tr>
+<tr>
+<td style="text-align: left;">          
+dumw </td>
+<td style="text-align: left;"> </td>
+<td style="text-align: left;"> </td>
+</tr>
+<tr>
+<td style="text-align: left;">          
+gkmw </td>
+<td style="text-align: left;"> log10 </td>
+<td style="text-align: left;"> </td>
+</tr>
+<tr>
+<td style="text-align: left;">          
+gkcw </td>
+<td style="text-align: left;"> The log10 cell/tissue to water PC </td>
+<td style="text-align: left;"> log10 unitless ratio</td>
+</tr>
+<tr>
+<td style="text-align: left;">          
+gkbsa </td>
+<td style="text-align: left;"> The log10 bovine serum albumin to water partitiion coefficient </td>
+<td style="text-align: left;"> unitless </td>
+</tr>
+<tr>
+<td style="text-align: left;">         
+gkpl </td>
+<td style="text-align: left;"> log10</td>
+<td style="text-align: left;"> </td>
+</tr>
+<tr>
+<td style="text-align: left;">          
+ksalt </td>
+<td style="text-align: left;"> Setschenow constant </td>
+<td style="text-align: left;"> L/mol </td>
+</tr>
+<tr>
+<td style="text-align: left;">        
+Tsys </td>
+<td style="text-align: left;"> System temperature </td>
+<td style="text-align: left;"> degrees C </td>
+</tr>
+<tr>
+<td style="text-align: left;">          
+Tref </td>
+<td style="text-align: left;"> Reference temperature</td>
+<td style="text-align: left;"> degrees K </td>
+</tr>
+<tr>
+<td style="text-align: left;">          
+option.kbsa2 </td>
+<td style="text-align: left;"> Use alternative bovine-serum-albumin partitioning model </td>
+<td style="text-align: left;"> logical </td>
+</tr>
+<tr>
+<td style="text-align: left;">  
+option.swat2 </td>
+<td style="text-align: left;"> Use alternative water solubility correction </td>
+<td style="text-align: left;"> logical </td>
+</tr>
+<tr>
+<td style="text-align: left;">  
+FBSf </td>
+<td style="text-align: left;"> Fraction fetal bovine serum </td>
+<td style="text-align: left;"> unitless </td>
+</tr>
+<tr>
+<td style="text-align: left;">          
+pseudooct </td>
+<td style="text-align: left;"> Pseudo-octanol cell storage lipid content </td>
+<td style="text-align: left;"> </td>
+</tr>
+<tr>
+<td style="text-align: left;">     
+memblip </td>
+<td style="text-align: left;"> Membrane lipid content of cells </td>
+<td style="text-align: left;">  </td>
+</tr>
+<tr>
+<td style="text-align: left;">       
+nlom </td>
+<td style="text-align: left;"> Structural protein content of cells </td>
+<td style="text-align: left;"> </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+P_nlom </td>
+<td style="text-align: left;"> Proportionality constant to octanol structural protein </td>
+<td style="text-align: left;"> unitless </td>
+</tr>
+<tr>
+<td style="text-align: left;">   
+P_dom </td>
+<td style="text-align: left;"> Proportionality constant to dissolved organic material (DOM) </td>
+<td style="text-align: left;"> unitless </td>
+</tr>
+<tr>
+<td style="text-align: left;">         
+P_cells </td>
+<td style="text-align: left;"> Proportionality constant to octanol storage lipid </td>
+<td style="text-align: left;"> unitless </td>
+</tr>
+<tr>
+<td style="text-align: left;">      
+csalt </td>
+<td style="text-align: left;"> Ionic strength of buffer </td>
+<td style="text-align: left;"> M=mol/L </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+celldensity </td>
+<td style="text-align: left;"> Cell density </td>
+<td style="text-align: left;"> kg/L, g/mL </td>
+</tr>
+<tr>
+<td style="text-align: left;">   
+cellmass </td>
+<td style="text-align: left;"> Mass per cell </td>
+<td style="text-align: left;"> ng/cell </td>
+</tr>
+<tr>
+<td style="text-align: left;">      
+f_oc </td>
+<td style="text-align: left;"> </td>
+<td style="text-align: left;"> </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+cellwat </td>
+<td style="text-align: left;"> </td>
+<td style="text-align: left;"> </td>
+</tr>
+<tr>
+<td style="text-align: left;">       
+Tcor </td>
+<td style="text-align: left;"> </td>
+<td style="text-align: left;"> </td>
+</tr>
+<tr>
+<td style="text-align: left;">          
+Vm </td>
+<td style="text-align: left;"> Volume of media </td>
+<td style="text-align: left;"> L </td>
+</tr>
+<tr>
+<td style="text-align: left;">            
+Vwell </td>
+<td style="text-align: left;"> Volume of medium (aqueous phase only) </td>
+<td style="text-align: left;"> L </td>
+</tr>
+<tr>
+<td style="text-align: left;">         
+Vair </td>
+<td style="text-align: left;"> Volume of head space </td>
+<td style="text-align: left;"> L </td>
+</tr>
+<tr>
+<td style="text-align: left;">          
+Vcells </td>
+<td style="text-align: left;"> Volume of cells/tissue</td>
+<td style="text-align: left;"> L </td>
+</tr>
+<tr>
+<td style="text-align: left;">        
+Valb </td>
+<td style="text-align: left;"> Volume of serum albumin </td>
+<td style="text-align: left;"> L </td>
+</tr>
+<tr>
+<td style="text-align: left;">         
+Vslip </td>
+<td style="text-align: left;"> Volume of serum lipids </td>
+<td style="text-align: left;"> L </td>
+</tr>
+<tr>
+<td style="text-align: left;">         
+Vdom </td>
+<td style="text-align: left;"> Volume of dissolved organic matter</td>
+<td style="text-align: left;"> L </td>
+</tr>
+<tr>
+<td style="text-align: left;">          
+F_ratio </td>
+<td style="text-align: left;"> </td>
+<td style="text-align: left;"> </td>
+</tr>
+<tr>
+<td style="text-align: left;">       
+gs1.GSE </td>
+<td style="text-align: left;"> </td>
+<td style="text-align: left;"> </td>
+</tr>
+<tr>
+<td style="text-align: left;">       
+s1.GSE </td>
+<td style="text-align: left;"> </td>
+<td style="text-align: left;"> </td>
+</tr>
+<tr>
+<td style="text-align: left;">        
+gss.GSE </td>
+<td style="text-align: left;"> </td>
+<td style="text-align: left;"> </td>
+</tr>
+<tr>
+<td style="text-align: left;">       
+ss.GSE </td>
+<td style="text-align: left;"> </td>
+<td style="text-align: left;"> </td>
+</tr>
+<tr>
+<td style="text-align: left;">        
+kmw </td>
+<td style="text-align: left;"> </td>
+<td style="text-align: left;"> </td>
+</tr>
+<tr>
+<td style="text-align: left;">           
+kow </td>
+<td style="text-align: left;"> The octanol to water PC (i.e., 10^gkow) </td>
+<td style="text-align: left;"> unitless </td>
+</tr>
+<tr>
+<td style="text-align: left;">           
+kaw </td>
+<td style="text-align: left;"> The air to water PC (i.e., 10^gkaw) </td>
+<td style="text-align: left;"> unitless </td>
+</tr>
+<tr>
+<td style="text-align: left;">           
+swat </td>
+<td style="text-align: left;"> The water solubility (i.e., 10^gswat) </td>
+<td style="text-align: left;"> mg/L </td>
+</tr>
+<tr>
+<td style="text-align: left;">         
+kpl </td>
+<td style="text-align: left;"> </td>
+<td style="text-align: left;"> </td>
+</tr>
+<tr>
+<td style="text-align: left;">           
+kcw </td>
+<td style="text-align: left;"> The cell/tissue to water PC (i.e., 10^gkcw) </td>
+<td style="text-align: left;"> unitless </td>
+</tr>
+<tr>
+<td style="text-align: left;">           
+kbsa </td>
+<td style="text-align: left;"> The bovine serum albumin to water PC </td>
+<td style="text-align: left;"> unitless </td>
+</tr>
+<tr>
+<td style="text-align: left;">          
+swat_L </td>
+<td style="text-align: left;"> </td>
+<td style="text-align: left;"> </td>
+</tr>
+<tr>
+<td style="text-align: left;">        
+soct_L </td>
+<td style="text-align: left;"> </td>
+<td style="text-align: left;"> </td>
+</tr>
+<tr>
+<td style="text-align: left;">        
+scell_L </td>
+<td style="text-align: left;"> </td>
+<td style="text-align: left;"> </td>
+</tr>
+<tr>
+<td style="text-align: left;">       
+cinit </td>
+<td style="text-align: left;"> Initial concentration </td>
+<td style="text-align: left;"> uM=umol/L </td>
+</tr>
+<tr>
+<td style="text-align: left;">         
+mtot </td>
+<td style="text-align: left;"> Total micromoles </td>
+<td style="text-align: left;"> umol </td>
+</tr>
+<tr>
+<td style="text-align: left;">          
+cwat </td>
+<td style="text-align: left;"> Total concentration in water </td>
+<td style="text-align: left;"> uM=umol/L </td>
+</tr>
+<tr>
+<td style="text-align: left;">          
+cwat_s </td>
+<td style="text-align: left;"> Dissolved concentration in water </td>
+<td style="text-align: left;"> uM=umol/L </td>
+</tr>
+<tr>
+<td style="text-align: left;">        
+csat </td>
+<td style="text-align: left;"> Is the solution saturated (1/0) </td>
+<td style="text-align: left;"> logical </td>
+</tr>
+<tr>
+<td style="text-align: left;">         
+activity </td>
+<td style="text-align: left;"> </td>
+<td style="text-align: left;"> </td>
+</tr>
+<tr>
+<td style="text-align: left;">      
+cair </td>
+<td style="text-align: left;"> Concentration in head space</td>
+<td style="text-align: left;"> uM=umol/L </td>
+</tr>
+<tr>
+<td style="text-align: left;">          
+calb </td>
+<td style="text-align: left;"> Concentration in serum albumin</td>
+<td style="text-align: left;"> uM=umol/L </td>
+</tr>
+<tr>
+<td style="text-align: left;">          
+cslip </td>
+<td style="text-align: left;"> Concentration in serum lipids</td>
+<td style="text-align: left;"> uM=umol/L </td>
+</tr>
+<tr>
+<td style="text-align: left;">         
+cdom </td>
+<td style="text-align: left;"> Concentration in dissolved organic matter</td>
+<td style="text-align: left;"> uM=umol/L </td>
+</tr>
+<tr>
+<td style="text-align: left;">          
+ccells </td>
+<td style="text-align: left;"> Concentration in cells</td>
+<td style="text-align: left;"> uM=umol/L </td>
+</tr>
+<tr>
+<td style="text-align: left;">        
+cplastic </td>
+<td style="text-align: left;"> Concentration in plastic</td>
+<td style="text-align: left;"> uM=umol/m^2 </td>
+</tr>
+<tr>
+<td style="text-align: left;">      
+mwat_s </td>
+<td style="text-align: left;"> Mass dissolved in water </td>
+<td style="text-align: left;"> umols </td>
+</tr>
+<tr>
+<td style="text-align: left;">        
+mair </td>
+<td style="text-align: left;"> Mass in air/head space </td>
+<td style="text-align: left;"> umols </td>
+</tr>
+<tr>
+<td style="text-align: left;">          
+mbsa </td>
+<td style="text-align: left;"> Mass bound to bovine serum albumin </td>
+<td style="text-align: left;"> umols </td>
+</tr>
+<tr>
+<td style="text-align: left;">          
+mslip </td>
+<td style="text-align: left;"> Mass bound to serum lipids </td>
+<td style="text-align: left;"> umols </td>
+</tr>
+<tr>
+<td style="text-align: left;">        
+mdom </td>
+<td style="text-align: left;"> Mass bound to dissolved organic matter </td>
+<td style="text-align: left;"> umols </td>
+</tr>
+<tr>
+<td style="text-align: left;">          
+mcells </td>
+<td style="text-align: left;"> Mass in cells </td>
+<td style="text-align: left;"> umols </td>
+</tr>
+<tr>
+<td style="text-align: left;">        
+mplastic </td>
+<td style="text-align: left;"> Mass bond to plastic </td>
+<td style="text-align: left;"> umols </td>
+</tr>
+<tr>
+<td style="text-align: left;">      
+mprecip </td>
+<td style="text-align: left;"> Mass precipitated out of solution </td>
+<td style="text-align: left;"> umols</td>
+</tr>
+<tr>
+<td style="text-align: left;">       
+xwat_s </td>
+<td style="text-align: left;"> Fraction dissolved in water </td>
+<td style="text-align: left;"> fraction </td>
+</tr>
+<tr>
+<td style="text-align: left;">        
+xair </td>
+<td style="text-align: left;"> Fraction in the air </td>
+<td style="text-align: left;"> fraction </td>
+</tr>
+<tr>
+<td style="text-align: left;">          
+xbsa </td>
+<td style="text-align: left;"> Fraction bound to bovine serum albumin </td>
+<td style="text-align: left;"> fraction </td>
+</tr>
+<tr>
+<td style="text-align: left;">          
+xslip </td>
+<td style="text-align: left;"> Fraction bound to serum lipids </td>
+<td style="text-align: left;"> fraction </td>
+</tr>
+<tr>
+<td style="text-align: left;">         
+xdom </td>
+<td style="text-align: left;"> Fraction bound to dissolved organic matter </td>
+<td style="text-align: left;"> fraction </td>
+</tr>
+<tr>
+<td style="text-align: left;">          
+xcells </td>
+<td style="text-align: left;"> Fraction within cells </td>
+<td style="text-align: left;"> fraction </td>
+</tr>
+<tr>
+<td style="text-align: left;">        
+xplastic </td>
+<td style="text-align: left;"> Fraction bound to plastic </td>
+<td style="text-align: left;"> fraction </td>
+</tr>
+<tr>
+<td style="text-align: left;">     
+xprecip </td>
+<td style="text-align: left;"> Fraction precipitated out of solution </td>
+<td style="text-align: left;"> fraction </td>
+</tr>
+<tr>
+<td style="text-align: left;">       
+eta_free </td>
+<td style="text-align: left;"> Effective availability ratio </td>
+<td style="text-align: left;"> fraction </td>
+</tr>
+<tr>
+<td style="text-align: left;">      
+<strong>cfree.invitro</strong> </td>
+<td style="text-align: left;"> <strong>Free concentration in the in vitro media</strong> (use for Honda1 and Honda2) </td>
+<td style="text-align: left;"> fraction </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>Greg Honda
+</p>
+
+
+<h3>References</h3>
+
+<p>Armitage, J. M.; Wania, F.; Arnot, J. A. Environ. Sci. Technol. 
+2014, 48, 9770-9779. https://doi.org/10.1021/es501955g
+</p>
+<p>Honda GS, Pearce RG, Pham LL, Setzer RW, Wetmore BA, Sipes NS, Gilbert J, Franz B, Thomas RS, Wambaugh JF (2019).
+“Using the concordance of in vitro and in vivo data to evaluate extrapolation assumptions.”
+<em>PloS one</em>, <b>14</b>(5), e0217564.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+library(httk)
+
+# Check to see if we have info on the chemical:
+"80-05-7" %in% get_cheminfo()
+
+#We do:
+temp &lt;- armitage_eval(casrn.vector = c("80-05-7", "81-81-2"), this.FBSf = 0.1,
+this.well_number = 384, nomconc = 10)
+print(temp$cfree.invitro)
+
+# Check to see if we have info on the chemical:
+"793-24-8" %in% get_cheminfo()
+
+# Since we don't have any info, let's look up phys-chem from dashboard:
+cheminfo &lt;- data.frame(
+  Compound="6-PPD",
+  CASRN="793-24-8",
+  DTXSID="DTXSID9025114",
+  logP=4.27, 
+  logHenry=log10(7.69e-8),
+  logWSol=log10(1.58e-4),
+  MP=	99.4,
+  MW=268.404
+  )
+  
+# Add the information to HTTK's database:
+chem.physical_and_invitro.data &lt;- add_chemtable(
+ cheminfo,
+ current.table=chem.physical_and_invitro.data,
+ data.list=list(
+ Compound="Compound",
+ CAS="CASRN",
+  DTXSID="DTXSID",
+  MW="MW",
+  logP="logP",
+  logHenry="logHenry",
+  logWSol="logWSol",
+  MP="MP"),
+  species="Human",
+  reference="CompTox Dashboard 31921")
+
+# Run the Armitage et al. (2014) model:
+out &lt;- armitage_eval(
+  casrn.vector = "793-24-8", 
+  this.FBSf = 0.1,
+  this.well_number = 384, 
+  nomconc = 10)
+  
+print(out)
+
+</code></pre>
+
+
+</div>

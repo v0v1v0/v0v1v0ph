@@ -1,0 +1,168 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>create_IndivCtstmTrans</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Create <code>IndivCtstmTrans</code> object</h2>
+
+<h3>Description</h3>
+
+<p>A generic function for creating an object of class <code>IndivCtstmTrans</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">create_IndivCtstmTrans(object, ...)
+
+## S3 method for class 'flexsurvreg_list'
+create_IndivCtstmTrans(
+  object,
+  input_data,
+  trans_mat,
+  clock = c("reset", "forward"),
+  n = 1000,
+  uncertainty = c("normal", "none"),
+  ...
+)
+
+## S3 method for class 'flexsurvreg'
+create_IndivCtstmTrans(
+  object,
+  input_data,
+  trans_mat,
+  clock = c("reset", "forward"),
+  n = 1000,
+  uncertainty = c("normal", "none"),
+  ...
+)
+
+## S3 method for class 'params_surv'
+create_IndivCtstmTrans(
+  object,
+  input_data,
+  trans_mat,
+  clock = c("reset", "forward", "mix", "mixt"),
+  reset_states = NULL,
+  transition_types = NULL,
+  ...
+)
+
+## S3 method for class 'params_surv_list'
+create_IndivCtstmTrans(
+  object,
+  input_data,
+  trans_mat,
+  clock = c("reset", "forward", "mix", "mixt"),
+  reset_states = NULL,
+  transition_types = NULL,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>object</code></td>
+<td>
+<p>An object of the appropriate class containing either a fitted
+multi-state model or parameters of a multi-state model.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Further arguments passed to <code>IndivCtstmTrans$new()</code> in <code>IndivCtstmTrans</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>input_data</code></td>
+<td>
+<p>An object of class <code>expanded_hesim_data</code> returned by
+<code>expand.hesim_data</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>trans_mat</code></td>
+<td>
+<p>The transition matrix describing the states and transitions in a
+multi-state model in the format from the <code>mstate</code> package. See <code>IndivCtstmTrans</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>clock</code></td>
+<td>
+<p>"reset" for a clock-reset model, "forward" for a clock-forward model,
+"mix" for a mixture by state, and "mixt" for a mixture by transition
+of clock-reset and clock-forward models. See the field <code>clock</code> in <code>IndivCtstmTrans</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n</code></td>
+<td>
+<p>Number of random observations to draw. Not used if <code>uncertainty = "none"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>uncertainty</code></td>
+<td>
+<p>Method determining how parameter uncertainty should be handled.
+If <code>"normal"</code>, then parameters are randomly drawn from their multivariate normal
+distribution. If <code>"none"</code>, then only point estimates are returned.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>reset_states</code></td>
+<td>
+<p>A vector denoting the states in which time resets. See the field
+<code>reset_states</code> in <code>IndivCtstmTrans</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>transition_types</code></td>
+<td>
+<p>A vector denoting the type for each transition. See the field
+<code>transition_types</code> in <code>IndivCtstmTrans</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Disease models may either be created from a fitted statistical
+model or from a parameter object. In the case of the former, <code>input_data</code>
+is a data frame like object that is used to look for variables from
+the statistical model that are required for simulation. In this sense,
+<code>input_data</code> is very similar to the <code>newdata</code> argument in most <code>predict()</code>
+methods (e.g., see <code>predict.lm()</code>). In other words, variables used in the
+<code>formula</code> of the statistical model must also be in <code>input_data</code>.
+</p>
+<p>In the case of the latter, the columns of <code>input_data</code> must be named in a
+manner that is consistent with the parameter object. In the typical case
+(e.g., with <code>params_surv</code> or <code>params_mlogit</code>), the parameter object
+contains coefficients from a regression model, usually stored as matrix
+where rows index parameter samples (i.e., for a probabilistic sensitivity
+analysis) and columns index model terms. In such instances, there must
+be one column from <code>input_data</code> with the same name as each model term in the
+coefficient matrix; that is, the columns in <code>input_data</code> are matched with
+the columns of the coefficient matrices by name. If there are model terms
+in the coefficient matrices that are not contained in <code>input_data</code>, then
+an error will be thrown.
+</p>
+
+
+<h3>Value</h3>
+
+<p>Returns an <code>R6::R6Class</code> object of class <code>IndivCtstmTrans</code>.
+</p>
+
+
+<h3>See Also</h3>
+
+<p>See <code>IndivCtstmTrans</code> and <code>IndivCtstm</code> for examples.
+</p>
+
+
+</div>

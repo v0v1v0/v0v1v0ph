@@ -1,0 +1,126 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>as.quantiles</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Extract quantile distribution from mcmcComposite object</h2>
+
+<h3>Description</h3>
+
+<p>Extract quantile distribution from mcmcComposite object
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">as.quantiles(
+  x,
+  chain = 1,
+  fun = function(...) return(as.numeric(list(...))),
+  probs = c(0.025, 0.975),
+  xlim = NULL,
+  nameparxlim = NULL,
+  namepar = NULL
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>A mcmcComposite obtained as a result of <code>MHalgoGen()</code> function</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>chain</code></td>
+<td>
+<p>The number of the chain in which to get parameters</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fun</code></td>
+<td>
+<p>The function to apply the parameters</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>probs</code></td>
+<td>
+<p>The probability to get quantiles</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>xlim</code></td>
+<td>
+<p>The values to apply in fun</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nameparxlim</code></td>
+<td>
+<p>The name of the parameter for xlim</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>namepar</code></td>
+<td>
+<p>The name of parameters from mcmc object to be used in fun</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A data.frame with quantiles
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Marc Girondot <a href="mailto:marc.girondot@gmail.com">marc.girondot@gmail.com</a>
+</p>
+
+
+<h3>See Also</h3>
+
+<p>Other mcmcComposite functions: 
+<code>MHalgoGen()</code>,
+<code>as.mcmc.mcmcComposite()</code>,
+<code>as.parameters()</code>,
+<code>merge.mcmcComposite()</code>,
+<code>plot.PriorsmcmcComposite()</code>,
+<code>plot.mcmcComposite()</code>,
+<code>setPriors()</code>,
+<code>summary.mcmcComposite()</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+library(HelpersMG)
+require(coda)
+x &lt;- rnorm(30, 10, 2)
+dnormx &lt;- function(data, x) {
+ data &lt;- unlist(data)
+ return(-sum(dnorm(data, mean=x['mean'], sd=x['sd'], log=TRUE)))
+}
+parameters_mcmc &lt;- data.frame(Density=c('dnorm', 'dlnorm'), 
+Prior1=c(10, 0.5), Prior2=c(2, 0.5), SDProp=c(1, 1), 
+Min=c(-3, 0), Max=c(100, 10), Init=c(10, 2), stringsAsFactors = FALSE, 
+row.names=c('mean', 'sd'))
+mcmc_run &lt;- MHalgoGen(n.iter=10000, parameters=parameters_mcmc, data=x, 
+likelihood=dnormx, n.chains=1, n.adapt=100, thin=1, trace=1)
+k &lt;- as.quantiles(x=mcmc_run, namepar="mean")
+k &lt;- as.quantiles(x=mcmc_run, namepar="mean", 
+                 xlim=c(1:5), nameparxlim="sd", 
+                 fun=function(...) return(sum(as.numeric(list(...)))))
+
+## End(Not run)
+</code></pre>
+
+
+</div>

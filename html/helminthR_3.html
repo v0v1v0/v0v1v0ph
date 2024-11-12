@@ -1,0 +1,182 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>findHost</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Find parasite occurrence data for given host.</h2>
+
+<h3>Description</h3>
+
+<p>Given a host genus, species, and/or location, returns a list of parasite
+occurrences on that host or for that location. 
+Use <code>data(locations)</code> for a list of possible locations.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">findHost(
+  genus = NULL,
+  species = NULL,
+  location = NULL,
+  citation = FALSE,
+  hostState = NULL,
+  speciesOnly = FALSE,
+  validateHosts = FALSE,
+  parGroup = NULL,
+  removeDuplicates = FALSE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>genus</code></td>
+<td>
+<p>Host genus</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>species</code></td>
+<td>
+<p>Host species</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>location</code></td>
+<td>
+<p>Geographic location.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>citation</code></td>
+<td>
+<p>Boolean. Should the output include the citation link and 
+the number of supporting citations? default is FALSE</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>hostState</code></td>
+<td>
+<p>number corresponding to one of six different host states. 
+The default value is NULL and includes all host states</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>speciesOnly</code></td>
+<td>
+<p>boolean flag to remove host and parasite species
+where data are only available at genus level (default = FALSE)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>validateHosts</code></td>
+<td>
+<p>boolean flag to check host species names
+against Catalogue of Life information and output taxonomic
+information (default = FALSE)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>parGroup</code></td>
+<td>
+<p>name of parasite group to query (default queries all groups)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>removeDuplicates</code></td>
+<td>
+<p>(boolean) should duplicate host-parasite 
+combinations be removed? (default is FALSE)</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p><code>hostState</code> can take values 1-6 corresponding to if the recorded host 
+was found 
+</p>
+ 
+<ul>
+<li>
+<p> (1) "In the wild"
+</p>
+</li>
+<li>
+<p> (2) "Zoo captivity" 
+</p>
+</li>
+<li>
+<p> (3) "Domesticated"
+</p>
+</li>
+<li>
+<p> (4) "Experimental"
+</p>
+</li>
+<li>
+<p> (5) "Commercial source"
+</p>
+</li>
+<li>
+<p> (6) "Accidental infestation"
+</p>
+</li>
+</ul>
+<p>A value of NULL should be entered if you would like to include 
+all hostStates.
+</p>
+<p><code>parGroup</code> can be specified as "Acanthocephalans", "Cestodes",
+"Monogeans", "Nematodes", "Trematodes", or "Turbs" (Turbellarians etc.). 
+The default is to query all helminth parasite taxa.
+</p>
+
+
+<h3>Value</h3>
+
+<p>Three (or five) column data.frame containing host species, 
+parasite species (shortened name and full name), and citation link and 
+number of citations (if 'citation'=TRUE), with each row corresponding 
+to an occurrence of a parasite species on a host species.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Tad Dallas
+</p>
+
+
+<h3>References</h3>
+
+<p>Gibson, D. I., Bray, R. A., &amp; Harris, E. A. (Compilers) (2005).
+Host-Parasite Database of the Natural History Museum, London.
+&lt;http://www.nhm.ac.uk/research-curation/scientific-resources/taxonomy-systematics/host-parasites/&gt;
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>findParasite</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+gorillaParasites &lt;- helminthR::findHost("Gorilla", "gorilla")
+
+# An example of how to query multiple hosts when you have a 
+# vector of host species names
+
+hosts &lt;- c("Gorilla gorilla", "Peromyscus leucopus")
+plyr::ldply(hosts, function(x)
+    {helminthR::findHost(unlist(strsplit(x, " "))[1], unlist(strsplit(x," "))[2])})
+
+</code></pre>
+
+
+</div>

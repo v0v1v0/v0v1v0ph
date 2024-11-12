@@ -1,0 +1,112 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>gigCalcRange</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Range of a Generalized Inverse Gaussian Distribution</h2>
+
+<h3>Description</h3>
+
+<p>Given the parameter vector Theta of a generalized inverse Gaussian
+distribution, this function determines the range outside of which the density
+function is negligible, to a specified tolerance. The parameterization
+used is the <code class="reqn">(\chi,\psi)</code> one (see
+<code>dgig</code>). To use another parameterization, use
+<code>gigChangePars</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">gigCalcRange(Theta, tol = 10^(-5), density = TRUE, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>Theta</code></td>
+<td>
+<p>Value of parameter vector specifying the generalized
+inverse Gaussian distribution.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tol</code></td>
+<td>
+<p>Tolerance.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>density</code></td>
+<td>
+<p>Logical. If <code>TRUE</code>, the bounds are for the density
+function. If <code>FALSE</code>, they should be for the probability
+distribution, but this has not yet been implemented.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Extra arguments for calls to <code>uniroot</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The particular generalized inverse Gaussian distribution being
+considered is specified by the value of the parameter value
+<code>Theta</code>.
+</p>
+<p>If <code>density = TRUE</code>, the function gives a range, outside of which
+the density is less than the given tolerance. Useful for plotting the
+density. Also used in determining break points for the separate
+sections over which numerical integration is used to determine the
+distribution function. The points are found by using
+<code>uniroot</code> on the density function.
+</p>
+<p>If <code>density = FALSE</code>, the function returns the message:
+"<code>Distribution function bounds not yet implemented</code>".
+</p>
+
+
+<h3>Value</h3>
+
+<p>A two-component vector giving the lower and upper ends of the range.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>David Scott <a href="mailto:d.scott@auckland.ac.nz">d.scott@auckland.ac.nz</a></p>
+
+
+<h3>References</h3>
+
+<p>Jörgensen, B. (1982).
+<em>Statistical Properties of the Generalized Inverse Gaussian
+Distribution</em>.
+Lecture Notes in Statistics, Vol. 9, Springer-Verlag, New York.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>dgig</code>, <code>gigChangePars</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">Theta &lt;- c(-0.5,5,2.5)
+maxDens &lt;- dgig(gigMode(Theta), Theta)
+gigRange &lt;- gigCalcRange(Theta, tol = 10^(-3)*maxDens)
+gigRange
+curve(dgig(x, Theta), gigRange[1], gigRange[2])
+## Not run: gigCalcRange(Theta, tol = 10^(-3), density = FALSE)
+</code></pre>
+
+
+</div>

@@ -1,0 +1,179 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>regWO.data.frame</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Win odds regression using a data frame</h2>
+
+<h3>Description</h3>
+
+<p>Win odds regression using a data frame
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">## S3 method for class 'data.frame'
+regWO(x, AVAL, TRTP, COVAR, ref, alpha = 0.05, WOnull = 1, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>a data frame containing subject-level data.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>AVAL</code></td>
+<td>
+<p>variable in the data with ordinal analysis values.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>TRTP</code></td>
+<td>
+<p>the treatment variable in the data.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>COVAR</code></td>
+<td>
+<p>a numeric covariate.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ref</code></td>
+<td>
+<p>the reference treatment group.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>alpha</code></td>
+<td>
+<p>significance level. The default is 0.05.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>WOnull</code></td>
+<td>
+<p>the null hypothesis. The default is 1.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>additional parameters.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>a data frame containing the win odds and its confidence interval.
+</p>
+
+<ul>
+<li>
+<p> WO_beta adjusted win odds.
+</p>
+</li>
+<li>
+<p> LCL lower confidence limit for adjusted WO.
+</p>
+</li>
+<li>
+<p> UCL upper confidence limit for adjusted WO.
+</p>
+</li>
+<li>
+<p> SE standard error of the adjusted win odds.
+</p>
+</li>
+<li>
+<p> WOnull win odds of the null hypothesis (specified in the <code>WOnull</code> argument).
+</p>
+</li>
+<li>
+<p> alpha two-sided significance level for calculating the confidence interval (specified in the <code>alpha</code> argument).
+</p>
+</li>
+<li>
+<p> Pvalue p-value associated with testing the null hypothesis.
+</p>
+</li>
+<li>
+<p> N total number of patients in the analysis.
+</p>
+</li>
+<li>
+<p> beta adjusted win probability.
+</p>
+</li>
+<li>
+<p> SE_beta standard error for the adjusted win probability.
+</p>
+</li>
+<li>
+<p> SD_beta standard deviation for the adjusted win probability.
+</p>
+</li>
+<li>
+<p> WP (non-adjusted) win probability.
+</p>
+</li>
+<li>
+<p> SE_WP standard error of the non-adjusted win probability.
+</p>
+</li>
+<li>
+<p> SD_WP standard deviation of the non-adjusted win probability.
+</p>
+</li>
+<li>
+<p> WO non-adjusted win odds.
+</p>
+</li>
+<li>
+<p> COVAR_MEAN_DIFF mean difference between two treatment groups of the numeric covariate.
+</p>
+</li>
+<li>
+<p> COVAR_VAR sum of variances of two treatment groups of the numeric covariate.
+</p>
+</li>
+<li>
+<p> COVAR_COV covariance between the response and the numeric covariate.
+</p>
+</li>
+</ul>
+<h3>References</h3>
+
+<p>Gasparyan SB et al. (2021) "Adjusted win ratio with stratification: calculation methods and interpretation." Statistical Methods in Medical Research 30.2: 580-611. <a href="doi:10.1177/0962280220942558">doi:10.1177/0962280220942558</a>.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>regWO()</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># A baseline covariate that is highly correlated with the outcome
+set.seed(2023)
+dat &lt;- COVID19
+n &lt;- nrow(dat)
+dat$Severity &lt;- ifelse(dat$GROUP &gt; 4, rnorm(n, 0), rnorm(n, 100))
+tapply(dat$Severity, dat$TRTP, mean)
+regWO(x = dat, AVAL = "GROUP", TRTP = "TRTP", COVAR = "Severity", ref = "Placebo")
+# Without adjustment
+calcWO(x = dat, AVAL = "GROUP", TRTP = "TRTP", ref = "Placebo")
+</code></pre>
+
+
+</div>

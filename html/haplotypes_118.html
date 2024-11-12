@@ -1,0 +1,172 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>parsimnet-methods</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Estimates gene genealogies using statistical parsimony</h2>
+
+<h3>Description</h3>
+
+<p>Function for estimating gene genealogies from DNA sequences or user provided absolute pairwise character difference matrix using statistical parsimony.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">## S4 method for signature 'Dna'
+parsimnet(x,indels="sic",prob=.95)
+## S4 method for signature 'dist'
+parsimnet(x,seqlength,prob=.95)
+## S4 method for signature 'matrix'
+parsimnet(x,seqlength,prob=.95)
+
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>an object of class <code>Dna</code>, dist, or matrix.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>indels</code></td>
+<td>
+<p>the indel coding method to be used. This must be one of "sic", "5th" or "missing". Any unambiguous substring can be given.  See <code>distance</code> for details.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>seqlength</code></td>
+<td>
+<p>an integer of length one giving the sequence length information (number of characters). </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>prob</code></td>
+<td>
+<p>a numeric vector of length one in the range [0.01, 0.99] giving the probability of parsimony as defined in Templeton et al. (1992). In order to set maximum connection steps to Inf (to connect all the haplotypes in a single network), set the probability to NULL. </p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The network estimation methods implemented in  <code>parsimnet</code> function finds one of the most parsimonious network (or sub-networks if connection between haplotypes exceeds the parsimony limit).  This is an implemetation of the TCS method proposed in Templeton et al. (1992) and Clement et al. (2002).<code>parsimnet</code> function generates an unambiguous haplotype network without loops. If more than one best networks found (results in ambiguous connections), only a network with the lowest average all-pairs distance is returned. Loops may occur only if they are present in initial haplotype distance matrix.
+</p>
+
+
+<h3>Value</h3>
+
+<p>S4 methods for signature 'Dna', 'matrix' or 'dist' returns an object of class <code>Parsimnet</code>.</p>
+
+
+<h3>Methods</h3>
+
+
+<dl>
+<dt><code>signature(x = "Dna")</code></dt>
+<dd>
+<p>estimating gene genealogies from DNA sequences.
+</p>
+</dd>
+<dt><code>signature(x = "dist")</code></dt>
+<dd>
+<p>estimating gene genealogies from distance matrix (dist object).
+</p>
+</dd>
+<dt><code>signature(x = "matrix")</code></dt>
+<dd>
+<p>estimating gene genealogies from distance matrix.
+</p>
+</dd>
+</dl>
+<h3>Note</h3>
+
+ 
+<p>Duplicate names in the final distance matrices in slot d are renamed without warning. An internal function <code>.TempletonProb</code> is taken from package pegas version 0.6 without any modification, authors Emmanuel Paradis, Klaus Schliep. 
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Caner Aktas, <a href="mailto:caktas.aca@gmail.com">caktas.aca@gmail.com</a>. 
+</p>
+
+
+<h3>References</h3>
+
+<p>Clement, M., Q. Snell, P. Walker, D. Posada, and K. A. Crandall (2002) TCS: Estimating Gene Genealogies  <em>in First IEEE International Workshop on High Performance Computational Biology (HiCOMB) </em> 
+</p>
+<p>Templeton, A. R., Crandall, K. A. and Sing, C. F. (1992) A cladistic
+analysis of phenotypic associations with haplotypes inferred from
+restriction endonuclease mapping and DNA sequence data. III. Cladogram
+estimation. <em>Genetics</em>, <b>132</b>, 619-635.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>network</code>, <code>plot-methods</code> and <code>pieplot-methods</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">	
+## Not run: 
+data("dna.obj")
+x&lt;-dna.obj
+
+### Method for signature 'Dna'.
+## statistical parsimony with 95
+p&lt;-parsimnet(x) 
+p
+plot(p)
+
+## statistical parsimony with 99
+p&lt;-parsimnet(x,prob=.99) 
+p
+# plot the first network
+plot(p,net=1) 
+
+## statistical parsimony with 99
+#indels are coded as missing
+p&lt;-parsimnet(x,indels="m",prob=.99)
+p
+plot(p)
+
+
+# statistical parsimony without connection limit.
+p&lt;-parsimnet(x,prob=NULL) 
+p
+plot(p)
+
+
+# plot the first network
+plot(p,net=1)
+
+### Method for signature 'dist'.
+d&lt;-distance(x)
+seqlength&lt;-length(x)
+## statistical parsimony with 95
+p&lt;-parsimnet(d,seqlength) 
+p
+plot(p)
+
+### Method for signature 'matrix'.
+d&lt;-as.matrix(distance(x))
+seqlength&lt;-length(x)
+## statistical parsimony with 95
+p&lt;-parsimnet(d,seqlength)
+p
+plot(p)
+
+
+## End(Not run)
+</code></pre>
+
+
+</div>

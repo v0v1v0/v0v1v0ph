@@ -1,0 +1,150 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>read.spc</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Import for Thermo Galactic's spc file format
+These functions allow to import Thermo Galactic/Grams .spc files.</h2>
+
+<h3>Description</h3>
+
+<p>Import for Thermo Galactic's spc file format
+These functions allow to import Thermo Galactic/Grams .spc files.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">read.spc(
+  filename,
+  keys.hdr2data = FALSE,
+  keys.log2data = FALSE,
+  log.txt = TRUE,
+  log.bin = FALSE,
+  log.disk = FALSE,
+  hdr = list(),
+  no.object = FALSE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>filename</code></td>
+<td>
+<p>The complete file name of the .spc file.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>keys.hdr2data, keys.log2data</code></td>
+<td>
+<p>character vectors with the names of parameters in the .spc
+file's log block (log2xxx) or header (hdr2xxx) that should go into the extra data (yyy2data) of
+the returned hyperSpec object.
+</p>
+<p>All header fields specified in the .spc file format specification (see
+below) are imported and can be referred to by their de-capitalized names.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>log.txt</code></td>
+<td>
+<p>Should the text part of the .spc file's log block be read?</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>log.bin, log.disk</code></td>
+<td>
+<p>Should the normal and on-disk binary parts of the
+.spc file's log block be read?  If so, they will be put as raw vectors
+into the hyperSpec object's log.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>hdr</code></td>
+<td>
+<p>A list with fileheader fields that overwrite the settings of
+actual file's header.
+</p>
+<p>Use with care, and look into the source code for detailed insight on the
+elements of this list.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>no.object</code></td>
+<td>
+<p>If <code>TRUE</code>, a list with wavelengths, spectra, labels,
+log and data are returned instead of a hyperSpec object.
+</p>
+<p>This parameter will likely be subject to change in future - use with care.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>If the file contains multiple spectra with individual wavelength
+axes, <code>read.spc</code> returns a list of hyperSpec objects.  Otherwise the
+result is a hyperSpec object.
+</p>
+<p><code>read.spc.KaiserMap</code> returns a hyperSpec object with data columns x,
+y, and z containing the stage position as recorded in the .spc files'
+log.
+</p>
+
+
+<h3>Note</h3>
+
+<p>Only a restricted set of test files was available for development.
+Particularly, the w-planes feature could not be tested.
+</p>
+<p>If you have .spc files that cannot be read with these function, don't
+hesitate to contact the package maintainer with your code patch or asking
+advice.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>C. Beleites
+</p>
+
+
+<h3>References</h3>
+
+<p>Source development kit and file format specification of .spc
+files.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>textio</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+## get the sample .spc files from ftirsearch.com (see above)
+## Not run: 
+# single spectrum
+spc &lt;- read.spc ("BENZENE.SPC")
+plot (spc)
+
+# multi-spectra .spc file with common wavelength axis
+spc &lt;- read.spc ('IG_MULTI.SPC')
+spc
+
+# multi-spectra .spc file with individual wavelength axes
+spc &lt;- read.spc ("BARBITUATES.SPC")
+plot (spc [[1]], lines.args = list (type = "h"))
+
+## End(Not run)
+
+</code></pre>
+
+
+</div>

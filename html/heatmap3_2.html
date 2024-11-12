@@ -1,0 +1,412 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>heatmap3</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>heatmap3</h2>
+
+<h3>Description</h3>
+
+<p>The function heatmap3 is completely compatible with the original R function heatmap, and provides more new features.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">heatmap3(
+  x,
+  Rowv = NULL,
+  Colv = if (symm) "Rowv" else NULL,
+  distfun = function(x) as.dist(1 - cor(t(x), use = "pa")),
+  distfunC,
+  distfunR,
+  balanceColor = F,
+  ColSideLabs,
+  RowSideLabs,
+  showColDendro = T,
+  showRowDendro = T,
+  col = colorRampPalette(c("navy", "white", "firebrick3"))(1024),
+  legendfun,
+  method = "complete",
+  ColAxisColors = 0,
+  RowAxisColors = 0,
+  hclustfun = hclust,
+  reorderfun = function(d, w) reorder(d, w),
+  add.expr,
+  symm = FALSE,
+  revC = identical(Colv, "Rowv"),
+  scale = c("row", "column", "none"),
+  na.rm = TRUE,
+  ColSideFun,
+  ColSideAnn,
+  ColSideWidth = 0.4,
+  ColSideCut,
+  colorCell,
+  highlightCell,
+  file = "heatmap3.pdf",
+  topN = NA,
+  filterFun = sd,
+  returnDistMatrix = FALSE,
+  margins = c(5, 5),
+  ColSideColors,
+  RowSideColors,
+  cexRow = 0.2 + 1/log10(nrow(x)),
+  cexCol = 0.2 + 1/log10(ncol(x)),
+  lasRow = 2,
+  lasCol = 2,
+  labRow = NULL,
+  labCol = NULL,
+  main = NULL,
+  xlab = NULL,
+  ylab = NULL,
+  keep.dendro = FALSE,
+  verbose = getOption("verbose"),
+  useRaster = if (ncol(x) * nrow(x) &gt;= 50000) TRUE else FALSE,
+  ...
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>numeric matrix of the values to be plotted. </p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Rowv</code></td>
+<td>
+<p>determines if and how the <em>row</em> dendrogram should be
+computed and reordered.  Either a <code>dendrogram</code> or a
+vector of values used to reorder the row dendrogram or
+<code>NA</code> to suppress any row dendrogram (and reordering) or
+by default, <code>NULL</code>, see ‘Details’ below.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Colv</code></td>
+<td>
+<p>determines if and how the <em>column</em> dendrogram should be
+reordered.  Has the same options as the <code>Rowv</code> argument above and
+<em>additionally</em> when <code>x</code> is a square matrix, <code>Colv =
+      "Rowv"</code> means that columns should be treated identically to the
+rows (and so if there is to be no row dendrogram there will not be a
+column one either).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>distfun</code></td>
+<td>
+<p>function used to compute the distance (dissimilarity)
+between both rows and columns.  Defaults to <code>dist</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>distfunC</code></td>
+<td>
+<p>function used to compute the distance (dissimilarity) between and columns. Will be the same as distfun if not specified.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>distfunR</code></td>
+<td>
+<p>function used to compute the distance (dissimilarity) between and rows. Will be the same as distfun if not specified.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>balanceColor</code></td>
+<td>
+<p>logical indicating if the colors need to be balanced so that the median color will represent the 0 value. The default value is F.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ColSideLabs</code></td>
+<td>
+<p>label for ColSideColors</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>RowSideLabs</code></td>
+<td>
+<p>label for RowSideColors</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>showColDendro</code></td>
+<td>
+<p>logical indicating if the coloum dendrogram should be plotted (when Colv isn't NA).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>showRowDendro</code></td>
+<td>
+<p>logical indicating if the row dendrogram should be plotted (when Rowv isn't NA).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>col</code></td>
+<td>
+<p>specifying the colors, used in <code>image</code> function.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>legendfun</code></td>
+<td>
+<p>function used to generate legend in top left of the figure. If not specified, the color bar will be plotted. The users can use any plot functions to generate their own legend. Or a function <code>showLegend</code> is also provided as a example.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+<p>the agglomeration method to be used by <code>hclust</code> function. This should be (an unambiguous abbreviation of) one of "ward", "single", "complete", "average", "mcquitty", "median" or "centroid".</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ColAxisColors</code></td>
+<td>
+<p>integer indicating which coloum of ColSideColors will be used as colors for labels in coloum axis. The default value is 0, which means all coloum labels will be in black color.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>RowAxisColors</code></td>
+<td>
+<p>integer indicating which coloum of RowSideColors will be used as colors for labels in row axis. The default value is 0, which means all row labels will be in black color.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>hclustfun</code></td>
+<td>
+<p>function used to compute the hierarchical clustering
+when <code>Rowv</code> or <code>Colv</code> are not dendrograms.  Defaults to
+<code>hclust</code>. Should take as argument a result of <code>distfun</code>
+and return an object to which <code>as.dendrogram</code> can be applied.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>reorderfun</code></td>
+<td>
+<p><code>function(d, w)</code> of dendrogram and weights for
+reordering the row and column dendrograms.  The default uses
+<code>reorder.dendrogram</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>add.expr</code></td>
+<td>
+<p>expression that will be evaluated after the call to
+<code>image</code>.  Can be used to add components to the plot.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>symm</code></td>
+<td>
+<p>logical indicating if <code>x</code> should be treated
+<b>symm</b>etrically; can only be true when <code>x</code> is a square matrix.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>revC</code></td>
+<td>
+<p>logical indicating if the column order should be
+<code>rev</code>ersed for plotting, such that e.g., for the
+symmetric case, the symmetry axis is as usual.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>scale</code></td>
+<td>
+<p>character indicating if the values should be centered and
+scaled in either the row direction or the column direction, or
+none.  The default is <code>"row"</code> if <code>symm</code> false, and
+<code>"none"</code> otherwise.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>na.rm</code></td>
+<td>
+<p>logical indicating whether <code>NA</code>'s should be removed.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ColSideFun</code></td>
+<td>
+<p>function used to generate annotation and labeling figure in column side. The users can use any plot functions to generate their own figure. And a function <code>showAnn</code> is also provided as a example.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ColSideAnn</code></td>
+<td>
+<p>data frame with continuous and factor variables as annotation information. This parameter will be sorted by coloum dendrogram and then passed to ColSideFun.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ColSideWidth</code></td>
+<td>
+<p>numeric the height of column side area, which can be used by ColSideFun function.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ColSideCut</code></td>
+<td>
+<p>numeric the value to be used in cutting coloum dendrogram. The dendrogram and annotation will be divided into different parts and labeled respectively.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>colorCell</code></td>
+<td>
+<p>A data.frame with 3 columns, indicating which cells will be colored by specific colors. The first column is row index, second column is column index, and the third column is color.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>highlightCell</code></td>
+<td>
+<p>A data.frame with 3 or 4 columns, indicating which cells will be highlighted by rectangles with specific colors. The first column is row index, second column is column index, the third column is color for rectangle border, and the optional forth column is width for rectangle border.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>file</code></td>
+<td>
+<p>pdf file name, only works when topN was used.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>topN</code></td>
+<td>
+<p>vector a list of numbers. topN genes will be used to generate the heatmaps.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>filterFun</code></td>
+<td>
+<p>function used to filter genes, such as sd, mean, sum. It will be used in a apply function to caculate for each row.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>returnDistMatrix</code></td>
+<td>
+<p>logical indicating if the distance matrix will be returned</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>margins</code></td>
+<td>
+<p>numeric vector of length 2 containing the margins
+(see <code>par(mar = *)</code>) for column and row names, respectively.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ColSideColors</code></td>
+<td>
+<p>(optional) character vector of length <code>ncol(x)</code>
+containing the color names for a horizontal side bar that may be used to
+annotate the columns of <code>x</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>RowSideColors</code></td>
+<td>
+<p>(optional) character vector of length <code>nrow(x)</code>
+containing the color names for a vertical side bar that may be used to
+annotate the rows of <code>x</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cexRow, cexCol</code></td>
+<td>
+<p>positive numbers, used as cex.axis in for the row or column axis labeling. The defaults currently only use number of rows or columns, respectively.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lasRow, lasCol</code></td>
+<td>
+<p>the style of row or column axis labels.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>labRow, labCol</code></td>
+<td>
+<p>character vectors with row and column labels to use; these default to rownames(x) or colnames(x), respectively.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>main, xlab, ylab</code></td>
+<td>
+<p>main, x- and y-axis titles; defaults to none.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>keep.dendro</code></td>
+<td>
+<p>logical indicating if the dendrogram(s) should be
+kept as part of the result (when <code>Rowv</code> and/or <code>Colv</code> are
+not NA).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p>logical indicating if information should be printed.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>useRaster</code></td>
+<td>
+<p>logical; if TRUE a bitmap raster is used to plot the image instead of polygons. The grid must be regular in that case, otherwise an error is raised.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>additional arguments passed on to <code>image</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>The same return value as <code>hclust</code> function.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">#gererate data
+set.seed(123456789)
+rnormData&lt;-matrix(rnorm(1000), 40, 25)
+rnormData[1:15, seq(6, 25, 2)] = rnormData[1:15, seq(6, 25, 2)] + 2
+rnormData[16:40, seq(7, 25, 2)] = rnormData[16:40, seq(7, 25, 2)] + 4
+colnames(rnormData)&lt;-c(paste("Control", 1:5, sep = ""), 
+paste(c("TrtA", "TrtB"), rep(1:10,each=2), sep = ""))
+rownames(rnormData)&lt;-paste("Probe", 1:40, sep = "")
+ColSideColors&lt;-cbind(Group1=c(rep("steelblue2",5), rep(c("brown1", 
+    "mediumpurple2"),10)),Group2=sample(c("steelblue2","brown1", 
+    "mediumpurple2"),25,replace=TRUE))
+colorCell&lt;-data.frame(row=c(1,3,5),col=c(2,4,6),color=c("green4",
+    "black","orange2"),stringsAsFactors=FALSE)
+highlightCell&lt;-data.frame(row=c(2,4,6),col=c(1,3,5),color=c("black",
+    "green4","orange2"),lwd=1:3,stringsAsFactors=FALSE)
+#A simple example
+heatmap3(rnormData,ColSideColors=ColSideColors,showRowDendro=FALSE,
+    colorCell=colorCell,highlightCell=highlightCell)
+#A more detail example
+ColSideAnn&lt;-data.frame(Information=rnorm(25),Group=c(rep("Control",5),
+    rep(c("TrtA","TrtB"),10)),stringsAsFactors=TRUE)
+row.names(ColSideAnn)&lt;-colnames(rnormData)
+RowSideColors&lt;-colorRampPalette(c("chartreuse4", "white", 
+    "firebrick"))(40)
+result&lt;-heatmap3(rnormData,ColSideCut=1.2,ColSideAnn=ColSideAnn,
+    ColSideFun=function(x) showAnn(x),ColSideWidth=0.8,
+    RowSideColors=RowSideColors,col=colorRampPalette(c("green","black"
+    , "red"))(1024),RowAxisColors=1,legendfun=function() 
+    showLegend(legend=c("Low","High"),col=c("chartreuse4","firebrick"))
+    ,verbose=TRUE)
+#annotations distribution in different clusters and the result 
+#of statistic tests
+result$cutTable
+</code></pre>
+
+
+</div>

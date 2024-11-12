@@ -1,0 +1,128 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>get_events</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Flow Fluctuation Events and Metrics</h2>
+
+<h3>Description</h3>
+
+<p>Given a data frame (time series) of stage measurements, all
+increase (IC) and decrease (DC) events are determined and all metrics
+implemented in the package <span class="pkg">hydropeak</span>
+(see <code>all_metrics()</code>) are computed and combined
+to a data frame. Optionally, NA events and constant events can be included.
+NA events occur due to missing stage measurement values. The beginning
+of NA events refers to the last measurement with a non-missing Q value.
+Constant events are events where the Q values stay constant over time.
+An event is uniquely identifiable through the combination of the event starting
+time (<code>Time</code>) and the gauging station identifier (<code>ID</code>).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">get_events(x, mc.cores = 2L, omit.constant = TRUE, omit.na = TRUE, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>Data frame (time series) of stage measurements which contains at
+least a column with ID of the gauging station (default: column index 1)
+column with date-time values (default: columns index 2) in character
+representation and a column with flow rates (default: column index 3).
+If the column indices differ from <code>c(1, 2, 3)</code>, they have to be
+specified as <code>...</code> argument in the format <code>c(i, j, k)</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>mc.cores</code></td>
+<td>
+<p>Number of cores to use with
+<code>parallel::mclapply()</code>. On Windows, this
+will be set to 1.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>omit.constant</code></td>
+<td>
+<p>A logical. If <code>FALSE</code> (default) it does not return
+events with constant measurements. Otherwise these events are included.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>omit.na</code></td>
+<td>
+<p>A logical. If <code>FALSE</code> (default) it does not return missing
+value events. Otherwise these events are included.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Arguments to be passed to <code>flow()</code> to specify
+the date-time format in the input data (default: <code>dd.mm.YYYY HH:MM</code>),
+the time zone used for the conversion (default: <code>Etc/GMT-1</code>) and the
+column indices in the input data, which contain date-time values and flow
+rate values. The default indices are 1 (ID), 2 (date-time) and 3 (flow rate,
+Q), i.e. <code>cols = c(1, 2, 3)</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A data frame which contains for every event in a given time series all
+metrics (<code>all_metrics()</code>), gauging station ID,
+event type, and starting time of an event.
+Included metrics are <code>amp()</code>, <code>mafr()</code>,
+<code>mefr()</code>, <code>dur()</code>,
+<code>ratio()</code>. These metrics are only computed for
+increasing (IC) and decreasing (DC) events. For all other events the
+values are set to 0 except for flow ratio that is set to 1.
+Event types are defined as follows:
+</p>
+
+<ul>
+<li>
+<p> 0: Constant event after NA event or constant event as first event in time series
+</p>
+</li>
+<li>
+<p> 1: Constant event after DC
+</p>
+</li>
+<li>
+<p> 2: Increasing event (IC)
+</p>
+</li>
+<li>
+<p> 3: Constant event after IC
+</p>
+</li>
+<li>
+<p> 4: Decreasing event (DC)
+</p>
+</li>
+<li>
+<p> 5: NA event
+</p>
+</li>
+</ul>
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Data with multiple events and different stations
+data(Q)
+get_events(Q)
+
+# including constant events
+get_events(Q, omit.constant = FALSE)
+</code></pre>
+
+
+</div>

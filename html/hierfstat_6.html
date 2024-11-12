@@ -1,0 +1,147 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>betas</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Estimates <code class="reqn">\beta</code>s per population and a bootstrap confidence interval</h2>
+
+<h3>Description</h3>
+
+<p>Estimate populations (Population specific FST) or individual coancestries 
+and a bootstrap confidence interval, assuming random mating
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">betas(dat,nboot=0,lim=c(0.025,0.975),diploid=TRUE,betaijT=FALSE)
+
+## S3 method for class 'betas'
+print(x, digits = 4, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>dat</code></td>
+<td>
+<p>data frame with genetic data and pop identifier</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nboot</code></td>
+<td>
+<p>number of bootstrap samples.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lim</code></td>
+<td>
+<p>width of the bootstrap confidence interval</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>diploid</code></td>
+<td>
+<p>whether the data comes from a diploid organism</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>betaijT</code></td>
+<td>
+<p>whether to estimate individual coancestries</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>a betas object</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>digits</code></td>
+<td>
+<p>number of digits to print</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>further arguments to pass to print</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>If betaijT=TRUE, and the first column contains a unique identifier for 
+each individual, the function returns the matrix of individual coancestries/kinships.  
+Individual inbreeding coefficients can be obtained by multiplying by 2 the diagonal 
+and substracting 1.
+</p>
+
+
+<h3>Value</h3>
+
+<p>Hi Within population gene diversities (complement to 1 of matching probabilities)
+</p>
+<p>Hb Between populations gene diversities
+</p>
+<p>betaiovl Average <code class="reqn">\hat{\beta_{WT}^i}</code> over loci (Population specific FSTs), Table 3 of 
+<a href="https://academic.oup.com/genetics/article/206/4/2085/6072590">Weir and Goudet, 2017 (Genetics)</a>
+</p>
+<p>betaW Average of the betaiovl <code class="reqn">\hat{\beta_{WT}}</code> over loci (overall population FST)
+</p>
+<p>ci The bootstrap confidence interval of population specific FSTs
+(only if more than 100 bootstraps requested AND if more than 10 loci are present)
+</p>
+<p>if betaijT=TRUE, return the matrix of pairwise kinships only.
+</p>
+
+
+<h3>Methods (by generic)</h3>
+
+
+<ul><li> <p><code>print</code>: print function for betas class
+</p>
+</li></ul>
+<h3>Author(s)</h3>
+
+<p>Jerome Goudet <a href="mailto:jerome.goudet@unil.ch">jerome.goudet@unil.ch</a>
+</p>
+
+
+<h3>References</h3>
+
+<p><a href="https://academic.oup.com/genetics/article/206/4/2085/6072590">Weir and Goudet, 2017 (Genetics)</a> 
+A unified characterization of population structure and relatedness.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>fs.dosage</code>, <code>beta.dosage</code> for Fst estimates (not assuming Random Mating) 
+and kinship estimates from dosage data, respectively
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+#3 different population sizes lead to 3 different betais
+dat&lt;-sim.genot(size=40,N=c(50,200,1000),nbloc=50,nbal=10)
+betas(dat,nboot=100)
+ 
+#individual coancestries from the smallest population are large
+ind.coan&lt;-betas(cbind(1:120,dat[,-1]),betaij=T)
+diag(ind.coan$betaij)&lt;-NA
+graphics::image(1:120,1:120,ind.coan$betaij,xlab="Inds",ylab="Inds")
+
+## End(Not run)
+
+</code></pre>
+
+
+</div>

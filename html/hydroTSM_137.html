@@ -1,0 +1,154 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>sname2ts</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Station Name -&gt; Time Series
+</h2>
+
+<h3>Description</h3>
+
+<p>This function takes a data.frame whose columns contains the time series of several gauging stations, along with a character representing the name of one gauging station, and extracts the time series corresponding to that station.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">sname2ts(x, sname, dates=1, date.fmt = "%Y-%m-%d", var.type, 
+         tstep.out = "daily", FUN, na.rm = TRUE, from, to)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+
+<p>data.frame containing the complete times series of all the stations. <br>
+It may also contain 1 column with the dates of the measurements, or they can be provided in a different way (see <code>dates</code> below).
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sname</code></td>
+<td>
+
+<p>Character representing the name of a station, which have to correspond to one column name in <code>x</code>
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dates</code></td>
+<td>
+
+<p>numeric, factor, Date object indicating how to obtain the dates corresponding to the <code>sname</code> station. <br>
+-) If <code>dates</code> is a number (default), it indicates the index of the column in <code>x</code> that stores the dates <br>
+-) If <code>dates</code> is a factor, it is converted into Date class, using the date format specified by <code>date.fmt</code> <br>
+-) If <code>dates</code> is already of Date class, the code verifies that the number of days in <code>dates</code> be equal to the number of element in <code>x</code>
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>date.fmt</code></td>
+<td>
+
+<p>character indicating the format in which the dates are stored in <var>dates</var>, e.g. <kbd>%Y-%m-%d</kbd>. See <code>format</code> in <code>as.Date</code>. <br>
+ONLY required when <code>class(dates)=="factor"</code> or <code>class(dates)=="numeric"</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>var.type</code></td>
+<td>
+
+<p>character representing the type of variable being plotted. Used for determining the function used for computing the monthly or/and annual values when <code>FUN</code> is missing. Valid values are: <br>
+-) <kbd>Precipitation</kbd> =&gt; <code>FUN=sum</code>  <br>
+-) <kbd>Temperature</kbd>   =&gt; <code>FUN= mean</code> <br>
+-) <kbd>Flow</kbd>          =&gt; <code>FUN= mean</code>
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tstep.out</code></td>
+<td>
+
+<p>character that defines the time step of the desired output time series. Valid values are: <br>
+-) <kbd>daily</kbd>  : daily time series   <br>
+-) <kbd>monthly</kbd>: monthly time series <br>
+-) <kbd>annual</kbd> : annual time series 
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>FUN</code></td>
+<td>
+
+<p>ONLY required when <code>var.type</code> is missing and <code>tstep</code> is one of <code>monthly</code> or <code>annual</code>. <br>
+Function that have to be applied for transforming from daily to monthly or annual time step (e.g., for precipitation <code>FUN=sum</code> and for temperature and flow ts, <code>FUN=mean</code>) 
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>na.rm</code></td>
+<td>
+
+<p>a logical value indicating whether 'NA' values should be stripped before the computation proceeds.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>from</code></td>
+<td>
+
+<p>OPTIONAL, used for extracting a subset of values. <br>
+Character indicating the starting date for the values to be extracted. It must be provided in the format specified by <code>date.fmt</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>to</code></td>
+<td>
+
+<p>OPTIONAL, used for extracting a subset of values. <br>
+Character indicating the ending date for the values to be extracted. It must be provided in the format specified by <code>date.fmt</code>.
+</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>zoo object
+
+
+
+
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Mauricio Zambrano-Bigiarini, <a href="mailto:mzb.devel@gmail">mzb.devel@gmail</a>
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>sname2plot</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Loading the monthly time series of precipitation within the Ebro River basin.
+data(EbroPPtsMonthly)
+
+## Annual values of temperature at the station "T9105", stored in 'EbroPPtsMonthly'.
+sname2ts(EbroPPtsMonthly, sname="P9001", dates=1, FUN=sum, tstep.out="annual")
+</code></pre>
+
+
+</div>

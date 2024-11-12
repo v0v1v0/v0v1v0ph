@@ -1,0 +1,140 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>predict.hdc</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Prediction method for ‘hdc’ class objects.</h2>
+
+<h3>Description</h3>
+
+<p>This function computes the class prediction of a dataset with respect to the model-based supervised and unsupervised classification methods <code>hdda</code> and <code>hddc</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">## S3 method for class 'hdc'
+predict(object, data, cls = NULL, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>object</code></td>
+<td>
+<p>An ‘hdc’ class object obtained by using <code>hdda</code> or <code>hddc</code> function.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>A matrix or a data frame of observations, assuming the rows are the observations and the columns the variables. The data should be in the exact same format as the one that trained the model. Note that NAs are not allowed.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cls</code></td>
+<td>
+<p>A vector of the thue classes of each observation. It is optional and used to be compared to the predicted classes, default is NULL.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Not currently used.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>class</code></td>
+<td>
+<p>vector of the predicted class.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>prob</code></td>
+<td>
+<p>The matrix of the probabilities to belong to a class for each observation and each class.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>loglik</code></td>
+<td>
+<p>The likelihood of the classification on the new data.</p>
+</td>
+</tr>
+</table>
+<p>If the initial class vector is given to the argument ‘cls’ then the adjusted rand index (ARI) is also returned. Also the following object is returned:
+</p>
+<table><tr style="vertical-align: top;">
+<td><code>ARI</code></td>
+<td>
+<p>The confusion matrix of the classification.</p>
+</td>
+</tr></table>
+<h3>Author(s)</h3>
+
+<p>Laurent Berge, Charles Bouveyron and Stephane Girard
+</p>
+
+
+<h3>References</h3>
+
+<p>Bouveyron, C. Girard, S. and Schmid, C. (2007) “High Dimensional Discriminant Analysis”, <em>Communications in Statistics: Theory and Methods</em>, vol. <b>36</b> (14), pp. 2607–2623
+</p>
+<p>Bouveyron, C. Girard, S. and Schmid, C. (2007) “High-Dimensional Data Clustering”, <em>Computational Statistics and Data Analysis</em>, vol. <b>52</b> (1), pp. 502–519
+</p>
+<p>Berge, L. Bouveyron, C. and Girard, S. (2012) “HDclassif: An R Package for Model-Based 
+Clustering and Discriminant Analysis of High-Dimensional Data”, <em>Journal of Statistical Software</em>, 
+<b>46</b>(6), 1–29, url: <a href="https://doi.org/10.18637/jss.v046.i06">doi:10.18637/jss.v046.i06</a>
+</p>
+
+
+<h3>See Also</h3>
+
+<p>The functions to do high dimensional classification <code>hdda</code> or clustering <code>hddc</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Example 1:
+data &lt;- simuldata(1000, 1000, 50)
+X &lt;- data$X
+clx &lt;- data$clx
+Y &lt;- data$Y
+cly &lt;- data$cly
+
+#clustering of the gaussian dataset:
+prms1 &lt;- hddc(X, K=3, algo="CEM", init='param')      
+          
+#class vector obtained by the clustering:
+prms1$class                   
+
+# only to see the good classification rate and 
+# the Adjusted Rand Index:                     
+res1 &lt;- predict(prms1, X, clx)                                            
+res2 &lt;- predict(prms1, Y)       
+
+#the class predicted using hddc parameters on the test dataset:  
+res2$class                                                           
+
+
+# Example 2:
+data(Crabs)
+#clustering of the Crabs dataset:
+prms3 &lt;- hddc(Crabs[,-1], K=4, algo="EM", init='kmeans')        
+res3 &lt;- predict(prms3, Crabs[,-1], Crabs[,1])
+
+
+
+
+</code></pre>
+
+
+</div>

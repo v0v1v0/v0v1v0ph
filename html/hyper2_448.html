@@ -1,0 +1,119 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>increment</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Increment and decrement operators</h2>
+
+<h3>Description</h3>
+
+<p>Syntactic sugar for incrementing and decrementing likelihood functions
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">inc(H, val = 1)
+dec(H, val = 1)
+trial(winners,players,val=1)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>H</code></td>
+<td>
+<p>A hyper2 object</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>winners,players</code></td>
+<td>
+<p>Numeric or character vectors specifying the
+winning team and the losing team</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>val</code></td>
+<td>
+<p>Numeric</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>A very frequent operation is to increment a single term in a hyper2
+object.  If
+</p>
+<pre>
+&gt; H &lt;- hyper2(list("b",c("a","b"),"c",c("b","c")),c(2,4,3,5))
+&gt; H
+a * (a + b)^4 * b^2 * (b + c)^5 * c^3
+</pre>
+<p>Suppose we wish to increment the power of <code>a+b</code>.  We could do:
+</p>
+<pre>
+H[c("a","b")] &lt;- H[c("a","b")] + 1
+</pre>
+<p>(see the discussion of <code>hyper2_sum_numeric</code> at
+<code>Ops.hyper2.Rd</code>).  Alternatively we could use <code>magrittr</code> pipes:
+</p>
+<pre>
+H[c("a","b")] %&lt;&gt;% `+`(1)
+</pre>
+<p>But <code>inc</code> and <code>dec</code> furnish convenient idiom to accomplish the
+same thing:
+</p>
+<pre>
+H[c("a","b")] %&lt;&gt;% inc
+</pre>
+<p>Functions <code>inc</code> and <code>dec</code> default to adding or subtracting 1,
+but other values can  be supplied:
+</p>
+<pre>
+H[c("a","b")] %&lt;&gt;% inc(3)
+</pre>
+<p>Or even 
+</p>
+<pre>
+H[c("a","b")] %&lt;&gt;% inc(H["a"])
+</pre>
+<p>The convenience function <code>trial()</code> takes this one step further and
+increments the ‘winning team’ and decrements the bracket
+containing all players.  The winners are expected to be players.
+</p>
+<pre>
+&gt; trial(c("a","b"),c("a","b","c"))
+&gt; (a + b) * (a + b + c)^-1
+</pre>
+<p>Using <code>trial()</code> in this way ensures that the powers sum to zero.
+</p>
+<p>The <code>inc</code> and <code>dec</code> operators and the <code>trial()</code>
+function are used in <code>inst/kka.Rmd</code>.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Robin K. S. Hankin</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(chess)
+
+## Now suppose we observe an additional match, in which Topalov beats
+## Anand.  To incorporate this observation into the LF:
+
+
+
+trial("a",c("a","b"))
+
+chess &lt;- chess + trial("Topalov",c("Topalov","Anand"))
+</code></pre>
+
+
+</div>

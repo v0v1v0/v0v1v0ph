@@ -1,0 +1,101 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>image.hglasso</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+Image plot of an object of class <code>hglasso</code>, <code>hcov</code>, or <code>hbn</code>
+</h2>
+
+<h3>Description</h3>
+
+<p>This function plots a hglasso or hcov — the estimated matrix V and Z from <code>hglasso</code>, <code>hcov</code>, or <code>hbn</code>
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">## S3 method for class 'hglasso'
+image(x, ...) 
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+
+<p>an object of class hglasso, hcov, or hbn.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+
+<p>additional parameters to be passed to <code>image</code>.
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The estimated inverse covariance matrix from <code>hglasso</code>,  covariance matrix from <code>hcov</code>, and estimated binary network <code>hbn</code> can be decomposed as Z + V + t(V), where V is a matrix that contains hub nodes.  This function creates image plots of Z and V.   
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Kean Ming Tan
+</p>
+
+
+<h3>References</h3>
+
+<p>Tan et al. (2014). Learning graphical models with hubs. To appear in Journal of Machine Learning Research. arXiv.org/pdf/1402.7349.pdf.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>plot.hglasso</code>
+<code>summary.hglasso</code>
+<code>hglasso</code>
+<code>hcov</code>
+<code>hbn</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">##############################################
+# Example from Figure 1 in the manuscript
+# A toy example to illustrate the results from 
+# Hub Graphical Lasso
+##############################################
+library(mvtnorm)
+set.seed(1)
+n=100
+p=100
+
+# A network with 4 hubs
+Theta&lt;-HubNetwork(p,0.99,4,0.1)$Theta
+
+# Generate data matrix x
+x &lt;- rmvnorm(n,rep(0,p),solve(Theta))
+x &lt;- scale(x)
+
+# Run Hub Graphical Lasso to estimate the inverse covariance matrix
+res1 &lt;- hglasso(cov(x),0.3,0.2,2)
+
+# image plots for the matrix V and Z
+image(res1)
+dev.off()
+
+</code></pre>
+
+
+</div>

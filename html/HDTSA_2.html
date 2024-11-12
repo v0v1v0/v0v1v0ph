@@ -1,0 +1,155 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>CP_MTS</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Estimation of matrix CP-factor model</h2>
+
+<h3>Description</h3>
+
+<p><code>CP_MTS()</code> deals with CP-decomposition for high-dimensional
+matrix time series proposed in Chang et al. (2023):</p>
+<p style="text-align: center;"><code class="reqn">{\bf{Y}}_t = {\bf A \bf X}_t{\bf B}^{'} +
+{\boldsymbol{\epsilon}}_t, </code>
+</p>
+<p> where <code class="reqn">{\bf X}_t = diag(x_{t,1},\ldots,x_{t,d})</code> is an <code class="reqn">d \times d</code>
+latent process, <code class="reqn">{\bf A}</code> and <code class="reqn">{\bf B}</code> are , respectively, <code class="reqn">p
+\times d</code> and <code class="reqn">q \times d</code> unknown constant matrix, and <code class="reqn"> {\boldsymbol{\epsilon}}_t </code>
+is a <code class="reqn">p \times q</code> matrix white noise process. This function aims to estimate the rank
+<code class="reqn">d</code> and the coefficient matrices <code class="reqn">{\bf A}</code> and <code class="reqn">{\bf B}</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">CP_MTS(
+  Y,
+  xi = NULL,
+  Rank = NULL,
+  lag.k = 15,
+  lag.ktilde = 10,
+  method = c("CP.Direct", "CP.Refined", "CP.Unified")
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>Y</code></td>
+<td>
+<p>A <code class="reqn">n \times p \times q</code> data array, where <code class="reqn">n</code> is the sample size and <code class="reqn">(p,q)</code>
+is the dimension of <code class="reqn">{\bf Y}_t</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>xi</code></td>
+<td>
+<p>A <code class="reqn">n \times 1</code> vector. If <code>NULL</code> (the default), then a PCA-based <code class="reqn">\xi_{t}</code>
+is used [See Section 5.1 in Chang et al. (2023)] to calculate the sample auto-covariance matrix
+<code class="reqn">\widehat{\bf \Sigma}_{\bf Y, \xi}(k)</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Rank</code></td>
+<td>
+<p>A list of the rank <code class="reqn">d</code>,<code class="reqn">d_1</code> and <code class="reqn">d_2</code>. Default to <code>NULL</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lag.k</code></td>
+<td>
+<p>Integer. Time lag <code class="reqn">K</code> is only used in <code>CP.Refined</code> and <code>CP.Unified</code> to
+calculate the nonnegative definte matrices <code class="reqn">\widehat{\mathbf{M}}_1</code> and
+<code class="reqn">\widehat{\mathbf{M}}_2</code>: </p>
+<p style="text-align: center;"><code class="reqn">\widehat{\mathbf{M}}_1\ =\
+  \sum_{k=1}^{K}\widehat{\mathbf{\Sigma}}_{\bf Y, \xi}(k)\widehat{\mathbf{\Sigma}}_{\bf Y, \xi}(k)',
+  </code>
+</p>
+<p>, </p>
+<p style="text-align: center;"><code class="reqn">\widehat{\mathbf{M}}_2\ =\
+  \sum_{k=1}^{K}\widehat{\mathbf{\Sigma}}_{\bf Y, \xi}(k)'\widehat{\mathbf{\Sigma}}_{\bf Y, \xi}(k),
+  </code>
+</p>
+
+<p>where <code class="reqn">\widehat{\mathbf{\Sigma}}_{\bf Y, \xi}(k)</code> is the sample auto-covariance of
+<code class="reqn"> {\bf Y}_t</code> and <code class="reqn">\xi_t</code> at lag <code class="reqn">k</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lag.ktilde</code></td>
+<td>
+<p>Integer. Time lag <code class="reqn">\tilde K</code> is only used in <code>CP.Unified</code> to calulate the
+nonnegative definte matrix <code class="reqn">\widehat{\mathbf{M}}</code>: </p>
+<p style="text-align: center;"><code class="reqn">\widehat{\mathbf{M}} \ =\
+  \sum_{k=1}^{\tilde K}\widehat{\mathbf{\Sigma}}_{\tilde{\bf Z}}(k)\widehat{\mathbf{\Sigma}}_{\tilde{\bf Z}}(k)'.
+  </code>
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+<p>Method to use: <code>CP.Direct</code> and <code>CP.Refined</code>, Chang et al.(2023)'s direct and refined estimators;
+<code>CP.Unified</code>, Chang et al.(2024+)'s unified estimation procedure.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>An object of class "mtscp" is a list containing the following
+components:
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>A</code></td>
+<td>
+<p>The estimated <code class="reqn">p \times d</code> left loading matrix <code class="reqn">\widehat{\bf A}</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>B</code></td>
+<td>
+<p>The estimated <code class="reqn">q \times d</code> right loading matrix <code class="reqn">\widehat{\bf B}</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>f</code></td>
+<td>
+<p>The estimated latent process <code class="reqn">(\hat{x}_{1,t},\ldots,\hat{x}_{d,t})</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Rank</code></td>
+<td>
+<p>The estimated rank <code class="reqn">(\hat{d}_1,\hat{d}_2,\hat{d})</code> of the matrix CP-factor model.</p>
+</td>
+</tr>
+</table>
+<h3>References</h3>
+
+<p>Chang, J., He, J., Yang, L. and Yao, Q.(2023). <em>Modelling matrix time series via a tensor CP-decomposition</em>.
+Journal of the Royal Statistical Society Series B: Statistical Methodology, Vol. 85(1), pp.127–148.
+</p>
+<p>Chang, J., Du, Y., Huang, G. and Yao, Q.(2024+). <em>On the Identification and Unified Estimation
+Procedure for the Matrix CP-factor Model</em>, Working paper.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">p = 10
+q = 10
+n = 400
+d = d1 = d2 = 3
+data &lt;- DGP.CP(n,p,q,d1,d2,d)
+Y = data$Y
+res1 &lt;- CP_MTS(Y,method = "CP.Direct")
+res2 &lt;- CP_MTS(Y,method = "CP.Refined")
+res3 &lt;- CP_MTS(Y,method = "CP.Unified")
+</code></pre>
+
+
+</div>

@@ -1,0 +1,85 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>neff</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Effective sample size calculation</h2>
+
+<h3>Description</h3>
+
+<p>Calculates an estimate of the adjusted MCMC sample size per parameter
+adjusted for autocorrelation.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">neff(object, burnin = NULL, lagmax = NULL, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>object</code></td>
+<td>
+<p>an object of class <code>hmclearn</code>, usually a result of a call to <code>mh</code> or <code>hmc</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>burnin</code></td>
+<td>
+<p>optional numeric parameter for the number of initial MCMC samples to omit from the summary</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lagmax</code></td>
+<td>
+<p>maximum lag to extract for determining effective sample sizes</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>currently unused</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>Numeric vector with effective sample sizes for each parameter in the model
+</p>
+
+
+<h3>References</h3>
+
+<p>Gelman, A., et. al. (2013) <em>Bayesian Data Analysis</em>.  Chapman and Hall/CRC.  Section 11.5
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># poisson regression example
+set.seed(7363)
+X &lt;- cbind(1, matrix(rnorm(40), ncol=2))
+betavals &lt;- c(0.8, -0.5, 1.1)
+lmu &lt;- X %*% betavals
+y &lt;- sapply(exp(lmu), FUN = rpois, n=1)
+
+f &lt;- hmc(N = 1000,
+          theta.init = rep(0, 3),
+          epsilon = c(0.03, 0.02, 0.015),
+          L = 10,
+          logPOSTERIOR = poisson_posterior,
+          glogPOSTERIOR = g_poisson_posterior,
+          varnames = paste0("beta", 0:2),
+          param = list(y=y, X=X),
+          parallel=FALSE, chains=2)
+
+neff(f, burnin=100)
+</code></pre>
+
+
+</div>

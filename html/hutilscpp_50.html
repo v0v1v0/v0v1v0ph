@@ -1,0 +1,86 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>range_rcpp</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Range C++</h2>
+
+<h3>Description</h3>
+
+<p>Range of a vector using Rcpp.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">range_rcpp(
+  x,
+  anyNAx = anyNA(x),
+  warn_empty = TRUE,
+  integer0_range_is_integer = FALSE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>A vector for which the range is desired. Vectors with missing values
+are not supported and have no definite behaviour.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>anyNAx</code></td>
+<td>
+<p>(logical, default: <code>anyNA(x)</code> lazily). Set to <code>TRUE</code>
+only if <code>x</code> is known to contain no missing values (including <code>NaN</code>).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>warn_empty</code></td>
+<td>
+<p>(logical, default: <code>TRUE</code>) If <code>x</code> is
+empty (i.e. has no length), should a warning be emitted (like <code>range</code>)?</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>integer0_range_is_integer</code></td>
+<td>
+<p>(logical, default: <code>FALSE</code>)
+If <code>x</code> is a length-zero integer, should the result also be an integer?
+Set to <code>FALSE</code> by default in order to be compatible with <code>range</code>, but can
+be set to <code>TRUE</code> if an integer result is desired, in which case
+<code>range_rcpp(integer())</code> is <code>(INT_MAX, -INT_MAX)</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>A length-4 vector, the first two positions give the range and
+the next two give the positions in <code>x</code> where the max and min occurred.
+</p>
+<p>This is almost equivalent to <code>c(range(x), which.min(x), which.max(x))</code>.
+Note that the type is not strictly preserved, but no loss should occur. In particular,
+logical <code>x</code> results in an integer result, and a double <code>x</code> will
+have double values for <code>which.min(x)</code> and <code>which.max(x)</code>.
+</p>
+<p>A completely empty, logical <code>x</code> returns <code>c(NA, NA, NA, NA)</code> as an integer vector.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">x &lt;- rnorm(1e3) # Not noticeable at this scale
+bench_system_time(range_rcpp(x))
+bench_system_time(range(x))
+
+
+
+</code></pre>
+
+
+</div>

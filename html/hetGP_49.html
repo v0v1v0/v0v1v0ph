@@ -1,0 +1,85 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>rebuild</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Import and export of hetGP objects</h2>
+
+<h3>Description</h3>
+
+<p>Functions to make <code>hetGP</code> objects lighter before exporting them, and to reverse this after import.
+The <code>rebuild</code> function may also be used to obtain more robust inverse of covariance matrices using <code>ginv</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">rebuild(object, robust)
+
+## S3 method for class 'homGP'
+rebuild(object, robust = FALSE)
+
+strip(object)
+
+## S3 method for class 'hetGP'
+rebuild(object, robust = FALSE)
+
+## S3 method for class 'homTP'
+rebuild(object, robust = FALSE)
+
+## S3 method for class 'hetTP'
+rebuild(object, robust = FALSE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>object</code></td>
+<td>
+<p><code>homGP</code> or <code>homTP</code> model without slot <code>Ki</code> (inverse covariance matrix),
+or <code>hetGP</code> or <code>hetTP</code> model without slot <code>Ki</code> or <code>Kgi</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>robust</code></td>
+<td>
+<p>if <code>TRUE</code> <code>ginv</code> is used for matrix inversion, otherwise it is done via Cholesky.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p><code>object</code> with additional or removed slots.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">set.seed(32)
+## motorcycle data
+library(MASS)
+X &lt;- matrix(mcycle$times, ncol = 1)
+Z &lt;- mcycle$accel
+## Model fitting
+model &lt;- mleHetGP(X = X, Z = Z, lower = 0.1, upper = 50)
+
+# Check size
+object.size(model)
+
+# Remove internal elements, e.g., to save it
+model &lt;- strip(model)
+
+# Check new size
+object.size(model)
+
+# Now rebuild model, and use ginv instead
+model &lt;- rebuild(model, robust = TRUE)
+object.size(model)
+
+</code></pre>
+
+
+</div>

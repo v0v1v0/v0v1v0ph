@@ -1,0 +1,245 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>AEdotplot</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2> AE (Adverse Events) dotplot of incidence and relative risk </h2>
+
+<h3>Description</h3>
+
+<p>A three-panel display of the most
+frequently occurring AEs in the active arm of a clinical
+study. The first panel displays their incidence by
+treatment group, with different symbols for each
+group. The second panel displays the relative risk
+of an event on the active arm relative to the
+placebo arm, with 95% confidence intervals for a <code class="reqn">2\times2</code> table.
+By default, the AEs are ordered by
+relative risk so that events with the largest
+increases in risk for the active treatment are
+prominent at the top of the display.
+By setting the argument <code>sortbyRelativeRisk=FALSE</code>, the AEs retain
+the order specified by the levels of the factor.
+The third panel displays the numerical values of number of patients for
+each treatment,
+number of adverse events for each treatment, and relative risk.
+The third panel can be suppressed by the <code>print</code> method.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">  AEdotplot(xr, ...)
+
+  ## S3 method for class 'formula'
+AEdotplot(xr, groups=NULL, data=NULL,
+          sortbyRelativeRisk=TRUE,
+          ...,
+          sub=list(deparse(this.call[1:4],
+                                width.cutoff=500), cex=.7))
+
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>xr</code></td>
+<td>
+<p>For the formula method, a formula of the form
+<code>AE ~ nAE/nTRT | OrgSys</code>, where the condition variable is
+optional.
+For the formula method only, the variable names are not restricted.
+See <code>AEdotplot.data.frame</code> for the support methods.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>groups</code></td>
+<td>
+<p>Variable containing the treatment levels.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p><code>data.frame</code> containing at least four variables:
+containing the AE name as a factor, the treatment level as a factor, the number of observed
+AE in that treatment level, the number of
+patients in that treatment group. It may also contain a fifth variable
+containing a condition variable used to
+split the <code>data.frame</code> into partitions.
+It may be used to partition the plot,
+for example by organ system or by gender.
+The treatment factor must have exactly two levels.
+Each AE name must appear exactly once for each level of the treatment.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sortbyRelativeRisk</code></td>
+<td>
+<p>logical.  If <code>TRUE</code>, then make the
+Adverse Events an ordered factor ordering by relative risk.
+If <code>FALSE</code>, then make the
+Adverse Events an ordered factor retaining the order of the input levels.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sub</code></td>
+<td>
+<p>Subtitle for the plot.  The default value is the command
+that generates the plot.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Any of the arguments (such as the sorting options) listed in the
+calling sequence for the methods documented in
+<code>AEdotplot.data.frame</code>.
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The first panel is an ordinary dotplot of the percent of AE observed for each
+treatment by AE.
+</p>
+<p>The second panel shows relative risk of an event on the Treatment B arm
+(usually the active compound)
+relative to the Treatment A arm (usually the placebo), with 95% confidence
+intervals for a <code class="reqn">2\times2</code> table.  Confidence intervals on the log
+relative risk are calculated using the asymptotic standard error
+formula given as Equation 3.18 in Agresti A., <em>Categorical Data
+Analysis.</em> Wiley: New York, 1990.
+</p>
+<p>By default the <code>AEdotplot</code> function sorts the events by relative risk.
+To retain the sort order implied by the <code>levels</code> of the AE
+factor, specify the argument <code>sortbyRelativeRisk=FALSE</code>.
+To control the sort order, make the AE factor in the input dataset
+an <code>ordered</code> factor
+and specify the levels in the order you want.
+</p>
+<p>The third panel shows the numerical values of the number and percent
+of observed events on each arm and the relative risk.
+The display of third panel can be suppressed by specifying the
+<code>panel.widths</code> argument.  See the discussion of the
+<code>panel.widths</code> in <code>AEdotplot.data.frame</code>.
+</p>
+
+
+<h3>Value</h3>
+
+<p>The primary interest is in the display of the plot.
+</p>
+<p>The function returns
+an <code>AEdotplot</code> object which is a list of three <code>trellis</code>
+objects,
+one for the the Percent plot, one for the Relative Risk plot, and one
+for
+the Text plot containing the table of input values.  The object has
+attributes
+</p>
+
+<ol>
+<li> <p><code>main</code> and <code>sub</code> hold the main and subtitles.  Each must
+be a list containing the text in the first component.
+</p>
+</li>
+<li> <p><code>ae.key</code> is a key as described in
+<code>xyplot</code>.
+</p>
+</li>
+<li> <p><code>n.events</code> is a vector containing the number of events in
+each subpanel.
+</p>
+</li>
+<li> <p><code>panel.widths</code> is a vector of relative widths of the three components
+of
+the graph.  The numbers must sum to one.  Zero values are permitted.
+The first width includes the left axis and the Percent plot.  The second
+is the Relative Risk plot, and the third is the plot of the table
+values.
+</p>
+</li>
+<li> <p><code>AEtable</code> is a table containing the data plotted on its row.
+</p>
+</li>
+</ol>
+<h3>Note</h3>
+
+<p>Ann Liu-Ferrara was a beta tester for the shiny app.</p>
+
+
+<h3>Author(s)</h3>
+
+<p> Richard M. Heiberger &lt;rmh@temple.edu&gt; </p>
+
+
+<h3>References</h3>
+
+<p>Ohad Amit, Richard M. Heiberger, and Peter W. Lane. (2008)
+“Graphical Approaches to the Analysis of Safety Data from Clinical Trials”.
+<em>Pharmaceutical Statistics</em>,
+<b>7</b>, 1, 20–35.
+
+<a href="https://onlinelibrary.wiley.com/doi/10.1002/pst.254">https://onlinelibrary.wiley.com/doi/10.1002/pst.254</a>
+
+
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>AEdotplot.data.frame</code></p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## formula method.  See ?AEdotplot.data.frame for other methods.
+data(AEdata)
+head(AEdata)
+
+AEdotplot(AE ~ nAE/nTRT, groups = TRT, data = AEdata)           ## sort by Relative Risk
+AEdotplot(AE ~ nAE/nTRT | OrgSys, groups = TRT, data = AEdata)  ## conditioned on Organ System
+
+## Not run: 
+AEdotplot(AE ~ nAE/nTRT, groups = TRT, data = AEdata, sortbyVar="PCT")                   ## PCT A
+AEdotplot(AE ~ nAE/nTRT, groups = TRT, data = AEdata, sortbyVar="PCT", sortbyVarBegin=2) ## PCT B
+AEdotplot(AE ~ nAE/nTRT, groups = TRT, data = AEdata, sortbyRelativeRisk=FALSE)     ## levels(AE)
+AEdotplot(AE ~ nAE/nTRT | OrgSys, groups = TRT, data = AEdata, sortbyVar="ase.logrelrisk")
+
+## End(Not run)
+
+
+## Not run: 
+
+
+AEdotplot(AE ~ nAE/nTRT | OrgSys, groups = TRT,
+          data = AEdata[c(AEdata$OrgSys %in% c("GI","Resp")),])
+
+## test sortbyRelativeRisk=FALSE
+ABCD.12345 &lt;- AEdata[1:12,]
+head(ABCD.12345)
+AEdotplot(AE ~ nAE/nTRT | OrgSys, groups=TRT, data=ABCD.12345)
+AEdotplot(AE ~ nAE/nTRT | OrgSys, groups=TRT, data=ABCD.12345, sort=FALSE)
+
+## suppress third panel
+tmp &lt;- AEdotplot(AE ~ nAE/nTRT, groups = TRT, data = AEdata)
+print(tmp, AEtable=FALSE)
+
+## End(Not run)
+
+## Not run: 
+  ## run the shiny app
+ if (interactive())  shiny::runApp(system.file("shiny/AEdotplot", package="HH"))
+
+## End(Not run)
+
+</code></pre>
+
+
+</div>

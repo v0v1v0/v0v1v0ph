@@ -1,0 +1,269 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>PlotBasinOutput</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Plot a suite of time series plots from a HYPE basin output file</h2>
+
+<h3>Description</h3>
+
+<p>Plot a standard suite of time series plots from a basin output file, typically used for model performance inspection and/or
+during manual calibration
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">PlotBasinOutput(
+  x,
+  filename,
+  driver = c("default", "pdf", "png", "screen"),
+  timestep = attr(x, "timestep"),
+  hype.vars = "all",
+  vol.err = TRUE,
+  log.q = FALSE,
+  start.mon = 1,
+  from = 1,
+  to = nrow(x),
+  date.format = "",
+  name = "",
+  area = NULL,
+  subid = attr(x, "subid"),
+  gd = NULL,
+  bd = NULL,
+  ylab.t1 = "Conc."
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>Data frame, with column-wise equally-spaced time series of HYPE variables. Date-times in
+<code>POSIXct</code> format in first column. Typically an imported basin output file from HYPE using <code>ReadBasinOutput</code>.
+See details for HYPE output variables required for plotting.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>filename</code></td>
+<td>
+<p>String, file name for plotting to file device, see argument <code>driver</code>. <em>No file extension!</em> Ignored with plotting
+to screen device. <em>Device dimensions are currently hard-coded, see Details.</em></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>driver</code></td>
+<td>
+<p>String, device driver name, one of <code>default</code>, <code>pdf</code>, <code>png</code>, or <code>screen</code>.
+Defaults to <code>default</code>, which plots using default plotting device <code>getOption("device")</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>timestep</code></td>
+<td>
+<p>Character string, timestep of <code>x</code>, one of <code>"month"</code>, <code>"week"</code>, <code>"day"</code>, or
+<code>"nhour"</code> (n = number of hours). If not provided, an attribute <code>timestep</code> is required in <code>x</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>hype.vars</code></td>
+<td>
+<p>Either a keyword string or a character vector of HYPE output variables. User-specified selection of HYPE variables
+to plot. Default (<code>"all"</code>) is to plot all variables which the function knows and which are available in <code>x</code>. See details
+for a list of known variables. Other possible keywords are <code>"hydro"</code> and <code>"wq"</code> (water quality), for which a pre-selected range of
+(available) result variables is plotted. Alternatively, a character vector holding HYPE output variables to be plotted. Variables unknown
+to the function will be ignored with a warning.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>vol.err</code></td>
+<td>
+<p>Logical, if <code>TRUE</code> and both observed and simulated discharge are available in <code>x</code>, the accumulated volume error
+will be plotted.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>log.q</code></td>
+<td>
+<p>Logical, y-axis scaling for flow duration curve and discharge time series, set to <code>TRUE</code> for log-scaling.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>start.mon</code></td>
+<td>
+<p>Integer between 1 and 12, starting month of the hydrological year. For runoff regime plot, see also
+<code>AnnualRegime</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>from, to</code></td>
+<td>
+<p>Integer or date string of format \
+interpreted as row indices of <code>x</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>date.format</code></td>
+<td>
+<p>String format for x-axis dates/times. See <code>strptime</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>name</code></td>
+<td>
+<p>Character string, name to be printed on the plot.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>area</code></td>
+<td>
+<p>Numeric, upstream area of sub-basin in m^2. Required for calculation of accumulated volume error. Optional argument,
+either this or arguments <code>subid</code>, <code>gd</code>, and <code>bd</code> are required.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>subid</code></td>
+<td>
+<p>Integer, HYPE SUBID of a target sub-catchment (must exist in <code>gd</code>). Mandatory in combination with <code>gd</code> and
+optionally <code>bd</code> if argument <code>area</code> is not defined.  If not provided, an attribute <code>subid</code> is required in <code>x</code>.
+Used to calculate upstream area internally with function <code>SumUpstreamArea</code>. For repeated calls to <code>PlotBasinOutput</code>
+providing <code>area</code> in combination with a one-off separate call to <code>SumUpstreamArea</code> saves computation time,
+especially in basins with many upstream sub-basins.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>gd</code></td>
+<td>
+<p>A data frame, containing 'SUBID' and 'MAINDOWN' columns, e.g. an imported 'GeoData.txt' file. Mandatory with argument
+<code>subid</code>, details see there.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>bd</code></td>
+<td>
+<p>A data frame, containing 'BRANCHID' and 'SOURCEID' columns, e.g. an imported 'BranchData.txt' file. Optional with argument
+<code>subid</code>, details see there.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ylab.t1</code></td>
+<td>
+<p>String or <code>plotmath</code> expression, y axis label for T1 tracer time series panel (tracer concentration units
+are not prescribed in HYPE).</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p><code>PlotBasinOutput</code> plots a suite of time series along with a flow duration curve, a flow regime plot, and a selection of
+goodness-of-fit measures from an imported HYPE basin output file. The function selects from a range of "known" variables, and plots
+those which are available in the user-supplied basin output. It is mostly meant as a support tool during calibration, manual or
+automatic, providing a quick and comprehensive overview of model dynamics in a subbasin of interest.
+</p>
+<p>HYPE outputs which are known to <code>PlotBasinOutput</code> include:
+</p>
+
+<ul>
+<li>
+<p>precipitation
+</p>
+</li>
+<li>
+<p>air temperature
+</p>
+</li>
+<li>
+<p>discharge
+</p>
+</li>
+<li>
+<p>lake water level
+</p>
+</li>
+<li>
+<p>water temperature
+</p>
+</li>
+<li>
+<p>evapotranspiration
+</p>
+</li>
+<li>
+<p>snow water equivalent
+</p>
+</li>
+<li>
+<p>sub-surface storage components
+</p>
+</li>
+<li>
+<p>nitrogen concentrations
+</p>
+</li>
+<li>
+<p>phosphorus concentrations
+</p>
+</li>
+<li>
+<p>suspended sediment concentrations
+</p>
+</li>
+<li>
+<p>total sediment concentrations
+</p>
+</li>
+<li>
+<p>tracer concentration
+</p>
+</li>
+</ul>
+<p>Below a complete list of HYPE variables known to the function in HYPE info.txt format, ready to copy-paste into an info.txt file.
+For a detailed description of the variables, see the
+<a href="http://hype.smhi.net//wiki/doku.php?id=start:hype_file_reference:info.txt:variables">HYPE online documentation</a>.
+</p>
+<p><code>basinoutput variable upcprf upcpsf temp upepot upevap cout rout soim sm13 upsmfp snow upcprc cct2 ret2 ccin rein ccon reon cctn retn 
+ccsp resp ccpp repp cctp retp wcom wstr ccss ress ccts rets cct1 ret1</code>
+</p>
+<p><em>Device dimensions</em> are hard-coded to a width of 15 inches and height depending on the number of plotted time series. When plotting
+to a screen device, a maximum height of 10 inches is enforced in order to prevent automatic resizing with slow redrawing.
+<code>PlotBasinOutput</code> throws a warning if the plot height exceeds 10 inches, which can lead to overlapping plot elements. On screens with
+less than 10 inch screen, redrawing is inhibited, which can lead to an empty plot. The recommended solution for both effects
+is to plot to pdf or png file devices instead.
+</p>
+
+
+<h3>Value</h3>
+
+<p>Returns a multi-panel plot in a new graphics device.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>PlotBasinSummary</code>, <code>PlotAnnualRegime</code>, <code>PlotDurationCurve</code>, <code>ReadBasinOutput</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Source data, HYPE basin output with a number of result variables
+te1 &lt;- ReadBasinOutput(filename = system.file("demo_model",
+"results","0003587.txt", package = "HYPEtools"))
+te2 &lt;- ReadGeoData(filename = system.file("demo_model",
+"GeoData.txt", package = "HYPEtools"))
+
+## Not run:  
+# Plot selected water variables on screen device
+PlotBasinOutput(x = te1, gd = te2, driver = "screen",hype.vars = c("cout", "rout", 
+"snow", "upcprf", "upcpsf"))
+
+## End(Not run)
+
+</code></pre>
+
+
+</div>

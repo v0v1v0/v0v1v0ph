@@ -1,0 +1,213 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>HSDiC_ADMM</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Homogeneity Detection Incorporating Prior Constraint Information by ADMM</h2>
+
+<h3>Description</h3>
+
+<p>simultaneous homogeneity detection and variable selection incorporating prior constraint by ADMM
+algorithm. The problem turn to solving quadratic programming problems of the form
+<em>min(-d^T b + 1/2 b^T D b)</em> with the constraints <em>A^T b &gt;= b_0</em>. The penalty is the pairwise
+fusion with p(p-1)/2 number of penalties.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">HSDiC_ADMM(X, Y, A.eq, A.ge, A.lbs, A.ubs, b.eq, b.ge, b.lbs, b.ubs,
+  penalty = c("MCP", "SCAD", "adlasso", "lasso"), lambda2,
+  admmScale1 = 1/nrow(X), admmScale2 = 1, admmAbsTol = 1e-04,
+  admmRelTol = 1e-04, nADMM = 2000, admmVaryScale = FALSE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>X</code></td>
+<td>
+<p>n-by-p design matrix.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Y</code></td>
+<td>
+<p>n-by-1 response matrix.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>A.eq</code></td>
+<td>
+<p>equality constraint matrix.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>A.ge</code></td>
+<td>
+<p>inequality constraint matrix.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>A.lbs</code></td>
+<td>
+<p>low-bounds matrix on variables, see examples.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>A.ubs</code></td>
+<td>
+<p>upper-bounds matrix on variables, see examples.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>b.eq</code></td>
+<td>
+<p>equality constraint vector.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>b.ge</code></td>
+<td>
+<p>inequality constraint vector.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>b.lbs</code></td>
+<td>
+<p>low-bounds on variables, see details.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>b.ubs</code></td>
+<td>
+<p>upper-bounds on variables, see details.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>penalty</code></td>
+<td>
+<p>The penalty to be applied to the model. Either "lasso" (the default), "SCAD",
+or "MCP".</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lambda2</code></td>
+<td>
+<p>penalty tuning parameter for thresholding function.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>admmScale1</code></td>
+<td>
+<p>first ADMM scale parameter, 1/nrow(X) is default.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>admmScale2</code></td>
+<td>
+<p>second ADMM scale parameter, 1 is default.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>admmAbsTol</code></td>
+<td>
+<p>absolute tolerance for ADMM, 1e-04 is default.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>admmRelTol</code></td>
+<td>
+<p>relative tolerance for ADMM, 1e-04 is default.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nADMM</code></td>
+<td>
+<p>maximum number of iterations for ADMM, 2000 is default.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>admmVaryScale</code></td>
+<td>
+<p>dynamically chance the ADMM scale parameter, FALSE is default</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>betahat</code></td>
+<td>
+<p>solution vector.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>stats.ADMM_inters</code></td>
+<td>
+<p>number of iterations.</p>
+</td>
+</tr>
+</table>
+<h3>References</h3>
+
+<p>'Pairwise Fusion Approach Incorporating Prior Constraint Information' by Yaguang Li
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>solve.QP</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+## data generation
+set.seed(111)
+n=100
+p=50
+r &lt;- 1 #0.5, 0.8, 1
+
+beta &lt;- r*c(sample(rep(1:2, each = 10)), rep(0,10), -sample(rep(1:2, each = 10)) )
+X &lt;- matrix(rnorm(n*p),nrow = n)
+sigma = 1
+Y &lt;- X %*% beta + sigma * rnorm(n, 0, 1)
+
+
+# equalities
+A.eq &lt;- rbind(rep(1,p))
+b.eq &lt;- c(0)
+
+# inequalities
+A.ge &lt;- diag( c(rep(1,30), rep(-1,20)) )
+b.ge &lt;- rep(0,p)
+
+# lower-bounds
+A.lbs &lt;- diag(1, p)
+b.lbs &lt;- rep(-2, p)
+
+# upper-bounds on variables
+A.ubs &lt;- diag(-1, p)
+b.ubs &lt;- rep(-2, p)
+
+ptm &lt;- proc.time()
+fit &lt;- HSDiC_ADMM(X, Y, A.eq, A.ge, A.lbs, A.ubs, b.eq, b.ge, b.lbs, b.ubs,
+                 penalty = "adlasso", lambda2 = 0.8, admmScale2 = 1)
+proc.time() - ptm
+
+## table(round(fit$beta,1))
+
+plot(beta, type="p", pch = 20, cex = 1)
+points(fit$beta, col = 3)
+
+
+</code></pre>
+
+
+</div>

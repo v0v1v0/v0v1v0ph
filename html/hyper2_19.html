@@ -1,0 +1,251 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hyper3</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Weighted probability vectors: <code>hyper3</code> objects</h2>
+
+<h3>Description</h3>
+
+<p>Objects of class <code>hyper3</code> are a generalization of <code>hyper2</code> objects
+that allow the brackets to contain weighted probabilities.
+</p>
+<p>As a motivating example, suppose two players with Bradley-Terry
+strengths <code class="reqn">p_1,p_2</code> play chess where we quantify the first-mover
+advantage with a term <code class="reqn">\lambda</code>.  If <code class="reqn">p_1</code> plays
+white <code class="reqn">a+b</code> times with <code class="reqn">a</code> wins and <code class="reqn">b</code> losses, and
+plays black <code class="reqn">c+d</code> times with <code class="reqn">c</code> wins and <code class="reqn">d</code>
+losses, then a sensible likelihood function might be
+</p>
+<p style="text-align: center;"><code class="reqn">
+  \left(\frac{\lambda p_1}{\lambda p_1 + p_2}\right)^{a}
+  \left(\frac{p_2        }{\lambda p_1 + p_2}\right)^{b}
+  \left(\frac{p_1        }{p_1 + \lambda p_2}\right)^{c}
+  \left(\frac{\lambda p_2}{p_1 + \lambda p_2}\right)^{d}
+  </code>
+</p>
+
+<p>If <code class="reqn">a=1,b=2,c=3,d=4</code> and <code class="reqn">\lambda=1.3</code> appropriate
+package idiom might be:
+</p>
+<pre>
+
+H &lt;- hyper3()
+H[c(p1=1.3)]      %&lt;&gt;% inc(1) # a=1
+H[c(p2=1)]        %&lt;&gt;% inc(2) # b=2
+H[c(p1=1.3,p2=1)] %&lt;&gt;% dec(3) # a+b=1+2=3
+H[c(p1=1)]        %&lt;&gt;% inc(3) # c=3
+H[c(p2=1.3)]      %&lt;&gt;% inc(4) # d=4
+H[c(p1=1,p2=1.3)] %&lt;&gt;% dec(7) # c+d=3+4=7
+H
+&gt; log( (p1=1)^3 * (p1=1, p2=1.3)^-7 * (p1=1.3)^1 * (p1=1.3, p2=1)^-3 *
+(p2=1)^2 * (p2=1.3)^4)
+</pre>
+<p>The general form of terms of a <code>hyper3</code> object would be
+<code class="reqn">\left(w_1p_1+\cdots+w_rp_r\right)^{\alpha}</code>; the
+complete object would be
+</p>
+<p style="text-align: center;"><code class="reqn">
+  \mathcal{L}\left(p_1,\ldots,p_n\right)=
+  \prod_{j=1}^N\left(\sum_{i=1}^n
+  w_{ij}p_i\right)^{\alpha_i}
+  </code>
+</p>
+
+<p>where we understand that <code class="reqn">p_n=1-\sum_{i=1}^{n-1}p_i</code>;
+many of the weights might be zero.  We see that the weights
+<code class="reqn">w_{ij}</code> may be arranged as a matrix and this form is taken
+by function <code>hyper3_m()</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hyper3(B = list(), W = list(), powers = 0, pnames)
+hyper3_bw(B = list(), W = list(), powers = 0, pnames)
+hyper3_nv(L=list(),powers=0,pnames)
+hyper3_m(M,p,stripzeros=TRUE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>B</code></td>
+<td>
+<p>A list of brackets</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>W</code></td>
+<td>
+<p>A list of weights</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>L</code></td>
+<td>
+<p>A list of named vectors</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>powers</code></td>
+<td>
+<p>Numeric vector of powers</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pnames</code></td>
+<td>
+<p>Character vector of player names</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>M</code></td>
+<td>
+<p>Matrix of weights, column names being player names</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>p</code></td>
+<td>
+<p>Vector of powers, length equal to <code>ncol(M)</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>stripzeros</code></td>
+<td>
+<p>Boolean with default <code>TRUE</code> meaning to silently
+remove all-zero rows of <code>M</code></p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+
+<ul>
+<li>
+<p> Function <code>hyper3()</code> is the user-friendly creation method,
+which dispatches to a helper function depending on its arguments.
+</p>
+</li>
+<li>
+<p> Function <code>hyper3_bw()</code> takes a list of brackets
+(character vectors) and a list of weights (numeric vectors)  and
+returns a <code>hyper3</code> object.
+</p>
+</li>
+<li>
+<p> Function <code>hyper3_nv()</code> takes a list of named vectors and
+returns a <code>hyper3</code> object.
+</p>
+</li>
+<li>
+<p> Function <code>hyper3_m()</code> takes a matrix with rows being the
+brackets (entries are weights) and a numeric vector of powers.
+</p>
+</li>
+<li>
+<p> Function <code>evaluate3()</code> is a low-level helper function
+that evaluates a log-likelihood at a point in probability space.
+Don't use this: use the user-friendly <code>loglik()</code> instead, which
+dispatches to <code>evaluate3()</code>.
+</p>
+</li>
+<li>
+<p> Function <code>maxp3()</code> is a placeholder (it is not yet
+written).  But the intention is that it will maximize the
+log-likelihood of a <code>hyper3</code> object over the Bradley Terry
+strengths <em>and</em> any weights given.  This might not be possible
+as envisaged right now; I present some thoughts in
+<code>inst/kka.Rmd</code>.
+</p>
+</li>
+<li>
+<p> Function <code>list2nv()</code> converts a list of character vectors
+into a named vector suitable for use as argument <code>e</code> of
+function <code>cheering3()</code>.  It is used in
+<code>inst/global_liveability_ranking.Rmd</code>.
+</p>
+</li>
+<li>
+<p> Function <code>as.namedvectorlist()</code> takes a <code>hyper3</code>
+object and returns a disoRdered list of named vectors corresponding
+to the brackets and their weights.
+</p>
+</li>
+<li>
+<p> Function <code>setweight()</code> alters the weight of every
+occurrence of a set of players.  It is vectorised, so
+<code>setweight(H,c("a","b"),88:89)</code> sets the weight of <code>a</code> to
+88 and <code>b</code> to 89.  Replacement methods are defined, so
+“<code>H["a"] &lt;- as.weight(3)</code>” will set the weight of every
+occurrence of player <code>a</code> to 3.  If <code>H</code> is a <code>hyper2</code>
+object, it will be coerced to <code>hyper3</code>.
+</p>
+</li>
+</ul>
+<h3>Value</h3>
+
+<p>Generally return or deal with <code>hyper3</code> objects
+</p>
+
+
+<h3>Note</h3>
+
+<p>Functionality for <code>hyper3</code> objects is generally indicated by adding
+a “<code>3</code>” to function names, eg <code>gradient()</code> goes to
+<code>gradient3()</code>.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Robin K. S. Hankin</p>
+
+
+<h3>See Also</h3>
+
+<p><code>hyper2</code></p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">
+
+hyper3(B=list("a",c("a","b"),"b"),W=list(1.2,c(1.2,1),1),powers=c(3,4,-7))
+hyper3(list(c(a=1.2),c(b=1),c(a=1.2,b=1)),powers=c(3,4,-7))
+## Above two objects should be identical.
+
+## Third method, send a matrix:
+M &lt;- matrix(rpois(15,3),5,3)
+colnames(M) &lt;- letters[1:3]
+hyper3(M,c(2,3,-1,-5,1))   # second argument interpreted as powers
+
+
+
+## Standard way to generate a hyper3 object is to create an empty object
+## and populate it using the replacement methods:
+
+a &lt;- hyper3()  # default creation method [empty object]
+
+a[c(p1=1.3)] &lt;- 5
+a[c(p2=1  )] &lt;- 2
+a[c(p1=1.3,p2=1)] &lt;- -7
+a
+
+chess3  # representative simple hyper3 object
+
+H1 &lt;- rankvec_likelihood(letters[sample(6)])
+H2 &lt;- rankvec_likelihood(letters[sample(6)])
+H1["a"] &lt;- as.weight(1.2)         # "a" has some disadvantage in H1
+H1[c("b","c")] &lt;- as.weight(2:3)  # "b" and "c" have some advantage in H1
+H2[c("c","d")] &lt;- as.weight(1.5)  # "c" and "d" have some advantage in H2
+H1+H2
+
+</code></pre>
+
+
+</div>

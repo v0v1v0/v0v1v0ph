@@ -1,0 +1,124 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>SpecTest</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Statistical inference for high-dimensional spectral density matrix</h2>
+
+<h3>Description</h3>
+
+<p><code>SpecTest()</code> implements a new global test proposed in
+Chang, Jiang, McElroy and Shao (2023) for the following hypothesis testing problem: 
+</p>
+<p style="text-align: center;"><code class="reqn">H_0:f_{i,j}(\omega)=0 \mathrm{\ for\ any\ }(i,j)\in\mathcal{I}\mathrm{\ and\ }
+\omega \in \mathcal{J}\mathrm{\ \ versus\ \ H_1:H_0\ is\ not\ true.} </code>
+</p>
+
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">SpecTest(X, J.set, cross.indices, B = 1000, flag_c = 0.8)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>X</code></td>
+<td>
+<p><code class="reqn">{\bf X} = \{{\bf x_1}, \dots , {\bf x}_n \}</code>, a <code class="reqn">n\times
+p</code> sample matrix, where <code class="reqn">n</code> is the sample size and <code class="reqn">p</code> is the 
+dimension of <code class="reqn">{\bf x}_t</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>J.set</code></td>
+<td>
+<p>Set <code class="reqn">\mathcal{J}</code> for frequencies, a vector, used to calculate the test statistic.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cross.indices</code></td>
+<td>
+<p>Set <code class="reqn">\mathcal{I}</code> for <code class="reqn">(i,j)</code>, a matrix with 2 columns,
+used to calculate the test statistic.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>B</code></td>
+<td>
+<p>Bootstrap times for generating multivariate normal distributed 
+random vectors in calculating the critical value. Default is <code>B</code> <code class="reqn">=2000</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>flag_c</code></td>
+<td>
+<p>Bandwidth <code class="reqn">c</code> of the flat-top kernel for estimating 
+<code class="reqn">f_{i,j}(\omega)</code>, where <code class="reqn">c\in(0,1]</code>. Default is <code>flag_c</code> <code class="reqn">=0.8</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>An object of class "hdtstest" is a list containing the following
+components:
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>Stat</code></td>
+<td>
+<p>Numerical value which represents the value of test statistic.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>pval</code></td>
+<td>
+<p>Numerical value which represents the p-value of the test.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cri95</code></td>
+<td>
+<p>Numerical value which represents the critical value of the test
+at the significance level 0.05.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+<p>A character string indicating what method was performed.</p>
+</td>
+</tr>
+</table>
+<h3>References</h3>
+
+<p>Chang, J., Jiang, Q., McElroy, T. &amp; Shao, X. (2023). 
+<em>Statistical inference for high-dimensional spectral density matrix</em>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">n &lt;- 200
+p &lt;- 10
+flag_c &lt;- 0.8
+B &lt;- 1000
+burn &lt;- 1000
+z.sim &lt;- matrix(rnorm((n+burn)*p),p,n+burn)
+phi.mat &lt;- 0.4*diag(p)
+x.sim &lt;- phi.mat %*% z.sim[,(burn+1):(burn+n)]
+x &lt;- x.sim - rowMeans(x.sim)
+cross.indices &lt;- matrix(c(1,2), ncol=2)
+J.set &lt;- 2*pi*seq(0,3)/4 - pi
+res &lt;- SpecTest(t(x), J.set, cross.indices, B, flag_c)
+Stat &lt;- res$Stat
+Pvalue &lt;- res$p.value
+CriVal &lt;- res$cri95
+</code></pre>
+
+
+</div>

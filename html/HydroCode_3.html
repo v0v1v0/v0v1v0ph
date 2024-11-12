@@ -1,0 +1,166 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>is.upstream</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Comparison of Pfafstetter Coded Basins</h2>
+
+<h3>Description</h3>
+
+<p>One point (river segment or subbasin) with Pfafstetter code <b>a</b>
+on the water system can be queried for beeing upstream or downstream
+as compared to one or many points <b>b</b> on the water system.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">is.upstream(a, b)
+
+a %up% b
+
+is.downstream(a, b)
+
+a %down% b
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>a</code></td>
+<td>
+<p>numeric, Pfafstetter coded point</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>b</code></td>
+<td>
+<p>numeric, one or more Pfaffstetter coded points</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>For the scientific background of the Pfafstetter coding system see
+the literature reference.
+</p>
+<p>The following option(s) can be set via,
+e.g. <code>options("hydrocode.X" = XX)</code>:
+</p>
+
+<dl>
+<dt>
+<code>hydrocode.parallel</code>:</dt>
+<dd>
+<p>logical. Defaults to <code>FALSE</code>.
+The runtime may or may not decrease for very large vectors (length &gt; 50000)
+on multi-threading processors.</p>
+</dd>
+<dt>
+<code>hydrocode.alloddorzero</code>:</dt>
+<dd>
+<p>logical. Defaults to <code>FALSE</code>.
+This refers to the original Pfafstetter coding system and tests, whether
+all <code>n</code> numbers are odd, <code>[13579]{n}</code>. Hydrocodes that contain
+the digit <code>0</code> are interpreted as closed catchments (endorheic basins).
+This setting works, e.g. with the Pfafstetter coded table <code>riversegments</code> of
+<em>CCM River and Catchment Database, v2.1</em> (European Commission - JRC, 2007;
+Vogt et al., 2007).
+For decoding the Pfafstetter coded tables of the <em>HydroBASIN, v1c</em> dataset
+(Lehner and Grill, 2013), this option should be set to
+<code>options("hydrocode.alloddorzero" = TRUE)</code>. This tests for all <code>n</code>
+numbers are odd or zero, <code>[013579]{n}</code>.</p>
+</dd>
+</dl>
+<h3>Value</h3>
+
+<p>a vector of type logical
+</p>
+
+
+<h3>References</h3>
+
+<p>A. L. de Jager and J. V. Vogt, 2010,
+Development and Demonstration of a
+Structured Hydrological Feature Coding
+System for Europe,
+<em>Hydrological Sciences Journal</em>, <b>55</b>,
+661–75, <a href="https://doi.org/10.1080/02626667.2010.490786">doi:10.1080/02626667.2010.490786</a>.
+</p>
+<p>B. Lehner and G. Grill, 2013, Global river hydrography and network
+routing: baseline data and new approaches to study the world’s
+large river systems, <em>Hydrological Processes</em>, <b>27</b>,
+2171–2186, <a href="https://doi.org/10.1002/hyp.9740">doi:10.1002/hyp.9740</a>.
+</p>
+<p>K. L. Verdin and J. P. Verdin, 1999,
+A topological system for delineation and codification
+of the Earth’s river basins,
+<em>Journal of Hydrology</em>, <b>218</b>, 1–12,
+<a href="https://doi.org/10.1016/S0022-1694%2899%2900011-6">doi:10.1016/S0022-1694(99)00011-6</a>.
+</p>
+<p>J. Vogt, P. Soille, A. de Jager, E. Rimavičiūtė,
+W. Mehl, S. Foisneau, K. Bódis, et al., 2007,
+<em>A Pan-European River and Catchment Database</em>,
+Publications Office: Luxembourg, <a href="https://doi.org/10.2788/35907">doi:10.2788/35907</a>.
+</p>
+<p>Wikipedia contributors, 2019,
+Pfafstetter Coding System,
+In <em>Wikipedia, The Free Encyclopedia</em>,
+Retrieved 13:23, November 9, 2019,
+<a href="https://en.wikipedia.org/w/index.php?title=Pfafstetter_Coding_System&amp;oldid=907987995">https://en.wikipedia.org/w/index.php?title=Pfafstetter_Coding_System&amp;oldid=907987995</a>
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>options</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## example from Wikipedia
+## 8835 is upstream of segments 8833 and 8811,
+## but not segments 8832, 8821 or 9135
+dwn &lt;- c(8833, 8811, 8832, 8821, 9135)
+is.upstream(8835, dwn)
+
+## works with operator
+8835 %up% dwn
+
+## this will produce errors
+## Not run: 
+is.upstream("12h", 123)
+is.upstream(12.4, 123)
+
+## End(Not run)
+
+## example from Verdin and Verdin, 1999, p. 10
+b &lt;- c(8883, 8881, 8879, 8877, 8875, 8873, 8871, 8859,
+       8857, 8855, 8853, 8851, 8839, 8837, 8835, 8833,
+       8831, 8819, 8817, 8815, 8813, 8811, 8886, 8887,
+       8888, 8889)
+a &lt;- 8885
+a %down% b
+
+## example from Vogt et al. (2007),
+## pollution source at 464.
+## Which subcatchments are
+## affected? Mixed levels of subdivisions.
+a &lt;- 464
+b &lt;- c(465, 466, 467, 47, 48, 49,
+       463, 461, 41, 43, 45, 452,
+       454)
+a %up% b
+
+## same hydro codes return TRUE per default
+112 %up% 112
+112 %down% 112
+
+</code></pre>
+
+
+</div>

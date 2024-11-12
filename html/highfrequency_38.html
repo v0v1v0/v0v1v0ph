@@ -1,0 +1,59 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>MDtest</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2># Difference of medians test
+# See Fried (2012)
+# Returns TRUE if H0 is rejected
+# importFrom stats density
+# keywords internal
+DMtest &lt;- function(x, y, alpha = 0.005) 
+m &lt;- length(x)
+n &lt;- length(y)
+xmed &lt;- median(x)
+ymed &lt;- median(y)
+xcor &lt;- x - xmed
+ycor &lt;- y - ymed
+delta1 &lt;- ymed - xmed
+out &lt;- density(c(xcor, ycor), kernel = "epanechnikov")
+fmed &lt;- as.numeric(BMS::quantile.density(out, probs = 0.5))
+fmedvalue &lt;- (out$y[max(which(out$x &lt; fmed))] +
+out$y[max(which(out$x &lt; fmed))+1])/2
+test &lt;- sqrt((m*n)/(m + n))*2*fmedvalue*delta1
+return(abs(test) &gt; qnorm(1-alpha/2))
+</h2>
+
+<h3>Description</h3>
+
+<p># Difference of medians test
+# See Fried (2012)
+# Returns TRUE if H0 is rejected
+# importFrom stats density
+# keywords internal
+DMtest &lt;- function(x, y, alpha = 0.005) 
+m &lt;- length(x)
+n &lt;- length(y)
+xmed &lt;- median(x)
+ymed &lt;- median(y)
+xcor &lt;- x - xmed
+ycor &lt;- y - ymed
+delta1 &lt;- ymed - xmed
+out &lt;- density(c(xcor, ycor), kernel = "epanechnikov")
+fmed &lt;- as.numeric(BMS::quantile.density(out, probs = 0.5))
+fmedvalue &lt;- (out$y[max(which(out$x &lt; fmed))] +
+out$y[max(which(out$x &lt; fmed))+1])/2
+test &lt;- sqrt((m*n)/(m + n))*2*fmedvalue*delta1
+return(abs(test) &gt; qnorm(1-alpha/2))
+
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">MDtest(x, y, alpha = 0.005, type = "MDa")
+</code></pre>
+
+
+</div>

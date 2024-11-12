@@ -1,0 +1,106 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>div_profile</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Diversity profile</h2>
+
+<h3>Description</h3>
+
+<p>Create diversity profile vectors (single sample or system) or tables (multiple samples or groups) from count tables.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">div_profile(count, qvalues, tree, hierarchy, level)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>count</code></td>
+<td>
+<p>A vector or a matrix indicating the (relative) OTU/ASV counts of one or multiple samples. If a matrix is provided, columns must refer to samples and rows to OTUs.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>qvalues</code></td>
+<td>
+<p>A vector of sequential orders of diversity (default from 0 to 5). order=seq(from = 0, to = 5, by = (0.1))</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tree</code></td>
+<td>
+<p>A tree of class 'phylo'. The tip labels must match the names of the vector values (if one sample) or matrix rows (if multiple samples).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>hierarchy</code></td>
+<td>
+<p>A two-column matrix indicating the relation between samples (first column) and groups (second column).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>level</code></td>
+<td>
+<p>Whether to compute alpha or gamma diversities of the system or the groups specified in the hierarchy table.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Diversity profile
+</p>
+
+
+<h3>Value</h3>
+
+<p>A vector or matrix containing diversity values at different orders of diversity (as specified in qvalues).
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Antton Alberdi, <a href="mailto:anttonalberdi@gmail.com">anttonalberdi@gmail.com</a>
+</p>
+
+
+<h3>References</h3>
+
+<p>Alberdi, A., Gilbert, M.T.P. (2019). A guide to the application of Hill numbers to DNA-based diversity analyses. Molecular Ecology Resources, 19, 804-817.<br><br>
+Chao, A., Chiu, C.H., &amp; Jost, L. (2014). Unifying species diversity, phylogenetic diversity, functional diversity, and related similarity and differentiation measures through hill numbers. Annual Review of Ecology Evolution and Systematics, 45, 297-324.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>div_profile_plot</code>, <code>hill_div</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data(bat.diet.otutable)
+data(bat.diet.tree)
+data(bat.diet.hierarchy)
+#One sample example
+bat.diet.sample &lt;- bat.diet.otutable[,1]
+div_profile(count=bat.diet.sample,qvalues=seq(from = 0, to = 5, by = (0.1)))
+#One sample example (phylogenetic Hill numbers)
+names(bat.diet.sample) &lt;- rownames(bat.diet.otutable)
+div_profile(count=bat.diet.sample,qvalues=seq(from = 0, to = 5, by = (0.1)),tree=bat.diet.tree)
+#Multiple samples
+div_profile(bat.diet.otutable)
+#Multiple groups (gamma diversity)
+div_profile(bat.diet.otutable,hierarchy=bat.diet.hierarchy,level="gamma")
+#Multiple groups (alpha diversity)
+div_profile(bat.diet.otutable,hierarchy=bat.diet.hierarchy,level="alpha")
+</code></pre>
+
+
+</div>

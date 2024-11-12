@@ -1,0 +1,190 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hypr-class</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>S4 class “hypr” and its methods</h2>
+
+<h3>Description</h3>
+
+<p>A <code>hypr</code> object contains equations, a hypothesis matrix and a contrast matrix, all of which are related to each other. See below for methods.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">## S4 method for signature 'hypr'
+show(object)
+
+## S4 method for signature 'hypr'
+levels(x)
+
+## S4 method for signature 'hypr'
+nlevels(x)
+
+## S4 method for signature 'hypr'
+names(x)
+
+## S4 method for signature 'hypr'
+as.call(x)
+
+## S4 replacement method for signature 'hypr'
+names(x) &lt;- value
+
+## S4 replacement method for signature 'hypr'
+levels(x) &lt;- value
+
+## S4 method for signature 'hypr'
+formula(x, ...)
+
+## S4 replacement method for signature 'hypr'
+formula(x, ...) &lt;- value
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>object, x</code></td>
+<td>
+<p>a hypr object</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>value</code></td>
+<td>
+<p>New value (<code>list</code> of equations for <code>formula</code>, <code>character</code> vector for <code>levels</code> and <code>names</code>)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>(ignored)</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>To generate a hypr object, use the <code>hypr</code> function.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A character vector of level names
+</p>
+<p>An integer denoting the number of levels
+</p>
+<p>A character vector of contrast names
+</p>
+<p>A <code>call</code> object that reproduces the <code>hypr</code> object
+</p>
+<p>A <code>list</code> of null hypothesis equations
+</p>
+
+
+<h3>Methods (by generic)</h3>
+
+
+<ul>
+<li> <p><code>show(hypr)</code>: Show summary of hypr object, including contrast equations, the (transposed) hypothesis matrix and the derived contrast matrix.
+</p>
+</li>
+<li> <p><code>levels(hypr)</code>: Retrieve the levels (variable names) used in a <code>hypr</code> object
+</p>
+</li>
+<li> <p><code>nlevels(hypr)</code>: Retrieve the number of levels (variable names) used in a <code>hypr</code> object
+</p>
+</li>
+<li> <p><code>names(hypr)</code>: Retrieve the contrast names used in a <code>hypr</code> object
+</p>
+</li>
+<li> <p><code>as.call(hypr)</code>: Transform <code>hypr</code> object to a reproducible function call
+</p>
+</li>
+<li> <p><code>names(hypr) &lt;- value</code>: Set the contrast names used in a <code>hypr</code> object
+</p>
+</li>
+<li> <p><code>levels(hypr) &lt;- value</code>: Set the levels used in a <code>hypr</code> object
+</p>
+</li>
+<li> <p><code>formula(hypr)</code>: Retrieve a <code>hypr</code> object’s null hypothesis equations.
+</p>
+</li>
+<li> <p><code>formula(hypr) &lt;- value</code>: Modify a <code>hypr</code> object’s null hypothesis equations
+</p>
+</li>
+</ul>
+<h3>Slots</h3>
+
+
+<dl>
+<dt><code>eqs</code></dt>
+<dd>
+<p>List of null hypotheses</p>
+</dd>
+<dt><code>hmat</code></dt>
+<dd>
+<p>Hypothesis matrix</p>
+</dd>
+<dt><code>cmat</code></dt>
+<dd>
+<p>Contrast matrix</p>
+</dd>
+</dl>
+<h3>See Also</h3>
+
+<p><code>hypr</code>, <code>cmat</code>, <code>hmat</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Equations and matrices in a hypr object are always congruent
+# Therefore creating a hypr object h and then copying ...
+h &lt;- hypr(mu1~0, mu2~mu1)
+
+# ... its equations, ...
+h2 &lt;- hypr()
+formula(h2) &lt;- formula(h)
+
+# ... its hypothesis matrix, ...
+h3 &lt;- hypr()
+hmat(h3) &lt;- hmat(h)
+
+# ... or its contast matrix ...
+h4 &lt;- hypr()
+cmat(h4) &lt;- cmat(h)
+
+# ... over to another hypr object is the same as copying the object:
+h5 &lt;- h
+
+# check that hypr objects are equal by comparing hmat() and cmat()
+stopifnot(all.equal(hmat(h), hmat(h2)))
+stopifnot(all.equal(cmat(h), cmat(h2)))
+stopifnot(all.equal(hmat(h), hmat(h3)))
+stopifnot(all.equal(cmat(h), cmat(h3)))
+stopifnot(all.equal(hmat(h), hmat(h4)))
+stopifnot(all.equal(cmat(h), cmat(h4)))
+stopifnot(all.equal(hmat(h), hmat(h5)))
+stopifnot(all.equal(cmat(h), cmat(h5)))
+
+
+h &lt;- hypr(mu1~0, mu2~mu1)
+formula(h)
+
+h2 &lt;- hypr()
+formula(h2) &lt;- formula(h)
+h2
+formula(h2)
+
+# After updating, matrices should be equal
+stopifnot(all.equal(hmat(h), hmat(h2)))
+stopifnot(all.equal(cmat(h), cmat(h2)))
+
+</code></pre>
+
+
+</div>

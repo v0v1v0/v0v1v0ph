@@ -1,0 +1,175 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>simulateScores</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Generate linear discriminant scores from random data, after selection</h2>
+
+<h3>Description</h3>
+
+<p>Simulates the effect of generating scores from random data, possibly
+with predicted scores calculates also for additional 'observations'
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">simulateScores(nrows = 7129, cl = rep(1:3, c(19, 10, 2)), x = NULL, cl.other = NULL,
+               x.other = NULL, nfeatures = 15, dimen=2, seed = NULL)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>nrows</code></td>
+<td>
+<p>number of rows of random data matrix</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cl</code></td>
+<td>
+<p>classifying factor</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>data matrix, by default randomly generated</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cl.other</code></td>
+<td>
+<p>classifying factor for additional observations</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x.other</code></td>
+<td>
+<p>additional observations</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nfeatures</code></td>
+<td>
+<p>number of features to select (by default uses
+aov F-statistic)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dimen</code></td>
+<td>
+<p>number of sets of discriminant scores to retain (at most
+one less than number of levels of <code>cl</code>)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>seed</code></td>
+<td>
+<p>set, if required, so that calculations can be reproduced</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>scores</code></td>
+<td>
+<p>matrix of scores</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cl</code></td>
+<td>
+<p>classifying factor</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>other</code></td>
+<td>
+<p>matrix of 'other' scores</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cl.other</code></td>
+<td>
+<p>classifying factor for <code>scores.other</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nfeatures</code></td>
+<td>
+<p>number of features used in generating the scores</p>
+</td>
+</tr>
+</table>
+<h3>Note</h3>
+
+<p>NB: Prior to 0.53, this function made (wrongly) a random
+selection of features.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>John Maindonald</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">scorelist &lt;- simulateScores(nrows=500, cl=rep(1:3, c(19,10,2)))
+plot(scorelist$scores, col=unclass(scorelist$cl), pch=16)
+
+
+## The function is currently defined as
+simulateScores &lt;-
+  function (nrows = 7129, cl = rep(1:3, c(19, 10, 2)), x = NULL,
+            cl.other = NULL, x.other = NULL, nfeatures = 15, dimen = 2,
+            seed = NULL)
+{
+  if (!is.null(seed))
+    set.seed(seed)
+  m &lt;- length(cl)
+  m.other &lt;- length(cl.other)
+  if (is.null(x)) {
+    x &lt;- matrix(rnorm(nrows * m), nrow = nrows)
+    rownames(x) &lt;- paste(1:nrows)
+  }
+  else nrows &lt;- dim(x)[1]
+  if (is.null(x.other)) {
+    x.other &lt;- matrix(rnorm(nrows * m.other), nrow = nrows)
+    rownames(x.other) &lt;- paste(1:nrows)
+  }
+  if (is.numeric(cl))
+    cl &lt;- paste("Gp", cl, sep = "")
+  if(!is.null(cl.other)){
+    if (is.numeric(cl.other))
+      cl.other &lt;- paste("Gp", cl.other, sep = "")
+    cl.other &lt;- factor(cl.other)
+  }
+  cl &lt;- factor(cl)
+  if (dimen &gt; length(levels(cl)) - 1)
+    dimen &lt;- length(levels(cl)) - 1
+  ordfeatures &lt;- orderFeatures(x, cl = cl, values = TRUE)
+  stat &lt;- ordfeatures$stat[1:nfeatures]
+  ord.use &lt;- ordfeatures$ord[1:nfeatures]
+  xUse.ord &lt;- data.frame(t(x[ord.use, ]))
+  xUseOther.ord &lt;- data.frame(t(x.other[ord.use, ]))
+  ordUse.lda &lt;- lda(xUse.ord, grouping = cl)
+  scores &lt;- predict(ordUse.lda, dimen = dimen)$x
+  if(!is.null(cl.other))
+    scores.other &lt;- predict(ordUse.lda, newdata = xUseOther.ord,
+                            dimen = dimen)$x else
+  scores.other &lt;- NULL
+  invisible(list(scores = scores, cl = cl, other = scores.other,
+                 cl.other = cl.other, nfeatures = nfeatures))
+}
+</code></pre>
+
+
+</div>

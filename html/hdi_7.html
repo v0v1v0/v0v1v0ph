@@ -1,0 +1,219 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hdi</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Function to perform inference in high-dimensional (generalized) linear models</h2>
+
+<h3>Description</h3>
+
+<p>Perform inference in high-dimensional (generalized) linear
+models using various approaches.</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hdi(x, y, method = "multi.split", B = NULL, fraction = 0.5,
+    model.selector = NULL, EV = NULL, threshold = 0.75,
+    gamma = seq(0.05, 0.99, by = 0.01),
+    classical.fit = NULL,
+    args.model.selector = NULL, args.classical.fit = NULL,
+    verbose = FALSE, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>Design matrix (without intercept).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>y</code></td>
+<td>
+<p>Response vector.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>method</code></td>
+<td>
+<p>Multi-splitting ("multi.split") or stability-selection
+("stability").</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>B</code></td>
+<td>
+<p>Number of sample-splits (for "multi.split") or sub-sample
+iterations (for "stability"). Default is 50 ("multi.split")or 100
+("stability"). Ignored otherwise.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fraction</code></td>
+<td>
+<p>Fraction of data used at each of the B iterations.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>model.selector</code></td>
+<td>
+<p>Function to perform model selection. Default is
+<code>lasso.cv</code> ("multi.split") and
+<code>lasso.firstq</code> ("stability"). Function must have at
+least two arguments: x (the design matrix) and y (the response
+vector). Return value is the index vector of selected columns. See
+<code>lasso.cv</code> and <code>lasso.firstq</code> for
+examples. Additional arguments can be passed through
+<code>args.model.selector</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>EV</code></td>
+<td>
+<p>(only for
+"stability"). Bound(s) for expected number of false positives . Can
+be a vector.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>threshold</code></td>
+<td>
+<p>(only for "stability"). Bound on selection frequency.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>gamma</code></td>
+<td>
+<p>(only for "multi.split"). Vector of gamma-values.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>classical.fit</code></td>
+<td>
+<p>(only
+for "multi.split"). Function to calculate (classical)
+p-values. Default is <code>lm.pval</code>. Function must
+have at least two arguments: x (the design matrix) and y (the
+response vector). Return value is the vector of p-values. See
+<code>lm.pval</code> for an example. Additional arguments can be
+passed through <code>args.classical.fit</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>args.model.selector</code></td>
+<td>
+<p>Named list of further arguments for
+function <code>model.selector</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>args.classical.fit</code></td>
+<td>
+<p>Named list of further arguments for function
+<code>classical.fit</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>verbose</code></td>
+<td>
+<p>Should information be printed out while computing
+(logical).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Other arguments to be passed to the underlying functions.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>pval</code></td>
+<td>
+<p>(only for "multi.split"). Vector of p-values.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>gamma.min</code></td>
+<td>
+<p>(only for "multi.split"). Value of gamma where
+minimal p-values was attained.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>select</code></td>
+<td>
+<p>(only for "stability"). List with selected predictors
+for the supplied values of EV.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>EV</code></td>
+<td>
+<p>(only for "stability"). Vector of corresponding values of EV.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>thresholds</code></td>
+<td>
+<p>(only for "stability"). Used thresholds.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>freq</code></td>
+<td>
+<p>(only for "stability"). Vector of selection frequencies.</p>
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>Lukas Meier</p>
+
+
+<h3>References</h3>
+
+<p>Meinshausen, N., Meier, L. and Bühlmann, P. (2009)
+P-values for high-dimensional regression.
+<em>Journal of the American Statistical Association</em> <b>104</b>, 1671–1681.
+</p>
+<p>Meinshausen, N. and Bühlmann, P. (2010)
+Stability selection (with discussion).
+<em>Journal of the Royal Statistical Society: Series B</em> <b>72</b>, 417–473.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>stability</code>, <code>multi.split</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">x &lt;- matrix(rnorm(100 * 200), nrow = 100, ncol = 200)
+y &lt;- x[,1] * 2 + x[,2] * 2.5 + rnorm(100)
+
+## Multi-splitting with lasso.firstq as model selector function
+fit.multi &lt;- hdi(x, y, method = "multi.split",
+                 model.selector =lasso.firstq,
+                 args.model.selector = list(q = 10))
+fit.multi
+fit.multi$pval.corr[1:10] ## the first 10 p-values
+
+## Stability selection
+fit.stab &lt;- hdi(x, y, method = "stability", EV = 2)
+fit.stab
+fit.stab$freq[1:10] ## frequency of the first 10 predictors
+</code></pre>
+
+
+</div>

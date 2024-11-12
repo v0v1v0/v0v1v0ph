@@ -1,0 +1,83 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>aovFbyrow</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>calculate aov F-statistic for each row of a matrix</h2>
+
+<h3>Description</h3>
+
+<p>Returns on aov F-statistic for each row of <code>x</code>
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">aovFbyrow(x=matrix(rnorm(1000), ncol=20), cl = factor(rep(1:3, c(7,9,4))))
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>features by observations matrix</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cl</code></td>
+<td>
+<p>factor that classifies the values in each row</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>This uses the functions <code>qr()</code> and <code>qr.qty()</code> for the main
+part of the calculation, for handling the calculations efficently
+</p>
+
+
+<h3>Value</h3>
+
+<p>one F-statistic for each row of <code>x</code>
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>John Maindonald</p>
+
+
+<h3>See Also</h3>
+
+<p>See also <code>orderFeatures</code></p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">mat &lt;- matrix(rnorm(1000), ncol=20)
+cl &lt;- factor(rep(1:3, c(7,9,4)))
+Fstats &lt;- aovFbyrow(x = mat, cl = cl)
+
+## The function is currently defined as
+aovFbyrow &lt;-
+function(x=matrix(rnorm(1000), ncol=20),
+         cl=factor(rep(1:3, c(7,9,4)))){
+    y &lt;- t(x)
+    qr.obj &lt;- qr(model.matrix(~cl))
+    qty.obj &lt;- qr.qty(qr.obj,y)
+    tab &lt;- table(factor(cl))
+    dfb &lt;- length(tab)-1
+    dfw &lt;- sum(tab)-dfb-1
+    ms.between &lt;- apply(qty.obj[2:(dfb+1), , drop=FALSE]^2, 2, sum)/dfb
+    ms.within &lt;- apply(qty.obj[-(1:(dfb+1)), , drop=FALSE]^2, 2, sum)/dfw
+    Fstat &lt;- ms.between/ms.within
+  }
+</code></pre>
+
+
+</div>

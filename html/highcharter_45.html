@@ -1,0 +1,102 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hctreemap2</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Shortcut to create treemaps.</h2>
+
+<h3>Description</h3>
+
+<p>This function helps create highcharts treemaps from data frames.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hctreemap2(data, group_vars, size_var, color_var = NULL, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>data frame containing variables to organize each level of the treemap on</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>group_vars</code></td>
+<td>
+<p>vector of strings containing column names of variables to generate treemap levels from. the first listed column will specify the top level of the treemap. the unique values in each of these columns must have no intersection (including NAs).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>size_var</code></td>
+<td>
+<p>string name of column containing numeric data to aggregate by</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>color_var</code></td>
+<td>
+<p>string name of column containing numeric data to color by. defaults to same column as <code>size_var</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>additional shared arguments for the data series
+(<a href="https://api.highcharts.com/highcharts/series">https://api.highcharts.com/highcharts/series</a>).</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>highchart plot object
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+
+library(tidyverse)
+library(highcharter)
+library(RColorBrewer)
+
+tibble(
+  index1 = sample(LETTERS[1:5], 500, replace = T),
+  index2 = sample(LETTERS[6:10], 500, replace = T),
+  index3 = sample(LETTERS[11:15], 500, replace = T),
+  value = rpois(500, 5),
+  color_value = rpois(500, 5)
+) %&gt;%
+  hctreemap2(
+    group_vars = c("index1", "index2", "index3"),
+    size_var = "value",
+    color_var = "color_value",
+    layoutAlgorithm = "squarified",
+    levelIsConstant = FALSE,
+    levels = list(
+      list(level = 1, dataLabels = list(enabled = TRUE)),
+      list(level = 2, dataLabels = list(enabled = FALSE)),
+      list(level = 3, dataLabels = list(enabled = FALSE))
+    )
+  ) %&gt;%
+  hc_colorAxis(
+    minColor = brewer.pal(7, "Greens")[1],
+    maxColor = brewer.pal(7, "Greens")[7]
+  ) %&gt;%
+  hc_tooltip(pointFormat = "&lt;b&gt;{point.name}&lt;/b&gt;:&lt;br&gt;
+             Value: {point.value:,.0f}&lt;br&gt;
+             Color Value: {point.colorValue:,.0f}")
+
+## End(Not run)
+
+</code></pre>
+
+
+</div>

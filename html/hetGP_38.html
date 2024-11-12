@@ -1,0 +1,255 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>mleHomTP</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Student-T process modeling with homoskedastic noise</h2>
+
+<h3>Description</h3>
+
+<p>Student-t process regression under homoskedastic noise based on maximum likelihood estimation of the 
+hyperparameters. This function is enhanced to deal with replicated observations.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">mleHomTP(
+  X,
+  Z,
+  lower = NULL,
+  upper = NULL,
+  known = list(beta0 = 0),
+  noiseControl = list(g_bounds = c(sqrt(.Machine$double.eps), 10000), nu_bounds = c(2 +
+    0.001, 30), sigma2_bounds = c(sqrt(.Machine$double.eps), 10000)),
+  init = list(nu = 3),
+  covtype = c("Gaussian", "Matern5_2", "Matern3_2"),
+  maxit = 100,
+  eps = sqrt(.Machine$double.eps),
+  settings = list(return.Ki = TRUE, factr = 1e+09)
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>X</code></td>
+<td>
+<p>matrix of all designs, one per row, or list with elements:
+</p>
+
+<ul>
+<li> <p><code>X0</code> matrix of unique design locations, one point per row
+</p>
+</li>
+<li> <p><code>Z0</code> vector of averaged observations, of length <code>nrow(X0)</code>
+</p>
+</li>
+<li> <p><code>mult</code> number of replicates at designs in <code>X0</code>, of length <code>nrow(X0)</code>
+</p>
+</li>
+</ul>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Z</code></td>
+<td>
+<p>vector of all observations. If using a list with <code>X</code>, <code>Z</code> has to be ordered with respect to <code>X0</code>, and of length <code>sum(mult)</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lower, upper</code></td>
+<td>
+<p>bounds for the <code>theta</code> parameter (see <code>cov_gen</code> for the exact parameterization).
+In the multivariate case, it is possible to give vectors for bounds (resp. scalars) for anisotropy (resp. isotropy)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>known</code></td>
+<td>
+<p>optional list of known parameters, e.g., <code>beta0</code> (default to <code>0</code>), <code>theta</code>, <code>g</code>, <code>sigma2</code> or <code>nu</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>noiseControl</code></td>
+<td>
+<p>list with element,
+</p>
+
+<ul>
+<li> <p><code>g_bound</code>, vector providing minimal and maximal noise variance
+</p>
+</li>
+<li> <p><code>sigma2_bounds</code>, vector providing minimal and maximal signal variance
+</p>
+</li>
+<li> <p><code>nu_bounds</code>, vector providing minimal and maximal values for the degrees of freedom. 
+The mininal value has to be stricly greater than 2. If the mle optimization gives a large value, e.g., 30,
+considering a GP with <code>mleHomGP</code> may be better. 
+</p>
+</li>
+</ul>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>init</code></td>
+<td>
+<p>list specifying starting values for MLE optimization, with elements:
+</p>
+
+<ul>
+<li> <p><code>theta_init</code> initial value of the theta parameters to be optimized over (default to 10% of the range determined with <code>lower</code> and <code>upper</code>)
+</p>
+</li>
+<li> <p><code>g_init</code> initial value of the nugget parameter to be optimized over (based on the variance at replicates if there are any, else 10% of the variance)
+</p>
+</li>
+<li> <p><code>sigma2</code> initial value of the variance paramter (default to <code>1</code>)
+</p>
+</li>
+<li> <p><code>nu</code> initial value of the degrees of freedom parameter (default to <code>3</code>)
+</p>
+</li>
+</ul>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>covtype</code></td>
+<td>
+<p>covariance kernel type, either 'Gaussian', 'Matern5_2' or 'Matern3_2', see <code>cov_gen</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>maxit</code></td>
+<td>
+<p>maximum number of iteration for L-BFGS-B of <code>optim</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>eps</code></td>
+<td>
+<p>jitter used in the inversion of the covariance matrix for numerical stability</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>settings</code></td>
+<td>
+<p>list with argument <code>return.Ki</code>, to include the inverse covariance matrix in the object for further use (e.g., prediction).
+Arguments <code>factr</code> (default to 1e9) and <code>pgtol</code> are available to be passed to <code>control</code> for L-BFGS-B in <code>optim</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The global covariance matrix of the model is parameterized as <code>K = sigma2 * C + g * diag(1/mult)</code>,
+with <code>C</code> the correlation matrix between unique designs, depending on the family of kernel used (see <code>cov_gen</code> for available choices).
+</p>
+<p>It is generally recommended to use <code>find_reps</code> to pre-process the data, to rescale the inputs to the unit cube and to normalize the outputs.
+</p>
+
+
+<h3>Value</h3>
+
+<p>a list which is given the S3 class "<code>homGP</code>", with elements:
+</p>
+
+<ul>
+<li> <p><code>theta</code>: maximum likelihood estimate of the lengthscale parameter(s),
+</p>
+</li>
+<li> <p><code>g</code>: maximum likelihood estimate of the nugget variance,
+</p>
+</li>
+<li> <p><code>trendtype</code>: either "<code>SK</code>" if <code>beta0</code> is given, else "<code>OK</code>" 
+</p>
+</li>
+<li> <p><code>beta0</code>: estimated trend unless given in input,
+</p>
+</li>
+<li> <p><code>sigma2</code>:  maximum likelihood estimate of the scale variance,
+</p>
+</li>
+<li> <p><code>nu2</code>:  maximum likelihood estimate of the degrees of freedom parameter,
+</p>
+</li>
+<li> <p><code>ll</code>: log-likelihood value,
+</p>
+</li>
+<li> <p><code>X0</code>, <code>Z0</code>, <code>Z</code>, <code>mult</code>, <code>eps</code>, <code>covtype</code>: values given in input,
+</p>
+</li>
+<li> <p><code>call</code>: user call of the function
+</p>
+</li>
+<li> <p><code>used_args</code>: list with arguments provided in the call
+</p>
+</li>
+<li> <p><code>nit_opt</code>, <code>msg</code>: <code>counts</code> and <code>msg</code> returned by <code>optim</code>
+</p>
+</li>
+<li> <p><code>Ki</code>, inverse covariance matrix (if <code>return.Ki</code> is <code>TRUE</code> in <code>settings</code>)
+</p>
+</li>
+<li> <p><code>time</code>: time to train the model, in seconds.
+</p>
+</li>
+</ul>
+<h3>References</h3>
+
+<p>M. Binois, Robert B. Gramacy, M. Ludkovski (2018), Practical heteroskedastic Gaussian process modeling for large simulation experiments,
+Journal of Computational and Graphical Statistics, 27(4), 808–821.<br> 
+Preprint available on arXiv:1611.05902.<br><br></p>
+<p>A. Shah, A. Wilson, Z. Ghahramani (2014), Student-t processes as alternatives to Gaussian processes, Artificial Intelligence and Statistics, 877–885. <br><br></p>
+<p>M. Chung, M. Binois, RB Gramacy, DJ Moquin, AP Smith, AM Smith (2019). 
+Parameter and Uncertainty Estimation for Dynamical Systems Using Surrogate Stochastic Processes.
+SIAM Journal on Scientific Computing, 41(4), 2212-2238.<br>
+Preprint available on arXiv:1802.00852.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>predict.homTP</code> for predictions.
+<code>summary</code> and <code>plot</code> functions are available as well.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">##------------------------------------------------------------
+## Example 1: Homoskedastic Student-t modeling on the motorcycle data
+##------------------------------------------------------------
+set.seed(32)
+
+## motorcycle data
+library(MASS)
+X &lt;- matrix(mcycle$times, ncol = 1)
+Z &lt;- mcycle$accel
+plot(X, Z, ylim = c(-160, 90), ylab = 'acceleration', xlab = "time")
+
+noiseControl = list(g_bounds = c(1e-3, 1e4))
+model &lt;- mleHomTP(X = X, Z = Z, lower = 0.01, upper = 100, noiseControl = noiseControl)
+summary(model)
+  
+## Display averaged observations
+points(model$X0, model$Z0, pch = 20) 
+xgrid &lt;- matrix(seq(0, 60, length.out = 301), ncol = 1) 
+preds &lt;- predict(x = xgrid, object =  model)
+
+## Display mean prediction
+lines(xgrid, preds$mean, col = 'red', lwd = 2)
+## Display 95% confidence intervals
+lines(xgrid, preds$mean + sqrt(preds$sd2) * qt(0.05, df = model$nu + nrow(X)), col = 2, lty = 2)
+lines(xgrid, preds$mean + sqrt(preds$sd2) * qt(0.95, df = model$nu + nrow(X)), col = 2, lty = 2)
+## Display 95% prediction intervals
+lines(xgrid, preds$mean + sqrt(preds$sd2 + preds$nugs) * qt(0.05, df = model$nu + nrow(X)), 
+  col = 3, lty = 2)
+lines(xgrid, preds$mean + sqrt(preds$sd2 + preds$nugs) * qt(0.95, df = model$nu + nrow(X)), 
+  col = 3, lty = 2)
+</code></pre>
+
+
+</div>

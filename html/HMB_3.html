@@ -1,0 +1,141 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>ghmb</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Generalized Hierarchical Model-Based estimation method</h2>
+
+<h3>Description</h3>
+
+<p>Generalized Hierarchical Model-Based estimation method
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">ghmb(y_S, X_S, X_Sa, Z_Sa, Z_U, Omega_S, Sigma_Sa)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>y_S</code></td>
+<td>
+<p>Response object that can be coerced into a column vector. The
+<code>_S</code> denotes that <code>y</code> is part of the sample <em>S</em>, with
+<code class="reqn">N_S \le N_{Sa} \le N_U</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>X_S</code></td>
+<td>
+<p>Object of predictors variables that can be coerced into a matrix.
+The rows of <code>X_S</code> correspond to the rows of <code>y_S</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>X_Sa</code></td>
+<td>
+<p>Object of predictor variables that can be coerced into a matrix.
+The set <em>Sa</em> is the intermediate sample.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Z_Sa</code></td>
+<td>
+<p>Object of predictor variables that can be coerced into a matrix.
+The set <em>Sa</em> is the intermediate sample, and the Z-variables often some
+sort of auxilairy, inexpensive data. The rows of <code>Z_Sa</code> correspond to
+the rows of <code>X_Sa</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Z_U</code></td>
+<td>
+<p>Object of predictor variables that can be coerced into a matrix.
+The set <em>U</em> is the universal population sample.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Omega_S</code></td>
+<td>
+<p>The covariance structure of <code class="reqn">\boldsymbol{\epsilon}_{S}</code>, up to a constant.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Sigma_Sa</code></td>
+<td>
+<p>The covariance structure of <code class="reqn">\boldsymbol{u}_{Sa}</code>, up to a constant.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>The GHMB assumes two models
+</p>
+<p style="text-align: center;"><code class="reqn">y = \boldsymbol{x} \boldsymbol{\beta} + \epsilon</code>
+</p>
+
+<p style="text-align: center;"><code class="reqn">\boldsymbol{x} \boldsymbol{\beta} = \boldsymbol{z} \boldsymbol{\alpha} + \boldsymbol{u}</code>
+</p>
+
+<p style="text-align: center;"><code class="reqn">\epsilon \perp u</code>
+</p>
+
+<p>For a sample from the superpopulation, the GHMB assumes
+</p>
+<p style="text-align: center;"><code class="reqn">E(\boldsymbol{\epsilon}) = \mathbf{0},
+      E(\boldsymbol{\epsilon} \boldsymbol{\epsilon}^T) = \omega^2 \boldsymbol{\Omega}</code>
+</p>
+
+<p style="text-align: center;"><code class="reqn">E(\boldsymbol{u}) = \mathbf{0},
+      E(\boldsymbol{u} \boldsymbol{u}^T) = \sigma^2 \boldsymbol{\Sigma}</code>
+</p>
+
+
+
+<h3>Value</h3>
+
+<p>A fitted object of class HMB.
+</p>
+
+
+<h3>References</h3>
+
+<p>Saarela, S., Holm, S., Healey, S.P., Andersen, H.-E., Petersson, H., Prentius, W., Patterson, P.L., Næsset, E., Gregoire, T.G. &amp; Ståhl, G. (2018). 
+Generalized Hierarchical Model-Based Estimation for Aboveground Biomass Assessment Using GEDI and Landsat Data, <em>Remote Sensing, 10(11),</em> 1832.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>summary</code>,
+<code>getSpec</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">pop_U    = sample(nrow(HMB_data), 20000)
+pop_Sa   = sample(pop_U, 2500)
+pop_S    = sample(pop_U, 300)
+
+y_S      = HMB_data[pop_S, "GSV"]
+X_S      = HMB_data[pop_S, c("hMAX", "h80", "CRR", "pVeg")]
+X_Sa     = HMB_data[pop_Sa, c("hMAX", "h80", "CRR", "pVeg")]
+Z_Sa     = HMB_data[pop_Sa, c("B20", "B30", "B50")]
+Z_U      = HMB_data[pop_U, c("B20", "B30", "B50")]
+
+Omega_S  = diag(1, nrow(X_S))
+Sigma_Sa = diag(1, nrow(Z_Sa))
+
+ghmb_model = ghmb(
+  y_S, X_S, X_Sa, Z_Sa, Z_U, Omega_S, Sigma_Sa)
+ghmb_model
+</code></pre>
+
+
+</div>

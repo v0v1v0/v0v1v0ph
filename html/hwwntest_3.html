@@ -1,0 +1,316 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>compute.rejection</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Function to compute empirical size or power for various
+tests of white noise. 
+</h2>
+
+<h3>Description</h3>
+
+<p>Can generate white noise sequences, or ARMA time series
+and subject multiple realizations of these to various tests for
+white noise. The function then counts how many have
+been rejected to give some idea of empirical size (if no <code>ar</code>
+or <code>ma</code> term is specified) or power (if such terms are specified). 
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">compute.rejection(ar = NULL, ma = NULL, npow = 100, nom.size = 0.05,
+	ndata = 1024, lapplyfn = lapply, Box.lag = 1, rand.gen = rnorm,
+	hwwn = TRUE, box = TRUE, bartlett = TRUE, 
+	d00test = TRUE, genwwn = TRUE, hywn = TRUE, hywavwn = TRUE,
+	filter.number = 10, family = "DaubExPhase",
+	away.from = "standard", ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>ar</code></td>
+<td>
+<p>Any autoregressive terms to go directly to the
+<code>arima.sim</code> function. Leave as it is if you wish to
+simulate white noise.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ma</code></td>
+<td>
+<p>As <code>ar</code> but for moving average terms.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>npow</code></td>
+<td>
+<p>The number of realizations to carry out. The best
+assessments are carried out with high values of <code>npow</code>,
+e.g. 1000 or even 10000. 
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>nom.size</code></td>
+<td>
+<p>The nominal statistical size of the test. Note: this
+does not change the nomimal size for ALL tests. You need to check
+each help pages for each function to check what can be changed.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ndata</code></td>
+<td>
+<p>The length of the white noise or ARMA realizations.
+Power for both these tests depends on sample size.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>lapplyfn</code></td>
+<td>
+<p>If you have the library <code>parallel</code> and a suitable
+multicore machine then this function can run the realizations
+in parallel. If so, then you can change this argument to
+<code>lapplyfn=mclapply</code> to take advantage of this.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>Box.lag</code></td>
+<td>
+<p>The Box test tests for white noise by examining
+autocorrelation coefficients. This argument specifies the max number
+of autocorrelation coefficients, ie. coefficients from lag 1 up
+to <code>Box.lag</code>.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>rand.gen</code></td>
+<td>
+<p>Alternative innovation generator. By default Gaussian
+innovations are used, but you can specify alternatives to get
+heavy-tailed innovations, for example. 
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>hwwn</code></td>
+<td>
+<p>If TRUE then the <code>hwwn.test</code> will be evaluated,
+if FALSE then it won't be. 
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>box</code></td>
+<td>
+<p>If TRUE then the <code>Box.test</code> will be evaluated,
+if FALSE then it won't be. 
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>bartlett</code></td>
+<td>
+<p>If TRUE then the <code>bartlettB.test</code>
+will be evaluated,
+if FALSE then it won't be. 
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>d00test</code></td>
+<td>
+<p>If TRUE then the <code>d00.test</code>
+will be evaluated, if FALSE then it won't be. 
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>genwwn</code></td>
+<td>
+<p>If TRUE then the <code>genwwn.test</code>
+will be evaluated, if FALSE then it won't be. 
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>hywn</code></td>
+<td>
+<p>If TRUE then the <code>hywn.test</code>
+will be evaluated, if FALSE then it won't be. 
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>hywavwn</code></td>
+<td>
+<p>If TRUE then the <code>hywavwn.test</code>
+will be evaluated, if FALSE then it won't be. 
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>filter.number</code></td>
+<td>
+<p>The number of vanishing moments of wavelets
+used in the general wavelet tests (genwwn, hywn and hywavwn).
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>family</code></td>
+<td>
+<p>Wavelet family, as for <code>filter.number</code> argument.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>away.from</code></td>
+<td>
+<p>The number of finer scales not to use for the
+general wavelet tests. These tests work by relying on the
+asymptotic normality of wavelet coefficients, but this only
+becomes useful away from the finer scales. This argument
+can be an integer in which case it defines the number of fine
+scales to ignore. Alternatively, you can supply the argument
+<code>"standard"</code> which chooses an automatically selected number
+of scales to stay away from which works well up to time series
+in length of 1000. Better performance can be obtained for
+series longer than 1000 by adapting the <code>away.from</code> argument.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Other arguments to <code>hwwn.test</code>.
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>This function repeatedly runs the hypothesis tests on 
+realizations from a stochastic process which can be white
+noise (if <code>ar</code> and <code>ma</code> are <code>NULL</code>) or an ARMA
+process specified by <code>ar</code> and <code>ma</code>. It then counts how
+many times the null was rejected and returns this as proportion
+of the total number of realizations. In this way, this function
+can compute the empirical size and power of the tests.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A list with eight components. Each component is a number, between
+zero and one, which corresponds to the empirical size or power
+of each test. Note, if any component is <code>NULL</code> this means
+that it was not evaluated and was ‘turned off’ in the command
+line by setting its name equal to <code>FALSE</code>.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Delyan Savchev and Guy Nason
+</p>
+
+
+<h3>References</h3>
+
+<p>Nason, G.P. and Savchev, D. (2014) White noise testing using
+wavelets. <em>Stat</em>, <b>3</b>, 351-362.
+<a href="https://doi.org/10.1002/sta4.69">doi:10.1002/sta4.69</a>
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>bartlettB.test</code>,
+<code>d00.test</code>,
+<code>genwwn.test</code>,
+<code>hwwn.test</code>, 
+<code>hywn.test</code>,
+<code>hywavwn.test</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">#
+# Compute empirical size of both tests using 1000 realizations
+# with data of length 32
+#
+answer &lt;- compute.rejection(npow=100, ndata=32)
+#
+# Print the answer
+#
+print(answer)
+#$hwwntest.rejprop
+#[1] 0.03
+#
+#$box.rejprop
+#[1] 0.02
+#
+#$bartlett.rejprop
+#[1] 0.01
+#
+#$d00.pow
+#[1] 0.03
+#
+#$genwwn.pow
+#[1] 0.02
+#
+#$hywn.pow
+#[1] 0.01
+#
+#$hywavwn.pow
+#[1] 0.03
+#
+#
+# So, all empirical sizes should be close to their nominal value of 0.05
+#
+# Now let's try and ascertain the empirical power on an AR(1)
+#
+answer &lt;- compute.rejection(ar=0.8, npow=100, ndata=32)
+#
+# Print the answer
+#
+print(answer)
+#$hwwntest.rejprop
+#[1] 0.79
+#
+#$box.rejprop
+#[1] 0.98
+#
+#$bartlett.rejprop
+#[1] 0.97
+#
+#$d00.pow
+#[1] 0.97
+#
+#$genwwn.pow
+#[1] 0.94
+#
+#$hywn.pow
+#[1] 0.95
+#
+#$hywavwn.pow
+#[1] 0.85
+#
+# Most powers are pretty good. 
+</code></pre>
+
+
+</div>

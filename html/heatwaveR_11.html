@@ -1,0 +1,204 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>geom_lolli</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Visualise a timeline of several event metrics as 'lollipops'.</h2>
+
+<h3>Description</h3>
+
+<p>The function will return a graph of the intensity of the selected
+metric along the *y*-axis versus a time variable along the *x*-axis.
+The number of top events (<code>n</code>) from the chosen metric may be highlighted
+in a brighter colour with the aesthetic value <code>colour_n</code>.
+This function differs in use from <code>lolli_plot</code>
+in that it must be created as a ggplot2 'geom' object. The benefit of this being
+that one may add additional information layer by layer to the figure as
+geoms as necessary.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">geom_lolli(
+  mapping = NULL,
+  data = NULL,
+  ...,
+  n = 0,
+  na.rm = FALSE,
+  show.legend = NA,
+  inherit.aes = TRUE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>mapping</code></td>
+<td>
+<p>Set of aesthetic mappings created by <code>aes()</code> or <code>aes_()</code>. If
+specified and inherit.aes = TRUE (the default), it is combined with the
+default mapping at the top level of the plot. You must supply mapping if
+there is no plot mapping.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>data</code></td>
+<td>
+<p>The data to be displayed in this layer. There are three options:
+</p>
+
+<ol>
+<li>
+<p> If NULL, the default, the data is inherited from the plot data as specified
+in the call to <code>ggplot()</code>.
+</p>
+</li>
+<li>
+<p> A data.frame, or other object, will override the plot data. All objects will
+be fortified to produce a data frame. See <code>fortify()</code> for which variables will
+be created.
+</p>
+</li>
+<li>
+<p> A function will be called with a single argument, the plot data. The return
+value must be a <code>data.frame</code>, and will be used as the layer data.
+</p>
+</li>
+</ol>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>other arguments passed on to <code>layer</code>. These are
+often aesthetics, used to set an aesthetic to a fixed value, like
+<code>color = "red"</code> or <code>size = 3</code>. They may also be parameters
+to the paired geom/stat.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>n</code></td>
+<td>
+<p>The number of top events to highlight as based on the value provided
+to <code>aes(y)</code>. Default is 0.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>na.rm</code></td>
+<td>
+<p>If <code>FALSE</code> (the default), removes missing values with
+a warning. If <code>TRUE</code> silently removes missing values.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>show.legend</code></td>
+<td>
+<p>Logical. Should this layer be included in the legends? <code>NA</code>,
+the default, includes if any aesthetics are mapped. <code>FALSE</code> never includes, and
+<code>TRUE</code> always includes. It can also be a named logical vector to finely select
+the aesthetics to display.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>inherit.aes</code></td>
+<td>
+<p>If <code>FALSE</code>, overrides the default aesthetics, rather
+than combining with them. This is most useful for helper functions that define
+both data and aesthetics and shouldn't inherit behaviour from the default plot
+specification, e.g. <code>borders()</code>.</p>
+</td>
+</tr>
+</table>
+<h3>Aesthetics</h3>
+
+<p><code>geom_lolli</code> understands the following aesthetics (required aesthetics
+are in bold):
+</p>
+
+<ul>
+<li> <p><strong><code>x</code></strong>
+</p>
+</li>
+<li> <p><strong><code>y</code></strong>
+</p>
+</li>
+<li> <p><code>alpha</code>
+</p>
+</li>
+<li> <p><code>color</code>
+</p>
+</li>
+<li> <p><code>linetype</code>
+</p>
+</li>
+<li> <p><code>size</code>
+</p>
+</li>
+<li> <p><code>shape</code>
+</p>
+</li>
+<li> <p><code>stroke</code>
+</p>
+</li>
+<li> <p><code>fill</code>
+</p>
+</li>
+<li> <p><code>colour_n</code> While this value may be used as an aesthetic, it works
+better as a parameter for this function because it is set to use discrete values.
+One may provide continuous values to <code>colour_n</code> but remember that one may
+not provide multiple continuous or discrete scales to a single ggplot2 object.
+Therefore, if one provides a continuous value to <code>aes(colour)</code>, the values
+supplied to <code>colour_n</code> must be discrete. <code>ggplot2</code> will attempt to
+do this automatically.
+</p>
+</li>
+</ul>
+<h3>Author(s)</h3>
+
+<p>Robert W. Schlegel
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>lolli_plot</code> for a non-geom based lolliplot function.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">ts &lt;- ts2clm(sst_WA, climatologyPeriod = c("1983-01-01", "2012-12-31"))
+res &lt;- detect_event(ts)
+mhw &lt;- res$event
+
+library(ggplot2)
+
+# Height of lollis represent event durations and their colours
+# are mapped to the events' cumulative intensity:
+ggplot(mhw, aes(x = date_peak, y = duration)) +
+  geom_lolli(aes(colour = intensity_cumulative)) +
+  scale_color_distiller(palette = "Spectral", name = "Cumulative \nintensity") +
+  xlab("Date") + ylab("Event duration [days]")
+
+# Height of lollis represent event durations and the top three (longest)
+# lollis are highlighted in red:
+ggplot(mhw, aes(x = date_peak, y = duration)) +
+  geom_lolli(n = 3, colour_n = "red") +
+  scale_color_distiller(palette = "Spectral") +
+  xlab("Peak date") + ylab("Event duration [days]")
+
+# Because this is a proper geom, any number of ill-advised things
+# may be done with it:
+ggplot(mhw, aes(x = event_no, y = intensity_max)) +
+  geom_lolli(shape = 5, aes(colour = rate_onset), linetype = "dotted") +
+  scale_color_distiller(palette = "RdYlGn", name = "Rate \nonset") +
+  xlab("Event number") + ylab("Max intensity [degree C]")
+
+</code></pre>
+
+
+</div>

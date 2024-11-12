@@ -1,0 +1,78 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>plotQuantErrorHistogram</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Make the quantization error plots for training and scoring.</h2>
+
+<h3>Description</h3>
+
+<p>This is the function that produces histograms displaying the distribution of Quantization Error (QE) values 
+for both train and test datasets, highlighting mean values with dashed lines for quick evaluation.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">plotQuantErrorHistogram(hvt.results, hvt.scoring)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>hvt.results</code></td>
+<td>
+<p>List. A list of hvt.results obtained from the trainHVT function.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>hvt.scoring</code></td>
+<td>
+<p>List. A list of hvt.scoring obtained from the scoreHVT function.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>Returns the ggplot object containing the quantization error distribution plots for 
+the given HVT results of training and scoring
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Shubhra Prakash &lt;shubhra.prakash@mu-sigma.com&gt;
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>plotHVT</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">data("EuStockMarkets")
+dataset &lt;- data.frame(date = as.numeric(time(EuStockMarkets)),
+                     DAX = EuStockMarkets[, "DAX"],
+                     SMI = EuStockMarkets[, "SMI"],
+                     CAC = EuStockMarkets[, "CAC"],
+                     FTSE = EuStockMarkets[, "FTSE"])
+rownames(EuStockMarkets) &lt;- dataset$date
+#Split in train and test
+train &lt;- EuStockMarkets[1:1302, ]
+test &lt;- EuStockMarkets[1303:1860, ]
+
+hvt.results&lt;- trainHVT(train,n_cells = 60, depth = 1, quant.err = 0.1,
+                      distance_metric = "L1_Norm", error_metric = "max",
+                      normalize = TRUE, quant_method = "kmeans")
+scoring &lt;- scoreHVT(test, hvt.results)
+plotQuantErrorHistogram(hvt.results, scoring) 
+</code></pre>
+
+
+</div>

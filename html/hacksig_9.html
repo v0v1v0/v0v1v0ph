@@ -1,0 +1,105 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hack_cinsarc</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Hack the CINSARC classification</h2>
+
+<h3>Description</h3>
+
+<p>Given a gene expression matrix and a 0-1 vector indicating the distant metastasis
+status of samples, <code>hack_cinsarc()</code> classifies samples into one of two risk
+classes, C1 or C2, using the CINSARC signature as implemented in
+<em>Chibon et al., 2010</em>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hack_cinsarc(expr_data, dm_status)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>expr_data</code></td>
+<td>
+<p>A normalized gene expression matrix (or data frame) with
+gene symbols as row names and samples as columns.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>dm_status</code></td>
+<td>
+<p>A numeric vector specifying whether a sample has either (1)
+or not (0) developed distant metastasis.</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>CINSARC (<em>Complexity INdex in SARComas</em>) is a prognostic 67-gene signature
+related to mitosis and control of chromosome integrity.
+It was developed to improve metastatic outcome prediction in soft tissue
+sarcomas over the FNCLCC (<em>Fédération Francaise des Centres de Lutte Contre
+le Cancer</em>) grading system.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A tibble with one row for each sample in <code>expr_data</code> and two columns:
+<code>sample_id</code> and <code>cinsarc_class</code>.
+</p>
+
+
+<h3>Algorithm</h3>
+
+<p>The CINSARC method implemented in <code>hacksig</code> makes use of leave-one-out cross
+validation (LOOCV) to classify samples into C1/C2 risk groups (see <em>Lesluyes &amp; Chibon, 2020</em>).
+First, gene expression values are centered by their mean across samples.
+Then, for each iteration of the LOOCV, mean normalized gene values are computed
+by metastasis group (i.e. compute the metastatic centroids). Then, one minus the
+Spearman's correlation between centered samples and metastatic centroids are computed.
+Finally, if a sample is more correlated to the non-metastatic centroid, then
+it is assigned to the C1 class (low risk). Conversely, if a sample is more
+correlated to the metastatic centroid, then it is assigned to the C2 class (high risk).
+</p>
+
+
+<h3>Source</h3>
+
+<p><a href="https://codeocean.com/capsule/4933686/tree/v4">codeocean.com/capsule/4933686/tree/v4</a>
+</p>
+
+
+<h3>References</h3>
+
+<p>Chibon, F., Lagarde, P., Salas, S., Pérot, G., Brouste, V., Tirode, F.,
+Lucchesi, C., de Reynies, A., Kauffmann, A., Bui, B., Terrier, P.,
+Bonvalot, S., Le Cesne, A., Vince-Ranchère, D., Blay, J. Y., Collin, F.,
+Guillou, L., Leroux, A., Coindre, J. M., &amp; Aurias, A. (2010). Validated
+prediction of clinical outcome in sarcomas and multiple types of cancer on
+the basis of a gene expression signature related to genome complexity.
+<em>Nature medicine</em>, 16(7), 781–787. doi: <a href="https://doi.org/10.1038/nm.2174">10.1038/nm.2174</a>.
+</p>
+<p>Lesluyes, T., &amp; Chibon, F. (2020). A Global and Integrated
+Analysis of CINSARC-Associated Genetic Defects. <em>Cancer research</em>, 80(23),
+5282–5290. doi: <a href="https://doi.org/10.1158/0008-5472.CAN-20-0512">10.1158/0008-5472.CAN-20-0512</a>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># generate random distant metastasis outcome
+set.seed(123)
+test_dm_status &lt;- sample(c(0, 1), size = ncol(test_expr), replace = TRUE)
+
+hack_cinsarc(test_expr, test_dm_status)
+</code></pre>
+
+
+</div>

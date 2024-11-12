@@ -1,0 +1,95 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>tparams_mean</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Predicted means</h2>
+
+<h3>Description</h3>
+
+<p>Create a list containing means predicted from a statistical model.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">tparams_mean(value, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>value</code></td>
+<td>
+<p>Matrix of samples from the distribution of the
+mean. Columns denote random samples and rows denote means for different
+observations.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Arguments to pass to id_attributes. Each row in
+<code>value</code> must be a prediction for a <code>strategy_id</code>,
+<code>patient_id</code>, <code>state_id</code>, and optionally <code>time_id</code> combination.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>An object of class <code>tparams_mean</code>, which is a list containing <code>value</code>,
+<code>n_samples</code>, and the ID attributes passed to id_attributes.
+</p>
+
+
+<h3>Note</h3>
+
+<p>The <code>tparams_mean()</code> constructor would not normally be used by users; instead,
+a <code>tparams_mean</code> object is typically created automatically as part of the
+<code>StateVals</code> class with <code>create_StateVals()</code>.
+</p>
+
+
+<h3>See Also</h3>
+
+<p>A <code>tparams_mean</code> object is a type of transformed parameter
+object and is a supported class type of the <code>params</code> field of the <code>StateVals</code>
+class. See the documentation for <code>create_StateVals()</code> and <code>stateval_tbl()</code>
+for examples of how to create<code>StateVals</code> objects. Predicted means can be
+summarized across parameter samples using <code>summary.tparams_mean()</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R"># Setup model
+hesim_dat &lt;- hesim_data(
+  strategies = data.frame(strategy_id = c(1, 2)),
+  patients = data.frame(patient_id = c(1, 2)),
+  states = data.frame(
+    state_id = c(1, 2, 3),
+    state_name = c("state1", "state2", "state3")
+  )
+)
+
+# Cost model
+cost_tbl &lt;- stateval_tbl(
+  data.frame(strategy_id = hesim_dat$strategies$strategy_id,
+             mean = c(5000, 3000),
+             se = c(200, 100)
+            ),
+  dist = "gamma"
+)
+costmod &lt;- create_StateVals(cost_tbl, n = 2, hesim_data = hesim_dat)
+
+# The 'params' field of the `StateVals` class is a tparams_mean object
+class(costmod$params)
+costmod$params
+summary(costmod$params)
+</code></pre>
+
+
+</div>

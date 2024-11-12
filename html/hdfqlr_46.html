@@ -1,0 +1,113 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>hql_write</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Write HDF Dataset or Attribute</h2>
+
+<h3>Description</h3>
+
+<p>Write a dataset or attribute to an HDF file.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">hql_write_dataset(
+  dataset,
+  path,
+  include.attributes = TRUE,
+  overwrite = FALSE,
+  parallel = FALSE
+)
+
+hql_write_attribute(attribute, path, overwrite = FALSE, parallel = FALSE)
+
+hql_write_all_attributes(attributes, path, overwrite = FALSE, parallel = FALSE)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>dataset</code></td>
+<td>
+<p>The dataset to write. The object must be coercible
+to an array.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>path</code></td>
+<td>
+<p>The location within the HDF file to write the dataset or attribute(s).</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>include.attributes</code></td>
+<td>
+<p>If <code>TRUE</code>, write the dataset attributes.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>overwrite</code></td>
+<td>
+<p>If <code>TRUE</code>, overwrite existing dataset or attribute.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>parallel</code></td>
+<td>
+<p>Use parallel processing functionality.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>attribute</code></td>
+<td>
+<p>The attribute to write.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>attributes</code></td>
+<td>
+<p>A list of attributes to write.</p>
+</td>
+</tr>
+</table>
+<h3>Functions</h3>
+
+
+<ul>
+<li> <p><code>hql_write_dataset</code>: Write a dataset to an HDF file.
+</p>
+</li>
+<li> <p><code>hql_write_attribute</code>: Write an attribute to an HDF file.
+</p>
+</li>
+<li> <p><code>hql_write_all_attributes</code>: Write multiple attributes to an HDF file.
+</p>
+</li>
+</ul>
+<h3>Examples</h3>
+
+<pre><code class="language-R">if(hql_is_loaded()){
+  tf = tempfile(fileext = ".h5")
+  hql_create_file(tf)
+
+  hql_use_file(tf)
+  x = matrix(rnorm(100), nrow = 20)
+  hql_write_dataset(x, "dataset0")
+  hql_write_attribute("normal", "dataset0/dist")
+
+  y = month.name
+  attr(y, "abbreviation") = month.abb
+  hql_write_dataset(y, "group1/dataset1")
+
+  hql_close_file(tf)
+}
+
+</code></pre>
+
+
+</div>

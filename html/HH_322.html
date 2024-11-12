@@ -1,0 +1,180 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>multicomp.order</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Update a multicomp object by ordering its contrasts.</h2>
+
+<h3>Description</h3>
+
+<p>Update a multicomp object by ordering its contrasts.
+The default <code>sort.by = "height"</code> matches the order in the MMC plot.
+An alternate <code>sort.by = "estimate"</code> matches the order of the
+half-normal plot.  Or the argument <code>sort.order</code> can be used
+to specify any other order.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">multicomp.order(mca, sort.by = "height", sort.order = NULL)
+
+multicomp.label.change(x, old="adj", new="new", how.many=2)
+
+## S3 method for class 'multicomp'
+multicomp.label.change(x, old="adj", new="new", how.many=2)
+
+## S3 method for class 'mmc.multicomp'
+multicomp.label.change(x, old="adj", new="new", how.many=2)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>mca</code></td>
+<td>
+<p><code>"multicomp"</code> object.  This is the result of
+<code>multicomp</code> in S-Plus or the result from applying <code>as.multicomp</code> to
+a <code>"glht"</code> object in R.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sort.by</code></td>
+<td>
+<p>Either <code>"height"</code> or <code>"estimate"</code>.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>sort.order</code></td>
+<td>
+<p>Vector of indices by which the contrasts are to be
+sorted.  When <code>sort.order</code> in non-<code>NULL</code>, it is used.</p>
+</td>
+</tr>
+</table>
+<table>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p><code>"multicomp"</code> object.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>old</code></td>
+<td>
+<p>character string to be removed from contrast names.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>new</code></td>
+<td>
+<p>replacement character string to be inserted in contrast names.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>how.many</code></td>
+<td>
+<p>number of times to make the replacement.</p>
+</td>
+</tr>
+</table>
+<h3>Value</h3>
+
+<p>The result is a <code>"multicomp"</code> object containing the same
+contrasts as the argument.<br><code>multicomp.order</code> sorts the contrasts
+(and renames them consistently) according to the specifications.<br><code>multicomp.label.change</code>
+changes the contrast names according to the specifications.
+</p>
+<p>When <code>sort.by=="height"</code>, sort the contrasts by the reverse order
+of the heights.  This provides a <code>"multicomp"</code> object that will be
+plotted by <code>plot.multicomp</code> in the same order used by<br><code>mmcplot</code> or the older <code>plot.mmc.multicomp</code>.  If there is not <code>"height"</code> component,
+the original <code>"multicomp"</code> object is returned.
+</p>
+<p>When <code>sort.by=="estimate"</code>, sort the contrasts by the reverse order
+of the contrast estimates.  This provides the same order as the
+half-normal plot.
+</p>
+<p>When <code>sort.order</code> in non-<code>NULL</code>, sort the contrasts in
+that order.
+</p>
+
+
+<h3>Note</h3>
+
+<p>S-Plus use the <code>multicomp</code> functions
+and R uses the <code>multcomp</code> package.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p> Richard M. Heiberger &lt;rmh@temple.edu&gt; </p>
+
+
+<h3>References</h3>
+
+<p>Heiberger, Richard M. and Holland, Burt (2015).
+<em>Statistical Analysis and Data Display: An Intermediate Course with Examples in R</em>.
+Second Edition.
+Springer-Verlag, New York.
+<a href="https://link.springer.com/book/10.1007/978-1-4939-2122-5">https://link.springer.com/book/10.1007/978-1-4939-2122-5</a>
+</p>
+<p>Heiberger, Richard M. and Holland, Burt (2006).
+"Mean–mean multiple comparison displays for families of linear contrasts."
+<em>Journal of Computational and Graphical Statistics</em>, 15:937–955.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>MMC</code>, <code>as.glht in R</code>,
+<code>multicomp.reverse</code></p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## continue with the example in mmc in R, or multicomp.mmc in S-Plus
+data(catalystm)
+
+catalystm1.aov &lt;- aov(concent ~ catalyst, data=catalystm)
+
+if.R(r={
+catalystm.mca &lt;-
+   glht(catalystm1.aov, linfct = mcp(catalyst = "Tukey"))
+print(confint(catalystm.mca))
+
+catalystm.mmc &lt;-
+   mmc(catalystm1.aov, linfct = mcp(catalyst = "Tukey"))
+## the contrasts have been ordered by height (see ?MMC),
+## which in this example corresponds to sort.order=c(1,2,4,3,5,6),
+## and reversed, to make the contrast Estimates positive.
+print(as.glht(catalystm.mmc$mca))
+
+## ## For consistency with the S-Plus example,
+## ## we change all factor level "A" to "control".
+## as.glht(multicomp.label.change(catalystm.mmc$mca, "A", "control"))
+},s={
+catalystm.mca &lt;-
+   multicomp(catalystm1.aov, method="Tukey")
+print(catalystm.mca)
+
+catalystm.mmc &lt;-
+   multicomp.mmc(catalystm1.aov, method="Tukey", plot=FALSE)
+## the contrasts have been ordered by height (see ?MMC),
+## which in this example corresponds to sort.order=c(1,2,4,3,5,6),
+## and reversed, to make the contrast Estimates positive.
+print(catalystm.mmc$mca)
+
+## S-Plus multicomp already uses simple names.  This function is
+## therefore used in more complex two-way ANOVA examples.  We illustrate
+## here by changing all factor level "A" to "control".
+print(multicomp.label.change(catalystm.mmc$mca, "A", "control"))
+})
+
+</code></pre>
+
+
+</div>

@@ -1,0 +1,71 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>transform.h2o4gpu_model</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Transform a Dataset using Trained H2O4GPU Estimator</h2>
+
+<h3>Description</h3>
+
+<p>This function transforms the given new data using a trained H2O4GPU model.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">## S3 method for class 'h2o4gpu_model'
+transform(object, x, ...)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>object</code></td>
+<td>
+<p>The h2o4gpu model object</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>x</code></td>
+<td>
+<p>The new data where each column represents a different predictor variable to
+be used in generating predictions.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>...</code></td>
+<td>
+<p>Additional arguments (unused for now).</p>
+</td>
+</tr>
+</table>
+<h3>Examples</h3>
+
+<pre><code class="language-R">## Not run: 
+
+library(h2o4gpu)
+
+# Prepare data
+iris$Species &lt;- as.integer(iris$Species) # convert to numeric data
+
+# Randomly sample 80% of the rows for the training set
+set.seed(1)
+train_idx &lt;- sample(1:nrow(iris), 0.8*nrow(iris)) 
+train &lt;- iris[train_idx, ]
+test &lt;- iris[-train_idx, ]
+
+# Train a K-Means model
+model_km &lt;- h2o4gpu.kmeans(n_clusters = 3L) %&gt;% fit(train)
+
+# Transform test data
+test_dist &lt;- model_km %&gt;% transform(test)
+
+
+## End(Not run)
+</code></pre>
+
+
+</div>

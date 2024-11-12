@@ -1,0 +1,227 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>mgss</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>
+compute a multi-goal security strategy</h2>
+
+<h3>Description</h3>
+
+<p>Finds security strategy that assures a maximal loss w.r.t. all goals of the given game, delivering a Pareto-efficient loss bound. Internally, it constructs an auxiliary one-against-all game and uses a sequence of linear programs to compute a lexicographic Nash equilibrium therein (Rass et al., 2022), using the methods described by (Lozovanu et al 2005; Rass, Wiegele &amp; König 2020).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">mgss(G, weights, cutOff, ord = 5, fbr = FALSE, points = 512, tol = 0.0)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>G</code></td>
+<td>
+
+<p>a multi-objective game constructed using <code>mosg</code>
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>weights</code></td>
+<td>
+
+<p>each goal in <code>G</code> can be assigned a weight to reflect its priority. If missing, the weights default to be all equal. The weights do not need to sum up to 1 (and are normalized towards a unit sum otherweise), but need to be all non-negative.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>cutOff</code></td>
+<td>
+
+<p>(only used for continuous loss distributions) the maximal loss for which no events are expected or otherwise the risk of exceeding <code>cutOff</code> are accepted. If missing, this value defaults to the maximal observation on which the loss distributions were constructed (equivalently, the right end of their common support).
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>ord</code></td>
+<td>
+
+<p>the order up to which a continuous loss distribution shall be approximated. This value may be set to high orders when it is necessary to distinguish distributions that are similar at the tails.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>fbr</code></td>
+<td>
+
+<p>if set to <code>TRUE</code>, instruct the function to additionally compute the  best replies regarding each goal individually, assuming that defender plays <code>optimalDefense</code> as a leader, and the attacker per goal follows (follower's best reply). These replies are always pure strategies.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>points</code></td>
+<td>
+
+<p>the number of points at which the resulting equilibrium loss distributions are evaluated numerically.
+</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tol</code></td>
+<td>
+
+<p>occasionally, it was observed that the internal linear programs failed due to roundoff errors; in these cases, the function reported an "internal error" on the LP failure. In that case, one can supply a tolerance to go into the optimization to avoid such roundoff problems. By default, the tolerance is set to zero, to search for an "exact" solution, though. The GLPK status given in the error message refers to the codes for the GNU Linear Programming Kit, given at <a href="https://rdrr.io/cran/glpkAPI/man/glpkConstants.html">https://rdrr.io/cran/glpkAPI/man/glpkConstants.html</a>.
+</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>For continuous loss distributions, the function uses a Gaussian kernel density approximation (constructed using the function <code>lossDistribution</code>), and computes a Taylor-polynomial approximation at the <code class="reqn">x</code> equal to <code>cutOff</code> for each distribution up to order <code>ord</code>. Preferences are decided using the methods described by (Rass, König and Schauer; 2022), and (Rass, König, Schauer, Bürgin, Epperlein and Wirth; 2021), using sign-alternating derivatives, representing a distribution by a vector with <code>ord</code> elements. Categorical distributions are represented likewise directly by the vector of their probability masses. In both cases, preferences are decided by a lexicographic comparison of vector-representations. The returned optima are Nash equilibria for single-goal games, and lexicographic Nash equilibria for multi-goal games. Constructing a game using <code>mosg</code> with vectors in the payoff description can, consequently, allows to use <code>mgss</code> to compute optimal results with explicit goal priorities in multi-criteria games.
+</p>
+
+
+<h3>Value</h3>
+
+<p>An object of class <code>mosg.equilibrium</code>, containing the following fields:
+</p>
+<table>
+<tr style="vertical-align: top;">
+<td><code>optimalDefense</code></td>
+<td>
+<p>a discrete probability distribution over the action space of player 1 (defender)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>optimalAttacks</code></td>
+<td>
+<p>a discrete probability distribution over the action space of player 2 (attacker). Note that this is <em>not</em> a best-response to the player 1's <code>optimalDefense</code>, but rather the best that the attacker could
+do if the game were <em>just about the particular goal</em> that the attacker refers to. This worst-case scenario assumes that the defender would focus all its efforts to that single goal.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>assurances</code></td>
+<td>
+<p>a list of loss distributions valid under the assumption that player 1 adheres to the <code>optimalDefense</code> distribution in its randomized action choices, while the opponent plays its own zero-sum equilibrium strategy in the game that is only (and exclusively) about this particular goal. This value has to be interpreted with care, as it assumes that player 1 would put all efforts into a defense for the particular goal, but in reality, will have multiple criteria to simultaneously optimize.
+This means that the attacker, in turn, could adapt to the <code>optimalDefense</code> of player 1, to cause more damage. The given assurance is thus only an upper bound of the worst-possible damage, under the assumption that player 1 would focus only on this particular goal.
+</p>
+<p>The list can be accessed by the names for each goal as specified through the input <code>mosg</code> object <code>G</code>. Each distribution within <code>assurances</code> is a mixed loss distribution constructed using <code>lossDistribution</code></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>br_to_optimalDefense</code></td>
+<td>
+<p>This is a vector of best replies per goal for a leading defender playing the fixed strategy <code>optimalDefense</code>, and letting the adversary (player 2) follow. It is the (stochastically largest) damage among <code class="reqn">optimalDefense^T\cdot A_p</code>, when <code class="reqn">A_p</code> is the game structure for the <code class="reqn">p</code>-th goal; the vector <code>br_to_optimalDefense</code> contains the indices of the individually best replies, pointing into the list of attack strategies.</p>
+</td>
+</tr>
+</table>
+<h3>Note</h3>
+
+<p>The output loss distributions (accessible by the list <code>assurances</code>) cannot be used to construct a subsequent game (see <code>mosg</code>), since continuous distributions are represented as a sequence of points, rather than raw data or probability masses.
+</p>
+<p>As of version 2.0.0 of the package, this function is no longer downwards compatible to earlier versions of itself, since the method of computation (formerly fictitious play) was replaced by linear programming to give exact solutions rather than approximations. Consequently, the parameters <code>T</code> (iteration count) and <code>eps</code> (accuracy) have become useless and have been removed after version 1.0.4.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Sandra Koenig, Stefan Rass
+</p>
+
+
+<h3>References</h3>
+
+<p>S. Rass, S. König, S. Schauer: Games over Probability Distributions Revisited: New Equilibrium Models and Refinements, MDPI Games 2022, 13(6), 80; DOI: https://doi.org/10.3390/g13060080, online: https://www.mdpi.com/2073-4336/13/6/80
+</p>
+<p>S. Rass, S. König, S. Schauer, V. Bürgin, J. Epperlein, F. Wirth: On Game Theory Using Stochastic Tail Orders, arXiv:2108.00680v1 [math.PR], 2021
+</p>
+<p>S. Rass, A. Wiegele, S. König: Security Games over Lexicographic Orders, in: Decision and Game Theory for Security, 11th International Conference, GameSec 2020, College Park, MD, USA, October 28–30, 2020, Proceedings, Springer LNCS 12513, ISBN 978-3-030-64792-6
+</p>
+<p>S. Rass, S. König, S. Schauer. Decisions with Uncertain Consequences-A Total Ordering on Loss-Distributions. PLoS ONE 11, e0168583. 2016, https://doi.org/10.1371/journal.pone.0168583
+</p>
+<p>S. Rass. On Game-Theoretic Risk Management (Part One). Towards a Theory of
+Games with Payoffs that are Probability-Distributions. June 2015.
+http://arxiv.org/abs/1506.07368.
+</p>
+<p>S. Rass. On Game-Theoretic Risk Management (Part Two). Algorithms to Compute Nash-Equilibria in Games with Distributions as Payoffs, 2015, arXiv:1511.08591v1 [q-fin.EC].
+</p>
+<p>D. Lozovanu, D. Solomon, and A. Zelikovsky. Multiobjective games and determining
+pareto-nash equilibria. Buletinul Academiei de Stiinte a Republicii Moldova
+Matematica, 3(49):115-122, 2005. ISSN 1024-7696.
+</p>
+
+
+
+<h3>See Also</h3>
+
+<p>A brief info on the results can be obtained by <code>print.mosg.equilibrium</code>, and a more detailed summary (showing all loss distributions in detail) is obtained by <code>summary.mosg.equilibrium</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="language-R">## raw data (PURELY ARTIFICIAL, for demo purposes only)
+# N=100 observations in each category
+obs111&lt;-c(rep(1,40),rep(3,20),rep(5,10),rep(7,20),rep(9,10));
+obs112&lt;-c(rep(1,50),rep(2,10),rep(4,10),rep(6,20),rep(8,10));
+obs121&lt;-c(rep(1,20),rep(4,30),rep(6,20),rep(8,10),rep(10,20));
+obs122&lt;-c(rep(1,40),rep(2.5,20),rep(5,20),rep(7.5,10),rep(9,10));
+obs211&lt;-c(rep(1,30),rep(2,30),rep(5,10),rep(8,10),rep(10,20));
+obs212&lt;-c(rep(1,10),rep(2,10),rep(4,20),rep(7,20),rep(10,40));
+obs221&lt;-c(rep(1,30),rep(3,30),rep(4,10),rep(7,20),rep(9,10));
+obs222&lt;-c(rep(1,10),rep(3,10),rep(5,50),rep(8,20),rep(10,10));
+obs311&lt;-c(rep(1,40),rep(2,30),rep(4,10),rep(7,10),rep(9,10));
+obs312&lt;-c(rep(1,20),rep(3,20),rep(4,20),rep(7,20),rep(10,20));
+obs321&lt;-c(rep(1,10),rep(3,40),rep(4,30),rep(7,10),rep(9,10));
+obs322&lt;-c(rep(1,10),rep(4,30),rep(5,30),rep(7,10),rep(10,20));
+
+## compute payoff densities
+f111&lt;-lossDistribution(obs111)
+f112&lt;-lossDistribution(obs112)
+f121&lt;-lossDistribution(obs121)
+f122&lt;-lossDistribution(obs122)
+f211&lt;-lossDistribution(obs211)
+f212&lt;-lossDistribution(obs212)
+f221&lt;-lossDistribution(obs221)
+f222&lt;-lossDistribution(obs222)
+f311&lt;-lossDistribution(obs311)
+f312&lt;-lossDistribution(obs312)
+f321&lt;-lossDistribution(obs321)
+f322&lt;-lossDistribution(obs322)
+
+payoffs&lt;-list(f111,f112,f121, f122,f211,f212,f221,f222, f311,f312,f321,f322)
+G &lt;- mosg( n=2,
+            m=2,
+            payoffs,
+            goals=3,
+            goalDescriptions=c("g1", "g2", "g3"),
+            defensesDescr = c("d1", "d2"),
+            attacksDescr = c("a1", "a2"))
+eq &lt;- mgss(G,weights=c(0.25,0.5,0.25))
+print(eq)
+summary(eq)
+
+# construct another loss distribution from a given behavior in the game G
+suboptimal &lt;- lossDistribution.mosg(G, c(0.1,0.1,0.8), c(0.2,0.3,0.5))
+plot(suboptimal)
+
+# compute an equilibrium in a standard matrix game
+#     [,1] [,2]
+#[1,]    3    4
+#[2,]    6    1
+G &lt;- mosg(n = 2, m = 2, goals = 1,
+          losses = list(3,6,4,1), byrow=FALSE,
+          attacksDescr = c("a1", "a2"))
+mgss(G, fbr=TRUE)  # compute an equilibrium, including best replies if the adversary is a follower
+
+# get best replies if there would be a following
+# adversary per goal (taking the defender as a leader)
+G$attacksDescriptions[eq$br_to_optimalDefense]
+</code></pre>
+
+
+</div>

@@ -1,0 +1,222 @@
+<div class="container">
+
+<table style="width: 100%;"><tr>
+<td>benchmark_httk</td>
+<td style="text-align: right;">R Documentation</td>
+</tr></table>
+<h2>Assess the current performance of httk relative to historical benchmarks</h2>
+
+<h3>Description</h3>
+
+<p>The function performs a series of "sanity checks" and predictive performance
+benchmarks so that the impact of changes to the data, models, and 
+implementation of the R package can be tested. Plots can be generated showing 
+how the performance of the current version compares with past releases of
+httk.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class="language-R">benchmark_httk(
+  basic.check = TRUE,
+  calc_mc_css.check = TRUE,
+  in_vivo_stats.check = TRUE,
+  tissuepc.check = TRUE,
+  suppress.messages = TRUE,
+  make.plots = TRUE
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table>
+<tr style="vertical-align: top;">
+<td><code>basic.check</code></td>
+<td>
+<p>Whether to run the basic checks, including uM and 
+mg/L units for <code>calc_analytic_css</code>, <code>calc_mc_css</code>, 
+and <code>solve_pbtk</code> as well as 
+the number of chemicals with sufficient data to run the steady_state model 
+(defaults to TRUE)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>calc_mc_css.check</code></td>
+<td>
+<p>Whether to check the Monte Carlo sample. A 
+comparison of the output of <code>calc_mc_css</code> to the SimCyp outputs 
+reported in 
+the Wetmore et al. (2012,2015) papers is performed. A comparison between the
+output of <code>calc_analytic_css</code> (no Monte Carlo) to the median of the output of
+<code>calc_mc_css</code> is also performed. (defaults to TRUE)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>in_vivo_stats.check</code></td>
+<td>
+<p>Whether to compare the outputs of 
+<code>calc_mc_css</code>
+and <code>calc_tkstats</code> to in vivo measurements of Css, AUC, and 
+Cmax collected
+by Wambaugh et al. (2018). (defaults to TRUE)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>tissuepc.check</code></td>
+<td>
+<p>Whether to compare the tissue-specific partition
+coefficient predictions from the calibrated Schmitt (2008) model to the 
+in vivo data-derived estimates compiled by Pearce et al. (2017). (defaults 
+to TRUE)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>suppress.messages</code></td>
+<td>
+<p>Whether or not output messages are suppressed
+(defaults to TRUE)</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td><code>make.plots</code></td>
+<td>
+<p>Whether current benchmarks should be plotted with 
+historical performance (defaults to TRUE)</p>
+</td>
+</tr>
+</table>
+<h3>Details</h3>
+
+<p>Historically some refinements made to one aspect of httk have unintentionally
+impacted other aspects. Most notably errors have occasionally been introduced 
+with respect to units (v1.9, v2.1.0). This benchmarking tool is intended to
+reduce the chance of these errors occurring in the future.
+</p>
+<p>Past performance was retroactively evaluated by manually installing previous 
+versions of 
+the package from <a href="https://cran.r-project.org/src/contrib/Archive/httk/">https://cran.r-project.org/src/contrib/Archive/httk/</a> and
+then adding the code for <code>benchmark_httk</code> at the command line
+interface. 
+</p>
+<p>The basic tests are important – if the output units for key functions are wrong, not
+much can be right. Past unit errors were linked to an incorrect unit 
+conversions made within an individual function. Since the usage of 
+<code>convert_units</code> became standard throughout httk,
+unit problems are hopefully less likely.
+</p>
+<p>There are two Monte Carlo tests. One compares <code>calc_mc_css</code> 95th percentile
+steady-state plasma concentrations for a 1 mg/kg/day exposure
+against the Css values calculated by SimCyp and reported in Wetmore et al.
+(2012,2015). These have gradually diverged as the assumptions for httk have
+shifted to better describe non-pharmaceutical, commercial chemicals.
+</p>
+<p>The in vivo tests are in some ways the most important, as they establish the
+overall predictability for httk for Cmax, AUC, and Css. The in vivo 
+statistics are currently based on comparisons to the in vivo
+data compiled by Wambaugh et al. (2018). We see that when the tissue
+partition coefficient calibrations were introduced in v1.6 that the
+overall predictability for in vivo endpoints was reduced (increased RMSLE).
+If this phenomena continues as new in vivo evaluation data become available,
+we may need to revisit whether evaluation against experimentally-derived 
+partition coefficients can actually be used for calibration, or just merely
+for establishing confidence intervals.
+</p>
+<p>The partition coefficient tests provide an important check of the httk
+implementation of the Schmitt (2008) model for tissue:plasma equilibrium 
+distribution. These predictions heavily rely on accurate description of 
+tissue composition and the ability to predict the ionization state of the
+compounds being modeled.
+</p>
+
+
+<h3>Value</h3>
+
+<p>named list, whose elements depend on the selected checks
+</p>
+
+<table>
+<tr>
+<td style="text-align: left;">
+  basic </td>
+<td style="text-align: left;"> A list with four metrics:
+ N.steadystate -- Number of chemicals with sufficient data for steady-state IVIVE
+    calc_analytic.units -- Ratio of mg/L to uM * 1000 / molecular weight -- should be 1
+    calc_mc.units -- Ratio should be 1
+    solve_pbtk.units -- Ratio should be 1 </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+
+  calc_mc_css </td>
+<td style="text-align: left;"> A list with four metrics:
+RMSLE.Wetmore -- Root mean squared log10 error (RMSLE) in predicted Css between literature values (SimCyp, Wetmore et al. 2012,2015) and <code>calc_mc_css</code>
+N.Wetmore -- Number of chemicals in Wetmore comparison
+RMSLE.noMC -- RMSLE between <code>calc_analytic_css</code> and <code>calc_mc_css</code>
+    N.noMC -- Number of chemicals in noMC comparison </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+
+  in_vivo_stats </td>
+<td style="text-align: left;"> A list with two metrics:
+RMSLE.InVivoCss -- RMSLE between the predictions of <code>calc_analytic_css</code> and in vivo estimates of Css
+N.InVivoCss -- Number of chemicals in comparison </td>
+</tr>
+<tr>
+<td style="text-align: left;">                    
+  
+  units.plot </td>
+<td style="text-align: left;"> A ggplot2 figure showing units tests of various functions. 
+Output is generated for mg/L and uM, and then the ratio mg/L/uM*1000/MW is
+calculated. If the units are correct the ratio should be 1 (within the 
+precision of the functions -- usually four significant figures). </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+
+  invivo.rmsle.plot </td>
+<td style="text-align: left;"> A ggplot2 figure comparing
+model predictions to in vivo measured values. 
+Output generated is the root mean square log10 error for parameters estimated
+by the package. </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+
+  model.rmsle.plot </td>
+<td style="text-align: left;"> A ggplot2 figure comparing various functions values
+against values predicted by other models (chiefly SimCyp predictions from
+Wetmore et al. 2012 and 2015. 
+Output generated is the root mean square log10 error for parameters estimated
+by the package. </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+
+  count.plot </td>
+<td style="text-align: left;"> A ggplot2 figure showing count of chemicals of various functions. 
+Output generated is a count of the chemicals available for the each of the
+parameters estimated by and used for benchmarking the package. </td>
+</tr>
+<tr>
+<td style="text-align: left;">
+</td>
+</tr>
+</table>
+<h3>Author(s)</h3>
+
+<p>John Wambaugh
+</p>
+
+
+<h3>References</h3>
+
+<p>Davidson-Fritz SE, Evans MV, Chang X, Breen M, Honda GS, Kenyon E, Linakis MW, Meade A, Pearce RG, Purucker T, Ring CL, Sfeir MA, Setzer RW, Sluka JP, Vitense K, Devito MJ, Wambaugh JF (2023).
+“Transparent and Evaluated Toxicokinetic Models for Bioinformatics and Public Health Risk Assessment.”
+Unpublished.
+</p>
+
+
+</div>
